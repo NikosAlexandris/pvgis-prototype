@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 # Use VCS tags as the sole authority on versions.  Dynamically determine the current
 # version from VCS tags:
 # https://github.com/pypa/setuptools_scm#pyprojecttoml-usage
-write_to = "src/pvgiscore/version.py"
+write_to = "pvgisprototype/version.py"
 # Uncomment to test uploading to PyPI locally
 # local_scheme = "no-local-version"
 [tool.commitizen]
@@ -32,8 +32,8 @@ build(release): Version $current_version → $new_version
 """
 [tool.towncrier]
 # https://towncrier.readthedocs.io/en/stable/#quick-start
-package = "pvgiscore"
-package_dir = "src"
+package = "pvgisprototype"
+package_dir = "pvgisprototype"
 name = "pvgis-prototype"
 
 [tool.pylint.MASTER]
@@ -45,8 +45,8 @@ output-format = "colorized"
 ignore-paths = [
 # Managed by tools, best to use `# pylint: disable=...` inline comments for any other
 # ignores.
-    "src/.+/version.py",
-    ".*/src/.+/version.py",
+    ".+/version.py",
+    ".*/.+/version.py",
 ]
 # Extend linting to usage of trusted extension packages
 extension-pkg-allow-list = ["lxml"]
@@ -67,7 +67,7 @@ ignore_missing_imports = true
 
 [tool.vulture]
 # https://github.com/jendrikseipp/vulture#ignoring-files
-exclude = ["src/pvgiscore/version.py"]
+exclude = ["pvgisprototype/version.py"]
 
 [tool.isort]
 # Match Black's defaults
