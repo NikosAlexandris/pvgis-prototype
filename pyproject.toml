@@ -73,3 +73,13 @@ exclude = ["pvgisprototype/version.py"]
 # Match Black's defaults
 # https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort
 profile = "black"
+
+
+[tool.pytest.ini_options]
+addopts = "-ra --verbose --showlocals --tb=short"
+testpaths = ["tests"]
+log_cli = true
+filterwarnings = [
+    'ignore:distutils Version classes are deprecated. Use packaging.version instead:DeprecationWarning',
+    'ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning',
+]
