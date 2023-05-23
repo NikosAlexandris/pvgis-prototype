@@ -5,6 +5,8 @@ import pytest
 from datetime import datetime, timedelta
 
 
+# (longitude, latitude)
+EU_GEOMETRIC_CENTER_POST_BREXIT = (9.902056, 49.843)
 @pytest.fixture
 def path_to_data():
     return pathlib.Path('data')
@@ -40,11 +42,11 @@ def create_minimal_netcdf(path_to_data):
     # Create the longitude and latitude variables
     lon_var = dataset.createVariable("lon", np.float32, ("lon",))
     lon_var.units = "degrees_east"
-    lon_var[:] = [9.902056]  # Set the longitude value
+    lon_var[:] = [EU_GEOMETRIC_CENTER_POST_BREXIT[0]]  # Set the longitude value
 
     lat_var = dataset.createVariable("lat", np.float32, ("lat",))
     lat_var.units = "degrees_north"
-    lat_var[:] = [49.843]  # Set the latitude value
+    lat_var[:] = [EU_GEOMETRIC_CENTER_POST_BREXIT[1]]  # Set the latitude value
 
     # Create the temperature variable
     temp_var = dataset.createVariable("t2m", np.float32, ("time", "lat", "lon"))
