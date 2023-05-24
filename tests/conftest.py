@@ -7,6 +7,12 @@ from datetime import datetime, timedelta
 
 # (longitude, latitude)
 EU_GEOMETRIC_CENTER_POST_BREXIT = (9.902056, 49.843)
+LONGITUDE_LOW=math.floor(EU_GEOMETRIC_CENTER_POST_BREXIT[0])
+LONGITUDE_HIGH=math.ceil(EU_GEOMETRIC_CENTER_POST_BREXIT[0])
+LATITUDE_LOW=math.floor(EU_GEOMETRIC_CENTER_POST_BREXIT[1])
+LATITUDE_HIGH=math.ceil(EU_GEOMETRIC_CENTER_POST_BREXIT[1])
+
+
 @pytest.fixture
 def path_to_data():
     return pathlib.Path('data')
