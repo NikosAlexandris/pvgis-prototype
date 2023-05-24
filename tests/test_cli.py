@@ -2,6 +2,7 @@ import pathlib
 import pytest
 from typer.testing import CliRunner
 from pvgisprototype.cli import app
+from .test_expected_output import EU_CENTER_LOCATION_VALUES
 
 
 runner = CliRunner()
@@ -10,8 +11,9 @@ runner = CliRunner()
 @pytest.mark.parametrize(
         'filename, longitude, latitude, expected_output',
         [
-            (pathlib.Path('data/era5_2m_temperature_2020_band_4381.nc'), 10, 10, 303.93634033203125),
-            (pathlib.Path('data/era5_2m_temperature_2020_band_4381.nc'), 9.902056, 49.843, 298.97149658203125),
+            (pathlib.Path('tests/data/era5_2m_temperature_2020_band_4381.nc'), 10, 10, 303.93634033203125),
+            (pathlib.Path('tests/data/era5_2m_temperature_2020_band_4381.nc'), 9.902056, 49.843, 298.97149658203125),
+            (pathlib.Path('tests/data/minimal_netcdf.nc'), 9.902056, 49.843, EU_CENTER_LOCATION_VALUES),
             ]
         )
 def test_query_location(
