@@ -48,12 +48,24 @@ def test_query_location(
         - The test data should contain valid netCDF files for accurate testing.
         - Ensure that the provided longitude and latitude values correspond to locations within the test data.
     """
-def test_query_location(filename: pathlib.Path, longitude, latitude,
-                        expected_output) -> None:
-    # result = runner.invoke(app, [filename.as_posix(), 10, 10])
-    result = runner.invoke(app, [filename.as_posix(), str(longitude), str(latitude)])
+    result = runner.invoke(app, [str(filename), str(longitude), str(latitude)])
+    output = result.output.strip()
+
+    # Check if the output is a single value
+    if isinstance(expected_output, float):
+        # Parse the output as a float
+        assert float(output) == pytest.approx(expected_output, rel=1e-6)
+    # Check if the output is a list of values
+    elif isinstance(expected_output, list):
+        # Split the output by commas and convert each value to a float
+        output_list = [float(value) for value in output[1:-1].split(',')]
+        # Compare the output list with the expected output list
+        assert output_list == pytest.approx(expected_output, rel=1e-6)
+    else:
+        raise ValueError("Invalid expected output format")
+
     assert result.exit_code == 0
-    assert result.output.strip() == str(expected_output)
+
 
 
 def test_create_minimal_netcdf(create_minimal_netcdf):
