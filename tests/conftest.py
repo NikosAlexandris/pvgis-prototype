@@ -1,4 +1,6 @@
+import os
 import pathlib
+import math
 import netCDF4 as nc
 import numpy as np
 import pytest
