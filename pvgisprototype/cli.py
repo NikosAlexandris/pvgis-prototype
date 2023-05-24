@@ -55,6 +55,7 @@ def read_raster_data(netcdf: str, mask_and_scale=False):
             typer.echo(f"Couldn't open dataset: {str(exc)}")
             raise typer.Exit(code=33)
 
+
 @app.command()
 def query_location(
         netcdf: str,
@@ -65,14 +66,19 @@ def query_location(
         ) -> int:
     """
     """
-    dataarray = read_raster_data(netcdf, mask_and_scale=mask_and_scale)
-    data = dataarray.sel(
-            lon=longitude,
-            lat=latitude,
-            method='nearest',
-            )
-    print(f"{float(data)}")
-    return 0
+    try:
+        dataarray = read_raster_data(netcdf, mask_and_scale=mask_and_scale)
+        data = dataarray.sel(
+                lon=longitude,
+                lat=latitude,
+                method='nearest',
+                )
+        output = data.values.tolist()
+        typer.echo(output)
+        return 0
+    except Exception as exc:
+        typer.echo(f"Error: {str(exc)}")
+        return 1
 
 
 if __name__ == "__main__":
