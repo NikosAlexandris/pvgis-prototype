@@ -19,14 +19,14 @@ def path_to_data():
 
 
 @pytest.fixture
-def create_minimal_netcdf(path_to_data):
+def create_minimal_netcdf(path_to_data: pathlib.Path, time=24, lon=2, lat=2):
     
     np.random.seed(43)  # Fix the random seed to ensure reproducibility
 
     # Define the dimensions
     time = 24  # 24 hours
-    lon = 1
-    lat = 1
+    lon = 2
+    lat = 2
 
     # Create the netCDF file
     filename = path_to_data / "minimal_netcdf.nc"
@@ -48,11 +48,11 @@ def create_minimal_netcdf(path_to_data):
     # Create the longitude and latitude variables
     lon_var = dataset.createVariable("lon", np.float32, ("lon",))
     lon_var.units = "degrees_east"
-    lon_var[:] = [EU_GEOMETRIC_CENTER_POST_BREXIT[0]]  # Set the longitude value
+    lon_var[:] = [LONGITUDE_LOW, LONGITUDE_HIGH]  # Set the longitude value
 
     lat_var = dataset.createVariable("lat", np.float32, ("lat",))
     lat_var.units = "degrees_north"
-    lat_var[:] = [EU_GEOMETRIC_CENTER_POST_BREXIT[1]]  # Set the latitude value
+    lat_var[:] = [LATITUDE_LOW, LATITUDE_HIGH]  # Set the latitude value
 
     # Create the temperature variable
     temp_var = dataset.createVariable("t2m", np.float32, ("time", "lat", "lon"))
