@@ -14,8 +14,12 @@ LATITUDE_HIGH=math.ceil(EU_GEOMETRIC_CENTER_POST_BREXIT[1])
 
 
 @pytest.fixture
-def path_to_data():
-    return pathlib.Path('data')
+def path_to_data(request):
+    """
+    Dynamically resolve and return the absolute path to 'tests/data'
+    """
+    module_directory = pathlib.Path(os.path.dirname(os.path.abspath(request.module.__file__)))
+    return module_directory / 'data'
 
 
 @pytest.fixture
