@@ -15,8 +15,6 @@ from .time_series import app as timeseries
 from .estimate_energy import app as estimate_energy
 from .tmy import app as tmy
 
-import xarray as xr
-
 
 state = {"verbose": False}
 
@@ -27,7 +25,7 @@ app = typer.Typer(
 )
 app.add_typer(estimate_energy, name="estimate", help='Estimate the energy production of a PV system')
 app.add_typer(tmy, name="tmy", help='Generate the Typical Meteorological Year')
-app.add_typer(timeseries, name="timeseries", help='Retrieve time series of solar radiation and/or PV output power')
+app.add_typer(timeseries, name="time-series", help='Retrieve time series of solar radiation and/or PV output power')
 
 
 def _version_callback(value: bool) -> None:
