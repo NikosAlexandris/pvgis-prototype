@@ -19,6 +19,10 @@ app = typer.Typer(
     add_help_option=True,
     help=f"PVGIS core CLI prototype",
 )
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"pvgis prototype version: {version('pvgis-prototype')}")
+        raise typer.Exit(code=0)
 
 
 def read_raster_data(netcdf: str, mask_and_scale=False):
