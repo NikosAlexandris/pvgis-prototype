@@ -8,10 +8,6 @@ import typer
 import xarray as xr
 
 
-def version_callback(value: bool) -> None:
-    if value:
-        typer.echo(f"pvgis prototype version: {version('pvgis-prototype')}")
-        raise typer.Exit(code=0)
 
 
 app = typer.Typer(
@@ -84,15 +80,20 @@ def query_location(
         typer.echo(f"Error: {str(exc)}")
         return 1
 @app.callback()
-def main(version: Optional[bool] = typer.Option(
-    None,
-    "--version",
-    "-v",
-    help="Show the application's version and exit.",
-    callback=_version_callback,
-    is_eager=True,
-    )
-         ) -> None:
+def main(
+        verbose: bool = False,
+        version: Optional[bool] = typer.Option(
+            None,
+            "--version",
+            "-v",
+            help="Show the application's version and exit.",
+            callback=_version_callback,
+            is_eager=True,
+            )
+        ) -> None:
+    if verbose:
+        print("Will write verbose output")
+        state["verbose"] = True
     return
 
 
