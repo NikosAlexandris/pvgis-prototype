@@ -83,7 +83,19 @@ def query_location(
     except Exception as exc:
         typer.echo(f"Error: {str(exc)}")
         return 1
+@app.callback()
+def main(version: Optional[bool] = typer.Option(
+    None,
+    "--version",
+    "-v",
+    help="Show the application's version and exit.",
+    callback=_version_callback,
+    is_eager=True,
+    )
+         ) -> None:
+    return
+
 
 
 if __name__ == "__main__":
-    typer.run(read_raster_data)
+    app()
