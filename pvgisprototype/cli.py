@@ -2,21 +2,28 @@
 PV electricity generation potential for different technologies and configurations
 """
 
-import warnings
+from pvgisprototype import __app_name__, __version__
 from importlib.metadata import version
-import os.path
+
+import warnings
 from pathlib import Path
 
 import typer
+from typing import Optional
+
+from .time_series import app as timeseries
+from .estimate_energy import app as estimate_energy
+from .tmy import app as tmy
+
 import xarray as xr
 
 
+state = {"verbose": False}
 
 
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"PVGIS core CLI prototype",
 )
 app.add_typer(estimate_energy, name="estimate", help='Estimate the energy production of a PV system')
 app.add_typer(tmy, name="tmy", help='Generate the Typical Meteorological Year')
@@ -63,17 +70,13 @@ def main(
             is_eager=True,
             )
         ) -> None:
+    """
+    callback() : PVGIS core CLI prototype
+    """
     if verbose:
         print("Will write verbose output")
         state["verbose"] = True
     return
-
-
-# @app.callback()
-# def callback():
-#     """
-#     callback() : PVGIS core CLI prototype
-#     """
 
 
 if __name__ == "__main__":
