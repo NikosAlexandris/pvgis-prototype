@@ -19,8 +19,8 @@ write_to = "pvgisprototype/version.py"
 name = "cz_conventional_commits"
 # TEMPLATE: Update these versions to the latest version for your project and ensure the
 # tag exists both locally and on the project's remote:
-changelog_start_rev = "v0.0.0"
-version = "0.0.0"
+changelog_start_rev = "v0.1.0"
+version = "0.1.0"
 tag_format = "v$version"
 annotated_tag = true
 gpg_sign = true
