@@ -1,7 +1,7 @@
 [build-system]
 # https://setuptools.pypa.io/en/latest/build_meta.html#how-to-use-it
-requires = ["setuptools"]
-# requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+# requires = ["setuptools", "wheel", "setuptools_scm"]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -21,6 +21,7 @@ name = "cz_conventional_commits"
 # tag exists both locally and on the project's remote:
 changelog_start_rev = "v0.1.0"
 version = "0.1.0"
+# dynamic = ["version"]
 tag_format = "v$version"
 annotated_tag = true
 gpg_sign = true
@@ -73,7 +74,6 @@ exclude = ["pvgisprototype/version.py"]
 # Match Black's defaults
 # https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort
 profile = "black"
-
 
 [tool.pytest.ini_options]
 addopts = "-ra --verbose --showlocals --tb=short"
