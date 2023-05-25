@@ -1,7 +1,8 @@
 import pathlib
 import pytest
 from typer.testing import CliRunner
-from pvgisprototype.cli import app
+# from pvgisprototype.cli import app
+from pvgisprototype.time_series import app
 from .conftest import EU_GEOMETRIC_CENTER_POST_BREXIT
 from .test_expected_output import EU_CENTER_LOCATION_VALUES
 
