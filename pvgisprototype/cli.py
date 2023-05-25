@@ -18,6 +18,11 @@ app = typer.Typer(
     add_help_option=True,
     help=f"PVGIS core CLI prototype",
 )
+app.add_typer(estimate_energy, name="estimate", help='Estimate the energy production of a PV system')
+app.add_typer(tmy, name="tmy", help='Generate the Typical Meteorological Year')
+app.add_typer(timeseries, name="timeseries", help='Retrieve time series of solar radiation and/or PV output power')
+
+
 def _version_callback(value: bool) -> None:
     if value:
         typer.echo(f"pvgis prototype version: {version('pvgis-prototype')}")
