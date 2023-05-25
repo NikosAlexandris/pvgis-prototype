@@ -2,6 +2,7 @@ import pathlib
 import pytest
 from typer.testing import CliRunner
 from pvgisprototype.cli import app
+from .conftest import EU_GEOMETRIC_CENTER_POST_BREXIT
 from .test_expected_output import EU_CENTER_LOCATION_VALUES
 
 
@@ -11,9 +12,14 @@ runner = CliRunner()
 @pytest.mark.parametrize(
         'filename, longitude, latitude, expected_output',
         [
-            (pathlib.Path('tests/data/era5_2m_temperature_2020_band_4381.nc'), 10, 10, 303.93634033203125),
-            (pathlib.Path('tests/data/era5_2m_temperature_2020_band_4381.nc'), 9.902056, 49.843, 298.97149658203125),
-            (pathlib.Path('tests/data/minimal_netcdf.nc'), 9.902056, 49.843, EU_CENTER_LOCATION_VALUES),
+            (pathlib.Path('tests/data/era5_2m_temperature_2020_band_4381.nc'),
+             EU_GEOMETRIC_CENTER_POST_BREXIT[0],
+             EU_GEOMETRIC_CENTER_POST_BREXIT[1],
+             298.97149658203125),
+            (pathlib.Path('tests/data/minimal_netcdf.nc'),
+             EU_GEOMETRIC_CENTER_POST_BREXIT[0],
+             EU_GEOMETRIC_CENTER_POST_BREXIT[1],
+             EU_CENTER_LOCATION_VALUES),
             ]
         )
 def test_query_location(
@@ -50,7 +56,7 @@ def test_query_location(
         - The test data should contain valid netCDF files for accurate testing.
         - Ensure that the provided longitude and latitude values correspond to locations within the test data.
     """
-    result = runner.invoke(app, [str(filename), str(longitude), str(latitude)])
+    result = runner.invoke(app, ['query-location', str(filename), str(longitude), str(latitude)])
     output = result.output.strip()
 
     # Check if the output is a single value
