@@ -96,6 +96,12 @@ def main(version: Optional[bool] = typer.Option(
     return
 
 
+# @app.callback()
+# def callback():
+#     """
+#     callback() : PVGIS core CLI prototype
+#     """
+
 
 if __name__ == "__main__":
     app()
