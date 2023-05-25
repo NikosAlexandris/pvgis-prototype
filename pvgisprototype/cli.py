@@ -1,4 +1,7 @@
-from devtools import debug
+"""
+PV electricity generation potential for different technologies and configurations
+"""
+
 import warnings
 from importlib.metadata import version
 import os.path
@@ -31,6 +34,7 @@ def read_raster_data(netcdf: str, mask_and_scale=False):
                 mask_and_scale=mask_and_scale,
                 )
         return dataarray
+
     except Exception as exc:
         if "already exists as a scalar variable" in str(exc):
             to_be_dropped = str(exc).split("'")[-2]
