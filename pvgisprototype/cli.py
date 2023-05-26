@@ -12,8 +12,9 @@ import typer
 from typing import Optional
 
 from .time_series import app as timeseries
-from .estimate_energy import app as estimate_energy
+from .estimate_energy import app as estimate
 from .tmy import app as tmy
+from .utilities import app as utility
 
 
 state = {"verbose": False}
@@ -23,9 +24,10 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
 )
-app.add_typer(estimate_energy, name="estimate", help='Estimate the energy production of a PV system')
+app.add_typer(estimate, name="estimate", help='Estimate the energy production of a PV system')
 app.add_typer(tmy, name="tmy", help='Generate the Typical Meteorological Year')
 app.add_typer(timeseries, name="time-series", help='Retrieve time series of solar radiation and/or PV output power')
+app.add_typer(utility, name="utility", help='Diagnose data issues and more')
 
 
 def _version_callback(value: bool) -> None:
