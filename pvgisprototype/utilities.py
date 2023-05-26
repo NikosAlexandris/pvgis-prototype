@@ -1,6 +1,20 @@
+import typer
+from typing_extensions import Annotated
+from typing import Optional
+from rich import print
+
+
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    help=f"PVGIS core CLI prototype",
+)
+
+
+@app.command()
 def get_horizon(
-        longitude: Annotated[float, typer.Argument(..., min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(..., min=-90, max=90)],
+        longitude: Annotated[Optional[float], typer.Argument(default=None, min=-180, max=180)],
+        latitude: Annotated[Optional[float], typer.Argument(default=None, min=-90, max=90)],
         ):
     """Computes the entire horizon angle height (in radians) around a single point from a digital elevation model
 
@@ -20,6 +34,7 @@ def get_horizon(
     pass
 
 
+@app.command()
 def get_elevation(
         longitude: Annotated[float, typer.Argument(..., min=-180, max=180)],
         latitude: Annotated[float, typer.Argument(..., min=-90, max=90)],
@@ -40,9 +55,10 @@ def get_elevation(
     pass
 
 
-def list_databases_for_location(
-        longitude: Annotated[float, typer.Argument(..., min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(..., min=-90, max=90)],
+@app.command()
+def list_databases(
+        longitude: Annotated[float, typer.Argument(default=None, min=-180, max=180)] = None,
+        latitude: Annotated[float, typer.Argument(default=None, min=-90, max=90)] = None,
         ):
     """
     List available databases for a location
@@ -58,11 +74,14 @@ def list_databases_for_location(
         -lon, float, M, [-180, 180], -, -, 
         -raddatabase, str, [[PVGIS-SARAH2](database:datasets:solar-radiation-data:sarah2), <br>[PVGIS-SARAH](database:datasets:solar-radiation-data:sarah), <br>[PVGIS-ERA5](database:datasets:solar-radiation-data:era5), <br>[PVGIS-CMSAF](database:datasets:solar-radiation-data:cmsaf), <br>[PVGIS-COSMO](database:datasets:solar-radiation-data:cosmo), <br>[PVGIS-NSRDB](database:datasets:solar-radiation-data:nsrdb)], Defaultdatabase, Optional
     """
-    try: 
-        location = (longitude, latitude)
-        databases = ['PVGIS-SARAH2', 'PVGIS-SARAH', 'PVGIS-ERA5', 'PVGIS-CMSAF', 'PVGIS-COSMO', 'PVGIS-NSRDB']
-        typer.secho(f"The available databases for the requested location {location} are:\n {databases}", fg=typer.colors.MAGENTA)
-        return 0
-    except Exception as exc:
-        typer.echo(f"Something went wrong: {str(exc)}")
-        raise typer.Exit(code=33)
+    databases = ['PVGIS-SARAH2', 'PVGIS-SARAH', 'PVGIS-ERA5', 'PVGIS-CMSAF', 'PVGIS-COSMO', 'PVGIS-NSRDB']
+    if longitude is None and latitude is None:
+        print(f'PVGIS databases:\n{databases}')
+    else:
+        try: 
+            location = (longitude, latitude)
+            typer.secho(f"The available databases for the requested location {location} are:\n {databases}", fg=typer.colors.MAGENTA)
+            return 0
+        except Exception as exc:
+            typer.echo(f"Something went wrong: {str(exc)}")
+            raise typer.Exit(code=33)
