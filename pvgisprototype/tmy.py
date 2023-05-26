@@ -5,7 +5,7 @@ from typing import Optional
 from pathlib import Path
 
 
-def degreedays(
+def calculate_degree_days(
         location: Annotated[Tuple[float, float], typer.Argument(..., help='Latitude, longitude [°]')],
         years: Annotated[Tuple[float, float], typer.Argument(..., min=2005, max=2020, help='First and last year of calculations')],
         meteo: Annotated[Path, typer.Argument( ..., exists=True, file_okay=True, dir_okay=False, writable=False, readable=True, resolve_path=True, help='Directory containing the meteorological data',)],
