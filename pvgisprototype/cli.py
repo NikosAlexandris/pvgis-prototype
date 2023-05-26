@@ -2,7 +2,7 @@
 PV electricity generation potential for different technologies and configurations
 """
 
-from pvgisprototype import __app_name__, __version__
+# from pvgisprototype import __app_name__, __version__
 from importlib.metadata import version
 
 import warnings
