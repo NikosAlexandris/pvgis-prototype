@@ -1,8 +1,9 @@
 import typer
 from typing_extensions import Annotated
 from typing import Optional
+import pathlib
+import os
 from .example_pv_estimation_output import csv_to_list_of_dictionaries
-from .example_pv_estimation_output import csv_filename
 from rich import print
 
 
@@ -154,11 +155,14 @@ def estimate_grid_connected_pv(
     Returns:
         str: PV calculation result based on the specified input parameters
     """
-    # Function implementation goes here
-    # Perform the necessary calculations based on the input parameters
-    
-    output_csv = csv_to_list_of_dictionaries(csv_filename)
-    print(output_csv)
+    # Fake an output for now! -------------------------------------------------
+    path_to_module = os.path.dirname(__file__)
+    path_to_test_data = pathlib.Path(path_to_module).parent / 'tests' / 'data'
+    csv_files = path_to_test_data.glob("*.csv")
+    for csv_file in csv_files:
+        output_csv = csv_to_list_of_dictionaries(csv_file)
+        print(output_csv)
+    # ------------------------------------------------# Fake an output for now!
     return 0
 
 
