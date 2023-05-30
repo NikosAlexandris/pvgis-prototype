@@ -10,7 +10,7 @@ from rich import print
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"PVGIS core CLI prototype",
+    help=f"Estimate the energy production of a PV system",
 )
 
 
