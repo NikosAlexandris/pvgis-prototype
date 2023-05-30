@@ -85,3 +85,23 @@ def list_databases(
         except Exception as exc:
             typer.echo(f"Something went wrong: {str(exc)}")
             raise typer.Exit(code=33)
+
+
+@app.command()
+def  calculate_peak_power(
+        area: Annotated[float, typer.Argument(
+            help='The area of the modules in m<sup>2</sup>',
+            min=0, max=0.001)] = None,  # min of mini-solar-panel?
+        conversion_efficiency: Annotated[float, typer.Argument(
+            help='Conversion efficianet in %',
+            min=0, max=100)] = None,
+        ):
+        """Calculate the peak power in kW based on area and conversion efficiency
+
+        .. math:: Power = 1/m^{2} * area * efficiency / 100
+
+        Returns:
+            Power in kWp
+        """
+        power = 1 / m2 * area * conversion_efficiency / 100
+        return power
