@@ -13,8 +13,8 @@ app = typer.Typer(
 
 @app.command()
 def get_horizon(
-        longitude: Annotated[Optional[float], typer.Argument(default=None, min=-180, max=180)],
-        latitude: Annotated[Optional[float], typer.Argument(default=None, min=-90, max=90)],
+        longitude: Annotated[Optional[float], typer.Argument(min=-180, max=180)],
+        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
         ):
     """Computes the entire horizon angle height (in radians) around a single point from a digital elevation model
 
@@ -57,8 +57,8 @@ def get_elevation(
 
 @app.command()
 def list_databases(
-        longitude: Annotated[float, typer.Argument(default=None, min=-180, max=180)] = None,
-        latitude: Annotated[float, typer.Argument(default=None, min=-90, max=90)] = None,
+        longitude: Annotated[float, typer.Argument(min=-180, max=180)] = None,
+        latitude: Annotated[float, typer.Argument(min=-90, max=90)] = None,
         ):
     """
     List available databases for a location
