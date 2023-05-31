@@ -21,10 +21,9 @@ def optimise_slope_aspect(
         end_year,
         number_of_values_to_read
         ):
-    """Optimise the inclination (slope) and orientation (aspect) angles for maximizing the PV output over a specified time period.
+    """Optimise the inclination (slope) and orientation (aspect) angles for
+    maximizing the output of a photovoltaic system over a specified time period.
 
-    The function aims to optimize the slope and aspect angles for a photovoltaic (PV) system
-    in order to maximize the PV output over a perio of time.
     The function takes various input parameters
     and performs an iterative optimization process
     to find the optimal values for slope and aspect.
@@ -201,6 +200,7 @@ def optimise_slope_aspect(
                 newslope = slope - derivatives[1] / derivatives[0]
             else:
                 newslope = slope
+
             if doublederivatives[0] != 0.0:
                 newaspect = aspect - doublederivatives[1] / doublederivatives[0]
             else:
