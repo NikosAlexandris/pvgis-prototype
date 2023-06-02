@@ -43,6 +43,17 @@ def create_minimal_netcdf(path_to_data: pathlib.Path, time=24, lon=2, lat=2):
     dataset.createDimension("lon", lon)
     dataset.createDimension("lat", lat)
 
+    # Additional global attributes
+    dataset.institution = "Your Institution"
+    dataset.source = "Your Source"
+    dataset.contributors = "Your Contributors"
+    dataset.contact = "Your Contact"
+    dataset.platform = "Your Platform"
+    dataset.processid = "Your Process ID"
+    dataset.project_id = "Your Project ID"
+    dataset.software = "Your Software"
+    dataset.title = "Your Title"
+
     # Create the time variable
     time_var = dataset.createVariable("time", np.float64, ("time",))
     time_var.units = "hours since 1970-01-01 00:00:00"
@@ -63,6 +74,7 @@ def create_minimal_netcdf(path_to_data: pathlib.Path, time=24, lon=2, lat=2):
     # Create the temperature variable
     temp_var = dataset.createVariable("t2m", np.float32, ("time", "lat", "lon"))
     temp_var.units = "K"
+    temp_var.long_name = "2m Temperature"
     # temp_data = np.random.uniform(low=280.0, high=310.0, size=(time, lat, lon))  # Generate random temperature values
     temp_data = np.random.uniform(low=280.0, high=310.0, size=(time, lat, lon))  # Generate random temperature values
     temp_var[:] = temp_data
