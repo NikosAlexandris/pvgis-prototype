@@ -34,7 +34,7 @@ def estimate_grid_connected_pv(
         consider_shadows: Annotated[Optional[bool], typer.Argument(
             help='Calculate effect of horizon shadowing'),
                                     ] = True,  # usehorizon
-        horizon_heights: Annotated[Optional[int], typer.Argument(
+        horizon_heights: Annotated[Optional[float], typer.Argument(
             help='Define horizon heights (comma-seprarated values or .csv file) at equal angular distance around the horizon given in clockwise direction starting at North, going to East, South, West, and back to North (first point is due north, last is west of north). Example: 10, 20, 30, 20, 5, 0, 10, 20, 5, 0, 10, 20, 30, 20, 5, 0, 10, 20, 5, 0'
             )] = None,  # userhorizon
         pv_techonology: Annotated[Optional[str], typer.Argument(
