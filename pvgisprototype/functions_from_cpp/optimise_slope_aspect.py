@@ -2,6 +2,8 @@
 A function based on a C function named `optimizeSlopeAspect` defined in 
 """
 
+from total_radiation import calculate_total_radiation
+
 # from: rsun_standalone_hourly_opt.cpp
 # function name: optimizeSlopeAspect
 def optimise_slope_aspect(
@@ -74,22 +76,22 @@ def optimise_slope_aspect(
     delta = 0.005
     iter = 0
     maxiter = 20
-    newslope = 0.0
-    newaspect = 0.0
+    new_slope = 0.0
+    new_aspectt = 0.0
     minslope = 0.0
     maxslope = 0.0
     (
         total_radiation,
-        total_radiationMinusSlope,
-        total_radiationPlusSlope,
-        total_radiationMinusAspect,
-        total_radiationPlusAspect
+        total_radiation_minus_slope,
+        total_radiation_plus_slope,
+        total_radiation_minus_aspect,
+        total_radiation_plus_aspect
     ) = 0.0, 0.0, 0.0, 0.0, 0.0
     (
-        total_radiationMinusSlopeMinusAspect,
-        total_radiationMinusSlopePlusAspect,
-        total_radiationPlusSlopeMinusAspect,
-        total_radiationPlusSlopePlusAspect 
+        total_radiation_minus_slope_minus_aspect,
+        total_radiation_minus_slope_plus_aspect,
+        total_radiation_plus_slope_minus_aspect,
+        total_radiation_plus_slope_plus_aspect 
     ) = 0.0, 0.0, 0.0, 0.0
 
     derivatives = [0.0, 0.0]
@@ -115,7 +117,7 @@ def optimise_slope_aspect(
             )
 
     # calcuate the total radiation
-    total_radiation = calculateTotal(
+    total_radiation = calculate_total_radiation(
             sun_geometry_variables,
             sun_surface_geometry,
             top_of_atmosphere_direct_normal_irradiance,
@@ -136,7 +138,7 @@ def optimise_slope_aspect(
                        sun_geometry_variables, sun_surface_geometry,
                        solar_constant, horizon_heights)
     
-    total_radiationMinusSlope = calculateTotal( sun_geometry_variables,
+    total_radiation_minus_slope = calculate_total_radiation( sun_geometry_variables,
                                                sun_surface_geometry,
                                                top_of_atmosphere_direct_normal_irradiance,
                                                solar_constant, location,
@@ -152,7 +154,7 @@ def optimise_slope_aspect(
                        sun_geometry_variables, sun_surface_geometry,
                        solar_constant, horizon_heights)
     
-    total_radiationPlusSlope = calculateTotal( sun_geometry_variables,
+    total_radiation_plus_slope = calculate_total_radiation( sun_geometry_variables,
                                               sun_surface_geometry,
                                               top_of_atmosphere_direct_normal_irradiance,
                                               solar_constant, location,
@@ -168,7 +170,7 @@ def optimise_slope_aspect(
                        sun_geometry_variables, sun_surface_geometry,
                        solar_constant, horizon_heights)
     
-    total_radiationMinusAspect = calculateTotal( sun_geometry_variables,
+    total_radiation_minus_aspect = calculate_total_radiation( sun_geometry_variables,
                                                 sun_surface_geometry,
                                                 top_of_atmosphere_direct_normal_irradiance,
                                                 solar_constant, location,
@@ -184,7 +186,7 @@ def optimise_slope_aspect(
                        sun_geometry_variables, sun_surface_geometry,
                        solar_constant, horizon_heights)
     
-    total_radiationPlusAspect = calculateTotal( sun_geometry_variables,
+    total_radiation_plus_aspect = calculate_total_radiation( sun_geometry_variables,
                                                sun_surface_geometry,
                                                top_of_atmosphere_direct_normal_irradiance,
                                                solar_constant, location,
@@ -197,31 +199,31 @@ def optimise_slope_aspect(
     while tolerance > 0.001 and iter < maxiter:
         if iter > 0:
             if derivatives[0] != 0.0:
-                newslope = slope - derivatives[1] / derivatives[0]
+                new_slope = slope - derivatives[1] / derivatives[0]
             else:
-                newslope = slope
+                new_slope = slope
 
             if doublederivatives[0] != 0.0:
-                newaspect = aspect - doublederivatives[1] / doublederivatives[0]
+                new_aspectt = aspect - doublederivatives[1] / doublederivatives[0]
             else:
-                newaspect = aspect
+                new_aspectt = aspect
 
-            # check if newslope is outside the range
-            if newslope > maxslope or newslope < minslope:
-                newslope = slope
+            # check if new_slope is outside the range
+            if new_slope > maxslope or new_slope < minslope:
+                new_slope = slope
 
-            # check if newaspect is outside the range
-            if newaspect > 360.0 or newaspect < -360.0:
-                newaspect = aspect
+            # check if new_aspectt is outside the range
+            if new_aspectt > 360.0 or new_aspectt < -360.0:
+                new_aspectt = aspect
 
             # update the geometry with the new values
-            updateGeometryYear(newslope, newaspect, axis_tracking_type,
+            updateGeometryYear(new_slope, new_aspectt, axis_tracking_type,
                                location, grid_geometry, sun_geometry_constants,
                                sun_geometry_variables, sun_surface_geometry,
                                solar_constant, horizon_heights)
 
             # calculate total radiation for the new geometry
-            total_radiation = calculateTotal( sun_geometry_variables,
+            total_radiation = calculate_total_radiation( sun_geometry_variables,
                                              sun_surface_geometry,
                                              top_of_atmosphere_direct_normal_irradiance,
                                              solar_constant, location,
@@ -232,37 +234,37 @@ def optimise_slope_aspect(
                                              number_of_values_to_read)
 
         # calculate the partial derivatives
-        derivatives[0] = (total_radiationMinusSlope - total_radiationPlusSlope) / (2.0 * delta)
-        derivatives[1] = (total_radiationMinusAspect - total_radiationPlusAspect) / (2.0 * delta)
+        derivatives[0] = (total_radiation_minus_slope - total_radiation_plus_slope) / (2.0 * delta)
+        derivatives[1] = (total_radiation_minus_aspect - total_radiation_plus_aspect) / (2.0 * delta)
 
         # calculate the double derivatives
         doublederivatives[0] = (
-                total_radiationMinusSlopeMinusAspect
-                - total_radiationPlusSlopeMinusAspect
-                - total_radiationMinusSlopePlusAspect
-                + total_radiationPlusSlopePlusAspect
+                total_radiation_minus_slope_minus_aspect
+                - total_radiation_plus_slope_minus_aspect
+                - total_radiation_minus_slope_plus_aspect
+                + total_radiation_plus_slope_plus_aspect
                 ) / (4.0 * delta * delta)
 
         doublederivatives[1] = (
-                total_radiationMinusSlopeMinusAspect
-                - total_radiationPlusSlopeMinusAspect
-                + total_radiationMinusSlopePlusAspect
-                - total_radiationPlusSlopePlusAspect
+                total_radiation_minus_slope_minus_aspect
+                - total_radiation_plus_slope_minus_aspect
+                + total_radiation_minus_slope_plus_aspect
+                - total_radiation_plus_slope_plus_aspect
                 ) / (4.0 * delta * delta)
 
         doublederivatives[2] = (
-                total_radiationMinusSlopeMinusAspect
-                + total_radiationPlusSlopeMinusAspect
-                - total_radiationMinusSlopePlusAspect
-                - total_radiationPlusSlopePlusAspect
+                total_radiation_minus_slope_minus_aspect
+                + total_radiation_plus_slope_minus_aspect
+                - total_radiation_minus_slope_plus_aspect
+                - total_radiation_plus_slope_plus_aspect
                 ) / (4.0 * delta * delta)
 
         # update the geometry and radiation values for the next iteration
-        slope = newslope
-        aspect = newaspect
-        total_radiationMinusSlope = total_radiationPlusSlope
-        total_radiationMinusAspect = total_radiationPlusAspect
-        total_radiationPlusSlope = calculateTotal(sun_geometry_variables,
+        slope = new_slope
+        aspect = new_aspectt
+        total_radiation_minus_slope = total_radiation_plus_slope
+        total_radiation_minus_aspect = total_radiation_plus_aspect
+        total_radiation_plus_slope = calculate_total_radiation(sun_geometry_variables,
                                                   sun_surface_geometry,
                                                   top_of_atmosphere_direct_normal_irradiance,
                                                   solar_constant, location,
@@ -272,7 +274,7 @@ def optimise_slope_aspect(
                                                   efficiency, start_year,
                                                   end_year,
                                                   number_of_values_to_read)
-        total_radiationPlusAspect = calculateTotal(sun_geometry_variables,
+        total_radiation_plus_aspect = calculate_total_radiation(sun_geometry_variables,
                                                    sun_surface_geometry,
                                                    top_of_atmosphere_direct_normal_irradiance,
                                                    solar_constant, location,
