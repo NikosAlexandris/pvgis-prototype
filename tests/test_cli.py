@@ -76,7 +76,6 @@ def test_query_location(
     assert result.exit_code == 0
 
 
-
 def test_create_minimal_netcdf(create_minimal_netcdf):
     minimal_netcdf = create_minimal_netcdf
     print(minimal_netcdf)

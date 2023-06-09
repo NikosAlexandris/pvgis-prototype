@@ -47,6 +47,7 @@ def query_location(
         output = data.values.tolist()
         typer.echo(output)
         return 0
+
     except Exception as exc:
         typer.echo(f"Error: {str(exc)}")
         return 1
