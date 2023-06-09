@@ -7,7 +7,7 @@ def calculate_optical_air_mass(sun_geometry):
     sun_geometry : dict
         Dictionary containing sun geometry variables.
         Requires the following keys:
-        - 'solar_altitude' : float
+        - 'sun_height' : float
             Solar altitude angle in radians.
 
     Returns
@@ -15,13 +15,13 @@ def calculate_optical_air_mass(sun_geometry):
     float
         Calculated optical air mass.
     """
-    solar_altitude = sun_geometry['solar_altitude']
+    sun_height = sun_geometry['sun_height']
     elevation_correction = np.exp(-sun_geometry['z_orig'] / 8434.5)
-    correction_numerator = 0.1594 + solar_altitude * (1.123 + 0.065656 * solar_altitude)
-    correction_denominator = 1. + solar_altitude * (28.9344 + 277.3971 * solar_altitude)
+    correction_numerator = 0.1594 + sun_height * (1.123 + 0.065656 * sun_height)
+    correction_denominator = 1. + sun_height * (28.9344 + 277.3971 * sun_height)
     atmospheric_refraction_angular_correction = 0.061359 * correction_numerator / correction_denominator  # in radians
-    corrected_solar_altitude = solar_altitude + atmospheric_refraction_angular_correction
-    denominator = np.sin(corrected_solar_altitude) + 0.50572 * np.power(corrected_solar_altitude * np.degrees + 6.07995, -1.6364)
+    corrected_sun_height = sun_height + atmospheric_refraction_angular_correction
+    denominator = np.sin(corrected_sun_height) + 0.50572 * np.power(corrected_sun_height * np.degrees + 6.07995, -1.6364)
     optical_air_mass = elevation_correction / denominator
 
     return optical_air_mass
@@ -78,7 +78,7 @@ def calculate_rayleigh_factor(optical_air_mass):
 def calculate_direct_radiation_coefficient(
         beam_radiation_coefficient,
         extraterrestrial_direct_normal_irradiance,
-        sine_of_solar_altitude,
+        sine_of_sun_height,
         rayleigh,
         optical_air_mass,
         air_mass2_linke
@@ -92,7 +92,7 @@ def calculate_direct_radiation_coefficient(
         Coefficient representing the beam radiation.
     extraterrestrial_direct_normal_radiation : float
         Extraterrestrial direct normal radiation.
-    sin_solar_altitude : float
+    sin_sun_height : float
         Sine of the solar altitude angle.
     rayleigh : float
         Rayleigh scattering factor.
@@ -108,7 +108,7 @@ def calculate_direct_radiation_coefficient(
     """
     beam_radiation_coefficient =
 
-     extraterrestrial_direct_normal_radiation * sin_solar_altitude * np.exp(-rayleigh * optical_air_mass * air_mass2_linke
+     extraterrestrial_direct_normal_radiation * sin_sun_height * np.exp(-rayleigh * optical_air_mass * air_mass2_linke
     )
     return beam_radiation_coefficient
 
@@ -118,7 +118,7 @@ def calculate_horizontal_direct_radiation(
         surface_azimuth,
         surface_tilt,
         solar_constant,
-        sine_of_solar_altitude,
+        sine_of_sun_height,
     ):
     """
     Calculate the beam radiation.
@@ -131,7 +131,7 @@ def calculate_horizontal_direct_radiation(
         Efficiency factor for converting solar radiation to usable energy.
     wind_speed : float
         Wind speed in meters per second.
-    sin_solar_altitude : float
+    sin_sun_height : float
         Sine of the solar altitude angle.
     surface_geometry : dict
         Dictionary containing surface geometry variables.
@@ -149,7 +149,7 @@ def calculate_horizontal_direct_radiation(
 
 
     if surface_azimuth is not None and surface_tilt != 0:
-        surface_direct_radiation = horizontal_direct_radiation * solar_constant  / sine_of_solar_altitude
+        surface_direct_radiation = horizontal_direct_radiation * solar_constant  / sine_of_sun_height
         return surface_direct_radiation
 
     else:
@@ -221,7 +221,7 @@ def calculate_direct_radiation(
     horizontal_beam_radiation = calculate_horizontal_beam_radiation(
         solar_radiation_variables['beam_radiation_coefficient'],
         solar_radiation_variables['extraterrestrial_direct_normal_irradiance'],
-        np.sin(sun_geometry['solar_altitude']),
+        np.sin(sun_geometry['sun_height']),
         rayleigh,
         optical_air_mass,
         air_mass2_linke
@@ -229,15 +229,15 @@ def calculate_direct_radiation(
 
     surface_azimuth = sun_geometry['azimuth']
     surface_tilt = sun_geometry['tilt']
-    sine_of_solar_altitude = sun_geometry['sine_of_solar_altitude']
-    sine_of_solar_altitude = sin(sun_geometry['solar_altitude']),
+    sine_of_sun_height = sun_geometry['sine_of_sun_height']
+    sine_of_sun_height = sin(sun_geometry['sun_height']),
 
     surface_beam_radiation = calculate_surface_direct_radiation(
         horizontal_beam_radiation,
         surface_azimuth,
         surface_tilt,
         solar_constant,
-        sine_of_solar_altitude,
+        sine_of_sun_height,
         surface_geometry
     )
 
