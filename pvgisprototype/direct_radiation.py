@@ -42,47 +42,60 @@ def calculate_angular_loss(
 # from: rsun_base.c
 # function name: brad_angle_irradiance
 @app.command('direct')
-def calculate_direct_radiation_for_a_tilted_surface(
-        direct_radiation_coefficient: Annotated[float, typer.Argument(
+def calculate_direct_radiation_for_tilted_surface(
+        direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
             help='Direct normal radiation coefficient',
-            min=0, max=1)],  # bh = sunRadVar->cbh;
-        sun_height: Annotated[float, typer.Argument(
+            min=-9000, max=1000)],  # bh = sunRadVar->cbh;
+        solar_altitude: Annotated[float, typer.Argument(
             help='Direct normal radiation coefficient',
-            min=0, max=1)],  # sh, s0
-        sine_of_sun_height: Annotated[float, typer.Argument(
+            min=0, max=90)],  # sh, s0
+        sine_of_solar_altitude: Annotated[float, typer.Argument(
             help='Sine of solar altitude',
             min=0, max=1)],  # sunVarGeom->sinSolarAltitude;
-        aoi_constant_index: Annotated[int, typer.Argument(
-            help='AOI constant -- What is this?')],  #
-        radiations,
+         # incidence_angle: Annotated[Union[IncidenceAngle, float], typer.Option(
+         incidence_angle: Annotated[IncidenceAngle, typer.Option(
+             parser=parse_incidence_angle,
+             help='Angle of incidence',
+             case_sensitive=False)] = IncidenceAngle(angle='auto'),
     ):
-    """
-    Calculate the direct radiation based on given parameters.
+    """Calculate the direct radiation based on given parameters.
 
-    Args:
-        direct_radiation_coefficient (list): Direct horizontal radiation
-        sun_height (float): Solar height ?
-        sine_of_sun_height (float): Sine of solar altitude.
-        aoi_constant_index (int): Index 0 or 1 for .. and .. respectively.
+    Calculate the angle of incidence irradiance and modify it based on certain
+    conditions.
 
-    Returns:
+    Parameters
+    ----------
+        direct_horizontal_radiation_coefficient (list): Direct horizontal radiation coefficient. Likely a reference to the clear-sky beam horizontal radiation?
+        solar_altitude (float): Solar altitude angle.
+        sine_of_solar_altitude (float): Sine of solar altitude angle.
+        incidence_angle_index (int): Index 0 or 1 for .. and .. respectively.
+        sun_geometry: Sun geometry variables for a specific day ?
+        sun_radiation_variables: Solar radiation variables.
+
+    Returns
+    -------
         float: Direct radiation value.
 
     Notes
     -----
 
-    After directly translating the original C code in to a Python-alike
-    pseudocode:
+    This function is the product of:
 
-        - `direct_radiation_coefficient` : from `solar_radiation_variables['direct_radiation_coefficient']`
-        - `sine_of_sun_height` : from `sun_geometry['sine_of_sun_height']`
-    """
-    direct_radiation = direct_radiation_coefficient * sun_height / sine_of_sun_height
-
-    angular_loss = calculate_angular_loss(aoi_constant_index)
-    aoi = AOI_CONSTANTS[aoi_constant_index]  # aoi = angle of incidence ?
-    if angular_loss:
-        direct_radiation *= ( 1 - math.exp( -sun_height / aoi ) ) * angular_loss
+        1. direct translation of the original C code function(s) in to
+        Python-like pseudocode
     
-    typer.echo(direct_radiation)
-    return direct_radiation
+        2. refactoring, trial and error
+
+    - `direct_radiation_coefficient` : from `solar_radiation_variables['direct_radiation_coefficient']`
+    - `sine_of_solar_altitude` : from `sun_geometry['sine_of_solar_altitude']`
+    """
+    # the direct radiation value to adjust
+    direct_radiation = direct_horizontal_radiation_coefficient * solar_altitude / sine_of_solar_altitude
+    adjusted_direct_radiation = apply_angular_loss(
+            direct_radiation,
+            solar_altitude,
+            incidence_angle
+            )
+
+    typer.echo(adjusted_direct_radiation)
+    return adjusted_direct_radiation
