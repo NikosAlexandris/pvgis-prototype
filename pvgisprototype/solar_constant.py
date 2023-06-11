@@ -1,10 +1,25 @@
+import typer
 import math
-from typing import Union
+
+
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    help=f"PVGIS core CLI prototype",
+)
+
 
 # from: rsun_base.cpp
 # function: com_sol_const(int no_of_day)
-def calculate_solar_constant(number_of_day: Union[int, float]) -> float:
-    """Compute solar constant.
+@app.callback(invoke_without_command=True)
+def calculate_solar_constant(
+        number_of_day: float,
+        days_in_a_year: float = 365.25,
+        average_solar_constant: float = 1367,
+        orbital_eccentricity: float = 0.03344,
+        perigee_offset: float = 0.048869,
+        ) -> float:
+    """Compute the solar constant corrected for the given day in the year.
 
     The solar constant is the amount of solar electromagnetic radiation
     received at the outer atmosphere of Earth in a unit area perpendicular to
@@ -18,6 +33,22 @@ def calculate_solar_constant(number_of_day: Union[int, float]) -> float:
         Number of the day in the year counted from 1 (January 1) to 365 or 366
         (December 31).
 
+    Solar constant:
+        1367.0 W/m^2
+    
+    Number of days in a year:
+        365.25
+
+    Perigee offset:
+        0.048869 (in angular units). The earth's closest position to the sun is
+        January 2 at 8:18pm or day number 2.8408. In angular units :
+        2*pi * 2.8408 / 365.25 = 0.048869.
+
+    Orbital eccentricity:
+        For Earth this is currently about 0.01672, and so the distance to the
+        sun varies by +/- 0.01672 from the mean distance (1AU). Thus, the
+        amplitude of the function over the year is: 2*eccentricity = 0.03344.
+
     Returns
     -------
     float
@@ -25,46 +56,31 @@ def calculate_solar_constant(number_of_day: Union[int, float]) -> float:
 
     Notes
     -----
-    The `position` of the Earth in its orbit around the Sun is calculated by
-    multiplying the number of the day by 2*pi (the full circumference of a
-    circle in radians), and then dividing by 365.25 (the average number of days
-    in a year, accounting for leap years). The resulting value is an angle in
-    radians that represents where in its orbit the Earth is.
 
-    The solar_constant is calculated by taking a base value of 1367 W/m^2 and
-    then adjusting it based on the Earth's `position` in its orbit. The
-    `adjustment_factor`, 0.03344 * cos(d1 - 0.048869), accounts for the slight
-    elliptical shape of the Earth's orbit - the solar constant is a bit higher
+    (The following text considers comments from GRASS-GIS' `r.sun` module.
+    The `position_of_earth` in its orbit around the Sun is calculated by
+    multiplying the number of the day in the year by 2*pi (which is the full
+    circumference of a circle in radians), and dividing it by 365.25 (the
+    average number of days in a year, accounting for leap years). The resulting
+    value is an angle in radians that represents the `position_of_earth` in its
+    orbit.
+
+    The `solar_constant` is calculated by adjusting the average (or base) value
+    of 1367 W/m^2 based on the `position_of_earth`. The `adjustment_factor`
+    `0.03344 * cos(position_of_earth - 0.048869)`, accounts for the slight
+    elliptical shape of the Earth's orbit : the solar constant is a bit higher
     when the Earth is closer to the Sun (perihelion) and a bit lower when it's
     farther away (aphelion).
 
-    Notes from GRASS-GIS' `r.sunlib.c`:
-
-    /* com_sol_const(): compute the Solar Constant corrected for the day of the
-       year. The Earth is closest to the Sun (Perigee) on about January 3rd,
-       it is furthest from the sun (Apogee) about July 6th. The 1367 W/m^2 solar
-       constant is at the average 1AU distance, but on Jan 3 it gets up to
-       around 1412.71 W/m^2 and on July 6 it gets down to around 1321 W/m^2.
-       This value is for what hits the top of the atmosphere before any energy
-       is attenuated. */
-
-
-    /* Solar constant: 1367.0 W/m^2. Note: solar constant is parameter.
-
-       Perigee offset: here we call Jan 2 at 8:18pm the Perigee, so day
-       number 2.8408. In angular units that's (2*pi * 2.8408 / 365.25) =
-       0.048869.
-
-       Orbital eccentricity: For Earth this is currently about 0.01672,
-       and so the distance to the sun varies by +/- 0.01672 from the
-       mean distance (1AU), so over the year the amplitude of the
-       function is 2*ecc = 0.03344.
-
-       And 365.25 is of course the number of days in a year.
-     */
+    The Earth is closest to the Sun (Perigee) on about January 3rd, and
+    furthest from it (Apogee) about July 6th. The 1367 W/m^2 solar constant is
+    at the average 1AU distance. However, on January 3 it gets up to around
+    1412.71 W/m^2 and on July 6 it gets down to around 1321 W/m^2. This value
+    is for what hits the top of the atmosphere before any energy is attenuated.
     """
-    position_of_earth = 2 * math.pi * number_of_day / 365.25
-    adjustment_factor =  0.03344 * math.cos(position_of_earth - 0.048869)
-    solar_constant = 1367 * (1 + adjustment_factor)
+    position_of_earth = 2 * math.pi * number_of_day / days_in_a_year
+    adjustment_factor = orbital_eccentricity * math.cos(position_of_earth - perigee_offset)
+    solar_constant = average_solar_constant * (1 + adjustment_factor)
 
+    typer.echo(solar_constant)
     return solar_constant
