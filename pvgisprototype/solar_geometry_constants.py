@@ -1,7 +1,7 @@
 import logging
 
 from pydantic import BaseModel
-from pvgisprototype.data_structures import SunGeometryDayConstants
+from pvgisprototype.data_structures import SolarGeometryDayConstants
 from pvgisprototype.data_structures import GridGeometry
 from pvgisprototype.constants import EPS
 
@@ -13,13 +13,19 @@ import numpy as np
 # from :
 # function : com_par_const()
 def calculate_solar_geometry_constants(
+        longitude: Annotated[float, typer.Argument(
+            help='Longitude in decimal degrees, west is negative',
+            min=-180, max=180)],  #lon
+        latitude: Annotated[float, typer.Argument(
+            help='Latitude in decimal degrees, south is negative',
+            min=-90, max=90)],  # lat
         local_solar_time: float,
-        time_offset: float = 0,
         cosine_of_declination: float,
         sine_of_declination: float,
-        grid_geometry: GridGeometry
+        grid_geometry: GridGeometry,
+        time_offset: float = 0,
         EPS: float = 1e-5,  # Assume a default value for EPS
-) -> SunGeometryDayConstants:
+) -> SolarGeometryDayConstants:
     """
     Compute solar geometry constants for the day.
 
@@ -36,13 +42,13 @@ def calculate_solar_geometry_constants(
 
     Returns
     -------
-    SunGeometryDayConstants
+    SolarGeometryDayConstants
         Sun geometry constants for the day.
     """
-    solar_geometry_day_constants = SunGeometryDayConstants(
+    solar_geometry_day_constants = SolarGeometryDayConstants(
             cosine_of_declination=cosine_of_declination,
-            sine_of_declination=sine_of_declination
-            )
+            sine_of_declination=sine_of_declination,
+    )
     solar_geometry_day_constants.lum_C11 = grid_geometry.sine_of_latitude * solar_geometry_day_constants.cosine_of_declination
     solar_geometry_day_constants.lum_C13 = -grid_geometry.cosine_of_latitude * solar_geometry_day_constants.sine_of_declination
     solar_geometry_day_constants.lum_C22 = solar_geometry_day_constants.cosine_of_declination
