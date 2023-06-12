@@ -25,7 +25,7 @@ state = {"verbose": False}
 
 
 app = typer.Typer(
-    add_completion=False,
+    add_completion=True,
     add_help_option=True,
     help=f"PVGIS core CLI prototype",
 )
