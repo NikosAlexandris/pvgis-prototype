@@ -5,8 +5,8 @@ a specific location.
 Models:
 - Location:                 Geographical coordinates of a location.
 - LocationSolarAttributes:  Various variables associated with a location.
-- SunGeometryConstants:     Constant sun geometry data for a day.
-- SunGeometryVariables:     The variable sun geometry data for a day.
+- SolarGeometryConstants:     Constant sun geometry data for a day.
+- SolarGeometryVariables:     The variable sun geometry data for a day.
 - SunSurfaceGeometry:       The sun-surface geometry data
 - SolarRadiationVariables: 
 - GridGeometry
@@ -14,9 +14,9 @@ Models:
 In the C/C++ source code, the corrsponding `struct`s for data, are:
 - Location                <- PointData: struct
 - LocationSolarAttributes <- PointVarData: struct
-- SunGeometryConstants    <- SunGeometryConstDay : struct
-- SunGeometryVariables    <- SunGeometryVarDay : struct
-- SunSurfaceGeometry      <- SunGeometryVarSlope : struct
+- SolarGeometryConstants    <- SolarGeometryConstDay : struct
+- SolarGeometryVariables    <- SolarGeometryVarDay : struct
+- SunSurfaceGeometry      <- SolarGeometryVarSlope : struct
 - SolarRadiationVariables <- SolarRadVar : struct
 - GridGeometry            <- GridGeometry : struct
 
@@ -54,9 +54,19 @@ if location_solar_attributes.validate():
 
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from pydantic import Field
 from typing import List
 from typing import Optional
+from math import degrees
+from math import radians
+from math import cos
+from math import sin
+from math import pi
+from math import acos
+from math import fabs
+import numpy as np
+import logging
 
 class Location(BaseModel):
     """
@@ -145,7 +155,7 @@ class LocationSolarAttributes(BaseModel):
     day: int
 
 
-class SunGeometryDayConstants(BaseModel):
+class SolarGeometryDayConstants(BaseModel):
     """
     Represents the constant sun geometry data for a day.
 
@@ -194,7 +204,7 @@ class GridGeometry(BaseModel):
 
 
 
-class SunGeometryDayVariables(BaseModel):
+class SolarGeometryDayVariables(BaseModel):
     """
     Represents the variable sun geometry data for a day.
 
