@@ -18,6 +18,7 @@ from .tmy import app as tmy
 from .time_series import app as timeseries
 from .utilities import app as utility
 from .solar_constant import app as solar_constant
+from .solar_geometry_constants import app as solar_geometry_constants
 
 
 state = {"verbose": False}
@@ -35,7 +36,8 @@ app.add_typer(estimate, name="estimate", help='Estimate the energy production of
 app.add_typer(tmy, name="tmy", help='Generate the Typical Meteorological Year')
 app.add_typer(timeseries, name="time-series", help='Retrieve time series of solar radiation and/or PV output power')
 app.add_typer(utility, name="utility", help='Diagnose data issues and more')
-app.add_typer(solar_constant, name="solar-constant", help='Compute the solar constant corrected for the given day in the year')
+app.add_typer(solar_constant, name="solar-constant", help='Compute the solar constant for a day of the year')
+app.add_typer(solar_geometry_constants, name="solar-geometry", help='Compute solar geometry constants for a day in a year')
 
 
 def _version_callback(value: bool) -> None:
