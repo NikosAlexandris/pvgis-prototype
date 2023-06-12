@@ -155,6 +155,11 @@ class LocationSolarAttributes(BaseModel):
     day: int
 
 
+class GridGeometry(BaseModel):
+    sine_of_latitude: float
+    cosine_of_latitude: float
+
+
 class SolarGeometryDayConstants(BaseModel):
     """
     Represents the constant sun geometry data for a day.
@@ -182,11 +187,6 @@ class SolarGeometryDayConstants(BaseModel):
     def __str__(self):
         attributes = "\n".join(f"{key.replace('_', ' ').capitalize()}: {value}" for key, value in self.dict().items())
         return f"Solar Geometry Day Constants\n{attributes}"
-
-class GridGeometry(BaseModel):
-    sine_of_latitude: float
-    cosine_of_latitude: float
-
 
 
 class SolarGeometryDayVariables(BaseModel):
