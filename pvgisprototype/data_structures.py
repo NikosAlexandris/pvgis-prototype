@@ -159,44 +159,29 @@ class SolarGeometryDayConstants(BaseModel):
     """
     Represents the constant sun geometry data for a day.
 
-    Attributes:
-    - luminance_C11: The value of luminance C11.
-    - luminance_C13: The value of luminance C13.
-    - luminance_C22: The value of luminance C22.
-    - luminance_C31: The value of luminance C31.
-    - luminance_C33: The value of luminance C33.
-    - sunrise_time: The time of sunrise.
-    - sunset_time: The time of sunset.
-    - time_angle: The time angle.
-    - sin_declination: The sine of solar declination.
-    - cos_declination: The cosine of solar declination.
-
     Notes
     -----
 
-    Is lum_C?? (in the original code) indeed luminance?
+    lum_C?? : Are these (in the original code) indeed luminance?
+    local_solar_time: `longitTime` set to 0 in the original source code!
     """
+    latitude: float = Field(..., description="The latitude of the location.")
+    # local_solar_time: float = Field(0, description="The local solar time.")  
+    solar_declination: float = Field(..., description="The solar declination.")
+    # time_offset: float = Field(0, description="The time offset.")
+    cosine_of_solar_declination: float = Field(None, description="The cosine of the solar declination.")
+    sine_of_solar_declination: float = Field(None, description="The sine of the solar declination.")
+    lum_C11: float = Field(None, description="The value of luminance C11.")
+    lum_C13: float = Field(None, description="The value of luminance C13.")
+    lum_C22: float = Field(None, description="The value of luminance C22.")
+    lum_C31: float = Field(None, description="The value of luminance C31.")
+    lum_C33: float = Field(None, description="The value of luminance C33.")
+    sunrise_time: float = Field(None, description="The time of sunrise.")
+    sunset_time: float = Field(None, description="The time of sunset.")
 
-    # luminance_C11: float
-    # luminance_C13: float
-    # luminance_C22: float
-    # luminance_C31: float
-    # luminance_C33: float
-    # sunrise_time: float
-    # sunset_time: float
-    # time_angle: float
-    # sin_declination: float
-    # cos_declination: float
-
-    cosine_of_declination: Optional[float] = None
-    sine_of_declination: Optional[float] = None
-    lum_C11: Optional[float] = None
-    lum_C13: Optional[float] = None
-    lum_C22: Optional[float] = None
-    lum_C31: Optional[float] = None
-    lum_C33: Optional[float] = None
-    sunrise_time: Optional[float] = None
-    sunset_time: Optional[float] = None
+    def __str__(self):
+        attributes = "\n".join(f"{key.replace('_', ' ').capitalize()}: {value}" for key, value in self.dict().items())
+        return f"Solar Geometry Day Constants\n{attributes}"
 
 class GridGeometry(BaseModel):
     sine_of_latitude: float
@@ -207,32 +192,22 @@ class GridGeometry(BaseModel):
 class SolarGeometryDayVariables(BaseModel):
     """
     Represents the variable sun geometry data for a day.
-
-    Attributes:
-    - is_shadow: Indicates whether there is a shadow.
-    - z_orig: The original Z value.
-    - z_max: The maximum Z value.
-    - zp: The Zp value.
-    - solar_altitude: The solar altitude.
-    - sin_solar_altitude: The sine of solar altitude.
-    - tan_solar_altitude: The tangent of solar altitude.
-    - solar_azimuth: The solar azimuth.
-    - sun_azimuth_angle: The sun azimuth angle.
-    - step_sin_angle: The step sine angle.
-    - step_cos_angle: The step cosine angle.
     """
+    is_shadow: bool = Field(False, description="Indicates whether there is a shadow.")
+    # z_orig: float = Field(..., description="The original Z value.")
+    # z_max: float = Field(..., description="The maximum Z value.")
+    # zp: float = Field(..., description="The Zp value.")
+    solar_altitude: float = Field(..., description="The solar altitude.")
+    sine_of_solar_altitude: float = Field(..., description="The sine of solar altitude.")
+    tan_of_solar_altitude: float = Field(..., description="The tangent of solar altitude.")
+    solar_azimuth: float = Field(..., description="The solar azimuth.")
+    sun_azimuth_angle: float = Field(..., description="The sun azimuth angle.")
+    # step_sine_angle: float
+    # step_cosine_angle: float
 
-    is_shadow: int
-    z_orig: float
-    z_max: float
-    zp: float
-    solar_altitude: float
-    sine_of_solar_altitude: float
-    tan_of_solar_altitude: float
-    solar_azimuth: float
-    sun_azimuth_angle: float
-    step_sine_angle: float
-    step_cosine_angle: float
+    def __str__(self):
+        attributes = "\n".join(f"{key.replace('_', ' ').capitalize()}: {value}" for key, value in self.dict().items())
+        return f"Solar Geometry Day Variables\n{attributes}"
 
 
 class SunSurfaceGeometry(BaseModel):
