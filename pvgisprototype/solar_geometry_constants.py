@@ -23,38 +23,24 @@ app = typer.Typer(
 
 @app.callback(invoke_without_command=True, no_args_is_help=True)
 def calculate_solar_geometry_constants(
-        longitude: Annotated[float, typer.Argument(
-            help='Longitude in decimal degrees, west is negative',
-            min=-180, max=180)],  #lon
-        latitude: Annotated[float, typer.Argument(
-            help='Latitude in decimal degrees, south is negative',
-            min=-90, max=90)],  # lat
+        latitude: float,
         local_solar_time: float,
-        cosine_of_declination: float,
-        sine_of_declination: float,
-        grid_geometry: GridGeometry,
+        solar_declination: float,
         time_offset: float = 0,
-        EPS: float = 1e-5,  # Assume a default value for EPS
-) -> SolarGeometryDayConstants:
+        EPS: float = 1e-5
+        ) -> SolarGeometryDayConstants:
+    """Calculate solar geometry constants for a given latitude and return a SolarGeometryDayConstants object with the calculated values.
     """
-    Compute solar geometry constants for the day.
+    # as per the original source code :
+    # `latitude = -deg2rad*fixedData.latitude;`
+    # that is, convert to radians & invert sign : why?
+    latitude = - radians(latitude)
+    sine_of_latitude = sin(latitude) 
+    cosine_of_latitude = cos(latitude)
 
-    Parameters
-    ----------
-    local_solar_time : float
-        Longitude time.
-    cosine_of_declination : float
-        Cosine of the solar declination.
-    sine_of_declination : float
-        Sine of the solar declination.
-    grid_geometry : GridGeometry
-        Grid geometry constants.
+    sine_of_solar_declination = np.sin(solar_declination)
+    cosine_of_solar_declination = np.cos(solar_declination)
 
-    Returns
-    -------
-    SolarGeometryDayConstants
-        Sun geometry constants for the day.
-    """
     solar_geometry_day_constants = SolarGeometryDayConstants(
             cosine_of_declination=cosine_of_declination,
             sine_of_declination=sine_of_declination,
