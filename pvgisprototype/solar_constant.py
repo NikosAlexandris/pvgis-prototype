@@ -5,13 +5,13 @@ import math
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"PVGIS core CLI prototype",
+    help=f"Calculate the solar constant for a day in the year",
 )
 
 
 # from: rsun_base.cpp
 # function: com_sol_const(int no_of_day)
-@app.callback(invoke_without_command=True)
+@app.callback(invoke_without_command=True, no_args_is_help=True)
 def calculate_solar_constant(
         number_of_day: float,
         days_in_a_year: float = 365.25,
@@ -19,7 +19,7 @@ def calculate_solar_constant(
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
         ) -> float:
-    """Compute the solar constant corrected for the given day in the year.
+    """Calculate the solar constant corrected for the given day in the year.
 
     The solar constant is the amount of solar electromagnetic radiation
     received at the outer atmosphere of Earth in a unit area perpendicular to

@@ -1,9 +1,17 @@
+import typer
 import math
+
+
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    help=f"Approximate the solar declination for a day in the year",
+)
 
 
 # from: rsun_base.cpp
 # function: com_declin(no_of_day)
-def calculate_solar_declination(number_of_day: int) -> float:
+@app.callback(invoke_without_command=True, no_args_is_help=True)
     """Approximate the sun's declination for a given day of the year.
 
     The solar declination is the angle between the Sun's rays and the
