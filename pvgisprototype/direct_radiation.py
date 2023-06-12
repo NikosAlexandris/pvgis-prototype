@@ -13,10 +13,17 @@ irradiance. The remaining part is the _beam_ irradiance.
 AOI_CONSTANTS = [ -0.074, 0.155]
 
 
+from pydantic import BaseModel
+from pydantic import Field
+from pydantic import validator
+
+
 import typer
+from rich import print
+from typing import Union
 from typing_extensions import Annotated
 from typing import Optional
-from rich import print
+from enum import Enum
 
 import numpy as np
 import math
@@ -29,14 +36,107 @@ app = typer.Typer(
 )
 
 
+class IncidenceAngle(BaseModel):
+    """
+    Example usage:
+
+    angle_auto = IncidenceAngle(angle="auto")
+    angle_user_defined = IncidenceAngle(angle="user_defined")
+    angle_float = IncidenceAngle(angle="30.5")
+    """
+    angle: Union[float, str] = Field(..., description="Angle of incidence")
+
+    @validator('angle')
+    def validate_angle(cls, value):
+        if isinstance(value, float):
+            return value
+        elif isinstance(value, str):
+            if value.lower() == "auto":
+                solar_altitude = 0.5  # Placeholder value, replace with actual solar altitude
+                return calculate_angle_of_incidence_auto(solar_altitude)
+            else:
+                raise ValueError("Invalid angle value. Must be 'auto' or a float.")
+        else:
+            raise ValueError("Invalid angle value. Must be 'auto' or a float.")
+
+    class Config:
+        allow_mutation = False
+
+
+def parse_incidence_angle(angle: str):
+    return IncidenceAngle(angle=angle).angle
+
+
+def calculate_angle_of_incidence_auto(solar_altitude: float) -> float:
+    # 
+    # if winter:
+    #     optimum_tilt_angle = latitude + 15
+    # if summer:
+    #     optimum_tilt_angle = latitude - 15
+    return  AOI_CONSTANTS[1] * 25  # Fake it.
+
+
 @app.command('angular-loss')
-def calculate_angular_loss(
-        index: int,
+def apply_angular_loss(
+        direct_radiation: float,
+        solar_altitude: float,
+        incidence_angle: float,
     ):
+    """Adjust the direct normal radiation for the angle of incidence losses
+
+    adjustment factor represents the fraction of the original
+    `direct_radiation` that is retained after accounting for angle of incidence losses.
+
+    the loss of radiation due to the angle of incidence or the orientation of
+    the surface with respect to the sun.
+
+
+
+    Parameters
+    ----------
+
+    direct_radiation (float): The direct normal radiation in watts per square meter (W/m²).
+    incidence_angle (float): In degrees (°).
+    solar_altitude (float): solar altitude angle in degrees (°).
+    expected_result (float): in watts per square meter (W/m²).
+
+    Returns
+    -------
+
+
+    Notes
+    -----
+
+    The adjustment involves:
+
+    1. computes the fraction of radiation that is not lost due to
+    the `solar_altitude` angle divided by the `incidence_angle` ranging between
+    0 (complete loss) and 1 (no loss):
+
+        ( 1 - exp( -solar_altitude / incidence_angle ) )
+
+        - The exponential function `exp`, raises the mathematical constant `e`
+          (approximately 2.71828) to the power of the given argument.
+
+        - The negative exponential term of the fraction `solar_altitude /
+          incidence_angle` calculates the exponential decay or attenuation
+          factor based on the ratio of `solar_altitude` to the `incidence_angle`. 
+    
+    2. rescales the adjusted value to bring it within a suitable range,
+    by multiplying it by the reciprocal of the exponential term with the
+    reciprocal of the `incidence_angle`:
+
+        1 / ( 1 - exp( - 1 / incidence_angle) )
+
+    ensuring no excessive amplification or diminishing the effect
+    (over-amplification or under-amplification).
     """
-    """
-    typer.echo(1 / ( 1 - math.exp( - 1 / AOI_CONSTANTS[index])))
-    return 1 / ( 1 - math.exp( - 1 / AOI_CONSTANTS[index]))
+    angular_loss_factor = 1 - math.exp( -solar_altitude / incidence_angle )
+    normalisation_term =  1 / ( 1 - math.exp( -1 / incidence_angle))
+    adjusted_direct_radiation = direct_radiation * angular_loss_factor / normalisation_term
+
+    typer.echo(adjusted_direct_radiation)
+    return(adjusted_direct_radiation)
 
 
 # from: rsun_base.c
