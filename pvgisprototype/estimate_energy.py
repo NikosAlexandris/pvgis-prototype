@@ -14,7 +14,7 @@ app = typer.Typer(
 )
 
 
-@app.command('grid')
+@app.command('grid', no_args_is_help=True)
 def estimate_grid_connected_pv(
         longitude: Annotated[float, typer.Argument(
             help='Longitude in decimal degrees, west is negative',
@@ -573,7 +573,7 @@ def estimate_grid_connected_pv(
     return 0
 
 
-@app.command('tracking')
+@app.command('tracking', no_args_is_help=True)
 def estimate_tracking_pv():
     """Estimate the energy production of a tracking PV system connected to the electricity grid
 
@@ -610,7 +610,7 @@ def estimate_tracking_pv():
     pass
 
 
-@app.command('offgrid')
+@app.command('offgrid', no_args_is_help=True)
 def estimate_offgrid_pv():
     """Estimate the energy production of a PV system that is not connected to
     the electricity grid but instead relies on battery storage

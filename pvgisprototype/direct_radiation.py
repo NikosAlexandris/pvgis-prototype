@@ -41,7 +41,7 @@ def calculate_angular_loss(
 
 # from: rsun_base.c
 # function name: brad_angle_irradiance
-@app.command('direct')
+@app.command('direct', no_args_is_help=True)
 def calculate_direct_radiation_for_tilted_surface(
         direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
             help='Direct normal radiation coefficient',
