@@ -1,17 +1,27 @@
 import logging
+from pvgisprototype.data_structures import SolarGeometryDayConstants
+
+from math import fabs
+from math import cos
+from math import sin
+from math import acos
+from math import radians
 
 from pydantic import BaseModel
-from pvgisprototype.data_structures import SolarGeometryDayConstants
-from pvgisprototype.data_structures import GridGeometry
-from pvgisprototype.constants import EPS
-
-from math import acos, pi, fabs
+import typer
 from typing import Optional
 import numpy as np
 
 
-# from :
-# function : com_par_const()
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    help=f"Estimate the direct normal radiance",
+)
+
+
+
+@app.callback(invoke_without_command=True, no_args_is_help=True)
 def calculate_solar_geometry_constants(
         longitude: Annotated[float, typer.Argument(
             help='Longitude in decimal degrees, west is negative',
