@@ -27,6 +27,17 @@ double_numpi = 2 * np.pi
 half_numpi = 0.5 * np.pi
 
 
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    help=f"Calculate solar geometry variables for a given latitude",
+)
+
+
+def parse_solar_geometry_constants_class(dict):
+    return SolarGeometryDayConstants(dict)
+
+
 def get_day_from_hour_of_year(year: int, hour_of_year: int):
     """Get day of year from hour of year."""
     start_of_year = np.datetime64(f'{year}-01-01')
@@ -76,8 +87,10 @@ def calculate_solar_time(
 
 # from: rsun_base.cpp
 # function : com_par()
+@app.callback(invoke_without_command=True)
 def calculate_solar_geometry_variables(
-        solar_geometry_day_constants: SolarGeometryDayConstants,
+        # solar_geometry_day_constants: SolarGeometryDayConstants,
+        solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
         year: int,
         hour_of_year: int,
         days_in_a_year: float = 365.25,
@@ -98,8 +111,8 @@ def calculate_solar_geometry_variables(
     solar_geometry_day_constants : SolarGeometryDayConstants
         The input solar geometry constants.
     """
-    print(len(solar_geometry_day_constants.dict().values()))
-    print(solar_geometry_day_constants.dict().values())
+    # print(len(solar_geometry_day_constants.dict().values()))
+    # print(solar_geometry_day_constants.dict().values())
     # Unpack constants
     (
         latitude,
