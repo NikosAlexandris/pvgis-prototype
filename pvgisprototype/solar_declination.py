@@ -1,6 +1,8 @@
 import typer
 from typing_extensions import Annotated
 import math
+import numpy as np
+import datetime
 
 
 def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
@@ -58,6 +60,15 @@ def calculate_solar_declination(
     Notes
     -----
 
+    - IMPORTANT: In the original C source code, there is at the end of
+        `com_declin` function:
+        
+        `decl = - decl;`
+
+        which is actually : `declination = - declination`.        
+        Why? The value is inverted again at some other part of the program when
+        it gets to read data. This has been "fixed" in this function here.-
+    
     - The function calculates the `proportion` of the way through the year (in
       radians), which is given by `(2 * pi * day_of_year) / 365.25`.
 
@@ -77,7 +88,6 @@ def calculate_solar_declination(
     """
     some_term = 2 * math.pi * day_of_year / days_in_a_year
     declination = math.asin(0.3978 * math.sin(some_term - 1.4 + orbital_eccentricity * math.sin(some_term - perigee_offset)))
-    declination = - declination  # why? in the C source code: decl = - decl;
 
     declination = convert_to_degrees_if_requested(declination, output_units)
     return declination
