@@ -26,11 +26,19 @@ def calculate_solar_geometry_constants(
         EPS: float = 1e-5
         ) -> SolarGeometryDayConstants:
     """Calculate solar geometry constants for a given latitude and return a SolarGeometryDayConstants object with the calculated values.
+
+    Notes
+    -----
+
+    - IMPORTANT: In the original C source code there is :
+
+        `latitude = -deg2rad*fixedData.latitude;`
+
+        likely due to `decl = -decl` line in `com_declin()` function.
+
+        Why? This has been "fixed" in this function here.-
     """
-    # as per the original source code :
-    # `latitude = -deg2rad*fixedData.latitude;`
-    # that is, convert to radians & invert sign : why?
-    latitude = - radians(latitude)
+    latitude = radians(latitude)
     sine_of_latitude = sin(latitude) 
     cosine_of_latitude = cos(latitude)
 
