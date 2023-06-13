@@ -30,11 +30,11 @@ Verify expected declination for these days based on a given formula or lookup ta
 def test_calculate_solar_declination(day_of_year: int, expected: float):
     # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='radians'), 0.0001) == expected
     # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 1) == expected
-    assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.1) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.01) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.001) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.0001) == expected
+    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.) == expected
+    assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.1) == expected
+    assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.01) == expected
+    assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.001) == expected
+    assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.0001) == expected
 
 
 # @pytest.mark.mpl_image_compare  # instructs use of a baseline image

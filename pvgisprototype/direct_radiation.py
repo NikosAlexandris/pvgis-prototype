@@ -37,13 +37,6 @@ app = typer.Typer(
 
 
 class IncidenceAngle(BaseModel):
-    """
-    Example usage:
-
-    angle_auto = IncidenceAngle(angle="auto")
-    angle_user_defined = IncidenceAngle(angle="user_defined")
-    angle_float = IncidenceAngle(angle="30.5")
-    """
     angle: Union[float, str] = Field(..., description="Angle of incidence")
 
     @validator('angle')
