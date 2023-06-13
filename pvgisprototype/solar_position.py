@@ -5,6 +5,8 @@ from datetime import datetime
 from datetime import timezone
 import suncalc
 import pysolar
+from pvgisprototype.conversions import convert_to_degrees_if_requested
+from pvgisprototype.conversions import convert_to_radians_if_requested
 
 
 class SolarPositionModels(str, Enum):
@@ -42,21 +44,28 @@ class SolarPositionModels(str, Enum):
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"Calculate the solar constant for a day in the year",
+    help=f"Calculate the solar altitude and azimuth for a day in the year",
 )
 
 
 @app.callback(invoke_without_command=True, no_args_is_help=True)
-def get_solar_position(
+def calculate_solar_position(
         longitude: float,
         latitude: float,
         timestamp: datetime,
         model: Annotated[SolarPositionModels, typer.Option(
+            '-m',
             '--model',
             show_default=True,
             show_choices=True,
             case_sensitive=False,
             help="Model to calculate solar position")] = 'suncalc',
+        output_units: Annotated[str, typer.Option(
+            '-u',
+            '--output-units',
+            show_default=True,
+            case_sensitive=False,
+            help="Output units for solar declination (degrees or radians)")] = 'degrees',
         ):
     """
     """
@@ -75,6 +84,8 @@ def get_solar_position(
                 lng=longitude,
                 lat=latitude,
                 ).values()
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
     if model.value  == 'pysolar':
         solar_altitude = pysolar.solar.get_altitude(
                 latitude_deg=longitude,  # this comes first
@@ -86,6 +97,9 @@ def get_solar_position(
                 longitude_deg=latitude,
                 when=timestamp,
                 )
-    # typer.echo(solar_altitude, solar_azimuth)
+        solar_azimuth = convert_to_radians_if_requested(solar_azimuth, output_units)
+        solar_altitude = convert_to_radians_if_requested(solar_altitude, output_units)
+
     print(solar_altitude, solar_azimuth)
+    # typer.echo(solar_altitude, solar_azimuth)
     return solar_altitude, solar_azimuth
