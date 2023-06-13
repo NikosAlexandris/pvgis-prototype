@@ -1,3 +1,4 @@
+from devtools import debug
 from pvgisprototype.solar_declination import calculate_solar_declination
 from pvgisprototype.solar_declination import calculate_solar_declination_hargreaves
 import matplotlib.pyplot as plt
@@ -32,7 +33,7 @@ def plot_solar_declination_one_year(
         year: int,
         title: str = 'Annual Variation of Solar Declination',
         ):
-    days = days_in_year(year)
+    days = np.arange(days_in_year(year))
     solar_declinations = np.vectorize(calculate_solar_declination)(days, output_units='degrees')  # Calculate solar declination for each day
     solar_declinations_hargreaves = np.vectorize(calculate_solar_declination_hargreaves)(days)  # Calculate solar declination for each day
 
