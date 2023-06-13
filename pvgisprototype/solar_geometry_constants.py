@@ -1,27 +1,23 @@
 import logging
+import typer
 from pvgisprototype.data_structures import SolarGeometryDayConstants
-
 from math import fabs
 from math import cos
 from math import sin
 from math import acos
 from math import radians
-
-from pydantic import BaseModel
-import typer
-from typing import Optional
 import numpy as np
 
 
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"Estimate the direct normal radiance",
+    help=f"Calculate solar geometry constants for a given latitude",
 )
 
 
-
-@app.callback(invoke_without_command=True, no_args_is_help=True)
+# from : rsun_base.cpp
+# function : com_par_const()
 def calculate_solar_geometry_constants(
         latitude: float,
         local_solar_time: float,
@@ -71,9 +67,7 @@ def calculate_solar_geometry_constants(
 
     return SolarGeometryDayConstants(
         latitude=latitude,
-        # local_solar_time=local_solar_time,
         solar_declination=solar_declination,
-        # time_offset=time_offset,
         cosine_of_solar_declination=cosine_of_solar_declination,
         sine_of_solar_declination=sine_of_solar_declination,
         lum_C11=lum_C11,
