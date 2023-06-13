@@ -3,6 +3,19 @@ from typing_extensions import Annotated
 import math
 
 
+def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
+    """Convert angle from radians to degrees if requested."""
+    x = np.degrees(angle) if output_units == 'degrees' else angle
+    debug(locals())
+    return x
+
+
+def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
+    """Convert angle from degrees to radians if requested."""
+    debug(locals())
+    return np.radians(angle) if output_units == 'radians' else angle
+
+
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
@@ -65,15 +78,20 @@ def calculate_solar_declination(
     some_term = 2 * math.pi * day_of_year / days_in_a_year
     declination = math.asin(0.3978 * math.sin(some_term - 1.4 + orbital_eccentricity * math.sin(some_term - perigee_offset)))
     declination = - declination  # why? in the C source code: decl = - decl;
-    if output_units == 'degrees':
-        declination = math.degrees(declination)
 
+    declination = convert_to_degrees_if_requested(declination, output_units)
     return declination
 
 
 def calculate_solar_declination_hargreaves(
         day_of_year: int,
         days_in_a_year: float = 365.25,
+        output_units: Annotated[str, typer.Option(
+            '-o',
+            '--output-units',
+            show_default=True,
+            case_sensitive=False,
+            help="Output units for solar declination (degrees or radians)")] = 'degrees',
         ) -> float:
     """Approximate the solar declination based on the Hargreaves formula.
 
@@ -101,5 +119,6 @@ def calculate_solar_declination_hargreaves(
         which typically occurs around June 21st.
     """
     declination = 23.45 * math.sin(math.radians(360/days_in_a_year * (284 + day_of_year + 0.4 * math.sin(math.radians(360/days_in_a_year * (day_of_year - 100))))))
+    declination = convert_to_radians_if_requested(declination, output_units)
 
     return declination
