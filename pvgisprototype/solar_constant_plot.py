@@ -30,7 +30,7 @@ def plot_solar_constant():
     plt.ylabel('Solar Constant (W/m^2)')
     plt.title('Annual Variation of Solar Constant')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc='lower right')
     plt.savefig('solar_constant.png')
     return fig
 
