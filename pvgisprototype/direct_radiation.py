@@ -303,6 +303,103 @@ def calculate_direct_horizontal_irradiance(
     sine_solar_altitude = C31 * cosine_horizontal_hour_angle + C33
     direct_horizontal_irradiance = direct_normal_irradiance * math.sin(solar_altitude)
     return direct_horizontal_irradiance
+
+
+@app.command('inclined', no_args_is_help=True)
+def calculate_direct_inclined_irradiance(
+        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
+        elevation: float,
+        year: int,
+        day_of_year: float,
+        hour_of_year: int,
+        surface_tilt: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
+        surface_orientation: float,
+        direct_horizontal_radiation: Annotated[float, typer.Argument(
+            help='Direct normal radiation in W/m²',
+            min=-9000, max=1000)],  # `sh` which comes from `s0`
+        direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
+            help='Direct normal radiation coefficient (dimensionless)',
+            min=0, max=1)],  # bh = sunRadVar->cbh;
+        solar_altitude: Annotated[float, typer.Argument(
+            help='Solar altitude in degrees °',
+            min=0, max=90)],
+        # incidence_angle: Annotated[Union[IncidenceAngle, float], typer.Option(
+        linke_turbidity_factor: float,
+        incidence_angle: Annotated[IncidenceAngle, typer.Option(
+             '--incidence-angle',
+             show_default=True,
+             parser=parse_incidence_angle,
+             help='Angle of incidence in degrees °',
+             case_sensitive=False)] = 'auto',
+        ):
+    """
+    """
+    # Hofierka, 2002 ------------------------------------------------------
+    # tangent_relative_longitude = - sin(surface_tilt)
+    #                              * sin(surface_orientation) /
+    #                                sin(latitude) 
+    #                              * sin(surface_tilt) 
+    #                              * cos(surface_orientation) 
+    #                              + cos(latitude) 
+    #                              * cos(surface_tilt)
+    tangent_relative_longitude = -math.sin(surface_tilt) * math.sin(surface_orientation) / math.sin(
+        latitude
+    ) * math.sin(surface_tilt) * math.cos(surface_orientation) + math.cos(latitude) * math.cos(surface_tilt)
+    # C source code -------------------------------------------------------
+    # There is an error of one negative sign in either of the expressions!
+    # That is so because : cos(pi/2 + x) = -sin(x)
+    # tangent_relative_longitude = - cos(half_pi - surface_tilt)  # cos(pi/2 - x) = sin(x)
+    #                              * cos(half_pi + surface_orientation) /  # cos(pi/2 + x) = -sin(x)
+    #                                sin(latitude) 
+    #                              * cos(half_pi - surface_tilt) 
+    #                              * sin(half_pi + surface_orientation)  # sin(pi/2 + x) = cos(x)
+    #                              + cos(latitude) 
+    #                              * sin(half_pi - surface_tilt)  # sin(pi/2 - x) = cos(x)
+    # --------------------------------------------------------------------
+
+    relative_longitude = math.atan(tangent_relative_longitude)
+    # cos(hour_angle - relative_longitude) = C33_inclined / C31_inclined
+
+    # Hofierka, 2002
+    # sine_relative_latitude = -cos(latitude) 
+    #                          * sin(surface_tilt)
+    #                          * cos(surface_orientation)
+    #                          + sin(latitude)
+    #                          * cos (surface_tilt)
+    sine_relative_latitude = -math.cos(latitude) * math.sin(surface_tilt) * math.cos(
+        surface_orientation
+    ) + math.sin(latitude) * math.cos(surface_tilt)
+    # Following is equal to above.
+    # # Huld ?
+    # sine_relative_latitude = -cos(latitude)
+    #                          * cos(half_pi - surface_tilt)
+    #                          * sin(half_pi + surface_orientation)
+    #                          + sin(latitude)
+    #                          * sin(half_pi - surface_tilt)
+    relative_latitude = math.asin(sine_relative_latitude)
+    math.cosine_relative_latitude = math.cos(relative_latitude)
+
+    from .solar_declination import calculate_solar_declination
+    solar_declination_horizontal = calculate_solar_declination(day_of_year)
+    C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination_horizontal)
+    C33_inclined = math.sin(relative_latitude) * math.sin(solar_declination_horizontal)
+
+    from .solar_geometry_variables import calculate_solar_time
+    solar_time = calculate_solar_time(year, hour_of_year)
+    hour_angle = 0.261799 * (solar_time - 12)
+    solar_declination_inclined = C31_inclined * math.cos (hour_angle - relative_longitude) + C33_inclined
+
+    direct_horizontal_irradiance = calculate_direct_horizontal_irradiance(
+            latitude=latitude,
+            elevation=elevation,
+            year=year,
+            day_of_year=day_of_year,
+            hour_of_year=hour_of_year,
+            solar_altitude=solar_altitude,
+            linke_turbidity_factor=linke_turbidity_factor,
+            )
+    direct_inclined_irradiance = direct_horizontal_irradiance * math.sin(solar_declination_inclined) / math.sin(solar_altitude)
+    return direct_inclined_irradiance
 # from: rsun_base.c
 # function name: brad_angle_irradiance
 @app.command('direct', no_args_is_help=True)
