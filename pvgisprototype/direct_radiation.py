@@ -206,6 +206,56 @@ def rayleigh_optical_thickness(
         rayleigh_optical_thickness = 1 / (10.4 + 0.718 * optical_air_mass)
 
     return rayleigh_optical_thickness
+
+
+@app.command('normal', no_args_is_help=True)
+def calculate_direct_normal_irradiance(
+        extraterrestial_irradiance: float,
+        linke_turbidity_factor: float,
+        optical_air_mass: float,
+        ):
+    """Calculate the direct irradiance normal to the solar beam B0c
+
+    The direct normal irradiance is attenuated by the cloudless atmosphere
+
+    Parameters
+    ----------
+    extraterrestial_irradiance: float
+
+    linke_turbidity_factor: float
+        The Linke turbidity factor (TL, for an air mass equal to 2) is a very
+        convenient approximation to model the atmospheric absorption and
+        scattering of the solar radiation under clear skies. It describes the
+        optical thickness of the atmosphere due to both the absorption by the
+        water vapor and the absorption and scattering by the aerosol particles
+        relative to a dry and clean atmosphere. It summarizes the turbidity of
+        the atmosphere, and hence the attenuation of the direct beam solar
+        radiation (WMO, 1981; Kasten, 1996). The larger the TL, the larger the
+        attenuation of the radiation by the clear sky atmosphere.
+
+    optical_air_mass: float
+
+    References
+    ----------
+
+    @article{Kasten1996,
+        doi = {10.1016/0038-092x(95)00114-7},
+        year = 1996,
+        publisher = {Elsevier {BV}},
+        volume = {56},
+        number = {3},
+        pages = {239--244},
+        author = {F. Kasten},
+        title = {The linke turbidity factor based on improved values of the integral Rayleigh optical thickness},
+        journal = {Solar Energy}
+    }
+    """
+    direct_normal_irradiance = extraterrestial_irradiance * math.exp(
+            corrected_linke_turbidity_factor(linke_turbidity_factor)
+            * optical_air_mass
+            * rayleigh_optical_thickness(optical_air_mass)
+            )
+    return direct_normal_irradiance  # B0c
 # from: rsun_base.c
 # function name: brad_angle_irradiance
 @app.command('direct', no_args_is_help=True)
