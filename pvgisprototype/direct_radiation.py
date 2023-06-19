@@ -46,6 +46,13 @@ app = typer.Typer(
 )
 
 
+# some correction for the given elevation (Hofierka, 2002)
+adjust_elevation = lambda elevation: math.exp(elevation / 8434.5)
+# ensure value ranges in [-pi, pi]
+range_in_minus_plus_pi = lambda radians: (radians + math.pi) % (2 * math.pi) - math.pi
+corrected_linke_turbidity_factor = lambda tlk: -0.8662 * tlk
+
+
 def calculate_angle_of_incidence_auto(solar_altitude: float) -> float:
     # 
     # if winter:
