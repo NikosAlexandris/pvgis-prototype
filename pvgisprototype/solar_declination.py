@@ -52,8 +52,8 @@ def calculate_solar_declination(
 
     Returns
     -------
-    float
-        The solar declination for the given day of the year.
+    solar_declination: float
+        The solar declination in radians for the given day of the year.
 
     Notes
     -----
@@ -84,8 +84,8 @@ def calculate_solar_declination(
       of solar position, comprehensive models like the Solar Position Algorithm
       (SPA) are typically used.
     """
-    some_term = 2 * math.pi * day_of_year / days_in_a_year
-    declination = math.asin(0.3978 * math.sin(some_term - 1.4 + orbital_eccentricity * math.sin(some_term - perigee_offset)))
+    day_angle = 2 * math.pi * day_of_year / days_in_a_year
+    declination = math.asin(0.3978 * math.sin(day_angle - 1.4 + orbital_eccentricity * math.sin(day_angle - perigee_offset)))
 
     declination = convert_to_degrees_if_requested(declination, output_units)
     return declination
