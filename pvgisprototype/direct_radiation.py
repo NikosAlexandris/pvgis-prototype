@@ -403,21 +403,34 @@ def calculate_direct_inclined_irradiance(
 # from: rsun_base.c
 # function name: brad_angle_irradiance
 @app.command('direct', no_args_is_help=True)
-def calculate_direct_radiation_for_tilted_surface(
-        direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
-            help='Direct normal radiation coefficient',
-            min=-9000, max=1000)],  # bh = sunRadVar->cbh;
+def calculate_direct_irradiance(
+        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
+        year: int,
+        day_of_year: float,
+        hour_of_year: float,
+        # direct_horizontal_radiation: Annotated[float, typer.Argument(
+        #     help='Direct normal radiation in W/m²',
+        #     min=-9000, max=1000)],  # `sh` which comes from `s0`
+        # direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
+        #     help='Direct normal radiation coefficient (dimensionless)',
+        #     min=0, max=1)],  # bh = sunRadVar->cbh;
         solar_altitude: Annotated[float, typer.Argument(
-            help='Direct normal radiation coefficient',
-            min=0, max=90)],  # sh, s0
-        sine_of_solar_altitude: Annotated[float, typer.Argument(
-            help='Sine of solar altitude',
-            min=0, max=1)],  # sunVarGeom->sinSolarAltitude;
-         # incidence_angle: Annotated[Union[IncidenceAngle, float], typer.Option(
-         incidence_angle: Annotated[IncidenceAngle, typer.Option(
+            help='Solar altitude in degrees °',
+            min=0, max=90)],
+        # incidence_angle: Annotated[Union[IncidenceAngle, float], typer.Option(
+        incidence_angle: Annotated[IncidenceAngle, typer.Option(
+             '--incidence-angle',
+             show_default=True,
              parser=parse_incidence_angle,
-             help='Angle of incidence',
-             case_sensitive=False)] = IncidenceAngle(angle='auto'),
+             help='Angle of incidence in degrees °',
+             case_sensitive=False)] = 'auto',
+        component: Annotated[DirectIrradianceComponents, typer.Option(
+            '-c',
+            '--component',
+            show_default=True,
+            show_choices=True,
+            case_sensitive=False,
+            help="Direct irradiance component to calculate")] = 'inclined',
     ):
     """Calculate the direct radiation based on given parameters.
 
@@ -450,13 +463,3 @@ def calculate_direct_radiation_for_tilted_surface(
     - `direct_radiation_coefficient` : from `solar_radiation_variables['direct_radiation_coefficient']`
     - `sine_of_solar_altitude` : from `sun_geometry['sine_of_solar_altitude']`
     """
-    # the direct radiation value to adjust
-    direct_radiation = direct_horizontal_radiation_coefficient * solar_altitude / sine_of_solar_altitude
-    adjusted_direct_radiation = apply_angular_loss(
-            direct_radiation,
-            solar_altitude,
-            incidence_angle
-            )
-
-    typer.echo(adjusted_direct_radiation)
-    return adjusted_direct_radiation
