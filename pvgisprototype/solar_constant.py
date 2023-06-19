@@ -13,7 +13,7 @@ app = typer.Typer(
 # function: com_sol_const(int no_of_day)
 @app.callback(invoke_without_command=True, no_args_is_help=True)
 def calculate_extraterrestrial_irradiance(
-        number_of_day: float,
+        day_of_year: float,
         days_in_a_year: float = 365.25,
         solar_constant: float = 1367,
         orbital_eccentricity: float = 0.03344,
@@ -29,30 +29,30 @@ def calculate_extraterrestrial_irradiance(
 
     Parameters
     ----------
-    number_of_day : int, float
-        Number of the day in the year counted from 1 (January 1) to 365 or 366
+    day_of_year : int, float
+        Number of Julian day of year counted from 1 (January 1) to 365 or 366
         (December 31).
 
-    Solar constant:
+    solar_constant: float
         1367.0 W/m^2
     
-    Number of days in a year:
+    days_in_a_year: float
         365.25
 
-    Perigee offset:
+    perigee_offset: float
         0.048869 (in angular units). The earth's closest position to the sun is
         January 2 at 8:18pm or day number 2.8408. In angular units :
         2*pi * 2.8408 / 365.25 = 0.048869.
 
-    Orbital eccentricity:
+    orbital_eccentricity: float
         For Earth this is currently about 0.01672, and so the distance to the
         sun varies by +/- 0.01672 from the mean distance (1AU). Thus, the
         amplitude of the function over the year is: 2*eccentricity = 0.03344.
 
     Returns
     -------
-    float
-        Solar constant.
+    extraterrestial_irradiance: float
+        The extraterrestial irradiance for the given day of the year.
 
     Notes
     -----
@@ -78,7 +78,7 @@ def calculate_extraterrestrial_irradiance(
     1412.71 W/m^2 and on July 6 it gets down to around 1321 W/m^2. This value
     is for what hits the top of the atmosphere before any energy is attenuated.
     """
-    position_of_earth = 2 * math.pi * number_of_day / days_in_a_year
+    position_of_earth = 2 * math.pi * day_of_year / days_in_a_year
     distance_correction_factor = 1 + orbital_eccentricity * math.cos(position_of_earth - perigee_offset)
     extraterrestial_irradiance = solar_constant * distance_correction_factor
 
