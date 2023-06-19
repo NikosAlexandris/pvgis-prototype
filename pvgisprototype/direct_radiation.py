@@ -10,7 +10,6 @@ irradiance. The remaining part is the _beam_ irradiance.
 """
 
 
-
 import logging
 logging.basicConfig(
     level=logging.ERROR,
@@ -171,6 +170,7 @@ def calculate_refracted_solar_altitude(
         solar_altitude: float,
         ):
     """
+    This function implements the algorithm described by Hofierka :cite:`p:hofierka2002`.
     """
     atmospheric_refraction = (
             0.061359
@@ -186,6 +186,7 @@ def calculate_optical_air_mass(
         refracted_solar_altitude: float, 
         ):
     """
+    This function implements the algorithm described by Hofierka :cite:`p:hofierka2002`.
     """
     optical_air_mass = adjust_elevation(elevation) / (
             math.sin(refracted_solar_altitude)
@@ -200,6 +201,8 @@ def rayleigh_optical_thickness(
         ):
     """
     δ R(m) = 1/(6.6296 + 1.7513m - 0.1202m2 + 0.0065m3 - 0.00013m4)
+    This function implements the algorithm described by Hofierka
+    :cite:`p:hofierka2002`.
     """
     if optical_air_mass <= 20:
         rayleigh_optical_thickness = 1 / (
@@ -221,9 +224,11 @@ def calculate_direct_normal_irradiance(
         linke_turbidity_factor: float,
         optical_air_mass: float,
         ):
-    """Calculate the direct irradiance normal to the solar beam B0c
+    """Calculate the direct normal irradiance attenuated by the cloudless
+    atmosphere
 
-    The direct normal irradiance is attenuated by the cloudless atmosphere
+    This function implements the algorithm described by Hofierka
+    :cite:`p:hofierka2002`.
 
     Parameters
     ----------
@@ -275,7 +280,10 @@ def calculate_direct_horizontal_irradiance(
         solar_altitude: float,
         linke_turbidity_factor: float,
         ):
-    """
+    """Calculate the direct irradiatiance incident on a horizontal solar surface.
+
+    This function implements the algorithm described by Hofierka
+    :cite:`p:hofierka2002`.
     """
     from .solar_declination import calculate_solar_declination
     solar_declination_horizontal = calculate_solar_declination(day_of_year)
@@ -339,7 +347,10 @@ def calculate_direct_inclined_irradiance(
              help='Angle of incidence in degrees °',
              case_sensitive=False)] = 'auto',
         ):
-    """
+    """Calculate the direct irradiatiance incident on a tilted solar surface.
+
+    This function implements the algorithm described by Hofierka
+    :cite:`p:hofierka2002`.
     """
     # Hofierka, 2002 ------------------------------------------------------
     # tangent_relative_longitude = - sin(surface_tilt)
@@ -447,66 +458,29 @@ def calculate_direct_irradiance(
             case_sensitive=False,
             help="Direct irradiance component to calculate")] = 'inclined',
     ):
-    """Calculate the direct radiation based on given parameters.
+    """Calculate the direct irradiatiance incident on a solar surface.
 
-    Calculate the angle of incidence irradiance and modify it based on certain
-    conditions.
+    This function implements the algorithm described by Hofierka
+    :cite:`p:hofierka2002`.
 
     Parameters
     ----------
-    direct_horizontal_radiation_coefficient (list): Direct horizontal radiation coefficient. Likely a reference to the clear-sky beam horizontal radiation?
-    solar_altitude (float): Solar altitude angle.
-    incidence_angle_index (int): Index 0 or 1 for .. and .. respectively.
-    sun_geometry: Sun geometry variables for a specific day ?
-    sun_radiation_variables: Solar radiation variables.
+    direct_horizontal_radiation_coefficient: list
+        Direct horizontal radiation coefficient. Likely a reference to the clear-sky beam horizontal radiation?
+    solar_altitude: float
+        Solar altitude angle.
+    incidence_angle_index: int
+        Index 0 or 1 for .. and .. respectively.
+    sun_geometry:
+        Sun geometry variables for a specific day ?
+    sun_radiation_variables:
+        Solar radiation variables.
 
     Returns
     -------
     direct_irradiance: float
         The direct radiant flux incident on a surface per unit area in W/m².
 
-    Notes
-    -----
-
-    This function is the product of:
-
-        1. direct translation of the original C code function(s) in to
-        Python-like pseudocode
-    
-        2. refactoring, trial and error
-
-    - `direct_radiation_coefficient` : from `solar_radiation_variables['direct_radiation_coefficient']`
-    - `sine_of_solar_altitude` : from `sun_geometry['sine_of_solar_altitude']`,
-      actually from : `sunVarGeom->sinSolarAltitude;`.
-
-      Removed from input arguments as it can be simply calculated internally!
-
-    Old C function:
-
-        ``` c
-        double brad_angle_irradiance(
-                double sh,
-                double *bh,
-                struct SunGeometryVarDay *sunVarGeom,
-                struct SolarRadVar *sunRadVar,
-                double *radiations
-                )
-        {
-            double br;
-            *bh = sunRadVar->cbh;
-
-            br = *bh * sh/ sunVarGeom->sinSolarAltitude;
-            radiations[0] = radiations[1] = br;
-
-            if(calculateAngleLoss())
-            {
-                br *= (1-exp(-sh/AOIConstants[1]))*angular_loss_denom;
-            }
-
-            radiations[0] = br;
-            return (br);
-        }
-        ```
     """
     # # convert to radians!
     # sine_of_solar_altitude = np.sin(np.radians(solar_altitude))
