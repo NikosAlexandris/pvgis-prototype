@@ -84,15 +84,12 @@ def apply_angular_loss(
         solar_altitude: float,
         incidence_angle: float,
     ):
-    """Adjust the direct normal radiation for the angle of incidence losses
+    """Apply losses to the direct normal radiation due to the angle of incidence
 
-    adjustment factor represents the fraction of the original
-    `direct_radiation` that is retained after accounting for angle of incidence losses.
-
-    the loss of radiation due to the angle of incidence or the orientation of
-    the surface with respect to the sun.
-
-
+    The adjustment factor represents the fraction of the original
+    `direct_radiation` that is retained after accounting for the loss of
+    radiation due to the angle of incidence or the orientation of the surface
+    with respect to the sun.
 
     Parameters
     ----------
@@ -104,7 +101,7 @@ def apply_angular_loss(
 
     Returns
     -------
-
+    adjusted_direct_radiation
 
     Notes
     -----
@@ -115,7 +112,7 @@ def apply_angular_loss(
     the `solar_altitude` angle divided by the `incidence_angle` ranging between
     0 (complete loss) and 1 (no loss):
 
-        ( 1 - exp( -solar_altitude / incidence_angle ) )
+        `( 1 - exp( -solar_altitude / incidence_angle ) )`
 
         - The exponential function `exp`, raises the mathematical constant `e`
           (approximately 2.71828) to the power of the given argument.
@@ -128,7 +125,7 @@ def apply_angular_loss(
     by multiplying it by the reciprocal of the exponential term with the
     reciprocal of the `incidence_angle`:
 
-        1 / ( 1 - exp( - 1 / incidence_angle) )
+        `1 / ( 1 - exp( - 1 / incidence_angle) )`
 
     ensuring no excessive amplification or diminishing the effect
     (over-amplification or under-amplification).
