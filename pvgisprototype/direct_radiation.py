@@ -439,16 +439,16 @@ def calculate_direct_irradiance(
 
     Parameters
     ----------
-        direct_horizontal_radiation_coefficient (list): Direct horizontal radiation coefficient. Likely a reference to the clear-sky beam horizontal radiation?
-        solar_altitude (float): Solar altitude angle.
-        sine_of_solar_altitude (float): Sine of solar altitude angle.
-        incidence_angle_index (int): Index 0 or 1 for .. and .. respectively.
-        sun_geometry: Sun geometry variables for a specific day ?
-        sun_radiation_variables: Solar radiation variables.
+    direct_horizontal_radiation_coefficient (list): Direct horizontal radiation coefficient. Likely a reference to the clear-sky beam horizontal radiation?
+    solar_altitude (float): Solar altitude angle.
+    incidence_angle_index (int): Index 0 or 1 for .. and .. respectively.
+    sun_geometry: Sun geometry variables for a specific day ?
+    sun_radiation_variables: Solar radiation variables.
 
     Returns
     -------
-        float: Direct radiation value.
+    direct_irradiance: float
+        The direct radiant flux incident on a surface per unit area in W/m².
 
     Notes
     -----
@@ -461,5 +461,35 @@ def calculate_direct_irradiance(
         2. refactoring, trial and error
 
     - `direct_radiation_coefficient` : from `solar_radiation_variables['direct_radiation_coefficient']`
-    - `sine_of_solar_altitude` : from `sun_geometry['sine_of_solar_altitude']`
+    - `sine_of_solar_altitude` : from `sun_geometry['sine_of_solar_altitude']`,
+      actually from : `sunVarGeom->sinSolarAltitude;`.
+
+      Removed from input arguments as it can be simply calculated internally!
+
+    Old C function:
+
+        ``` c
+        double brad_angle_irradiance(
+                double sh,
+                double *bh,
+                struct SunGeometryVarDay *sunVarGeom,
+                struct SolarRadVar *sunRadVar,
+                double *radiations
+                )
+        {
+            double br;
+            *bh = sunRadVar->cbh;
+
+            br = *bh * sh/ sunVarGeom->sinSolarAltitude;
+            radiations[0] = radiations[1] = br;
+
+            if(calculateAngleLoss())
+            {
+                br *= (1-exp(-sh/AOIConstants[1]))*angular_loss_denom;
+            }
+
+            radiations[0] = br;
+            return (br);
+        }
+        ```
     """
