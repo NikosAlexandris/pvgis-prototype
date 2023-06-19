@@ -41,7 +41,7 @@ def plot_solar_declination_one_year(
     plt.plot(days, solar_declinations, label='PVGIS')
     plt.plot(days, solar_declinations_hargreaves, label='Hargreaves')
     plt.xlabel('Day of the Year')
-    plt.ylabel(f'Solar Declination in {year}')
+    # plt.ylabel(f'Solar Declination')
     plt.title(title)
     plt.grid(True)
     plt.legend()
