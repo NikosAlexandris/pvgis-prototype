@@ -256,6 +256,53 @@ def calculate_direct_normal_irradiance(
             * rayleigh_optical_thickness(optical_air_mass)
             )
     return direct_normal_irradiance  # B0c
+
+
+@app.command('horizontal', no_args_is_help=True)
+def calculate_direct_horizontal_irradiance(
+        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
+        elevation: float,
+        year: int,
+        day_of_year: float,
+        hour_of_year: int,
+        solar_altitude: float,
+        linke_turbidity_factor: float,
+        ):
+    """
+    """
+    from .solar_declination import calculate_solar_declination
+    solar_declination_horizontal = calculate_solar_declination(day_of_year)
+
+    from .solar_geometry_variables import calculate_solar_time
+    solar_time = calculate_solar_time(year, hour_of_year)
+
+    C31 = math.cos(latitude) * math.cos(solar_declination_horizontal)
+    C33 = math.sin(latitude) * math.sin(solar_declination_horizontal)
+    cosine_horizontal_hour_angle = -C33 / C31
+
+    # hour_angle = 0.261799 * (solar_time - 12)
+
+    # convert to radians!
+    # sine_solar_altitude = np.sin(np.radians(solar_altitude))
+    from .solar_constant import calculate_extraterrestrial_irradiance
+    extraterrestial_irradiance = calculate_extraterrestrial_irradiance(day_of_year)
+
+    refracted_solar_altitude = calculate_refracted_solar_altitude(
+            solar_altitude=solar_altitude,
+            )
+
+    optical_air_mass = calculate_optical_air_mass(
+            elevation=elevation,
+            refracted_solar_altitude=refracted_solar_altitude,
+            )
+    direct_normal_irradiance = calculate_direct_normal_irradiance(
+            extraterrestial_irradiance=extraterrestial_irradiance,
+            linke_turbidity_factor=linke_turbidity_factor,
+            optical_air_mass=optical_air_mass,
+            )
+    sine_solar_altitude = C31 * cosine_horizontal_hour_angle + C33
+    direct_horizontal_irradiance = direct_normal_irradiance * math.sin(solar_altitude)
+    return direct_horizontal_irradiance
 # from: rsun_base.c
 # function name: brad_angle_irradiance
 @app.command('direct', no_args_is_help=True)
