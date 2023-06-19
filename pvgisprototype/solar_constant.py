@@ -5,21 +5,21 @@ import math
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"Calculate the solar constant for a day in the year",
+    help=f"Calculate the extraterrestial_irradiance for a day in the year",
 )
 
 
 # from: rsun_base.cpp
 # function: com_sol_const(int no_of_day)
 @app.callback(invoke_without_command=True, no_args_is_help=True)
-def calculate_solar_constant(
+def calculate_extraterrestrial_irradiance(
         number_of_day: float,
         days_in_a_year: float = 365.25,
-        average_solar_constant: float = 1367,
+        solar_constant: float = 1367,
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
         ) -> float:
-    """Calculate the solar constant corrected for the given day in the year.
+    """Calculate the extraterrestial_irradiance for the given day of the year.
 
     The solar constant is the amount of solar electromagnetic radiation
     received at the outer atmosphere of Earth in a unit area perpendicular to
@@ -79,8 +79,8 @@ def calculate_solar_constant(
     is for what hits the top of the atmosphere before any energy is attenuated.
     """
     position_of_earth = 2 * math.pi * number_of_day / days_in_a_year
-    adjustment_factor = orbital_eccentricity * math.cos(position_of_earth - perigee_offset)
-    solar_constant = average_solar_constant * (1 + adjustment_factor)
+    distance_correction_factor = 1 + orbital_eccentricity * math.cos(position_of_earth - perigee_offset)
+    extraterrestial_irradiance = solar_constant * distance_correction_factor
 
-    typer.echo(solar_constant)
-    return solar_constant
+    typer.echo(extraterrestial_irradiance)
+    return extraterrestial_irradiance
