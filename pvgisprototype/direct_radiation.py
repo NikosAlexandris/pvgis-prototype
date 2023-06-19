@@ -400,6 +400,14 @@ def calculate_direct_inclined_irradiance(
             )
     direct_inclined_irradiance = direct_horizontal_irradiance * math.sin(solar_declination_inclined) / math.sin(solar_altitude)
     return direct_inclined_irradiance
+
+
+class DirectIrradianceComponents(str, Enum):
+    normal = 'normal'
+    on_horizontal_surface = 'horizontal'
+    on_inclined_surface = 'inclined'
+
+
 # from: rsun_base.c
 # function name: brad_angle_irradiance
 @app.command('direct', no_args_is_help=True)
