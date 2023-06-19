@@ -10,7 +10,6 @@ irradiance. The remaining part is the _beam_ irradiance.
 """
 
 
-AOI_CONSTANTS = [ -0.074, 0.155]
 
 import logging
 logging.basicConfig(
@@ -26,7 +25,6 @@ from pydantic import BaseModel
 from pydantic import Field
 from pydantic import validator
 
-
 import typer
 from rich import print
 from typing import Union
@@ -38,35 +36,14 @@ import numpy as np
 import math
 
 
+AOI_CONSTANTS = [ -0.074, 0.155]
+
+
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     help=f"Estimate the direct normal radiance",
 )
-
-
-class IncidenceAngle(BaseModel):
-    angle: Union[float, str] = Field(..., description="Angle of incidence")
-
-    @validator('angle')
-    def validate_angle(cls, value):
-        if isinstance(value, float):
-            return value
-        elif isinstance(value, str):
-            if value.lower() == "auto":
-                solar_altitude = 0.5  # Placeholder value, replace with actual solar altitude
-                return calculate_angle_of_incidence_auto(solar_altitude)
-            else:
-                raise ValueError("Invalid angle value. Must be 'auto' or a float.")
-        else:
-            raise ValueError("Invalid angle value. Must be 'auto' or a float.")
-
-    class Config:
-        allow_mutation = False
-
-
-def parse_incidence_angle(angle: str):
-    return IncidenceAngle(angle=angle).angle
 
 
 def calculate_angle_of_incidence_auto(solar_altitude: float) -> float:
@@ -75,7 +52,49 @@ def calculate_angle_of_incidence_auto(solar_altitude: float) -> float:
     #     optimum_tilt_angle = latitude + 15
     # if summer:
     #     optimum_tilt_angle = latitude - 15
-    return  AOI_CONSTANTS[1] * 25  # Fake it.
+    return AOI_CONSTANTS[1]  # Fake it.
+
+
+class IncidenceAngle(BaseModel):
+    angle: Union[float, str] = Field(..., description="Angle of incidence")
+
+    @validator('angle')
+    def validate_angle(cls, value):
+        if isinstance(value, float):
+            # Ensuring the value is within 0 and 90
+            if 0 <= value <= 90:
+                return value
+            else:
+                raise ValueError("Angle value must be between 0 and 90.")
+        elif isinstance(value, str):
+            if value.lower() == "auto":
+                solar_altitude = 0.5  # Placeholder value, replace with actual solar altitude
+                return calculate_angle_of_incidence_auto(solar_altitude)
+            else:
+                try:
+                    value = float(value)
+                    if 0 <= value <= 90:
+                        return value
+                    else:
+                        raise ValueError("Angle value must be between 0 and 90.")
+                except ValueError:
+                    raise ValueError("Invalid angle value. Must be 'auto', a float, or a string representation of a float.")
+        else:
+            raise ValueError("Invalid angle value. Must be 'auto', a float, or a string representation of a float.")
+
+
+def parse_incidence_angle(angle: Union[str, float]) -> float:
+    if isinstance(angle, str) and angle.lower() == "auto":
+        solar_altitude = 0.5  # Placeholder value, replace with actual solar altitude
+        return calculate_angle_of_incidence_auto(solar_altitude)
+    else:
+        try:
+            angle = float(angle)
+            if not 0 <= angle <= 90:
+                raise ValueError
+        except ValueError:
+            raise ValueError("Invalid angle value. Must be 'auto', a float, or a string representation of a float between 0 and 90.")
+        return angle
 
 
 @app.command('angular-loss')
