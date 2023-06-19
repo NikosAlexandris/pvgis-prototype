@@ -12,6 +12,15 @@ irradiance. The remaining part is the _beam_ irradiance.
 
 AOI_CONSTANTS = [ -0.074, 0.155]
 
+import logging
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler('error.log'),  # Save log to a file
+        logging.StreamHandler()  # Print log to the console
+    ]
+)
 
 from pydantic import BaseModel
 from pydantic import Field
