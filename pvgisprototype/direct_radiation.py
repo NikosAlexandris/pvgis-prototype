@@ -155,6 +155,38 @@ def calculate_refracted_solar_altitude(
     return refracted_solar_altitude
 
 
+def calculate_optical_air_mass(
+        elevation: float,
+        refracted_solar_altitude: float, 
+        ):
+    """
+    """
+    optical_air_mass = adjust_elevation(elevation) / (
+            math.sin(refracted_solar_altitude)
+            + 0.50572
+            * math.pow((refracted_solar_altitude + 6.07995), -1.6364)
+            )
+    return optical_air_mass
+
+
+def rayleigh_optical_thickness(
+        optical_air_mass: float,
+        ):
+    """
+    δ R(m) = 1/(6.6296 + 1.7513m - 0.1202m2 + 0.0065m3 - 0.00013m4)
+    """
+    if optical_air_mass <= 20:
+        rayleigh_optical_thickness = 1 / (
+        6.6296 + 1.7513 * optical_air_mass
+        - 0.1202 * pow(optical_air_mass, 2)
+        + 0.0065 * pow(optical_air_mass, 3)
+        - 0.00013* pow(optical_air_mass, 4)
+        )
+
+    if optical_air_mass > 20:
+        rayleigh_optical_thickness = 1 / (10.4 + 0.718 * optical_air_mass)
+
+    return rayleigh_optical_thickness
 # from: rsun_base.c
 # function name: brad_angle_irradiance
 @app.command('direct', no_args_is_help=True)
