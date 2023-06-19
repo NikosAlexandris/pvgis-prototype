@@ -87,11 +87,11 @@ def list_databases(
             raise typer.Exit(code=33)
 
 
-@app.command()
+@app.callback(invoke_without_command=True)
 def  calculate_peak_power(
         area: Annotated[float, typer.Argument(
             help='The area of the modules in m<sup>2</sup>',
-            min=0, max=0.001)] = None,  # min of mini-solar-panel?
+            min=0.001)] = None,  # min of mini-solar-panel?
         conversion_efficiency: Annotated[float, typer.Argument(
             help='Conversion efficianet in %',
             min=0, max=100)] = None,
