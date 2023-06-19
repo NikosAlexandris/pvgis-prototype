@@ -43,5 +43,5 @@ def plot_sunrise_sunset(latitude: float, start_day: int, end_day: int):
     plt.title(f'Sunrise and Sunset Times @ {latitude} degrees latitude')
     plt.legend()
     plt.grid(True)
-    plt.savefig(f'solar_geometry_day_constants_at_{latitude}_latitude.png')
+    plt.savefig(f'solar_sun_rise_set_at_{latitude}_latitude.png')
     return fig
