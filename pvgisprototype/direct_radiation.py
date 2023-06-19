@@ -130,12 +130,17 @@ def apply_angular_loss(
     ensuring no excessive amplification or diminishing the effect
     (over-amplification or under-amplification).
     """
-    angular_loss_factor = 1 - math.exp( -solar_altitude / incidence_angle )
-    normalisation_term =  1 / ( 1 - math.exp( -1 / incidence_angle))
-    adjusted_direct_radiation = direct_radiation * angular_loss_factor / normalisation_term
+    try:
+        angular_loss_factor = 1 - math.exp( -solar_altitude / incidence_angle )
+        normalisation_term =  1 / ( 1 - math.exp( -1 / incidence_angle))
+        return direct_radiation * angular_loss_factor / normalisation_term
 
-    typer.echo(adjusted_direct_radiation)
-    return(adjusted_direct_radiation)
+    except ZeroDivisionError as e:
+        logging.error(f"Zero Division Error: {e}")
+        typer.echo("No angular losses when the incidence angle is 0.")
+        return direct_radiation
+
+
 
 
 # from: rsun_base.c
