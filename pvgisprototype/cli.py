@@ -12,7 +12,7 @@ import typer
 from typing import Optional
 
 # from .manual import app as manual
-from .direct_radiation import app as direct_radiation
+from .irradiance import app as irradiance
 from .estimate_energy import app as estimate
 from .tmy import app as tmy
 from .time_series import app as timeseries
@@ -32,7 +32,7 @@ app = typer.Typer(
 )
 
 # app.add_typer(manual, name'manual', help='Manual for PVGIS commands, arguments and options')
-app.add_typer(direct_radiation, name="radiation", help='Estimate the direct normal radiation')
+app.add_typer(irradiance, name="irradiance", help='Estimate the direct normal radiation')
 app.add_typer(estimate, name="estimate", help='Estimate the energy production of a PV system')
 app.add_typer(tmy, name="tmy", help='Generate the Typical Meteorological Year')
 app.add_typer(timeseries, name="time-series", help='Retrieve time series of solar radiation and/or PV output power')
