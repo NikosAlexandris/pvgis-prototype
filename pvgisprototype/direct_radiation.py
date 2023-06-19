@@ -141,6 +141,18 @@ def apply_angular_loss(
         return direct_radiation
 
 
+def calculate_refracted_solar_altitude(
+        solar_altitude: float,
+        ):
+    """
+    """
+    atmospheric_refraction = (
+            0.061359
+            * (0.1594 + 1.123 * solar_altitude + 0.065656 * math.pow(solar_altitude, 2))
+            / (1 + 28.9344 * solar_altitude + 277.3971 * math.pow(solar_altitude, 2))
+            )
+    refracted_solar_altitude = solar_altitude + atmospheric_refraction
+    return refracted_solar_altitude
 
 
 # from: rsun_base.c
