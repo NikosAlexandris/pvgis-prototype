@@ -19,20 +19,18 @@ logging.basicConfig(
         logging.StreamHandler()  # Print log to the console
     ]
 )
-
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import validator
-
 import typer
 from rich import print
 from typing import Union
 from typing_extensions import Annotated
 from typing import Optional
 from enum import Enum
-
 import numpy as np
 import math
+from .extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
 
 
 AOI_CONSTANTS = [ -0.074, 0.155]
