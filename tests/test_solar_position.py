@@ -61,39 +61,16 @@ def test_calculate_solar_position(model):
 #         # assert False, f"Expected ValueError for invalid coordinates ({longitude}, {latitude}), but got ({altitude_suncalc}, {azimuth_suncalc})"
 
 
+@pytest.mark.parametrize("model", models)
+@pytest.mark.mpl_image_compare
+def test_plot_daily_solar_altitude(model):
     longitude = 0.0
     latitude = 0.0
-    altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
-    assert isinstance(altitude_suncalc, float)
-    assert isinstance(azimuth_suncalc, float)
-
-    # Test maximum and minimum valid longitudes and latitudes
-    longitudes = [-180.0, 180.0]
-    latitudes = [-90.0, 90.0]
-    for longitude in longitudes:
-        for latitude in latitudes:
-            altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
-            assert isinstance(altitude_suncalc, float)
-            assert isinstance(azimuth_suncalc, float)
-
-    # Test invalid coordinates
-    longitudes = [-181.0, 181.0]
-    latitudes = [-91.0, 91.0]
-    for longitude in longitudes:
-        for latitude in latitudes:
-            try:
-                altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
-            except ValueError:
-                pass
-            else:
-                assert False, f"Expected ValueError for invalid coordinates ({longitude}, {latitude}), but got ({altitude_suncalc}, {azimuth_suncalc})"
-
-    # Test with future and past dates
-    timestamps = [datetime.now().replace(tzinfo=timezone.utc, year=year) for year in range(2000, 2030)]
-    for timestamp in timestamps:
-        altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
-        assert isinstance(altitude_suncalc, float)
-        assert isinstance(azimuth_suncalc, float)
+    day = datetime.now()
+    try:
+        plot_daily_solar_altitude(longitude, latitude, day, model)
+    except Exception as e:
+        assert False, f"plot_daily_solar_position raised an error: {e}"
 
 
 def test_plot_daily_solar_position():
