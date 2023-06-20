@@ -4,63 +4,63 @@
 
 Functions :
 
-|       | Function                                | start line | end  | name in Python                                             |
-|-------|-----------------------------------------|------------|------|------------------------------------------------------------|
-| - [ ] | systemEfficiency()                      | 75         | 78   |                                                            |
-| - [ ] | setSystemEfficiency()                   | 79         | 82   |                                                            |
-| - [ ] | useTimeOffset()                         | 85         | 88   |                                                            |
-| - [ ] | setUseTimeOffset()                      | 89         | 92   |                                                            |
-| - [x] | ~~joules2~~ Not used!                   | 98         | 189  |                                                            |
-| - [x] | joules_onetime()                        | 192        | 284  | to calculate_hourly_radiation.py                           |
-| - [x] | EnergyContributionPerformanceModelMPP() | 286        | 396  | energy_contribution_performance_model_mpp.py               |
-| - [x] | optimizeSlope()                         | 400        | 532  | optimise_slope.py                                          |
-| - [x] | optimizeSlopeAspect()                   | 535        | 868  |                                                            |
-| - [ ] | main()                                  | 889        | 2013 |                                                            |
-| - [ ] | joules_with_unshadowed()                | 2025       | 2147 |                                                            |
-| - [x] | dateFromHour()                          | 2158       | 2205 | get_day_from_hour_of_year() in solar_geometry_variables.py |
-| - [ ] | updateGeometryYear()                    | 2208       | 2454 |                                                            |
-| - [x] | calculateGeometryYear()                 | 2456       | 2708 |                                                            |
-| - [x] | calculateTotal()                        | 2711       | 2802 |                                                            |
-| - [x] | calculate()                             | 2805       | 3128 |                                                            |
+|       | Function                                | start line | end  | name in Python                                             | Remakrs                                                   |
+|-------|-----------------------------------------|------------|------|------------------------------------------------------------|-----------------------------------------------------------|
+| - [ ] | systemEfficiency()                      | 75         | 78   |                                                            |                                                           |
+| - [ ] | setSystemEfficiency()                   | 79         | 82   |                                                            |                                                           |
+| - [ ] | useTimeOffset()                         | 85         | 88   |                                                            |                                                           |
+| - [ ] | setUseTimeOffset()                      | 89         | 92   |                                                            |                                                           |
+| - [x] | ~~joules2~~ Not used!                   | 98         | 189  |                                                            |                                                           |
+| - [x] | joules_onetime()                        | 192        | 284  | to calculate_hourly_radiation.py                           |                                                           |
+| - [x] | EnergyContributionPerformanceModelMPP() | 286        | 396  | energy_contribution_performance_model_mpp.py               |                                                           |
+| - [x] | optimizeSlope()                         | 400        | 532  | optimise_slope.py                                          |                                                           |
+| - [x] | optimizeSlopeAspect()                   | 535        | 868  |                                                            |                                                           |
+| - [ ] | main()                                  | 889        | 2013 |                                                            |                                                           |
+| - [ ] | joules_with_unshadowed()                | 2025       | 2147 |                                                            |                                                           |
+| - [x] | dateFromHour()                          | 2158       | 2205 | get_day_from_hour_of_year() in solar_geometry_variables.py |                                                           |
+| - [ ] | updateGeometryYear()                    | 2208       | 2454 |                                                            |                                                           |
+| - [x] | calculateGeometryYear()                 | 2456       | 2708 | solar_declination.py                                       | Among others, calculates solar declination based on Jenco |
+| - [x] | calculateTotal()                        | 2711       | 2802 |                                                            |                                                           |
+| - [x] | calculate()                             | 2805       | 3128 |                                                            |                                                           |
 
 average_SD() -> average_standard_deviation.py
 
 ## rsun_base.c
 
 | Function                                                           | Start line | End | Notes
-|--------------------------------------------------------------------|------------|-----|----------------------------------------------------------------|
-| - [ ] brad.c                                                       |            |     | Not used                                                       |
-| - [ ] brad_angle_irradiance.c                                      |            |     | Defines s0, uses sh : s0 == sh. sh stands for 'solar height' ? |
-| - [ ] brad_angle_loss.c                                            |            |     |                                                                |
-| - [ ] brad_angle_loss_with_cs.c                                    |            |     |                                                                |
-| - [ ] drad.c                                                       |            |     |                                                                |
-| - [x] drad.cpp                                                     |            |     |                                                                |
-| - [ ] drad_angle_irradiance.c                                      |            |     |                                                                |
-| - [ ] drad_angle_loss.c                                            |            |     |                                                                |
-| - [x] drad_angle_loss.cpp                                          |            |     |                                                                |
-| - [ ] drad_angle_loss_with_cs.c                                    |            |     |                                                                |
-| - [ ] efficiency.c                                                 |            |     |                                                                |
-| - [ ] efficiency_ww.c                                              |            |     |                                                                |
-| - [ ] initEfficiencyCoeffs.c                                       |            |     |                                                                |
-| - [ ] initEfficiencyCoeffsWind.c                                   |            |     |                                                                |
-| - [ ] SplinesMonthlyTemperature.c                                  |            |     |                                                                |
-| - [ ] calculateAngleLoss.c                                         |            |     |                                                                |
-| - [ ] calculate_angle_loss.c                                       |            |     |                                                                |
-| - [x] com_declin.c                                                 |            |     | Why does it invert the sign of the calculated declination?     |
-| - [x] com_par.c                                                    |            |     | Simpler approximations. How do they compare with others?       |
-| - [x] com_par_const.c                                              |            |     |                                                                |
-| - [x] com_sol_const.c                                              |            |     |                                                                |
-| - [ ] correctTemperatureElevation.c                                |            |     |                                                                |
-| - [x] dateFromHour.c                                               |            |     | Complex, not needed                                            |
-| - [ ] dni_rad.c                                                    |            |     |                                                                |
-| - [ ] imageTimeOffset.c                                            |            |     |                                                                |
-| - [ ] lumcline2.c                                                  |            |     |                                                                |
-| - [ ] rearrangeHorizon.c                                           |            |     |                                                                |
-| - [ ] satgeo.c                                                     |            |     |                                                                |
-| - [ ] satgeomsgnew.c                                               |            |     |                                                                |
-| - [ ] slotHourOffset.c                                             |            |     |                                                                |
-| - [ ] small_functions_from_start_and_before_calculate_angle_loss.c |            |     |                                                                |
-| - [ ] temperature.c                                                |            |     |                                                                |
+|--------------------------------------------------------------------|------------|-----|---------------------------------------------------------------------------------------------------------------------|
+| - [ ] brad.c                                                       |            |     | Not used                                                                                                            |
+| - [x] brad_angle_irradiance.c                                      |            |     | Defines s0, uses sh : s0 == sh. sh stands for 'solar height/declination' != altitude ?                              |
+| - [ ] brad_angle_loss.c                                            |            |     |                                                                                                                     |
+| - [ ] brad_angle_loss_with_cs.c                                    |            |     |                                                                                                                     |
+| - [ ] drad.c                                                       |            |     |                                                                                                                     |
+| - [x] drad.cpp                                                     |            |     |                                                                                                                     |
+| - [ ] drad_angle_irradiance.c                                      |            |     |                                                                                                                     |
+| - [ ] drad_angle_loss.c                                            |            |     |                                                                                                                     |
+| - [x] drad_angle_loss.cpp                                          |            |     |                                                                                                                     |
+| - [ ] drad_angle_loss_with_cs.c                                    |            |     |                                                                                                                     |
+| - [ ] efficiency.c                                                 |            |     |                                                                                                                     |
+| - [ ] efficiency_ww.c                                              |            |     |                                                                                                                     |
+| - [ ] initEfficiencyCoeffs.c                                       |            |     |                                                                                                                     |
+| - [ ] initEfficiencyCoeffsWind.c                                   |            |     |                                                                                                                     |
+| - [ ] SplinesMonthlyTemperature.c                                  |            |     |                                                                                                                     |
+| - [x] calculateAngleLoss.c                                         |            |     | Calculates loss to direct horizontal irradiance due to solar declination. Hardcodes incidence angle (AOIConstants)! |
+| - [x] calculate_angle_loss.c                                       |            |     | Variable                                                                                                            |
+| - [x] com_declin.c                                                 |            |     | Inverts sign of calculated declination due to trigonometry mathematical error!                                      |
+| - [x] com_par.c                                                    |            |     | Simpler approximations. How do they compare with others?                                                            |
+| - [x] com_par_const.c                                              |            |     |                                                                                                                     |
+| - [x] com_sol_const.c                                              |            |     |                                                                                                                     |
+| - [ ] correctTemperatureElevation.c                                |            |     |                                                                                                                     |
+| - [x] dateFromHour.c                                               |            |     | Complex, not needed                                                                                                 |
+| - [ ] dni_rad.c                                                    |            |     |                                                                                                                     |
+| - [ ] imageTimeOffset.c                                            |            |     |                                                                                                                     |
+| - [x] lumcline2.c                                                  |            |     | Calculates the solar declination based on Jenco                                                                     |
+| - [ ] rearrangeHorizon.c                                           |            |     |                                                                                                                     |
+| - [ ] satgeo.c                                                     |            |     |                                                                                                                     |
+| - [ ] satgeomsgnew.c                                               |            |     |                                                                                                                     |
+| - [ ] slotHourOffset.c                                             |            |     |                                                                                                                     |
+| - [ ] small_functions_from_start_and_before_calculate_angle_loss.c |            |     |                                                                                                                     |
+| - [ ] temperature.c                                                |            |     |                                                                                                                     |
 
 
 ## Reading the old source code
@@ -108,8 +108,11 @@ A simplified overview :
 
 The beginning of the `main` function
 
-- declares several variables of different types, including `int`, `bool`, `double`, `float`, and `char` arrays.
+- declares several variables of different types, including :
+  `int`, `bool`, `double`, `float`, and `char` arrays.
+
 - initializes some of the variables with specific values
+
 - and parses command-line arguments.
 
   1.Checks the number of command-line arguments (`argc`).
@@ -148,17 +151,22 @@ The beginning of the `main` function
 
 The next section performs several checks and sets a series of variables
 
-1. The code checks if the `databasePrefix` is either "sarah_" or "sarah2_". If it is not, `setUseTimeOffset(false)` is called. Otherwise, `setUseTimeOffset(true)` is called. This function uses a time offset based on the database prefix.
+1. The code checks if the `databasePrefix` is either "sarah_" or "sarah2_".
+   If it is not, `setUseTimeOffset(false)` is called.
+   Otherwise, `setUseTimeOffset(true)` is called.
+   This function uses a time offset based on the database prefix.
 
 2. The variables `elevationFileNumberNS` and `elevationFileNumberEW`
    are calculated based on the `fixedData.latitude` and `fixedData.longitude` values.
    These calculations involve
    dividing the difference between $75$ and `fixedData.latitude` by `TILE_SIZE`,
    adding 1 to `elevationFileNumberNS`,
-   and assigning `FIRST_EAST_TILE + floor(fixedData.longitude/TILE_SIZE)` to `elevationFileNumberEW`.
+   and assigning `FIRST_EAST_TILE + floor(fixedData.longitude/TILE_SIZE)`
+   to `elevationFileNumberEW`.
 
 3. The variables `tileLatNorth` and `tileLonWest`
-   are calculated using the `elevationFileNumberNS`, `elevationFileNumberEW`, and `TILE_SIZE` values.
+   are calculated using the `elevationFileNumberNS`, `elevationFileNumberEW`,
+   and `TILE_SIZE` values.
    They represent the latitude and longitude of the top-left corner of a tile.
 
 4. The variables `rowoffset` and `coloffset` are calculated by
@@ -176,22 +184,26 @@ The next section performs several checks and sets a series of variables
 
 1. `printSystemPerformance`
 
-   - If the variable `printSystemPerformance` is true, the code reads hourly consumption data from a file specified by `consumptionFileName`.
+   - If the variable `printSystemPerformance` is true,
+     the code reads hourly consumption data
+     from a file specified by `consumptionFileName`.
 
-   - If the reading is unsuccessful (return value of `ReadASCIIOrString()` is not 0), an error message is printed, and the program exits.
+   - If the reading is unsuccessful
+     (the return value of `ReadASCIIOrString()` is not 0),
+     an error message is printed and the program exits.
    
-   - Otherwise, the `hourlyConsumption` array is populated by multiplying each element of `hourlyConsumptionRead` with `energyConsumption`.
+   - Otherwise, the `hourlyConsumption` array is populated
+     by multiplying each element of `hourlyConsumptionRead`
+     with `energyConsumption`.
 
 2. `useDetailedModel`
 
    - If `useDetailedModel` is greater than 0,
-     the code reads charge matrix data from a file specified by `chargeMatrixFile`
-     and initializes the corresponding variables
+     the code reads charge matrix data from a file
+     specified by `chargeMatrixFile` and initializes the corresponding variables
      - `chargeCurrents`,
      - `chargeStates`,
      - `chargeMatrix`
-
-     as well as
      - `batterySize`
      - and `batteryCutoff`
 
@@ -204,7 +216,8 @@ The next section performs several checks and sets a series of variables
      - `powerMatrix`
 
   - If `optimalAngle` is true and `axisTrackingType` is either $2$, $1$, or $4$,
-    an error message is printed indicating that optimum angles can only be calculated for tracking types $3$ and $5$.
+    an error message is printed indicating that optimum angles
+    can only be calculated for tracking types $3$ and $5$.
     The program then exits.
 
 3. The code sets `fixedData.elevation` to $0$ and reads fixed data from a file specified by `elevationFilename`, using
@@ -214,25 +227,38 @@ The next section performs several checks and sets a series of variables
    - `elevationFileNumberNS`
    - and `elevationFileNumberEW`.
 
-6. The variable `arrayNumInt` is calculated by dividing $0.75001$ by `step` and adding 1.
+6. The variable `arrayNumInt` is calculated by dividing $0.75001$
+   by `step` and adding 1.
 
 ### Use of horizon heights
 
-If horizon heights are supplied (`useHorizonData()` is set to true), the code performs the following steps:
+If horizon heights are supplied (`useHorizonData()` is set to true),
+the code performs the following steps:
 
-   - Checks if `horizonStep` is greater than 0. If it is not, an error message is printed, and the program exits.
-   - Sets the horizon number of intervals using `setHorizonNumInt()` and rounds 360.00001 divided by `horizonStep`.
-   - Allocates memory for the `horizonArray` based on the horizon number of intervals.
-   - Depending on the `horizonInfoType`:
-     - If it is 1, the code reads horizon data from a file specified by `horizonFileName` using `ReadHorizonASCII()`.
-     - If it is 2, the code reads horizon data from a file specified by `horizonFileName` by parsing comma-separated values and storing them in `readHorizonArray`. It then converts the values from degrees to radians, rearranges the array, and assigns it to `horizonArray`.
-     - Otherwise, the code reads horizon data using `ReadHorizon()` based on the latitude, longitude, elevation file numbers, and the horizon number of intervals.
+- Checks if `horizonStep` is greater than 0.
+  If it is not, an error message is printed, and the program exits.
+- Sets the horizon number of intervals using `setHorizonNumInt()`
+  and rounds 360.00001 divided by `horizonStep`.
+- Allocates memory for `horizonArray` based on the horizon number of intervals.
+- Depending on the `horizonInfoType`:
+ - If it is 1, the code reads data from a file specified by `horizonFileName`
+   using `ReadHorizonASCII()`.
+ - If it is 2, the code reads data from a file specified by `horizonFileName`
+   by parsing comma-separated values and storing them in `readHorizonArray`.
+   It then converts the values from degrees to radians,
+   rearranges the array,
+   and assigns it to `horizonArray`.
+ - Otherwise, the code reads data using `ReadHorizon()`
+   based on the latitude, longitude, elevation file numbers,
+   and the horizon number of intervals.
 
 ### Number of hourly values to consider
 
-This code section initializes the `hourlyVarData` array with data corresponding to each hour of each day for the specified range of years.
+This section initializes the `hourlyVarData` array
+for each hour of each day for the specified range of years.
 
-1. The variable `numYears` is calculated as the difference between `yearEnd` and `yearStart`, plus 1.
+1. The variable `numYears` is calculated as the difference between
+   `yearEnd` and `yearStart`, plus 1.
 
 2. The variable `numValsToRead` is initialized to 0. 
 
@@ -243,87 +269,107 @@ This code section initializes the `hourlyVarData` array with data corresponding 
    an additional 24 values are added to account for the leap day.
 
 3. The variables `yearOffset` and `numDaysInYear` are initialized to 0.
-
-    `yearOffset` is used to keep track of the offset in the `hourlyVarData` array,
+   `yearOffset` tracks the offset in the `hourlyVarData` array,
     and `numDaysInYear` represents the number of days in a year
     (365 for non-leap years and 366 for leap years).
 
-4. The `hourlyVarData` array is dynamically allocated with a size of `numValsToRead`.
-
-   It is an array of `pointVarData` structures.
+4. The `hourlyVarData` is an array of `pointVarData` structure,
+   dynamically allocated with a size of `numValsToRead`.
 
 5. The loop iterates over each year (`y`) from 0 to `numYears - 1`.
 
    It calculates the number of days in the current year (`numDaysInYear`)
    based on whether it is a leap year or not.
-   If the current year (`yearStart + y`) is divisible by 4, it is considered a leap year,
-   and `numDaysInYear` is set to 366; otherwise, it remains 365.
+   If the current year (`yearStart + y`) is divisible by 4,
+   it is considered a leap year,
+   and `numDaysInYear` is set to 366.
+   Else, otherwise, it remains 365.
 
-6. Within the inner loop, the loop iterates over each day of the current year (`i`) from 1 to `numDaysInYear`.
+6. The inner loop iterates over each day of the current year (`i`)
+   from 1 to `numDaysInYear`.
 
    For each day, it further iterates over each hour (`j`) from 0 to 23.
 
-7. Inside the innermost loop, the `day` field of the `hourlyVarData` structure
-   at the corresponding index (`yearOffset + 24 * (i - 1) + j`) is set to the
-   current day (`i`).
+7. Inside the innermost loop,
+   the `day` field of the `hourlyVarData` structure at the corresponding index
+   (`yearOffset + 24 * (i - 1) + j`) is set to the current day (`i`).
 
    > The `declination` field is commented out in the code.
 
-8. After the innermost loop completes, `yearOffset` is incremented by the product of 24 and `numDaysInYear`.
-
+8. After the innermost loop completes,
+   `yearOffset` is incremented by the product of 24 and `numDaysInYear`.
    It represents the offset for the next year's data.
 
 ###  Reads `sis` and `sid` data
 
-This code section 
+This section 
 
-- reads `sis` and `sid` data, computes the difference between the values and stores them in the `hourlyVarData` array.
-- and calculates the total irradiation by summing the `sis` values and assigns a value of $1$ to each element in the `spectralCorrectionValues` array.
+- reads `sis` and `sid` data, computes the difference between the values
+  and stores them in the `hourlyVarData` array.
+- calculates the total irradiation by summing the `sis` values
+  and assigns a value of $1$ to each element in the
+  `spectralCorrectionValues` array.
 
 In detail
 
-1. The `sisVals` and `sidVals` arrays are dynamically allocated with sizes of `numValsToRead`.
-
+1. The `sisVals` and `sidVals`
+   arrays are dynamically allocated with sizes of `numValsToRead`.
    These arrays will store the values read from the data files.
 
-2. The `dailyName` string is formatted using `dailyPrefix` and `databasePrefix` to create the filename for the `sis` data file.
+2. The `dailyName` string is formatted using `dailyPrefix`
+   and `databasePrefix` to create the filename for the `sis` data file.
 
-3. The function `ReadTimeSeriesDataFileBZ2()` is called to read the data from the `sis` file, storing the values in the `sisVals` array.
+3. The function `ReadTimeSeriesDataFileBZ2()`
+   reads the data from the `sis` file,
+   storing the values in the `sisVals` array.
 
-   The function takes several parameters, including the `sisVals` array, geographical information, year range, and filename.
+   The function takes several parameters,
+   includes the `sisVals` array, geographical information,
+   year range, and filename.
 
-4. The `dailyName` string is formatted to create the filename for the `sid` data file.
+4. The `dailyName` string is formatted
+   to create the filename for the `sid` data file.
 
-5. The function `ReadTimeSeriesDataFileBZ2()` is called then to read the data from the `sid` file, storing the values in the `sidVals` array.
+5. The function `ReadTimeSeriesDataFileBZ2()` reads data from the `sid` file,
+   storing the values in the `sidVals` array.
 
 6. A variable `sisSum` is initialized to $0$.
-
-   This variable will be used to calculate the total irradiation from the `sis` values.
+   and then used to calculate the total irradiation from the `sis` values.
 
 7. A loop iterates over each value in `numValsToRead`.
 
    For each value,
 
-   - the `beamCoefficient` field of the corresponding `hourlyVarData` structure is set to the corresponding `sidVals` value,
-   - and the `diffCoefficient` field is set to the difference between the corresponding `sisVals` and `sidVals` values.
+   - the `beamCoefficient` field of the corresponding `hourlyVarData` structure 
+     is set to the corresponding `sidVals` value,
+   - and the `diffCoefficient` field is set to the difference
+     between the corresponding `sisVals` and `sidVals` values.
 
-9. If the `sisVals` value for the current index is greater than 0, it is added to `sisSum`.
+9. If the `sisVals` value for the current index is greater than 0,
+   it is added to `sisSum`.
 
-10. The `sisVals` and `sidVals` arrays are freed using the `free()` function to release the memory allocated for them.
+10. The `sisVals` and `sidVals` arrays are freed using the `free()` function
+    to release the memory allocated for them.
 
-11. A loop sets each value in the `spectralCorrectionValues` array to 1. This array has a size of 12.
+11. A loop sets each value in the `spectralCorrectionValues` array to 1.
+    This array has a size of 12.
 
 ### Temperature & wind speed
 
-This section reads temperature and wind speed data, assigns the values to the `hourlyVarData` array, and prepares for the calculation of geometry for the entire year.
+This section reads temperature and wind speed data,
+assigns the values to the `hourlyVarData` array,
+and prepares for the calculation of geometry for the entire year.
 
-1. The code checks if `useEfficiency`, `useDetailedModel`, or `outputTemperatures` is true.
+1. The code checks if `useEfficiency`, `useDetailedModel`,
+   or `outputTemperatures` is true.
+   If any of these conditions are met,
+   the code proceeds to execute the following steps.
 
-   If any of these conditions are met, the code proceeds to execute the following steps.
+2. A variable `readOK` is initialized to 0
+   and used to check if the reading of spectral data was successful.
 
-2. A variable `readOK` is initialized to 0. This variable will be used to check if the reading of spectral data was successful.
-
-3. The variable `numTempToRead` is calculated as `numValsToRead` divided by `TEMPERATURE_INTERVAL`.
+3. The variable `numTempToRead` is calculated as `numValsToRead`
+   divided by `TEMPERATURE_INTERVAL`.
 
    ``` cpp
    int numTempToRead=numValsToRead/TEMPERATURE_INTERVAL;
@@ -366,7 +412,139 @@ This section reads temperature and wind speed data, assigns the values to the `h
 
 15. The function `calculateGeometryYear()` is called to calculate the geometry for the entire year.
 
-    The function takes various parameters, including slope, aspect, tracking type, location data, and arrays for storing geometry information.
+    The function takes various parameters, including:
+    - slope,
+    - aspect,
+    - tracking type,
+    - location data,
+    - and arrays for storing geometry information.
+
+#### Solar declination
+
+> - `sh` input to `brad_angle_irradiance()`
+> <-- `s0` from `joules_onetime()`
+> <-- from `calculate()` 
+> <-- from `calculateTotal()`
+
+`s0` and, then, the `sh`
+is the solar _height_ or _declination_
+input argument to `brad_angle_irradiance`.
+It is **not** the solar _altitude_.
+
+`s0` is the input to :
+
+```
+brad_angle_irradiance(
+                    s0,
+                    &bh,
+                    sunVarGeom,
+                    sunRadVar,
+                    beam_values
+                    );
+```
+
+which corresponds to `sh` in its definition :
+
+```
+double brad_angle_irradiance(
+        double sh,
+        double *bh,
+        struct SunGeometryVarDay *sunVarGeom,
+        struct SolarRadVar *sunRadVar,
+        double *radiations
+        )
+```
+
+`s0` comes from :
+
+```
+/* Calculate at various inclinations, start with 0. */
+        joules_onetime(
+                useEfficiency,
+                temperature,
+                windSpeed,
+                s0[geomPos],
+                sunVarGeom+geomPos,
+                sunSlopeGeom+geomPos,
+                &sunRadVar,
+                &gridGeom,
+                horizonArray,
+                dayRadiationVals
+                );
+```
+
+whose definition is
+
+
+```
+void joules_onetime(
+        bool useEfficiency,
+        double temperature,
+        double windSpeed,
+        double s0,
+        struct SunGeometryVarDay *sunVarGeom,
+        struct SunGeometryVarSlope *sunSlopeGeom,
+        struct SolarRadVar *sunRadVar,
+        struct GridGeometry *gridGeom,
+        double *horizonArray,
+        double *hourRadiationVals
+        )
+```
+
+which is used in :
+
+```
+double calculate(
+        struct SunGeometryVarDay *sunVarGeom,
+        struct SunGeometryVarSlope *sunSlopeGeom,
+        double *DNI_TOA,
+        double *s0,
+        struct pointData fixedData,
+        struct pointVarData *varData,
+        double *horizonArray,
+        int optimalAngle,
+        int axisTrackingType,
+        bool useEfficiency,
+        int outputOption,
+        int startYear,
+        int endYear,
+        int numVals,
+        float *spectralCorrectionValues,
+        double *radiationVals
+        )
+```
+
+which in turn is used in `main()`
+where `s0` is initialised as :
+
+    `double s0[8760];`
+
+and is then populated when runnning :
+
+```
+calculateGeometryYear(
+            slopeInput,
+            aspectInput,
+            axisTrackingType,
+            fixedData,
+            &gridGeom,
+            &sunGeom,
+            sunVarGeom,
+            sunSlopeGeom,
+            DNI_TOA,
+            s0,
+            horizonArray
+    );
+```
+
+during a for loop :
+
+```
+for(int pos=0; pos < 8760; pos++)
+```
+
+by the `lumcline2()` function! 
+
 
 ### Optimise inclination & orientation
 
@@ -383,7 +561,12 @@ This section of the code
 
    3. If the calculated slope is valid, it is assigned to `newslope`.
 
-   4. `updateGeometryYear()` is called to update the geometry based on the new slope and aspect (the existing aspect value is used in this case).
+   4. `updateGeometryYear()` is called to update the geometry
+   based on the new slope and aspect
+   (the existing aspect value is used in this case).
+
+   **Important** in this function is that it calculates the solar declination
+   using the method presented by Jenco.
 
 2. If `optimalAngle` is 2, it means that both the slope and aspect are to be optimized.
 
@@ -404,6 +587,14 @@ The code finally calls the `calculate()` function to perform the actual calculat
 
    - `calculate()` takes various parameters, including geometry, data, and options.
    - The calculated total radiation is stored in the variable `totRad`.
+
+   **Important** in this function is that, unlike the `updateGeometryYear` (and
+   the first `calculateGeometryYear` functions),
+   it calculates the solar declination bsed on some alternative method.
+   That is, it does not use method presented by Jenco. This "alternative"
+   method, hardcodes the angle of incidence (see `AOIConstants`) which, in turn
+   does not take in to accound a more realistic approximation of the sun's
+   position.
 
 ###  Performance & energy consumption
 
