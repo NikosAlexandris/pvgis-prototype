@@ -72,7 +72,7 @@ def calculate_solar_position(
             '--output-units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar declination (degrees or radians)")] = 'degrees',
+            help="Output units for solar declination (degrees or radians)")] = 'radians',
         ):
     """
     """
