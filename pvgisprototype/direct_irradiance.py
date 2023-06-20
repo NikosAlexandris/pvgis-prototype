@@ -384,13 +384,6 @@ def calculate_direct_irradiance(
         solar_altitude: Annotated[float, typer.Argument(
             help='Solar altitude in degrees °',
             min=0, max=90)],
-        # incidence_angle: Annotated[Union[IncidenceAngle, float], typer.Option(
-        incidence_angle: Annotated[IncidenceAngle, typer.Option(
-             '--incidence-angle',
-             show_default=True,
-             parser=parse_incidence_angle,
-             help='Angle of incidence in degrees °',
-             case_sensitive=False)] = 'auto',
         component: Annotated[DirectIrradianceComponents, typer.Option(
             '-c',
             '--component',
@@ -410,8 +403,6 @@ def calculate_direct_irradiance(
         Direct horizontal radiation coefficient. Likely a reference to the clear-sky beam horizontal radiation?
     solar_altitude: float
         Solar altitude angle.
-    incidence_angle_index: int
-        Index 0 or 1 for .. and .. respectively.
     sun_geometry:
         Sun geometry variables for a specific day ?
     sun_radiation_variables:
