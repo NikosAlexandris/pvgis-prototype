@@ -30,7 +30,37 @@ invalid_coordinates = [
     (0.0, 91.0),  # invalid latitude
 ]
 
+@pytest.mark.parametrize("model", models)
+def test_calculate_solar_position(model):
+    longitude = 0.0
+    latitude = 0.0
     timestamp = datetime.now().replace(tzinfo=timezone.utc)
+    altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+    assert isinstance(altitude, float)
+    assert isinstance(azimuth, float)
+
+
+# @pytest.mark.parametrize("longitude, latitude", valid_coordinates)
+# @pytest.mark.parametrize("timestamp", dates)
+# @pytest.mark.parametrize("model", models)
+# def test_calculate_solar_position_valid_coordinates(longitude, latitude, timestamp, model):
+#     # altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
+#     # altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, model)
+#     altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+#     # assert isinstance(altitude_suncalc, float)
+#     # assert isinstance(azimuth_suncalc, float)
+#     assert isinstance(altitude, float)
+#     assert isinstance(azimuth, float)
+
+
+# @pytest.mark.parametrize("longitude, latitude", invalid_coordinates)
+# @pytest.mark.parametrize("timestamp", dates)
+# def test_calculate_solar_position_invalid_coordinates(longitude, latitude, timestamp):
+#     with pytest.raises(ValueError):
+#         calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
+#         # assert False, f"Expected ValueError for invalid coordinates ({longitude}, {latitude}), but got ({altitude_suncalc}, {azimuth_suncalc})"
+
+
     longitude = 0.0
     latitude = 0.0
     altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
