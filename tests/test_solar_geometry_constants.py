@@ -7,10 +7,12 @@ from pvgisprototype.solar_geometry_constants_plot import plot_sunrise_sunset
 @pytest.mark.parametrize(
     "latitude, local_solar_time, solar_declination",
     [
+        (0, 12, 15),
+        (15, 12, 15),
         (30, 12, 15),
         (45, 12, 15),
-        (60, 12, 15),
-        # add more parameter sets if needed
+        (50, 12, 15),
+        (65, 12, 15),
     ],
 )
 def test_solar_geometry_day_constants(latitude, local_solar_time, solar_declination):
@@ -31,16 +33,16 @@ def test_solar_geometry_day_constants(latitude, local_solar_time, solar_declinat
     assert solar_constants.sunset_time is not None, "sunset_time should not be None"
 
 
-# @pytest.mark.mpl_image_compare
-# def test_solar_geometry_constants_plot():
-#     return plot_sunrise_sunset(latitude=0, start_day=1, end_day=365)
+@pytest.mark.mpl_image_compare
+def test_solar_geometry_constants_plot_latitude_0():
+    return plot_sunrise_sunset(latitude=0, start_day=1, end_day=365)
 
 @pytest.mark.mpl_image_compare
-def test_solar_geometry_constants_plot():
+def test_solar_geometry_constants_plot_latitude_45():
     return plot_sunrise_sunset(latitude=45.0, start_day=1, end_day=365)
 
-# @pytest.mark.mpl_image_compare
-# def test_solar_geometry_constants_plot():
-#     return plot_sunrise_sunset(latitude=90, start_day=1, end_day=365)
+@pytest.mark.mpl_image_compare
+def test_solar_geometry_constants_plot_latitude_65():
+    return plot_sunrise_sunset(latitude=65, start_day=1, end_day=365)
 
 # The last one overwrites existing file!
