@@ -219,23 +219,32 @@ def calculate_direct_inclined_irradiance(
         direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
             help='Direct normal radiation coefficient (dimensionless)',
             min=0, max=1)],  # bh = sunRadVar->cbh;
-        solar_altitude: Annotated[float, typer.Argument(
-            help='Solar altitude in degrees °',
-            min=0, max=90)],
-        # incidence_angle: Annotated[Union[IncidenceAngle, float], typer.Option(
+        # solar_altitude: Annotated[float, typer.Argument(
+        #     help='Solar altitude in degrees °',
+        #     min=0, max=90)],
         linke_turbidity_factor: float,
-        incidence_angle: Annotated[IncidenceAngle, typer.Option(
-             '--incidence-angle',
-             show_default=True,
-             parser=parse_incidence_angle,
-             help='Angle of incidence in degrees °',
-             case_sensitive=False)] = 'auto',
+        method_for_solar_incidence_angle: Annotated[SolarIncidenceAngleMethod, typer.Option(
+            '-m',
+            '--solar-declination-method',
+            show_default=True,
+            show_choices=True,
+            case_sensitive=False,
+            help="Method to calculate the solar declination")] = 'jenco',
         ):
     """Calculate the direct irradiatiance incident on a tilted solar surface.
 
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
     """
+    direct_horizontal_irradiance = calculate_direct_horizontal_irradiance(
+            latitude=latitude,
+            elevation=elevation,
+            year=year,
+            day_of_year=day_of_year,
+            hour_of_year=hour_of_year,
+            linke_turbidity_factor=linke_turbidity_factor,
+            )
+
     # Hofierka, 2002 ------------------------------------------------------
     # tangent_relative_longitude = - sin(surface_tilt)
     #                              * sin(surface_orientation) /
@@ -244,9 +253,15 @@ def calculate_direct_inclined_irradiance(
     #                              * cos(surface_orientation) 
     #                              + cos(latitude) 
     #                              * cos(surface_tilt)
-    tangent_relative_longitude = -math.sin(surface_tilt) * math.sin(surface_orientation) / math.sin(
+    tangent_relative_longitude = -math.sin(surface_tilt) * math.sin(
+        surface_orientation
+    ) / math.sin(latitude) * math.sin(surface_tilt) * math.cos(
+        surface_orientation
+    ) + math.cos(
         latitude
-    ) * math.sin(surface_tilt) * math.cos(surface_orientation) + math.cos(latitude) * math.cos(surface_tilt)
+    ) * math.cos(
+        surface_tilt
+    )
     # C source code -------------------------------------------------------
     # There is an error of one negative sign in either of the expressions!
     # That is so because : cos(pi/2 + x) = -sin(x)
@@ -271,41 +286,85 @@ def calculate_direct_inclined_irradiance(
     sine_relative_latitude = -math.cos(latitude) * math.sin(surface_tilt) * math.cos(
         surface_orientation
     ) + math.sin(latitude) * math.cos(surface_tilt)
-    # Following is equal to above.
-    # # Huld ?
+    # Verified the following is equal to above.
+    # Huld ?
     # sine_relative_latitude = -cos(latitude)
     #                          * cos(half_pi - surface_tilt)
     #                          * sin(half_pi + surface_orientation)
     #                          + sin(latitude)
     #                          * sin(half_pi - surface_tilt)
-    relative_latitude = math.asin(sine_relative_latitude)
-    math.cosine_relative_latitude = math.cos(relative_latitude)
 
-    solar_declination_horizontal = calculate_solar_declination(day_of_year)
-    C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination_horizontal)
-    C33_inclined = math.sin(relative_latitude) * math.sin(solar_declination_horizontal)
+    # calculate solar declination + C3x geometry parameters
+    solar_declination = calculate_solar_declination(day_of_year)
+    C31 = math.cos(latitude) * math.cos(solar_declination)
+    C33 = math.sin(latitude) * math.sin(solar_declination)
 
+    # calculate solar altitude
     solar_time = calculate_solar_time(year, hour_of_year)
-    hour_angle = 0.261799 * (solar_time - 12)
-    solar_declination_inclined = C31_inclined * math.cos (hour_angle - relative_longitude) + C33_inclined
+    hour_angle = np.radians(15) * (solar_time - 12)
+    sine_solar_altitude = C31 * math.cos(hour_angle) + C33
+    solar_altitude = math.asin(sine_solar_altitude)
 
-    direct_horizontal_irradiance = calculate_direct_horizontal_irradiance(
-            latitude=latitude,
-            elevation=elevation,
-            year=year,
-            day_of_year=day_of_year,
-            hour_of_year=hour_of_year,
-            solar_altitude=solar_altitude,
-            linke_turbidity_factor=linke_turbidity_factor,
-            )
-    direct_inclined_irradiance = direct_horizontal_irradiance * math.sin(solar_declination_inclined) / math.sin(solar_altitude)
-    return direct_inclined_irradiance
+    # calculate C3x geometry parameters for inclined surface
+    relative_latitude = math.asin(sine_relative_latitude)
+    C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination)
+    C33_inclined = math.sin(relative_latitude) * math.sin(solar_declination)
 
+    # calculate solar incidence angle
+    solar_incidence_angle = C31_inclined * math.cos (hour_angle - relative_longitude) + C33_inclined
 
-class DirectIrradianceComponents(str, Enum):
-    normal = 'normal'
-    on_horizontal_surface = 'horizontal'
-    on_inclined_surface = 'inclined'
+    # "Simpler" way to calculate the inclined solar declination?
+    if method_for_solar_incidence_angle == 'simple':
+        modified_direct_horizontal_irradiance = direct_horizontal_irradiance / math.sin(solar_altitude)
+        # In the old C source code, the following runs if:
+        # --------------------------------- Review & Add ?
+            # 1. surface is NOT shaded
+            # 3. solar declination > 0
+        # --------------------------------- Review & Add ?
+        try:
+            angular_loss_factor = calculate_angular_loss_factor(
+                    solar_altitude,
+                    solar_declination,
+                    )
+            direct_inclined_irradiance = modified_direct_horizontal_irradiance * angular_loss_factor
+
+            # Deduplicate Me! -------------------------------------------------
+            typer.echo(f'Direct inclined irradiance: {direct_inclined_irradiance}')  # B0c
+            return direct_inclined_irradiance
+            # Deduplicate Me! -------------------------------------------------
+
+        # Else, the following runs:
+        # --------------------------------- Review & Add ?
+            # 1. surface is shaded
+            # 3. solar declination = 0
+        # --------------------------------- Review & Add ?
+        except ZeroDivisionError as e:
+            logging.error(f"Zero Division Error: {e}")
+            typer.echo("Is the solar altitude angle zero?")
+            # see brad_angle_irradiance() - however, why return anything?
+
+            # Deduplicate Me! -------------------------------------------------
+            typer.echo(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {simple})')  # B0c
+            return modified_direct_horizontal_irradiance
+            # Deduplicate Me! -------------------------------------------------
+
+    if method_for_solar_incidence_angle == 'jenco':
+        try:
+            # split the following and deduplicate?
+            # i.e. reuse modified_direct_horizontal_irradiance?
+            direct_inclined_irradiance = direct_horizontal_irradiance * math.sin(solar_incidence_angle) / math.sin(solar_altitude)
+
+            # Deduplicate Me! -------------------------------------------------
+            typer.echo(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {method_for_solar_incidence_angle})')  # B0c
+            return direct_inclined_irradiance
+            # Deduplicate Me! -------------------------------------------------
+
+        except ZeroDivisionError:
+            logging.error(f"Error: Division by zero in calculating the direct inclined irradiance based on the solar declination algorithm by Jenco 1992.")
+
+            typer.echo("Is the solar altitude angle zero?")
+            # should this return something? Like in r.sun's simpler's approach?
+            return 0
 
 
 # from: rsun_base.c
