@@ -1,5 +1,10 @@
 import pytest
 from pvgisprototype.angular_loss_factor import calculate_angular_loss_factor
+from pvgisprototype.direct_irradiance import calculate_refracted_solar_altitude
+from pvgisprototype.direct_irradiance import calculate_optical_air_mass
+from pvgisprototype.direct_irradiance import rayleigh_optical_thickness
+from pvgisprototype.direct_irradiance import calculate_direct_normal_irradiance
+from pvgisprototype.direct_irradiance import calculate_direct_horizontal_irradiance
 from pvgisprototype.direct_irradiance import calculate_direct_inclined_irradiance
 
 
@@ -49,6 +54,36 @@ def test_calculate_angular_loss_factor(solar_altitude, solar_declination, expext
         (1361, 1, 90, 1, 1361),
     ]
 )
+
+# def test_calculate_refracted_solar_altitude():
+#     result = calculate_refracted_solar_altitude(0.5)
+#     assert isinstance(result, float)
+
+
+# def test_calculate_optical_air_mass():
+#     result = calculate_optical_air_mass(1000, 0.5)
+#     assert isinstance(result, float)
+
+
+# def test_rayleigh_optical_thickness():
+#     result = rayleigh_optical_thickness(10)
+#     assert isinstance(result, float)
+
+
+# def test_calculate_direct_normal_irradiance():
+#     result = calculate_direct_normal_irradiance(1361, 2, 1)
+#     assert isinstance(result, float)
+
+
+def test_calculate_direct_horizontal_irradiance(mocker):
+    # Mocking imports and functions that are not defined in the current code
+    mocker.patch('main.calculate_solar_declination', return_value=0.1)
+    mocker.patch('main.calculate_solar_time', return_value=10)
+    mocker.patch('main.calculate_extraterrestrial_irradiance', return_value=1000)
+    mocker.patch('main.calculate_direct_normal_irradiance', return_value=500)
+    result = calculate_direct_horizontal_irradiance(45, 1000, 2023, 150, 5, 2)
+    assert isinstance(result, float)
+
 def test_calculate_direct_inclined_irradiance(
         direct_radiation,
         direct_radiation_coefficient,
