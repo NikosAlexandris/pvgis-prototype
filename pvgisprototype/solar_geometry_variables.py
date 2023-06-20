@@ -3,11 +3,13 @@ from pvgisprototype.data_structures import SolarGeometryDayVariables
 
 from pvgisprototype.constants import EPS
 from pvgisprototype.constants import HOUR_ANGLE
+from pvgisprototype.solar_declination import calculate_solar_declination
 
 from math import fabs
 from math import cos
 from math import sin
 import typer
+import math
 from math import acos
 from math import radians
 
@@ -85,6 +87,7 @@ def calculate_solar_time(
     return solar_time
 
 
+# REDESIGN-ME -----------------------------------------------------------------
 # from: rsun_base.cpp
 # function : com_par()
 @app.callback(invoke_without_command=True)
@@ -136,19 +139,18 @@ def calculate_solar_geometry_variables(
             eccentricity,
             hour_offset
     )
-    # approximate position of the sun in the sky
+    # approximate sun position in the sky (`solar_time`), convert to angle
         # solar noon : 0 degrees, solar midnight : 180 degrees
         # `solar_time - 12` : center the solar time around solar noon (i.e., 12:00).
-    # and convert solar time into an angle
     time_angle = (solar_time - 12) * HOUR_ANGLE
 
     # the sine of solar altitude == height above the horizon.
     # lum_C31, lum_C33 : coefficients to calculate height aboe horizon?
-    sine_of_solar_altitude = lum_C31 * np.cos(time_angle) + lum_C33
+    sine_solar_altitude = lum_C31 * np.cos(time_angle) + lum_C33
 
     if np.abs(lum_C31) < EPS:
-        if np.abs(sine_of_solar_altitude) >= EPS:
-            if sine_of_solar_altitude > 0:
+        if np.abs(sine_solar_altitude) >= EPS:
+            if sine_solar_altitude > 0:
                 sunrise_time = 0
                 sunset_time = 24
             else:
@@ -206,88 +208,3 @@ def calculate_solar_geometry_variables(
         # step_sine_angle=step_sine_angle,
         # step_cosine_angle=step_cosine_angle
     )
-@app.callback(invoke_without_command=True)
-def calculate_solar_azimuth(
-        solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
-        year: int,
-        hour_of_year: int,
-        days_in_a_year: float = 365.25,
-        perigee_offset = 0.048869,
-        eccentricity = 0.01672,
-        hour_offset: float = 0,
-        output_units: Annotated[str, typer.Option(
-            '-o',
-            '--output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> SolarGeometryDayVariables:
-    """Compute various solar geometry variables.
-
-    Parameters
-    ----------
-    solar_geometry_day_constants : SolarGeometryDayConstants
-        The input solar geometry constants.
-    """
-    # Unpack constants
-    (
-        latitude,
-        solar_declination,
-        cosine_of_solar_declination,
-        sine_of_solar_declination,
-        lum_C11,
-        lum_C13,
-        lum_C22,
-        lum_C31,
-        lum_C33,
-        sunrise_time,
-        sunset_time,
-    ) = solar_geometry_day_constants.dict().values()
-
-    solar_time = calculate_solar_time(
-            year,
-            hour_of_year,
-            days_in_a_year,
-            perigee_offset,
-            eccentricity,
-            hour_offset
-    )
-    # approximate position of the sun in the sky
-        # solar noon : 0 degrees, solar midnight : 180 degrees
-        # `solar_time - 12` : center the solar time around solar noon (i.e., 12:00).
-    # and convert solar time into an angle
-    time_angle = (solar_time - 12) * HOUR_ANGLE
-
-    # the sine of solar altitude == height above the horizon.
-    # lum_C31, lum_C33 : coefficients to calculate height aboe horizon?
-    sine_of_solar_altitude = lum_C31 * np.cos(time_angle) + lum_C33
-
-    if np.abs(lum_C31) < EPS:
-        if np.abs(sine_of_solar_altitude) >= EPS:
-            if sine_of_solar_altitude < 0:
-                logging.warning('The Sun is above the area during the whole day')
-                return UNDEF
-
-    lum_Lx = -lum_C22 * np.sin(time_angle)
-    lum_Ly = lum_C11 * np.cos(time_angle) + lum_C13
-    xpom = lum_Lx * lum_Lx
-    ypom = lum_Ly * lum_Ly
-    pom = np.sqrt(xpom + ypom)
-
-    if np.abs(pom) > EPS:
-        solar_azimuth = lum_Ly / pom
-        solar_azimuth = np.arccos(solar_azimuth)
-        if lum_Lx < 0:
-            solar_azimuth = double_numpi - solar_azimuth
-    else:
-        solar_azimuth = UNDEF
-
-    if solar_azimuth < half_numpi:
-        sun_azimuth_angle = half_numpi - solar_azimuth
-    else:
-        sun_azimuth_angle = 2.5 * np.pi - solar_azimuth
-
-    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
-    sun_azimuth_angle = convert_to_degrees_if_requested(sun_azimuth_angle, output_units)
-
-    return solar_azimuth, sun_azimuth_angle
