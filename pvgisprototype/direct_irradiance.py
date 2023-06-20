@@ -168,7 +168,6 @@ def calculate_direct_horizontal_irradiance(
         year: int,
         day_of_year: float,
         hour_of_year: int,
-        solar_altitude: float,
         linke_turbidity_factor: float,
         ):
     """Calculate the direct irradiatiance incident on a horizontal solar surface.
@@ -176,38 +175,30 @@ def calculate_direct_horizontal_irradiance(
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
     """
-    from .solar_declination import calculate_solar_declination
-    solar_declination_horizontal = calculate_solar_declination(day_of_year)
-
-    from .solar_geometry_variables import calculate_solar_time
+    solar_declination = calculate_solar_declination(day_of_year)
+    C31 = math.cos(latitude) * math.cos(solar_declination)
+    C33 = math.sin(latitude) * math.sin(solar_declination)
     solar_time = calculate_solar_time(year, hour_of_year)
-
-    C31 = math.cos(latitude) * math.cos(solar_declination_horizontal)
-    C33 = math.sin(latitude) * math.sin(solar_declination_horizontal)
-    cosine_horizontal_hour_angle = -C33 / C31
-
-    # hour_angle = 0.261799 * (solar_time - 12)
-
-    # convert to radians!
-    # sine_solar_altitude = np.sin(np.radians(solar_altitude))
-    from .solar_constant import calculate_extraterrestrial_irradiance
-    extraterrestial_irradiance = calculate_extraterrestrial_irradiance(day_of_year)
-
+    hour_angle = np.radians(15) * (solar_time - 12)
+    sine_solar_altitude = C31 * math.cos(hour_angle) + C33
+    solar_altitude = math.asin(sine_solar_altitude)
     refracted_solar_altitude = calculate_refracted_solar_altitude(
             solar_altitude=solar_altitude,
             )
-
     optical_air_mass = calculate_optical_air_mass(
             elevation=elevation,
             refracted_solar_altitude=refracted_solar_altitude,
             )
+
+    extraterrestial_irradiance = calculate_extraterrestrial_irradiance(day_of_year)
     direct_normal_irradiance = calculate_direct_normal_irradiance(
             extraterrestial_irradiance=extraterrestial_irradiance,
             linke_turbidity_factor=linke_turbidity_factor,
             optical_air_mass=optical_air_mass,
             )
-    sine_solar_altitude = C31 * cosine_horizontal_hour_angle + C33
-    direct_horizontal_irradiance = direct_normal_irradiance * math.sin(solar_altitude)
+    direct_horizontal_irradiance = direct_normal_irradiance * sine_solar_altitude
+
+    typer.echo(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')  # B0c
     return direct_horizontal_irradiance
 
 
