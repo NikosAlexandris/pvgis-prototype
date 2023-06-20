@@ -1,8 +1,28 @@
 import logging
-from pvgisprototype.data_structures import SolarGeometryDayConstants
-from pvgisprototype.data_structures import SolarGeometryDayVariables
 import typer
 from typing import Annotated
+from typing import Optional
+
+from pvgisprototype.data_structures import SolarGeometryDayConstants
+from pvgisprototype.data_structures import SolarGeometryDayVariables
+from .solar_declination import calculate_solar_declination
+import numpy as np
+import datetime
+import math
+
+
+UNDEF = float('nan')
+double_numpi = 2 * np.pi
+half_numpi = 0.5 * np.pi
+
+
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    help=f"Calculate solar geometry parameters for a day in a year",
+)
+
+
 def get_day_from_hour_of_year(year: int, hour_of_year: int):
     """Get day of year from hour of year."""
     start_of_year = np.datetime64(f'{year}-01-01')
