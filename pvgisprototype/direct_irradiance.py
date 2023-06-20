@@ -50,57 +50,6 @@ range_in_minus_plus_pi = lambda radians: (radians + math.pi) % (2 * math.pi) - m
 corrected_linke_turbidity_factor = lambda tlk: -0.8662 * tlk
 
 
-def calculate_angle_of_incidence_auto(solar_altitude: float) -> float:
-    # 
-    # if winter:
-    #     optimum_tilt_angle = latitude + 15
-    # if summer:
-    #     optimum_tilt_angle = latitude - 15
-    return AOI_CONSTANTS[1]  # Fake it.
-
-
-class IncidenceAngle(BaseModel):
-    angle: Union[float, str] = Field(..., description="Angle of incidence")
-
-    @validator('angle')
-    def validate_angle(cls, value):
-        if isinstance(value, float):
-            # Ensuring the value is within 0 and 90
-            if 0 <= value <= 90:
-                return value
-            else:
-                raise ValueError("Angle value must be between 0 and 90.")
-        elif isinstance(value, str):
-            if value.lower() == "auto":
-                solar_altitude = 0.5  # Placeholder value, replace with actual solar altitude
-                return calculate_angle_of_incidence_auto(solar_altitude)
-            else:
-                try:
-                    value = float(value)
-                    if 0 <= value <= 90:
-                        return value
-                    else:
-                        raise ValueError("Angle value must be between 0 and 90.")
-                except ValueError:
-                    raise ValueError("Invalid angle value. Must be 'auto', a float, or a string representation of a float.")
-        else:
-            raise ValueError("Invalid angle value. Must be 'auto', a float, or a string representation of a float.")
-
-
-def parse_incidence_angle(angle: Union[str, float]) -> float:
-    if isinstance(angle, str) and angle.lower() == "auto":
-        solar_altitude = 0.5  # Placeholder value, replace with actual solar altitude
-        return calculate_angle_of_incidence_auto(solar_altitude)
-    else:
-        try:
-            angle = float(angle)
-            if not 0 <= angle <= 90:
-                raise ValueError
-        except ValueError:
-            raise ValueError("Invalid angle value. Must be 'auto', a float, or a string representation of a float between 0 and 90.")
-        return angle
-
-
 @app.command('angular-loss')
 def apply_angular_loss(
         direct_radiation: float,
