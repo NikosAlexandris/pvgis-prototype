@@ -31,6 +31,7 @@ from enum import Enum
 import numpy as np
 import math
 from .extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
+from .angular_loss_factor import calculate_angular_loss_factor
 
 
 AOI_CONSTANTS = [ -0.074, 0.155]
