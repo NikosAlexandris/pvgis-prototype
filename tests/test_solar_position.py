@@ -1,12 +1,35 @@
+import pytest
 from pvgisprototype.solar_position import calculate_solar_position
 from pvgisprototype.solar_position import SolarPositionModels
 from pvgisprototype.solar_position_plot import plot_daily_solar_position
+from pvgisprototype.solar_position_plot import plot_daily_solar_position_scatter
+from pvgisprototype.solar_position_plot import plot_daily_solar_altitude
+from pvgisprototype.solar_position_plot import plot_daily_solar_azimuth
 from pvgisprototype.solar_position_plot import plot_yearly_solar_position
+from pvgisprototype.solar_position_plot import plot_analemma
 from datetime import datetime, timezone
-import pytest
 
 
-def test_calculate_solar_position():
+models = [
+        SolarPositionModels.suncalc,
+        SolarPositionModels.pysolar,
+        SolarPositionModels.pvgis,
+]
+dates = [
+        datetime.now().replace(tzinfo=timezone.utc, year=year) for year in range(2000, 2010)
+]
+valid_coordinates = [
+    (0.0, 0.0),  # zero coordinates
+    (-180.0, -90.0),  # minimum valid longitudes and latitudes
+    (180.0, 90.0),  # maximum valid longitudes and latitudes
+]
+invalid_coordinates = [
+    (-181.0, 0.0),  # invalid longitude
+    (181.0, 0.0),  # invalid longitude
+    (0.0, -91.0),  # invalid latitude
+    (0.0, 91.0),  # invalid latitude
+]
+
     timestamp = datetime.now().replace(tzinfo=timezone.utc)
     longitude = 0.0
     latitude = 0.0
