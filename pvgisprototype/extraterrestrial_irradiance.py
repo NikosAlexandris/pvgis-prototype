@@ -1,4 +1,5 @@
 import typer
+from typing_extensions import Annotated
 import math
 
 
@@ -15,7 +16,9 @@ app = typer.Typer(
 def calculate_extraterrestrial_irradiance(
         day_of_year: float,
         days_in_a_year: float = 365.25,
-        solar_constant: float = 1367,
+        solar_constant: Annotated[float, typer.Argument(
+            help="The solar constant is a flux density measuring mean solar electromagnetic radiation (total solar irradiance) per unit area (perpendicular to the rays) arriving at the top of the Earth's atmosphere (about 1360.8 W/m2) one astronomical unit (au) away from the Sun (roughly the distance from the Sun to the Earth).",
+            min=1360)] = 1360.8,
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
         ) -> float:
@@ -24,7 +27,8 @@ def calculate_extraterrestrial_irradiance(
     The solar constant is the amount of solar electromagnetic radiation
     received at the outer atmosphere of Earth in a unit area perpendicular to
     the rays of the Sun, on a day when Earth is at its mean distance from the
-    Sun. Its approximate value is around 1361 W/m^2 but varies slightly
+    Sun. Its approximate value is around 1360.8 +/-0.5 W/m^2
+    (:cite:`p:Kopp2011`) but varies slightly
     throughout the year due to the Earth's elliptical orbit.
 
     Parameters
@@ -34,7 +38,7 @@ def calculate_extraterrestrial_irradiance(
         (December 31).
 
     solar_constant: float
-        1367.0 W/m^2
+        1360.8 W/m^2
     
     days_in_a_year: float
         365.25
@@ -66,14 +70,14 @@ def calculate_extraterrestrial_irradiance(
     orbit.
 
     The `solar_constant` is calculated by adjusting the average (or base) value
-    of 1367 W/m^2 based on the `position_of_earth`. The `adjustment_factor`
+    of 1360.8 W/m^2 based on the `position_of_earth`. The `adjustment_factor`
     `0.03344 * cos(position_of_earth - 0.048869)`, accounts for the slight
     elliptical shape of the Earth's orbit : the solar constant is a bit higher
     when the Earth is closer to the Sun (perihelion) and a bit lower when it's
     farther away (aphelion).
 
     The Earth is closest to the Sun (Perigee) on about January 3rd, and
-    furthest from it (Apogee) about July 6th. The 1367 W/m^2 solar constant is
+    furthest from it (Apogee) about July 6th. The 1360.8 W/m^2 solar constant is
     at the average 1AU distance. However, on January 3 it gets up to around
     1412.71 W/m^2 and on July 6 it gets down to around 1321 W/m^2. This value
     is for what hits the top of the atmosphere before any energy is attenuated.
@@ -82,5 +86,7 @@ def calculate_extraterrestrial_irradiance(
     distance_correction_factor = 1 + orbital_eccentricity * math.cos(position_of_earth - perigee_offset)
     extraterrestial_irradiance = solar_constant * distance_correction_factor
 
-    typer.echo(extraterrestial_irradiance)
+    typer.echo(f'Extraterrestrial irradiance: {extraterrestial_irradiance}')
     return extraterrestial_irradiance
+
+
