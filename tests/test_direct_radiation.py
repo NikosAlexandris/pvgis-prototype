@@ -84,6 +84,7 @@ def test_calculate_direct_horizontal_irradiance(mocker):
     result = calculate_direct_horizontal_irradiance(45, 1000, 2023, 150, 5, 2)
     assert isinstance(result, float)
 
+
 def test_calculate_direct_inclined_irradiance(
         direct_radiation,
         direct_radiation_coefficient,
