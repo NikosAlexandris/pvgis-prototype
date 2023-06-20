@@ -379,7 +379,7 @@ def calculate_direct_inclined_irradiance(
 
 # from: rsun_base.c
 # function name: brad_angle_irradiance
-@app.command('direct', no_args_is_help=True)
+# @app.command('direct', no_args_is_help=True)
 def calculate_direct_irradiance(
         latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
         year: int,
