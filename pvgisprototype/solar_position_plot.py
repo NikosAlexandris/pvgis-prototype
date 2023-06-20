@@ -3,19 +3,86 @@ from pvgisprototype.solar_position import SolarPositionModels
 import matplotlib.pyplot as plt
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 from datetime import time
 import numpy as np
+import pandas as pd
+
+
+def plot_daily_solar_altitude(
+        longitude: float,
+        latitude: float,
+        day: datetime,
+        model: SolarPositionModels,
+        title: str = 'Daily Variation of Solar Position',
+        ):
+    altitudes = []
+    azimuths = []
+    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
+    for timestamp in timestamps:
+        altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+        altitudes.append(altitude)
+
+    fig, ax1 = plt.subplots()
+
+    # Remove unwanted spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    plt.xlabel('Hour of the day')
+    plt.ylabel('Solar Altitude')
+    plt.plot(timestamps, altitudes)
+    # plt.tick_params(axis='y')
+
+    plt.suptitle(title)
+    title = f' observed from (longitude, latitude) {longitude}, {latitude}'
+    title = f' based on {model}'
+    plt.title(title)
+    plt.savefig(f'solar_altitude_daily_{model}.png')
+
+
+def plot_daily_solar_azimuth(
+        longitude: float,
+        latitude: float,
+        day: datetime,
+        model: SolarPositionModels,
+        title: str = 'Daily Variation of Solar Position',
+        ):
+    azimuths = []
+    azimuths = []
+    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
+    for timestamp in timestamps:
+        altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+        azimuths.append(azimuth)
+
+    fig, ax1 = plt.subplots()
+
+    # Remove unwanted spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    plt.xlabel('Hour of the day')
+    plt.ylabel('Solar Azimuth')
+    plt.plot(timestamps, azimuths)
+    # plt.tick_params(axis='y')
+
+    plt.suptitle(title)
+    title = f' observed from (longitude, latitude) {longitude}, {latitude}'
+    title = f' based on {model}'
+    plt.title(title)
+    plt.savefig(f'solar_azimuth_daily_{model}.png')
+
 
 def plot_daily_solar_position(
         longitude: float,
         latitude: float,
         day: datetime,
         model: SolarPositionModels,
+        title: str = 'Daily Variation of Solar Position',
         ):
-    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
     altitudes = []
     azimuths = []
-
+    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
     for timestamp in timestamps:
         altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
         altitudes.append(altitude)
@@ -23,20 +90,62 @@ def plot_daily_solar_position(
 
     fig, ax1 = plt.subplots()
 
-    color = 'tab:red'
+    # Remove unwanted spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    # color = 'tab:red'
     ax1.set_xlabel('Hour of the day')
-    ax1.set_ylabel('Altitude', color=color)
-    ax1.plot(range(24), altitudes, color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
+    # ax1.set_ylabel('Altitude', color=color)
+    ax1.set_ylabel('Altitude')
+    # ax1.plot(timestamps, altitudes, color=color)
+    ax1.plot(timestamps, altitudes)
+    # ax1.tick_params(axis='y', labelcolor=color)
+    ax1.tick_params(axis='y')
 
     ax2 = ax1.twinx()
-    color = 'tab:blue'
-    ax2.set_ylabel('Azimuth', color=color)
-    ax2.plot(range(24), azimuths, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
+    # color = 'tab:blue'
+    # ax2.set_ylabel('Azimuth', color=color)
+    ax2.set_ylabel('Azimuth')
+    # ax2.plot(range(24), azimuths, color=color)
+    # ax2.plot(timestamps, azimuths, color=color)
+    ax2.plot(timestamps, azimuths)
+    # ax2.tick_params(axis='y', labelcolor=color)
+    ax2.tick_params(axis='y')
 
-    fig.tight_layout()
-    plt.savefig('solar_position_daily.png')
+    # fig.tight_layout()
+    plt.title(title)
+    plt.savefig(f'solar_position_daily_{model}.png')
+
+
+def plot_daily_solar_position_scatter(
+        longitude: float,
+        latitude: float,
+        day: datetime,
+        model: SolarPositionModels,
+        title: str = 'Daily Variation of Solar Position',
+        ):
+    altitudes = []
+    azimuths = []
+    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
+    for timestamp in timestamps:
+        altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+        altitudes.append(altitude)
+        azimuths.append(azimuth)
+
+    fig = plt.figure(figsize=(10,6))
+
+    # Remove unwanted spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    
+    plt.scatter(azimuths, altitudes, label='Solar Geometry Plot')
+    plt.xlabel('Azimuth')
+    plt.ylabel('Altitude')
+
+    # fig.tight_layout()
+    plt.title(title)
+    plt.savefig(f'solar_geometry_daily_{model}.png')
 
 
 def plot_yearly_solar_position(
@@ -62,6 +171,10 @@ def plot_yearly_solar_position(
 
     fig, ax1 = plt.subplots()
 
+    # Remove unwanted spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
     color = 'tab:red'
     ax1.set_xlabel('Day of the year')
     ax1.set_ylabel('Altitude', color=color)
@@ -75,4 +188,55 @@ def plot_yearly_solar_position(
     ax2.tick_params(axis='y', labelcolor=color)
 
     fig.tight_layout()
+    plt.title(f'Sun Position in {start_date}')
     plt.savefig('solar_position_yearly.png')
+
+
+def plot_analemma(longitude, latitude, year, model):
+    start_date = datetime(year, 1, 1)
+    end_date = datetime(year, 12, 31)
+    delta = timedelta(hours=1)
+    timestamps = []
+    azimuths = []
+    zeniths = []
+
+    while start_date <= end_date:
+        for h in range(24):
+            timestamp = datetime.combine(start_date, time(h, 0))
+            altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+            if altitude > 0:  # consider only daytime
+                timestamps.append(timestamp)
+                azimuths.append(azimuth)
+                zeniths.append(90 - altitude)  # from altitude to zenith
+        start_date += delta
+
+    fig = plt.figure()
+    ax = plt.subplot(1, 1, 1, projection='polar')
+
+    # draw analemmas
+    points = ax.scatter(np.radians(azimuths), zeniths, s=2, c=[t.timetuple().tm_yday for t in timestamps])
+    fig.colorbar(points)
+
+    # draw hour labels
+    for hour in np.unique([t.hour for t in timestamps]):
+        subset_indices = [i for i, t in enumerate(timestamps) if t.hour == hour]
+        subset_zeniths = [zeniths[i] for i in subset_indices]
+        pos_index = subset_indices[subset_zeniths.index(min(subset_zeniths))]  # smallest zenith for each hour
+        ax.text(np.radians(azimuths[pos_index]), zeniths[pos_index], str(hour))
+
+    # draw individual days
+    for month, day in [(3, 21), (6, 21), (12, 21)]:
+        date = datetime(year, month, day)
+        times_indices = [i for i, t in enumerate(timestamps) if t.date() == date]
+        if times_indices:
+            azimuths_date = [azimuths[i] for i in times_indices]
+            zeniths_date = [zeniths[i] for i in times_indices]
+            ax.plot(np.radians(azimuths_date), zeniths_date, label=date.strftime('%Y-%m-%d'))
+
+    ax.legend(loc='upper left')
+
+    # compass-like view
+    ax.set_theta_zero_location('N')
+    ax.set_theta_direction(-1)
+    ax.set_rmax(90)
+    plt.savefig(f'solar_analemma_{model}.png')

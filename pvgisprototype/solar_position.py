@@ -5,8 +5,8 @@ from datetime import datetime
 from datetime import timezone
 import suncalc
 import pysolar
-from pvgisprototype.solar_geometry_variables import calculate_solar_altitude
-from pvgisprototype.solar_geometry_variables import calculate_solar_azimuth
+from pvgisprototype.solar_geometry import calculate_solar_altitude
+from pvgisprototype.solar_geometry import calculate_solar_azimuth
 from pvgisprototype.conversions import convert_to_degrees_if_requested
 from pvgisprototype.conversions import convert_to_radians_if_requested
 
