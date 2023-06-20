@@ -45,6 +45,12 @@ def calculate_solar_declination(
     the Earth's axis and is an important parameter in determining the seasons
     and the amount of solar radiation received at different latitudes.
 
+    The function calculates the `proportion` of the way through the year (in
+    radians), which is given by `(2 * pi * day_of_year) / 365.25`.
+    The `0.3978`, `1.4`, and `0.0355` are constants in the approximation
+    formula, with the `0.0489` being an adjustment factor for the slight
+    eccentricity of Earth's orbit.
+  
     Parameters
     ----------
     day_of_year: int
@@ -57,32 +63,9 @@ def calculate_solar_declination(
 
     Notes
     -----
-
-    - IMPORTANT: In the original C source code, there is at the end of
-        `com_declin` function:
-        
-        `decl = - decl;`
-
-        which is actually : `declination = - declination`.        
-        Why? The value is inverted again at some other part of the program when
-        it gets to read data. This has been "fixed" in this function here.-
-    
-    - The function calculates the `proportion` of the way through the year (in
-      radians), which is given by `(2 * pi * day_of_year) / 365.25`.
-
-    - The `0.3978`, `1.4`, and `0.0355` are constants in the approximation
-      formula, with the `0.0489` being an adjustment factor for the slight
-      eccentricity of Earth's orbit.
-  
-    - Finally, the declination is negated (`declination = - declination`). This
-      might be due to the coordinate system in use, where a negative
-      declination means the sun is in the Southern Hemisphere. This would
-      depend on the broader context of the program.
-
-    - Please note that the formula used here is a simple approximation, and
-      might not provide highly precise results. For more accurate calculations
-      of solar position, comprehensive models like the Solar Position Algorithm
-      (SPA) are typically used.
+    The formula used here is a simple approximation. For more accurate
+    calculations of solar position, comprehensive models like the Solar
+    Position Algorithm (SPA) are typically used.
     """
     day_angle = 2 * math.pi * day_of_year / days_in_a_year
     declination = math.asin(0.3978 * math.sin(day_angle - 1.4 + orbital_eccentricity * math.sin(day_angle - perigee_offset)))
