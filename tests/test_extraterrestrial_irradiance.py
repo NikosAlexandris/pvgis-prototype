@@ -1,6 +1,6 @@
 import pytest
-from pvgisprototype.solar_constant import calculate_solar_constant
-from pvgisprototype.solar_constant_plot import plot_solar_constant
+from pvgisprototype.extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
+from pvgisprototype.extraterrestrial_irradiance_plot import plot_extraterrestrial_irradiance
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -17,10 +17,10 @@ import random
         (random.randint(1, 365), 1361.44578929)  # Random day of the year
     ]
 )
-def test_calculate_solar_constant(day_of_year: int, expected: float):
-    assert pytest.approx(calculate_solar_constant(day_of_year), 0.0001) == expected
+def test_calculate_extraterrestrial_irradiance(day_of_year: int, expected: float):
+    assert pytest.approx(calculate_extraterrestrial_irradiance(day_of_year), 0.0001) == expected
 
 
 @pytest.mark.mpl_image_compare  # instructs use of a baseline image
-def test_solar_constant_plot():
-    return plot_solar_constant()
+def test_extraterrestrial_irradiance_plot():
+    return plot_extraterrestrial_irradiance()
