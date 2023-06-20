@@ -46,6 +46,16 @@ app = typer.Typer(
 )
 
 
+class DirectIrradianceComponents(str, Enum):
+    normal = 'normal'
+    on_horizontal_surface = 'horizontal'
+    on_inclined_surface = 'inclined'
+
+
+class SolarIncidenceAngleMethod(str, Enum):
+    jenco = 'jenco'
+    simple = 'simple'
+
 # some correction for the given elevation (Hofierka, 2002)
 adjust_elevation = lambda elevation: math.exp(-elevation / 8434.5)
 # ensure value ranges in [-pi, pi]
@@ -414,29 +424,12 @@ def calculate_direct_irradiance(
         The direct radiant flux incident on a surface per unit area in W/m².
 
     """
-    # # convert to radians!
-    # sine_of_solar_altitude = np.sin(np.radians(solar_altitude))
-    # try:
-    #     # how to name this factor?
-    #     some_factor = direct_horizontal_radiation_coefficient / sine_of_solar_altitude
-    # except ZeroDivisionError as e:
-    #     logging.error(f"Zero Division Error: {e}")
-    #     typer.echo("Likely the solar altitude angle is zero.")
-    #     some_factor = 0
-
-    # modified_direct_irradiance = direct_horizontal_radiation * some_factor
-    # direct_irradiance = apply_angular_loss(
-    #         modified_direct_irradiance,
-    #         solar_altitude,
-    #         incidence_angle
-    #         )
-
     if surface_tilt == 0:
-        typer.echo(direct_horizontal_irradiance)
+        typer.echo(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')
         direct_horizontal_irradiance = calculate_direct_horizontal_irradiance()
         return direct_horizontal_irradiance  # Bhc
 
     if surface_tilt != 0:
         direct_inclined_irradiance = calculate_direct_inclined_irradiance()
-        typer.echo(direct_inclined_irradiance)
+        typer.echo(f'Direct inclined irradiance : {direct_inclined_irradiance}')
         return direct_inclined_irradiance  # Bic
