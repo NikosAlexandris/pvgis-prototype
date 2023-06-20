@@ -146,8 +146,6 @@ def calculate_horizontal_direct_radiation(
     float
         Calculated beam radiation.
     """
-
-
     if surface_azimuth is not None and surface_tilt != 0:
         surface_direct_radiation = horizontal_direct_radiation * solar_constant  / sine_of_sun_height
         return surface_direct_radiation
