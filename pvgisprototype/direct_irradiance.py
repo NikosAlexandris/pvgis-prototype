@@ -32,6 +32,8 @@ import numpy as np
 import math
 from .extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
 from .angular_loss_factor import calculate_angular_loss_factor
+from .solar_declination import calculate_solar_declination
+from .solar_geometry_variables import calculate_solar_time
 
 
 AOI_CONSTANTS = [ -0.074, 0.155]
@@ -279,12 +281,10 @@ def calculate_direct_inclined_irradiance(
     relative_latitude = math.asin(sine_relative_latitude)
     math.cosine_relative_latitude = math.cos(relative_latitude)
 
-    from .solar_declination import calculate_solar_declination
     solar_declination_horizontal = calculate_solar_declination(day_of_year)
     C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination_horizontal)
     C33_inclined = math.sin(relative_latitude) * math.sin(solar_declination_horizontal)
 
-    from .solar_geometry_variables import calculate_solar_time
     solar_time = calculate_solar_time(year, hour_of_year)
     hour_angle = 0.261799 * (solar_time - 12)
     solar_declination_inclined = C31_inclined * math.cos (hour_angle - relative_longitude) + C33_inclined
