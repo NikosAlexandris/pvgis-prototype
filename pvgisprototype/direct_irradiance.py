@@ -105,15 +105,19 @@ def rayleigh_optical_thickness(
 
 @app.command('normal', no_args_is_help=True)
 def calculate_direct_normal_irradiance(
-        extraterrestial_irradiance: float,
-        linke_turbidity_factor: float,
+        extraterrestial_irradiance: Annotated[float, typer.Argument(
+            help="The average annual solar radiation arriving at the top of the Earth's atmosphere, about 1361 W/m2",
+            min=1360)],
+        linke_turbidity_factor: Annotated[float, typer.Argument(
+            help='A measure of atmospheric turbidity, equal to the ratio of total optical depth to the Rayleigh optical depth',
+            min=0, max=8)],
         optical_air_mass: float,
         ):
     """Calculate the direct normal irradiance attenuated by the cloudless
     atmosphere
 
     This function implements the algorithm described by Hofierka
-    :cite:`p:hofierka2002`.
+    :cite:`p:Hofierka2002`.
 
     Parameters
     ----------
@@ -152,6 +156,8 @@ def calculate_direct_normal_irradiance(
             * optical_air_mass
             * rayleigh_optical_thickness(optical_air_mass)
             )
+
+    typer.echo(f'Direct normal irradiance: {direct_normal_irradiance}')  # B0c
     return direct_normal_irradiance  # B0c
 
 
