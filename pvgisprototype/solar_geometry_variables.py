@@ -206,69 +206,6 @@ def calculate_solar_geometry_variables(
         # step_sine_angle=step_sine_angle,
         # step_cosine_angle=step_cosine_angle
     )
-
-
-@app.callback(invoke_without_command=True)
-def calculate_solar_altitude(
-        solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
-        year: int,
-        hour_of_year: int,
-        days_in_a_year: float = 365.25,
-        perigee_offset = 0.048869,
-        eccentricity = 0.01672,
-        hour_offset: float = 0,
-        output_units: Annotated[str, typer.Option(
-            '-o',
-            '--output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> SolarGeometryDayVariables:
-    """Compute various solar geometry variables.
-
-    Parameters
-    ----------
-    solar_geometry_day_constants : SolarGeometryDayConstants
-        The input solar geometry constants.
-    """
-    (
-        latitude,
-        solar_declination,
-        cosine_of_solar_declination,
-        sine_of_solar_declination,
-        lum_C11,
-        lum_C13,
-        lum_C22,
-        lum_C31,
-        lum_C33,
-        sunrise_time,
-        sunset_time,
-    ) = solar_geometry_day_constants.dict().values()
-
-    solar_time = calculate_solar_time(
-            year,
-            hour_of_year,
-            days_in_a_year,
-            perigee_offset,
-            eccentricity,
-            hour_offset
-    )
-    # approximate position of the sun in the sky
-        # solar noon : 0 degrees, solar midnight : 180 degrees
-        # `solar_time - 12` : center the solar time around solar noon (i.e., 12:00).
-    # and convert solar time into an angle
-    time_angle = (solar_time - 12) * HOUR_ANGLE
-
-    # the sine of solar altitude == height above the horizon.
-    # lum_C31, lum_C33 : coefficients to calculate height aboe horizon?
-    sine_of_solar_altitude = lum_C31 * np.cos(time_angle) + lum_C33
-    solar_altitude = convert_to_degrees_if_requested(
-            np.arcsin(sine_of_solar_altitude),
-            output_units
-            )
-    return solar_altitude
-
-
 @app.callback(invoke_without_command=True)
 def calculate_solar_azimuth(
         solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
