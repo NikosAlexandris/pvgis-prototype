@@ -85,6 +85,49 @@ def calculate_solar_altitude(
     return solar_altitude
 
 
+# Clean-Up --------------------------------------------------------------------
+@app.callback(invoke_without_command=True)
+def calculate_solar_azimuth(
+        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
+        year: int,
+        day_of_year: float,
+        hour_of_year: int,
+        days_in_a_year: float = 365.25,
+        perigee_offset = 0.048869,
+        eccentricity = 0.01672,
+        hour_offset: float = 0,
+        output_units: Annotated[str, typer.Option(
+            '-o',
+            '--output-units',
+            show_default=True,
+            case_sensitive=False,
+            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        ) -> SolarGeometryDayVariables:
+    """Compute various solar geometry variables.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    solar_azimuth: float
+
+    """
+    solar_declination = calculate_solar_declination(day_of_year)
+    C11 = math.sin(latitude) * math.cos(solar_declination)
+    C13 = -math.cos(latitude) * math.sin(solar_declination)
+    C22 = math.cos(solar_declination)
+    C31 = math.cos(latitude) * math.cos(solar_declination)
+    C33 = math.sin(latitude) * math.sin(solar_declination)
+    solar_time = calculate_solar_time(year, hour_of_year)
+    hour_angle = np.radians(15) * (solar_time - 12)
+    cosine_solar_azimuth = (C11 * math.cos(hour_angle + C13)) / pow(
+    pow((C22 * math.sin(hour_angle)), 2) + pow((C11 * math.cos(hour_angle) + C13), 2), 0.5
+)
+    solar_azimuth = math.acos(cosine_solar_azimuth)
+    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
+
+    return solar_azimuth
 
 
 def calculate_solar_geometry_constants(
