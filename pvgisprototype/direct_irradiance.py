@@ -50,69 +50,6 @@ range_in_minus_plus_pi = lambda radians: (radians + math.pi) % (2 * math.pi) - m
 corrected_linke_turbidity_factor = lambda tlk: -0.8662 * tlk
 
 
-@app.command('angular-loss')
-def apply_angular_loss(
-        direct_radiation: float,
-        solar_altitude: float,
-        incidence_angle: float,
-    ):
-    """Apply losses to the direct normal radiation due to the angle of incidence
-
-    The adjustment factor represents the fraction of the original
-    `direct_radiation` that is retained after accounting for the loss of
-    radiation due to the angle of incidence or the orientation of the surface
-    with respect to the sun.
-
-    Parameters
-    ----------
-
-    direct_radiation (float): The direct normal radiation in watts per square meter (W/m²).
-    incidence_angle (float): In degrees (°).
-    solar_altitude (float): solar altitude angle in degrees (°).
-    expected_result (float): in watts per square meter (W/m²).
-
-    Returns
-    -------
-    adjusted_direct_radiation
-
-    Notes
-    -----
-
-    The adjustment involves:
-
-    1. computes the fraction of radiation that is not lost due to
-    the `solar_altitude` angle divided by the `incidence_angle` ranging between
-    0 (complete loss) and 1 (no loss):
-
-        `( 1 - exp( -solar_altitude / incidence_angle ) )`
-
-        - The exponential function `exp`, raises the mathematical constant `e`
-          (approximately 2.71828) to the power of the given argument.
-
-        - The negative exponential term of the fraction `solar_altitude /
-          incidence_angle` calculates the exponential decay or attenuation
-          factor based on the ratio of `solar_altitude` to the `incidence_angle`. 
-    
-    2. rescales the adjusted value to bring it within a suitable range,
-    by multiplying it by the reciprocal of the exponential term with the
-    reciprocal of the `incidence_angle`:
-
-        `1 / ( 1 - exp( - 1 / incidence_angle) )`
-
-    ensuring no excessive amplification or diminishing the effect
-    (over-amplification or under-amplification).
-    """
-    try:
-        angular_loss_factor = 1 - math.exp( -solar_altitude / incidence_angle )
-        normalisation_term =  1 / ( 1 - math.exp( -1 / incidence_angle))
-        return direct_radiation * angular_loss_factor / normalisation_term
-
-    except ZeroDivisionError as e:
-        logging.error(f"Zero Division Error: {e}")
-        typer.echo("No angular losses when the incidence angle is 0.")
-        return direct_radiation
-
-
 def calculate_refracted_solar_altitude(
         solar_altitude: float,
         ):
