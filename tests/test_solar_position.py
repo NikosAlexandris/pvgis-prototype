@@ -30,6 +30,7 @@ invalid_coordinates = [
     (0.0, 91.0),  # invalid latitude
 ]
 
+
 @pytest.mark.parametrize("model", models)
 def test_calculate_solar_position(model):
     longitude = 0.0
@@ -73,16 +74,43 @@ def test_plot_daily_solar_altitude(model):
         assert False, f"plot_daily_solar_position raised an error: {e}"
 
 
-def test_plot_daily_solar_position():
+@pytest.mark.parametrize("model", models)
+@pytest.mark.mpl_image_compare
+def test_plot_daily_solar_azimuth(model):
     longitude = 0.0
     latitude = 0.0
     day = datetime.now()
-    model = SolarPositionModels.suncalc
+    try:
+        plot_daily_solar_azimuth(longitude, latitude, day, model)
+    except Exception as e:
+        assert False, f"plot_daily_solar_position raised an error: {e}"
+
+
+@pytest.mark.parametrize("model", models)
+@pytest.mark.mpl_image_compare
+def test_plot_daily_solar_position(model):
+    longitude = 0.0
+    latitude = 0.0
+    day = datetime.now()
     try:
         plot_daily_solar_position(longitude, latitude, day, model)
     except Exception as e:
         assert False, f"plot_daily_solar_position raised an error: {e}"
 
+
+@pytest.mark.parametrize("model", models)
+@pytest.mark.mpl_image_compare
+def test_plot_daily_solar_position_scatter(model):
+    longitude = 0.0
+    latitude = 0.0
+    day = datetime.now()
+    try:
+        plot_daily_solar_position_scatter(longitude, latitude, day, model)
+    except Exception as e:
+        assert False, f"plot_daily_solar_position raised an error: {e}"
+
+
+@pytest.mark.mpl_image_compare
 def test_plot_yearly_solar_position():
     longitude = 0.0
     latitude = 0.0
@@ -92,3 +120,15 @@ def test_plot_yearly_solar_position():
         plot_yearly_solar_position(longitude, latitude, year, model)
     except Exception as e:
         assert False, f"plot_yearly_solar_position raised an error: {e}"
+
+
+@pytest.mark.mpl_image_compare
+def test_analemma_plot():
+    longitude = 0.0
+    latitude = 0.0
+    year = datetime.now().year
+    model = SolarPositionModels.suncalc
+    try:
+        return plot_analemma(longitude, latitude, year, model)
+    except Exception as e:
+        assert False, f"plot_analemma raised an error: {e}"
