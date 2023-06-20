@@ -18,6 +18,7 @@ console = Console()
 class SolarPositionModels(str, Enum):
     suncalc = 'suncalc'
     pysolar = 'pysolar'
+    pvgis_new = 'pvgis-new'
 
 
 # def select_solar_position_model(
@@ -108,6 +109,27 @@ def calculate_solar_position(
                 when=timestamp,
                 )
         solar_azimuth = convert_to_radians_if_requested(solar_azimuth, output_units)
+
+    if model.value  == 'pvgis-new':
+
+        year = timestamp.year
+        start_of_year = datetime(year=year, month=1, day=1, tzinfo=timezone.utc)
+        day_of_year = timestamp.timetuple().tm_yday
+        hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+        solar_altitude = calculate_solar_altitude(
+                latitude=latitude,
+                year=year,
+                day_of_year=day_of_year,
+                hour_of_year=hour_of_year,
+                output_units=output_units,
+                )
+        solar_azimuth = calculate_solar_azimuth(
+                latitude=latitude,
+                year=year,
+                day_of_year=day_of_year,
+                hour_of_year=hour_of_year,
+                output_units=output_units,
+                )
 
     table = Table("Altitude", "Azimuth")
     table.add_row(str(solar_altitude), str(solar_azimuth))
