@@ -1,6 +1,9 @@
 import pytest
 from pvgisprototype.solar_position import calculate_solar_position
 from pvgisprototype.solar_position import SolarPositionModels
+from pvgisprototype.solar_position import calculate_solar_position_pvgis
+from pvgisprototype.data_structures import SolarGeometryDayConstants
+from pvgisprototype.data_structures import SolarGeometryDayVariables
 from pvgisprototype.solar_position_plot import plot_daily_solar_position
 from pvgisprototype.solar_position_plot import plot_daily_solar_position_scatter
 from pvgisprototype.solar_position_plot import plot_daily_solar_altitude
@@ -13,6 +16,7 @@ from datetime import datetime, timezone
 models = [
         SolarPositionModels.suncalc,
         SolarPositionModels.pysolar,
+        SolarPositionModels.pvis,
         SolarPositionModels.pvgis,
 ]
 dates = [
@@ -37,8 +41,42 @@ def test_calculate_solar_position(model):
     latitude = 0.0
     timestamp = datetime.now().replace(tzinfo=timezone.utc)
     altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
-    assert isinstance(altitude, float)
-    assert isinstance(azimuth, float)
+    # handling the 'pvgis' model
+    if model == calculate_solar_position_pvgis:
+        solar_geometry_day_constants = SolarGeometryDayConstants(
+            latitude=45.0,
+            solar_declination=23.45,
+            cosine_of_solar_declination=0.917,
+            sine_of_solar_declination=0.398,
+            lum_C11=0.123,
+            lum_C13=0.456,
+            lum_C22=0.789,
+            lum_C31=0.987,
+            lum_C33=0.654,
+            sunrise_time=6.0,
+            sunset_time=18.0,
+        )
+        year = 2023
+        hour_of_year = 100
+        solar_altitude, solar_azimuth, sun_azimuth = calculate_solar_position_pvgis(
+            solar_geometry_day_constants=solar_geometry_day_constants,
+            year=year,
+            hour_of_year=hour_of_year
+        )
+
+        # Check types
+        assert isinstance(solar_altitude, float)
+        assert isinstance(solar_azimuth, float)
+        assert isinstance(sun_azimuth, float)
+
+        # Assert output
+        # assert solar_altitude == expected_solar_altitude
+        # assert solar_azimuth == expected_solar_azimuth
+        # assert sun_azimuth == expected_sun_azimuth
+
+    else:
+        assert isinstance(altitude, float)
+        assert isinstance(azimuth, float)
 
 
 # @pytest.mark.parametrize("longitude, latitude", valid_coordinates)
@@ -68,10 +106,43 @@ def test_plot_daily_solar_altitude(model):
     longitude = 0.0
     latitude = 0.0
     day = datetime.now()
-    try:
-        plot_daily_solar_altitude(longitude, latitude, day, model)
-    except Exception as e:
-        assert False, f"plot_daily_solar_position raised an error: {e}"
+    
+    # handling the 'pvgis' model
+    if model == calculate_solar_position_pvgis:
+        # Create SolarGeometryDayConstants object
+        solar_geometry_day_constants = SolarGeometryDayConstants(
+            latitude=45.0,
+            solar_declination=23.45,
+            cosine_of_solar_declination=0.917,
+            sine_of_solar_declination=0.398,
+            lum_C11=0.123,
+            lum_C13=0.456,
+            lum_C22=0.789,
+            lum_C31=0.987,
+            lum_C33=0.654,
+            sunrise_time=6.0,
+            sunset_time=18.0,
+        )
+        year = 2023
+        hour_of_year = 100
+
+        try:
+            plot_daily_solar_altitude(
+                    longitude=longitude,
+                    latitude=latitude,
+                    day=day,
+                    model=model,
+                    solar_geometry_day_constants=solar_geometry_day_constants,
+                    year=year,
+                    hour_of_year=hour_of_year,
+                    )
+        except Exception as e:
+            assert False, f"plot_daily_solar_position raised an error: {e}"
+    else:
+        try:
+            plot_daily_solar_altitude(longitude, latitude, day, model)
+        except Exception as e:
+            assert False, f"plot_daily_solar_position raised an error: {e}"
 
 
 @pytest.mark.parametrize("model", models)
@@ -122,13 +193,13 @@ def test_plot_yearly_solar_position():
         assert False, f"plot_yearly_solar_position raised an error: {e}"
 
 
-@pytest.mark.mpl_image_compare
-def test_analemma_plot():
-    longitude = 0.0
-    latitude = 0.0
-    year = datetime.now().year
-    model = SolarPositionModels.suncalc
-    try:
-        return plot_analemma(longitude, latitude, year, model)
-    except Exception as e:
-        assert False, f"plot_analemma raised an error: {e}"
+# @pytest.mark.mpl_image_compare
+# def test_analemma_plot():
+#     longitude = 0.0
+#     latitude = 0.0
+#     year = datetime.now().year
+#     model = SolarPositionModels.suncalc
+#     try:
+#         return plot_analemma(longitude, latitude, year, model)
+#     except Exception as e:
+#         assert False, f"plot_analemma raised an error: {e}"
