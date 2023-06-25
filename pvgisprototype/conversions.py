@@ -1,4 +1,15 @@
+import typer
 import numpy as np
+
+
+def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
+    """Convert angle to radians."""
+    if ctx.resilient_parsing:
+        return
+    if type(angle) != float:
+        raise typer.BadParameter("Latitude should be a float!")
+
+    return np.radians(angle)
 
 
 def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
