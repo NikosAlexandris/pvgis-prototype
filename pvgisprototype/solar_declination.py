@@ -82,7 +82,13 @@ def calculate_solar_declination(
     start_of_year = datetime(year=year, month=1, day=1)
     day_of_year = timestamp.timetuple().tm_yday
     day_angle = 2 * math.pi * day_of_year / days_in_a_year
-    declination = math.asin(0.3978 * math.sin(day_angle - 1.4 + orbital_eccentricity * math.sin(day_angle - perigee_offset)))
+    declination = math.asin(
+            0.3978 * math.sin(
+                day_angle - 1.4 + orbital_eccentricity * math.sin(
+                    day_angle - perigee_offset
+                    )
+                )
+            )
 
     declination = convert_to_degrees_if_requested(declination, output_units)
     return declination
@@ -145,7 +151,7 @@ def calculate_solar_declination_hargreaves(
             '--output-units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar declination (degrees or radians)")] = 'degrees',
+            help="Output units for solar declination (degrees or radians)")] = 'radians',
         ) -> float:
     """Approximate the solar declination based on the Hargreaves formula.
 
