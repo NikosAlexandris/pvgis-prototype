@@ -241,23 +241,29 @@ def calculate_direct_horizontal_irradiance(
 
 @app.command('inclined', no_args_is_help=True)
 def calculate_direct_inclined_irradiance(
-        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
-        elevation: float,
-        year: int,
-        day_of_year: float,
-        hour_of_year: int,
-        surface_tilt: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
-        surface_orientation: float,
-        direct_horizontal_radiation: Annotated[float, typer.Argument(
-            help='Direct normal radiation in W/m²',
-            min=-9000, max=1000)],  # `sh` which comes from `s0`
-        direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
-            help='Direct normal radiation coefficient (dimensionless)',
-            min=0, max=1)],  # bh = sunRadVar->cbh;
+        latitude: Annotated[Optional[float], typer.Argument(
+            min=-90, max=90)],
+        elevation: Annotated[float, typer.Argument(min=0, max=8848)],
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Timezone',
+            callback=convert_to_timezone)] = None,
+        surface_tilt: Annotated[Optional[float], typer.Argument(min=0, max=90)] = 0,
+        surface_orientation: Annotated[Optional[float], typer.Argument(min=0, max=360)] = 180,
+        # direct_horizontal_radiation: Annotated[float, typer.Argument(
+        #     help='Direct normal radiation in W/m²',
+        #     min=-9000, max=1000)],  # `sh` which comes from `s0`
+        # direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
+        #     help='Direct normal radiation coefficient (dimensionless)',
+        #     min=0, max=1)],  # bh = sunRadVar->cbh;
         # solar_altitude: Annotated[float, typer.Argument(
         #     help='Solar altitude in degrees °',
         #     min=0, max=90)],
-        linke_turbidity_factor: float,
+        linke_turbidity_factor: Annotated[float, typer.Argument(
+            help='A measure of atmospheric turbidity, equal to the ratio of total optical depth to the Rayleigh optical depth',
+            min=0, max=10)] = 2,  # 2 to get going for now
         method_for_solar_incidence_angle: Annotated[SolarIncidenceAngleMethod, typer.Option(
             '-m',
             '--solar-declination-method',
@@ -271,12 +277,20 @@ def calculate_direct_inclined_irradiance(
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
     """
+    # if timestamp.tzinfo is None:
+    #     timestamp = timestamp.replace(tzinfo=datetime.timezone.utc)
+    year = timestamp.year
+    start_of_year = datetime(year=year, month=1, day=1,
+                             tzinfo=timestamp.tzinfo)
+    day_of_year = timestamp.timetuple().tm_yday
+    hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+
+    # day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
+
     direct_horizontal_irradiance = calculate_direct_horizontal_irradiance(
             latitude=latitude,
             elevation=elevation,
-            year=year,
-            day_of_year=day_of_year,
-            hour_of_year=hour_of_year,
+            timestamp=timestamp,
             linke_turbidity_factor=linke_turbidity_factor,
             )
 
@@ -330,7 +344,7 @@ def calculate_direct_inclined_irradiance(
     #                          * sin(half_pi - surface_tilt)
 
     # calculate solar declination + C3x geometry parameters
-    solar_declination = calculate_solar_declination(day_of_year)
+    solar_declination = calculate_solar_declination(timestamp)
     C31 = math.cos(latitude) * math.cos(solar_declination)
     C33 = math.sin(latitude) * math.sin(solar_declination)
 
