@@ -29,18 +29,28 @@ app = typer.Typer(
 )
 
 
-@app.callback(invoke_without_command=True, no_args_is_help=True)
+@app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
+# @app.command('position', no_args_is_help=True, context_settings={"ignore_unknown_options": True})
 def calculate_solar_position(
-        longitude: float,
-        latitude: float,
-        timestamp: datetime,
+        longitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-180, max=180)],
+        latitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-90, max=90)],
+        timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+            callback=convert_to_timezone)] = None,
         model: Annotated[SolarPositionModels, typer.Option(
             '-m',
             '--model',
             show_default=True,
             show_choices=True,
             case_sensitive=False,
-            help="Model to calculate solar position")] = 'suncalc',
+            help="Model to calculate solar position")] = SolarPositionModels.suncalc,
         output_units: Annotated[str, typer.Option(
             '-u',
             '--output-units',
@@ -50,15 +60,7 @@ def calculate_solar_position(
         ):
     """
     """
-    # cleaner implementation? ------------------------------------
-    # solar_azimuth, solar_altitude = select_solar_position_model(
-    #         longitude,
-    #         latitude,
-    #         datetime,
-    #         model)
-
-    timestamp = timestamp.replace(tzinfo=timezone.utc)
-    if model.value == 'suncalc':
+    if model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth, solar_altitude = suncalc.get_position(
                 date=timestamp,  # this comes first here!
@@ -68,8 +70,9 @@ def calculate_solar_position(
         solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
         solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
     
-    if model.value  == 'pysolar':
+    if model.value  == SolarPositionModels.pysolar:
 
+        timestamp = attach_timezone(timestamp, timezone)
         solar_altitude = pysolar.solar.get_altitude(
                 latitude_deg=longitude,  # this comes first
                 longitude_deg=latitude,
@@ -84,24 +87,18 @@ def calculate_solar_position(
                 )
         solar_azimuth = convert_to_radians_if_requested(solar_azimuth, output_units)
 
-    if model.value  == 'pvgis-new':
+    if model.value  == SolarPositionModels.pvis:
 
-        year = timestamp.year
-        start_of_year = datetime(year=year, month=1, day=1, tzinfo=timezone.utc)
-        day_of_year = timestamp.timetuple().tm_yday
-        hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
         solar_altitude = calculate_solar_altitude(
+                longitude=longitude,
                 latitude=latitude,
-                year=year,
-                day_of_year=day_of_year,
-                hour_of_year=hour_of_year,
+                timestamp=timestamp,
                 output_units=output_units,
                 )
         solar_azimuth = calculate_solar_azimuth(
+                longitude=longitude,
                 latitude=latitude,
-                year=year,
-                day_of_year=day_of_year,
-                hour_of_year=hour_of_year,
+                timestamp=timestamp,
                 output_units=output_units,
                 )
 
