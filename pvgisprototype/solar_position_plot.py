@@ -1,12 +1,14 @@
 from pvgisprototype.solar_position import calculate_solar_position
 from pvgisprototype.solar_position import SolarPositionModels
+from pvgisprototype.solar_position import calculate_solar_position_pvgis
+from pvgisprototype.data_structures import SolarGeometryDayConstants
+from pvgisprototype.data_structures import SolarGeometryDayVariables
 import matplotlib.pyplot as plt
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 from datetime import time
 import numpy as np
-import pandas as pd
 
 
 def plot_daily_solar_altitude(
@@ -15,29 +17,37 @@ def plot_daily_solar_altitude(
         day: datetime,
         model: SolarPositionModels,
         title: str = 'Daily Variation of Solar Position',
+        solar_geometry_day_constants=None,
+        year=None,
+        hour_of_year=None
         ):
-    altitudes = []
-    azimuths = []
-    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
-    for timestamp in timestamps:
-        altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
-        altitudes.append(altitude)
 
-    fig, ax1 = plt.subplots()
+    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
+    altitudes = []
+
+    for timestamp in timestamps:
+        if model == calculate_solar_position_pvgis:
+            solar_altitude, _, _ = model(solar_geometry_day_constants, year, hour_of_year)
+            altitudes.append(solar_altitude)
+        else:
+            solar_altitude, _ = calculate_solar_position(longitude, latitude, timestamp, model)
+            altitudes.append(solar_altitude)
+
+    fig, ax = plt.subplots()
 
     # Remove unwanted spines
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
-    plt.xlabel('Hour of the day')
-    plt.ylabel('Solar Altitude')
-    plt.plot(timestamps, altitudes)
+    ax.set_xlabel('Hour of the day')
+    ax.set_ylabel('Solar Altitude')
+    ax.plot(timestamps, altitudes)
     # plt.tick_params(axis='y')
 
     plt.suptitle(title)
-    title = f' observed from (longitude, latitude) {longitude}, {latitude}'
-    title = f' based on {model}'
-    plt.title(title)
+    subtitle = f' observed from (longitude, latitude) {longitude}, {latitude}'
+    subtitle += f' based on {model}'
+    ax.set_title(subtitle)
     plt.savefig(f'solar_altitude_daily_{model}.png')
 
 
@@ -55,7 +65,7 @@ def plot_daily_solar_azimuth(
         altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
         azimuths.append(azimuth)
 
-    fig, ax1 = plt.subplots()
+    fig, ax = plt.subplots()
 
     # Remove unwanted spines
     ax.spines['top'].set_visible(False)
@@ -91,8 +101,8 @@ def plot_daily_solar_position(
     fig, ax1 = plt.subplots()
 
     # Remove unwanted spines
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
 
     # color = 'tab:red'
     ax1.set_xlabel('Hour of the day')
@@ -104,6 +114,11 @@ def plot_daily_solar_position(
     ax1.tick_params(axis='y')
 
     ax2 = ax1.twinx()
+
+    # Remove unwanted spines
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+
     # color = 'tab:blue'
     # ax2.set_ylabel('Azimuth', color=color)
     ax2.set_ylabel('Azimuth')
@@ -133,7 +148,7 @@ def plot_daily_solar_position_scatter(
         altitudes.append(altitude)
         azimuths.append(azimuth)
 
-    fig = plt.figure(figsize=(10,6))
+    fig, ax = plt.subplots(figsize=(10,6))
 
     # Remove unwanted spines
     ax.spines['top'].set_visible(False)
@@ -172,8 +187,8 @@ def plot_yearly_solar_position(
     fig, ax1 = plt.subplots()
 
     # Remove unwanted spines
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
 
     color = 'tab:red'
     ax1.set_xlabel('Day of the year')
@@ -182,6 +197,8 @@ def plot_yearly_solar_position(
     ax1.tick_params(axis='y', labelcolor=color)
 
     ax2 = ax1.twinx()
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
     color = 'tab:blue'
     ax2.set_ylabel('Azimuth', color=color)
     ax2.plot(timestamps, azimuths, color=color)
