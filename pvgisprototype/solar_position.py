@@ -10,10 +10,6 @@ from pvgisprototype.solar_geometry import calculate_solar_azimuth
 from pvgisprototype.conversions import convert_to_degrees_if_requested
 from pvgisprototype.conversions import convert_to_radians_if_requested
 
-from rich.console import Console
-from rich.table import Table
-
-console = Console()
 
 class SolarPositionModels(str, Enum):
     suncalc = 'suncalc'
@@ -102,7 +98,4 @@ def calculate_solar_position(
                 output_units=output_units,
                 )
 
-    table = Table("Altitude", "Azimuth")
-    table.add_row(str(solar_altitude), str(solar_azimuth))
-    console.print(table)
     return solar_altitude, solar_azimuth
