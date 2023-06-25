@@ -1,6 +1,7 @@
 import typer
 from typing_extensions import Annotated
 import math
+import numpy as np
 
 
 app = typer.Typer(
@@ -10,8 +11,6 @@ app = typer.Typer(
 )
 
 
-# from: rsun_base.cpp
-# function: com_sol_const(int no_of_day)
 @app.callback(invoke_without_command=True, no_args_is_help=True)
 def calculate_extraterrestrial_irradiance(
         day_of_year: float,
@@ -61,7 +60,14 @@ def calculate_extraterrestrial_irradiance(
     Notes
     -----
 
-    (The following text considers comments from GRASS-GIS' `r.sun` module.
+    This function came first from a direct translation from PVGIS' rsun3 source
+    code:
+
+      - from file: rsun_base.cpp
+      - function: com_sol_const(int no_of_day)
+
+    The following text considers comments from GRASS-GIS' `r.sun` module.
+
     The `position_of_earth` in its orbit around the Sun is calculated by
     multiplying the number of the day in the year by 2*pi (which is the full
     circumference of a circle in radians), and dividing it by 365.25 (the
@@ -77,8 +83,8 @@ def calculate_extraterrestrial_irradiance(
     farther away (aphelion).
 
     The Earth is closest to the Sun (Perigee) on about January 3rd, and
-    furthest from it (Apogee) about July 6th. The 1360.8 W/m^2 solar constant is
-    at the average 1AU distance. However, on January 3 it gets up to around
+    furthest from it (Apogee) about July 6th. The 1360.8 W/m^2 solar constant
+    is at the average 1AU distance. However, on January 3 it gets up to around
     1412.71 W/m^2 and on July 6 it gets down to around 1321 W/m^2. This value
     is for what hits the top of the atmosphere before any energy is attenuated.
     """
@@ -88,5 +94,3 @@ def calculate_extraterrestrial_irradiance(
 
     typer.echo(f'Extraterrestrial irradiance: {extraterrestial_irradiance}')
     return extraterrestial_irradiance
-
-
