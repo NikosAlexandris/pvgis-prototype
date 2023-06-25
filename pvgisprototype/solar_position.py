@@ -1,14 +1,23 @@
 import typer
 from typing import Annotated
+from typing import Optional
 from enum import Enum
-from datetime import datetime
-from datetime import timezone
+import numpy as np
+import datetime
 import suncalc
 import pysolar
-from pvgisprototype.solar_geometry import calculate_solar_altitude
-from pvgisprototype.solar_geometry import calculate_solar_azimuth
-from pvgisprototype.conversions import convert_to_degrees_if_requested
-from pvgisprototype.conversions import convert_to_radians_if_requested
+from .conversions import convert_to_degrees_if_requested
+from .conversions import convert_to_radians_if_requested
+from .conversions import convert_to_radians
+from .timestamp import now_datetime
+from .timestamp import convert_to_timezone
+from .timestamp import attach_timezone
+from .solar_altitude import calculate_solar_altitude
+from .solar_azimuth import calculate_solar_azimuth
+from .solar_declination import calculate_solar_declination
+from .solar_geometry_pvgis import calculate_solar_position_pvgis
+from .solar_geometry_pvgis import calculate_solar_time_pvgis
+from .solar_geometry_pvgis_constants import calculate_solar_geometry_pvgis_constants
 
 
 class SolarPositionModels(str, Enum):
@@ -97,5 +106,29 @@ def calculate_solar_position(
                 timestamp=timestamp,
                 output_units=output_units,
                 )
+
+    if model.value  == SolarPositionModels.pvgis:
+        
+        solar_declination = calculate_solar_declination(timestamp)
+        local_solar_time = calculate_solar_time_pvgis(
+                longitude=longitude,
+                latitude=latitude,
+                timestamp=timestamp,
+                )
+
+        solar_geometry_pvgis_day_constants = calculate_solar_geometry_pvgis_constants(
+                longitude=longitude,
+                latitude=latitude,
+                local_solar_time=local_solar_time,
+                solar_declination=solar_declination,
+                )
+
+        solar_altitude, solar_azimuth, sun_azimuth = calculate_solar_position_pvgis(
+                solar_geometry_pvgis_day_constants,
+                timestamp,
+                )
+
+        solar_altitude = convert_to_radians_if_requested(solar_altitude, output_units)
+        solar_azimuth = convert_to_radians_if_requested(solar_azimuth, output_units)
 
     return solar_altitude, solar_azimuth
