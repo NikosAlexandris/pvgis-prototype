@@ -1,8 +1,14 @@
 import typer
-from typing_extensions import Annotated
+from typing import Annotated
+from typing import Optional
 import math
 import numpy as np
-import datetime
+from datetime import datetime
+from datetime import timezone
+from datetime import timedelta
+from .timestamp import now_datetime
+from .timestamp import convert_to_timezone
+from .timestamp import attach_timezone
 
 
 def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
@@ -27,7 +33,12 @@ app = typer.Typer(
 # function: com_declin(no_of_day)
 @app.callback(invoke_without_command=True, no_args_is_help=True)
 def calculate_solar_declination(
-        day_of_year: int,
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Timezone',
+            callback=convert_to_timezone)] = None,
         days_in_a_year: float = 365.25,
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
@@ -67,6 +78,9 @@ def calculate_solar_declination(
     calculations of solar position, comprehensive models like the Solar
     Position Algorithm (SPA) are typically used.
     """
+    year = timestamp.year
+    start_of_year = datetime(year=year, month=1, day=1)
+    day_of_year = timestamp.timetuple().tm_yday
     day_angle = 2 * math.pi * day_of_year / days_in_a_year
     declination = math.asin(0.3978 * math.sin(day_angle - 1.4 + orbital_eccentricity * math.sin(day_angle - perigee_offset)))
 
@@ -74,8 +88,13 @@ def calculate_solar_declination(
     return declination
 
 
-def calculate_solar_declination_rsun_base(
-        day_of_year: int,
+def calculate_solar_declination_pvgis(
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Timezone',
+            callback=convert_to_timezone)] = None,
         days_in_a_year: float = 365.25,
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
@@ -105,8 +124,10 @@ def calculate_solar_declination_rsun_base(
     which is actually : `declination = - declination`. Why? The value is
     inverted again at some other part of the program when it gets to read data.
     """
+    day_of_year = timestamp.timetuple().tm_yday
     solar_declination = calculate_solar_declination(
-        day_of_year,
+        timestamp,
+        timezone,
         days_in_a_year,
         orbital_eccentricity,
         perigee_offset,
@@ -117,7 +138,7 @@ def calculate_solar_declination_rsun_base(
 
 
 def calculate_solar_declination_hargreaves(
-        day_of_year: int,
+        timestamp: datetime = partial(datetime.now, tz=timezone.utc),
         days_in_a_year: float = 365.25,
         output_units: Annotated[str, typer.Option(
             '-o',
@@ -151,6 +172,9 @@ def calculate_solar_declination_hargreaves(
         variation and is usually chosen to align with the summer solstice,
         which typically occurs around June 21st.
     """
+    # year = timestamp.year
+    # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timezone.utc)
+    day_of_year = timestamp.timetuple().tm_yday
     declination = 23.45 * math.sin(math.radians(360/days_in_a_year * (284 + day_of_year + 0.4 * math.sin(math.radians(360/days_in_a_year * (day_of_year - 100))))))
     declination = convert_to_radians_if_requested(declination, output_units)
 
