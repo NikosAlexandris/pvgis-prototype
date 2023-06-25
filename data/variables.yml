@@ -1,0 +1,55 @@
+- variable: Angle Of Incidence
+  variable_name: angle_of_incidence
+  symbol: θ
+  description: Angle Of Incidence is defined as the angle formed between the direction of the sun ray and the line normal to the surface.
+  units: Radian
+  tags:
+    - solar
+    - geometry
+
+- variable: Latitude
+  variable_name: latitude_angle
+  symbol: Φ
+  description: Latitude Angle is defined as the angle between the sun's rays and its projection on the horizontal surface.
+  units: Radian
+  tags:
+    - solar
+    - geometry
+
+- variable: Declination
+  variable_name: declination_angle
+  symbol: δ
+  description: The declination angle of the sun is the angle between the equator and a line drawn from the centre of the Earth to the centre of the sun.
+  units: Radian
+  tags:
+    - solar
+    - astronomy
+
+- variable: Tilt
+  variable_name: tilt_angle
+  symbol: β
+  description: Tilt Angle is the angle between the inclined slope and the horizontal plane.
+  units: Radian
+  tags:
+    - solar
+    - geometry
+    - surface
+
+- variable: Surface Azimuth Angle
+  variable_name: surface_azimuth_angle
+  symbol: γ
+  description: Surface Azimuth Angle is the angle in the horizontal plane between the line due south and the horizontal projection of the normal to the inclined plane surface.
+  units: Radian
+  tags:
+    - solar
+    - geometry
+    - surface
+
+- variable: Hour angle
+  variable_name: hour_angle
+  symbol: ω
+  description: The hour angle at any instant is the angle through which the earth has to turn to bring the meridian of the observer directly in line with the sun's rays.
+  units: Radian
+  tags:
+    - solar
+    - astronomy
