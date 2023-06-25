@@ -170,6 +170,7 @@ class SolarGeometryDayConstants(BaseModel):
     lum_C?? : Are these (in the original code) indeed luminance?
     local_solar_time: `longitTime` set to 0 in the original source code!
     """
+    longitude: float = Field(..., description="The longitude of the location.")
     latitude: float = Field(..., description="The latitude of the location.")
     # local_solar_time: float = Field(0, description="The local solar time.")  
     solar_declination: float = Field(..., description="The solar declination.")
