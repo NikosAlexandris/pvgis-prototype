@@ -73,6 +73,7 @@ def calculate_solar_declination(
 
     Notes
     -----
+
     The equation used here is a simple approximation and bases upon a direct
     translation from PVGIS' rsun3 source code:
 
