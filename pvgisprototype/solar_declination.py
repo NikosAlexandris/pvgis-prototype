@@ -3,12 +3,20 @@ from typing import Annotated
 from typing import Optional
 import math
 import numpy as np
+from functools import partial
 from datetime import datetime
 from datetime import timezone
 from datetime import timedelta
 from .timestamp import now_datetime
 from .timestamp import convert_to_timezone
 from .timestamp import attach_timezone
+
+
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    help=f"Approximate the solar declination for a day in the year",
+)
 
 
 def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
@@ -22,15 +30,6 @@ def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
     return np.radians(angle) if output_units == 'radians' else angle
 
 
-app = typer.Typer(
-    add_completion=False,
-    add_help_option=True,
-    help=f"Approximate the solar declination for a day in the year",
-)
-
-
-# from: rsun_base.cpp
-# function: com_declin(no_of_day)
 @app.callback(invoke_without_command=True, no_args_is_help=True)
 def calculate_solar_declination(
         timestamp: Annotated[Optional[datetime], typer.Argument(
@@ -74,9 +73,14 @@ def calculate_solar_declination(
 
     Notes
     -----
-    The formula used here is a simple approximation. For more accurate
-    calculations of solar position, comprehensive models like the Solar
-    Position Algorithm (SPA) are typically used.
+    The equation used here is a simple approximation and bases upon a direct
+    translation from PVGIS' rsun3 source code:
+
+      - from file: rsun_base.cpp
+      - function: com_declin(no_of_day)
+
+    For more accurate calculations of solar position, comprehensive models like
+    the Solar Position Algorithm (SPA) are typically used.
     """
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1)
@@ -89,8 +93,8 @@ def calculate_solar_declination(
                     )
                 )
             )
-
     declination = convert_to_degrees_if_requested(declination, output_units)
+
     return declination
 
 
