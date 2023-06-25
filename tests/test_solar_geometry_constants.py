@@ -1,22 +1,24 @@
 import pytest
 from pvgisprototype.data_structures import SolarGeometryDayConstants
-from pvgisprototype.solar_geometry_constants import calculate_solar_geometry_constants
-from pvgisprototype.solar_geometry_constants_plot import plot_sunrise_sunset
+from pvgisprototype.solar_geometry_pvgis_constants import calculate_solar_geometry_pvgis_constants
+from pvgisprototype.solar_geometry_pvgis_constants_plot import plot_sunrise_sunset
+import datetime
 
 
 @pytest.mark.parametrize(
-    "latitude, local_solar_time, solar_declination",
+    "longitude, latitude, local_solar_time, solar_declination",
     [
-        (0, 12, 15),
-        (15, 12, 15),
-        (30, 12, 15),
-        (45, 12, 15),
-        (50, 12, 15),
-        (65, 12, 15),
+        (0, 0, 12, 15),
+        (0, 15, 12, 15),
+        (0, 30, 12, 15),
+        (0, 45, 12, 15),
+        (0, 50, 12, 15),
+        (0, 65, 12, 15),
     ],
 )
-def test_solar_geometry_day_constants(latitude, local_solar_time, solar_declination):
-    solar_constants = calculate_solar_geometry_constants(
+def test_solar_geometry_pvgis_day_constants(longitude, latitude, local_solar_time, solar_declination):
+    solar_constants = calculate_solar_geometry_pvgis_constants(
+            longitude=longitude,
             latitude=latitude,
             local_solar_time=local_solar_time,
             solar_declination=solar_declination,
@@ -32,17 +34,18 @@ def test_solar_geometry_day_constants(latitude, local_solar_time, solar_declinat
     assert solar_constants.sunrise_time is not None, "sunrise_time should not be None"
     assert solar_constants.sunset_time is not None, "sunset_time should not be None"
 
-
+location_and_timestamps = [
+        (0, 0, datetime.datetime(2023, 1, 1), datetime.datetime(2024, 1, 1)),
+        (0, 30, datetime.datetime(2023, 1, 1), datetime.datetime(2024, 1, 1)),
+        (0, 45, datetime.datetime(2023, 1, 1), datetime.datetime(2024, 1, 1)),
+        (0, 60, datetime.datetime(2023, 1, 1), datetime.datetime(2024, 1, 1)),
+    ]
+@pytest.mark.parametrize("longitude, latitude, start_date, end_date", location_and_timestamps)
 @pytest.mark.mpl_image_compare
-def test_solar_geometry_constants_plot_latitude_0():
-    return plot_sunrise_sunset(latitude=0, start_day=1, end_day=365)
-
-@pytest.mark.mpl_image_compare
-def test_solar_geometry_constants_plot_latitude_45():
-    return plot_sunrise_sunset(latitude=45.0, start_day=1, end_day=365)
-
-@pytest.mark.mpl_image_compare
-def test_solar_geometry_constants_plot_latitude_65():
-    return plot_sunrise_sunset(latitude=65, start_day=1, end_day=365)
-
-# The last one overwrites existing file!
+def test_solar_geometry_pvgis_constants_plot_latitude(
+        longitude: float,
+        latitude: float,
+        start_date: datetime.datetime,
+        end_date: datetime.datetime,
+        ):
+    return plot_sunrise_sunset(longitude, latitude, start_date, end_date)
