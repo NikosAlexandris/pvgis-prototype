@@ -1,12 +1,11 @@
 """
-Direct irradiance
-
-The _direct_ or _beam_ irradiance is one of the main components of solar irradiance.
-It comes perpendicular from the Sun and is not scattered before it irradiates a surface.
+_Direct_ or _beam_ irradiance is one of the main components of solar
+irradiance. It comes perpendicular from the Sun and is not scattered before it
+irradiates a surface.
 
 During a cloudy day the sunlight will be partially absorbed and scattered by
 different air molecules. The latter part is defined as the _diffuse_
-irradiance. The remaining part is the _beam_ irradiance.
+irradiance. The remaining part is the _direct_ irradiance.
 """
 
 
@@ -182,7 +181,7 @@ def calculate_direct_horizontal_irradiance(
         hour_of_year: int,
         linke_turbidity_factor: float,
         ):
-    """Calculate the direct irradiatiance incident on a horizontal solar surface.
+    """Calculate the direct irradiatiance incident on a horizontal surface
 
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
@@ -241,7 +240,7 @@ def calculate_direct_inclined_irradiance(
             case_sensitive=False,
             help="Method to calculate the solar declination")] = 'jenco',
         ):
-    """Calculate the direct irradiatiance incident on a tilted solar surface.
+    """Calculate the direct irradiance incident on a tilted surface
 
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
