@@ -392,9 +392,6 @@ def calculate_direct_inclined_irradiance(
 # @app.command('direct', no_args_is_help=True)
 def calculate_direct_irradiance(
         latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
-        year: int,
-        day_of_year: float,
-        hour_of_year: float,
         # direct_horizontal_radiation: Annotated[float, typer.Argument(
         #     help='Direct normal radiation in W/m²',
         #     min=-9000, max=1000)],  # `sh` which comes from `s0`
@@ -404,6 +401,12 @@ def calculate_direct_irradiance(
         solar_altitude: Annotated[float, typer.Argument(
             help='Solar altitude in degrees °',
             min=0, max=90)],
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Timezone',
+            callback=convert_to_timezone)] = None,
         component: Annotated[DirectIrradianceComponents, typer.Option(
             '-c',
             '--component',
@@ -434,12 +437,18 @@ def calculate_direct_irradiance(
         The direct radiant flux incident on a surface per unit area in W/m².
 
     """
-    if surface_tilt == 0:
-        typer.echo(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')
-        direct_horizontal_irradiance = calculate_direct_horizontal_irradiance()
-        return direct_horizontal_irradiance  # Bhc
+    pass
+    # year = timestamp.year
+    # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timezone.utc)
+    # hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+    # day_of_year = timestamp.timetuple().tm_yday
+    # day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
+    # if surface_tilt == 0:
+    #     typer.echo(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')
+    #     direct_horizontal_irradiance = calculate_direct_horizontal_irradiance()
+    #     return direct_horizontal_irradiance  # Bhc
 
-    if surface_tilt != 0:
-        direct_inclined_irradiance = calculate_direct_inclined_irradiance()
-        typer.echo(f'Direct inclined irradiance : {direct_inclined_irradiance}')
-        return direct_inclined_irradiance  # Bic
+    # if surface_tilt != 0:
+    #     direct_inclined_irradiance = calculate_direct_inclined_irradiance()
+    #     typer.echo(f'Direct inclined irradiance : {direct_inclined_irradiance}')
+    #     return direct_inclined_irradiance  # Bic
