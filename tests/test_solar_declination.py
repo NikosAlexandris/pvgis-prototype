@@ -6,6 +6,7 @@ from pvgisprototype.solar_declination_plot import plot_solar_declination_five_ye
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import datetime
 
 
 """
@@ -18,26 +19,25 @@ Verify expected declination for these days based on a given formula or lookup ta
 
 
 @pytest.mark.parametrize(
-    "day_of_year, expected", 
+    "timestamp, expected", 
     [
-        (79, 0),  # Around vernal equinox
-        (80, 0),  # Around vernal equinox
-        (171, 23.44),  # Around summer solstice
-        (172, 23.44),  # Around summer solstice
-        (265, 0),  # Around autumnal equinox
-        (266, 0),  # Around autumnal equinox
-        (355, -23.44),  # Around winter solstice
-        (356, -23.44),  # Around winter solstice
+        (datetime.datetime(2023, 1, 1), -23.38044),  # Around vernal equinox
+        (datetime.datetime(2023, 3, 20), 0),  # Around vernal equinox
+        (datetime.datetime(2023, 3, 21), 0),  # Around vernal equinox
+        (datetime.datetime(2023, 6, 20), 23.44),  # Around summer solstice
+        (datetime.datetime(2023, 6, 21), 23.44),  # Around summer solstice
+        (datetime.datetime(2023, 9, 22), 0),  # Around autumnal equinox
+        (datetime.datetime(2023, 9, 23), 0),  # Around autumnal equinox
+        (datetime.datetime(2023, 12, 21), -23.44),  # Around winter solstice
+        (datetime.datetime(2023, 12, 22), -23.44),  # Around winter solstice
+        (datetime.datetime(2023, 12, 30), -16.428456),  # Around winter solstice
     ]
 )
-def test_calculate_solar_declination(day_of_year: int, expected: float):
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='radians'), 0.0001) == expected
-    assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 1) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.1) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.01) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.001) == expected
-    # assert pytest.approx(calculate_solar_declination(day_of_year, output_units='degrees'), 0.0001) == expected
+def test_calculate_solar_declination(timestamp: datetime.datetime, expected: float):
+    assert pytest.approx(
+            calculate_solar_declination(timestamp=timestamp, timezone=None, output_units='degrees'), 1) == expected
+    # assert pytest.approx(calculate_solar_declination(timestamp, output_units='degrees'), 0.1) == expected
+    # assert pytest.approx(calculate_solar_declination(timestamp, output_units='degrees'), 0.1) == expected
 
 
 # @pytest.mark.mpl_image_compare  # instructs use of a baseline image
@@ -50,9 +50,17 @@ random.seed(43) # Comment to really pick a random year
 random_year = random.randint(2005, 2023)
 @pytest.mark.mpl_image_compare  # instructs use of a baseline image
 def test_solar_declination_plot_one_year():
-    return plot_solar_declination_one_year(year=random_year, title=f'Solar Declination {random_year}')
+    return plot_solar_declination_one_year(
+            year=random_year,
+            title=f'Solar Declination {random_year}',
+            output_units='degrees',
+            )
 
 
 @pytest.mark.mpl_image_compare
 def test_solar_declination_plot_five_years():
-    return plot_solar_declination_five_years(start_year=2018, end_year=2022)
+    return plot_solar_declination_five_years(
+            start_year=2018,
+            end_year=2022,
+            output_units='degrees',
+            )
