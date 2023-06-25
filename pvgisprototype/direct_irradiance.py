@@ -187,21 +187,36 @@ def calculate_direct_normal_irradiance(
 def calculate_direct_horizontal_irradiance(
         latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
         elevation: float,
-        year: int,
-        day_of_year: float,
-        hour_of_year: int,
         linke_turbidity_factor: float,
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Timezone',
+            callback=convert_to_timezone)] = None,
         ):
     """Calculate the direct irradiatiance incident on a horizontal surface
 
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
     """
-    solar_declination = calculate_solar_declination(day_of_year)
+    # if timestamp.tzinfo is None:
+    #     timestamp = timestamp.replace(tzinfo=datetime.timezone.utc)
+
+    day_of_year = timestamp.timetuple().tm_yday
+    solar_declination = calculate_solar_declination(timestamp)
     C31 = math.cos(latitude) * math.cos(solar_declination)
     C33 = math.sin(latitude) * math.sin(solar_declination)
+
+    year = timestamp.year
+    start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
+    hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+    # -------------------------------------------------------------------------
+    # Replace with ephem or else!
     solar_time = calculate_solar_time(year, hour_of_year)
     hour_angle = np.radians(15) * (solar_time - 12)
+    # -------------------------------------------------------------------------
+
     sine_solar_altitude = C31 * math.cos(hour_angle) + C33
     solar_altitude = math.asin(sine_solar_altitude)
     refracted_solar_altitude = calculate_refracted_solar_altitude(
