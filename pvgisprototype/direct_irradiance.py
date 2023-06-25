@@ -18,30 +18,39 @@ logging.basicConfig(
         logging.StreamHandler()  # Print log to the console
     ]
 )
+
+
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import validator
 import typer
 from rich import print
 from typing import Union
-from typing_extensions import Annotated
+from typing import Annotated
 from typing import Optional
+from functools import partial
 from enum import Enum
-import numpy as np
-import math
+
 from .extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
 from .angular_loss_factor import calculate_angular_loss_factor
 from .solar_declination import calculate_solar_declination
-from .solar_geometry_variables import calculate_solar_time
+from .solar_geometry_pvgis_variables import calculate_solar_time
 
+from datetime import datetime
+from .timestamp import now_datetime
+from .timestamp import convert_to_timezone
+from .timestamp import attach_timezone
 
-AOI_CONSTANTS = [ -0.074, 0.155]
+from .constants import AOI_CONSTANTS
+
+import numpy as np
+import math
 
 
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"Estimate the direct normal radiance",
+    help=f"Estimate the direct solar radiation",
 )
 
 
@@ -52,11 +61,13 @@ class DirectIrradianceComponents(str, Enum):
 
 
 class SolarIncidenceAngleMethod(str, Enum):
-    jenco = 'jenco'
+    jenco = 'Jenco'
     simple = 'simple'
+
 
 # some correction for the given elevation (Hofierka, 2002)
 adjust_elevation = lambda elevation: math.exp(-elevation / 8434.5)
+
 # ensure value ranges in [-pi, pi]
 range_in_minus_plus_pi = lambda radians: (radians + math.pi) % (2 * math.pi) - math.pi
 corrected_linke_turbidity_factor = lambda tlk: -0.8662 * tlk
