@@ -14,6 +14,7 @@ app = typer.Typer(
     help=f"Calculate solar irradiance",
 )
 
+
 app.add_typer(direct_irradiance, name="direct", help='Estimate the direct irradiance', no_args_is_help=True)
 app.add_typer(diffuse_irradiance, name="diffuse", help='Estimate the diffuse irradiance', no_args_is_help=True)
 app.add_typer(reflected_irradiance, name="reflected", help='Estimate the direct reflected radiation', no_args_is_help=True)

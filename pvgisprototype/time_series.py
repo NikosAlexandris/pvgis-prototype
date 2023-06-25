@@ -22,7 +22,7 @@ def read_raster_data(netcdf: str, mask_and_scale=False):
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"PVGIS core CLI prototype",
+    help='Retrieve time series of solar radiation and PV power output',
 )
 
 

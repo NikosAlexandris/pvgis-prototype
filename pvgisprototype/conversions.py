@@ -3,8 +3,8 @@ import numpy as np
 
 def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
     """Convert angle from radians to degrees if requested."""
-    x = np.degrees(angle) if output_units == 'degrees' else angle
-    return x
+
+    return np.degrees(angle) if output_units == 'degrees' else angle
 
 
 def convert_to_radians_if_requested(angle: float, output_units: str) -> float:

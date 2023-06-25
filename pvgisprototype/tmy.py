@@ -5,6 +5,13 @@ from typing import Optional
 from pathlib import Path
 
 
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    help='Generate a Typical Meteorological Year', 
+)
+
+
 def calculate_degree_days(
         location: Annotated[Tuple[float, float], typer.Argument(..., help='Latitude, longitude [°]')],
         years: Annotated[Tuple[float, float], typer.Argument(..., min=2005, max=2020, help='First and last year of calculations')],
@@ -36,13 +43,6 @@ def calculate_degree_days(
     pass
 
 
-app = typer.Typer(
-    add_completion=False,
-    add_help_option=True,
-    help=f"PVGIS core CLI prototype",
-)
-
-
 @app.command('tmy')
 def generate_tmy():
     """Generate the Typical Meteorological Year
@@ -55,3 +55,6 @@ def generate_tmy():
     """
     pass
 
+
+if __name__ == '__main__':
+    app()

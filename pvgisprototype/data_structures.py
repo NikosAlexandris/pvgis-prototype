@@ -156,8 +156,8 @@ class LocationSolarAttributes(BaseModel):
 
 
 class GridGeometry(BaseModel):
-    sine_of_latitude: float
-    cosine_of_latitude: float
+    sine_latitude: float
+    cosine_latitude: float
 
 
 class SolarGeometryDayConstants(BaseModel):
@@ -174,8 +174,8 @@ class SolarGeometryDayConstants(BaseModel):
     # local_solar_time: float = Field(0, description="The local solar time.")  
     solar_declination: float = Field(..., description="The solar declination.")
     # time_offset: float = Field(0, description="The time offset.")
-    cosine_of_solar_declination: float = Field(None, description="The cosine of the solar declination.")
-    sine_of_solar_declination: float = Field(None, description="The sine of the solar declination.")
+    cosine_solar_declination: float = Field(None, description="The cosine of the solar declination.")
+    sine_solar_declination: float = Field(None, description="The sine of the solar declination.")
     lum_C11: float = Field(None, description="The value of luminance C11.")
     lum_C13: float = Field(None, description="The value of luminance C13.")
     lum_C22: float = Field(None, description="The value of luminance C22.")
@@ -198,8 +198,8 @@ class SolarGeometryDayVariables(BaseModel):
     # z_max: float = Field(..., description="The maximum Z value.")
     # zp: float = Field(..., description="The Zp value.")
     solar_altitude: float = Field(..., description="The solar altitude.")
-    sine_of_solar_altitude: float = Field(..., description="The sine of solar altitude.")
-    tan_of_solar_altitude: float = Field(..., description="The tangent of solar altitude.")
+    sine_solar_altitude: float = Field(..., description="The sine of solar altitude.")
+    tan_solar_altitude: float = Field(..., description="The tangent of solar altitude.")
     solar_azimuth: float = Field(..., description="The solar azimuth.")
     sun_azimuth_angle: float = Field(..., description="The sun azimuth angle.")
     # step_sine_angle: float
