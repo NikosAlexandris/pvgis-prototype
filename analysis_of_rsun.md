@@ -65,7 +65,30 @@ average_SD() -> average_standard_deviation.py
 
 ## Reading the old source code
 
-### Overviewing main()
+### The main function
+
+#### Overview
+
+1. Parses command-line arguments.
+
+2. Checks which solar radiation database is requested. If it is none of SARAH
+   or SARAH2, a _time offset_ is flagged to be set (through a function later
+   on).
+
+
+   > At this point, a row and column offset indices are set which point to the
+   > pixel locatio to read data from all relevant datasets (elevatin, SIS, SID,
+   > temperature, wind speed and direction)
+
+3. Depending on the user's request, sets flags or battery capacity
+   related data are read (i.e. hourly consumption data, battery charge matrix, power
+   matrix (?)).
+
+4. Reads the elevation for the fiven location.
+
+4. 
+
+#### Analysis
 
 The `main()` algorithm
 is evaluating and tracking the performance of a solar power system.
@@ -237,20 +260,26 @@ the code performs the following steps:
 
 - Checks if `horizonStep` is greater than 0.
   If it is not, an error message is printed, and the program exits.
+
 - Sets the horizon number of intervals using `setHorizonNumInt()`
   and rounds 360.00001 divided by `horizonStep`.
+
 - Allocates memory for `horizonArray` based on the horizon number of intervals.
+
 - Depending on the `horizonInfoType`:
- - If it is 1, the code reads data from a file specified by `horizonFileName`
-   using `ReadHorizonASCII()`.
- - If it is 2, the code reads data from a file specified by `horizonFileName`
-   by parsing comma-separated values and storing them in `readHorizonArray`.
-   It then converts the values from degrees to radians,
-   rearranges the array,
-   and assigns it to `horizonArray`.
- - Otherwise, the code reads data using `ReadHorizon()`
-   based on the latitude, longitude, elevation file numbers,
-   and the horizon number of intervals.
+
+- If it is 1, the code reads data from a file specified by `horizonFileName`
+  using `ReadHorizonASCII()`.
+
+- If it is 2, the code reads data from a file specified by `horizonFileName`
+  by parsing comma-separated values and storing them in `readHorizonArray`.
+  It then converts the values from degrees to radians,
+  rearranges the array,
+  and assigns it to `horizonArray`.
+
+- Otherwise, the code reads data using `ReadHorizon()`
+  based on the latitude, longitude, elevation file numbers,
+  and the horizon number of intervals.
 
 ### Number of hourly values to consider
 
@@ -306,6 +335,7 @@ This section
 
 - reads `sis` and `sid` data, computes the difference between the values
   and stores them in the `hourlyVarData` array.
+
 - calculates the total irradiation by summing the `sis` values
   and assigns a value of $1$ to each element in the
   `spectralCorrectionValues` array.
@@ -342,6 +372,7 @@ In detail
 
    - the `beamCoefficient` field of the corresponding `hourlyVarData` structure 
      is set to the corresponding `sidVals` value,
+
    - and the `diffCoefficient` field is set to the difference
      between the corresponding `sisVals` and `sidVals` values.
 
