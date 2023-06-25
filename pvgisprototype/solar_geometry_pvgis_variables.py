@@ -19,7 +19,8 @@ from typing import Optional
 import numpy as np
 from numba import njit
 import datetime
-
+from .time import convert_to_timezone
+from .time import attach_timezone
 import logging
 
 
@@ -91,15 +92,21 @@ def calculate_solar_time(
 # from: rsun_base.cpp
 # function : com_par()
 @app.callback(invoke_without_command=True)
-def calculate_solar_geometry_variables(
+def calculate_solar_geometry_pvgis_variables(
         # solar_geometry_day_constants: SolarGeometryDayConstants,
         solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
-        year: int,
-        hour_of_year: int,
-        days_in_a_year: float = 365.25,
-        perigee_offset = 0.048869,
-        eccentricity = 0.01672,
-        hour_offset: float = 0,
+        timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
+            help='Timestamp', callback=attach_timezone)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Timezone')] = None,
+        days_in_a_year: Annotated[float, typer.Option(
+            help='Days in a year')] = 365.25,
+        perigee_offset: Annotated[float, typer.Option(
+            help='Perigee offset')] = 0.048869,
+        eccentricity: Annotated[float, typer.Option(
+            help='Eccentricity')] = 0.01672,
+        hour_offset: Annotated[float, typer.Option(
+            help='Hour offset')] = 0,
         output_units: Annotated[str, typer.Option(
             '-o',
             '--output-units',
@@ -114,10 +121,14 @@ def calculate_solar_geometry_variables(
     solar_geometry_day_constants : SolarGeometryDayConstants
         The input solar geometry constants.
     """
-    # print(len(solar_geometry_day_constants.dict().values()))
-    # print(solar_geometry_day_constants.dict().values())
+
+    year = timestamp.year
+    start_of_year = datetime.datetime(year=year, month=1, day=1)
+    hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+
     # Unpack constants
     (
+        longitude,
         latitude,
         solar_declination,
         cosine_of_solar_declination,
@@ -164,7 +175,7 @@ def calculate_solar_geometry_variables(
             sunset_time = 24
 
     # vertical angle of the sun
-    solar_altitude = np.arcsin(sine_of_solar_altitude)
+    solar_altitude = np.arcsin(sine_solar_altitude)
 
     lum_Lx = -lum_C22 * np.sin(time_angle)
     lum_Ly = lum_C11 * np.cos(time_angle) + lum_C13
@@ -187,11 +198,11 @@ def calculate_solar_geometry_variables(
 
     input_angle = sun_azimuth_angle + half_numpi
     input_angle = input_angle if input_angle >= double_numpi else input_angle - double_numpi
-    tan_of_solar_altitude = np.tan(solar_altitude)
+    tan_solar_altitude = np.tan(solar_altitude)
 
     solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
-    sine_of_solar_altitude = convert_to_degrees_if_requested(sine_of_solar_altitude, output_units)
-    tan_of_solar_altitude = convert_to_degrees_if_requested(tan_of_solar_altitude, output_units)
+    sine_solar_altitude = convert_to_degrees_if_requested(sine_solar_altitude, output_units)
+    tan_solar_altitude = convert_to_degrees_if_requested(tan_solar_altitude, output_units)
     solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
     sun_azimuth_angle = convert_to_degrees_if_requested(sun_azimuth_angle, output_units)
 
@@ -201,8 +212,8 @@ def calculate_solar_geometry_variables(
         # z_max=z_max,
         # zp=zp,
         solar_altitude=solar_altitude,
-        sine_of_solar_altitude=sine_of_solar_altitude,
-        tan_of_solar_altitude=tan_of_solar_altitude,
+        sine_solar_altitude=sine_solar_altitude,
+        tan_solar_altitude=tan_solar_altitude,
         solar_azimuth=solar_azimuth,
         sun_azimuth_angle=sun_azimuth_angle,
         # step_sine_angle=step_sine_angle,

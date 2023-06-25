@@ -18,7 +18,8 @@ app = typer.Typer(
 
 # from : rsun_base.cpp
 # function : com_par_const()
-def calculate_solar_geometry_constants(
+def calculate_solar_geometry_pvgis_constants(
+        longitude: float,
         latitude: float,
         local_solar_time: float,
         solar_declination: float,
@@ -38,6 +39,7 @@ def calculate_solar_geometry_constants(
 
         Why? This has been "fixed" in this function here.-
     """
+    longitude = radians(longitude)
     latitude = radians(latitude)
     sine_of_latitude = sin(latitude) 
     cosine_of_latitude = cos(latitude)
@@ -74,6 +76,7 @@ def calculate_solar_geometry_constants(
                     sunset_time = 12
 
     return SolarGeometryDayConstants(
+        longitude=longitude,
         latitude=latitude,
         solar_declination=solar_declination,
         cosine_of_solar_declination=cosine_of_solar_declination,
