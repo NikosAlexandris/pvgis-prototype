@@ -18,34 +18,8 @@ console = Console()
 class SolarPositionModels(str, Enum):
     suncalc = 'suncalc'
     pysolar = 'pysolar'
-    pvgis_new = 'pvgis-new'
-
-
-# def select_solar_position_model(
-#         longitude: float,
-#         latitude: float,
-#         timestamp: datetime,
-#         model: str,
-# ):
-#     """Select solar position model"""
-#     if model == 'suncalc':
-#         solar_azimuth, solar_altitude = suncalc.get_position(
-#                 timestamp,  # this comes first here!
-#                 longitude,
-#                 latitude,
-#                 )
-#     if model == 'pysolar':
-#         solar_altitude = pysolar.solar.get_altitude(
-#                 latitude,  # this comes first
-#                 longitude,
-#                 when=timestamp,
-#                 )
-#         solar_azimuth = pysolar.solar.get_azimuth(
-#                 latitude,  # this comes first
-#                 longitude,
-#                 when=timestamp,
-#                 )
-#     return solar_altitude, solar_azimuth
+    pvis = 'pvis'
+    pvgis = 'pvgis'
 
 
 app = typer.Typer(
