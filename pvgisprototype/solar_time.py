@@ -400,25 +400,30 @@ def calculate_solar_time_pvgis(
     3. Calculate the solar time by adding the current hour of the year, the
     time offset from the equation of time, and the hour offset (likely a
     longitude-based correction).
+
+    Returns
+    -------
+    solar_time: float
+        The solar time in decimal hours
     """
     year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1,
-                                      tzinfo=timestamp.tzinfo)
-    
+    start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     day_of_year = timestamp.timetuple().tm_yday
     day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
     hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+    hour_of_day = hour_of_year % 24  # integer
 
-    # set `time_offset` for `solar_time`
-    time_offset = - 0.128 * np.sin(day_of_year_in_radians - perigee_offset) - eccentricity * np.sin(2 * day_of_year_in_radians + 0.34383)
-    
-    # set `image_offset` for `hour_offset`
-    image_offset = get_image_offset(longitude, latitude)
+    # approximation like the Equation of Time?!
+    time_offset = - 0.128 \
+                  * np.sin(day_of_year_in_radians - perigee_offset) \
+                  - eccentricity \
+                  * np.sin(2 * day_of_year_in_radians + 0.34383)
 
-    # set `hour_offset` for `solar_time`
-    hour_offset = time_slot_offset_global + longitude / 15 + image_offset
-
-    solar_time = hour_of_year % 24 + time_offset + hour_offset
+    # Very complicated implementation borrowed from SPECMAGIC!
+    image_offset = get_image_offset(longitude, latitude)  # for `hour_offset`
+    # adding longitude to UTC produces mean solar time!
+    hour_offset = time_slot_offset_global + longitude / 15 + image_offset  # for `solar_time`
+    solar_time = hour_of_day + time_offset + hour_offset
     
     return solar_time
 
