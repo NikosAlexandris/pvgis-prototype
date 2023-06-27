@@ -37,8 +37,8 @@ def test_calculate_angular_loss_factor_with_invalid_inputs(solar_altitude, solar
     ]
 )
 def test_calculate_angular_loss_factor(solar_altitude, solar_declination, expexted_angular_loss_factor):
-    result = calculate_angular_loss_factor(direct_radiation, solar_altitude, incidence_angle)
-    assert result == pytest.approx(expected_result)
+    result = calculate_angular_loss_factor(solar_altitude, solar_declination)
+    assert result == pytest.approx(expexted_angular_loss_factor)
 
 
 @pytest.mark.parametrize(
