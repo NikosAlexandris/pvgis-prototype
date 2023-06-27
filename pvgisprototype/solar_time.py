@@ -7,7 +7,21 @@ from datetime import datetime
 import pytz
 from tzlocal import get_localzone
 import ephem
+
+from skyfield import almanac
+from skyfield.api import Topos
+from skyfield.api import load
+from skyfield.api import N
+from skyfield.api import W
+from skyfield.api import wgs84
+from skyfield.api import load
+
 import numpy as np
+from math import pi
+from math import sin
+from math import cos
+from math import tan 
+from math import acos
 from .constants import HOUR_ANGLE
 from .constants import UNDEF
 from .constants import double_numpi
@@ -15,19 +29,17 @@ from .constants import half_numpi
 from .conversions import convert_to_radians
 from .conversions import convert_to_degrees_if_requested
 from .timestamp import now_datetime
-from .timestamp import convert_to_timezone
+from .timestamp import ctx_convert_to_timezone
 from .timestamp import attach_timezone
 from .timestamp import convert_hours_to_seconds
 from .image_offset import get_image_offset
-from math import cos
-from math import tan 
-from math import acos
 
 
 class SolarTimeModels(str, Enum):
     eot = 'eot'
     ephem = 'ephem'
     pvgis = 'pvgis'
+    skyfield = 'Skyfield'
 
 
 app = typer.Typer(
@@ -37,7 +49,7 @@ app = typer.Typer(
 )
 
 
-def calculate_solar_time_ephem(
+def calculate_solar_time_skyfield(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
             min=-180, max=180)],
@@ -49,11 +61,46 @@ def calculate_solar_time_ephem(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         ):
     """
     """
-    observer = ephem.Observer()
+    # Handle Me during input validation? -------------------------------------
+    try:
+        timestamp = timezone.localize(timestamp)
+    except Exception:
+        logging.warning(f'tzinfo already set for timestamp = {timestamp}')
+    # Handle Me during input validation? -------------------------------------
+
+    midnight = timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
+    next_midnight = midnight + timedelta(days=1)
+    timescale = load.timescale()
+    midnight_time = timescale.from_datetime(midnight)
+    next_midnight_time = timescale.from_datetime(next_midnight)
+
+    ephemeris = load('de421.bsp')
+    sun = ephemeris['Sun']
+    location = wgs84.latlon(latitude * N, longitude * W)
+    f = almanac.meridian_transits(ephemeris, sun, location)
+    times, events = almanac.find_discrete(midnight_time, next_midnight_time, f)
+    
+    times = times[events == 1]  # select transits instead of antitransits
+    if not times:
+        raise ValueError("No solar noon found in the given time range")
+
+    solar_noon = times[0]
+    solar_noon_string = str(solar_noon.astimezone(timezone))[:19]
+    # typer.echo(f'Solar noon: {solar_noon_string}')
+    solar_noon_datetime = solar_noon.utc_datetime().replace(tzinfo=pytz.UTC)
+    local_solar_time = timestamp - solar_noon_datetime.astimezone(timezone)
+    typer.echo(f'Local solar time: {local_solar_time}')
+    decimal_hours = local_solar_time.total_seconds() / 3600
+
+    from devtools import debug
+    debug(locals())
+    return decimal_hours
+
+
     observer.date = timestamp
     observer.lon = longitude
     observer.lat = latitude
@@ -222,6 +269,15 @@ def calculate_solar_time(
     """
     # if local and timestamp is not None and timezone is not None:
     #     timestamp = timezone.localize(timestamp)
+
+    if model.value == SolarTimeModels.skyfield:
+
+        solar_time = calculate_solar_time_skyfield(
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            )
 
     if model.value == SolarTimeModels.ephem:
 
