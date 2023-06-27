@@ -41,7 +41,9 @@ def test_calculate_solar_time_ephem_simple(
 models = [
         SolarTimeModels.ephem,
         SolarTimeModels.eot,
+        SolarTimeModels.noaa,
         SolarTimeModels.pvgis,
+        SolarTimeModels.skyfield,
 ]
 coordinates = [
     (0, 90),  # 'North Pole'
