@@ -90,17 +90,27 @@ def test_calculate_direct_horizontal_irradiance(latitude, elevation, timestamp, 
 #     result = calculate_direct_horizontal_irradiance(45, 1000, 2023, 150, 5, 2)
 #     assert isinstance(result, float)
 
-def test_calculate_direct_inclined_irradiance(
-        direct_radiation,
-        direct_radiation_coefficient,
-        solar_altitude,
-        incidence_angle_index,
-        expected_result
-        ):
-    result = calculate_direct_radiation_for_tilted_surface(
-            direct_radiation,
-            direct_radiation_coefficient,
-            solar_altitude,
-            incidence_angle_index,
-            )
-    assert result == pytest.approx(expected_result)
+
+@pytest.mark.parametrize(
+    "latitude, elevation, timestamp, surface_tilt, surface_orientation, linke_turbidity_factor, method_for_solar_incidence_angle, expected_output",
+    [
+        (40.085556, 2917.727, '2023-06-22', 40, 180, 2, 'jenco', "Extraterrestrial irradiance: 1316.337133501784\nDirect normal irradiance: 1118.9581621543896\nDirect horizontal irradiance: 1052.6015867964556"),  # Mt Olympos
+    ]
+)
+def test_calculate_direct_inclined_irradiance(latitude, elevation, timestamp, surface_tilt, surface_orientation, linke_turbidity_factor, method_for_solar_incidence_angle, expected_output):
+    # Convert the parameters to strings to pass them as command-line arguments
+    arguments = [
+        'inclined',
+        str(latitude),
+        str(elevation),
+        str(timestamp),
+        str(surface_tilt),
+        str(surface_orientation),
+        str(linke_turbidity_factor),
+        '-m',
+        str(method_for_solar_incidence_angle),
+    ]
+    result = run_app(arguments)
+    print(result) 
+    # assert result.exit_code == 0
+    assert expected_output in result.output
