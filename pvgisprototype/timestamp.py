@@ -30,26 +30,31 @@ def convert_hours_to_seconds(hours: float):
     return hours * 3600
 
 
-
-def convert_to_timezone( ctx: typer.Context, param: typer.CallbackParam, value: str):
+def convert_to_timezone(string: str):
     """Convert string to `tzinfo` timezone object
     """
-    if value == "local":
+    if string == "local":
         try:
             tzinfo = get_localzone()
         except Exception:
             tzinfo = pytz.timezone('UTC')
             typer.echo("Unable to determine local timezone. Defaulting to UTC.")
-    elif value is None:
+    elif string is None:
         tzinfo = pytz.timezone('UTC')
     else:
         try:
-            tzinfo = pytz.timezone(value)
+            tzinfo = pytz.timezone(string)
         except pytz.UnknownTimeZoneError:
-            typer.echo(f"Unknown timezone: {value}. Please input a valid timezone.")
+            typer.echo(f"Unknown timezone: {string}. Please input a valid timezone.")
             raise typer.Exit(code=1)
 
     return tzinfo
+
+
+def ctx_convert_to_timezone( ctx: typer.Context, param: typer.CallbackParam, value: str):
+    """Convert string to `tzinfo` timezone object
+    """
+    return convert_to_timezone(value)
 
 
 def attach_timezone(
