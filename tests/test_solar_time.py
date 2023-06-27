@@ -2,6 +2,7 @@ import pytest
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
+import pytz
 from pvgisprototype.solar_time import (
     calculate_solar_time_ephem,
     calculate_solar_time_eot,
@@ -12,6 +13,7 @@ from pvgisprototype.solar_time import (
     SolarTimeModels
 )
 from pvgisprototype.timestamp import convert_hours_to_seconds
+from pvgisprototype.timestamp import convert_to_timezone
 import numpy as np
 
 # import typer
@@ -94,33 +96,50 @@ from datetime import datetime, timedelta
 # the list of models you want to test
 models = [SolarTimeModels.ephem, SolarTimeModels.eot, SolarTimeModels.pvgis]
 
+
+coordinates = [
+    (0, 90, 'North Pole'),
+    (0, -90, 'South Pole'),
+    (-180, 0, 'International Date Line'),
+    (0, 0, 'Greenwich Meridian / Equator'),
+    (22.358611, 40.085556, 'Όλυμπος'),  # Please replace 'Location 1' with the actual location name
+    (6.6327, 46.5218, 'Lausanne, Switzerland'),  # Please replace 'Location 2' with the actual location name
+    (40.7128, -74.0060, 'New York, USA'),
+    (51.5074, -0.1278, 'London, UK'),
+    (-33.8688, 151.2093, 'Sydney, Australia'),
+    (35.6895, 139.6917, 'Tokyo, Japan'),
+    (-33.9249, 18.4241, 'Cape Town, South Africa'),
+    (-34.6037, -58.3816, 'Buenos Aires, Argentina'),
+    (55.7558, 37.6176, 'Moscow, Russia'),
+    (1.3521, 103.8198, 'Singapore'),
+    (64.1265, -21.8174, 'Reykjavik, Iceland'),
+    (21.3069, -157.8583, 'Honolulu, Hawaii, USA'),
+    (19.0760, 72.8777, 'Mumbai (Bombay), India'),
+]
+@pytest.mark.parametrize("longitude, latitude, location", coordinates)
 @pytest.mark.mpl_image_compare  # instructs use of a baseline image
-def test_calculate_solar_time_plot():
-    longitude = 0
-    latitude = 0
+def test_calculate_solar_time_plot(longitude, latitude, location):
     start_date = datetime.now()
     end_date = start_date + timedelta(days=365)  # one year from now
     timestamps = [start_date + timedelta(days=i) for i in range((end_date - start_date).days)]
-
-    # solar_times = np.vectorize(calculate_solar_time)(longitude, latitude, timestamps, models)
-    # solar_times_pvgis = np.vectorize(calculate_solar_time_pvgis)(timestamps)
-    # solar_times_eot = np.vectorize(calculate_solar_time_eot)(timestamps)
-    
+    # timezone = 'UTC'
+    # if isinstance(timezone, str):
+    #     timezone = convert_to_timezone(timezone)  # done via a callback in cli
+    from devtools import debug
+    debug(locals())
+    timezone = pytz.timezone('UTC')
     fig, ax = plt.subplots(figsize=(10, 6))
         
     for model in SolarTimeModels:
-        solar_times = [calculate_solar_time(longitude, latitude, timestamp, model=model) for timestamp in timestamps]
+        solar_times = [calculate_solar_time(longitude, latitude, timestamp, timezone, model=model) for timestamp in timestamps]
         ax.plot(timestamps, solar_times, label=f'Model: {model.name}')
 
-    # fig = plt.figure(figsize=(10,6))
-    # plt.plot(timestamps, solar_times, linewidth=4, alpha=0.7, label='PVIS', linestyle='-', color='#66CCCC')
-    # plt.plot(timestamps, solar_times_pvgis, linewidth=2.0, alpha=0.35, label='PVGIS (current C code)', linestyle='--', color='red')
-    # plt.plot(timestamps, solar_times_eot, linewidth=2.0, alpha=1.0, label='Equation of Time', linestyle=':', color='#9966CC')
     # plt.xlabel('Date')
-    plt.ylabel('Solar Time')
+    plt.ylabel('Decimal hours')
     plt.legend()
-    plt.title('Solar Time Calculation')
-    fig.savefig('solar_time_comparison.png')
+    plt.title(f'Solar Time Calculation for {location}')
+    fig.savefig(f'solar_time_comparison_at_{longitude}_{latitude}.png')
+
     return fig
 
 
