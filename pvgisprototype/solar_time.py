@@ -38,6 +38,7 @@ from .image_offset import get_image_offset
 class SolarTimeModels(str, Enum):
     eot = 'eot'
     ephem = 'ephem'
+    noaa = 'NOAA'
     pvgis = 'pvgis'
     skyfield = 'Skyfield'
 
@@ -110,6 +111,95 @@ def calculate_solar_time_skyfield(
 
     return hour_angle
 
+def calculate_solar_time_noaa(
+        longitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-180, max=180)],
+        latitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-90, max=90)],
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Timezone',
+            callback=ctx_convert_to_timezone)] = None,
+        ):
+    """
+    General Solar Position Calculations - NOAA Global Monitoring Division
+    """
+    from devtools import debug
+    
+    # Handle Me during input validation? -------------------------------------
+    try:
+        timestamp = timezone.localize(timestamp)
+    except Exception:
+        logging.warning(f'tzinfo already set for timestamp = {timestamp}')
+    # Handle Me during input validation? -------------------------------------
+
+
+    # utc_offset_hours = timestamp.utcoffset().total_seconds() / 3600
+
+    # Calculate the fractional year, in radians
+    gamma = 2 * pi / 365 * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
+    # equation of time in minutes
+    equation_of_time = 229.18 * (
+                    0.000075 \
+                    + 0.001868 * cos(gamma) \
+                    - 0.032077 * sin(gamma) \
+                    - 0.014615 * cos(2 * gamma) \
+                    - 0.040849 * sin(2 * gamma)
+                    )
+
+    # # solar declination in radians
+    declination = 0.006918 - 0.399912 * cos(gamma) + 0.070257 * sin(gamma) \
+           - 0.006758 * cos(2 * gamma) + 0.000907 * sin(2 * gamma) \
+           - 0.002697 * cos(3 * gamma) + 0.00148 * sin(3 * gamma)
+    
+    # time offset in minutes ?
+    timezone_offset = timestamp.utcoffset().total_seconds() / 3600
+    time_offset = equation_of_time + 4 * longitude - 60 * timezone_offset
+
+    # the true solar time in minutes
+    true_solar_time = timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
+    
+    # the solar hour angle (in degrees)
+    hour_angle = true_solar_time / 4 - 180
+    
+    # # Calculate the solar zenith angle (in radians)
+    # cos_phi = sin(latitude) * sin(declination) + cos(latitude) * cos(decl) * cos(radians(h))
+    # phi = acos(cos_phi)
+    
+    # # Calculate the solar azimuth (in radians)
+    # cos_theta = (-sin(latitude_rad) * cos(phi) - sin(decl)) / (cos(latitude_rad) * sin(phi))
+    # theta = pi - acos(cos_theta)
+    
+    # hour angle at sunrise/sunset (in degrees)
+    hour_angle_ss = np.degrees(acos(cos(np.radians(90.833)) / (cos(latitude) * cos(declination)) - tan(latitude) * tan(declination)))
+    
+    # the UTC time of sunrise and sunset (in minutes)
+    sunrise = 720 - 4 * (longitude + hour_angle_ss) - equation_of_time
+    sunset = 720 - 4 * (longitude - hour_angle_ss) - equation_of_time
+    
+    # Calculate solar noon in minutes
+    solar_noon = 720 - 4 * longitude - equation_of_time
+    
+    # Convert minutes to datetime objects
+    # sunrise_time = datetime.combine(timestamp.date(), datetime_time(0)) + timedelta(minutes=sunrise)
+    # sunset_time = datetime.combine(timestamp.date(), datetime_time(0)) + timedelta(minutes=sunset)
+    solar_noon_time = datetime.combine(timestamp.date(), datetime_time(0)) + timedelta(minutes=solar_noon)
+    solar_noon_time = solar_noon_time.replace(tzinfo=pytz.UTC)
+    solar_noon_time = solar_noon_time.astimezone(timezone)
+
+    local_solar_time = timestamp - solar_noon_time
+    typer.echo(f'Local solar time: {local_solar_time}')
+    decimal_hours = local_solar_time.total_seconds() / 3600
+
+    from devtools import debug
+    debug(locals())
+    # return sunrise_time, sunset_time, solar_noon_time
+    # return solar_noon_time
+    return decimal_hours
 
 def calculate_solar_time_eot(
         longitude: Annotated[float, typer.Argument(
@@ -282,6 +372,15 @@ def calculate_solar_time(
     if model.value == SolarTimeModels.ephem:
 
         solar_time = calculate_solar_time_ephem(
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            )
+
+    if model.value == SolarTimeModels.noaa:
+
+        solar_time = calculate_solar_time_noaa(
             longitude,
             latitude,
             timestamp,
