@@ -1,9 +1,11 @@
+import logging
 import typer
 from typing import Annotated
 from typing import Optional
 from enum import Enum
-# from datetime import datetime
 from datetime import datetime
+from datetime import time as datetime_time
+from datetime import timedelta
 import pytz
 from tzlocal import get_localzone
 import ephem
@@ -211,7 +213,7 @@ def calculate_solar_time_eot(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: Annotated[float, typer.Option(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
@@ -286,12 +288,12 @@ def calculate_solar_time_pvgis(
             callback=attach_timezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: float = 365.25,
         perigee_offset: float = 0.048869,
-        eccentricity: float = 0.0165,  # from the C code
+        eccentricity: float = 0.165,  # from the C code
         time_slot_offset_global: float = 0,
-):
+) -> float:
     """Calculate the solar time.
 
     1. Map the day of the year onto the circumference of a circle, essentially
@@ -336,7 +338,7 @@ def calculate_solar_time(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: Annotated[float, typer.Option(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
