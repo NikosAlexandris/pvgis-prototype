@@ -42,18 +42,24 @@ def test_calculate_angular_loss_factor(solar_altitude, solar_declination, expext
 
 
 @pytest.mark.parametrize(
-    "direct_radiation, direct_radiation_coefficient, solar_altitude, incidence_angle_index, expected_result",
+    "latitude, elevation, timestamp, linke_turbidity_factor, expected_output", 
     [
-        (0, 0, 0, 0, 0),  # All parameters at 0
-        (1, 0.0, 0.0, 0, 0),  # Minimum direct radiation with coefficient, solar altitude, and incidence angle set to 0, expected result is 0
-        (500, 0.5, 30, 1, 29.95266075017529),
-        (600, 0.6, 60, 0, 5.292740994406696),
-        (800, 0.85, 45, 1, 420),
-        (1000, 0.85, 45, 1, 54.016467406610325),
-        (1000, 0.8, 45, 0, 4.716948972727759e+271),
-        (1361, 1, 90, 1, 1361),
-    ]
+        (40.085556, 2917.727, 0.2, '2023-06-22', 'Extraterrestrial irradiance: 1316.337133501784\nDirect normal irradiance: 1295.125350879713\nDirect horizontal irradiance: 1218.3216902511913\n'),
+        ]
 )
+def test_calculate_direct_horizontal_irradiance(latitude, elevation, timestamp, linke_turbidity_factor, expected_output):
+    arguments = [
+        'horizontal',
+        str(latitude),
+        str(elevation),
+        str(timestamp),
+        str(linke_turbidity_factor),
+    ]
+    result = run_app(arguments)
+    
+    assert result.exit_code == 0
+    assert expected_output in result.output
+
 
 # def test_calculate_refracted_solar_altitude():
 #     result = calculate_refracted_solar_altitude(0.5)
@@ -75,15 +81,14 @@ def test_calculate_angular_loss_factor(solar_altitude, solar_declination, expext
 #     assert isinstance(result, float)
 
 
-def test_calculate_direct_horizontal_irradiance(mocker):
-    # Mocking imports and functions that are not defined in the current code
-    mocker.patch('main.calculate_solar_declination', return_value=0.1)
-    mocker.patch('main.calculate_solar_time', return_value=10)
-    mocker.patch('main.calculate_extraterrestrial_irradiance', return_value=1000)
-    mocker.patch('main.calculate_direct_normal_irradiance', return_value=500)
-    result = calculate_direct_horizontal_irradiance(45, 1000, 2023, 150, 5, 2)
-    assert isinstance(result, float)
-
+# def test_calculate_direct_horizontal_irradiance(mocker):
+#     # Mocking imports and functions not defined in the current code
+#     mocker.patch('main.calculate_solar_declination', return_value=0.1)
+#     mocker.patch('main.calculate_solar_time', return_value=10)
+#     mocker.patch('main.calculate_extraterrestrial_irradiance', return_value=1000)
+#     mocker.patch('main.calculate_direct_normal_irradiance', return_value=500)
+#     result = calculate_direct_horizontal_irradiance(45, 1000, 2023, 150, 5, 2)
+#     assert isinstance(result, float)
 
 def test_calculate_direct_inclined_irradiance(
         direct_radiation,
