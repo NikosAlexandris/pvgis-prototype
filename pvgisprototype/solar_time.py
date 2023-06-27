@@ -104,14 +104,109 @@ def calculate_solar_time_skyfield(
     return decimal_hours
 
 
+def calculate_solar_time_ephem(
+        longitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-180, max=180)],
+        latitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-90, max=90)],
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Timezone',
+            callback=ctx_convert_to_timezone)] = None,
+        ):
+    """Calculate the solar time using PyEphem
+
+    The position of the Sun in the sky changes slightly day to day due to the
+    Earth's elliptical orbit and axis tilt around the Sun. In consequence, the
+    length of each solar day varies slightly.
+
+    The mean solar time (as "opposed" to the apparent solar time which is
+    measured with a sundial), averages out these variations to create a "mean"
+    or average solar day of 24 hours long. This is the basis of our standard
+    time system, although further adjusted to create the time zones.
+
+    A key concept in solar time is the solar noon, the moment when the Sun
+    reaches its highest point in the sky each day. In apparent solar time,
+    solar noon is the moment the Sun crosses the local meridian (an imaginary
+    line that runs from North to South overhead).
+
+    Solar time can vary significantly from standard clock time, depending on
+    the time of year and the observer's longitude within their time zone. For
+    example, at the eastern edge of a time zone, the Sun may reach its highest
+    point (solar noon) significantly earlier than noon according to standard
+    clock time.
+
+    Returns
+    -------
+
+    solar_time: float
+
+    Notes
+    -----
+
+    hour_angle: float
+
+        The hour angle is the time since the Sun was at the local meridian
+        measured in radians.
+
+        The hour angle is the time elapsed since an astronomical object (in
+        this case, the Sun) passed the observer's local meridian, an imaginary
+        line in the sky that goes from north to south and passes directly
+        overhead. In astronomical terms, the hour angle is the difference
+        between the local sidereal time and the right ascension of the object.
+
+        - The local meridian is an imaginary line in the sky that runs from the
+          north to the south and passes directly over the observer's location.
+
+        - Solar noon (or local solar noon) is the moment when the Sun is at its
+          highest point in the sky, directly overhead or on the local meridian,
+          for a specific location on Earth. The exact time of solar noon
+          depends on the observer's longitude because different places on Earth
+          reach this point at different times as the Earth rotates.
+
+        - Local solar time is exactly 12:00 (noon) when the sun crosses the
+          local meridian.
+
+        - The local sidereal time is a measure of the position of the observer
+          relative to the stars (hence, 'sidereal', which means 'related to the
+          stars').
+
+        - The right ascension of an object is its position along the celestial
+          equator (an imaginary line in the sky above the Earth's equator).
+
+        Subtracting the Sun's right ascension (`sun.ra`) from the local
+        sidereal time (`observer.sidereal_time()`) gives the time elapsed since
+        the Sun was at the observer's local meridian.
+    """
+    observer = ephem.Observer()  # an Observer object
     observer.date = timestamp
     observer.lon = longitude
     observer.lat = latitude
-    sun=ephem.Sun()
-    sun.compute(observer)
-    hour_angle = observer.sidereal_time() - sun.ra
+    sidereal_time = observer.sidereal_time()
+    typer.echo(f'Local sidereal time: {sidereal_time}')
 
-    return hour_angle
+    sun=ephem.Sun()  # a Sun object
+    sun.compute(observer)  # sun position for observer's location and time
+    sun_right_ascension = sun.ra
+    typer.echo(f'Sun right ascension: {sun.ra}')
+
+    # sidereal time == ra (right ascension) is the highest point (noon)
+    hour_angle = sidereal_time - sun_right_ascension
+    typer.echo(f'Hour angle: {hour_angle}')
+
+    solar_time = hour_angle + 12
+
+    from devtools import debug
+    debug(locals())
+    typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
+    typer.echo(f'Mean solar time: {solar_time}')
+    return ephem.hours(hour_angle + ephem.hours('12:00')).norm  # norm for 24h
+    # return solar_time
+
 
 def calculate_solar_time_noaa(
         longitude: Annotated[float, typer.Argument(
