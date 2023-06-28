@@ -228,9 +228,11 @@ def azimuth(
 @app.command('declination', no_args_is_help=True, help='Calculate the solar declination')
 def declination(
         timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp', callback=attach_timezone)],
+            help='Timestamp',
+            default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone')] = None,
+            help='Timezone',
+            callback=convert_to_timezone)] = None,
         local: Annotated[bool, typer.Option(
             help='Use the system\'s local time zone',
             callback=get_localzone)] = False,

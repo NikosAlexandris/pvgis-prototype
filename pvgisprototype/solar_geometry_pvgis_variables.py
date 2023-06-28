@@ -19,8 +19,9 @@ from typing import Optional
 import numpy as np
 from numba import njit
 import datetime
-from .time import convert_to_timezone
-from .time import attach_timezone
+from .timestamp import convert_to_timezone
+from .timestamp import attach_timezone
+from .timestamp import now_datetime
 import logging
 
 
@@ -96,9 +97,11 @@ def calculate_solar_geometry_pvgis_variables(
         # solar_geometry_day_constants: SolarGeometryDayConstants,
         solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
         timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
-            help='Timestamp', callback=attach_timezone)],
+            help='Timestamp',
+            default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone')] = None,
+            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+            callback=convert_to_timezone)] = None,
         days_in_a_year: Annotated[float, typer.Option(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
