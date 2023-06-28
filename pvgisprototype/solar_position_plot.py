@@ -148,6 +148,40 @@ def plot_daily_solar_position(
     plt.savefig(f'solar_position_daily_{model}.png')
 
 
+def plot_daily_solar_position_models(
+        longitude: float,
+        latitude: float,
+        day: datetime,
+        models: List[SolarPositionModels],
+        title: str = 'Daily Variation of Solar Position',
+        ):
+    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
+
+    fig, axs = plt.subplots(len(models), 1, figsize=(8, len(models)*6))  # adjust the figure size as needed
+
+    for i, model in enumerate(models):
+        altitudes = []
+        azimuths = []
+        for timestamp in timestamps:
+            altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+            altitudes.append(altitude)
+            azimuths.append(azimuth)
+
+        ax1 = axs[i]
+        ax1.set_xlabel('Hour of the day')
+        ax1.set_ylabel('Altitude')
+        ax1.plot(timestamps, altitudes)
+
+        ax2 = ax1.twinx()
+        ax2.set_ylabel('Azimuth')
+        ax2.plot(timestamps, azimuths)
+
+        ax1.title.set_text(f'{title} - Model: {model.value}')
+
+    # plt.tight_layout()
+    plt.savefig('solar_position_daily_comparison.png')
+
+
 def plot_daily_solar_position_scatter(
         longitude: float,
         latitude: float,
