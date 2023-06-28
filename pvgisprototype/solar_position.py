@@ -91,8 +91,8 @@ def calculate_solar_position(
 
         timestamp = attach_timezone(timestamp, timezone)
         solar_altitude = pysolar.solar.get_altitude(
-                latitude_deg=longitude,  # this comes first
-                longitude_deg=latitude,
+                latitude_deg=latitude,  # this comes first
+                longitude_deg=longitude,
                 when=timestamp,
                 )
         solar_altitude = convert_to_radians_if_requested(solar_altitude, output_units)
