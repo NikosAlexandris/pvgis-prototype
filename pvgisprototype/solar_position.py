@@ -66,6 +66,17 @@ def calculate_solar_position(
         ):
     """
     """
+    if model.value == SolarPositionModels.skyfield:
+        solar_altitude, solar_azimuth, distance_to_sun = calculate_solar_position_skyfield(
+                longitude,
+                latitude,
+                timestamp,
+                timezone,
+                # output_units,
+                )
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
+    
     if model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth, solar_altitude = suncalc.get_position(
