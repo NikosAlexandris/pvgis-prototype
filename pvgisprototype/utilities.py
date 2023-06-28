@@ -7,7 +7,8 @@ from rich import print
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"Various diagnostic functions",
+    rich_markup_mode="rich",
+    help=f":toolbox:  Diagnostic functions",
 )
 
 

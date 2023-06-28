@@ -11,7 +11,8 @@ from .angular_loss_factor import app as angular_loss_factor
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"Calculate solar irradiance",
+    rich_markup_mode="rich",
+    help=f":sun_with_face:  Calculate solar irradiance",
 )
 
 

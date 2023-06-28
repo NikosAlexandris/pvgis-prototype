@@ -2,6 +2,14 @@ import typer
 import xarray as xr
 
 
+app = typer.Typer(
+    add_completion=False,
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help='Retrieve time series of solar radiation and PV power output',
+)
+
+
 def read_raster_data(netcdf: str, mask_and_scale=False):
     """
     """
@@ -17,13 +25,6 @@ def read_raster_data(netcdf: str, mask_and_scale=False):
         # typer.echo(f"Couldn't open {dataset_type.value} dataset: {str(exc)}")
         typer.echo(f"Couldn't open dataset: {str(exc)}")
         raise typer.Exit(code=33)
-
-
-app = typer.Typer(
-    add_completion=False,
-    add_help_option=True,
-    help='Retrieve time series of solar radiation and PV power output',
-)
 
 
 @app.command()

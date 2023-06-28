@@ -39,6 +39,7 @@ app = typer.Typer(
     cls=OrderCommands,
     add_completion=True,
     add_help_option=True,
+    rich_markup_mode="rich",
     help=f"PVGIS core CLI prototype",
 )
 app.add_typer(manual.app, name='manual', no_args_is_help=True)

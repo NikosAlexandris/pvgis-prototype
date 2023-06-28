@@ -8,7 +8,8 @@ from pathlib import Path
 app = typer.Typer(
     add_completion=True,
     add_help_option=True,
-    help='Manual for solar radiation variables',
+    rich_markup_mode="rich",
+    help=':book:  Manual for solar radiation variables',
 )
 
 

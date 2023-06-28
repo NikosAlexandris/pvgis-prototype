@@ -34,7 +34,8 @@ console = Console()
 app = typer.Typer(
     add_completion=True,
     add_help_option=True,
-    help=f"Calculate solar geometry parameters for a location and moment in time",
+    rich_markup_mode="rich",
+    help=f":compass:  Calculate solar geometry parameters for a location and moment in time",
 )
 
 
