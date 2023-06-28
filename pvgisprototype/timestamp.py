@@ -58,25 +58,22 @@ def ctx_convert_to_timezone( ctx: typer.Context, param: typer.CallbackParam, val
 
 
 def attach_timezone(
-        value: Optional[str] = None,
-        timezone: Optional[pytz.timezone] = None
+        timestamp: Optional[datetime] = None,
+        timezone: Optional[str] = None
         ) -> datetime:
     """Convert datetime object to timezone-aware.
     """
-    local_tz = get_localzone() 
+    if timestamp is None:
+        timestamp = datetime.utcnow()  # Default to UTC
 
-    if value == 'UTC':
-        timestamp_utc = datetime.utcfromtimestamp(timestamp)
+    try:
+        tzinfo = convert_to_timezone(timezone)
+    except Exception as e:
+        raise ValueError(f"Could not convert timezone: {e}")
+    
+    timestamp = timestamp.replace(tzinfo=pytz.UTC).astimezone(tzinfo)
 
-    local_now = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz) # utc -> local
-    assert local_now.replace(tzinfo=None) == now
-    if value is None:
-        timestamp = datetime.now(tz=timezone)
-    else:
-        datetimestamp_naive = datetime.strptime(value, '%Y-%m-%d')
-        datetimestamp = timezone.localize(datetimestamp_naive)
-
-    return datetimestamp
+    return timestamp
 
 
 def get_day_from_hour_of_year(year: int, hour_of_year: int):
