@@ -1,6 +1,19 @@
+import logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    # level=logging.ERROR,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler('error.log'),  # Save log to a file
+        logging.StreamHandler()  # Print log to the console
+    ]
+)
+from typing import List
+
 from pvgisprototype.solar_position import calculate_solar_position
 from pvgisprototype.solar_position import SolarPositionModels
 from pvgisprototype.solar_position import calculate_solar_position_pvgis
+from pvgisprototype.solar_position import calculate_solar_position_skyfield
 from pvgisprototype.data_structures import SolarGeometryDayConstants
 from pvgisprototype.data_structures import SolarGeometryDayVariables
 import matplotlib.pyplot as plt
@@ -86,15 +99,16 @@ def plot_daily_solar_azimuth(
 def plot_daily_solar_position(
         longitude: float,
         latitude: float,
-        day: datetime,
+        timestamp: datetime,
         model: SolarPositionModels,
         title: str = 'Daily Variation of Solar Position',
         ):
     altitudes = []
     azimuths = []
-    timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
+    timestamps = [timestamp.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
     for timestamp in timestamps:
         altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+        logging.debug(f"{model}: Altitude={altitude}, Azimuth={azimuth}")
         altitudes.append(altitude)
         azimuths.append(azimuth)
 
@@ -129,6 +143,7 @@ def plot_daily_solar_position(
     ax2.tick_params(axis='y')
 
     # fig.tight_layout()
+    title += f' based on {model}'
     plt.title(title)
     plt.savefig(f'solar_position_daily_{model}.png')
 
