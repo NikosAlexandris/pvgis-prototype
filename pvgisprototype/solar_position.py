@@ -21,10 +21,11 @@ from .solar_geometry_pvgis_constants import calculate_solar_geometry_pvgis_const
 
 
 class SolarPositionModels(str, Enum):
-    suncalc = 'suncalc'
     pysolar = 'pysolar'
     pvis = 'pvis'
-    pvgis = 'pvgis'
+    pvgis = 'PVGIS'
+    suncalc = 'suncalc'
+    skyfield = 'Skyfield'
 
 
 app = typer.Typer(
