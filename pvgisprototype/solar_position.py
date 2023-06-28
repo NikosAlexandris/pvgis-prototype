@@ -15,6 +15,7 @@ from .timestamp import attach_timezone
 from .solar_altitude import calculate_solar_altitude
 from .solar_azimuth import calculate_solar_azimuth
 from .solar_declination import calculate_solar_declination
+from .solar_geometry_skyfield import calculate_solar_position_skyfield
 from .solar_geometry_pvgis import calculate_solar_position_pvgis
 from .solar_geometry_pvgis import calculate_solar_time_pvgis
 from .solar_geometry_pvgis_constants import calculate_solar_geometry_pvgis_constants
