@@ -1,4 +1,12 @@
 import logging
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler('error.log'),  # Save log to a file
+        logging.StreamHandler()  # Print log to the console
+    ]
+)
 import typer
 from typing import Annotated
 from typing import Optional
@@ -99,8 +107,6 @@ def calculate_solar_time_skyfield(
     typer.echo(f'Local solar time: {local_solar_time}')
     decimal_hours = local_solar_time.total_seconds() / 3600
 
-    from devtools import debug
-    debug(locals())
     return decimal_hours
 
 
