@@ -77,7 +77,7 @@ corrected_linke_turbidity_factor = lambda tlk: -0.8662 * tlk
 def calculate_refracted_solar_altitude(
         solar_altitude: float,
         ):
-    """
+    """Adjust the solar altitude angle for atmospheric refraction
     This function implements the algorithm described by Hofierka :cite:`p:hofierka2002`.
     """
     atmospheric_refraction = (
@@ -273,13 +273,11 @@ def calculate_direct_inclined_irradiance(
             case_sensitive=False,
             help="Method to calculate the solar declination")] = 'jenco',
         ):
-    """Calculate the direct irradiance incident on a tilted surface
+    """Calculate the direct irradiance incident on a tilted surface [W*m-2] 
 
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
     """
-    # if timestamp.tzinfo is None:
-    #     timestamp = timestamp.replace(tzinfo=datetime.timezone.utc)
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1,
                              tzinfo=timestamp.tzinfo)
