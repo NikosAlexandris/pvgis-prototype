@@ -574,7 +574,7 @@ def estimate_grid_connected_pv(
     return 0
 
 
-@app.command('tracking', no_args_is_help=True)
+@app.command('tracking', no_args_is_help=True, help=":electric_plug:  Estimate PV power output for a system not connected to the grid")
 def estimate_tracking_pv():
     """Estimate the energy production of a tracking PV system connected to the electricity grid
 
@@ -611,7 +611,7 @@ def estimate_tracking_pv():
     pass
 
 
-@app.command('offgrid', no_args_is_help=True)
+@app.command('offgrid', no_args_is_help=True, help=':battery:  Estimate PV power output for a system not connected to the grid')
 def estimate_offgrid_pv():
     """Estimate the energy production of a PV system that is not connected to
     the electricity grid but instead relies on battery storage
