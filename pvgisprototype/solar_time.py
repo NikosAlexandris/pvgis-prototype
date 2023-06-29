@@ -113,6 +113,7 @@ def calculate_solar_time_skyfield(
         typer.echo(f'Solar noon: {solar_noon_string}')
         typer.echo(f'Local solar time: {local_solar_time}')
 
+    return decimal_hours, 'decimal hours'
 
 
 def calculate_solar_time_ephem(
@@ -155,7 +156,7 @@ def calculate_solar_time_ephem(
     Returns
     -------
 
-    solar_time: float
+    (solar_time, units): float, str
 
     Notes
     -----
@@ -208,7 +209,8 @@ def calculate_solar_time_ephem(
 
     hour_angle = sidereal_time - sun_right_ascension
 
-    solar_time = hour_angle + 12
+    # norm -> normalise to 24h
+    solar_time = ephem.hours(hour_angle + ephem.hours('12:00')).norm
 
     if verbose:
         typer.echo(f'Local sidereal time: {sidereal_time}')
@@ -216,10 +218,7 @@ def calculate_solar_time_ephem(
         typer.echo(f'Hour angle: {hour_angle}')
         typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
         typer.echo(f'Mean solar time: {solar_time}')
-    from devtools import debug
-    debug(locals())
-    return ephem.hours(hour_angle + ephem.hours('12:00')).norm  # norm for 24h
-    # return solar_time
+    return solar_time, 'decimal hours'  # norm for 24h
 
 
 def calculate_solar_time_noaa(
@@ -239,9 +238,12 @@ def calculate_solar_time_noaa(
         ):
     """
     General Solar Position Calculations - NOAA Global Monitoring Division
+
+    Returns
+    -------
+
+    (solar_time, units): float, str
     """
-    from devtools import debug
-    
     # Handle Me during input validation? -------------------------------------
     try:
         timestamp = timezone.localize(timestamp)
@@ -249,11 +251,11 @@ def calculate_solar_time_noaa(
         logging.warning(f'tzinfo already set for timestamp = {timestamp}')
     # Handle Me during input validation? -------------------------------------
 
-
     # utc_offset_hours = timestamp.utcoffset().total_seconds() / 3600
 
     # Calculate the fractional year, in radians
     gamma = 2 * pi / 365 * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
+
     # equation of time in minutes
     equation_of_time = 229.18 * (
                     0.000075 \
@@ -306,13 +308,12 @@ def calculate_solar_time_noaa(
     local_solar_time = timestamp - solar_noon_time
     decimal_hours = local_solar_time.total_seconds() / 3600
 
-    from devtools import debug
-    debug(locals())
     # return sunrise_time, sunset_time, solar_noon_time
     # return solar_noon_time
     if verbose:
         typer.echo(f'Local solar time: {local_solar_time}')
-    return decimal_hours
+    return decimal_hours, 'decimal hours?'
+
 
 def calculate_solar_time_eot(
         longitude: Annotated[float, typer.Argument(
@@ -381,7 +382,7 @@ def calculate_solar_time_eot(
 
     solar_time = hour_of_year % 24 + time_offset + hour_offset
     
-    return solar_time
+    return solar_time, 'decimal hours?'
 
 
 def calculate_solar_time_pvgis(
@@ -434,11 +435,12 @@ def calculate_solar_time_pvgis(
 
     # Complicated implementation borrowed from SPECMAGIC!
     image_offset = get_image_offset(longitude, latitude)  # for `hour_offset`
+
     # adding longitude to UTC produces mean solar time!
     hour_offset = time_slot_offset_global + longitude / 15 + image_offset  # for `solar_time`
     solar_time = hour_of_day + time_offset + hour_offset
     
-    return solar_time
+    return solar_time, 'decimal hours?'
 
 
 def calculate_solar_time(
@@ -447,11 +449,17 @@ def calculate_solar_time(
         latitude: Annotated[float, typer.Argument(
             callback=convert_to_radians, min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_datetime)],
+            help='Timestamp', default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
-            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+            help='Specify timezone (e.g., "Europe/Athens"). Use \'local\' to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
+        model: Annotated[SolarTimeModels, typer.Option(
+            '-m',
+            '--model',
+            help="Model to calculate solar position",
+            show_default=True,
+            show_choices=True,
+            case_sensitive=False)] = SolarTimeModels.skyfield,
         days_in_a_year: Annotated[float, typer.Option(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
@@ -462,13 +470,6 @@ def calculate_solar_time(
             help='Global time offset')] = 0,
         hour_offset: Annotated[float, typer.Option(
             help='Hour offset')] = 0,
-        model: Annotated[SolarTimeModels, typer.Option(
-            '-m',
-            '--model',
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False,
-            help="Model to calculate solar position")] = SolarTimeModels.ephem,
         ):
     """
     """
@@ -477,7 +478,7 @@ def calculate_solar_time(
 
     if model.value == SolarTimeModels.skyfield:
 
-        solar_time = calculate_solar_time_skyfield(
+        solar_time, units = calculate_solar_time_skyfield(
             longitude,
             latitude,
             timestamp,
@@ -486,7 +487,7 @@ def calculate_solar_time(
 
     if model.value == SolarTimeModels.ephem:
 
-        solar_time = calculate_solar_time_ephem(
+        solar_time, units = calculate_solar_time_ephem(
             longitude,
             latitude,
             timestamp,
@@ -495,7 +496,7 @@ def calculate_solar_time(
 
     if model.value == SolarTimeModels.noaa:
 
-        solar_time = calculate_solar_time_noaa(
+        solar_time, units = calculate_solar_time_noaa(
             longitude,
             latitude,
             timestamp,
@@ -504,7 +505,7 @@ def calculate_solar_time(
 
     if model.value == SolarTimeModels.eot:
 
-        solar_time = calculate_solar_time_eot(
+        solar_time, units = calculate_solar_time_eot(
                 longitude,
                 latitude,
                 timestamp,
@@ -518,14 +519,14 @@ def calculate_solar_time(
 
     if model.value == SolarTimeModels.pvgis:
 
-        solar_time = calculate_solar_time_pvgis(
+        solar_time, units = calculate_solar_time_pvgis(
             longitude,
             latitude,
             timestamp,
             timezone,
             )
 
-    return solar_time
+    return solar_time, units
 
 
 def calculate_hour_angle(
