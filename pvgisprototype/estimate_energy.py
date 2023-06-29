@@ -11,7 +11,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f"Estimate the energy production of a PV system",
+    help=f":high_voltage:  Estimate the energy production of a PV system",
 )
 
 
