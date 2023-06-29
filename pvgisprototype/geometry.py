@@ -5,6 +5,8 @@ Important sun and solar surface geometry parameters in calculating the amount of
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import Union
+from typing import List
 from rich.console import Console
 from rich.table import Table
 from datetime import datetime
@@ -12,9 +14,9 @@ import math
 import numpy as np
 from tzlocal import get_localzone
 
-from .time import now_datetime
-from .time import convert_to_timezone
-from .time import attach_timezone
+from .timestamp import now_datetime
+from .timestamp import ctx_convert_to_timezone
+from .timestamp import attach_timezone
 from .timestamp import convert_hours_to_seconds
 from .conversions import convert_to_radians
 from .conversions import convert_to_degrees_if_requested
