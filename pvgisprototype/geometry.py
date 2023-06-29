@@ -53,14 +53,15 @@ def position(
             help='Timestamp',
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone')] = None,
-        model: Annotated[SolarPositionModels, typer.Option(
+            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+            callback=ctx_convert_to_timezone)] = None,
+        model: Annotated[List[SolarPositionModels], typer.Option(
             '-m',
             '--model',
             show_default=True,
             show_choices=True,
             case_sensitive=False,
-            help="Model to calculate solar position")] = SolarPositionModels.suncalc,
+            help="Model(s) to calculate solar position. Add multiple models like: --model Skyfield --model PVGIS")] = [SolarPositionModels.skyfield],
         output_units: Annotated[str, typer.Option(
             '-u',
             '--output-units',
