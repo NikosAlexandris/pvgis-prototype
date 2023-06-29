@@ -37,7 +37,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":compass:  Calculate solar geometry parameters for a location and moment in time",
+    help=f":triangular_ruler:  Calculate solar geometry parameters for a location and moment in time",
 )
 
 
