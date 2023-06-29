@@ -17,6 +17,10 @@ from typing import Annotated
 from typing import Optional
 from rich import print
 
+from .rich_help_panel_names import rich_help_panel_pv
+from .rich_help_panel_names import rich_help_panel_toolbox
+from .rich_help_panel_names import rich_help_panel_reference
+
 from . import manual
 from . import geometry
 from . import time
@@ -47,14 +51,26 @@ app = typer.Typer(
 )
 # app_completion = typer.Typer(help="Generate and install completion scripts.", hidden=True)
 # app.add_typer(app_completion, name="completion")
-app.add_typer(manual.app, name='manual', no_args_is_help=True)
-app.add_typer(geometry.app, name="geometry", no_args_is_help=True)
-app.add_typer(time.app, name="time", no_args_is_help=True)
-app.add_typer(irradiance.app, name="irradiance", no_args_is_help=True)
-app.add_typer(tmy.app, name="tmy", no_args_is_help=True)
-app.add_typer(estimate_energy.app, name="energy", no_args_is_help=True)
-app.add_typer(time_series.app, name="series", no_args_is_help=True)
-app.add_typer(utilities.app, name="helpers", no_args_is_help=True)
+
+
+app.add_typer(irradiance.app, name="irradiance", no_args_is_help=True,
+              rich_help_panel=rich_help_panel_pv)
+app.add_typer(tmy.app, name="tmy", no_args_is_help=True,
+              rich_help_panel=rich_help_panel_pv)
+app.add_typer(estimate_energy.app, name="energy", no_args_is_help=True,
+              rich_help_panel=rich_help_panel_pv)
+app.add_typer(time_series.app, name="series", no_args_is_help=True,
+              rich_help_panel=rich_help_panel_pv)
+
+app.add_typer(geometry.app, name="geometry", no_args_is_help=True,
+              rich_help_panel=rich_help_panel_toolbox)
+app.add_typer(time.app, name="time", no_args_is_help=True,
+              rich_help_panel=rich_help_panel_toolbox)
+app.add_typer(utilities.app, name="helpers", no_args_is_help=True,
+              rich_help_panel=rich_help_panel_toolbox)
+
+app.add_typer(manual.app, name='manual', no_args_is_help=True,
+              rich_help_panel=rich_help_panel_reference)
 
 
 # @app_completion.command(no_args_is_help=True, help="Show completion for the specified shell, to copy or customize it.")
