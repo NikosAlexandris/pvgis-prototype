@@ -71,17 +71,26 @@ def position(
         ):
     """
     """
-    solar_altitude, solar_azimuth = calculate_solar_position(
+    if SolarPositionModels.all in model:
+        models = [model for model in SolarPositionModels if model != SolarPositionModels.all]
+
+    solar_position = calculate_solar_position(
             longitude,
             latitude,
             timestamp,
             timezone,
-            model,
+            models,
             output_units,
             )
-    table = Table("Altitude", "Azimuth")
-    table.add_row(str(solar_altitude), str(solar_azimuth))
-    console.print(table)
+    solar_position_table = Table("Model", "Altitude", "Azimuth")
+    for model_result in solar_position:
+        model_name = model_result.get('Model', '')
+        altitude = model_result.get('Altitude', '')
+        azimuth = model_result.get('Azimuth', '')
+        # units = model_result.get('Units', '')
+        solar_position_table.add_row(model_name, str(altitude), str(azimuth))
+
+    console.print(solar_position_table)
 
 
 @app.command('altitude', no_args_is_help=True, help='Calculate the solar altitude')
