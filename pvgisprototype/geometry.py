@@ -125,7 +125,7 @@ def altitude(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         output_units: Annotated[str, typer.Option(
             '-u',
             '--units',
@@ -171,7 +171,7 @@ def zenith(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         output_units: Annotated[str, typer.Option(
             '-u',
             '--units',
@@ -216,7 +216,7 @@ def azimuth(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: float = 365.25,
         perigee_offset: float = 0.048869,
         eccentricity: float = 0.01672,
@@ -265,7 +265,7 @@ def declination(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         local: Annotated[bool, typer.Option(
             help='Use the system\'s local time zone',
             callback=get_localzone)] = False,
