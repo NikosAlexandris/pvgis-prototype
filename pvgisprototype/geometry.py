@@ -145,7 +145,7 @@ def altitude(
     solar_geometry_day_constants : SolarGeometryDayConstants
         The input solar geometry constants.
     """
-    solar_altitude = calculate_solar_altitude(
+    solar_altitude, units = calculate_solar_altitude(
             longitude,
             latitude,
             timestamp,
@@ -154,8 +154,8 @@ def altitude(
             )
     if output_units == 'degrees':
         output_units += ' °'
-    typer.echo(f'Solar altitude: {solar_altitude} ({output_units})')
-    return solar_altitude
+    typer.echo(f'Solar altitude: {solar_altitude} {units}')
+    # return solar_altitude
 
 
 @app.command('zenith', no_args_is_help=True, help='Calculate the solar zenith')
@@ -200,7 +200,7 @@ def zenith(
             )
     solar_zenith = 90 - solar_altitude
     typer.echo(f'Solar zenith: {solar_zenith} ({output_units})')
-    return solar_zenith
+    # return solar_zenith
 
 
 @app.command('azimuth', no_args_is_help=True, help='Calculate the solar azimuth')
@@ -255,7 +255,7 @@ def azimuth(
         output_units,
         )
     typer.echo(f'Solar azimuth: {solar_azimuth} ({output_units})')
-    return solar_azimuth
+    # return solar_azimuth
 
 
 @app.command('declination', no_args_is_help=True, help='Calculate the solar declination')
@@ -304,8 +304,8 @@ def declination(
         output_units,
         )
 
-    typer.echo(f'Solar declination: {solar_declination} ({output_units})')
-    return solar_declination
+    typer.echo(f'Solar declination: {solar_declination} {output_units}')
+    # return solar_declination
 
 
 @app.command('surface-orientation', no_args_is_help=True, help='Calculate the solar surface orientation (azimuth)')
@@ -385,8 +385,7 @@ def hour_angle(
             solar_time=solar_time,
             output_units=output_units,
             )
-    # typer.echo(f'Solar time: {hour_angle} ({timezone})')
-    typer.echo(f'Solar time: {hour_angle} ({output_units})')
+    typer.echo(f'Solar time: {hour_angle} {output_units}')
 
 
 @app.command('sunrise', no_args_is_help=True, help='Calculate the hour angle (ω) at sun rise and set')
@@ -420,6 +419,7 @@ def hour_angle(
             output_units=output_units,
             )
     typer.echo(f'Solar time: {hour_angle} ({output_units})')
+
 
 if __name__ == "__main__":
     app()
