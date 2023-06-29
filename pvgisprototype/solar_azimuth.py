@@ -7,7 +7,7 @@ import math
 import numpy as np
 
 from .time import now_datetime
-from .time import convert_to_timezone
+from .time import ctx_convert_to_timezone
 from .time import attach_timezone
 from .conversions import convert_to_radians
 from .conversions import convert_to_degrees_if_requested
@@ -39,7 +39,7 @@ def calculate_solar_azimuth(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: float = 365.25,
         perigee_offset: float = 0.048869,
         eccentricity: float = 0.01672,
