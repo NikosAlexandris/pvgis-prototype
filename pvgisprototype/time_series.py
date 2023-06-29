@@ -6,7 +6,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help='Retrieve time series of solar radiation and PV power output',
+    help=':chart_increasing:  Retrieve time series of solar radiation and PV power output',
 )
 
 

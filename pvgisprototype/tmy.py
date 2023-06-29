@@ -9,7 +9,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help='Generate a Typical Meteorological Year', 
+    help=':thermometer:  Generate a Typical Meteorological Year', 
 )
 
 
