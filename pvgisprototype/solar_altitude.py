@@ -11,13 +11,14 @@ import numpy as np
 # from .data_structures import SolarGeometryDayVariables
 
 
-from .time import now_datetime
-from .time import convert_to_timezone
-from .time import attach_timezone
+from .timestamp import now_datetime
+from .timestamp import ctx_convert_to_timezone
+from .timestamp import attach_timezone
+from .timestamp import convert_hours_to_seconds
 from .conversions import convert_to_radians
 from .conversions import convert_to_degrees_if_requested
 from .solar_declination import calculate_solar_declination
-from .solar_time import calculate_solar_time_ephem
+from .solar_time import calculate_solar_time
 
 # app = typer.Typer(
 #     add_completion=False,
@@ -38,7 +39,7 @@ def calculate_solar_altitude(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         output_units: Annotated[str, typer.Option(
             '-u',
             '--units',
@@ -65,10 +66,11 @@ def calculate_solar_altitude(
     # hour_angle = (solar_time - 12)
     
     # timestamp = hour_of_year_to_datetime(year, hour_of_year)
-    hour_angle = calculate_solar_time_ephem(
-            timestamp=timestamp,
-            latitude=latitude,
-            longitude=longitude,
+    hour_angle, _units = calculate_solar_time(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
     )
     
     sine_solar_altitude = C31 * math.cos(hour_angle) + C33
@@ -78,4 +80,4 @@ def calculate_solar_altitude(
             output_units,
             )
 
-    return solar_altitude
+    return solar_altitude, output_units
