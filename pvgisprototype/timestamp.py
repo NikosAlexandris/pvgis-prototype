@@ -71,10 +71,13 @@ def attach_timezone(
     if timestamp is None:
         timestamp = datetime.utcnow()  # Default to UTC
 
-    try:
-        tzinfo = convert_to_timezone(timezone)
-    except Exception as e:
-        raise ValueError(f"Could not convert timezone: {e}")
+    if isinstance(timezone, str):
+        try:
+            tzinfo = convert_to_timezone(timezone)
+        except Exception as e:
+            raise ValueError(f"Could not convert timezone: {e}")
+    else:  # If timezone is not a string, it should be a datetime.tzinfo object
+        tzinfo = timezone
     
     timestamp = timestamp.replace(tzinfo=pytz.UTC).astimezone(tzinfo)
 
