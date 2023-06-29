@@ -49,7 +49,7 @@ class SolarTimeModels(str, Enum):
     eot = 'eot'
     ephem = 'ephem'
     noaa = 'NOAA'
-    pvgis = 'pvgis'
+    pvgis = 'PVGIS'
     skyfield = 'Skyfield'
 
 
@@ -73,14 +73,18 @@ def calculate_solar_time_skyfield(
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
+        verbose: bool = False,
         ):
     """
+    Returns
+    -------
+    (decimal_hours, units): float, str
     """
     # Handle Me during input validation? -------------------------------------
     try:
         timestamp = timezone.localize(timestamp)
     except Exception:
-        logging.warning(f'tzinfo already set for timestamp = {timestamp}')
+        logging.warning(f'tzinfo {timezone} already set for timestamp = {timestamp}')
     # Handle Me during input validation? -------------------------------------
 
     midnight = timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -101,13 +105,14 @@ def calculate_solar_time_skyfield(
 
     solar_noon = times[0]
     solar_noon_string = str(solar_noon.astimezone(timezone))[:19]
-    # typer.echo(f'Solar noon: {solar_noon_string}')
     solar_noon_datetime = solar_noon.utc_datetime().replace(tzinfo=pytz.UTC)
     local_solar_time = timestamp - solar_noon_datetime.astimezone(timezone)
-    typer.echo(f'Local solar time: {local_solar_time}')
     decimal_hours = local_solar_time.total_seconds() / 3600
 
-    return decimal_hours
+    if verbose:
+        typer.echo(f'Solar noon: {solar_noon_string}')
+        typer.echo(f'Local solar time: {local_solar_time}')
+
 
 
 def calculate_solar_time_ephem(
@@ -123,6 +128,7 @@ def calculate_solar_time_ephem(
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
+        verbose: bool = False,
         ):
     """Calculate the solar time using PyEphem
 
@@ -175,7 +181,9 @@ def calculate_solar_time_ephem(
           reach this point at different times as the Earth rotates.
 
         - Local solar time is exactly 12:00 (noon) when the sun crosses the
-          local meridian.
+          local meridian. Effectively, the Sun is in its highest point in the
+          sky (noon) when the _sidereal time_ equals its time of right
+          ascension.
 
         - The local sidereal time is a measure of the position of the observer
           relative to the stars (hence, 'sidereal', which means 'related to the
@@ -184,32 +192,32 @@ def calculate_solar_time_ephem(
         - The right ascension of an object is its position along the celestial
           equator (an imaginary line in the sky above the Earth's equator).
 
-        Subtracting the Sun's right ascension (`sun.ra`) from the local
+        - Subtracting the Sun's right ascension (`sun.ra`) from the local
         sidereal time (`observer.sidereal_time()`) gives the time elapsed since
         the Sun was at the observer's local meridian.
     """
-    observer = ephem.Observer()  # an Observer object
+    observer = ephem.Observer()
     observer.date = timestamp
     observer.lon = longitude
     observer.lat = latitude
     sidereal_time = observer.sidereal_time()
-    typer.echo(f'Local sidereal time: {sidereal_time}')
 
-    sun=ephem.Sun()  # a Sun object
+    sun = ephem.Sun()  # a Sun object
     sun.compute(observer)  # sun position for observer's location and time
     sun_right_ascension = sun.ra
-    typer.echo(f'Sun right ascension: {sun.ra}')
 
-    # sidereal time == ra (right ascension) is the highest point (noon)
     hour_angle = sidereal_time - sun_right_ascension
-    typer.echo(f'Hour angle: {hour_angle}')
 
     solar_time = hour_angle + 12
 
+    if verbose:
+        typer.echo(f'Local sidereal time: {sidereal_time}')
+        typer.echo(f'Sun right ascension: {sun.ra}')
+        typer.echo(f'Hour angle: {hour_angle}')
+        typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
+        typer.echo(f'Mean solar time: {solar_time}')
     from devtools import debug
     debug(locals())
-    typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
-    typer.echo(f'Mean solar time: {solar_time}')
     return ephem.hours(hour_angle + ephem.hours('12:00')).norm  # norm for 24h
     # return solar_time
 
@@ -227,6 +235,7 @@ def calculate_solar_time_noaa(
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
+        verbose: bool = False,
         ):
     """
     General Solar Position Calculations - NOAA Global Monitoring Division
@@ -254,7 +263,7 @@ def calculate_solar_time_noaa(
                     - 0.040849 * sin(2 * gamma)
                     )
 
-    # # solar declination in radians
+    # solar declination in radians
     declination = 0.006918 - 0.399912 * cos(gamma) + 0.070257 * sin(gamma) \
            - 0.006758 * cos(2 * gamma) + 0.000907 * sin(2 * gamma) \
            - 0.002697 * cos(3 * gamma) + 0.00148 * sin(3 * gamma)
@@ -295,13 +304,14 @@ def calculate_solar_time_noaa(
     solar_noon_time = solar_noon_time.astimezone(timezone)
 
     local_solar_time = timestamp - solar_noon_time
-    typer.echo(f'Local solar time: {local_solar_time}')
     decimal_hours = local_solar_time.total_seconds() / 3600
 
     from devtools import debug
     debug(locals())
     # return sunrise_time, sunset_time, solar_noon_time
     # return solar_noon_time
+    if verbose:
+        typer.echo(f'Local solar time: {local_solar_time}')
     return decimal_hours
 
 def calculate_solar_time_eot(
@@ -357,13 +367,10 @@ def calculate_solar_time_eot(
     }
     """
     year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1,
-                                      tzinfo=timestamp.tzinfo)
-    
+    start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
     day_of_year = timestamp.timetuple().tm_yday
     day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
-    
     time_offset = - 0.128 * np.sin(day_of_year_in_radians - perigee_offset) - eccentricity * np.sin(2 * day_of_year_in_radians + 0.34383)
 
     # set `image_offset` for `hour_offset`
@@ -425,7 +432,7 @@ def calculate_solar_time_pvgis(
                   - eccentricity \
                   * np.sin(2 * day_of_year_in_radians + 0.34383)
 
-    # Very complicated implementation borrowed from SPECMAGIC!
+    # Complicated implementation borrowed from SPECMAGIC!
     image_offset = get_image_offset(longitude, latitude)  # for `hour_offset`
     # adding longitude to UTC produces mean solar time!
     hour_offset = time_slot_offset_global + longitude / 15 + image_offset  # for `solar_time`
