@@ -294,10 +294,9 @@ def declination(
     -------
     solar_declination: float
     """
-    solar_declination = calculate_solar_decliation(
+    solar_declination = calculate_solar_declination(
         timestamp,
         timezone,
-        local,
         days_in_a_year,
         orbital_eccentricity,
         perigee_offset,
