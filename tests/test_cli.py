@@ -18,6 +18,32 @@ from .test_expected_output import EU_CENTER_LOCATION_VALUES
 runner = CliRunner()
 
 
+def test_create_minimal_netcdf(create_minimal_netcdf):
+    minimal_netcdf = create_minimal_netcdf
+    print(minimal_netcdf)
+    pass
+
+
+def test_irradiance_subcommand():
+    result = runner.invoke(cli_app, ['irradiance', 'arg1', 'arg2'])
+    assert result.exit_code == 0
+
+
+def test_estimate_energy_subcommand():
+    result = runner.invoke(cli_app, ['energy', 'arg1', 'arg2'])
+    assert result.exit_code == 0
+
+
+def test_tmy_subcommand():
+    result = runner.invoke(cli_app, ['tmy', 'arg1', 'arg2'])
+    assert result.exit_code == 0
+
+
+def test_time_series_subcommand():
+    result = runner.invoke(cli_app, ['time-series', 'arg1', 'arg2'])
+    assert result.exit_code == 0
+
+
 @pytest.mark.parametrize(
         'filename, longitude, latitude, expected_output',
         [
@@ -84,7 +110,11 @@ def test_series_query_location(
     assert result.exit_code == 0
 
 
-def test_create_minimal_netcdf(create_minimal_netcdf):
-    minimal_netcdf = create_minimal_netcdf
-    print(minimal_netcdf)
-    pass
+def test_utility_subcommand():
+    result = runner.invoke(cli_app, ['utility', 'arg1', 'arg2'])
+    assert result.exit_code == 0
+
+
+def test_solar_position_subcommand():
+    result = runner.invoke(cli_app, ['solar-position', 'arg1', 'arg2'])
+    assert result.exit_code == 0
