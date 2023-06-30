@@ -263,6 +263,11 @@ def declination(
             show_default=True,
             case_sensitive=False,
             help="Output units for solar declination (degrees or radians)")] = 'radians',
+        random_time: Annotated[bool, typer.Option(
+            '-r',
+            '--random',
+            '--random-time',
+            help="Generate a random date, time and timezone to demonstrate calculation")] = False,
         ) -> float:
     """Calculat the solar declination angle 
 
@@ -277,6 +282,9 @@ def declination(
     -------
     solar_declination: float
     """
+    if random_time:
+        timestamp, timezone = random_datetimezone()
+
     solar_declination = calculate_solar_declination(
         timestamp,
         timezone,
