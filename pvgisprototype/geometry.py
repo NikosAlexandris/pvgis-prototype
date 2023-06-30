@@ -9,27 +9,28 @@ from typing import Union
 from typing import List
 from rich.console import Console
 from rich.table import Table
+from rich import box
 from datetime import datetime
 import math
 import numpy as np
 from tzlocal import get_localzone
-
-from .timestamp import now_datetime
-from .timestamp import ctx_convert_to_timezone
-from .timestamp import attach_timezone
-from .timestamp import convert_hours_to_seconds
-from .conversions import convert_to_radians
-from .conversions import convert_to_degrees_if_requested
-
-from .solar_declination import calculate_solar_declination
-from .solar_incidence import calculate_solar_incidence
-from .solar_time import calculate_solar_time_ephem
-from .solar_time import calculate_hour_angle
-from .solar_time import calculate_hour_angle_sunrise
-from .solar_altitude import calculate_solar_altitude
-from .solar_azimuth import calculate_solar_azimuth
-from .solar_position import SolarPositionModels
-from .solar_position import calculate_solar_position
+from .api.utilities.timestamp import now_datetime
+from .api.utilities.timestamp import ctx_convert_to_timezone
+from .api.utilities.timestamp import attach_timezone
+from .api.utilities.timestamp import convert_hours_to_seconds
+from .api.utilities.timestamp import random_datetimezone
+from .api.utilities.conversions import convert_to_radians
+from .api.utilities.conversions import convert_to_degrees_if_requested
+from .api.geometry.solar_declination import calculate_solar_declination
+from .api.geometry.solar_incidence import calculate_solar_incidence
+from .api.geometry.solar_time import calculate_solar_time_ephem
+from .api.geometry.solar_time import calculate_hour_angle
+from .api.geometry.solar_time import calculate_hour_angle_sunrise
+from .api.geometry.solar_altitude import calculate_solar_altitude
+from .api.geometry.solar_azimuth import calculate_solar_azimuth
+from .api.geometry.solar_position import SolarPositionModels
+from .api.geometry.solar_position import _parse_model
+from .api.geometry.solar_position import calculate_solar_position
 
 
 console = Console()
