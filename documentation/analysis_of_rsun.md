@@ -53,7 +53,7 @@ average_SD() -> average_standard_deviation.py
 | - [ ] correctTemperatureElevation.c                                |            |     |                                                                                                                     |
 | - [x] dateFromHour.c                                               |            |     | Complex, not needed                                                                                                 |
 | - [ ] dni_rad.c                                                    |            |     |                                                                                                                     |
-| - [ ] imageTimeOffset.c                                            |            |     |                                                                                                                     |
+| - [ ] imageTimeOffset.c                                            |            |     | Complicated calculation of a time offset that adds up to the hour angle for the estimation of solar time            |
 | - [x] lumcline2.c                                                  |            |     | Calculates the solar declination based on Jenco                                                                     |
 | - [ ] rearrangeHorizon.c                                           |            |     |                                                                                                                     |
 | - [ ] satgeo.c                                                     |            |     |                                                                                                                     |
@@ -64,6 +64,152 @@ average_SD() -> average_standard_deviation.py
 
 
 ## Reading the old source code
+
+### the optimizeSlope function
+
+
+double optimizeSlope(
+        double aspectInput,
+        struct GridGeometry *gridGeom,
+        struct SunGeometryConstDay *sunGeom,
+        struct SunGeometryVarDay *sunVarGeom,
+        struct SunGeometryVarSlope *sunSlopeGeom,
+        double *DNI_TOA,
+        double *s0,
+        struct pointData fixedData,
+        struct pointVarData *hourlyVarData,
+        double *horizonArray,
+        int optimalAngle,
+        int axisTrackingType,
+        bool useEfficiency,
+        int startYear,
+        int endYear,
+        int numValsToRead
+        )
+{
+    bool iterationProblem=false;
+    int iter=0;
+    int maxiter=20;
+    double slopediff=0.5;
+    double newslope;
+    double totRad, totRadMinus, totRadPlus;
+    double derivative, doublederivative;
+    double tolerance=100.;
+    double slope=pow(fabs(fixedData.latitude),0.9);
+    
+    // Initialize
+    
+    Calculate geometry variables for `slope` -> 
+    
+        with parameters:
+            aspectInput, axisTrackingType,
+            fixedData,gridGeom, sunGeom,
+            sunVarGeom, sunSlopeGeom,
+            s0, horizonArray
+    
+    Calculate total radiation using the updated geometry variables
+
+        with parameters:
+
+            sunVarGeom, sunSlopeGeom,
+            DNI_TOA, s0, fixedData,
+            hourlyVarData,
+            horizonArray, axisTrackingType,
+            useEfficiency, startYear,
+            endYear, numValsToRead
+
+    Calculate geometry variables and total radiation "minus"
+    for `slope - slopediff` with same parameters as above
+    
+    Calculate geometry variables and total radiation "plus"
+    for `slope + slopediff` with same parameteres as above
+
+    Calculate the derivative of:
+
+        total radiation plus - total radiation "minus" / 2 * slopediff
+
+    while(iter<maxiter)
+    {
+    
+        Calculate the double derivative of:
+
+        total radiation "plus" + total radiation "minus" - 2 * total radiation)
+        -----------------------------------------------------------------------
+                                        `slopediff`^2
+
+        Calculate `newslope` = `slope` - derivative / double derivative
+
+        if((newslope<-5.)||(newslope>90.))
+        {
+            // Better try the stepwise method
+            newslope=pow(fabs(fixedData.latitude),0.9);
+            iterationProblem=true;
+            break;
+        }
+
+        updateGeometryYear(newslope, aspectInput, axisTrackingType, fixedData,gridGeom, sunGeom,
+                sunVarGeom, sunSlopeGeom, s0, horizonArray);
+        totRad=calculateTotal( sunVarGeom,sunSlopeGeom,DNI_TOA,s0,fixedData, hourlyVarData,
+                horizonArray,
+                axisTrackingType, 
+                useEfficiency,startYear, endYear, numValsToRead );
+        
+        updateGeometryYear(newslope-slopediff, aspectInput, axisTrackingType, fixedData,gridGeom, sunGeom,
+                sunVarGeom, sunSlopeGeom, s0, horizonArray);
+        totRadMinus=calculateTotal( sunVarGeom,sunSlopeGeom,DNI_TOA,s0,fixedData, hourlyVarData,
+                horizonArray,
+                axisTrackingType, 
+                useEfficiency,startYear, endYear, numValsToRead );
+        
+        updateGeometryYear(newslope+slopediff, aspectInput, axisTrackingType, fixedData,gridGeom,
+                sunGeom, sunVarGeom, sunSlopeGeom, s0, horizonArray);
+        totRadPlus=calculateTotal( sunVarGeom,sunSlopeGeom,DNI_TOA,s0,fixedData, hourlyVarData,
+                horizonArray,
+                axisTrackingType, 
+                useEfficiency,startYear, endYear, numValsToRead );
+
+        derivative=(totRadPlus-totRadMinus)/(2.*slopediff);
+        if((fabs(derivative)<tolerance)||((totRad>totRadPlus)&&(totRad>totRadMinus)))
+        {
+            break;
+        }
+        slope=newslope;
+        iter++;	
+    }
+    if((iter>=maxiter)||iterationProblem)
+    {
+        double oldTotRad,newTotRad;
+        double direction;
+        // Do the search the old-fashioned way, one step at a time.
+        oldTotRad=totRad;
+        if(totRadPlus>totRad)
+        {
+            newTotRad=totRadPlus;
+            direction=1.;
+        }
+        else
+        {
+            newTotRad=totRadMinus;
+            direction=-1.;
+        }
+        while(newTotRad>oldTotRad&&(newslope>-5.)&&(newslope<90.))
+        {
+            oldTotRad=newTotRad;
+            newslope+=direction;
+            updateGeometryYear(newslope, aspectInput, axisTrackingType, fixedData,gridGeom, sunGeom,
+                    sunVarGeom, sunSlopeGeom, s0, horizonArray);
+
+            newTotRad=calculateTotal( sunVarGeom,sunSlopeGeom,DNI_TOA,s0,fixedData, hourlyVarData,
+                    horizonArray,
+                    axisTrackingType, 
+                    useEfficiency,startYear, endYear, numValsToRead );
+        }
+        return newslope-direction;
+    }
+    //	printf("#Number of iterations: %d\n", iter);
+    return newslope;
+}
+
 
 ### The main function
 
@@ -396,7 +542,7 @@ and prepares for the calculation of geometry for the entire year.
    If any of these conditions are met,
    the code proceeds to execute the following steps.
 
-2. A variable `readOK` is initialized to 0
+2. A variable `readOK` is initialized to `0`
    and used to check if the reading of spectral data was successful.
 
 3. The variable `numTempToRead` is calculated as `numValsToRead`
@@ -406,7 +552,7 @@ and prepares for the calculation of geometry for the entire year.
    int numTempToRead=numValsToRead/TEMPERATURE_INTERVAL;
    ```
 
-4. If `spectralCorrection` is true, the code attempts to read spectral correction values from a data file using the function `ReadDataFileFloat()`.
+4. If `spectralCorrection` is true, the code attempts to read spectral correction values from a data file using the function `ReadDataFileFloat()`
 
    The filename and other parameters are provided to the function.
    If reading the file is successful (`readOK` is $0$),
@@ -581,18 +727,21 @@ by the `lumcline2()` function!
 
 This section of the code 
 
-1. The code checks if `optimalAngle` is 1. If so, it means that the slope is to be optimized for a given aspect.
+1. The code checks if `optimalAngle` is 1.
+   If so, it means that the slope is to be optimized for a given aspect.
 
-   1. `optimizeSlope()` is called with various parameters to determine the optimal slope.
-   The calculated slope is stored in the variable `calculatedSlope`.
+   1. `optimizeSlope()` is called with various parameters
+   in order to calculate the optimal slope which is stored
+   in the variable `calculatedSlope`.
 
-   2. If `calculatedSlope` is very small (`< 0.01`) or the latitude is close to 0,
+   2. If `calculatedSlope` is very small (`< 0.01`)
+   or the latitude close to `0`
    indicating convergence problems or issues with the optimization,
-   a small default slope value of `0.001` is assigned to the variable `newslope`.
+   a small default slope value of `0.001` is assigned to `newslope`.
 
    3. If the calculated slope is valid, it is assigned to `newslope`.
 
-   4. `updateGeometryYear()` is called to update the geometry
+   4. `updateGeometryYear()` is called to update the geometry variables
    based on the new slope and aspect
    (the existing aspect value is used in this case).
 
