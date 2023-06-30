@@ -7,20 +7,20 @@ from typing import Annotated
 from typing import Optional
 from rich.console import Console
 from rich.table import Table
+
 from datetime import datetime
-from tzlocal import get_localzone # $ pip install tzlocal
+from tzlocal import get_localzone
 import math
 import numpy as np
-from tzlocal import get_localzone # $ pip install tzlocal
 
-from .timestamp import now_datetime
-from .timestamp import convert_to_timezone
-from .timestamp import attach_timezone
-from .conversions import convert_to_radians
-from .conversions import convert_to_degrees_if_requested
-from .solar_time import SolarTimeModels
-from .solar_time import calculate_solar_time
-from .solar_time import calculate_hour_angle
+from .api.utilities.timestamp import now_datetime
+from .api.utilities.timestamp import ctx_convert_to_timezone
+from .api.utilities.timestamp import attach_timezone
+from .api.utilities.conversions import convert_to_radians
+from .api.utilities.conversions import convert_to_degrees_if_requested
+from .api.geometry.solar_time import SolarTimeModels
+from .api.geometry.solar_time import calculate_solar_time
+from .api.geometry.solar_time import calculate_hour_angle
 
 
 console = Console()
