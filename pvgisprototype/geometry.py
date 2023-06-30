@@ -56,12 +56,12 @@ def position(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
         model: Annotated[List[SolarPositionModels], typer.Option(
-            '-m',
             '--model',
             show_default=True,
             show_choices=True,
             case_sensitive=False,
-            help="Model(s) to calculate solar position. Add multiple models like: --model Skyfield --model PVGIS")] = [SolarPositionModels.skyfield],
+            # callback=_parse_model,
+            help="Model(s) to calculate solar position.")] = [SolarPositionModels.skyfield],
         output_units: Annotated[str, typer.Option(
             '-u',
             '--output-units',
@@ -71,15 +71,16 @@ def position(
         ):
     """
     """
+    # Why does the callback function `_parse_model` not work? 
     if SolarPositionModels.all in model:
-        models = [model for model in SolarPositionModels if model != SolarPositionModels.all]
+        model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
 
     solar_position = calculate_solar_position(
             longitude,
             latitude,
             timestamp,
             timezone,
-            models,
+            model,
             output_units,
             )
     solar_position_table = Table("Model", "Altitude", "Azimuth")
