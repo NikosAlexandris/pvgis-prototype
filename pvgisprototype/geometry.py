@@ -83,12 +83,13 @@ def position(
             model,
             output_units,
             )
-    solar_position_table = Table("Model", "Altitude", "Azimuth")
+    solar_position_table = Table('Model', 'Altitude', 'Azimuth', 'Units',
+                                 box=box.SIMPLE_HEAD)
     for model_result in solar_position:
         model_name = model_result.get('Model', '')
         altitude = model_result.get('Altitude', '')
         azimuth = model_result.get('Azimuth', '')
-        # units = model_result.get('Units', '')
+        units = model_result.get('Units', '')
         solar_position_table.add_row(model_name, str(altitude), str(azimuth))
 
     console.print(solar_position_table)
