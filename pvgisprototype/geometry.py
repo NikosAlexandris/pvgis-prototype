@@ -136,8 +136,6 @@ def altitude(
             timezone,
             output_units,
             )
-    if output_units == 'degrees':
-        output_units += ' °'
     typer.echo(f'Solar altitude: {solar_altitude} {units}')
     # return solar_altitude
 
