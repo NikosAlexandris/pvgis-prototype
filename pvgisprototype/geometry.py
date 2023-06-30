@@ -41,25 +41,6 @@ app = typer.Typer(
 )
 
 
-def convert_dictionary_to_table(dictionary):
-    table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("Key", style="dim", width=12)
-    table.add_column("Value")
-
-    for key, value in dictionary.items():
-        table.add_row(str(key), str(value))
-    
-    return table
-
-
-def _parse_models(value: List[SolarPositionModels]) -> List[SolarPositionModels]:
-    if SolarPositionModels.all in value:
-        # Return all models except 'all' itself
-        return [model for model in SolarPositionModels if model != SolarPositionModels.all]
-    else:
-        return value
-
-
 @app.command('position', no_args_is_help=True, help='Calculate solar position parameters (altitude, azimuth)')
 def position(
         longitude: Annotated[float, typer.Argument(
