@@ -294,6 +294,7 @@ def declination(
         output_units,
         )
 
+    typer.echo(f'Date, time and zone: {timestamp} {timezone}')
     typer.echo(f'Solar declination: {solar_declination} {output_units}')
     # return solar_declination
 
