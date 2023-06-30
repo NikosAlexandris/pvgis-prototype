@@ -95,7 +95,7 @@ def position(
     console.print(solar_position_table)
 
 
-@app.command('altitude', no_args_is_help=True, help='Calculate the solar altitude')
+@app.command('altitude', no_args_is_help=True, help='⦩ Calculate the solar altitude')
 def altitude(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
@@ -141,7 +141,7 @@ def altitude(
     # return solar_altitude
 
 
-@app.command('zenith', no_args_is_help=True, help='Calculate the solar zenith')
+@app.command('zenith', no_args_is_help=True, help='⦭ Calculate the solar zenith')
 def zenith(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
@@ -174,7 +174,7 @@ def zenith(
     solar_geometry_day_constants : SolarGeometryDayConstants
         The input solar geometry constants.
     """
-    solar_altitude = calculate_solar_altitude(
+    solar_altitude, units = calculate_solar_altitude(
             longitude,
             latitude,
             timestamp,
@@ -182,11 +182,11 @@ def zenith(
             output_units,
             )
     solar_zenith = 90 - solar_altitude
-    typer.echo(f'Solar zenith: {solar_zenith} ({output_units})')
+    typer.echo(f'Solar zenith: {solar_zenith} {output_units}')
     # return solar_zenith
 
 
-@app.command('azimuth', no_args_is_help=True, help='Calculate the solar azimuth')
+@app.command('azimuth', no_args_is_help=True, help='⦬ Calculate the solar azimuth')
 def azimuth(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
@@ -226,7 +226,7 @@ def azimuth(
     -------
     solar_azimuth: float
     """
-    solar_azimuth = calculate_solar_azimuth(
+    solar_azimuth, units = calculate_solar_azimuth(
         longitude,
         latitude,
         timestamp,
@@ -237,11 +237,11 @@ def azimuth(
         hour_offset,
         output_units,
         )
-    typer.echo(f'Solar azimuth: {solar_azimuth} ({output_units})')
+    typer.echo(f'Solar azimuth: {solar_azimuth} {units}')
     # return solar_azimuth
 
 
-@app.command('declination', no_args_is_help=True, help='Calculate the solar declination')
+@app.command('declination', no_args_is_help=True, help='∢ Calculate the solar declination')
 def declination(
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
@@ -367,10 +367,10 @@ def hour_angle(
             solar_time=solar_time,
             output_units=output_units,
             )
-    typer.echo(f'Solar time: {hour_angle} {output_units}')
+    typer.echo(f'Hour angle: {hour_angle} {output_units}')
 
 
-@app.command('sunrise', no_args_is_help=True, help='Calculate the hour angle (ω) at sun rise and set')
+@app.command('sunrise', no_args_is_help=True, help=':sunrise: Calculate the hour angle (ω) at sun rise and set')
 def hour_angle(
         latitude: Annotated[Optional[float], typer.Argument(
             min=-90, max=90)],
@@ -400,7 +400,7 @@ def hour_angle(
             solar_declination,
             output_units=output_units,
             )
-    typer.echo(f'Solar time: {hour_angle} ({output_units})')
+    typer.echo(f'Solar time: {hour_angle} {output_units}')
 
 
 if __name__ == "__main__":
