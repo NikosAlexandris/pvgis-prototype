@@ -44,7 +44,7 @@ from ..utilities.timestamp import now_datetime
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
 from ..utilities.timestamp import convert_hours_to_seconds
-from ..utilities.image_offset import get_image_offset
+from ..utilities.image_offset_prototype import get_image_offset
 
 
 class SolarTimeModels(str, Enum):

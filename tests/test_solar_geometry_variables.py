@@ -2,14 +2,13 @@ import pytest
 import datetime
 import numpy as np
 import random
-
-from pvgisprototype.data_structures import SolarGeometryDayConstants
-from pvgisprototype.data_structures import SolarGeometryDayVariables
-from pvgisprototype.solar_geometry_pvgis_variables import calculate_solar_time
-from pvgisprototype.solar_geometry_pvgis_constants import calculate_solar_geometry_pvgis_constants
-from pvgisprototype.solar_geometry_pvgis_variables import calculate_solar_geometry_pvgis_variables
-from pvgisprototype.solar_geometry_pvgis_variables_plot import plot_solar_geometry_pvgis_variables
-from pvgisprototype.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.data_structures import SolarGeometryDayConstants
+from pvgisprototype.api.data_structures import SolarGeometryDayVariables
+from pvgisprototype.api.geometry.solar_time import calculate_solar_time_pvgis
+from pvgisprototype.api.geometry.solar_geometry_pvgis import calculate_solar_geometry_pvgis_constants
+from pvgisprototype.api.geometry.solar_geometry_pvgis import calculate_solar_geometry_pvgis_variables
+from pvgisprototype.plot.plot_solar_geometry_pvgis import plot_solar_geometry_pvgis_variables
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 # Set a seed to ensure agreement of plots between tests!

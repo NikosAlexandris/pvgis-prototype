@@ -1,8 +1,16 @@
-import pathlib
 import pytest
+import pathlib
 from typer.testing import CliRunner
-# from pvgisprototype.cli import app
-from pvgisprototype.time_series import app
+from pvgisprototype.cli import app as cli_app
+from pvgisprototype.series import app as series_app
+# from pvgisprototype.time_series import app as timeseries
+from pvgisprototype.utilities import app as utility_app
+# from pvgisprototype.solar_geometry_pvgis_constants import app as solar_geometry_pvgis_constants_app
+# from pvgisprototype.solar_geometry_pvgis_variables import app as solar_geometry_pvgis_variables_app
+from pvgisprototype.api.geometry.solar_position import app as solar_position_app
+from pvgisprototype.api.irradiance.extraterrestrial_irradiance import app as extraterrestrial_irradiance_app
+from pvgisprototype.api.irradiance.direct_irradiance import app as direct_irradiance_app
+
 from .conftest import EU_GEOMETRIC_CENTER_POST_BREXIT
 from .test_expected_output import EU_CENTER_LOCATION_VALUES
 
@@ -23,7 +31,7 @@ runner = CliRunner()
              EU_CENTER_LOCATION_VALUES),
             ]
         )
-def test_query_location(
+def test_series_query_location(
     path_to_data: pathlib.Path,
     filename: pathlib.Path,
     longitude: float,
@@ -57,7 +65,7 @@ def test_query_location(
         - The test data should contain valid netCDF files for accurate testing.
         - Ensure that the provided longitude and latitude values correspond to locations within the test data.
     """
-    result = runner.invoke(app, ['query-location', str(filename), str(longitude), str(latitude)])
+    result = runner.invoke(series_app, ['query-location', str(filename), str(longitude), str(latitude)])
     output = result.output.strip()
 
     # Check if the output is a single value

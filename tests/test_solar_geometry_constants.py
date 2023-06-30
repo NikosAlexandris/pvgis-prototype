@@ -1,7 +1,7 @@
 import pytest
-from pvgisprototype.data_structures import SolarGeometryDayConstants
-from pvgisprototype.solar_geometry_pvgis_constants import calculate_solar_geometry_pvgis_constants
-from pvgisprototype.solar_geometry_pvgis_constants_plot import plot_sunrise_sunset
+from pvgisprototype.api.data_structures import SolarGeometryDayConstants
+from pvgisprototype.api.geometry.solar_geometry_pvgis import calculate_solar_geometry_pvgis_constants
+from pvgisprototype.plot.plot_solar_geometry_pvgis import plot_sunrise_sunset
 import datetime
 
 

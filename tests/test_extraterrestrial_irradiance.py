@@ -1,7 +1,7 @@
 import pytest
-from pvgisprototype.extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
-from pvgisprototype.extraterrestrial_irradiance_plot import plot_extraterrestrial_irradiance
 import matplotlib.pyplot as plt
+from pvgisprototype.api.irradiance.extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
+from pvgisprototype.plot.plot_extraterrestrial_irradiance import plot_extraterrestrial_irradiance
 import numpy as np
 import random
 

@@ -1,9 +1,9 @@
 import pytest
-from pvgisprototype.solar_declination import calculate_solar_declination
-from pvgisprototype.solar_declination_plot import plot_solar_declination
-from pvgisprototype.solar_declination_plot import plot_solar_declination_one_year
-from pvgisprototype.solar_declination_plot import plot_solar_declination_five_years
 import matplotlib.pyplot as plt
+from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
+from pvgisprototype.plot.plot_solar_declination import plot_solar_declination
+from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year
+from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_five_years
 import numpy as np
 import random
 import datetime

@@ -3,7 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 import pytz
-from pvgisprototype.solar_time import (
+from pvgisprototype.api.geometry.solar_time import (
     calculate_solar_time_ephem,
     calculate_solar_time_eot,
     calculate_solar_time_pvgis,
@@ -12,9 +12,10 @@ from pvgisprototype.solar_time import (
     calculate_hour_angle_sunrise,
     SolarTimeModels
 )
-from pvgisprototype.timestamp import convert_hours_to_seconds
-from pvgisprototype.timestamp import convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
+from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 import numpy as np
+
 
 # import typer
 # from typer.testing import CliRunner

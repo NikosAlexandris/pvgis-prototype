@@ -1,14 +1,14 @@
 import pytest
 import pytz
 from typer.testing import CliRunner
-from pvgisprototype.angular_loss_factor import calculate_angular_loss_factor
-from pvgisprototype.direct_irradiance import calculate_refracted_solar_altitude
-from pvgisprototype.direct_irradiance import calculate_optical_air_mass
-from pvgisprototype.direct_irradiance import rayleigh_optical_thickness
-from pvgisprototype.direct_irradiance import calculate_direct_normal_irradiance
-from pvgisprototype.direct_irradiance import calculate_direct_horizontal_irradiance
-from pvgisprototype.direct_irradiance import calculate_direct_inclined_irradiance
-from pvgisprototype.direct_irradiance import app
+from pvgisprototype.api.irradiance.angular_loss_factor import calculate_angular_loss_factor
+from pvgisprototype.api.irradiance.direct_irradiance import calculate_refracted_solar_altitude
+from pvgisprototype.api.irradiance.direct_irradiance import calculate_optical_air_mass
+from pvgisprototype.api.irradiance.direct_irradiance import rayleigh_optical_thickness
+from pvgisprototype.api.irradiance.direct_irradiance import calculate_direct_normal_irradiance
+from pvgisprototype.api.irradiance.direct_irradiance import calculate_direct_horizontal_irradiance
+from pvgisprototype.api.irradiance.direct_irradiance import calculate_direct_inclined_irradiance
+from pvgisprototype.api.irradiance.direct_irradiance import app
 
 def run_app(arguments):
     runner = CliRunner()
