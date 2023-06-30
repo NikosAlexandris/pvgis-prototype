@@ -43,7 +43,7 @@ def solar_time(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: Annotated[float, typer.Option(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
