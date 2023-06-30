@@ -9,13 +9,12 @@ logging.basicConfig(
     ]
 )
 from typing import List
-
-from pvgisprototype.solar_position import calculate_solar_position
-from pvgisprototype.solar_position import SolarPositionModels
-from pvgisprototype.solar_position import calculate_solar_position_pvgis
-from pvgisprototype.solar_position import calculate_solar_position_skyfield
-from pvgisprototype.data_structures import SolarGeometryDayConstants
-from pvgisprototype.data_structures import SolarGeometryDayVariables
+from pvgisprototype.api.geometry.solar_position import SolarPositionModels
+from pvgisprototype.api.geometry.solar_position import calculate_solar_position
+from pvgisprototype.api.geometry.solar_position import calculate_solar_position_pvgis
+from pvgisprototype.api.geometry.solar_position import calculate_solar_position_skyfield
+from pvgisprototype.api.data_structures import SolarGeometryDayConstants
+from pvgisprototype.api.data_structures import SolarGeometryDayVariables
 import matplotlib.pyplot as plt
 from datetime import datetime
 from datetime import timedelta

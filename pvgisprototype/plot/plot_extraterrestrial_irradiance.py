@@ -1,4 +1,4 @@
-from pvgisprototype.extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
+from pvgisprototype.api.irradiance.extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
 import matplotlib.pyplot as plt
 import numpy as np
 
