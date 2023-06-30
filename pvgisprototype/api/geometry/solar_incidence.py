@@ -2,8 +2,8 @@ import typer
 from typing import Annotated
 from typing import Optional
 from math import sin, cos, acos
-from .conversions import convert_to_radians
-from .conversions import convert_to_degrees_if_requested
+from ..utilities.conversions import convert_to_radians
+from ..utilities.conversions import convert_to_degrees_if_requested
 
 
 def calculate_solar_incidence(

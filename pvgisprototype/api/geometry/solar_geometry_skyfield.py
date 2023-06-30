@@ -1,17 +1,19 @@
+import logging
 import typer
 from typing import Annotated
 from typing import Optional
-from skyfield import api
-from skyfield import almanac
+import skyfield
+# from skyfield import api
+# from skyfield import almanac
 from datetime import datetime
 from datetime import timedelta
 import dateutil.parser
 from calendar import monthrange
-from .conversions import convert_to_degrees_if_requested
-from .conversions import convert_to_radians_if_requested
-from .conversions import convert_to_radians
-from .timestamp import now_datetime
-from .timestamp import convert_to_timezone
+from ..utilities.conversions import convert_to_degrees_if_requested
+from ..utilities.conversions import convert_to_radians_if_requested
+from ..utilities.conversions import convert_to_radians
+from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import convert_to_timezone
 
 
 def calculate_solar_position_skyfield(
@@ -62,15 +64,17 @@ def calculate_solar_position_skyfield(
         logging.warning(f'tzinfo already set for timestamp = {timestamp}')
     # Handle Me during input validation? -------------------------------------
 
-    ephemeris = load('de421.bsp')
+    ephemeris = skyfield.api.load('de421.bsp')
     sun = ephemeris['Sun']
     earth = ephemeris['Earth']
-    location = wgs84.latlon(latitude * N, longitude * W)  # W or E ?
+    N = skyfield.api.N
+    W = skyfield.api.W
+    location = skyfield.api.wgs84.latlon(latitude * N, longitude * W)  # W or E ?
 
     # the sun position as seen from the observer
-    timescale = api.load.timescale()
+    timescale = skyfield.api.load.timescale()
     solar_position = (earth + location).at(timescale.now()).observe(sun).apparent()
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
 
     # in degrees? -> solar_altitude.degrees, solar_azimuth.degrees
-    return solar_altitude, solar_azimuth, distance_to_sun
+    return solar_altitude.radians, solar_azimuth.radians, distance_to_sun

@@ -8,7 +8,6 @@ different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
 
-
 import logging
 logging.basicConfig(
     level=logging.ERROR,
@@ -18,35 +17,34 @@ logging.basicConfig(
         logging.StreamHandler()  # Print log to the console
     ]
 )
-
-
+from functools import partial
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import validator
 import typer
-from rich import print
-from typing import Union
 from typing import Annotated
 from typing import Optional
-from functools import partial
+from typing import Union
 from enum import Enum
-
-from .extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
-from .angular_loss_factor import calculate_angular_loss_factor
-from .solar_declination import calculate_solar_declination
-from .solar_geometry_pvgis_variables import calculate_solar_time
-
-from datetime import datetime
-from .timestamp import now_datetime
-from .timestamp import convert_to_timezone
-from .timestamp import attach_timezone
-
-from .constants import AOI_CONSTANTS
-
-import numpy as np
+from rich import print
+from rich.console import Console
 import math
+import numpy as np
+from datetime import datetime
+from ..constants import AOI_CONSTANTS
+from ..geometry.solar_declination import calculate_solar_declination
+from ..geometry.solar_time import SolarTimeModels
+from ..geometry.solar_time import calculate_solar_time
+from ..utilities.conversions import convert_to_radians
+from ..utilities.conversions import convert_dictionary_to_table
+from ..utilities.timestamp import attach_timezone
+from ..utilities.timestamp import ctx_convert_to_timezone
+from ..utilities.timestamp import now_datetime
+from .angular_loss_factor import calculate_angular_loss_factor
+from .extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
 
 
+console = Console()
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
@@ -63,7 +61,7 @@ class DirectIrradianceComponents(str, Enum):
 
 class SolarIncidenceAngleMethod(str, Enum):
     jenco = 'Jenco'
-    simple = 'simple'
+    simple = 'PVGIS'
 
 
 # some correction for the given elevation (Hofierka, 2002)
@@ -78,6 +76,19 @@ def calculate_refracted_solar_altitude(
         solar_altitude: float,
         ):
     """Adjust the solar altitude angle for atmospheric refraction
+
+                       ⎛                                  2⎞
+            0.061359 ⋅ ⎜0.1594 + 1.123 ⋅ h  + 0.065656 ⋅ h ⎟
+      ref              ⎝                  0               0⎠
+    ∆h    = ────────────────────────────────────────────────
+      0                                            2        
+                    1 + 28.9344 ⋅ h  + 277.3971 ⋅ h         
+                                   0               0        
+                                                            
+     ref          ref                                       
+    h    = h  + ∆h                                          
+     0      0     0                                         
+
     This function implements the algorithm described by Hofierka :cite:`p:hofierka2002`.
     """
     atmospheric_refraction = (
@@ -186,7 +197,10 @@ def calculate_direct_normal_irradiance(
 
 @app.command('horizontal', no_args_is_help=True)
 def calculate_direct_horizontal_irradiance(
-        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
+        longitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians, min=-180, max=180)],
+        latitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians, min=-90, max=90)],
         elevation: float,
         linke_turbidity_factor: float,
         timestamp: Annotated[Optional[datetime], typer.Argument(
@@ -194,7 +208,24 @@ def calculate_direct_horizontal_irradiance(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
+        days_in_a_year: Annotated[float, typer.Option(
+            help='Days in a year')] = 365.25,
+        perigee_offset: Annotated[float, typer.Option(
+            help='Perigee offset')] = 0.048869,
+        eccentricity: Annotated[float, typer.Option(
+            help='Eccentricity')] = 0.01672,
+        time_offset_global: Annotated[float, typer.Option(
+            help='Global time offset')] = 0,
+        hour_offset: Annotated[float, typer.Option(
+            help='Hour offset')] = 0,
+        solar_time_model: Annotated[SolarTimeModels, typer.Option(
+            '-m',
+            '--solar-time-model',
+            help="Model to calculate solar position",
+            show_default=True,
+            show_choices=True,
+            case_sensitive=False)] = SolarTimeModels.skyfield,
         ):
     """Calculate the direct irradiatiance incident on a horizontal surface
 
@@ -213,8 +244,18 @@ def calculate_direct_horizontal_irradiance(
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
     # -------------------------------------------------------------------------
-    # Replace with ephem or else!
-    solar_time = calculate_solar_time(year, hour_of_year)
+    solar_time, _units = calculate_solar_time(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=solar_time_model,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity=eccentricity,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset
+    )
     hour_angle = np.radians(15) * (solar_time - 12)
     # -------------------------------------------------------------------------
 
@@ -236,23 +277,32 @@ def calculate_direct_horizontal_irradiance(
             )
     direct_horizontal_irradiance = direct_normal_irradiance * sine_solar_altitude
 
+    table_with_inputs = convert_dictionary_to_table(locals())
+    console.print(table_with_inputs)
     typer.echo(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')  # B0c
     return direct_horizontal_irradiance
 
 
 @app.command('inclined', no_args_is_help=True)
 def calculate_direct_inclined_irradiance(
-        latitude: Annotated[Optional[float], typer.Argument(
+        longitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-180, max=180)],
+        latitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
             min=-90, max=90)],
-        elevation: Annotated[float, typer.Argument(min=0, max=8848)],
+        elevation: Annotated[float, typer.Argument(
+            min=0, max=8848)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
-        surface_tilt: Annotated[Optional[float], typer.Argument(min=0, max=90)] = 0,
-        surface_orientation: Annotated[Optional[float], typer.Argument(min=0, max=360)] = 180,
+            callback=ctx_convert_to_timezone)] = None,
+        surface_tilt: Annotated[Optional[float], typer.Argument(
+            min=0, max=90)] = 0,
+        surface_orientation: Annotated[Optional[float], typer.Argument(
+            min=0, max=360)] = 180,
         # direct_horizontal_radiation: Annotated[float, typer.Argument(
         #     help='Direct normal radiation in W/m²',
         #     min=-9000, max=1000)],  # `sh` which comes from `s0`
@@ -265,19 +315,42 @@ def calculate_direct_inclined_irradiance(
         linke_turbidity_factor: Annotated[float, typer.Argument(
             help='A measure of atmospheric turbidity, equal to the ratio of total optical depth to the Rayleigh optical depth',
             min=0, max=10)] = 2,  # 2 to get going for now
-        method_for_solar_incidence_angle: Annotated[SolarIncidenceAngleMethod, typer.Option(
-            '-m',
-            '--solar-declination-method',
+        solar_incidence_angle_model: Annotated[SolarIncidenceAngleMethod, typer.Option(
+            '--incidence-angle-model',
             show_default=True,
             show_choices=True,
             case_sensitive=False,
             help="Method to calculate the solar declination")] = 'jenco',
+        solar_time_model: Annotated[SolarTimeModels, typer.Option(
+            '--solar-time-model',
+            help="Model to calculate solar position",
+            show_default=True,
+            show_choices=True,
+            case_sensitive=False)] = SolarTimeModels.skyfield,
+        days_in_a_year: Annotated[float, typer.Option(
+            help='Days in a year')] = 365.25,
+        perigee_offset: Annotated[float, typer.Option(
+            help='Perigee offset')] = 0.048869,
+        eccentricity: Annotated[float, typer.Option(
+            help='Eccentricity')] = 0.01672,
+        time_offset_global: Annotated[float, typer.Option(
+            help='Global time offset')] = 0,
+        hour_offset: Annotated[float, typer.Option(
+            help='Hour offset')] = 0,
         ):
     """Calculate the direct irradiance incident on a tilted surface [W*m-2] 
 
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
     """
+    # Notes
+    # -----
+    #           B   ⋅ sin ⎛δ   ⎞                    
+    #            hc       ⎝ exp⎠         ⎛ W ⎞
+    #     B   = ────────────────     in  ⎜───⎟
+    #      ic       sin ⎛h ⎞             ⎜ -2⎟           
+    #                   ⎝ 0⎠             ⎝m  ⎠           
+
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1,
                              tzinfo=timestamp.tzinfo)
@@ -287,9 +360,11 @@ def calculate_direct_inclined_irradiance(
     # day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
 
     direct_horizontal_irradiance = calculate_direct_horizontal_irradiance(
+            longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
             elevation=elevation,
             timestamp=timestamp,
+            timezone=timezone,
             linke_turbidity_factor=linke_turbidity_factor,
             )
 
@@ -348,7 +423,18 @@ def calculate_direct_inclined_irradiance(
     C33 = math.sin(latitude) * math.sin(solar_declination)
 
     # calculate solar altitude
-    solar_time = calculate_solar_time(year, hour_of_year)
+    solar_time, _units = calculate_solar_time(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=solar_time_model,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity=eccentricity,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset
+    )
     hour_angle = np.radians(15) * (solar_time - 12)
     sine_solar_altitude = C31 * math.cos(hour_angle) + C33
     solar_altitude = math.asin(sine_solar_altitude)
@@ -362,7 +448,7 @@ def calculate_direct_inclined_irradiance(
     solar_incidence_angle = C31_inclined * math.cos (hour_angle - relative_longitude) + C33_inclined
 
     # "Simpler" way to calculate the inclined solar declination?
-    if method_for_solar_incidence_angle == 'simple':
+    if solar_incidence_angle_model == 'simple':
         modified_direct_horizontal_irradiance = direct_horizontal_irradiance / math.sin(solar_altitude)
         # In the old C source code, the following runs if:
         # --------------------------------- Review & Add ?
@@ -396,14 +482,14 @@ def calculate_direct_inclined_irradiance(
             return modified_direct_horizontal_irradiance
             # Deduplicate Me! -------------------------------------------------
 
-    if method_for_solar_incidence_angle == 'jenco':
+    if solar_incidence_angle_model == 'jenco':
         try:
             # split the following and deduplicate?
             # i.e. reuse modified_direct_horizontal_irradiance?
             direct_inclined_irradiance = direct_horizontal_irradiance * math.sin(solar_incidence_angle) / math.sin(solar_altitude)
 
             # Deduplicate Me! -------------------------------------------------
-            typer.echo(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {method_for_solar_incidence_angle})')  # B0c
+            typer.echo(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {solar_incidence_angle_model})')  # B0c
             return direct_inclined_irradiance
             # Deduplicate Me! -------------------------------------------------
 
@@ -434,7 +520,7 @@ def calculate_direct_irradiance(
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
-            callback=convert_to_timezone)] = None,
+            callback=ctx_convert_to_timezone)] = None,
         component: Annotated[DirectIrradianceComponents, typer.Option(
             '-c',
             '--component',

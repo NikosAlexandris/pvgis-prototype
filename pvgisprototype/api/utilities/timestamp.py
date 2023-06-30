@@ -1,20 +1,40 @@
 import typer
 from typing import Annotated
 from typing import Optional
-from datetime import datetime
-import pytz
 
-import time
 from datetime import datetime
+from datetime import timedelta
 from datetime import timezone
-import pytz # $ pip install pytz
-from tzlocal import get_localzone # $ pip install tzlocal
+import pytz
+from tzlocal import get_localzone
+import calendar
+import time
+import random
 
 
 def now_datetime():
     """
     """
     return datetime.now().astimezone()
+
+
+def random_datetimezone():
+    """
+    Generate a random datetime and timezone object
+    """
+    year = datetime.now().year
+    month = random.randint(1, 12)
+    _, days_in_month = calendar.monthrange(year, month)
+    day = random.randint(1, days_in_month)
+    hour = random.randint(0, 23)
+    minute = random.randint(0, 59)
+    second = random.randint(0, 59)
+    datetimestamp = datetime(year, month, day, hour, minute, second)
+    timezone_str = random.choice(pytz.all_timezones)
+    timezone = pytz.timezone(timezone_str)
+    # datetimezone = timezone.localize(datetimestamp)
+
+    return datetimestamp, timezone
 
 
 def timestamp_to_decimal_hours(timestamp, timezone='UTC'):

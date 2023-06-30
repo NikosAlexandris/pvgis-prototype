@@ -1,4 +1,7 @@
 import typer
+from rich.table import Table
+from rich.progress import track
+from rich import box
 import numpy as np
 
 
@@ -21,3 +24,17 @@ def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
 def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
     """Convert angle from degrees to radians if requested."""
     return np.radians(angle) if output_units == 'radians' else angle
+
+
+def convert_dictionary_to_table(dictionary):
+    table = Table(show_header=True, header_style="bold magenta",
+                                 box=box.SIMPLE_HEAD)
+    table.add_column("Parameter", style="dim")
+    table.add_column("Value")
+
+    # for key, value in dictionary.items():
+    # for key, value in track(dictionary.items(), description="Converting dictionary to table..."):
+    for key, value in dictionary.items():
+        table.add_row(str(key), str(value))
+
+    return table

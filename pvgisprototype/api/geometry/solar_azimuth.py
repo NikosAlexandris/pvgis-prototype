@@ -6,11 +6,11 @@ from datetime import datetime
 import math
 import numpy as np
 
-from .time import now_datetime
-from .time import ctx_convert_to_timezone
-from .time import attach_timezone
-from .conversions import convert_to_radians
-from .conversions import convert_to_degrees_if_requested
+from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import ctx_convert_to_timezone
+from ..utilities.timestamp import attach_timezone
+from ..utilities.conversions import convert_to_radians
+from ..utilities.conversions import convert_to_degrees_if_requested
 
 from .solar_declination import calculate_solar_declination
 from .solar_time import calculate_solar_time_ephem
@@ -76,7 +76,7 @@ def calculate_solar_azimuth(
     # hour_angle = (solar_time - 12)
 
     # timestamp = hour_of_year_to_datetime(year, hour_of_year)
-    hour_angle = calculate_solar_time_ephem(
+    hour_angle, _units = calculate_solar_time_ephem(
             timestamp=timestamp,
             latitude=latitude,
             longitude=longitude,
@@ -88,4 +88,4 @@ def calculate_solar_azimuth(
     solar_azimuth = math.acos(cosine_solar_azimuth)
     solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
 
-    return solar_azimuth
+    return solar_azimuth, output_units

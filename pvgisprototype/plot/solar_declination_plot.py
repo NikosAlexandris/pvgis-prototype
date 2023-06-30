@@ -8,6 +8,10 @@ from datetime import datetime
 from datetime import timezone
 from datetime import timedelta
 
+from bokeh.plotting import figure
+from bokeh.embed import json_item
+from bokeh.embed import components
+
 
 def days_in_year(year):
     start_date = datetime(year, 1, 1)  # First day of the year
@@ -55,6 +59,45 @@ def plot_solar_declination_one_year(
     plt.legend()
     plt.savefig('solar_declination.png')
     return fig
+
+from bokeh.plotting import figure, output_file, save
+from bokeh.models import Legend, LegendItem
+from bokeh.io import show
+
+
+def plot_solar_declination_one_year_bokeh(
+        year: int,
+        title: str = 'Annual Variation of Solar Declination',
+        output_units: str = 'radians',
+        ):
+    timestamps = [datetime(year, 1, 1) + timedelta(days=i) for i in range((datetime(year+1, 1, 1) - datetime(year, 1, 1)).days)]
+    timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime
+
+    solar_declinations = np.vectorize(calculate_solar_declination)(timestamps, output_units=output_units)
+    solar_declinations_pvgis= np.vectorize(calculate_solar_declination_pvgis)(timestamps, output_units=output_units)
+    solar_declinations_hargreaves = np.vectorize(calculate_solar_declination_hargreaves)(timestamps, output_units=output_units)
+
+    fig = figure(width=800, height=600, title=title, x_axis_type="datetime")
+    p1 = fig.line(timestamps_float, solar_declinations, line_width=4, alpha=0.7, color='#00BFFF')
+    p2 = fig.line(timestamps_float, solar_declinations_pvgis, line_width=2, alpha=0.35, color='red')
+    p3 = fig.line(timestamps_float, solar_declinations_hargreaves, line_width=2, alpha=1, color='#9966CC')
+
+    fig.xaxis.axis_label = 'Day of the Year'
+    fig.yaxis.axis_label = output_units
+
+    legend = Legend(items=[
+        LegendItem(label='PVIS', renderers=[p1]),
+        LegendItem(label='PVGIS (current C code)', renderers=[p2]),
+        LegendItem(label='Hargreaves', renderers=[p3])
+    ])
+    fig.add_layout(legend)
+    fig.legend.location = "top_left"
+
+    fig.grid.grid_line_color = "gray"
+    fig.grid.grid_line_alpha = 0.3
+
+    script, div = components(fig)
+    return script, div
 
 
 def plot_solar_declination_five_years(

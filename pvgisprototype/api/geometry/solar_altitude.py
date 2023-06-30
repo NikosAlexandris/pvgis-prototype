@@ -11,20 +11,22 @@ import numpy as np
 # from .data_structures import SolarGeometryDayVariables
 
 
-from .timestamp import now_datetime
-from .timestamp import ctx_convert_to_timezone
-from .timestamp import attach_timezone
-from .timestamp import convert_hours_to_seconds
-from .conversions import convert_to_radians
-from .conversions import convert_to_degrees_if_requested
+from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import ctx_convert_to_timezone
+from ..utilities.timestamp import attach_timezone
+from ..utilities.timestamp import convert_hours_to_seconds
+from ..utilities.conversions import convert_to_radians
+from ..utilities.conversions import convert_to_degrees_if_requested
 from .solar_declination import calculate_solar_declination
 from .solar_time import calculate_solar_time
+
 
 # app = typer.Typer(
 #     add_completion=False,
 #     add_help_option=True,
 #     help=f"Calculate solar altitude for a location and time",
 # )
+
 
 # @app.callback('altitude', no_args_is_help=True, help='Calculate solar altitude')
 def calculate_solar_altitude(

@@ -1,3 +1,4 @@
+from devtools import debug
 import logging
 logging.basicConfig(
     level=logging.ERROR,
@@ -23,6 +24,7 @@ from skyfield.api import Topos
 from skyfield.api import load
 from skyfield.api import N
 from skyfield.api import W
+from skyfield.api import E
 from skyfield.api import wgs84
 from skyfield.api import load
 
@@ -32,17 +34,17 @@ from math import sin
 from math import cos
 from math import tan 
 from math import acos
-from .constants import HOUR_ANGLE
-from .constants import UNDEF
-from .constants import double_numpi
-from .constants import half_numpi
-from .conversions import convert_to_radians
-from .conversions import convert_to_degrees_if_requested
-from .timestamp import now_datetime
-from .timestamp import ctx_convert_to_timezone
-from .timestamp import attach_timezone
-from .timestamp import convert_hours_to_seconds
-from .image_offset import get_image_offset
+from ..constants import HOUR_ANGLE
+from ..constants import UNDEF
+from ..constants import double_numpi
+from ..constants import half_numpi
+from ..utilities.conversions import convert_to_radians
+from ..utilities.conversions import convert_to_degrees_if_requested
+from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import ctx_convert_to_timezone
+from ..utilities.timestamp import attach_timezone
+from ..utilities.timestamp import convert_hours_to_seconds
+from ..utilities.image_offset import get_image_offset
 
 
 class SolarTimeModels(str, Enum):

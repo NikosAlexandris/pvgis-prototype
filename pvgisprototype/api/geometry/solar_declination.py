@@ -1,3 +1,4 @@
+from devtools import debug
 import typer
 from typing import Annotated
 from typing import Optional
@@ -7,9 +8,9 @@ from functools import partial
 from datetime import datetime
 from datetime import timezone
 from datetime import timedelta
-from .timestamp import now_datetime
-from .timestamp import convert_to_timezone
-from .timestamp import attach_timezone
+from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import convert_to_timezone
+from ..utilities.timestamp import attach_timezone
 
 
 app = typer.Typer(
@@ -47,6 +48,11 @@ def calculate_solar_declination(
             show_default=True,
             case_sensitive=False,
             help="Output units for solar declination (degrees or radians)")] = 'radians',
+        random_time: Annotated[bool, typer.Option(
+            '-r',
+            '--random',
+            '--random-time',
+            help="Generate a random date, time and timezone to demonstrate calculation")] = False,
         ) -> float:
     """Approximate the sun's declination for a given day of the year.
 
@@ -160,7 +166,9 @@ def calculate_solar_declination_hargreaves(
         ) -> float:
     """Approximate the solar declination based on the Hargreaves formula.
 
-        δ = 23.45° × sin [360/365 × (284 + n + 0.4 × sin [360/365 × (n - 100)])]
+                         ⎛360   ⎛                    ⎛360            ⎞⎞⎞
+        δ = 23.45° ⋅ sin ⎜─── ⋅ ⎜284 + n + 0.4 ⋅ sin ⎜─── ⋅ (n - 100)⎟⎟⎟
+                         ⎝365   ⎝                    ⎝365            ⎠⎠⎠
 
         Notes
         -----
@@ -186,7 +194,18 @@ def calculate_solar_declination_hargreaves(
     # year = timestamp.year
     # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timezone.utc)
     day_of_year = timestamp.timetuple().tm_yday
-    declination = 23.45 * math.sin(math.radians(360/days_in_a_year * (284 + day_of_year + 0.4 * math.sin(math.radians(360/days_in_a_year * (day_of_year - 100))))))
+    declination = 23.45 * math.sin(
+        math.radians(
+            360
+            / days_in_a_year
+            * (
+                284
+                + day_of_year
+                + 0.4
+                * math.sin(math.radians(360 / days_in_a_year * (day_of_year - 100)))
+            )
+        )
+    )
     declination = convert_to_radians_if_requested(declination, output_units)
 
     return declination
