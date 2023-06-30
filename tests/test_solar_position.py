@@ -15,10 +15,11 @@ from datetime import datetime, timezone
 
 
 models = [
-        SolarPositionModels.suncalc,
         SolarPositionModels.pysolar,
         SolarPositionModels.pvis,
         SolarPositionModels.pvgis,
+        SolarPositionModels.skyfield,
+        SolarPositionModels.suncalc,
 ]
 dates = [
         datetime.now().replace(tzinfo=timezone.utc, year=year) for year in range(2000, 2010)
@@ -166,6 +167,18 @@ def test_plot_daily_solar_position(model):
     day = datetime.now()
     try:
         plot_daily_solar_position(longitude, latitude, day, model)
+    except Exception as e:
+        assert False, f"plot_daily_solar_position raised an error: {e}"
+
+
+@pytest.mark.parametrize("model", models)
+@pytest.mark.mpl_image_compare
+def test_plot_daily_solar_position_models(model):
+    longitude = 0.0
+    latitude = 0.0
+    day = datetime.now()
+    try:
+        plot_daily_solar_position_models(longitude, latitude, day, model)
     except Exception as e:
         assert False, f"plot_daily_solar_position raised an error: {e}"
 
