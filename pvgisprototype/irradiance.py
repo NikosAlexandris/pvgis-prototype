@@ -1,11 +1,12 @@
 import typer
 from typing_extensions import Annotated
 from typing import Optional
-from .direct_irradiance import app as direct_irradiance
-from .diffuse_irradiance import app as diffuse_irradiance
-from .reflected_irradiance import app as reflected_irradiance
-from .extraterrestrial_irradiance import app as extraterrestrial_irradiance
-from .angular_loss_factor import app as angular_loss_factor
+
+from .api.irradiance.direct_irradiance import app as direct_irradiance
+from .api.irradiance.diffuse_irradiance import app as diffuse_irradiance
+from .api.irradiance.reflected_irradiance import app as reflected_irradiance
+from .api.irradiance.extraterrestrial_irradiance import app as extraterrestrial_irradiance
+from .api.irradiance.angular_loss_factor import app as angular_loss_factor
 
 
 app = typer.Typer(
