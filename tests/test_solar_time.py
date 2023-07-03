@@ -16,7 +16,11 @@ from pvgisprototype.api.geometry.solar_time import (
 from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from pvgisprototype.plot.plot_solar_time import plot_solar_time
+from pvgisprototype.plot.plot_solar_time import plot_solar_time_one_year
+from pvgisprototype.plot.plot_solar_time import plot_solar_time_one_year_bokeh
+from pvgisprototype.plot.plot_solar_time import plot_solar_time_one_year_bokeh_static
 import numpy as np
+import random
 
 
 # import typer
@@ -127,6 +131,82 @@ def test_plot_solar_time(longitude, latitude, location, timezone):
             )
 
 
+# Set a seed to ensure agreement of plots between tests!
+random.seed(43) # Comment to really pick a random year
+random_year = random.randint(2005, 2023)
+@pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
+@pytest.mark.parametrize("year", [random_year])
+# @pytest.mark.parametrize("model", models)
+@pytest.mark.parametrize("model", [SolarTimeModels.skyfield])
+@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+def test_plot_solar_time_one_year(
+        longitude,
+        latitude,
+        timezone,
+        year,
+        model,
+        location
+):
+    return plot_solar_time_one_year(
+            longitude,
+            latitude,
+            timezone,
+            year,
+            [model],
+            location,
+            )
+
+
+# Set a seed to ensure agreement of plots between tests!
+random.seed(43) # Comment to really pick a random year
+random_year = random.randint(2005, 2023)
+@pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
+@pytest.mark.parametrize("year", [random_year])
+@pytest.mark.parametrize("model", models)
+@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+def test_plot_solar_time_one_year_bokeh_static(
+        longitude,
+        latitude,
+        timezone,
+        year,
+        model,
+        location
+):
+    # debug(locals())
+    return plot_solar_time_one_year_bokeh_static(
+            longitude,
+            latitude,
+            timezone,
+            year,
+            [model],
+            location,
+            )
+
+
+# Set a seed to ensure agreement of plots between tests!
+random.seed(43) # Comment to really pick a random year
+random_year = random.randint(2005, 2023)
+@pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
+@pytest.mark.parametrize("year", [random_year])
+@pytest.mark.parametrize("model", models)
+@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+def test_plot_solar_time_one_year_bokeh(
+        longitude,
+        latitude,
+        timezone,
+        year,
+        model,
+        location
+):
+    # debug(locals())
+    return plot_solar_time_one_year_bokeh(
+            longitude,
+            latitude,
+            timezone,
+            year,
+            [model],
+            location,
+            )
 
 # @pytest.mark.parametrize("longitude, latitude", coordinates)
 # @pytest.mark.parametrize("timestamp", timestamps)
