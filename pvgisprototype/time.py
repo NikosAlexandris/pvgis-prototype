@@ -5,8 +5,10 @@ Important sun and solar surface geometry parameters in calculating the amount of
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import List
 from rich.console import Console
 from rich.table import Table
+from rich import box
 
 from datetime import datetime
 from tzlocal import get_localzone
@@ -35,14 +37,16 @@ app = typer.Typer(
 @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
 def solar_time(
         longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians, min=-180, max=180)],
+            callback=convert_to_radians,
+            min=-180, max=180)],
         latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians, min=-90, max=90)],
+            callback=convert_to_radians,
+            min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
             default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
+            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: Annotated[float, typer.Option(
             help='Days in a year')] = 365.25,
@@ -54,13 +58,13 @@ def solar_time(
             help='Global time offset')] = 0,
         hour_offset: Annotated[float, typer.Option(
             help='Hour offset')] = 0,
-        model: Annotated[SolarTimeModels, typer.Option(
+        model: Annotated[List[SolarTimeModels], typer.Option(
             '-m',
             '--model',
+            help="Model to calculate solar time",
             show_default=True,
             show_choices=True,
-            case_sensitive=False,
-            help="Model to calculate solar time")] = SolarTimeModels.ephem,
+            case_sensitive=False)] = [SolarTimeModels.skyfield],
         ):
     """Calculate the solar time.
 
