@@ -98,24 +98,24 @@ from datetime import datetime, timedelta
 models = [SolarTimeModels.ephem, SolarTimeModels.eot, SolarTimeModels.pvgis]
 
 
-coordinates = [
-    (0, 90, 'North Pole'),
-    (0, -90, 'South Pole'),
-    (-180, 0, 'International Date Line'),
-    (0, 0, 'Greenwich Meridian / Equator'),
-    (22.358611, 40.085556, 'Όλυμπος'),  # Please replace 'Location 1' with the actual location name
-    (6.6327, 46.5218, 'Lausanne, Switzerland'),  # Please replace 'Location 2' with the actual location name
-    (40.7128, -74.0060, 'New York, USA'),
-    (51.5074, -0.1278, 'London, UK'),
-    (-33.8688, 151.2093, 'Sydney, Australia'),
-    (35.6895, 139.6917, 'Tokyo, Japan'),
-    (-33.9249, 18.4241, 'Cape Town, South Africa'),
-    (-34.6037, -58.3816, 'Buenos Aires, Argentina'),
-    (55.7558, 37.6176, 'Moscow, Russia'),
-    (1.3521, 103.8198, 'Singapore'),
-    (64.1265, -21.8174, 'Reykjavik, Iceland'),
-    (21.3069, -157.8583, 'Honolulu, Hawaii, USA'),
-    (19.0760, 72.8777, 'Mumbai (Bombay), India'),
+locations = [
+    (0, 90, 'North Pole', 'UTC'),
+    (0, -90, 'South Pole', 'UTC'),
+    (-180, 0, 'International Date Line', 'UTC'),
+    (0, 0, 'Greenwich Meridian / Equator', 'UTC'),
+    (22.358611, 40.085556, 'Όλυμπος', 'Europe/Athens'),
+    (6.6327, 46.5218, 'Lausanne, Switzerland', 'Europe/Zurich'),
+    (-74.0060, 40.7128, 'New York, USA', 'America/New_York'),
+    (-0.1278, 51.5074, 'London, UK', 'Europe/London'),
+    (151.2093, -33.8688, 'Sydney, Australia', 'Australia/Sydney'),
+    (139.6917, 35.6895, 'Tokyo, Japan', 'Asia/Tokyo'),
+    (18.4241, -33.9249, 'Cape Town, South Africa', 'Africa/Johannesburg'),
+    (-58.3816, -34.6037, 'Buenos Aires, Argentina', 'America/Argentina/Buenos_Aires'),
+    (37.6176, 55.7558, 'Moscow, Russia', 'Europe/Moscow'),
+    (103.8198, 1.3521, 'Singapore', 'Asia/Singapore'),
+    (-21.8174, 64.1265, 'Reykjavik, Iceland', 'Atlantic/Reykjavik'),
+    (-157.8583, 21.3069, 'Honolulu, Hawaii, USA', 'Pacific/Honolulu'),
+    (72.8777, 19.0760, 'Mumbai (Bombay), India', 'Asia/Kolkata'),
 ]
 @pytest.mark.parametrize("longitude, latitude, location", coordinates)
 @pytest.mark.mpl_image_compare  # instructs use of a baseline image
