@@ -56,7 +56,7 @@ def _parse_model(ctx: typer.Context, model: List[SolarPositionModels], param: ty
     return model
 
 
-def calculate_solar_position_for_model(
+def model_solar_position(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
             min=-180, max=180)],
@@ -207,7 +207,7 @@ def calculate_solar_position(
     results = []
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
-            solar_altitude, solar_azimuth, units = calculate_solar_position_for_model(
+            solar_altitude, solar_azimuth, units = model_solar_position(
                 longitude, latitude, timestamp, timezone, model, output_units
             )
             results.append({
