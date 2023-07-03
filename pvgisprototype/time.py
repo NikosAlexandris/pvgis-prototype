@@ -85,19 +85,35 @@ def solar_time(
         except Exception as e:
             logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # Handle Me during input validation? -------------------------------------
-    solar_time = calculate_solar_time(
+    # Why does the callback function `_parse_model` not work? 
+    if SolarTimeModels.all in model:
+        model = [model for model in SolarTimeModels if model != SolarTimeModels.all]
+
+    solar_time  = calculate_solar_time(
             longitude,
             latitude,
             timestamp,
             timezone,
+            model,
             days_in_a_year,
             perigee_offset,
             eccentricity,
             time_offset_global,
             hour_offset,
-            model,
             )
-    typer.echo(f'Solar time: {solar_time} ({timezone})')
+    solar_time_table = Table('Model', 'Solar time', 'Units',
+                                 box=box.SIMPLE_HEAD)
+    for model_result in solar_time:
+        # typer.echo(f'Solar time: {solar_time} {units} ({timezone})')
+        model_name = model_result.get('Model', '')
+        solar_time = model_result.get('Solar time', '')
+        units = model_result.get('Units', '')
+        solar_time_table.add_row(
+                model_name,
+                str(solar_time),
+                str(units),
+        )
+    console.print(solar_time_table)
 
 
 # @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
