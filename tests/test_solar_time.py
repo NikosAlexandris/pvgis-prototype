@@ -1,4 +1,5 @@
 import pytest
+import matplotlib.pyplot as plt
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -14,6 +15,7 @@ from pvgisprototype.api.geometry.solar_time import (
 )
 from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
+from pvgisprototype.plot.plot_solar_time import plot_solar_time
 import numpy as np
 
 
@@ -90,10 +92,6 @@ def test_calculate_solar_time(
     assert result == pytest.approx(expected_solar_time)
 
 
-import matplotlib.pyplot as plt
-import pytest
-from datetime import datetime, timedelta
-
 # the list of models you want to test
 models = [SolarTimeModels.ephem, SolarTimeModels.eot, SolarTimeModels.pvgis]
 
@@ -117,31 +115,17 @@ locations = [
     (-157.8583, 21.3069, 'Honolulu, Hawaii, USA', 'Pacific/Honolulu'),
     (72.8777, 19.0760, 'Mumbai (Bombay), India', 'Asia/Kolkata'),
 ]
-@pytest.mark.parametrize("longitude, latitude, location", coordinates)
+@pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
 @pytest.mark.mpl_image_compare  # instructs use of a baseline image
-def test_calculate_solar_time_plot(longitude, latitude, location):
-    start_date = datetime.now()
-    end_date = start_date + timedelta(days=365)  # one year from now
-    timestamps = [start_date + timedelta(days=i) for i in range((end_date - start_date).days)]
-    # timezone = 'UTC'
-    # if isinstance(timezone, str):
-    #     timezone = convert_to_timezone(timezone)  # done via a callback in cli
-    from devtools import debug
-    debug(locals())
-    timezone = pytz.timezone('UTC')
-    fig, ax = plt.subplots(figsize=(10, 6))
-        
-    for model in SolarTimeModels:
-        solar_times = [calculate_solar_time(longitude, latitude, timestamp, timezone, model=model) for timestamp in timestamps]
-        ax.plot(timestamps, solar_times, label=f'Model: {model.name}')
+def test_plot_solar_time(longitude, latitude, location, timezone):
+    return plot_solar_time(
+            longitude,
+            latitude,
+            location,
+            timezone,
+            [model],
+            )
 
-    # plt.xlabel('Date')
-    plt.ylabel('Decimal hours')
-    plt.legend()
-    plt.title(f'Solar Time Calculation for {location}')
-    fig.savefig(f'solar_time_comparison_at_{longitude}_{latitude}.png')
-
-    return fig
 
 
 # @pytest.mark.parametrize("longitude, latitude", coordinates)
