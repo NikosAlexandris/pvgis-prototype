@@ -101,7 +101,8 @@ def calculate_solar_time_skyfield(
 
     ephemeris = load('de421.bsp')
     sun = ephemeris['Sun']
-    location = wgs84.latlon(latitude * N, longitude * W)
+    # location = wgs84.latlon(latitude * N, longitude * W)
+    location = wgs84.latlon(latitude * N, longitude * E)
     f = almanac.meridian_transits(ephemeris, sun, location)
     times, events = almanac.find_discrete(midnight_time, next_midnight_time, f)
     
@@ -221,10 +222,31 @@ def calculate_solar_time_ephem(
     sun.compute(observer)  # sun position for observer's location and time
     sun_right_ascension = sun.ra
 
-    hour_angle = sidereal_time - sun_right_ascension
+    # hour_angle = sidereal_time - sun_right_ascension
+    hour_angle = sun.ha
+
+    # ------------------------------------------------------------------------
+    # Calculate the start of a new (solar) day at 0:00 hrs : `base_date`
+    reference_date = round(observer.date)
+    if reference_date > observer.date:
+        base_date = reference_date - 1.5
+    else:
+        base_date = reference_date - 0.5
+
+    # mean solar time = UTC + longitude | solar time = mean solar time + equation of time
+    mean_solar_time = ephem.date(observer.date + (observer.lon / pi * 12) * ephem.hour)
+    hour, minute, second = mean_solar_time.tuple()[3:]
+    mean_solar_time_decimal_hours = hour + minute / 60 + second / 3600  # to decimal hours
+
+    # solar time = hour angle + 12 hrs
+    solar_time_alternative = ephem.date(base_date + (hour_angle + ephem.hours('12:00')) / (2 * pi))
+    hour, minute, second = solar_time_alternative.tuple()[3:]
+    solar_time_alternative_decimal_hours = hour + minute / 60 + second / 3600
+    # ------------------------------------------------------------------------
 
     # norm -> normalise to 24h
     solar_time = ephem.hours(hour_angle + ephem.hours('12:00')).norm
+    solar_time = solar_time * 24 / pi / 2  # convert to decimal hours
 
     if verbose:
         typer.echo(f'Local sidereal time: {sidereal_time}')
@@ -296,8 +318,8 @@ def calculate_solar_time_noaa(
            - 0.002697 * cos(3 * gamma) + 0.00148 * sin(3 * gamma)
     
     # time offset in minutes ?
-    timezone_offset = timestamp.utcoffset().total_seconds() / 3600
-    time_offset = equation_of_time + 4 * longitude - 60 * timezone_offset
+    timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60
+    time_offset = 4 * (longitude - timezone_offset_minutes) + equation_of_time
 
     # the true solar time in minutes
     true_solar_time = timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
@@ -337,7 +359,7 @@ def calculate_solar_time_noaa(
     # return solar_noon_time
     if verbose:
         typer.echo(f'Local solar time: {local_solar_time}')
-    return decimal_hours, 'decimal hours?'
+    return decimal_hours, 'decimal hours'
 
 
 def calculate_solar_time_eot(
@@ -411,22 +433,32 @@ def calculate_solar_time_eot(
         except Exception as e:
             logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # Handle Me during input validation? -------------------------------------
+
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
     day_of_year = timestamp.timetuple().tm_yday
-    day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
-    time_offset = - 0.128 * np.sin(day_of_year_in_radians - perigee_offset) - eccentricity * np.sin(2 * day_of_year_in_radians + 0.34383)
 
-    # set `image_offset` for `hour_offset`
-    image_offset = get_image_offset(longitude, latitude)
+    # Equation of Time, Milne 1921 -------------------------------------------
+    # The difference of local time from UTC equals the time zone, in hours
+    local_time_minus_utc = timestamp.utcoffset().total_seconds() / 3600
+    local_standard_meridian_time = 15 * local_time_minus_utc
 
-    # set `hour_offset` for `solar_time`
-    hour_offset = time_offset_global + longitude / 15 + image_offset
+    b = radians( 360 / 365 * (day_of_year - 81))  # from degrees to radians
+    equation_of_time = 9.87 * sin(2*b) - 7.53 * cos(b) - 1.5 * sin(b)
 
-    solar_time = hour_of_year % 24 + time_offset + hour_offset
+    # ------------------------------------------------------------------------
+    longitude = np.degrees(longitude)  # the equation of time requires degrees!
+    # ------------------------------------------------------------------------
+
+    time_correction_factor = 4 * (longitude - local_standard_meridian_time) + equation_of_time
+    time_correction_factor_hours = time_correction_factor / 60
+    solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
+    solar_time = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600
+    hour_angle = 15 * (solar_time - 12)
+    # ------------------------------------------------------------------------
     
-    return solar_time, 'decimal hours?'
+    return solar_time, 'decimal hours'
 
 
 def calculate_solar_time_pvgis(
@@ -491,7 +523,7 @@ def calculate_solar_time_pvgis(
     hour_offset = time_slot_offset_global + longitude / 15 + image_offset  # for `solar_time`
     solar_time = hour_of_day + time_offset + hour_offset
     
-    return solar_time, 'decimal hours?'
+    return solar_time, 'decimal hours'
 
 
 def model_solar_time(
@@ -580,7 +612,8 @@ def model_solar_time(
             timezone,
             )
 
-    return solar_time, units
+    return (solar_time, units)
+
 
 @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
 @app.command('solar-time')
