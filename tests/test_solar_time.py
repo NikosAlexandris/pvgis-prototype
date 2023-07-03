@@ -1,3 +1,4 @@
+from devtools import debug
 import pytest
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -23,11 +24,37 @@ import numpy as np
 import random
 
 
-# import typer
-# from typer.testing import CliRunner
-# app = typer.Typer()
-# app.command()(calculate_hour_angle)
-# runner = CliRunner()
+# Set a seed to ensure agreement of plots between tests!
+random.seed(43) # Comment to really pick a random year
+random_year = random.randint(2005, 2023)
+
+
+models = [
+        SolarTimeModels.ephem,
+        SolarTimeModels.eot,
+        SolarTimeModels.noaa,
+        SolarTimeModels.pvgis,
+        SolarTimeModels.skyfield,
+]
+locations = [
+    (0, 90, 'North Pole', 'UTC'),
+    (0, -90, 'South Pole', 'UTC'),
+    (-180, 0, 'International Date Line', 'UTC'),
+    (0, 0, 'Greenwich Meridian / Equator', 'UTC'),
+    (22.358611, 40.085556, 'Όλυμπος', 'Europe/Athens'),
+    (6.6327, 46.5218, 'Lausanne, Switzerland', 'Europe/Zurich'),
+    (-74.0060, 40.7128, 'New York, USA', 'America/New_York'),
+    (-0.1278, 51.5074, 'London, UK', 'Europe/London'),
+    (151.2093, -33.8688, 'Sydney, Australia', 'Australia/Sydney'),
+    (139.6917, 35.6895, 'Tokyo, Japan', 'Asia/Tokyo'),
+    (18.4241, -33.9249, 'Cape Town, South Africa', 'Africa/Johannesburg'),
+    (-58.3816, -34.6037, 'Buenos Aires, Argentina', 'America/Argentina/Buenos_Aires'),
+    (37.6176, 55.7558, 'Moscow, Russia', 'Europe/Moscow'),
+    (103.8198, 1.3521, 'Singapore', 'Asia/Singapore'),
+    (-21.8174, 64.1265, 'Reykjavik, Iceland', 'Atlantic/Reykjavik'),
+    (-157.8583, 21.3069, 'Honolulu, Hawaii, USA', 'Pacific/Honolulu'),
+    (72.8777, 19.0760, 'Mumbai (Bombay), India', 'Asia/Kolkata'),
+]
 
 
 @pytest.mark.parametrize(
@@ -47,13 +74,6 @@ def test_calculate_solar_time_ephem_simple(
     assert result == pytest.approx(expected_solar_time)
 
 
-models = [
-        SolarTimeModels.ephem,
-        SolarTimeModels.eot,
-        SolarTimeModels.noaa,
-        SolarTimeModels.pvgis,
-        SolarTimeModels.skyfield,
-]
 coordinates = [
     (0, 90),  # 'North Pole'
     (0, -90),  # 'South Pole'
@@ -96,31 +116,8 @@ def test_calculate_solar_time(
     assert result == pytest.approx(expected_solar_time)
 
 
-# the list of models you want to test
-models = [SolarTimeModels.ephem, SolarTimeModels.eot, SolarTimeModels.pvgis]
-
-
-locations = [
-    (0, 90, 'North Pole', 'UTC'),
-    (0, -90, 'South Pole', 'UTC'),
-    (-180, 0, 'International Date Line', 'UTC'),
-    (0, 0, 'Greenwich Meridian / Equator', 'UTC'),
-    (22.358611, 40.085556, 'Όλυμπος', 'Europe/Athens'),
-    (6.6327, 46.5218, 'Lausanne, Switzerland', 'Europe/Zurich'),
-    (-74.0060, 40.7128, 'New York, USA', 'America/New_York'),
-    (-0.1278, 51.5074, 'London, UK', 'Europe/London'),
-    (151.2093, -33.8688, 'Sydney, Australia', 'Australia/Sydney'),
-    (139.6917, 35.6895, 'Tokyo, Japan', 'Asia/Tokyo'),
-    (18.4241, -33.9249, 'Cape Town, South Africa', 'Africa/Johannesburg'),
-    (-58.3816, -34.6037, 'Buenos Aires, Argentina', 'America/Argentina/Buenos_Aires'),
-    (37.6176, 55.7558, 'Moscow, Russia', 'Europe/Moscow'),
-    (103.8198, 1.3521, 'Singapore', 'Asia/Singapore'),
-    (-21.8174, 64.1265, 'Reykjavik, Iceland', 'Atlantic/Reykjavik'),
-    (-157.8583, 21.3069, 'Honolulu, Hawaii, USA', 'Pacific/Honolulu'),
-    (72.8777, 19.0760, 'Mumbai (Bombay), India', 'Asia/Kolkata'),
-]
 @pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
-@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+@pytest.mark.mpl_image_compare  # use a baseline image
 def test_plot_solar_time(longitude, latitude, location, timezone):
     return plot_solar_time(
             longitude,
@@ -131,14 +128,10 @@ def test_plot_solar_time(longitude, latitude, location, timezone):
             )
 
 
-# Set a seed to ensure agreement of plots between tests!
-random.seed(43) # Comment to really pick a random year
-random_year = random.randint(2005, 2023)
 @pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
 @pytest.mark.parametrize("year", [random_year])
-# @pytest.mark.parametrize("model", models)
 @pytest.mark.parametrize("model", [SolarTimeModels.skyfield])
-@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+@pytest.mark.mpl_image_compare
 def test_plot_solar_time_one_year(
         longitude,
         latitude,
@@ -157,13 +150,10 @@ def test_plot_solar_time_one_year(
             )
 
 
-# Set a seed to ensure agreement of plots between tests!
-random.seed(43) # Comment to really pick a random year
-random_year = random.randint(2005, 2023)
 @pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
 @pytest.mark.parametrize("year", [random_year])
 @pytest.mark.parametrize("model", models)
-@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+@pytest.mark.mpl_image_compare
 def test_plot_solar_time_one_year_bokeh_static(
         longitude,
         latitude,
@@ -183,13 +173,10 @@ def test_plot_solar_time_one_year_bokeh_static(
             )
 
 
-# Set a seed to ensure agreement of plots between tests!
-random.seed(43) # Comment to really pick a random year
-random_year = random.randint(2005, 2023)
 @pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
 @pytest.mark.parametrize("year", [random_year])
 @pytest.mark.parametrize("model", models)
-@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+@pytest.mark.mpl_image_compare
 def test_plot_solar_time_one_year_bokeh(
         longitude,
         latitude,
@@ -207,33 +194,6 @@ def test_plot_solar_time_one_year_bokeh(
             [model],
             location,
             )
-
-# @pytest.mark.parametrize("longitude, latitude", coordinates)
-# @pytest.mark.parametrize("timestamp", timestamps)
-# @pytest.mark.parametrize("timezone", timezones)
-# @pytest.mark.parametrize("expexted_solar_time", expected)
-# def test_calculate_solar_time_eot(
-#         longitude,
-#         latitude,
-#         timestamp,
-#         timezone,
-#         expexted_solar_time):
-#     result = calculate_solar_time_eot(longitude, latitude, timestamp, timezone)
-#     assert result == pytest.approx(expexted_solar_time)
-
-
-# @pytest.mark.parametrize("longitude, latitude", coordinates)
-# @pytest.mark.parametrize("timestamp", timestamps)
-# @pytest.mark.parametrize("timezone", timezones)
-# @pytest.mark.parametrize("expexted_solar_time", expected)
-# def test_calculate_solar_time_pvgis(
-#         longitude,
-#         latitude,
-#         timestamp,
-#         timezone,
-#         expexted_solar_time):
-#     result = calculate_solar_time_pvgis(longitude, latitude, timestamp, timezone)
-#     assert result == pytest.approx(expexted_solar_time)
 
 cases = [
     ( 1, -2.8875),
@@ -274,8 +234,7 @@ def test_calculate_hour_angle(solar_time, expected_hour_angle):
     assert calculated_hour_angle == pytest.approx(expected_hour_angle, 0.00000000000000001)
 
 
-import matplotlib.pyplot as plt
-@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+@pytest.mark.mpl_image_compare
 def test_calculate_hour_angle_plot():
     calculated_hour_angles = []
     expected_hour_angles = []
@@ -296,7 +255,3 @@ def test_calculate_hour_angle_plot():
     plt.title('Calculated vs Expected Hour Angles')
     plt.savefig('hour_angle_from_solat_time_calculated_vs_expected.png')
     return fig
-
-
-def test_calculate_hour_angle_sunrise():
-    pass
