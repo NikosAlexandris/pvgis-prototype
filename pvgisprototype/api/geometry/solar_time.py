@@ -50,7 +50,8 @@ from ..utilities.image_offset_prototype import get_image_offset
 
 
 class SolarTimeModels(str, Enum):
-    eot = 'eot'
+    all = 'all'
+    eot = 'EoT'
     ephem = 'ephem'
     noaa = 'NOAA'
     pvgis = 'PVGIS'
