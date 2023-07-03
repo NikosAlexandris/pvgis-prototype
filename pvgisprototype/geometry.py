@@ -57,6 +57,7 @@ def position(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
         model: Annotated[List[SolarPositionModels], typer.Option(
+            '-m',
             '--model',
             show_default=True,
             show_choices=True,
@@ -91,7 +92,12 @@ def position(
         altitude = model_result.get('Altitude', '')
         azimuth = model_result.get('Azimuth', '')
         units = model_result.get('Units', '')
-        solar_position_table.add_row(model_name, str(altitude), str(azimuth))
+        solar_position_table.add_row(
+                model_name,
+                str(altitude),
+                str(azimuth),
+                str(units),
+        )
 
     console.print(solar_position_table)
 
