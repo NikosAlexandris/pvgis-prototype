@@ -1,16 +1,20 @@
 from devtools import debug
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvgis
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_hargreaves
 import matplotlib.pyplot as plt
-import numpy as np
 from datetime import datetime
-from datetime import timezone
 from datetime import timedelta
-
-from bokeh.plotting import figure
-from bokeh.embed import json_item
+from datetime import timezone
+import numpy as np
 from bokeh.embed import components
+from bokeh.embed import json_item
+from bokeh.io import show
+from bokeh.models import Legend
+from bokeh.models import LegendItem
+from bokeh.plotting import figure
+from bokeh.plotting import output_file
+from bokeh.plotting import save
+from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
+from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_hargreaves
+from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvgis
 
 
 def days_in_year(year):
@@ -21,9 +25,9 @@ def days_in_year(year):
 
 def plot_solar_declination(start_date: datetime, end_date: datetime, title: str = 'Annual Variation of Solar Declination'):
     timestamps = [datetime(year, 1, 1) + timedelta(days=i) for i in range(end_date - start_date).days]
-    solar_declinations = np.vectorize(calculate_solar_declination)(timestamps, output_units='degrees')  # Calculate solar declination for each day
-    solar_declinations_pvgis = np.vectorize(calculate_solar_declination_pvgis)(timestamps, output_units='degrees')  # Calculate solar declination for each day
-    solar_declinations_hargreaves = np.vectorize(calculate_solar_declination_hargreaves)(timestamps)  # Calculate solar declination for each day
+    solar_declinations = np.vectorize(calculate_solar_declination)(timestamps, output_units='degrees')
+    solar_declinations_pvgis = np.vectorize(calculate_solar_declination_pvgis)(timestamps, output_units='degrees')
+    solar_declinations_hargreaves = np.vectorize(calculate_solar_declination_hargreaves)(timestamps)
 
     fig = plt.figure(figsize=(10,6))
     plt.plot(timestamps, solar_declinations, linewidth=4, alpha=0.7, label='PVIS', linestyle='-', color='#66CCCC')
@@ -59,10 +63,6 @@ def plot_solar_declination_one_year(
     plt.legend()
     plt.savefig('solar_declination.png')
     return fig
-
-from bokeh.plotting import figure, output_file, save
-from bokeh.models import Legend, LegendItem
-from bokeh.io import show
 
 
 def plot_solar_declination_one_year_bokeh(
