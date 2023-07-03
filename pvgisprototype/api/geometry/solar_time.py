@@ -11,6 +11,7 @@ logging.basicConfig(
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import List
 from enum import Enum
 from datetime import datetime
 from datetime import time as datetime_time
@@ -34,6 +35,7 @@ from math import sin
 from math import cos
 from math import tan 
 from math import acos
+from math import radians
 from ..constants import HOUR_ANGLE
 from ..constants import UNDEF
 from ..constants import double_numpi
@@ -254,6 +256,16 @@ def calculate_solar_time_noaa(
     -------
 
     (solar_time, units): float, str
+
+    Notes
+    -----
+    
+    The General Solar Position Calculations provided by the NOAA Global
+    Monitoring Division are well known sets of simplified equations.
+
+    See also:
+
+        - https://unpkg.com/solar-calculator@0.1.0/index.js
     """
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -351,17 +363,29 @@ def calculate_solar_time_eot(
 ):
     """Calculate the solar time.
 
-    Convert this one to use Milne's_ equation of time?
+    - Local Time (LT)
 
-    1. Map the day of the year onto the circumference of a circle, essentially
-    converting the day of the year into radians.
+    - Local Standard Time Meridian (LSTM)
+    
+        - 15°= 360°/24 hours.
+        - Examples:
+            - Sydney Australia is UTC +10 so the LSTM is 150 °E.
+            - Phoenix, USA is UTC -7 so the LSTM is 105 °W
 
-    2. Approximate empirically the equation of time, which accounts for the
-    elliptical shape of Earth's orbit and the tilt of its axis.
+    - The equation of time (EoT) (in minutes) is an empirical equation that
+      corrects for the eccentricity of the Earth's orbit and the Earth's axial
+      tilt. An approximation accurate to within ½ minute is:
 
-    3. Calculate the solar time by adding the current hour of the year, the
-    time offset from the equation of time, and the hour offset (likely a
-    longitude-based correction).
+      EoT = 9.87 * sin(2*B) - 7.53 * cos(B) - 1.5 * sin(B)
+
+        where:
+
+        - DeltaTUTC : Local time minus UTC, in hours, also equal to the time zone
+        - B = 360 / 365 * (day_of_year - 81)  # in degrees
+        - Time correction factor = 4 * (longitude - LSTM) + EoT
+
+    - Solar time (or local solar time) = LT +  TC / 60
+    - Hour angle = 15 * (LST - 12)
 
     Notes
     -----
