@@ -493,15 +493,18 @@ def calculate_solar_time_pvgis(
     return solar_time, 'decimal hours?'
 
 
-def calculate_solar_time(
+def model_solar_time(
         longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians, min=-180, max=180)],
+            callback=convert_to_radians,
+            min=-180, max=180)],
         latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians, min=-90, max=90)],
+            callback=convert_to_radians,
+            min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp', default_factory=now_datetime)],
+            help='Timestamp',
+            default_factory=now_datetime)],
         timezone: Annotated[Optional[str], typer.Option(
-            help='Specify timezone (e.g., "Europe/Athens"). Use \'local\' to use the system\'s time zone',
+            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
         model: Annotated[SolarTimeModels, typer.Option(
             '-m',
@@ -577,6 +580,65 @@ def calculate_solar_time(
             )
 
     return solar_time, units
+
+@app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
+@app.command('solar-time')
+def calculate_solar_time(
+        longitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-180, max=180)],
+        latitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-90, max=90)],
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime)],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+            callback=ctx_convert_to_timezone)] = None,
+        models: Annotated[List[SolarTimeModels], typer.Option(
+            '-m',
+            '--model',
+            help="Model to calculate solar position",
+            show_default=True,
+            show_choices=True,
+            case_sensitive=False)] = [SolarTimeModels.skyfield],
+        days_in_a_year: Annotated[float, typer.Option(
+            help='Days in a year')] = 365.25,
+        perigee_offset: Annotated[float, typer.Option(
+            help='Perigee offset')] = 0.048869,
+        eccentricity: Annotated[float, typer.Option(
+            help='Eccentricity')] = 0.01672,
+        time_offset_global: Annotated[float, typer.Option(
+            help='Global time offset')] = 0,
+        hour_offset: Annotated[float, typer.Option(
+            help='Hour offset')] = 0,
+):
+    """
+    Calculates the solar time using all models and returns the results in a table.
+    """
+    results = []
+    for model in models:
+        if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
+            solar_time, units = model_solar_time(
+                    longitude,
+                    latitude,
+                    timestamp,
+                    timezone,
+                    model,
+                    days_in_a_year,
+                    perigee_offset,
+                    eccentricity,
+                    time_offset_global,
+                    hour_offset,
+                    )
+            results.append({
+                'Model': model.value,
+                'Solar time': solar_time,
+                'Units': units,  # Don't trust me -- Redesign Me!
+            })
+
+    return results
 
 
 def calculate_hour_angle(
