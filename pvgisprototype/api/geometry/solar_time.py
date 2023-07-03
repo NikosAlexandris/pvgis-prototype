@@ -83,10 +83,11 @@ def calculate_solar_time_skyfield(
     (decimal_hours, units): float, str
     """
     # Handle Me during input validation? -------------------------------------
-    try:
-        timestamp = timezone.localize(timestamp)
-    except Exception:
-        logging.warning(f'tzinfo {timezone} already set for timestamp = {timestamp}')
+    if timezone != timestamp.tzinfo:
+        try:
+            timestamp = timestamp.astimezone(timezone)
+        except Exception as e:
+            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # Handle Me during input validation? -------------------------------------
 
     midnight = timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -199,6 +200,14 @@ def calculate_solar_time_ephem(
         sidereal time (`observer.sidereal_time()`) gives the time elapsed since
         the Sun was at the observer's local meridian.
     """
+    # Handle Me during input validation? -------------------------------------
+    if timezone != timestamp.tzinfo:
+        try:
+            timestamp = timestamp.astimezone(timezone)
+        except Exception as e:
+            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
+    # Handle Me during input validation? -------------------------------------
+
     observer = ephem.Observer()
     observer.date = timestamp
     observer.lon = longitude
@@ -247,10 +256,11 @@ def calculate_solar_time_noaa(
     (solar_time, units): float, str
     """
     # Handle Me during input validation? -------------------------------------
-    try:
-        timestamp = timezone.localize(timestamp)
-    except Exception:
-        logging.warning(f'tzinfo already set for timestamp = {timestamp}')
+    if timezone != timestamp.tzinfo:
+        try:
+            timestamp = timestamp.astimezone(timezone)
+        except Exception as e:
+            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # Handle Me during input validation? -------------------------------------
 
     # utc_offset_hours = timestamp.utcoffset().total_seconds() / 3600
@@ -369,6 +379,13 @@ def calculate_solar_time_eot(
         journal = {The Mathematical Gazette}
     }
     """
+    # Handle Me during input validation? -------------------------------------
+    if timezone != timestamp.tzinfo:
+        try:
+            timestamp = timestamp.astimezone(timezone)
+        except Exception as e:
+            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
+    # Handle Me during input validation? -------------------------------------
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
@@ -422,6 +439,13 @@ def calculate_solar_time_pvgis(
     solar_time: float
         The solar time in decimal hours
     """
+    # Handle Me during input validation? -------------------------------------
+    if timezone != timestamp.tzinfo:
+        try:
+            timestamp = timestamp.astimezone(timezone)
+        except Exception as e:
+            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
+    # Handle Me during input validation? -------------------------------------
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     day_of_year = timestamp.timetuple().tm_yday

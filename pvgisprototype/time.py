@@ -78,6 +78,13 @@ def solar_time(
     time offset from the equation of time, and the hour offset (likely a
     longitude-based correction).
     """
+    # Handle Me during input validation? -------------------------------------
+    if timezone != timestamp.tzinfo:
+        try:
+            timestamp = timestamp.astimezone(timezone)
+        except Exception as e:
+            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
+    # Handle Me during input validation? -------------------------------------
     solar_time = calculate_solar_time(
             longitude,
             latitude,
