@@ -160,22 +160,19 @@ def ctx_convert_to_timezone( ctx: typer.Context, param: typer.CallbackParam, val
 
 def attach_timezone(
         timestamp: Optional[datetime] = None,
-        timezone: Optional[str] = None
-        ) -> datetime:
-    """Convert datetime object to timezone-aware.
-    """
-    if timestamp is None:
-        timestamp = datetime.utcnow()  # Default to UTC
+        timezone_string: Optional[str] = None
+) -> datetime:
+    """Convert datetime object to timezone-aware."""
 
-    if isinstance(timezone, str):
+    if timestamp is None:
+        timestamp = datetime.now(ZoneInfo('UTC'))  # Default to UTC
+
+    if isinstance(timezone_string, str):
         try:
-            tzinfo = convert_to_timezone(timezone)
+            tzinfo = convert_to_timezone(timezone_string)
+            timestamp = timestamp.replace(tzinfo=tzinfo)
         except Exception as e:
             raise ValueError(f"Could not convert timezone: {e}")
-    else:  # If timezone is not a string, it should be a datetime.tzinfo object
-        tzinfo = timezone
-    
-    timestamp = timestamp.replace(tzinfo=pytz.UTC).astimezone(tzinfo)
 
     return timestamp
 
