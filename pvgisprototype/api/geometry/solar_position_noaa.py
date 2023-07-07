@@ -20,6 +20,7 @@ from ..utilities.conversions import convert_to_degrees_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
 from .decorators import validate_with_pydantic
 from .models import CalculateFractionalYearNOAAInput
+from .models import CalculateEquationOfTimeNOAAInput
 from zoneinfo import ZoneInfo
 
 
@@ -57,7 +58,14 @@ def calculate_fractional_year_noaa(
             raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
     return fractional_year, output_units
 
-def equation_of_time_noaa(fractional_year: float) -> float:
+
+@validate_with_pydantic(CalculateEquationOfTimeNOAAInput)
+def calculate_equation_of_time_noaa(
+    timestamp: datetime,
+    output_units: Optional[str] = "minutes",
+) -> float:
+    """Calculate the equation of time in minutes"""
+    fractional_year, _units = calculate_fractional_year_noaa(timestamp)
     equation_of_time = 229.18 * (
         0.000075
         + 0.001868 * cos(fractional_year)
@@ -65,8 +73,12 @@ def equation_of_time_noaa(fractional_year: float) -> float:
         - 0.014615 * cos(2 * fractional_year)
         - 0.040849 * sin(2 * fractional_year)
     )
-    return equation_of_time
 
+    # Validate
+    if not -20 <= equation_of_time <= 20:
+        raise ValueError("The equation of time must be within the range [-20, 20] minutes")
+
+    return equation_of_time, output_units
 
 def calculate_solar_declination_noaa(fractional_year: float) -> float:
     declination = (
