@@ -18,17 +18,22 @@ from typing import Tuple
 from typing import Union
 from ..utilities.conversions import convert_to_degrees_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
+from .decorators import validate_with_pydantic
+from .models import CalculateFractionalYearNOAAInput
 from zoneinfo import ZoneInfo
 
 
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
+
+
 class SolarPositionData(BaseModel):
     longitude: float = Field(..., ge=-180, le=180)
     latitude: float = Field(..., ge=-90, le=90)
     timestamp: Optional[datetime] = Field(default_factory=datetime.now)
 
 
+@validate_with_pydantic(CalculateFractionalYearNOAAInput)
 def calculate_fractional_year_noaa(
         timestamp: datetime,
         output_units: Optional[str] = "radians",
@@ -41,7 +46,15 @@ def calculate_fractional_year_noaa(
         * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
     )
 
+    if not 0 <= fractional_year < 2 * pi:
+        raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
+
     fractional_year = convert_to_degrees_if_requested(fractional_year, output_units)
+
+    # Validate
+    if output_units == 'degrees':
+        if not 0 <= fractional_year < 360:
+            raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
     return fractional_year, output_units
 
 def equation_of_time_noaa(fractional_year: float) -> float:
