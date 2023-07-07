@@ -47,47 +47,59 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f"PVGIS core CLI prototype",
 )
+
+
 # app_completion = typer.Typer(help="Generate and install completion scripts.", hidden=True)
 # app.add_typer(app_completion, name="completion")
-app.add_typer(
-    irradiance.app,
-    name="irradiance",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_pv,
-)
-app.add_typer(
-    tmy.app,
-    name="tmy",
-     no_args_is_help=True,
-     rich_help_panel=rich_help_panel_pv,
-)
+
+# @app_completion.command(no_args_is_help=True, help="Show completion for the specified shell, to copy or customize it.")
+# def show(ctx: typer.Context, shell: Shells) -> None:
+#     typer.completion.show_callback(ctx, None, shell)
+
+# @app_completion.command(no_args_is_help=True, help="Install completion for the specified shell.")
+# def install(ctx: typer.Context, shell: Shells) -> None:
+#     typer.completion.install_callback(ctx, None, shell)
+
+
 app.add_typer(
         energy.app,
         name="energy",
         no_args_is_help=True,
-        rich_help_panel=rich_help_panel_pv,
+        rich_help_panel=rich_help_panel_performance,
 )
 app.add_typer(
-        series.app,
-        name="series",
-        no_args_is_help=True,
-        rich_help_panel=rich_help_panel_pv,
-)
-app.add_typer(
-    geometry.app,
-    name="geometry",
+    irradiance.app,
+    name="irradiance",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_toolbox,
+    rich_help_panel=rich_help_panel_series
+)
+app.add_typer(
+        meteorology.app,
+        name="meteorology",
+        no_args_is_help=True,
+        rich_help_panel=rich_help_panel_series,
 )
 app.add_typer(
         time.app,
         name="time",
         no_args_is_help=True,
-        rich_help_panel=rich_help_panel_toolbox,
+        rich_help_panel=rich_help_panel_geometry,
+)
+app.add_typer(
+    position.app,
+    name="position",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_geometry,
+)
+app.add_typer(
+        time.app,
+        name="surface",
+        no_args_is_help=True,
+        rich_help_panel=rich_help_panel_geometry,
 )
 app.add_typer(
     utilities.app,
-    name="helpers",
+    name="utilities",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_toolbox,
 )
@@ -97,14 +109,6 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_reference,
 )
-
-
-# @app_completion.command(no_args_is_help=True, help="Show completion for the specified shell, to copy or customize it.")
-# def show(ctx: typer.Context, shell: Shells) -> None:
-#     typer.completion.show_callback(ctx, None, shell)
-# @app_completion.command(no_args_is_help=True, help="Install completion for the specified shell.")
-# def install(ctx: typer.Context, shell: Shells) -> None:
-#     typer.completion.install_callback(ctx, None, shell)
 
 
 def _version_callback(value: bool) -> None:
