@@ -15,9 +15,11 @@ from tzlocal import get_localzone
 import math
 import numpy as np
 
-from .api.utilities.timestamp import now_datetime
-from .api.utilities.timestamp import ctx_convert_to_timezone
 from .api.utilities.timestamp import attach_timezone
+from .api.utilities.timestamp import ctx_attach_requested_timezone
+from .api.utilities.timestamp import ctx_convert_to_timezone
+from .api.utilities.timestamp import now_datetime
+from .api.utilities.timestamp import random_datetimezone
 from .api.utilities.conversions import convert_to_radians
 from .api.utilities.conversions import convert_to_degrees_if_requested
 from .api.geometry.solar_time import SolarTimeModels
@@ -44,7 +46,9 @@ def solar_time(
             min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_datetime,
+            callback=ctx_attach_requested_timezone,
+            )],
         timezone: Annotated[Optional[str], typer.Option(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
