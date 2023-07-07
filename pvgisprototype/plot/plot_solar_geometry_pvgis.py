@@ -49,10 +49,6 @@ def plot_sunrise_sunset(longitude: float, latitude: float, start_date: datetime.
     plt.savefig(f'solar_sun_rise_set_at_longitude_{longitude}_latitude_{latitude}.png')
     return fig
 
-# Set a seed to ensure agreement of plots between tests!
-random.seed(43) # Comment to really pick a random year
-year = random.randint(2005, 2020)
-
 
 def plot_solar_geometry_pvgis_variables(longitude:float, latitude: float, start_date: datetime.datetime, end_date: datetime.datetime):
     """
