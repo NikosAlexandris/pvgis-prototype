@@ -11,7 +11,7 @@ from rich.table import Table
 from rich import box
 
 from datetime import datetime
-from tzlocal import get_localzone
+from zoneinfo import ZoneInfo
 import math
 import numpy as np
 
@@ -82,13 +82,18 @@ def solar_time(
     time offset from the equation of time, and the hour offset (likely a
     longitude-based correction).
     """
-    # Handle Me during input validation? -------------------------------------
-    if timezone != timestamp.tzinfo:
-        try:
-            timestamp = timestamp.astimezone(timezone)
-        except Exception as e:
-            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
-    # Handle Me during input validation? -------------------------------------
+    # Convert the input timestamp to UTC, for _all_ internal calculations
+    utc_zoneinfo = ZoneInfo("UTC")
+    if timestamp.tzinfo != utc_zoneinfo:
+
+        # Note the input timestamp and timezone
+        user_requested_timestamp = timestamp
+        user_requested_timezone = timezone
+
+        timestamp = timestamp.astimezone(utc_zoneinfo)
+        timezone = utc_zoneinfo
+        typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
+    
     # Why does the callback function `_parse_model` not work? 
     if SolarTimeModels.all in model:
         model = [model for model in SolarTimeModels if model != SolarTimeModels.all]
