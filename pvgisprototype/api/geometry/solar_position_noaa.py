@@ -23,6 +23,7 @@ from .models import CalculateFractionalYearNOAAInput
 from .models import CalculateSolarDeclinationNOAAInput
 from .models import CalculateEquationOfTimeNOAAInput
 from .models import CalculateTimeOffsetNOAAInput
+from .models import CalculateTrueSolarTimeNOAAInput
 from zoneinfo import ZoneInfo
 
 
@@ -180,6 +181,13 @@ def calculate_time_offset_noaa(
         raise ValueError("The time offset must range within [-720, 720] minutes ?")
 
     return time_offset, output_units
+
+@validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
+def calculate_true_solar_time_noaa(
+        longitude: float,
+        timestamp: datetime, 
+        timezone: Optional[ZoneInfo],
+        output_units: Optional[str] = 'minutes',
     ) -> float:
     """Calculate the true solar time.
 
@@ -198,11 +206,19 @@ def calculate_time_offset_noaa(
     """
     if timezone != timestamp.tzinfo:
         try:
-            timestamp = timestamp.astimezone(pytz.timezone(timezone))
+            timestamp = timestamp.astimezone(timezone)
         except pytz.UnknownTimeZoneError as e:
             logging.warning(f'Unknown timezone: {e}')
             raise
-    return timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
+    
+    time_offset, _units = calculate_time_offset_noaa(longitude, timestamp)  # in minutes
+    true_solar_time = timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
+
+    # Validate output
+    if not 0 <= true_solar_time <= 1440:
+        raise ValueError("The true solar time must range within [0, 1440] minutes")
+
+    return true_solar_time, output_units
 
 
 def calculate_hour_angle_noaa(
