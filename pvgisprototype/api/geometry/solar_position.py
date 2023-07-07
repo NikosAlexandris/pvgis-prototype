@@ -18,13 +18,17 @@ from .solar_altitude import calculate_solar_altitude
 from .solar_azimuth import calculate_solar_azimuth
 from .solar_declination import calculate_solar_declination
 from .solar_geometry_skyfield import calculate_solar_position_skyfield
+from .solar_geometry_skyfield import calculate_solar_altitude_azimuth_skyfield
 from .solar_geometry_pvgis import calculate_solar_position_pvgis
 from .solar_geometry_pvgis import calculate_solar_time_pvgis
 from .solar_geometry_pvgis import calculate_solar_geometry_pvgis_constants
+from .solar_position_noaa import calculate_solar_altitude_noaa
+from .solar_position_noaa import calculate_solar_azimuth_noaa
 
 
 class SolarPositionModels(str, Enum):
     all = 'all'
+    noaa = 'NOAA'
     pysolar = 'pysolar'
     pvis = 'pvis'
     pvgis = 'PVGIS'
@@ -39,7 +43,6 @@ app = typer.Typer(
 )
 
 
-
 def _parse_model(ctx: typer.Context, model: List[SolarPositionModels], param: typer.CallbackParam) -> List[SolarPositionModels]:
 
     print(f'ctx : {ctx}')
@@ -51,7 +54,6 @@ def _parse_model(ctx: typer.Context, model: List[SolarPositionModels], param: ty
     if SolarPositionModels.all in model:
         # Return all models except for the 'all' itself!
         model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-    debug(locals())
     print(f"Return model: {model}")
     return model
 
@@ -76,6 +78,11 @@ def model_solar_position(
             show_choices=True,
             case_sensitive=False,
             help="Model to calculate solar position")] = SolarPositionModels.skyfield,
+        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
+            '-a',
+            '--atmospheric-refraction',
+            help='Apply atmospheric refraction functions',
+            )] = False,
         output_units: Annotated[str, typer.Option(
             '-u',
             '--output-units',
@@ -84,19 +91,46 @@ def model_solar_position(
             help="Output units for solar declination (degrees or radians)")] = 'radians',
         ):
     """
+    The solar altitude angle measures from the horizon up towards the zenith
+    (positive, and down towards the nadir (negative)). The altitude is zero all
+    along the great circle between zenith and nadir.
+
+    The solar azimuth angle measures horizontally around the horizon from north
+    through east, south, and west.
 
     Notes
     -----
 
-    - All solar calculation functions return floating angular measurements in radians
+    - All solar calculation functions return floating angular measurements in
+      radians.
     """
-    if model.value == SolarPositionModels.skyfield:
-        solar_altitude, solar_azimuth, distance_to_sun = calculate_solar_position_skyfield(
+    if model.value == SolarPositionModels.noaa:
+
+        solar_altitude, units = calculate_solar_altitude_noaa(
                 longitude,
                 latitude,
                 timestamp,
                 timezone,
-                # output_units,
+                output_units,
+                )
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
+
+        solar_azimuth, units = calculate_solar_azimuth_noaa(
+                longitude,
+                latitude,
+                timestamp,
+                timezone,
+                apply_atmospheric_refraction,
+                output_units,
+                )
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
+    if model.value == SolarPositionModels.skyfield:
+        solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
+                longitude,
+                latitude,
+                timestamp,
+                timezone,
+                output_units,
                 )
         solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
         solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
