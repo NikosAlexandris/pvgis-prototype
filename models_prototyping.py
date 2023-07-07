@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from pydantic import validator
 from typing import Optional
 from zoneinfo import ZoneInfo
+from pydantic import ConstrainedFloat
 
 
 class BaseTimeInputModel(BaseModel):
@@ -29,3 +30,25 @@ class BaseTimeOutputUnitsModel(BaseModel):
         if v not in valid_units:
             raise ValueError(f"output_units must be one of {valid_units}")
         return v
+
+
+class Longitude(ConstrainedFloat):
+    ge = -180
+    le = 180
+
+
+class Latitude(ConstrainedFloat):
+    ge = -90
+    le = 90
+
+
+class BaseLongitudeInputModel(BaseModel):
+    longitude: Longitude
+
+
+class BaseLatitudeInputModel(BaseModel):
+    latitude: Latitude
+
+
+class BaseCoordinatesInputModel(BaseLongitudeInputModel, BaseLatitudeInputModel):
+    pass
