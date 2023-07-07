@@ -2,9 +2,13 @@ from devtools import debug
 import logging
 import matplotlib.pyplot as plt
 from bokeh.embed import components
+from bokeh.layouts import column
+from bokeh.models import ColumnDataSource
+from bokeh.models import RangeTool
 from bokeh.models import Legend
-from bokeh.models import Legend, LegendItem
+from bokeh.models import LegendItem
 from bokeh.plotting import figure
+from bokeh.plotting import figure, show
 from bokeh.plotting import output_file
 from bokeh.plotting import save
 from bokeh.plotting import show
@@ -70,14 +74,15 @@ def plot_solar_time_one_year(
         models,
         location,
     ):
+    print(f'Location : {location}')
     timezone = pytz.timezone(timezone)
     timestamps = [datetime(year, 1, 1, tzinfo=timezone) + timedelta(days=i) for i in range((datetime(year+1, 1, 1, tzinfo=timezone) - datetime(year, 1, 1, tzinfo=timezone)).days)]
 
     results = {}
-    for model in track(models, description=f'Models {models}'):
+    for model in models:
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
             solar_times = []
-            for timestamp in timestamps:
+            for timestamp in track(timestamps, description=f'Calculating solar time after {model}'):
                 solar_time, unit = model_solar_time(longitude, latitude, timestamp, timezone, model)
                 solar_times.append(solar_time)
             results[model.value] = {'location': location, 'timezone': timezone, 'year': year, 'solar_times': solar_times, 'unit': unit}  # Add model solar_times to results
@@ -113,22 +118,38 @@ def plot_solar_time_one_year_bokeh_static(
         models,
         location,
     ):
+
+    # Get the timezone right!
     timezone = pytz.timezone(timezone)
+
+    # Build the time series
     timestamps = [datetime(year, 1, 1, tzinfo=timezone) + timedelta(days=i) for i in range((datetime(year+1, 1, 1, tzinfo=timezone) - datetime(year, 1, 1, tzinfo=timezone)).days)]
 
+    # Create a dictionary for the source data
+    source_data = {'timestamps': timestamps}
+
+    # Calculate and collect solar times for each model
     results = {}
-    for model in track(models, description=f'Models {models}'):
+    for model in models:
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
             solar_times = []
-            for timestamp in timestamps:
+            for timestamp in track(timestamps, description='Calculating solar time after {model}'):
                 solar_time, unit = model_solar_time(longitude, latitude, timestamp, timezone, model)
                 solar_times.append(solar_time)
             results[model.value] = {'location': location, 'timezone': timezone, 'year': year, 'solar_times': solar_times, 'unit': unit}  # Add model solar_times to results
+            source_data[model.value] = solar_times  # Add model solar_times to source data
 
-    # output to static HTML file
-    output_file(f"solar_time_at_{location}_{year}.html")
+    # Define the `source`
+    source = ColumnDataSource(source_data)
 
-    p = figure(x_axis_type='datetime', width=800, height=350, title=f'Variation of Solar Time at {location} in {year}')
+    # Initialise the figure
+    p = figure(
+        x_axis_type="datetime",
+        title=f"Variation of Solar Time at {location} in {year}",
+        width=800,
+    )
+
+    # A list for
     legend_items = []
 
     # Plot
@@ -146,13 +167,44 @@ def plot_solar_time_one_year_bokeh_static(
             line_width=style["line_width"],
             line_dash=style["line_dash"],
         )
+        
         legend_items.append((model, [line]))
 
-    # add a legend
+    # Add the legend
     legend = Legend(items=legend_items)
     p.add_layout(legend, 'right')
 
-    show(p)
+    #
+    select = figure(
+            title="Drag the middle and edges of the selection box to change the range above",
+            height=130,
+            width=800,
+            x_axis_type="datetime",
+            x_range=(timestamps[100], timestamps[200]),
+            x_axis_location="above",
+            y_axis_type=None,
+            tools='xpan',
+            toolbar_location=None,
+            background_fill_color="#efefef"
+    )
+
+    #
+    range_tool = RangeTool(x_range=p.x_range)
+    range_tool.overlay.fill_color = "navy"
+    range_tool.overlay.fill_alpha = 0.2
+
+    # Create the range tool plot
+    for model in results.keys():
+        select.line('timestamps', model, source=source, color='gray')
+
+    select.ygrid.grid_line_color = None
+    select.add_tools(range_tool)
+
+    # Output to static HTML file
+    output_file(f"solar_time_at_{location}_{year}.html")
+
+    # Show both plots
+    show(column(p, select))
 
 
 def plot_solar_time_one_year_bokeh(
@@ -168,7 +220,7 @@ def plot_solar_time_one_year_bokeh(
     timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime
 
     results = {}
-    for model in track(models, description = f'Model : {model}'):
+    for model in models:
         # print(f'Model : {model}')
         print(f'Model in class ? : {SolarTimeModels(model)}')
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
