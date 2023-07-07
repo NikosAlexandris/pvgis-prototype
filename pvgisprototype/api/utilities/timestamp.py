@@ -48,17 +48,29 @@ Read also:
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
-import pytz
+from typing import Annotated
+from typing import Optional
 from tzlocal import get_localzone
 import calendar
-import time
 import random
+import time
+import typer
+import zoneinfo
+from zoneinfo import ZoneInfo
+from rich import print
 
 
-def now_datetime():
+app = typer.Typer()
+
+
+def now_datetime() -> datetime:
+    """Returns the current datetime in UTC.
+
+    Return an aware timestamp using the local system time, however defaulting
+    to UTC timezone. 
     """
-    """
-    return datetime.now().astimezone()
+    return datetime.now(ZoneInfo('UTC'))
+
 
 
 def random_datetimezone():
