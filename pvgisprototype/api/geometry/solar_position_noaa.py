@@ -20,6 +20,7 @@ from ..utilities.conversions import convert_to_degrees_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
 from .decorators import validate_with_pydantic
 from .models import CalculateFractionalYearNOAAInput
+from .models import CalculateSolarDeclinationNOAAInput
 from .models import CalculateEquationOfTimeNOAAInput
 from zoneinfo import ZoneInfo
 
@@ -80,7 +81,15 @@ def calculate_equation_of_time_noaa(
 
     return equation_of_time, output_units
 
-def calculate_solar_declination_noaa(fractional_year: float) -> float:
+
+@validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
+def calculate_solar_declination_noaa(
+        timestamp: datetime,
+        output_units: Optional[str] = 'radians'
+) -> float:
+    """Calculate the solar declination in radians"""
+    # debug(locals())
+    fractional_year, _units = calculate_fractional_year_noaa(timestamp, output_units)
     declination = (
         0.006918
         - 0.399912 * cos(fractional_year)
@@ -90,7 +99,8 @@ def calculate_solar_declination_noaa(fractional_year: float) -> float:
         - 0.002697 * cos(3 * fractional_year)
         + 0.00148 * sin(3 * fractional_year)
     )
-    return declination
+    declination = convert_to_degrees_if_requested(declination, output_units)
+    return declination, output_units
 
 
 def calculate_time_offset_noaa(
