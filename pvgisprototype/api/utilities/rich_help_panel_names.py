@@ -1,0 +1,11 @@
+rich_help_panel_performance = 'Performance'  # 1
+rich_help_panel_series = 'Time series'  # 1
+rich_help_panel_series_irradiance = 'Solar irradiance'          # level 2
+rich_help_panel_series_meteorology = 'Meteorology'              # level 2
+rich_help_panel_geometry = 'Solar geometry'  # 1
+rich_help_panel_geometry_time = 'Solar time'                    # level 2
+rich_help_panel_geometry_position = 'Solar position'            # level 2
+rich_help_panel_geometry_refraction = 'Atmospheric refraction'  # level 2
+rich_help_panel_geometry_surface = 'Solar surface'              # level 2
+rich_help_panel_toolbox = 'Toolbox'  # 1
+rich_help_panel_reference = 'Reference'  # 1
