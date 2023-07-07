@@ -1,6 +1,49 @@
 import typer
 from typing import Annotated
 from typing import Optional
+"""
+Date, time and zones
+--------------------
+
+By default, input timestamps will default to the Coordinated Universal Time
+(UTC) unless a user explicitly requests another or the system's local time and
+zone. Regardless, all timestamps will convert internally to UTC. The rationale
+behind this design decision is:
+
+- UTC provides an unambiguous reference point as it does not observe Daylight
+Saving Time (DST) which may bring in various complexities.
+
+- UTC is a standard used worldwide, making it a safer choice for
+interoperability.
+
+- Using UTC can avoid issues when a server/system's local time zone may not be
+  under control.
+
+- While the software allows users to to specify their time zone if they wish,
+  internally all timestamps will convert to UTC internally and only convert
+  back to the user's time zone when displaying the time to the user.
+
+
+Things to keep in mind:
+
+> From: https://blog.ganssle.io/articles/2022/04/naive-local-datetimes.html
+
+- The local offset may change during the course of the interpreter run.
+
+- You can use datetime.astimezone with None to convert a naïve time into an
+  aware datetime with a fixed offset representing the current system local
+  time.
+
+- All arithmetic operations should be applied to naïve datetimes when working
+  in system local civil time — only call .astimezone(None) when you need to
+  represent an absolute time, e.g. for display or comparison with aware
+  datetimes.[3]
+
+
+Read also:
+
+- https://peps.python.org/pep-0615/
+"""
 
 from datetime import datetime
 from datetime import timedelta
