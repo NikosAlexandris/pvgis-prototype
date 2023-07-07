@@ -131,36 +131,25 @@ def random_datetimezone() -> tuple:
     return datetimestamp, timezone
 
 
-
-    return decimal_hours
-
-
+def convert_to_timezone(timezone_string: str) -> ZoneInfo:
+    """Convert string to ZoneInfo object."""
 
 
-def convert_to_timezone(string: str):
-    """Convert string to `tzinfo` timezone object
-    """
-    if string is None:
-        tzinfo = pytz.timezone('UTC')
+    if timezone_string is None:
+        print(f'Setting timezone to UTC')
+        return ZoneInfo('UTC')
 
-    elif isinstance(string, str):
-        if string == "local":
-            try:
-                tzinfo = get_localzone()
-            except Exception:
-                tzinfo = pytz.timezone('UTC')
-                typer.echo("Unable to determine local timezone. Defaulting to UTC.")
-        else:
-            try:
-                tzinfo = pytz.timezone(string)
-            except pytz.UnknownTimeZoneError:
-                typer.echo(f"Unknown timezone: {string}. Please input a valid timezone.")
-                raise typer.Exit(code=1)
-    # if input is not a string, it _should_ be a `tzinfo` object
-    else:  
-        tzinfo = string
+    else:
+        try:
+            if timezone == 'local':
+                return datetime.now().astimzone(None).tzinfo
 
-    return tzinfo
+            else:
+                return ZoneInfo(timezone_string)
+
+        except (zoneinfo.ZoneInfoNotFoundError, Exception):
+            print(f"Requested zone {timezone} not found. Setting it to UTC.")
+            return ZoneInfo('UTC')
 
 
 def ctx_convert_to_timezone( ctx: typer.Context, param: typer.CallbackParam, value: str):
