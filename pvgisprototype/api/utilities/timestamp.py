@@ -72,6 +72,46 @@ def now_datetime() -> datetime:
     return datetime.now(ZoneInfo('UTC'))
 
 
+def ctx_attach_requested_timezone(
+        ctx: typer.Context,
+        timestamp: datetime,
+        param: typer.CallbackParam,
+        # verbose: bool = False,
+    ) -> datetime:
+    """Returns the current datetime in the user-requested timezone."""
+
+    timezone = ctx.params.get('timezone')
+    if timestamp.tzinfo is not None:
+        # --------------------------------------------------------------------
+        print("WARNING: The provided timestamp already has a timezone.")  # Convert to warning!
+        print("Please ensure the timestamp is provided as a naive datetime object.")
+        print("Usage example: YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD")
+        # --------------------------------------------------------------------
+        return timestamp
+
+    if timezone is None:
+        # --------------------------------------------------------------------
+        print('No timezone requested. Setting timezone to UTC.')  # Convert to warning!
+        # --------------------------------------------------------------------
+        timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+
+    else:
+        try:
+            # --------------------------------------------------------------------
+            print(f'Attaching the {timezone} to the {timestamp}')  # Convert to warning!
+            # --------------------------------------------------------------------
+            timezone_aware_timestamp = timestamp.replace(tzinfo=timezone)
+
+        except Exception as e:
+            print(f'Failed to attach the requested timezone \'{timezone}\' to the timestamp: {e}')
+            print("Defaulting to UTC timezone.")
+            timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+    # if verbose:
+    #     print(f'Input timestamp    : {timestamp}')
+    #     print(f'Requested timezone : {timezone} of type \'{type(timezone)}\'')
+    #     # add verbosity...
+    return timezone_aware_timestamp
+
 
 def random_datetimezone() -> tuple:
     """
