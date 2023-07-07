@@ -54,6 +54,14 @@ def plot_solar_time(longitude, latitude, location, timezone, model):
     return fig
 
 
+styles_for_solar_time_one_year = {
+    'ephem':    {'color': 'blue',    'linewidth': 2, 'linestyle': '-' },
+    'EoT':      {'color': '#00BFFF', 'linewidth': 3, 'linestyle': '--'},
+    'NOAA':     {'color': 'green',   'linewidth': 4, 'linestyle': '-.'},
+    'PVGIS':    {'color': 'red',     'linewidth': 5, 'linestyle': ':' },
+    'Skyfield': {'color': '#9966CC', 'linewidth': 6, 'linestyle': ':' },
+}
+
 def plot_solar_time_one_year(
         longitude,
         latitude,
@@ -76,9 +84,9 @@ def plot_solar_time_one_year(
 
     plt.figure(figsize=(10, 6))
 
-    for model, data in results.items():
+    for model, data in track(results.items(), description=f'Plotting data after {model}'):
         solar_times = data['solar_times']
-        plt.plot(timestamps, solar_times, label=model)
+        plt.plot(timestamps, solar_times, label=model, **styles_for_solar_time_one_year[model])
 
     # plt.xlabel('Day of the Year')
     plt.ylabel('decimal hours')
@@ -88,6 +96,14 @@ def plot_solar_time_one_year(
 
     plt.savefig(f'solar_time_at_{location}_{year}.png')
 
+
+styles_for_solar_time_one_year_bokeh_static = {
+    'ephem':    {'line_color': 'blue',    'line_width': 2, 'line_dash': 'solid'  },
+    'EoT':      {'line_color': '#00BFFF', 'line_width': 3, 'line_dash': 'dashed' },
+    'NOAA':     {'line_color': 'green',   'line_width': 4, 'line_dash': 'dotdash'},
+    'PVGIS':    {'line_color': 'red',     'line_width': 5, 'line_dash': 'dotted' },
+    'Skyfield': {'line_color': '#9966CC', 'line_width': 6, 'line_dash': 'dotted' },
+}
 
 def plot_solar_time_one_year_bokeh_static(
         longitude,
@@ -115,9 +131,21 @@ def plot_solar_time_one_year_bokeh_static(
     p = figure(x_axis_type='datetime', width=800, height=350, title=f'Variation of Solar Time at {location} in {year}')
     legend_items = []
 
-    for model, data in results.items():
-        solar_times = data['solar_times']
-        line = p.line(timestamps, solar_times, line_width=2)
+    # Plot
+    for model, data in track(results.items(), description=f'Plotting solar times after {model}'):
+
+        style = styles_for_solar_time_one_year_bokeh_static.get(
+            model, {"line_color": "black", "line_width": 2, "line_dash": "solid"}
+        )  # if model style not defined, use the latter one
+
+        line = p.line(
+            'timestamps',
+            model,
+            source=source,
+            line_color=style["line_color"],
+            line_width=style["line_width"],
+            line_dash=style["line_dash"],
+        )
         legend_items.append((model, [line]))
 
     # add a legend
