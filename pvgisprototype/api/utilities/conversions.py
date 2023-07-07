@@ -38,3 +38,20 @@ def convert_dictionary_to_table(dictionary):
         table.add_row(str(key), str(value))
 
     return table
+
+
+def round_float_values(obj, decimal_places=3):
+    if isinstance(obj, float):
+        return f"{round(obj, decimal_places):.{decimal_places}f}"
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            if isinstance(v, dict):
+                for key, value in v.items():
+                    if isinstance(value, float):
+                        v[key] = f"{round(value, decimal_places):.{decimal_places}f}"
+            elif isinstance(v, float):
+                obj[i] = f"{round(v, decimal_places):.{decimal_places}f}"
+        return obj
+    else:
+        return obj
+
