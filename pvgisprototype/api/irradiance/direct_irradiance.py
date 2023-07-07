@@ -34,7 +34,7 @@ from datetime import datetime
 from ..constants import AOI_CONSTANTS
 from ..geometry.solar_declination import calculate_solar_declination
 from ..geometry.solar_time import SolarTimeModels
-from ..geometry.solar_time import calculate_solar_time
+from ..geometry.solar_time import model_solar_time
 from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_dictionary_to_table
 from ..utilities.timestamp import attach_timezone
@@ -244,7 +244,7 @@ def calculate_direct_horizontal_irradiance(
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
     # -------------------------------------------------------------------------
-    solar_time, _units = calculate_solar_time(
+    solar_time, _units = model_solar_time(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
@@ -303,15 +303,6 @@ def calculate_direct_inclined_irradiance(
             min=0, max=90)] = 0,
         surface_orientation: Annotated[Optional[float], typer.Argument(
             min=0, max=360)] = 180,
-        # direct_horizontal_radiation: Annotated[float, typer.Argument(
-        #     help='Direct normal radiation in W/m²',
-        #     min=-9000, max=1000)],  # `sh` which comes from `s0`
-        # direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
-        #     help='Direct normal radiation coefficient (dimensionless)',
-        #     min=0, max=1)],  # bh = sunRadVar->cbh;
-        # solar_altitude: Annotated[float, typer.Argument(
-        #     help='Solar altitude in degrees °',
-        #     min=0, max=90)],
         linke_turbidity_factor: Annotated[float, typer.Argument(
             help='A measure of atmospheric turbidity, equal to the ratio of total optical depth to the Rayleigh optical depth',
             min=0, max=10)] = 2,  # 2 to get going for now
@@ -423,7 +414,7 @@ def calculate_direct_inclined_irradiance(
     C33 = math.sin(latitude) * math.sin(solar_declination)
 
     # calculate solar altitude
-    solar_time, _units = calculate_solar_time(
+    solar_time, _units = model_solar_time(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
