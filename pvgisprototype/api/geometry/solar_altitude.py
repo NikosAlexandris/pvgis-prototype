@@ -18,7 +18,8 @@ from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_to_degrees_if_requested
 from .solar_declination import calculate_solar_declination
-from .solar_time import calculate_solar_time
+from .solar_time import model_solar_time
+from .solar_time import calculate_hour_angle
 
 
 # app = typer.Typer(
@@ -62,19 +63,18 @@ def calculate_solar_altitude(
             )
     C31 = math.cos(latitude) * math.cos(solar_declination)
     C33 = math.sin(latitude) * math.sin(solar_declination)
-
-    # solar_time = calculate_solar_time(year, hour_of_year)
+    solar_time, _units = model_solar_time(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            )
     # hour_angle = np.radians(15) * (solar_time - 12)
     # hour_angle = (solar_time - 12)
-    
-    # timestamp = hour_of_year_to_datetime(year, hour_of_year)
-    hour_angle, _units = calculate_solar_time(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
+    hour_angle, _units = calculate_hour_angle(
+            solar_time,
+            output_units,
     )
-    
     sine_solar_altitude = C31 * math.cos(hour_angle) + C33
     solar_altitude = np.arcsin(sine_solar_altitude) 
     solar_altitude = convert_to_degrees_if_requested(
