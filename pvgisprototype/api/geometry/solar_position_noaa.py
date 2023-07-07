@@ -6,6 +6,7 @@ from math import cos
 from math import tan
 from math import acos
 from math import radians
+from math import degrees
 from math import pi
 from pydantic import BaseModel
 from pydantic import Field
@@ -15,24 +16,33 @@ from typing import Callable
 from typing import Optional
 from typing import Tuple
 from typing import Union
-import pytz
+from ..utilities.conversions import convert_to_degrees_if_requested
+from ..utilities.conversions import convert_to_radians_if_requested
+from zoneinfo import ZoneInfo
 
 
+radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
+degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
 class SolarPositionData(BaseModel):
     longitude: float = Field(..., ge=-180, le=180)
     latitude: float = Field(..., ge=-90, le=90)
     timestamp: Optional[datetime] = Field(default_factory=datetime.now)
 
 
-def calculate_fractional_year_noaa(timestamp: datetime) -> float:
+def calculate_fractional_year_noaa(
+        timestamp: datetime,
+        output_units: Optional[str] = "radians",
+        ) -> float:
+    """Calculate fractional year in radians """
     fractional_year = (
         2
         * pi
         / 365
         * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
     )
-    return fractional_year
 
+    fractional_year = convert_to_degrees_if_requested(fractional_year, output_units)
+    return fractional_year, output_units
 
 def equation_of_time_noaa(fractional_year: float) -> float:
     equation_of_time = 229.18 * (
