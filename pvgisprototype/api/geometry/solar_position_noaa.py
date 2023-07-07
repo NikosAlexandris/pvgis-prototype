@@ -24,6 +24,8 @@ from .models import CalculateSolarDeclinationNOAAInput
 from .models import CalculateEquationOfTimeNOAAInput
 from .models import CalculateTimeOffsetNOAAInput
 from .models import CalculateHourAngleNOAAInput
+from .models import CalculateSolarAltitudeNOAAInput
+from .models import CalculateSolarAzimuthNOAAInput
 from .models import CalculateTrueSolarTimeNOAAInput
 from .models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from zoneinfo import ZoneInfo
@@ -418,10 +420,39 @@ def calculate_solar_zenith_noaa(
     return solar_zenith, output_units
 
 
+@validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
+def calculate_solar_altitude_noaa(
+        longitude: float,
+        latitude: datetime,
+        timestamp: float,
+        timezone: str,
+        output_units: str = 'radians',
+        ):
+    """Calculate the solar zenith angle (φ) in radians
+    """
+    hour_angle, _units = calculate_hour_angle_noaa(
+        longitude, timestamp, timezone, output_units="radians"
+    )
+    solar_zenith, _units = calculate_solar_zenith_noaa(
+        latitude,
+        timestamp,
+        hour_angle,
+            )  # radians
+    solar_altitude = pi/2 - solar_zenith
+    solar_altitude = convert_to_degrees_if_requested(solar_altitude,
+                                                     output_units)
+    if not isfinite(solar_altitude) or not -0.0146 <= solar_altitude <= pi/2:
+        raise ValueError('The `solar_altitude` should be a finite number ranging in [-0.0146, π/2] radians')
+    return solar_altitude, output_units
+
+
+@validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
 def calculate_solar_azimuth_noaa(
+        longitude: float,
         latitude: float,
-        solar_declination: float,
-        solar_zenith: float = -0.9629159426075866,  # cosine of 90.833
+        timestamp: float,
+        timezone: str,
+        output_units: str = 'radians',
         ):
     """Calculate the solar azimith (θ) in radians
 
@@ -430,10 +461,26 @@ def calculate_solar_azimuth_noaa(
     latitude: float
         The latitude in radians
     """
-    cosine_solar_azimuth = (-sin(latitude) * cos(solar_zenith) - sin(solar_declination)) / (
+    solar_declination, _units = calculate_solar_declination_noaa(timestamp)  # radians
+    hour_angle, _units = calculate_hour_angle_noaa(longitude, timestamp, timezone)  # radians
+    solar_zenith, _units = calculate_solar_zenith_noaa(
+        latitude,
+        timestamp,
+        hour_angle,
+            )  # radians
+    cosine_pi_minus_solar_azimuth = - (sin(latitude) * cos(solar_zenith) - sin(solar_declination)) / (
         cos(latitude) * sin(solar_zenith)
     )
-    return pi - acos(cosine_solar_azimuth)
+    cosine_pi_minus_solar_azimuth = max(-1, min(1, cosine_pi_minus_solar_azimuth))
+    
+    pi_minus_solar_azimuth = acos(cosine_pi_minus_solar_azimuth)
+    solar_azimuth = pi - pi_minus_solar_azimuth 
+    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
+
+    if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
+        raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
+
+    return solar_azimuth, output_units
 
 
 def calculate_event_time(
