@@ -13,17 +13,20 @@ from typer.core import TyperGroup
 from typing import Annotated
 from typing import Optional
 from rich import print
-from .api.utilities.rich_help_panel_names import rich_help_panel_pv
+
+from .api.utilities.rich_help_panel_names import rich_help_panel_performance
+from . import energy
+from .api.utilities.rich_help_panel_names import rich_help_panel_series
+from . import irradiance
+from . import meteorology
+from .api.utilities.rich_help_panel_names import rich_help_panel_geometry
+from . import time
+from . import position
+from . import surface
 from .api.utilities.rich_help_panel_names import rich_help_panel_toolbox
+from . import utilities
 from .api.utilities.rich_help_panel_names import rich_help_panel_reference
 from . import manual
-from . import geometry
-from . import time
-from . import irradiance
-from . import tmy
-from . import energy
-from . import series
-from . import utilities
 
 
 state = {"verbose": False}
