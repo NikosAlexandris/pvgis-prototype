@@ -1,10 +1,11 @@
 from datetime import datetime
 from datetime import timezone
+from math import pi
 from pydantic import BaseModel
+from pydantic import ConstrainedFloat
 from pydantic import validator
 from typing import Optional
 from zoneinfo import ZoneInfo
-from pydantic import ConstrainedFloat
 
 
 class BaseTimeInputModel(BaseModel):
@@ -52,3 +53,14 @@ class BaseLatitudeInputModel(BaseModel):
 
 class BaseCoordinatesInputModel(BaseLongitudeInputModel, BaseLatitudeInputModel):
     pass
+
+
+class BaseAngleOutputUnitsModel(BaseModel):
+    output_units: Optional[str]
+
+    @validator('output_units')
+    def validate_output_units(cls, v):
+        valid_units = ['radians', 'degrees']
+        if v not in valid_units:
+            raise ValueError(f"output_units must be one of {valid_units}")
+        return v
