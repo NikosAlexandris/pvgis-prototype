@@ -73,7 +73,7 @@ def now_datetime() -> datetime:
 
 
 
-def random_datetimezone():
+def random_datetimezone() -> tuple:
     """
     Generate a random datetime and timezone object
     """
@@ -84,25 +84,17 @@ def random_datetimezone():
     hour = random.randint(0, 23)
     minute = random.randint(0, 59)
     second = random.randint(0, 59)
-    datetimestamp = datetime(year, month, day, hour, minute, second)
-    timezone_str = random.choice(pytz.all_timezones)
-    timezone = pytz.timezone(timezone_str)
-    # datetimezone = timezone.localize(datetimestamp)
+    datetimestamp = datetime(year, month, day, hour, minute, second, tzinfo=ZoneInfo('UTC'))
+    timezone_str = random.choice(list(ZoneInfo.available_timezones()))
+    timezone = ZoneInfo(timezone_str)
 
     return datetimestamp, timezone
 
 
-def timestamp_to_decimal_hours(timestamp, timezone='UTC'):
-    dt = datetime.fromtimestamp(timestamp, pytz.timezone(timezone))
-    decimal_hours = dt.hour + dt.minute / 60 + dt.second / 3600
 
     return decimal_hours
 
 
-def convert_hours_to_seconds(hours: float):
-    """
-    """
-    return hours * 3600
 
 
 def convert_to_timezone(string: str):
@@ -157,6 +149,19 @@ def attach_timezone(
     timestamp = timestamp.replace(tzinfo=pytz.UTC).astimezone(tzinfo)
 
     return timestamp
+
+
+def convert_hours_to_seconds(hours: float):
+    """
+    """
+    return hours * 3600
+
+
+def timestamp_to_decimal_hours(timestamp: float, timezone_string: str = 'UTC') -> float:
+    dt = datetime.fromtimestamp(timestamp, ZoneInfo(timezone_string))
+    decimal_hours = dt.hour + dt.minute / 60 + dt.second / 3600
+
+    return decimal_hours
 
 
 def get_day_from_hour_of_year(year: int, hour_of_year: int):
