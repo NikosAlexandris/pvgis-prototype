@@ -1,6 +1,13 @@
+"""
+The General Solar Position Calculations provided by the NOAA Global
+Monitoring Division are well known sets of simplified equations.
+
+See also: https://unpkg.com/solar-calculator@0.1.0/index.js
+"""
 import logging
 from datetime import datetime
 from datetime import timedelta
+from datetime import time
 from math import sin
 from math import cos
 from math import tan
@@ -8,6 +15,7 @@ from math import acos
 from math import radians
 from math import degrees
 from math import pi
+from math import isfinite
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import validator
@@ -28,6 +36,7 @@ from .models import CalculateSolarAltitudeNOAAInput
 from .models import CalculateSolarAzimuthNOAAInput
 from .models import CalculateTrueSolarTimeNOAAInput
 from .models import CalculateEventTimeNOAAInput
+from .models import CalculateLocalSolarTimeNOAAInput
 from .models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from zoneinfo import ZoneInfo
 
@@ -135,6 +144,7 @@ def calculate_time_offset_noaa(
     Returns
     -------
     float: The time offset
+
     Notes
     -----
 
@@ -557,18 +567,20 @@ def calculate_event_time_noaa(
     return event_datetime, output_units
 
 
+@validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
 def calculate_local_solar_time_noaa(
         longitude: float,
         latitude: float,
         timestamp: float,
         timezone: str,
-        solar_declination: float,
-        equation_of_time: float,
-        solar_zenith: float = -0.9629159426075866,  # cosine of 90.833
-        event: str = 'noon',
-        output_units: str = 'radians'  # for the hour angle! Remove Me?
+        output_units: str = 'hours',  # for the hour angle! Remove Me?
+        verbose: str = False,
     ) -> float:
     """
+    Returns
+    -------
+
+    (solar_time, units): float, str
     """
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -577,16 +589,13 @@ def calculate_local_solar_time_noaa(
         except Exception as e:
             logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # ------------------------------------------------------------------------
-    solar_noon_timestamp = calculate_event_time(
+    solar_noon_timestamp, units = calculate_event_time(
             longitude,
             latitude,
             timestamp,
             timezone,
-            solar_zenith,
-            solar_declination,
-            equation_of_time,
-            event,  # = 'noon'
-            output_units,
+            event='noon',
+            output_units = 'minutes',  # THIS does not really work yet!
             )
     local_solar_time = timestamp - solar_noon_timestamp
     decimal_hours = local_solar_time.total_seconds() / 3600
@@ -594,6 +603,4 @@ def calculate_local_solar_time_noaa(
     if verbose:
         typer.echo(f'Local solar time: {local_solar_time}')
 
-    debug(locals())
-    return decimal_hours, 'decimal hours'
-
+    return decimal_hours, output_units
