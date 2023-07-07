@@ -395,18 +395,27 @@ def adjust_solar_zenith_for_atmospheric_refraction(
 
 def calculate_solar_zenith_noaa(
         latitude: float,
-        solar_declination: float,
+        timestamp: datetime,
         hour_angle: float,
+        apply_atmospheric_refraction: bool = False,
+        output_units: str = 'radians',
         ):
     """Calculate the solar zenith angle (φ) in radians
     """
+    solar_declination, _units = calculate_solar_declination_noaa(timestamp, output_units)
     cosine_solar_zenith = sin(latitude) * sin(solar_declination) + cos(latitude) * cos(
         solar_declination
-    ) * cos(radians(hour_angle))
+    ) * cos(hour_angle)
+    # debug(locals())
     solar_zenith = acos(cosine_solar_zenith)
-    solar_zenith = atmospheric_refraction(solar_zenith)
+    if apply_atmospheric_refraction:
+        solar_zenith, _units = adjust_solar_zenith_for_atmospheric_refraction(solar_zenith)  # in radians
+    solar_zenith = convert_to_degrees_if_requested(solar_zenith, output_units)
 
-    return solar_zenith
+    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
+        raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π + 0.0146] radians')
+
+    return solar_zenith, output_units
 
 
 def calculate_solar_azimuth_noaa(
