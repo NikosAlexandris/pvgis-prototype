@@ -64,3 +64,65 @@ class BaseAngleOutputUnitsModel(BaseModel):
         if v not in valid_units:
             raise ValueError(f"output_units must be one of {valid_units}")
         return v
+
+
+class CalculateFractionalYearNOAAInput(BaseTimeInputModel,BaseTimeOutputUnitsModel):
+    pass
+
+
+class CalculateEquationOfTimeNOAAInput(BaseTimeInputModel,BaseTimeOutputUnitsModel):
+    pass
+
+
+class CalculateSolarDeclinationNOAAInput(BaseTimeInputModel,BaseAngleOutputUnitsModel):
+    pass
+
+
+class CalculateTimeOffsetNOAAInput(BaseLongitudeInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel):
+    pass
+
+
+class CalculateTrueSolarTimeNOAAInput(BaseLongitudeInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel):
+    pass
+
+
+class CalculateHourAngleNOAAInput(BaseLongitudeInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel,BaseAngleOutputUnitsModel):
+    pass
+
+
+class AdjustSolarZenithForAtmosphericRefractionNOAAInput(BaseAngleOutputUnitsModel):
+    solar_zenith: float
+
+    @validator('solar_zenith')
+    def solar_zenith_range(cls, v):
+        if not (0 <= v <= pi):
+            raise ValueError('solar_zenith must range within [0, π]')
+        return v
+
+
+class CalculateSolarZenithNOAAInput(BaseLatitudeInputModel,BaseTimeInputModel,BaseAngleOutputUnitsModel):
+        hour_angle: float
+        apply_atmospheric_refraction: bool = False
+
+
+class CalculateSolarAltitudeNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseAngleOutputUnitsModel):
+    pass
+
+
+class CalculateSolarAzimuthNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseAngleOutputUnitsModel):
+    pass
+
+
+class CalculateEventTimeNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel):
+    event: str
+
+    @validator('event')
+    def validate_event(cls, v):
+        valid_events = ['noon', 'sunrise', 'sunset']
+        if v not in valid_events:
+            raise ValueError(f"event must be one of {valid_events}")
+        return v
+
+
+class CalculateLocalSolarTimeNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel):
+    verbose: Optional[bool] = False
