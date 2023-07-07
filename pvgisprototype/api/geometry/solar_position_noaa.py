@@ -22,6 +22,7 @@ from .decorators import validate_with_pydantic
 from .models import CalculateFractionalYearNOAAInput
 from .models import CalculateSolarDeclinationNOAAInput
 from .models import CalculateEquationOfTimeNOAAInput
+from .models import CalculateTimeOffsetNOAAInput
 from zoneinfo import ZoneInfo
 
 
@@ -103,12 +104,18 @@ def calculate_solar_declination_noaa(
     return declination, output_units
 
 
+@validate_with_pydantic(CalculateTimeOffsetNOAAInput)
 def calculate_time_offset_noaa(
-        timestamp: datetime, 
         longitude: float, 
-        equation_of_time: float
+        timestamp: datetime, 
+        output_units: Optional[str] = 'minutes'  # redesign me!
     ) -> float:
-    """Calculate the time offset for NOAA's solar position calculations.
+    """Calculate the time offset for NOAA's solar position calculations
+    measured in minutes.
+
+    The time offset (in minutes) incorporates the Equation of Time and accounts
+    for the variation of the Local Solar Time (LST) within a given time zone
+    due to the longitude variations within the time zone.
 
     Parameters
     ----------
@@ -122,16 +129,57 @@ def calculate_time_offset_noaa(
     Returns
     -------
     float: The time offset
+    Notes
+    -----
+
+    The reference equation here is:
+
+        `time_offset = eqtime + 4*longitude – 60*timezone`
+
+        (source: https://gml.noaa.gov/grad/solcalc/solareqns.PDF)
+
+        where (variable name and units):
+            - time_offset, minutes
+            - longitude, degrees
+            - timezone, hours
+            - eqtime, minutes
+
+    A cleaner (?) reference:
+
+        `TC = 4 * (Longitude - LSTM) + EoT`
+
+        where:
+            - TC       : Time Correction Factor, minutes
+            - Longitude: Geographical Longitude, degrees
+            - LSTM     : Local Standard Time Meridian, degrees * hours
+
+                where:
+                - `LSTM = 15 degrees * ΔTUTC`
+            
+                    where:
+                    - ΔTUTC = LT - UTC, hours
+
+                        where:
+                        - LT : Local Time
+                        - UTC: Universal Coordinated Time
+                        - difference of LT from UTC in hours
+
+            - The factor of 4 minutes comes from the fact that the Earth
+              rotates 1° every 4 minutes.
+
+            Examples:
+                Mount Olympus is UTC + 2, hence LSTM = 15 * 2 = 30 deg. East
     """
+    longitude_in_minutes = radians_to_time_minutes(longitude)
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # in minutes
-    time_offset = 4 * (longitude - timezone_offset_minutes) + equation_of_time
-    return time_offset
+    equation_of_time, _units = calculate_equation_of_time_noaa(timestamp)  # in minutes
+    time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time
 
+    # Validate output
+    if not -720 <= time_offset <= 720:
+        raise ValueError("The time offset must range within [-720, 720] minutes ?")
 
-def calculate_true_solar_time(
-        timestamp: Optional[datetime], 
-        timezone: Optional[str], 
-        time_offset: float
+    return time_offset, output_units
     ) -> float:
     """Calculate the true solar time.
 
