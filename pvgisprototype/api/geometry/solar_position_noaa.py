@@ -25,6 +25,7 @@ from .models import CalculateEquationOfTimeNOAAInput
 from .models import CalculateTimeOffsetNOAAInput
 from .models import CalculateHourAngleNOAAInput
 from .models import CalculateTrueSolarTimeNOAAInput
+from .models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from zoneinfo import ZoneInfo
 
 
@@ -269,48 +270,74 @@ def calculate_hour_angle_noaa(
     return hour_angle, output_units
 
 
-def atmospheric_refraction_correction_for_high_elevation(te: float) -> float:
+def atmospheric_refraction_for_high_solar_altitude(
+    solar_altitude: float,
+) -> float:
     """
-    Calculate the atmospheric refraction correction for high elevations.
+    Calculate the atmospheric refraction adjustment for high solar_altitudes.
 
     Parameters:
-    te (float): The tangent of the solar elevation angle
+    tangent_solar_altitude (float): The tangent of the solar altitude angle
 
     Returns:
     float: The correction factor
     """
-    return 58.1 / te - 0.07 / (te**3) + 0.000086 / (te**5)
+    tangent_solar_altitude = tan(solar_altitude)  # in radians
+    adjustment_in_degrees = (
+        58.1 / tangent_solar_altitude
+        - 0.07 / (tangent_solar_altitude**3)
+        + 0.000086 / (tangent_solar_altitude**5)
+    ) / 3600  # 1 degree / 3600 seconds
+
+    return radians(adjustment_in_degrees)
 
 
-def atmospheric_refraction_correction_for_near_horizon(elevation: float) -> float:
+def atmospheric_refraction_for_near_horizon(solar_altitude: float) -> float:
     """
-    Calculate the atmospheric refraction correction for near horizon.
+    Calculate the atmospheric refraction adjusment for near horizon.
 
     Parameters:
-    elevation (float): The solar elevation angle
+    solar_altitude (float): The solar solar_altitude angle
+
+    Returns:
+    float: The adjustment factor
+    """
+    solar_altitude = degrees(solar_altitude)
+    adjustment_in_degrees = (
+        1735
+        + solar_altitude
+        * (
+            -518.2
+            + solar_altitude
+            * (103.4 + solar_altitude * (-12.79 + solar_altitude * 0.711))
+        )
+    ) / 3600  # 1 degree / 3600 seconds
+
+    return radians(adjustment_in_degrees)
+
+
+def atmospheric_refraction_for_below_horizon(solar_altitude: float) -> float:
+    """
+    Calculate the atmospheric refraction adjustment for below horizon.
+
+    Parameters:
+    tangent_solar_altitude (float): The tangent of the solar altitude angle
 
     Returns:
     float: The correction factor
     """
-    return 1735 + elevation * (
-        -518.2 + elevation * (103.4 + elevation * (-12.79 + elevation * 0.711))
-    )
+    tangent_solar_altitude = tan(solar_altitude)  # in radians
+    adjustment_in_degrees = (
+        -20.774 / tangent_solar_altitude
+    ) / 3600  # 1 degree / 3600 seconds
 
+    return radians(adjustment_in_degrees)
 
-def atmospheric_refraction_correction_for_below_horizon(te: float) -> float:
-    """
-    Calculate the atmospheric refraction correction for below horizon.
-
-    Parameters:
-    te (float): The tangent of the solar elevation angle
-
-    Returns:
-    float: The correction factor
-    """
-    return -20.774 / te
-
-
-def atmospheric_refraction(solar_zenith: float) -> float:
+@validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
+def adjust_solar_zenith_for_atmospheric_refraction(
+        solar_zenith: float,
+        output_units: str = 'radians',
+        ) -> float:
     """Adjust solar zenith for atmospheric refraction
 
     The effects of the atmosphere vary with atmospheric pressure, humidity, and
@@ -329,25 +356,42 @@ def atmospheric_refraction(solar_zenith: float) -> float:
     -------
     float: The corrected solar zenith angle
     """
+    debug(locals())
     atmospheric_refraction_functions: Dict[str, Callable[[float], float]] = {
-        'high_elevation': atmospheric_refraction_correction_for_high_elevation,
-        'near_horizon': atmospheric_refraction_correction_for_near_horizon,
-        'below_horizon': atmospheric_refraction_correction_for_below_horizon
+        'high_solar_altitude': atmospheric_refraction_for_high_solar_altitude,
+        'near_horizon': atmospheric_refraction_for_near_horizon,
+        'below_horizon': atmospheric_refraction_for_below_horizon
     }
-    solar_elevation = 90 - solar_zenith  # in degrees
-    if solar_elevation <= 85:
-        te = tan(radians(solar_elevation))
-        if solar_elevation > 5:
-            function: Callable = atmospheric_refraction_functions['high_elevation']
-        elif solar_elevation > -0.575:
+
+    solar_altitude = radians(90) - solar_zenith  # in radians
+    if solar_altitude <= radians(85):
+
+        if solar_altitude > radians(5):
+            function: Callable = atmospheric_refraction_functions['high_solar_altitude']
+        
+        elif solar_altitude > radians(-0.575):
             function = atmospheric_refraction_functions['near_horizon']
+        
         else:
             function = atmospheric_refraction_functions['below_horizon']
-        adjusment = function(te if solar_elevation > -0.575 else solar_elevation)
-        solar_zenith -= (adjusment / 3600) * radians(1)
+        
+        # solar zenith = 0 degrees + refraction correction.
+        atmospheric_refraction_adjustment_radians = function(solar_altitude)  # in radians
+        solar_zenith -= atmospheric_refraction_adjustment_radians  # in radians
+        # solar_zenith += function(solar_altitude)  # in radians
 
-    return solar_zenith
+    solar_zenith = convert_to_degrees_if_requested(solar_zenith, output_units)
 
+    # Reasonably increase the upper limit for the solar zenith
+    # beyond π/2 radians to account for atmospheric refraction.
+    # i.e. at 90.833 degrees or about π/2 + 0.0146 radians
+    # which is the solar zenith angle when the center of the sun is at the horizon,
+    # considering both its apparent size and atmospheric refraction.
+    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
+        # raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π/2 + 0.0146] radians')
+        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')
+
+    return solar_zenith, output_units
 
 def calculate_solar_zenith_noaa(
         latitude: float,
