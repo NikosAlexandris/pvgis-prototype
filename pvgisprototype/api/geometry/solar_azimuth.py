@@ -14,6 +14,8 @@ from ..utilities.conversions import convert_to_degrees_if_requested
 
 from .solar_declination import calculate_solar_declination
 from .solar_time import calculate_solar_time_ephem
+from .solar_time import model_solar_time
+from .solar_time import calculate_hour_angle
 
 # from .data_structures import SolarGeometryDayConstants
 # from .data_structures import SolarGeometryDayVariables
@@ -74,12 +76,16 @@ def calculate_solar_azimuth(
     # solar_time = calculate_solar_time(year, hour_of_year)
     # hour_angle = np.radians(15) * (solar_time - 12)
     # hour_angle = (solar_time - 12)
-
-    # timestamp = hour_of_year_to_datetime(year, hour_of_year)
-    hour_angle, _units = calculate_solar_time_ephem(
-            timestamp=timestamp,
-            latitude=latitude,
+    solar_time, _units = model_solar_time(
             longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            )
+
+    hour_angle, _units = calculate_hour_angle(
+            solar_time,
+            output_units,
     )
 
     cosine_solar_azimuth = (C11 * math.cos(hour_angle + C13)) / pow(
