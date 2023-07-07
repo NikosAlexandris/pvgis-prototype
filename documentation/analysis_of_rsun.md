@@ -770,7 +770,7 @@ The code finally calls the `calculate()` function to perform the actual calculat
 
    **Important** in this function is that, unlike the `updateGeometryYear` (and
    the first `calculateGeometryYear` functions),
-   it calculates the solar declination bsed on some alternative method.
+   it calculates the solar declination based on some alternative method.
    That is, it does not use method presented by Jenco. This "alternative"
    method, hardcodes the angle of incidence (see `AOIConstants`) which, in turn
    does not take in to accound a more realistic approximation of the sun's

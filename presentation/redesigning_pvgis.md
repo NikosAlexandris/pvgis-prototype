@@ -44,6 +44,71 @@ _Core_ **API**  +  **CLI**  +  _Web_ **API**
     : Typer  (Click)
 
 
+#### Structure (DRAFT)
+
+- energy
+
+  - grid
+
+      - fixed
+      - tracking
+
+  - off-grid
+
+- series
+
+    - irradiance
+
+        - global
+        - direct
+        - diffuse
+        - infrared
+        - data-bases
+
+    - meteorology
+    
+        - temperature
+        - wind-speed
+        - wind-direction
+        - humidity
+        - air-pressure
+
+- geometry
+
+    - time
+
+        - fractional-year
+        - equation-of-time
+        - offset
+        - solar
+        - local
+        - correction
+
+    - position
+
+        - altitude
+        - zenith
+        - azimuth
+        - declination
+        - hour-angle
+        - refraction
+
+            - high-solar-altitude
+            - near-horizon
+            - below-horizon
+            - adjust_solar_zenith
+
+- surface
+
+    - tilt
+    - orientation
+    - horizon
+    - elevation
+
+- reference
+
+    - manual
+
 ### Web API
 
     : FastAPI
