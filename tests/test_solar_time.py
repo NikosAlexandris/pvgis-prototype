@@ -40,7 +40,7 @@ locations = [
     (0, 90, 'North Pole', 'UTC'),
     (0, -90, 'South Pole', 'UTC'),
     (-180, 0, 'International Date Line', 'UTC'),
-    (0, 0, 'Greenwich Meridian / Equator', 'UTC'),
+    (0, 0, 'Greenwich Meridian/Equator', 'UTC'),
     (22.358611, 40.085556, 'Όλυμπος', 'Europe/Athens'),
     (6.6327, 46.5218, 'Lausanne, Switzerland', 'Europe/Zurich'),
     (-74.0060, 40.7128, 'New York, USA', 'America/New_York'),
@@ -96,7 +96,7 @@ timezones = [
     # ('Asia/Tokyo'),
     ('Europe/Athens'),
 ]
-expected = [
+expected_solar_time = [
         (-3.1555168792302877),  # UPDATE-ME
         # (-3.1555168792302877),  # UPDATE-ME
 ]
@@ -104,7 +104,7 @@ expected = [
 @pytest.mark.parametrize("timestamp", timestamps)
 @pytest.mark.parametrize("timezone", timezones)
 @pytest.mark.parametrize("model", models)
-@pytest.mark.parametrize("expected_solar_time", expected)
+@pytest.mark.parametrize("expected_solar_time", expected_solar_time)
 def test_calculate_solar_time(
         longitude,
         latitude,
@@ -128,16 +128,36 @@ def test_plot_solar_time(longitude, latitude, location, timezone):
             )
 
 
+# @pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
+# @pytest.mark.parametrize("year", [random_year])
+# @pytest.mark.parametrize("model", models)
+# @pytest.mark.mpl_image_compare
+# def test_plot_solar_time_one_year(
+#         longitude,
+#         latitude,
+#         timezone,
+#         year,
+#         model,
+#         location
+# ):
+#     return plot_solar_time_one_year(
+#             longitude,
+#             latitude,
+#             timezone,
+#             year,
+#             [model],
+#             location,
+#             )
+
+
 @pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
 @pytest.mark.parametrize("year", [random_year])
-@pytest.mark.parametrize("model", [SolarTimeModels.skyfield])
 @pytest.mark.mpl_image_compare
-def test_plot_solar_time_one_year(
+def test_plot_solar_time_models_one_year(
         longitude,
         latitude,
         timezone,
         year,
-        model,
         location
 ):
     return plot_solar_time_one_year(
@@ -145,21 +165,42 @@ def test_plot_solar_time_one_year(
             latitude,
             timezone,
             year,
-            [model],
+            models,
             location,
             )
 
 
+# @pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
+# @pytest.mark.parametrize("year", [random_year])
+# @pytest.mark.parametrize("model", models)
+# @pytest.mark.mpl_image_compare
+# def test_plot_solar_time_model_one_year_bokeh_static(
+#         longitude,
+#         latitude,
+#         timezone,
+#         year,
+#         model,
+#         location
+# ):
+#     # debug(locals())
+#     return plot_solar_time_one_year_bokeh_static(
+#             longitude,
+#             latitude,
+#             timezone,
+#             year,
+#             [model],
+#             location,
+#             )
+
+
 @pytest.mark.parametrize("longitude, latitude, location, timezone", locations)
 @pytest.mark.parametrize("year", [random_year])
-@pytest.mark.parametrize("model", models)
 @pytest.mark.mpl_image_compare
-def test_plot_solar_time_one_year_bokeh_static(
+def test_plot_solar_time_models_one_year_bokeh_static(
         longitude,
         latitude,
         timezone,
         year,
-        model,
         location
 ):
     # debug(locals())
@@ -168,7 +209,7 @@ def test_plot_solar_time_one_year_bokeh_static(
             latitude,
             timezone,
             year,
-            [model],
+            models,
             location,
             )
 
