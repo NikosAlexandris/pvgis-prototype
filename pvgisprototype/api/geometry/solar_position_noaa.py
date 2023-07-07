@@ -27,6 +27,7 @@ from .models import CalculateHourAngleNOAAInput
 from .models import CalculateSolarAltitudeNOAAInput
 from .models import CalculateSolarAzimuthNOAAInput
 from .models import CalculateTrueSolarTimeNOAAInput
+from .models import CalculateEventTimeNOAAInput
 from .models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from zoneinfo import ZoneInfo
 
@@ -483,16 +484,14 @@ def calculate_solar_azimuth_noaa(
     return solar_azimuth, output_units
 
 
-def calculate_event_time(
+@validate_with_pydantic(CalculateEventTimeNOAAInput)
+def calculate_event_time_noaa(
         longitude: float,
         latitude: float,
         timestamp: float,
         timezone: str,
-        solar_declination: float,
-        equation_of_time: float,
         event: str,
-        solar_zenith: float = -0.9629159426075866,  # cosine of 90.833
-        output_units: str = 'radians',
+        output_units: str = 'minutes',
         ):
     """Calculate the sunrise or sunset
 
@@ -530,26 +529,32 @@ def calculate_event_time(
     - All angles in radians
     - cosine(90.833) = -0.9629159426075866
     """
-    expression = (cos(solar_zenith) / (cos(latitude) * cos(solar_declination))) - tan(
+    equation_of_time, _units = calculate_equation_of_time_noaa(timestamp)  # minutes
+    solar_declination , _units= calculate_solar_declination_noaa(timestamp)  # radians
+    hour_angle, _units = calculate_hour_angle_noaa(longitude, timestamp, timezone)  # radians
+    solar_zenith, _units = calculate_solar_zenith_noaa(latitude, timestamp, hour_angle)  # radians
+    cosine_hour_angle = (cos(solar_zenith) / (cos(latitude) * cos(solar_declination))) - tan(
         latitude
     ) * tan(solar_declination)
-    hour_angle = acos(expression)
+    hour_angle = acos(cosine_hour_angle)
     hour_angle = convert_to_degrees_if_requested(hour_angle, output_units)
 
+    # Retouch Me! NOAA, why on earth switch units?
+    longitude_minutes = radians_to_time_minutes(longitude)
+    hour_angle_minutes = radians_to_time_minutes(hour_angle)
     event_calculations = {
-        'noon': 720 - 4 * longitude - equation_of_time,
-        'sunrise': 720 - 4 * (longitude + hour_angle) - equation_of_time,
-        'sunset': 720 - 4 * (longitude - hour_angle) - equation_of_time
+        'noon': 720 - longitude_minutes - equation_of_time,
+        'sunrise': 720 - longitude_minutes + hour_angle_minutes - equation_of_time,
+        'sunset': 720 - longitude_minutes - hour_angle_minutes - equation_of_time
     }
     event_time = event_calculations.get(event.lower())
-    event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(
-        minutes=event_time
-    )
-    # Review the following !
-    event_datetime = event_datetime.replace(tzinfo=pytz.UTC)
-    event_datetime = event_datetime.astimezone(pytz.timezone(timezone))
+    event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(minutes=event_time)
 
-    return event_datetime
+    utc_zoneinfo = ZoneInfo("UTC")
+    event_datetime = event_datetime.astimezone(utc_zoneinfo)
+    print(f'The timestamp for \'{event}\' is {event_datetime}.')
+
+    return event_datetime, output_units
 
 
 def calculate_local_solar_time_noaa(
