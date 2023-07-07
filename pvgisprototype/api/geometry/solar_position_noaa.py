@@ -23,6 +23,7 @@ from .models import CalculateFractionalYearNOAAInput
 from .models import CalculateSolarDeclinationNOAAInput
 from .models import CalculateEquationOfTimeNOAAInput
 from .models import CalculateTimeOffsetNOAAInput
+from .models import CalculateHourAngleNOAAInput
 from .models import CalculateTrueSolarTimeNOAAInput
 from zoneinfo import ZoneInfo
 
@@ -221,12 +222,22 @@ def calculate_true_solar_time_noaa(
     return true_solar_time, output_units
 
 
+@validate_with_pydantic(CalculateHourAngleNOAAInput)
 def calculate_hour_angle_noaa(
+        longitude: float,
         timestamp: datetime, 
         timezone: Optional[str], 
-        longitude: float
+        output_units: Optional[str] = 'radians',
+
         ) -> float:
-    """Calculate the solar hour angle.
+    """Calculate the solar hour angle in radians.
+
+    The Hour Angle converts the local solar time (LST) into the number of
+    degrees which the sun moves across the sky. By definition, the Hour Angle
+    is 0° at solar noon. Since the Earth rotates 15° per hour, each hour away
+    from solar noon corresponds to an angular motion of the sun in the sky of
+    15°. In the morning the hour angle is negative, in the afternoon the hour
+    angle is positive.
 
     Parameters
     ----------
@@ -240,32 +251,22 @@ def calculate_hour_angle_noaa(
     Returns:
     float: The solar hour angle
     """
-    # Handle Me during input validation? -------------------------------------
-    if timezone != timestamp.tzinfo:
-        try:
-            # timestamp = timestamp.astimezone(timezone)
-            timestamp = timestamp.astimezone(pytz.timezone(timezone))
-        except pytz.UnknownTimeZoneError as e:
-        # except Exception as e:
-            # logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
-            logging.warning(f'Unknown timezone: {e}')
-            raise
-    # ------------------------------------------------------------------------
-    fractional_year = calculate_fractional_year_noaa(timestamp)  # in radians
-    equation_of_time = calculate_equation_of_time_noaa(fractional_year)  # in minutes
-    solar_declination = calculate_solar_declination_noaa(fractional_year)  # in radians
-    time_offset = calculate_time_offset_noaa(
-        timestamp, longitude, equation_of_time
+    true_solar_time, _units = calculate_true_solar_time_noaa(
+        longitude, timestamp, timezone, output_units="minutes"
     )  # in minutes
-    true_solar_time = calculate_true_solar_time(timestamp, timezone, time_offset)  # in minutes
-    hour_angle = true_solar_time / 4 - 180  # solar hour angle in degrees
+    # hour_angle = true_solar_time / 4 - 180  # original equation in degrees!
+    # Here, going directly to radians
+    #  a circle is 360 degrees, divide by 1440 minutes in a day = 0.25
+    hour_angle = (true_solar_time - 720) * (pi / 720)
 
-    return hour_angle
+    # Validate
+    if output_units == 'radians' and not -pi <= hour_angle <= pi:
+        raise ValueError("The hour angle in radians must be within the range [-π, π]")
 
+    elif output_units == 'degrees' and not -180 <= hour_angle <= 180:
+        raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")
 
-# Callable[[float], float] : a function that takes one float and returns a float
-def apply_correction(function: Callable[[float], float], value: float) -> float:
-    return function(value)
+    return hour_angle, output_units
 
 
 def atmospheric_refraction_correction_for_high_elevation(te: float) -> float:
