@@ -47,6 +47,7 @@ from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
 from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.image_offset_prototype import get_image_offset
+from .solar_position_noaa import calculate_local_solar_time_noaa
 
 
 class SolarTimeModels(str, Enum):
@@ -85,13 +86,6 @@ def calculate_solar_time_skyfield(
     -------
     (decimal_hours, units): float, str
     """
-    # Handle Me during input validation? -------------------------------------
-    if timezone != timestamp.tzinfo:
-        try:
-            timestamp = timestamp.astimezone(timezone)
-        except Exception as e:
-            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
-    # Handle Me during input validation? -------------------------------------
 
     midnight = timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
     next_midnight = midnight + timedelta(days=1)
@@ -254,112 +248,8 @@ def calculate_solar_time_ephem(
         typer.echo(f'Hour angle: {hour_angle}')
         typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
         typer.echo(f'Mean solar time: {solar_time}')
+
     return solar_time, 'decimal hours'  # norm for 24h
-
-
-def calculate_solar_time_noaa(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_datetime)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
-        verbose: bool = False,
-        ):
-    """
-    General Solar Position Calculations - NOAA Global Monitoring Division
-
-    Returns
-    -------
-
-    (solar_time, units): float, str
-
-    Notes
-    -----
-    
-    The General Solar Position Calculations provided by the NOAA Global
-    Monitoring Division are well known sets of simplified equations.
-
-    See also:
-
-        - https://unpkg.com/solar-calculator@0.1.0/index.js
-    """
-    # Handle Me during input validation? -------------------------------------
-    if timezone != timestamp.tzinfo:
-        try:
-            timestamp = timestamp.astimezone(timezone)
-        except Exception as e:
-            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
-    # Handle Me during input validation? -------------------------------------
-
-    # utc_offset_hours = timestamp.utcoffset().total_seconds() / 3600
-
-    # Calculate the fractional year, in radians
-    gamma = 2 * pi / 365 * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
-
-    # equation of time in minutes
-    equation_of_time = 229.18 * (
-                    0.000075 \
-                    + 0.001868 * cos(gamma) \
-                    - 0.032077 * sin(gamma) \
-                    - 0.014615 * cos(2 * gamma) \
-                    - 0.040849 * sin(2 * gamma)
-                    )
-
-    # solar declination in radians
-    declination = 0.006918 - 0.399912 * cos(gamma) + 0.070257 * sin(gamma) \
-           - 0.006758 * cos(2 * gamma) + 0.000907 * sin(2 * gamma) \
-           - 0.002697 * cos(3 * gamma) + 0.00148 * sin(3 * gamma)
-    
-    # time offset in minutes ?
-    timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60
-    time_offset = 4 * (longitude - timezone_offset_minutes) + equation_of_time
-
-    # the true solar time in minutes
-    true_solar_time = timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
-    
-    # the solar hour angle (in degrees)
-    hour_angle = true_solar_time / 4 - 180
-    
-    # # Calculate the solar zenith angle (in radians)
-    # cos_phi = sin(latitude) * sin(declination) + cos(latitude) * cos(decl) * cos(radians(h))
-    # phi = acos(cos_phi)
-    
-    # # Calculate the solar azimuth (in radians)
-    # cos_theta = (-sin(latitude_rad) * cos(phi) - sin(decl)) / (cos(latitude_rad) * sin(phi))
-    # theta = pi - acos(cos_theta)
-    
-    # hour angle at sunrise/sunset (in degrees)
-    hour_angle_ss = np.degrees(acos(cos(np.radians(90.833)) / (cos(latitude) * cos(declination)) - tan(latitude) * tan(declination)))
-    
-    # the UTC time of sunrise and sunset (in minutes)
-    sunrise = 720 - 4 * (longitude + hour_angle_ss) - equation_of_time
-    sunset = 720 - 4 * (longitude - hour_angle_ss) - equation_of_time
-    
-    # Calculate solar noon in minutes
-    solar_noon = 720 - 4 * longitude - equation_of_time
-    
-    # Convert minutes to datetime objects
-    # sunrise_time = datetime.combine(timestamp.date(), datetime_time(0)) + timedelta(minutes=sunrise)
-    # sunset_time = datetime.combine(timestamp.date(), datetime_time(0)) + timedelta(minutes=sunset)
-    solar_noon_time = datetime.combine(timestamp.date(), datetime_time(0)) + timedelta(minutes=solar_noon)
-    solar_noon_time = solar_noon_time.replace(tzinfo=pytz.UTC)
-    solar_noon_time = solar_noon_time.astimezone(timezone)
-
-    local_solar_time = timestamp - solar_noon_time
-    decimal_hours = local_solar_time.total_seconds() / 3600
-
-    # return sunrise_time, sunset_time, solar_noon_time
-    # return solar_noon_time
-    if verbose:
-        typer.echo(f'Local solar time: {local_solar_time}')
-    return decimal_hours, 'decimal hours'
 
 
 def calculate_solar_time_eot(
@@ -390,7 +280,7 @@ def calculate_solar_time_eot(
 
     - Local Standard Time Meridian (LSTM)
     
-        - 15°= 360°/24 hours.
+        - 15° = 360°/24 hours.
         - Examples:
             - Sydney Australia is UTC +10 so the LSTM is 150 °E.
             - Phoenix, USA is UTC -7 so the LSTM is 105 °W
@@ -426,13 +316,13 @@ def calculate_solar_time_eot(
         journal = {The Mathematical Gazette}
     }
     """
-    # Handle Me during input validation? -------------------------------------
-    if timezone != timestamp.tzinfo:
-        try:
-            timestamp = timestamp.astimezone(timezone)
-        except Exception as e:
-            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
-    # Handle Me during input validation? -------------------------------------
+    # # Handle Me during input validation? -------------------------------------
+    # if timezone != timestamp.tzinfo:
+    #     try:
+    #         timestamp = timestamp.astimezone(timezone)
+    #     except Exception as e:
+    #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
+    # # Handle Me during input validation? -------------------------------------
 
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
@@ -448,7 +338,7 @@ def calculate_solar_time_eot(
     equation_of_time = 9.87 * sin(2*b) - 7.53 * cos(b) - 1.5 * sin(b)
 
     # ------------------------------------------------------------------------
-    longitude = np.degrees(longitude)  # the equation of time requires degrees!
+    longitude = np.degrees(longitude)  # this equation of time requires degrees!
     # ------------------------------------------------------------------------
 
     time_correction_factor = 4 * (longitude - local_standard_meridian_time) + equation_of_time
@@ -562,33 +452,6 @@ def model_solar_time(
     # if local and timestamp is not None and timezone is not None:
     #     timestamp = timezone.localize(timestamp)
 
-    if model.value == SolarTimeModels.skyfield:
-
-        solar_time, units = calculate_solar_time_skyfield(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            )
-
-    if model.value == SolarTimeModels.ephem:
-
-        solar_time, units = calculate_solar_time_ephem(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            )
-
-    if model.value == SolarTimeModels.noaa:
-
-        solar_time, units = calculate_solar_time_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            )
-
     if model.value == SolarTimeModels.eot:
 
         solar_time, units = calculate_solar_time_eot(
@@ -602,10 +465,36 @@ def model_solar_time(
                 time_offset_global,
                 hour_offset,
                 )
+    if model.value == SolarTimeModels.ephem:
+
+        solar_time, units = calculate_solar_time_ephem(
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            )
 
     if model.value == SolarTimeModels.pvgis:
 
         solar_time, units = calculate_solar_time_pvgis(
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            )
+
+    if model.value == SolarTimeModels.noaa:
+
+        solar_time, units = calculate_local_solar_time_noaa(
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            )
+
+    if model.value == SolarTimeModels.skyfield:
+
+        solar_time, units = calculate_solar_time_skyfield(
             longitude,
             latitude,
             timestamp,
@@ -686,12 +575,14 @@ def calculate_hour_angle(
             case_sensitive=False,
             help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
         ):
-    """Calculate the hour angle 'ω = (ST / 3600 - 12) * 15 * 0.0175'
-    
+    """Calculate the hour angle ω'
+
+    ω = (ST / 3600 - 12) * 15 * pi / 180
+
     Parameters
     ----------
 
-    solar_time: float
+    hour_angle: float
         The solar time (ST) is a calculation of the passage of time based on the
         position of the Sun in the sky. It is expected to be decimal hours in a
         24 hour format and measured internally in seconds. 
@@ -705,12 +596,13 @@ def calculate_hour_angle(
         sun's rays measured in radian.
     """
     # `solar_time` here received in seconds!
-    hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
+    # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
+    hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
             output_units,
             )
-    return hour_angle
+    return hour_angle, output_units
 
 
 @app.callback()
