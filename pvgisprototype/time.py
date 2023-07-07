@@ -139,5 +139,52 @@ def solar_time(
 #     typer.echo(f'Solar time: {hour_angle} ({timezone})')
 
 
+@app.command('fractional-year', no_args_is_help=True, help='⦩ Calculate the fractional year')
+def fractional_year():
+    """
+    """
+    pass
+
+
+@app.command('eot', no_args_is_help=True, help='⦩ Calculate the equation of time')
+def equation_of_time(
+        ):
+    """
+    """
+    pass
+
+
+@app.command('offset', no_args_is_help=True, help='⦩ Calculate the time offset')
+def offset(
+        ):
+    """
+    """
+    pass
+
+
+@app.command('solar', no_args_is_help=True, help='⦩ Calculate the solar time')
+def solar(
+        ):
+    """
+    """
+    pass
+
+
+@app.command('local', no_args_is_help=True, help='⦩ Calculate the local time')
+def local(
+        ):
+    """
+    """
+    pass
+
+
+@app.command('correction', no_args_is_help=True, help='⦩ Calculate the time correction')
+def correction(
+        ):
+    """
+    """
+    pass
+
+
 if __name__ == "__main__":
     app()
