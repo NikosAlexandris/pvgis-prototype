@@ -4,6 +4,10 @@ from devtools import debug
 Important sun and solar surface geometry parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
 """
 
+
+state = {"verbose": False}
+
+
 import typer
 from typing import Annotated
 from typing import Optional
@@ -52,6 +56,20 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f":triangular_ruler:  Calculate solar geometry parameters for a location and moment in time",
 )
+
+@app.callback()
+def main(
+        ctx: typer.Context,
+        verbose: bool = False,
+        ):
+    """
+    Solar position algorithms
+    """
+    print(f"About to execute command: {ctx.invoked_subcommand}")
+
+    if verbose:
+        print("Will write verbose output")
+        state["verbose"] = True
 
 @app.command(
         'noaa',
@@ -234,7 +252,10 @@ def position(
             timestamp,
             timezone,
             model,
-            output_units,
+            apply_atmospheric_refraction,
+            time_output_units,
+            angle_units,
+            angle_output_units,
             )
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
@@ -250,7 +271,6 @@ def position(
         "Units",
         box=box.SIMPLE_HEAD,
         )
-
     if "user_requested_timestamp" in locals() and "user_requested_timezone" in locals():
         solar_position_table = Table(
             "Longitude",
@@ -370,7 +390,6 @@ def altitude(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
     
-
     # debug(locals())
     solar_altitude, _, units = model_solar_position(
             longitude,
@@ -493,6 +512,7 @@ def azimuth(
             show_default=True,
             case_sensitive=False,
             help="Output units for solar azimuth (degrees or radians)")] = 'radians',
+        verbose: bool = False,
         ) -> float:
     """Calculate the solar azimuth angle
 
@@ -529,7 +549,9 @@ def azimuth(
             model,
             output_units,
             )
-    typer.echo(f'Solar azimuth: {solar_azimuth} {units}')
+    if verbose:
+        solar_azimuth = f'Solar azimuth : {solar_azimuth}' 
+    typer.echo(f'{solar_azimuth} {units}')
     # return solar_azimuth
 
 
