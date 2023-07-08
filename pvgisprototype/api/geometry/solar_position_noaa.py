@@ -55,7 +55,7 @@ degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
 def calculate_fractional_year_noaa(
         timestamp: datetime,
-        output_units: Optional[str] = "radians",
+        angle_output_units: Optional[str] = "radians",
         ) -> float:
     """Calculate fractional year in radians """
     fractional_year = (
@@ -68,13 +68,11 @@ def calculate_fractional_year_noaa(
     if not 0 <= fractional_year < 2 * pi:
         raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
 
-    fractional_year = convert_to_degrees_if_requested(fractional_year, output_units)
-
-    # Validate
-    if output_units == 'degrees':
+    fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
+    if angle_output_units == 'degrees':
         if not 0 <= fractional_year < 360:
             raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
-    return fractional_year, output_units
+    return fractional_year, angle_output_units
 
 
 @validate_with_pydantic(CalculateEquationOfTimeNOAAInput)
