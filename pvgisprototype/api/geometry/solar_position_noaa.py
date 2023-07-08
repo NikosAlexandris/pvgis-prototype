@@ -388,7 +388,7 @@ def atmospheric_refraction_for_below_horizon(solar_altitude: float) -> float:
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction(
         solar_zenith: float,
-        output_units: str = 'radians',
+        angle_output_units: str = 'radians',
         ) -> float:
     """Adjust solar zenith for atmospheric refraction
 
@@ -408,7 +408,6 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     -------
     float: The corrected solar zenith angle
     """
-    debug(locals())
     atmospheric_refraction_functions: Dict[str, Callable[[float], float]] = {
         'high_solar_altitude': atmospheric_refraction_for_high_solar_altitude,
         'near_horizon': atmospheric_refraction_for_near_horizon,
@@ -432,18 +431,18 @@ def adjust_solar_zenith_for_atmospheric_refraction(
         solar_zenith -= atmospheric_refraction_adjustment_radians  # in radians
         # solar_zenith += function(solar_altitude)  # in radians
 
-    solar_zenith = convert_to_degrees_if_requested(solar_zenith, output_units)
+    solar_zenith = convert_to_degrees_if_requested(solar_zenith, angle_output_units)
 
     # Reasonably increase the upper limit for the solar zenith
     # beyond π/2 radians to account for atmospheric refraction.
     # i.e. at 90.833 degrees or about π/2 + 0.0146 radians
     # which is the solar zenith angle when the center of the sun is at the horizon,
     # considering both its apparent size and atmospheric refraction.
-    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
+    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi:
         # raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π/2 + 0.0146] radians')
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')
+        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi}] radians')
 
-    return solar_zenith, output_units
+    return solar_zenith, angle_output_units
 
 def calculate_solar_zenith_noaa(
         latitude: float,
