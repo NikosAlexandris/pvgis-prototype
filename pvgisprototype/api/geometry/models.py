@@ -125,11 +125,20 @@ class CalculateTimeOffsetNOAAInput(
     pass
 
 
-class CalculateTrueSolarTimeNOAAInput(BaseLongitudeInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel):
+class CalculateTrueSolarTimeNOAAInput(
+    BaseLongitudeInputModel,
+    BaseTimeInputModel,
+    BaseTimeOutputUnitsModel,
+):
     pass
 
 
-class CalculateHourAngleNOAAInput(BaseLongitudeInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel,BaseAngleOutputUnitsModel):
+class CalculateSolarHourAngleNOAAInput(
+    BaseLongitudeInputModel,
+    BaseTimeInputModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
     pass
 
 
