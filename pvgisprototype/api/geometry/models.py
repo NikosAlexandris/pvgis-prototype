@@ -167,7 +167,14 @@ class CalculateSolarZenithNOAAInput(
     solar_hour_angle: float
 
 
-class CalculateSolarAzimuthNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseAngleOutputUnitsModel):
+class CalculateSolarAltitudeNOAAInput(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    BaseApplyAtmosphericRefraction,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
     pass
 
 
