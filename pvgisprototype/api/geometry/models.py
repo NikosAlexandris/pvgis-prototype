@@ -1,5 +1,4 @@
 from datetime import datetime
-from datetime import timezone
 from math import pi
 from pydantic import BaseModel
 from pydantic import ConstrainedFloat
