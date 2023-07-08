@@ -160,7 +160,6 @@ class CalculateSolarZenithNOAAInput(
     BaseLatitudeInputModel,
     BaseTimestampInputModel,
     BaseApplyAtmosphericRefraction,
-    # BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
