@@ -39,13 +39,13 @@ class BaseTimeEventInputModel(BaseModel):
 
 
 class BaseTimeOutputUnitsModel(BaseModel):
-    output_units: Optional[str]
+    time_output_units: Optional[str]
 
-    @validator('output_units')
-    def validate_output_units(cls, v):
+    @validator('time_output_units')
+    def validate_time_output_units(cls, v):
         valid_units = ['minutes', 'seconds', 'hours']
         if v not in valid_units:
-            raise ValueError(f"output_units must be one of {valid_units}")
+            raise ValueError(f"time_output_units must be one of {valid_units}")
         return v
 
 
