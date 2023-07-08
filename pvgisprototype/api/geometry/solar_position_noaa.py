@@ -528,7 +528,10 @@ def calculate_solar_azimuth_noaa(
         latitude: float,
         timestamp: float,
         timezone: str,
-        output_units: str = 'radians',
+        apply_atmospheric_refraction: bool = True,
+        time_output_units: str = 'minutes',
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians',
         ):
     """Calculate the solar azimith (θ) in radians
 
@@ -537,26 +540,36 @@ def calculate_solar_azimuth_noaa(
     latitude: float
         The latitude in radians
     """
-    solar_declination, _units = calculate_solar_declination_noaa(timestamp)  # radians
-    hour_angle, _units = calculate_hour_angle_noaa(longitude, timestamp, timezone)  # radians
+    solar_declination, _units = calculate_solar_declination_noaa(
+            timestamp,
+            angle_units,
+            angle_output_units,
+            )  # radians
+    solar_hour_angle, _units = calculate_solar_hour_angle_noaa(
+        longitude, timestamp, timezone, time_output_units, angle_output_units
+    )  # radians
     solar_zenith, _units = calculate_solar_zenith_noaa(
         latitude,
         timestamp,
-        hour_angle,
+        solar_hour_angle,
+        apply_atmospheric_refraction,
+        # time_output_units,
+        angle_units,
+        angle_output_units,
             )  # radians
     cosine_pi_minus_solar_azimuth = - (sin(latitude) * cos(solar_zenith) - sin(solar_declination)) / (
         cos(latitude) * sin(solar_zenith)
     )
     cosine_pi_minus_solar_azimuth = max(-1, min(1, cosine_pi_minus_solar_azimuth))
-    
     pi_minus_solar_azimuth = acos(cosine_pi_minus_solar_azimuth)
     solar_azimuth = pi - pi_minus_solar_azimuth 
-    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
         raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
 
-    return solar_azimuth, output_units
+    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+
+    return solar_azimuth, angle_output_units
 
 
 @validate_with_pydantic(CalculateEventTimeNOAAInput)
