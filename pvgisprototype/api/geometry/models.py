@@ -156,8 +156,15 @@ class BaseApplyAtmosphericRefraction(BaseModel):
     apply_atmospheric_refraction: bool
 
 
-class CalculateSolarAltitudeNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseAngleOutputUnitsModel):
-    pass
+class CalculateSolarZenithNOAAInput(
+    BaseLatitudeInputModel,
+    BaseTimestampInputModel,
+    BaseApplyAtmosphericRefraction,
+    # BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
+    solar_hour_angle: float
 
 
 class CalculateSolarAzimuthNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseAngleOutputUnitsModel):
