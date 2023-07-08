@@ -37,6 +37,7 @@ from .api.geometry.solar_position import SolarPositionModels
 from .api.geometry.solar_position import _parse_model
 from .api.geometry.solar_position import calculate_solar_position
 from .api.geometry.solar_position import model_solar_position
+from .api.geometry.solar_position_noaa import calculate_noaa_solar_position
 
 from .api.utilities.rich_help_panel_names import rich_help_panel_geometry_time
 from .api.utilities.rich_help_panel_names import rich_help_panel_geometry_position
@@ -52,6 +53,102 @@ app = typer.Typer(
     help=f":triangular_ruler:  Calculate solar geometry parameters for a location and moment in time",
 )
 
+@app.command(
+        'noaa',
+        no_args_is_help=True,
+        help='⦩⦬ Calculate solar position parameters after NOAA',
+ )
+def noaa(
+        ctx: typer.Context,
+        longitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-180, max=180)],
+        latitude: Annotated[float, typer.Argument(
+            callback=convert_to_radians,
+            min=-90, max=90)],
+        timestamp: Annotated[Optional[datetime], typer.Argument(
+            help='Timestamp',
+            default_factory=now_datetime,
+            callback=ctx_attach_requested_timezone,
+            )],
+        timezone: Annotated[Optional[str], typer.Option(
+            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+            callback=ctx_convert_to_timezone)] = None,
+        refracted_solar_zenith: float = 1.5853349194640094,  # radians
+        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
+            '-a',
+            '--atmospheric-refraction',
+            help='Apply atmospheric refraction functions',
+            )] = True,
+        time_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--output-units',
+            show_default=True,
+            case_sensitive=False,
+            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+        angle_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+        angle_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
+        rounding_places: Annotated[Optional[int], typer.Option(
+            '-r',
+            '--rounding-places',
+            show_default=True,
+            help='Number of places to round results to.')] = 5,
+        verbose: bool = False,
+        ):
+    """
+    """
+    solar_position_calculations = calculate_noaa_solar_position(
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            refracted_solar_zenith,
+            apply_atmospheric_refraction,
+            time_output_units,
+            angle_units,
+            angle_output_units,
+            )
+    longitude = round_float_values(longitude, rounding_places)
+    latitude = round_float_values(latitude, rounding_places)
+    rounded_solar_position_calculations = round_float_values(solar_position_calculations, rounding_places)
+    solar_position_table = Table(
+        "Longitude",
+        "Latitude",
+        "Time",
+        "Zone",
+        "Model",
+        "Altitude",
+        "Azimuth",
+        "Sunrise",
+        'Noon',
+        'Local solar time',
+        "Sunset",
+        box=box.SIMPLE_HEAD,
+    )
+    solar_position_table.add_row(
+        str(longitude),
+        str(latitude),
+        str(timestamp),
+        str(timezone),
+        "NOAA",  # Model name
+        str(rounded_solar_position_calculations['solar_altitude']),
+        str(rounded_solar_position_calculations['solar_azimuth']),
+        str(rounded_solar_position_calculations['sunrise_time']),
+        str(rounded_solar_position_calculations['noon_time']),
+        str(rounded_solar_position_calculations['local_solar_time']),
+        str(rounded_solar_position_calculations['sunset_time']),
+    )
+    console.print(solar_position_table)
 
 @app.command('position', no_args_is_help=True, help='⦩⦬ Calculate solar position parameters (altitude, azimuth)')
 def position(
