@@ -129,7 +129,8 @@ def calculate_solar_declination_noaa(
 def calculate_time_offset_noaa(
         longitude: float, 
         timestamp: datetime, 
-        output_units: Optional[str] = 'minutes'  # redesign me!
+        time_output_units: str = 'minutes',  # redesign me!
+        angle_units: str = 'radians',
     ) -> float:
     """Calculate the time offset for NOAA's solar position calculations
     measured in minutes.
@@ -192,16 +193,20 @@ def calculate_time_offset_noaa(
             Examples:
                 Mount Olympus is UTC + 2, hence LSTM = 15 * 2 = 30 deg. East
     """
-    longitude_in_minutes = radians_to_time_minutes(longitude)
-    timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # in minutes
-    equation_of_time, _units = calculate_equation_of_time_noaa(timestamp)  # in minutes
+
+    longitude_in_minutes = radians_to_time_minutes(longitude)  # time
+    timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
+    equation_of_time, _units = calculate_equation_of_time_noaa(timestamp,
+                                                               time_output_units,
+                                                               angle_units,
+                                                               )  # minutes
     time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time
 
     # Validate output
     if not -720 <= time_offset <= 720:
         raise ValueError("The time offset must range within [-720, 720] minutes ?")
 
-    return time_offset, output_units
+    return time_offset, time_output_units
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
 def calculate_true_solar_time_noaa(
