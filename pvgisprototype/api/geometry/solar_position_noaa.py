@@ -1,6 +1,6 @@
 """
-The General Solar Position Calculations provided by the NOAA Global
-Monitoring Division are well known sets of simplified equations.
+The General Solar Position Calculations
+provided by the NOAA Global Monitoring Division
 
 See also: https://unpkg.com/solar-calculator@0.1.0/index.js
 """
@@ -27,17 +27,22 @@ from typing import Union
 from ..utilities.conversions import convert_to_degrees_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
 from .decorators import validate_with_pydantic
+from .models import Longitude
+from .models import Latitude
 from .models import CalculateFractionalYearNOAAInput
-from .models import CalculateSolarDeclinationNOAAInput
 from .models import CalculateEquationOfTimeNOAAInput
+from .models import CalculateSolarDeclinationNOAAInput
 from .models import CalculateTimeOffsetNOAAInput
-from .models import CalculateHourAngleNOAAInput
+from .models import CalculateTrueSolarTimeNOAAInput
+from .models import CalculateSolarHourAngleNOAAInput
+from .models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
+from .models import CalculateSolarZenithNOAAInput
 from .models import CalculateSolarAltitudeNOAAInput
 from .models import CalculateSolarAzimuthNOAAInput
-from .models import CalculateTrueSolarTimeNOAAInput
+from .models import CalculateEventHourAngleNOAAInput
 from .models import CalculateEventTimeNOAAInput
 from .models import CalculateLocalSolarTimeNOAAInput
-from .models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
+from .models import CalculateSolarPositionNOAA
 from zoneinfo import ZoneInfo
 
 
@@ -45,10 +50,6 @@ radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_
 degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
 
 
-class SolarPositionData(BaseModel):
-    longitude: float = Field(..., ge=-180, le=180)
-    latitude: float = Field(..., ge=-90, le=90)
-    timestamp: Optional[datetime] = Field(default_factory=datetime.now)
 
 
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
