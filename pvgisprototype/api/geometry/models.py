@@ -208,5 +208,15 @@ class CalculateEventHourAngleNOAAInput(
         return v
 
 
-class CalculateLocalSolarTimeNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel):
+class CalculateEventTimeNOAAInput(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    BaseApplyAtmosphericRefraction,
+    BaseTimeEventInputModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
     verbose: Optional[bool] = False
