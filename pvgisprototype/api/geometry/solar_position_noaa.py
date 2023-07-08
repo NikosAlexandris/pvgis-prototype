@@ -444,24 +444,37 @@ def adjust_solar_zenith_for_atmospheric_refraction(
 
     return solar_zenith, angle_output_units
 
+@validate_with_pydantic(CalculateSolarZenithNOAAInput)
 def calculate_solar_zenith_noaa(
         latitude: float,
         timestamp: datetime,
-        hour_angle: float,
+        solar_hour_angle: float,
         apply_atmospheric_refraction: bool = False,
-        output_units: str = 'radians',
+        # time_output_units: str = 'minutes',
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians',
         ):
     """Calculate the solar zenith angle (φ) in radians
     """
-    solar_declination, _units = calculate_solar_declination_noaa(timestamp, output_units)
+    solar_declination, _units = calculate_solar_declination_noaa(
+            timestamp,
+            angle_units,
+            angle_output_units,
+            )
     cosine_solar_zenith = sin(latitude) * sin(solar_declination) + cos(latitude) * cos(
         solar_declination
-    ) * cos(hour_angle)
+    ) * cos(solar_hour_angle)
     # debug(locals())
     solar_zenith = acos(cosine_solar_zenith)
     if apply_atmospheric_refraction:
-        solar_zenith, _units = adjust_solar_zenith_for_atmospheric_refraction(solar_zenith)  # in radians
-    solar_zenith = convert_to_degrees_if_requested(solar_zenith, output_units)
+        solar_zenith, _units = adjust_solar_zenith_for_atmospheric_refraction(
+                solar_zenith,
+                angle_output_units,
+                )  # in radians
+    solar_zenith = convert_to_degrees_if_requested(
+            solar_zenith,
+            angle_output_units,
+            )
 
     if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
         raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π + 0.0146] radians')
