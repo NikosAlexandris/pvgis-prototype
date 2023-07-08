@@ -571,6 +571,37 @@ def calculate_solar_azimuth_noaa(
 
     return solar_azimuth, angle_output_units
 
+@validate_with_pydantic(CalculateEventHourAngleNOAAInput)
+def calculate_event_hour_angle_noaa(
+        latitude: Latitude,
+        timestamp: datetime,
+        event: str,
+        refracted_solar_zenith: float = 1.5853349194640094,  # radians
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians',
+        ):
+    """
+    """
+    solar_declination, _units = calculate_solar_declination_noaa(
+            timestamp,
+            angle_units,
+            angle_output_units,
+            )  # radians
+    cosine_event_hour_angle = cos(refracted_solar_zenith) / (
+        cos(latitude) * cos(solar_declination)
+    ) - tan(latitude) * tan(solar_declination)
+    event_hour_angle = acos(cosine_event_hour_angle)  # radians
+
+    # ------------------------------------------------------------------------
+    if angle_output_units == 'degrees':  # is this ever needed?
+        event_hour_angle = convert_to_degrees_if_requested(
+                event_hour_angle,
+                angle_output_units,
+                )
+    # ------------------------------------------------------------------------
+
+    return event_hour_angle, angle_output_units
+
 
 @validate_with_pydantic(CalculateEventTimeNOAAInput)
 def calculate_event_time_noaa(
