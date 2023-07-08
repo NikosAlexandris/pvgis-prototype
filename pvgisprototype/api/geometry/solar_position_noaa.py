@@ -710,7 +710,11 @@ def calculate_local_solar_time_noaa(
         latitude: float,
         timestamp: float,
         timezone: str,
-        output_units: str = 'hours',  # for the hour angle! Remove Me?
+        refracted_solar_zenith: float = 1.5853349194640094,  # radians
+        apply_atmospheric_refraction: bool = False,
+        time_output_units: str = 'hours',
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians',
         verbose: str = False,
     ) -> float:
     """
@@ -726,13 +730,17 @@ def calculate_local_solar_time_noaa(
         except Exception as e:
             logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # ------------------------------------------------------------------------
-    solar_noon_timestamp, units = calculate_event_time(
+    solar_noon_timestamp, units = calculate_event_time_noaa(
             longitude,
             latitude,
             timestamp,
             timezone,
-            event='noon',
-            output_units = 'minutes',  # THIS does not really work yet!
+            'noon',
+            refracted_solar_zenith,
+            apply_atmospheric_refraction,
+            time_output_units,
+            angle_units,
+            angle_output_units,
             )
     local_solar_time = timestamp - solar_noon_timestamp
     decimal_hours = local_solar_time.total_seconds() / 3600
@@ -740,4 +748,4 @@ def calculate_local_solar_time_noaa(
     if verbose:
         typer.echo(f'Local solar time: {local_solar_time}')
 
-    return decimal_hours, output_units
+    return decimal_hours, time_output_units
