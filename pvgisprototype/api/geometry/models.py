@@ -108,7 +108,11 @@ class CalculateEquationOfTimeNOAAInput(
     pass
 
 
-class CalculateSolarDeclinationNOAAInput(BaseTimeInputModel,BaseAngleOutputUnitsModel):
+class CalculateSolarDeclinationNOAAInput(
+    BaseTimestampInputModel,
+    BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
     pass
 
 
