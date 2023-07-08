@@ -93,7 +93,10 @@ class BaseAngleOutputUnitsModel(BaseModel):
         return v
 
 
-class CalculateFractionalYearNOAAInput(BaseTimeInputModel,BaseTimeOutputUnitsModel):
+class CalculateFractionalYearNOAAInput(
+    BaseTimestampInputModel,
+    BaseAngleOutputUnitsModel,
+):
     pass
 
 
