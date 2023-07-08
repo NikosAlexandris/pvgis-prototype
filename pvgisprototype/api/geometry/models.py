@@ -227,3 +227,25 @@ class CalculateLocalSolarTimeNOAAInput(
     BaseAngleOutputUnitsModel,
 ):
     verbose: Optional[bool] = False
+
+
+class CalculateSolarPositionNOAA(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    BaseApplyAtmosphericRefraction,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+        ):
+    refracted_solar_zenith: float
+
+    @validator('refracted_solar_zenith')
+    def validate_refracted_solar_zenith(cls, v):
+        target_zenith = 1.5853349194640094  # approx. 90.833 degrees in radians
+        error_margin = 0.01
+        if not (target_zenith - error_margin) <= v <= (target_zenith + error_margin):
+            raise ValueError(
+                f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
+            )
+        return v
+    pass
