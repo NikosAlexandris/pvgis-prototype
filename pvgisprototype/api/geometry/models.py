@@ -219,4 +219,11 @@ class CalculateEventTimeNOAAInput(
 ):
     pass
 
+class CalculateLocalSolarTimeNOAAInput(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
     verbose: Optional[bool] = False
