@@ -284,13 +284,16 @@ def calculate_solar_hour_angle_noaa(
     ----------
     timestamp: datetime, optional
         The timestamp to calculate offset for
+
     timezone: str, optional
         The timezone for calculation
+    
     longitude: float
         The longitude for calculation
 
     Returns:
     float: The solar hour angle
+
     Notes
     -----
 
@@ -607,10 +610,14 @@ def calculate_event_hour_angle_noaa(
 def calculate_event_time_noaa(
         longitude: float,
         latitude: float,
-        timestamp: float,
+        timestamp: datetime,
         timezone: str,
         event: str,
-        output_units: str = 'minutes',
+        refracted_solar_zenith: float = 1.5853349194640094,  # radians
+        apply_atmospheric_refraction: bool = False,
+        time_output_units: str = 'minutes',
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians',
         ):
     """Calculate the sunrise or sunset
 
