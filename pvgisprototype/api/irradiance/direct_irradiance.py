@@ -38,8 +38,8 @@ from ..geometry.solar_time import model_solar_time
 from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_dictionary_to_table
 from ..utilities.timestamp import attach_timezone
-from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import ctx_convert_to_timezone
 from .angular_loss_factor import calculate_angular_loss_factor
 from .extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
 
