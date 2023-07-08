@@ -123,9 +123,12 @@ def model_solar_position(
                 latitude,
                 timestamp,
                 timezone,
-                output_units,
+                apply_atmospheric_refraction,
+                time_output_units,
+                angle_units,
+                angle_output_units,
                 )
-        solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
         solar_azimuth, units = calculate_solar_azimuth_noaa(
                 longitude,
@@ -133,9 +136,11 @@ def model_solar_position(
                 timestamp,
                 timezone,
                 apply_atmospheric_refraction,
-                output_units,
+                time_output_units,
+                angle_units,
+                angle_output_units,
                 )
-        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
     if model.value == SolarPositionModels.skyfield:
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude,
