@@ -7,8 +7,14 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 
-class BaseTimeInputModel(BaseModel):
+class BaseTimestampInputModel(BaseModel):
     timestamp: datetime
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class BaseTimeInputModel(BaseTimestampInputModel):
     timezone: Optional[ZoneInfo]
 
     class Config:
