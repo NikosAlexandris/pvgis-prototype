@@ -476,10 +476,12 @@ def calculate_solar_zenith_noaa(
             angle_output_units,
             )
 
-    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
-        raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π + 0.0146] radians')
+    # if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
+    #     raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π + 0.0146] radians')
+    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi:
+        raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π] radians')
 
-    return solar_zenith, output_units
+    return solar_zenith, angle_output_units
 
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
@@ -488,24 +490,36 @@ def calculate_solar_altitude_noaa(
         latitude: datetime,
         timestamp: float,
         timezone: str,
-        output_units: str = 'radians',
+        apply_atmospheric_refraction: bool = True,
+        time_output_units: str = 'minutes',
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians',
         ):
     """Calculate the solar zenith angle (φ) in radians
     """
-    hour_angle, _units = calculate_hour_angle_noaa(
-        longitude, timestamp, timezone, output_units="radians"
+    solar_hour_angle, _units = calculate_solar_hour_angle_noaa(
+        longitude,
+        timestamp,
+        timezone,
+        time_output_units,
+        angle_output_units,
     )
     solar_zenith, _units = calculate_solar_zenith_noaa(
         latitude,
         timestamp,
-        hour_angle,
+        solar_hour_angle,
+        apply_atmospheric_refraction,
+        # time_output_units,
+        angle_units,
+        angle_output_units,
             )  # radians
     solar_altitude = pi/2 - solar_zenith
+    if not isfinite(solar_altitude) or not -pi/2 <= solar_altitude <= pi/2:
+        raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
+
     solar_altitude = convert_to_degrees_if_requested(solar_altitude,
-                                                     output_units)
-    if not isfinite(solar_altitude) or not -0.0146 <= solar_altitude <= pi/2:
-        raise ValueError('The `solar_altitude` should be a finite number ranging in [-0.0146, π/2] radians')
-    return solar_altitude, output_units
+                                                     angle_output_units)
+    return solar_altitude, angle_output_units
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
