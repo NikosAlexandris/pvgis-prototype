@@ -246,12 +246,29 @@ def calculate_solar_position(
             case_sensitive=False,
             callback=_parse_model,
             help="Model(s) to calculate solar position.")] = [SolarPositionModels.skyfield],
-        output_units: Annotated[str, typer.Option(
+        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
+            '-a',
+            '--atmospheric-refraction',
+            help='Apply atmospheric refraction functions',
+            )] = True,
+        time_output_units: Annotated[str, typer.Option(
             '-u',
             '--output-units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar declination (degrees or radians)")] = 'radians',
+            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+        angle_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+        angle_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
 ):
     """
     Calculates the solar position using all models and returns the results in a table.
@@ -260,7 +277,15 @@ def calculate_solar_position(
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
             solar_altitude, solar_azimuth, units = model_solar_position(
-                longitude, latitude, timestamp, timezone, model, output_units
+                longitude,
+                latitude,
+                timestamp,
+                timezone,
+                model,
+                apply_atmospheric_refraction,
+                time_output_units,
+                angle_units,
+                angle_output_units,
             )
             results.append({
                 'Model': model.value,
