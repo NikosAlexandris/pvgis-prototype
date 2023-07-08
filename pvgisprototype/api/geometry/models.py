@@ -27,6 +27,17 @@ class BaseTimeInputModel(BaseTimestampInputModel):
         return v
 
 
+class BaseTimeEventInputModel(BaseModel):
+    event: str
+
+    @validator('event')
+    def validate_event(cls, v):
+        valid_events = ['noon', 'sunrise', 'sunset']
+        if v not in valid_events:
+            raise ValueError(f"`event` must be one of {valid_events}")
+        return v
+
+
 class BaseTimeOutputUnitsModel(BaseModel):
     output_units: Optional[str]
 
