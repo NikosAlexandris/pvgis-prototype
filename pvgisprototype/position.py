@@ -150,7 +150,13 @@ def noaa(
     )
     console.print(solar_position_table)
 
-@app.command('position', no_args_is_help=True, help='⦩⦬ Calculate solar position parameters (altitude, azimuth)')
+
+
+@app.command(
+        'overview',
+        no_args_is_help=True,
+        help='⦩⦬ Calculate solar position parameters (altitude, azimuth)',
+ )
 def position(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
@@ -174,17 +180,35 @@ def position(
             case_sensitive=False,
             # callback=_parse_model,
             help="Model(s) to calculate solar position.")] = [SolarPositionModels.skyfield],
-        output_units: Annotated[str, typer.Option(
+        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
+            '-a',
+            '--atmospheric-refraction',
+            help='Apply atmospheric refraction functions',
+            )] = True,
+        time_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--output-units',
+            show_default=True,
+            case_sensitive=False,
+            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+        angle_units: Annotated[str, typer.Option(
             '-u',
             '--units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+        angle_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
         rounding_places: Annotated[Optional[int], typer.Option(
             '-r',
             '--rounding-places',
             show_default=True,
             help='Number of places to round results to.')] = 5,
+        verbose: bool = False,
         ):
     """
     """
