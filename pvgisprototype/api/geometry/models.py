@@ -178,14 +178,16 @@ class CalculateSolarAltitudeNOAAInput(
     pass
 
 
-class CalculateEventTimeNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseTimeOutputUnitsModel):
-    event: str
+class CalculateSolarAzimuthNOAAInput(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
 
-    @validator('event')
-    def validate_event(cls, v):
-        valid_events = ['noon', 'sunrise', 'sunset']
-        if v not in valid_events:
-            raise ValueError(f"event must be one of {valid_events}")
+
         return v
 
 
