@@ -213,7 +213,8 @@ def calculate_true_solar_time_noaa(
         longitude: float,
         timestamp: datetime, 
         timezone: Optional[ZoneInfo],
-        output_units: Optional[str] = 'minutes',
+        time_output_units: str = 'minutes',
+        angle_units: str = 'radians',
     ) -> float:
     """Calculate the true solar time.
 
@@ -237,14 +238,21 @@ def calculate_true_solar_time_noaa(
             logging.warning(f'Unknown timezone: {e}')
             raise
     
-    time_offset, _units = calculate_time_offset_noaa(longitude, timestamp)  # in minutes
-    true_solar_time = timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
+    time_offset, _units = calculate_time_offset_noaa(
+            longitude,
+            timestamp,
+            time_output_units,
+            angle_units,
+            )  # in minutes
+    true_solar_time = (
+        timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
+    )
 
-    # Validate output
-    if not 0 <= true_solar_time <= 1440:
-        raise ValueError("The true solar time must range within [0, 1440] minutes")
+    if time_output_units == 'minutes':
+        if not 0 <= true_solar_time <= 1440:
+            raise ValueError("The true solar time must range within [0, 1440] minutes")
 
-    return true_solar_time, output_units
+    return true_solar_time, time_output_units
 
 
 @validate_with_pydantic(CalculateHourAngleNOAAInput)
