@@ -71,6 +71,17 @@ class BaseCoordinatesInputModel(BaseLongitudeInputModel, BaseLatitudeInputModel)
     pass
 
 
+class BaseAngleUnitsModel(BaseModel):
+    angle_units: str
+
+    @validator('angle_units')
+    def validate_angle_units(cls, v):
+        valid_units = ['radians', 'degrees']
+        if v not in valid_units:
+            raise ValueError(f"angle_units must be one of {valid_units}")
+        return v
+
+
 class BaseAngleOutputUnitsModel(BaseModel):
     output_units: Optional[str]
 
