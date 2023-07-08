@@ -100,7 +100,11 @@ class CalculateFractionalYearNOAAInput(
     pass
 
 
-class CalculateEquationOfTimeNOAAInput(BaseTimeInputModel,BaseTimeOutputUnitsModel):
+class CalculateEquationOfTimeNOAAInput(
+    BaseTimestampInputModel,
+    BaseAngleUnitsModel,
+    BaseTimeOutputUnitsModel,
+):
     pass
 
 
