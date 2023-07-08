@@ -152,9 +152,8 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(BaseAngleOutputUnitsMod
         return v
 
 
-class CalculateSolarZenithNOAAInput(BaseLatitudeInputModel,BaseTimeInputModel,BaseAngleOutputUnitsModel):
-        hour_angle: float
-        apply_atmospheric_refraction: bool = False
+class BaseApplyAtmosphericRefraction(BaseModel):
+    apply_atmospheric_refraction: bool
 
 
 class CalculateSolarAltitudeNOAAInput(BaseCoordinatesInputModel,BaseTimeInputModel,BaseAngleOutputUnitsModel):
