@@ -82,13 +82,25 @@ def model_solar_position(
             '-a',
             '--atmospheric-refraction',
             help='Apply atmospheric refraction functions',
-            )] = False,
-        output_units: Annotated[str, typer.Option(
+            )] = True,
+        time_output_units: Annotated[str, typer.Option(
             '-u',
             '--output-units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar declination (degrees or radians)")] = 'radians',
+            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+        angle_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+        angle_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
         ):
     """
     The solar altitude angle measures from the horizon up towards the zenith
