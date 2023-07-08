@@ -147,10 +147,10 @@ def model_solar_position(
                 latitude,
                 timestamp,
                 timezone,
-                output_units,
+                angle_output_units,
                 )
-        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
-        solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
     
     if model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
@@ -159,8 +159,8 @@ def model_solar_position(
                 lng=longitude,
                 lat=latitude,
                 ).values()
-        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
-        solar_altitude = convert_to_degrees_if_requested(solar_altitude, output_units)
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
     
     if model.value  == SolarPositionModels.pysolar:
 
@@ -170,14 +170,14 @@ def model_solar_position(
                 longitude_deg=longitude,
                 when=timestamp,
                 )
-        solar_altitude = convert_to_radians_if_requested(solar_altitude, output_units)
+        solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
 
         solar_azimuth = pysolar.solar.get_azimuth(
                 latitude_deg=longitude,  # this comes first
                 longitude_deg=latitude,
                 when=timestamp,
                 )
-        solar_azimuth = convert_to_radians_if_requested(solar_azimuth, output_units)
+        solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
     if model.value  == SolarPositionModels.pvis:
 
@@ -186,13 +186,13 @@ def model_solar_position(
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
-                output_units=output_units,
+                output_units=angle_output_units,
                 )
         solar_azimuth, _units = calculate_solar_azimuth(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
-                output_units=output_units,
+                output_units=angle_output_units,
                 )
 
     if model.value  == SolarPositionModels.pvgis:
@@ -216,10 +216,11 @@ def model_solar_position(
                 timestamp,
                 )
 
-        solar_altitude = convert_to_radians_if_requested(solar_altitude, output_units)
-        solar_azimuth = convert_to_radians_if_requested(solar_azimuth, output_units)
+        solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
+        solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
-    return solar_altitude, solar_azimuth, output_units  # redesign a safer output_units!
+    debug(locals())
+    return solar_altitude, solar_azimuth, angle_output_units  # redesign a safer output_units!
 
 
 @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
