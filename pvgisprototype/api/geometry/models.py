@@ -83,13 +83,13 @@ class BaseAngleUnitsModel(BaseModel):
 
 
 class BaseAngleOutputUnitsModel(BaseModel):
-    output_units: Optional[str]
+    angle_output_units: str
 
-    @validator('output_units')
-    def validate_output_units(cls, v):
+    @validator('angle_output_units')
+    def validate_angle_output_units(cls, v):
         valid_units = ['radians', 'degrees']
         if v not in valid_units:
-            raise ValueError(f"output_units must be one of {valid_units}")
+            raise ValueError(f"angle_output_units must be one of {valid_units}")
         return v
 
 
