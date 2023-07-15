@@ -1,3 +1,4 @@
+from devtools import debug
 """
 Date, time and zones
 --------------------
@@ -47,7 +48,6 @@ from datetime import timedelta
 from datetime import timezone
 from typing import Annotated
 from typing import Optional
-from tzlocal import get_localzone
 import calendar
 import random
 import time
@@ -60,7 +60,14 @@ from rich import print
 app = typer.Typer()
 
 
-def now_datetime() -> datetime:
+def now_local_datetimezone():
+    """Get current local date and time and zone
+    """
+    print('I am runnning now the now_local_datetimezone() function!')
+    return datetime.now().astimezone(ZoneInfo.local())
+
+
+def now_utc_datetimezone() -> datetime:
     """Returns the current datetime in UTC.
 
     Return an aware timestamp using the local system time, however defaulting
@@ -69,45 +76,101 @@ def now_datetime() -> datetime:
     return datetime.now(ZoneInfo('UTC'))
 
 
-def ctx_attach_requested_timezone(
-        ctx: typer.Context,
+def attach_requested_timezone(
         timestamp: datetime,
-        param: typer.CallbackParam,
-        # verbose: bool = False,
+        timezone: ZoneInfo = None
     ) -> datetime:
-    """Returns the current datetime in the user-requested timezone."""
+    """Attaches the requested timezone to a naive datetime."""
 
-    timezone = ctx.params.get('timezone')
     if timestamp.tzinfo is not None:
-        # --------------------------------------------------------------------
-        print("WARNING: The provided timestamp already has a timezone.")  # Convert to warning!
+        print("WARNING: The provided timestamp already has a timezone.")  
         print("Please ensure the timestamp is provided as a naive datetime object.")
-        print("Usage example: YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD")
-        # --------------------------------------------------------------------
         return timestamp
 
     if timezone is None:
-        # --------------------------------------------------------------------
-        print('No timezone requested. Setting timezone to UTC.')  # Convert to warning!
-        # --------------------------------------------------------------------
+        print(f'[yellow]No timezone requested! Set to[/yellow] [red]UTC[/red].') 
         timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
 
     else:
         try:
-            # --------------------------------------------------------------------
-            print(f'Attaching the {timezone} to the {timestamp}')  # Convert to warning!
-            # --------------------------------------------------------------------
+            print(f'Attaching the {timezone} to the {timestamp}')  
             timezone_aware_timestamp = timestamp.replace(tzinfo=timezone)
 
         except Exception as e:
             print(f'Failed to attach the requested timezone \'{timezone}\' to the timestamp: {e}')
             print("Defaulting to UTC timezone.")
             timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
-    # if verbose:
-    #     print(f'Input timestamp    : {timestamp}')
-    #     print(f'Requested timezone : {timezone} of type \'{type(timezone)}\'')
-    #     # add verbosity...
+
     return timezone_aware_timestamp
+
+
+def ctx_attach_requested_timezone(
+        ctx: typer.Context,
+        timestamp: datetime,
+        param: typer.CallbackParam
+    ) -> datetime:
+    """Returns the current datetime in the user-requested timezone."""
+
+    print(f'[yellow]i[/yellow] Executing `ctx_attach_requested_timezone()`')
+    timezone = ctx.params.get('timezone')
+    return attach_requested_timezone(timestamp, timezone)
+
+
+# def ctx_attach_requested_timezone(
+#         ctx: typer.Context,
+#         timestamp: datetime,
+#         param: typer.CallbackParam,
+#         # verbose: bool = False,
+#     ) -> datetime:
+#     """Returns the current datetime in the user-requested timezone."""
+
+#     # if verbose:
+#     print(f'[yellow]i[/yellow] Executing `ctx_attach_requested_timezone()`')
+#     timezone = ctx.params.get('timezone')
+#     # debug(locals())
+
+#     if timestamp.tzinfo is not None:
+#         # --------------------------------------------------------------------
+#         print("WARNING: The provided timestamp already has a timezone.")  # Convert to warning!
+#         print("Please ensure the timestamp is provided as a naive datetime object.")
+#         print("Usage example: YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD")
+#         # --------------------------------------------------------------------
+#         debug(locals())
+#         return timestamp
+
+#     if timezone is None:
+#         # --------------------------------------------------------------------
+#         print(f'[yellow]No timezone requested! Set to[/yellow] [red]UTC[/red].')  # Convert to warning!
+#         # --------------------------------------------------------------------
+#         timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+
+#     else:
+#         try:
+#             # --------------------------------------------------------------------
+#             print(f'Attaching the {timezone} to the {timestamp}')  # Convert to warning!
+#             # --------------------------------------------------------------------
+#             timezone_aware_timestamp = timestamp.replace(tzinfo=timezone)
+
+#         except Exception as e:
+#             print(f'Failed to attach the requested timezone \'{timezone}\' to the timestamp: {e}')
+#             print("Defaulting to UTC timezone.")
+#             timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+
+#     # debug(locals())
+#     # if verbose:
+#     #     print(f'Input timestamp    : {timestamp}')
+#     #     print(f'Requested timezone : {timezone} of type \'{type(timezone)}\'')
+#     #     # add verbosity...
+#     return timezone_aware_timestamp
+
+
+def random_day_of_year(days_in_a_year) -> int:
+    """
+    Generate a random datetime and timezone object
+    """
+    day = random.randint(1, days_in_a_year)
+
+    return days_in_a_year
 
 
 def random_datetimezone() -> tuple:
@@ -130,22 +193,28 @@ def random_datetimezone() -> tuple:
 
 def convert_to_timezone(timezone_string: str) -> ZoneInfo:
     """Convert string to ZoneInfo object."""
+    print(f'[yellow]i[/yellow] Executing `convert_to_timezone()`')
 
+    # debug(locals())
 
     if timezone_string is None:
-        print(f'Setting timezone to UTC')
+        print(f'[yellow]No timezone requested? Set to[/yellow] [red]UTC[/red].')  # Convert to warning!
+        print(f'[yellow]Setting timezone to[/yellow] [red]UTC[/red]')
         return ZoneInfo('UTC')
 
     else:
         try:
             if timezone == 'local':
+                # debug(locals())
                 return datetime.now().astimzone(None).tzinfo
 
             else:
+                # debug(locals())
                 return ZoneInfo(timezone_string)
 
         except (zoneinfo.ZoneInfoNotFoundError, Exception):
             print(f"Requested zone {timezone} not found. Setting it to UTC.")
+            # debug(locals())
             return ZoneInfo('UTC')
 
 
@@ -160,6 +229,7 @@ def attach_timezone(
         timezone_string: Optional[str] = None
 ) -> datetime:
     """Convert datetime object to timezone-aware."""
+    # debug(locals())
 
     if timestamp is None:
         timestamp = datetime.now(ZoneInfo('UTC'))  # Default to UTC
@@ -171,6 +241,7 @@ def attach_timezone(
         except Exception as e:
             raise ValueError(f"Could not convert timezone: {e}")
 
+    # debug(locals())
     return timestamp
 
 
