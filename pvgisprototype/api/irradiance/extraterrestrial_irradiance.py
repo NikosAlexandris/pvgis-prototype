@@ -2,6 +2,8 @@ import typer
 from typing_extensions import Annotated
 import math
 import numpy as np
+from .constants import SOLAR_CONSTANT
+from ...api.utilities.timestamp import random_day_of_year
 
 
 app = typer.Typer(
@@ -11,24 +13,38 @@ app = typer.Typer(
 )
 
 
-@app.callback(invoke_without_command=True, no_args_is_help=True)
+@app.callback(
+    invoke_without_command=True,
+    no_args_is_help=True,
+)
 def calculate_extraterrestrial_irradiance(
-        day_of_year: float,
-        days_in_a_year: float = 365.25,
+        day_of_year: Annotated[float, typer.Argument(
+            min=1,
+            max=366,
+            help='Day of year')] = None,
         solar_constant: Annotated[float, typer.Argument(
-            help="The solar constant is a flux density measuring mean solar electromagnetic radiation (total solar irradiance) per unit area (perpendicular to the rays) arriving at the top of the Earth's atmosphere (about 1360.8 W/m2) one astronomical unit (au) away from the Sun (roughly the distance from the Sun to the Earth).",
-            min=1360)] = 1360.8,
-        orbital_eccentricity: float = 0.03344,
-        perigee_offset: float = 0.048869,
+            help="The mean solar electromagnetic radiation at the top of the atmosphere (~1360.8 W/m2) one astronomical unit (au) away from the Sun.",
+            min=1360)] = SOLAR_CONSTANT,
+        days_in_a_year: Annotated[float, typer.Option(
+            help='Days in a year')] = 365.25,
+        perigee_offset: Annotated[float, typer.Option(
+            help='Perigee offset')] = 0.048869,
+        eccentricity: Annotated[float, typer.Option(
+            help='Eccentricity')] = 0.01672,
+        random_day: Annotated[bool, typer.Option(
+            '-r',
+            '--random-day',
+            help="Generate a random day to demonstrate calculation")] = False,
         ) -> float:
-    """Calculate the extraterrestial_irradiance for the given day of the year.
+    """Calculate the extraterrestial irradiance for the given day of the year.
 
-    The solar constant is the amount of solar electromagnetic radiation
-    received at the outer atmosphere of Earth in a unit area perpendicular to
-    the rays of the Sun, on a day when Earth is at its mean distance from the
+    The solar constant is a flux density measuring the amount of solar
+    electromagnetic radiation received at the outer atmosphere of Earth in a
+    unit area perpendicular to the rays of the Sun, on a day when the Earth is
+    at its mean distance from the Sun (one astronomical unit (au) away from the
     Sun. Its approximate value is around 1360.8 +/-0.5 W/m^2
-    (:cite:`p:Kopp2011`) but varies slightly
-    throughout the year due to the Earth's elliptical orbit.
+    (:cite:`p:Kopp2011`) but varies slightly throughout the year due to the
+    Earth's elliptical orbit.
 
     Parameters
     ----------
@@ -88,9 +104,13 @@ def calculate_extraterrestrial_irradiance(
     1412.71 W/m^2 and on July 6 it gets down to around 1321 W/m^2. This value
     is for what hits the top of the atmosphere before any energy is attenuated.
     """
+    # Possible to move to a callback? ----------------------------------------
+    if random_day:
+        day_of_year = random_day_of_year(int(days_in_a_year))
+    # ------------------------------------------------------------------------
     position_of_earth = 2 * math.pi * day_of_year / days_in_a_year
-    distance_correction_factor = 1 + orbital_eccentricity * math.cos(position_of_earth - perigee_offset)
+    distance_correction_factor = 1 + eccentricity * math.cos(position_of_earth - perigee_offset)
     extraterrestial_irradiance = solar_constant * distance_correction_factor
 
-    typer.echo(f'Extraterrestrial irradiance: {extraterrestial_irradiance}')
+    # typer.echo(f'Extraterrestrial irradiance: {extraterrestial_irradiance}')
     return extraterrestial_irradiance
