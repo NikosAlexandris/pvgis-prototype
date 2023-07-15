@@ -2,8 +2,8 @@ import typer
 from typing import Annotated
 from typing import Optional
 from math import sin, cos, acos
-from ..utilities.conversions import convert_to_radians
-from ..utilities.conversions import convert_to_degrees_if_requested
+from ...api.utilities.conversions import convert_to_radians
+from ...api.utilities.conversions import convert_to_degrees_if_requested
 
 
 def calculate_solar_incidence(
@@ -75,12 +75,27 @@ def calculate_solar_incidence(
         sun ray and the line normal to the surface measured in radian.
     """
     solar_incidence = acos(
-        sin(latitude) * (sin(solar_declination) * cos(surface_slope) +
-                         cos(solar_declination) * cos(surface_azimuth) *
-                         cos(hour_angle) * sin(surface_slope)) +
-        cos(latitude) * (cos(solar_declination) * cos(hour_angle) * cos(surface_slope) -
-                         sin(solar_declination) * cos(surface_azimuth) *
-                         sin(surface_slope)) +
-        cos(solar_declination) * sin(surface_azimuth) * sin(hour_angle) * sin(surface_slope)
+        sin(latitude)
+        * (
+            sin(solar_declination)
+            * cos(surface_slope)
+            + cos(solar_declination)
+            * cos(surface_azimuth)
+            * cos(hour_angle)
+            * sin(surface_slope)
+        )
+        + cos(latitude)
+        * (
+            cos(solar_declination)
+            * cos(hour_angle)
+            * cos(surface_slope)
+            - sin(solar_declination)
+            * cos(surface_azimuth)
+            * sin(surface_slope)
+        )
+        + cos(solar_declination)
+        * sin(surface_azimuth)
+        * sin(hour_angle)
+        * sin(surface_slope)
     )
     return solar_incidence
