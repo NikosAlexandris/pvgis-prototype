@@ -1,5 +1,10 @@
+from devtools import debug
+
+from typing import Annotated
 from typing import Union
 from typing import Optional
+from typing import List
+from pydantic import BaseModel
 
 from fastapi import FastAPI
 from fastapi import Query
@@ -14,11 +19,19 @@ from bokeh.embed import components
 from bokeh.resources import INLINE
 from bokeh.resources import CDN
 
-from .solar_time import calculate_solar_time_skyfield
-from .timestamp import now_datetime
-from .timestamp import convert_to_timezone
-from .plot import plot_line
-from .solar_declination_plot import plot_solar_declination_one_year_bokeh
+
+from .api.geometry.time.models import SolarTimeModels
+from .api.geometry.solar_time import calculate_solar_time
+
+from .api.utilities.conversions import convert_to_radians_fastapi
+from .api.utilities.timestamp import now_utc_datetimezone
+from .api.utilities.timestamp import convert_to_timezone
+
+from .plot.plot import plot_line
+from .plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
+
+from .web_api.geometry.noaa.solar_position import noaa_solar_position
+
 
 
 app = FastAPI()
@@ -47,16 +60,55 @@ def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/calculate_solar_time_skyfield/")
-async def get_solar_time_skyfield(
+class SolarTimeResult(BaseModel):
+    Model: str
+    Solar_time: float
+    Units: str
+
+
+# @app.get("/calculate_solar_time/", response_model=List[SolarTimeResult])
+@app.get("/calculate_solar_time/")
+async def get_solar_time(
     longitude: float = Query(..., ge=-180, le=180),
     latitude: float = Query(..., ge=-90, le=90),
-    timestamp: datetime = Query(default_factory=now_datetime),
+    timestamp: Optional[datetime] = None,
     timezone: Optional[str] = None,
+    model: List[SolarTimeModels] = Query([SolarTimeModels.skyfield], description="Model to calculate solar time"),
+    days_in_a_year: float = Query(365.25, description="Days in a year"),
+    perigee_offset: float = Query(0.048869, description="Perigee offset"),
+    eccentricity: float = Query(0.01672, description="Eccentricity"),
+    time_offset_global: float = Query(0, description="Global time offset"),
+    hour_offset: float = Query(0, description="Hour offset"),
 ):
-    timezone = convert_to_timezone(timezone)
-    decimal_hours = calculate_solar_time_skyfield(longitude, latitude, timestamp, timezone)
-    return {"Local solar time": decimal_hours}
+    debug(locals())
+    longitude = convert_to_radians_fastapi(longitude)
+    latitude = convert_to_radians_fastapi(latitude)
+
+    if timestamp is None:
+        timestamp = now_utc_datetimezone()
+
+    if timezone:
+        timezone = convert_to_timezone(timezone)
+        timestamp = timestamp.astimezone(timezone)
+    
+    debug(locals())
+    solar_time  = calculate_solar_time(
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            model,
+            days_in_a_year,
+            perigee_offset,
+            eccentricity,
+            time_offset_global,
+            hour_offset,
+            )
+    debug(locals())
+    return {"Local solar time": solar_time}
+
+
+app.get("/calculate/geometry/noaa/solar_position")(noaa_solar_position)
 
 
 @app.get("/plot", response_class=HTMLResponse)
