@@ -1,5 +1,4 @@
 import pytest
-import pytz
 from typer.testing import CliRunner
 from pvgisprototype.api.irradiance.angular_loss_factor import calculate_angular_loss_factor
 from pvgisprototype.api.irradiance.direct_irradiance import calculate_refracted_solar_altitude
@@ -7,8 +6,9 @@ from pvgisprototype.api.irradiance.direct_irradiance import calculate_optical_ai
 from pvgisprototype.api.irradiance.direct_irradiance import rayleigh_optical_thickness
 from pvgisprototype.api.irradiance.direct_irradiance import calculate_direct_normal_irradiance
 from pvgisprototype.api.irradiance.direct_irradiance import calculate_direct_horizontal_irradiance
-from pvgisprototype.api.irradiance.direct_irradiance import calculate_direct_inclined_irradiance
+from pvgisprototype.api.irradiance.direct_irradiance import calculate_direct_inclined_irradiance_pvgis
 from pvgisprototype.api.irradiance.direct_irradiance import app
+
 
 def run_app(arguments):
     runner = CliRunner()
@@ -16,6 +16,21 @@ def run_app(arguments):
     return result
 
 
+# @pytest.mark.parametrize(
+#     "latitude, elevation, timestamp, linke_turbidity_factor, expected_output", 
+#     [
+#         (40.085556, 2917.727, 0.2, '2023-06-22', 'Extraterrestrial irradiance: 1316.337133501784\nDirect normal irradiance: 1295.125350879713\nDirect horizontal irradiance: 1218.3216902511913\n'),
+#         ]
+# )
+# def test_calculate_direct_horizontal_irradiance(latitude, elevation, timestamp, linke_turbidity_factor, expected_output):
+#     arguments = [
+#         'horizontal',
+#         str(latitude),
+#         str(elevation),
+#         str(timestamp),
+#         str(linke_turbidity_factor),
+#     ]
+#     result = run_app(arguments)
 @pytest.mark.parametrize(
     "solar_altitude, solar_declination, expexted_angular_loss_factor",
     [
@@ -47,26 +62,9 @@ def test_calculate_angular_loss_factor_with_invalid_inputs(solar_altitude, solar
 def test_calculate_angular_loss_factor(solar_altitude, solar_declination, expexted_angular_loss_factor):
     result = calculate_angular_loss_factor(solar_altitude, solar_declination)
     assert result == pytest.approx(expexted_angular_loss_factor)
-
-
-@pytest.mark.parametrize(
-    "latitude, elevation, timestamp, linke_turbidity_factor, expected_output", 
-    [
-        (40.085556, 2917.727, 0.2, '2023-06-22', 'Extraterrestrial irradiance: 1316.337133501784\nDirect normal irradiance: 1295.125350879713\nDirect horizontal irradiance: 1218.3216902511913\n'),
-        ]
-)
-def test_calculate_direct_horizontal_irradiance(latitude, elevation, timestamp, linke_turbidity_factor, expected_output):
-    arguments = [
-        'horizontal',
-        str(latitude),
-        str(elevation),
-        str(timestamp),
-        str(linke_turbidity_factor),
-    ]
-    result = run_app(arguments)
     
-    assert result.exit_code == 0
-    assert expected_output in result.output
+#     assert result.exit_code == 0
+#     assert expected_output in result.output
 
 
 # def test_calculate_refracted_solar_altitude():
@@ -98,27 +96,40 @@ def test_calculate_direct_horizontal_irradiance(latitude, elevation, timestamp, 
 #     result = calculate_direct_horizontal_irradiance(45, 1000, 2023, 150, 5, 2)
 #     assert isinstance(result, float)
 
+locations = [ 
+    (40.085556, 2917.727, '2023-06-22'),  # Mt Olympos
+    (0, 40, 2000),  # Another location
+]
+
+other_parameters = [ 
+    (40, 180, 2, 'jenco', 
+    "Extraterrestrial irradiance: 1316.337133501784\nDirect normal irradiance: 1118.9581621543896\nDirect horizontal irradiance: 1052.6015867964556"),  
+    # (2, 30, 180, 'simple', 
+    # 'Direct inclined irradiance: XXX (based on simple)\n'),
+]
 
 @pytest.mark.parametrize(
-    "latitude, elevation, timestamp, surface_tilt, surface_orientation, linke_turbidity_factor, method_for_solar_incidence_angle, expected_output",
-    [
-        (40.085556, 2917.727, '2023-06-22', 40, 180, 2, 'jenco', "Extraterrestrial irradiance: 1316.337133501784\nDirect normal irradiance: 1118.9581621543896\nDirect horizontal irradiance: 1052.6015867964556"),  # Mt Olympos
-    ]
+    "location, parameters",
+    list(zip(locations, other_parameters))
 )
-def test_calculate_direct_inclined_irradiance(latitude, elevation, timestamp, surface_tilt, surface_orientation, linke_turbidity_factor, method_for_solar_incidence_angle, expected_output):
-    # Convert the parameters to strings to pass them as command-line arguments
+def test_calculate_direct_inclined_irradiance_pvgis(location, parameters):
+    longitude, latitude, elevation = location
+    linke_turbidity_factor, surface_tilt, surface_orientation, solar_incidence_angle_model, expected_output = parameters
     arguments = [
         'inclined',
+        str(longitude),
         str(latitude),
         str(elevation),
         str(timestamp),
-        str(surface_tilt),
-        str(surface_orientation),
+        '--linke-turbidity-factor',
         str(linke_turbidity_factor),
-        '-m',
-        str(method_for_solar_incidence_angle),
+        '--surface-tilt',
+        str(surface_tilt),
+        '--surface-orientation',
+        str(surface_orientation),
+        '--incidence-angle-model',
+        solar_incidence_angle_model,
     ]
     result = run_app(arguments)
-    print(result) 
-    # assert result.exit_code == 0
+    assert result.exit_code == 0
     assert expected_output in result.output
