@@ -12,7 +12,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":triangular_ruler:  Calculate solar surface geometry parameters for a location and moment in time",
+    help=f"󰶛  Calculate solar surface geometry parameters for a location and moment in time",
 )
 
 

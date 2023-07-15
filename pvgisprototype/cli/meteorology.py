@@ -15,7 +15,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=':chart_increasing:  Retrieve time series of meteorological variables',
+    help=':sun_behind_rain_cloud:  Meteorological time series',
 )
 
 
