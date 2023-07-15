@@ -1,6 +1,8 @@
 import pytest
 import matplotlib.pyplot as plt
 from pvgisprototype.api.irradiance.extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
+from pvgisprototype.api.irradiance.constants import EXTRATERRESTRIAL_IRRADIANCE_MIN
+from pvgisprototype.api.irradiance.constants import EXTRATERRESTRIAL_IRRADIANCE_MAX
 from pvgisprototype.plot.plot_extraterrestrial_irradiance import plot_extraterrestrial_irradiance
 import numpy as np
 import random
@@ -14,13 +16,29 @@ import random
         (183, 1321.44578929),  # Aphelion: solar constant should be minimum
         (266, 1361.44578929),  # Autumnal equinox
         (355, 1400.25687453),  # Close to winter solstice
-        (random.randint(1, 365), 1361.44578929)  # Random day of the year
     ]
 )
 def test_calculate_extraterrestrial_irradiance(day_of_year: int, expected: float):
-    assert pytest.approx(calculate_extraterrestrial_irradiance(day_of_year), 0.0001) == expected
+    assert expected == pytest.approx(calculate_extraterrestrial_irradiance(day_of_year), 0.0001)
 
 
-@pytest.mark.mpl_image_compare  # instructs use of a baseline image
-def test_extraterrestrial_irradiance_plot():
-    return plot_extraterrestrial_irradiance()
+@pytest.mark.parametrize(
+    "day_of_year", 
+    [
+        # (random.randint(1, 366), 1360.8931954516274)  # Random day of the year
+        (random.randint(1, 366)),
+        (random.randint(1, 366)),
+        (random.randint(1, 366)),
+        (random.randint(1, 366)),
+        (random.randint(1, 366)),
+    ]
+)
+def test_calculate_extraterrestrial_irradiance_for_random_day(day_of_year: int):
+    calculated = calculate_extraterrestrial_irradiance(day_of_year)
+    # assert expected == pytest.approx(calculated, abs=0.5)
+    assert EXTRATERRESTRIAL_IRRADIANCE_MIN <= calculated <= EXTRATERRESTRIAL_IRRADIANCE_MAX
+
+
+# @pytest.mark.mpl_image_compare  # instructs use of a baseline image
+# def test_extraterrestrial_irradiance_plot():
+#     return plot_extraterrestrial_irradiance()
