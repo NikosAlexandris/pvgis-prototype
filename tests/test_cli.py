@@ -1,10 +1,10 @@
 import pytest
 import pathlib
 from typer.testing import CliRunner
-from pvgisprototype.cli import app as cli_app
-from pvgisprototype.series import app as series_app
+from pvgisprototype.cli.cli import app as cli_app
+from pvgisprototype.cli.series import app as series_app
 # from pvgisprototype.time_series import app as timeseries
-from pvgisprototype.utilities import app as utility_app
+from pvgisprototype.cli.utilities import app as utility_app
 # from pvgisprototype.solar_geometry_pvgis_constants import app as solar_geometry_pvgis_constants_app
 # from pvgisprototype.solar_geometry_pvgis_variables import app as solar_geometry_pvgis_variables_app
 from pvgisprototype.api.geometry.solar_position import app as solar_position_app
