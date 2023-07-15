@@ -4,22 +4,24 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
-import pytz
-from pvgisprototype.api.geometry.solar_time import (
-    calculate_solar_time_ephem,
-    calculate_solar_time_eot,
-    calculate_solar_time_pvgis,
-    calculate_solar_time,
-    calculate_hour_angle,
-    calculate_hour_angle_sunrise,
-    SolarTimeModels
-)
+
+from pvgisprototype.api.geometry.solar_time import calculate_solar_time
+from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
+from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
+
+from pvgisprototype.models.pyephem.solar_time import calculate_solar_time_ephem
+from pvgisprototype.models.milne1921.solar_time import calculate_solar_time_eot
+from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_time_pvgis
+from pvgisprototype.api.geometry.time_models import SolarTimeModels
+
 from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
+
 from pvgisprototype.plot.plot_solar_time import plot_solar_time
 from pvgisprototype.plot.plot_solar_time import plot_solar_time_one_year
 from pvgisprototype.plot.plot_solar_time import plot_solar_time_one_year_bokeh
 from pvgisprototype.plot.plot_solar_time import plot_solar_time_one_year_bokeh_static
+
 import numpy as np
 import random
 
