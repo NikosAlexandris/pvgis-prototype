@@ -14,18 +14,21 @@ from typing import Annotated
 from typing import Optional
 from rich import print
 
-from .api.utilities.rich_help_panel_names import rich_help_panel_performance
+from .rich_help_panel_names import rich_help_panel_performance
 from . import energy
-from .api.utilities.rich_help_panel_names import rich_help_panel_series
+from .rich_help_panel_names import rich_help_panel_series
+# from . import series
+from ..api.series import series
 from . import irradiance
 from . import meteorology
-from .api.utilities.rich_help_panel_names import rich_help_panel_geometry
+# from .plot import uniplot
+from .rich_help_panel_names import rich_help_panel_geometry
 from . import time
 from . import position
 from . import surface
-from .api.utilities.rich_help_panel_names import rich_help_panel_toolbox
+from .rich_help_panel_names import rich_help_panel_toolbox
 from . import utilities
-from .api.utilities.rich_help_panel_names import rich_help_panel_reference
+from .rich_help_panel_names import rich_help_panel_reference
 from . import manual
 
 
@@ -62,28 +65,40 @@ app = typer.Typer(
 
 
 app.add_typer(
-        energy.app,
-        name="energy",
-        no_args_is_help=True,
-        rich_help_panel=rich_help_panel_performance,
+    energy.app,
+    name="energy",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_performance,
 )
+app.add_typer(
+    series.app,
+    name="series",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series,
+)
+# app.add_typer(
+#     uniplot.app,
+#     name="uniplot",
+#     no_args_is_help=True,
+#     rich_help_panel=rich_help_panel_series,
+# )
 app.add_typer(
     irradiance.app,
     name="irradiance",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series
+    rich_help_panel=rich_help_panel_series,
 )
 app.add_typer(
-        meteorology.app,
-        name="meteorology",
-        no_args_is_help=True,
-        rich_help_panel=rich_help_panel_series,
+    meteorology.app,
+    name="meteorology",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series,
 )
 app.add_typer(
-        time.app,
-        name="time",
-        no_args_is_help=True,
-        rich_help_panel=rich_help_panel_geometry,
+    time.app,
+    name="time",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_geometry,
 )
 app.add_typer(
     position.app,
@@ -92,10 +107,10 @@ app.add_typer(
     rich_help_panel=rich_help_panel_geometry,
 )
 app.add_typer(
-        time.app,
-        name="surface",
-        no_args_is_help=True,
-        rich_help_panel=rich_help_panel_geometry,
+    time.app,
+    name="surface",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_geometry,
 )
 app.add_typer(
     utilities.app,
