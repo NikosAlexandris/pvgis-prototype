@@ -13,22 +13,20 @@ from typing import Optional
 import datetime
 import numpy as np
 import typer
-from ..constants import EPS
-from ..constants import HOUR_ANGLE
-from ..constants import UNDEF
-from ..constants import double_numpi
-from ..constants import half_numpi
-from ..data_structures import SolarGeometryDayConstants
-from ..data_structures import SolarGeometryDayVariables
-from ..utilities.conversions import convert_to_degrees_if_requested
-from ..utilities.conversions import convert_to_radians
-from ..utilities.timestamp import attach_timezone
-from ..utilities.timestamp import convert_to_timezone
-from ..utilities.timestamp import ctx_convert_to_timezone
-from ..utilities.timestamp import get_day_from_hour_of_year
-from ..utilities.timestamp import now_datetime
-from .solar_declination import calculate_solar_declination
-from .solar_time import calculate_solar_time
+from ...api.constants import EPS
+from ...api.constants import HOUR_ANGLE
+from ...api.constants import UNDEF
+from ...api.constants import double_numpi
+from ...api.constants import half_numpi
+from ...api.data_structures import SolarGeometryDayConstants
+from ...api.data_structures import SolarGeometryDayVariables
+from ...api.utilities.conversions import convert_to_degrees_if_requested
+from ...api.utilities.conversions import convert_to_radians
+from ...api.utilities.timestamp import attach_timezone
+from ...api.utilities.timestamp import convert_to_timezone
+from ...api.utilities.timestamp import ctx_convert_to_timezone
+from ...api.utilities.timestamp import get_day_from_hour_of_year
+from ...api.utilities.timestamp import now_utc_datetimezone
 from .solar_time import calculate_solar_time_pvgis
 
 
@@ -133,7 +131,7 @@ def calculate_solar_geometry_pvgis_variables(
         solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
         timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=convert_to_timezone)] = None,
@@ -180,7 +178,7 @@ def calculate_solar_geometry_pvgis_variables(
         sunset_time,
     ) = solar_geometry_day_constants.dict().values()
 
-    solar_time = calculate_solar_time(
+    solar_time, _units = calculate_solar_time_pvgis(
             year,
             hour_of_year,
             days_in_a_year,
@@ -267,7 +265,7 @@ def calculate_solar_position_pvgis(
         solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
         timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
