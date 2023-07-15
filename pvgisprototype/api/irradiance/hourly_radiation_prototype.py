@@ -1,30 +1,12 @@
-"""
-Prototype function defined in `rsun_standalone_hourly_opt.cpp`
-
-``` c
-void joules_onetime(
-        bool useEfficiency,
-        double temperature,
-        double windSpeed,
-        double solar_constant,
-        struct SunGeometryVarDay *sunVarGeom,
-        struct SunGeometryVarSlope *sunSlopeGeom,
-        struct SolarRadVar *sunRadVar,
-        struct GridGeometry *gridGeom,
-        double *horizonArray,
-        double *hour_radiation
-)
-
-This function calculates the hourly radiation values (`hour_radiation`)
-for a specific moment in time,
-considering variables like
-temperature, wind speed, solar geometry, and grid geometry.
-"""
-
+from math import cos
+from typing import Annotated
+from typing import List
+from typing import Optional
+import math
 import numpy as np
+import typer
 
-# from: rsun_standalone_hourly_opt.cpp
-# function name: joules_onetime
+
 def calculate_hourly_radiation(
         use_efficiency: bool,
         temperature: float,
@@ -71,6 +53,29 @@ def calculate_hourly_radiation(
 
     Notes
     -----
+    Prototype function defined in `rsun_standalone_hourly_opt.cpp`
+
+    ``` c
+    void joules_onetime(
+            bool useEfficiency,
+            double temperature,
+            double windSpeed,
+            double solar_constant,
+            struct SunGeometryVarDay *sunVarGeom,
+            struct SunGeometryVarSlope *sunSlopeGeom,
+            struct SolarRadVar *sunRadVar,
+            struct GridGeometry *gridGeom,
+            double *horizonArray,
+            double *hour_radiation
+    )
+
+    This function calculates the hourly radiation values (`hour_radiation`)
+    for a specific moment in time,
+    considering variables like
+    temperature, wind speed, solar geometry, and grid geometry.
+
+    - from: rsun_standalone_hourly_opt.cpp
+    - function name: joules_onetime
     - The function calculates the hourly radiation values based on the provided inputs.
     - The calculated values are stored in the `hour_radiation_values` array.
     - The `use_efficiency` flag determines whether system efficiency is considered in the calculation.
