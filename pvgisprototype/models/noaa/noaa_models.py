@@ -1,26 +1,24 @@
 from datetime import datetime
 from math import pi
+from pydantic import ConfigDict
+from pydantic import field_validator
 from pydantic import BaseModel
-from pydantic import ConstrainedFloat
-from pydantic import validator
+from pydantic import confloat
 from typing import Optional
 from zoneinfo import ZoneInfo
 
 
 class BaseTimestampInputModel(BaseModel):
     timestamp: datetime
-
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class BaseTimeInputModel(BaseTimestampInputModel):
-    timezone: Optional[ZoneInfo]
+    timezone: Optional[ZoneInfo] = None
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    class Config:
-        arbitrary_types_allowed = True
-
-    @validator('timezone')
+    @field_validator('timezone')
+    @classmethod
     def validate_timezone(cls, v):
         if v is not None and not isinstance(v, ZoneInfo):
             raise ValueError("The `timezone` must be a valid `zoneinfo.ZoneInfo` object.")
@@ -30,7 +28,8 @@ class BaseTimeInputModel(BaseTimestampInputModel):
 class BaseTimeEventInputModel(BaseModel):
     event: str
 
-    @validator('event')
+    @field_validator('event')
+    @classmethod
     def validate_event(cls, v):
         valid_events = ['noon', 'sunrise', 'sunset']
         if v not in valid_events:
@@ -39,9 +38,10 @@ class BaseTimeEventInputModel(BaseModel):
 
 
 class BaseTimeOutputUnitsModel(BaseModel):
-    time_output_units: Optional[str]
+    time_output_units: Optional[str] = None
 
-    @validator('time_output_units')
+    @field_validator('time_output_units')
+    @classmethod
     def validate_time_output_units(cls, v):
         valid_units = ['minutes', 'seconds', 'hours']
         if v not in valid_units:
@@ -49,32 +49,31 @@ class BaseTimeOutputUnitsModel(BaseModel):
         return v
 
 
-class Longitude(ConstrainedFloat):
-    ge = -180
-    le = 180
+class Longitude(BaseModel):
+    longitude: confloat(ge=-180, le=180)
 
 
-class Latitude(ConstrainedFloat):
-    ge = -90
-    le = 90
+class Latitude(BaseModel):
+    latitude: confloat(ge=-90, le=90)
 
 
-class BaseLongitudeInputModel(BaseModel):
-    longitude: Longitude
+# class BaseLongitudeInputModel(BaseModel):
+#     longitude: Longitude
 
 
-class BaseLatitudeInputModel(BaseModel):
-    latitude: Latitude
+# class BaseLatitudeInputModel(BaseModel):
+#     latitude: Latitude
 
 
-class BaseCoordinatesInputModel(BaseLongitudeInputModel, BaseLatitudeInputModel):
+class BaseCoordinatesInputModel(Longitude, Latitude):
     pass
 
 
 class BaseAngleUnitsModel(BaseModel):
     angle_units: str
 
-    @validator('angle_units')
+    @field_validator('angle_units')
+    @classmethod
     def validate_angle_units(cls, v):
         valid_units = ['radians', 'degrees']
         if v not in valid_units:
@@ -85,7 +84,8 @@ class BaseAngleUnitsModel(BaseModel):
 class BaseAngleOutputUnitsModel(BaseModel):
     angle_output_units: str
 
-    @validator('angle_output_units')
+    @field_validator('angle_output_units')
+    @classmethod
     def validate_angle_output_units(cls, v):
         valid_units = ['radians', 'degrees']
         if v not in valid_units:
@@ -117,7 +117,7 @@ class CalculateSolarDeclinationNOAAInput(
 
 
 class CalculateTimeOffsetNOAAInput(
-    BaseLongitudeInputModel,
+    Longitude,
     BaseTimestampInputModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
@@ -126,7 +126,7 @@ class CalculateTimeOffsetNOAAInput(
 
 
 class CalculateTrueSolarTimeNOAAInput(
-    BaseLongitudeInputModel,
+    Longitude,
     BaseTimeInputModel,
     BaseTimeOutputUnitsModel,
 ):
@@ -134,7 +134,7 @@ class CalculateTrueSolarTimeNOAAInput(
 
 
 class CalculateSolarHourAngleNOAAInput(
-    BaseLongitudeInputModel,
+    Longitude,
     BaseTimeInputModel,
     BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -145,7 +145,8 @@ class CalculateSolarHourAngleNOAAInput(
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(BaseAngleOutputUnitsModel):
     solar_zenith: float
 
-    @validator('solar_zenith')
+    @field_validator('solar_zenith')
+    @classmethod
     def solar_zenith_range(cls, v):
         if not (0 <= v <= pi):
             raise ValueError('solar_zenith must range within [0, π]')
@@ -157,7 +158,7 @@ class BaseApplyAtmosphericRefraction(BaseModel):
 
 
 class CalculateSolarZenithNOAAInput(
-    BaseLatitudeInputModel,
+    Latitude,
     BaseTimestampInputModel,
     BaseApplyAtmosphericRefraction,
     BaseAngleUnitsModel,
@@ -188,15 +189,15 @@ class CalculateSolarAzimuthNOAAInput(
 
 
 class CalculateEventHourAngleNOAAInput(
-    BaseLatitudeInputModel,
+    Latitude,
     BaseTimestampInputModel,
-    BaseTimeEventInputModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     refracted_solar_zenith: float
 
-    @validator('refracted_solar_zenith')
+    @field_validator('refracted_solar_zenith')
+    @classmethod
     def validate_refracted_solar_zenith(cls, v):
         target_zenith = 1.5853349194640094  # approx. 90.833 degrees in radians
         error_margin = 0.01
@@ -238,7 +239,8 @@ class CalculateSolarPositionNOAA(
         ):
     refracted_solar_zenith: float
 
-    @validator('refracted_solar_zenith')
+    @field_validator('refracted_solar_zenith')
+    @classmethod
     def validate_refracted_solar_zenith(cls, v):
         target_zenith = 1.5853349194640094  # approx. 90.833 degrees in radians
         error_margin = 0.01
