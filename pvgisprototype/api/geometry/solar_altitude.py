@@ -11,7 +11,7 @@ import numpy as np
 # from .data_structures import SolarGeometryDayVariables
 
 
-from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
 from ..utilities.timestamp import convert_hours_to_seconds
@@ -19,7 +19,7 @@ from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_to_degrees_if_requested
 from .solar_declination import calculate_solar_declination
 from .solar_time import model_solar_time
-from .solar_time import calculate_hour_angle
+from .solar_hour_angle import calculate_hour_angle
 
 
 # app = typer.Typer(
@@ -39,7 +39,7 @@ def calculate_solar_altitude(
             min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
@@ -54,8 +54,6 @@ def calculate_solar_altitude(
 
     Parameters
     ----------
-    solar_geometry_day_constants : SolarGeometryDayConstants
-        The input solar geometry constants.
     """
     solar_declination = calculate_solar_declination(
             timestamp,
@@ -69,6 +67,7 @@ def calculate_solar_altitude(
             timestamp=timestamp,
             timezone=timezone,
             )
+    
     # hour_angle = np.radians(15) * (solar_time - 12)
     # hour_angle = (solar_time - 12)
     hour_angle, _units = calculate_hour_angle(

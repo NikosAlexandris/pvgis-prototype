@@ -1,3 +1,4 @@
+from devtools import debug
 import typer
 from typing import Annotated
 from typing import Optional
@@ -6,16 +7,16 @@ from datetime import datetime
 import math
 import numpy as np
 
-from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
 from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_to_degrees_if_requested
 
 from .solar_declination import calculate_solar_declination
-from .solar_time import calculate_solar_time_ephem
+from ...models.pyephem.solar_time import calculate_solar_time_ephem
 from .solar_time import model_solar_time
-from .solar_time import calculate_hour_angle
+from .solar_hour_angle import calculate_hour_angle
 
 # from .data_structures import SolarGeometryDayConstants
 # from .data_structures import SolarGeometryDayVariables
@@ -38,7 +39,7 @@ def calculate_solar_azimuth(
             min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
@@ -91,6 +92,7 @@ def calculate_solar_azimuth(
     cosine_solar_azimuth = (C11 * math.cos(hour_angle + C13)) / pow(
     pow((C22 * math.sin(hour_angle)), 2) + pow((C11 * math.cos(hour_angle) + C13), 2), 0.5
 )
+    # debug(locals())
     solar_azimuth = math.acos(cosine_solar_azimuth)
     solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
 

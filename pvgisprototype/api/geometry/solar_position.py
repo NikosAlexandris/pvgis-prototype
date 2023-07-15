@@ -11,19 +11,19 @@ import pysolar
 from ..utilities.conversions import convert_to_degrees_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
 from ..utilities.conversions import convert_to_radians
-from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
 from .solar_altitude import calculate_solar_altitude
 from .solar_azimuth import calculate_solar_azimuth
 from .solar_declination import calculate_solar_declination
-from .solar_geometry_skyfield import calculate_solar_position_skyfield
-from .solar_geometry_skyfield import calculate_solar_altitude_azimuth_skyfield
-from .solar_geometry_pvgis import calculate_solar_position_pvgis
-from .solar_geometry_pvgis import calculate_solar_time_pvgis
-from .solar_geometry_pvgis import calculate_solar_geometry_pvgis_constants
-from .solar_position_noaa import calculate_solar_altitude_noaa
-from .solar_position_noaa import calculate_solar_azimuth_noaa
+from ...models.skyfield.solar_geometry import calculate_solar_position_skyfield
+from ...models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
+from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
+from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
+from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
+from ...models.noaa.solar_position import calculate_solar_altitude_noaa
+from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
 
 
 class SolarPositionModels(str, Enum):
@@ -54,6 +54,7 @@ def _parse_model(ctx: typer.Context, model: List[SolarPositionModels], param: ty
     if SolarPositionModels.all in model:
         # Return all models except for the 'all' itself!
         model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
+    # debug(locals())
     print(f"Return model: {model}")
     return model
 
@@ -67,7 +68,7 @@ def model_solar_position(
             min=-90, max=90)],
         timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
@@ -141,6 +142,7 @@ def model_solar_position(
                 angle_output_units,
                 )
         solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+    
     if model.value == SolarPositionModels.skyfield:
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude,
@@ -234,7 +236,7 @@ def calculate_solar_position(
             min=-90, max=90)],
         timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
@@ -273,6 +275,7 @@ def calculate_solar_position(
     """
     Calculates the solar position using all models and returns the results in a table.
     """
+    debug(locals())
     results = []
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
