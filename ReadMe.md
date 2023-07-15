@@ -4,96 +4,8 @@
 
 ### CLI
 
-``` bash                                                                                
- Usage: pvgis-prototype [OPTIONS] COMMAND [ARGS]...                             
-                                                                                
- PVGIS core CLI prototype                                                       
-                                                                                
-╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --verbose                 --no-verbose      [default: no-verbose]            │
-│ --version             -v                    Show the application's version   │
-│                                             and exit.                        │
-│ --install-completion                        Install completion for the       │
-│                                             current shell.                   │
-│ --show-completion                           Show completion for the current  │
-│                                             shell, to copy it or customize   │
-│                                             the installation.                │
-│ --help                                      Show this message and exit.      │
-╰──────────────────────────────────────────────────────────────────────────────╯
-╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ manual      Manual for solar radiation variables                             │
-│ geometry    Calculate solar geometry parameters for a location and moment in │
-│             time                                                             │
-│ time        Calculate the solar time for a location and moment in time       │
-│ irradiance  Calculate solar irradiance                                       │
-│ tmy         Generate a Typical Meteorological Year                           │
-│ energy      Estimate the energy production of a PV system                    │
-│ series      Retrieve time series of solar radiation and PV power output      │
-│ helpers     Various diagnostic functions                                     │
-╰──────────────────────────────────────────────────────────────────────────────╯
-```
+> Too long to document here!  Update-Me!
 
-#### Solar time
-
-Available parameters?
-
-``` bash
- Usage: pvgis-prototype time [OPTIONS] LONGITUDE LATITUDE                       
-                             [TIMESTAMP]:[%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d   
-                             %H:%M:%S] COMMAND [ARGS]...                        
-                                                                                
- Calculate the solar time for a location and moment in time                     
-                                                                                
-╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    longitude      FLOAT RANGE                 [default: None] [required]   │
-│ *    latitude       FLOAT RANGE                 [default: None] [required]   │
-│      timestamp      [TIMESTAMP]:[%Y-%m-%d|%Y-%  Timestamp                    │
-│                     m-%dT%H:%M:%S|%Y-%m-%d      [default: (dynamic)]         │
-│                     %H:%M:%S]                                                │
-╰──────────────────────────────────────────────────────────────────────────────╯
-╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --timezone                    TEXT                   Timezone                │
-│                                                      [default: None]         │
-│ --days-in-a-year              FLOAT                  Days in a year          │
-│                                                      [default: 365.25]       │
-│ --perigee-offset              FLOAT                  Perigee offset          │
-│                                                      [default: 0.048869]     │
-│ --eccentricity                FLOAT                  Eccentricity            │
-│                                                      [default: 0.01672]      │
-│ --time-offset-global          FLOAT                  Global time offset      │
-│                                                      [default: 0]            │
-│ --hour-offset                 FLOAT                  Hour offset             │
-│                                                      [default: 0]            │
-│ --model               -m      [eot|ephem|NOAA|pvgis  Model to calculate      │
-│                               |Skyfield]             solar time              │
-│                                                      [default:               │
-│                                                      SolarTimeModels.ephem]  │
-│ --help                                               Show this message and   │
-│                                                      exit.                   │
-╰──────────────────────────────────────────────────────────────────────────────╯
-```
-
-### Examples for `time`
-
-Based on Skyfield
-
-``` bash
-pvgis-prototype time -m Skyfield 6.6327 46.5218 2023-06-26T12:04:25
-```
-
-``` bash
-Solar time: 0.0183169325 (UTC)
-```
-
-Based on NOAA's equation of time
-
-``` bash
-pvgis-prototype time -m NOAA 6.6327 46.5218 2023-06-26T12:04:25
-```
-
-``` bash
-Solar time: 0.041037615 (UTC)
-```
 
 ### API 
 
@@ -105,14 +17,16 @@ uvicorn pvgisprototype.webapi:app --reload
 
 Then, test some endpoints!
 
-#### Solar time
+#### Examples
+
+##### Solar time
 
 - [`http://localhost:8000/calculate_solar_time_skyfield/?longitude=-70&latitude=40&timestamp=2023-06-26T12:00:00&timezone=America/New_York`](http://localhost:8000/calculate_solar_time_skyfield/?longitude=-70&latitude=40&timestamp=2023-06-26T12:00:00&timezone=America/New_York)
 
 - [`http://localhost:8000/calculate_solar_time_skyfield/?longitude=6.6327&latitude=46.5218&timestamp=2023-06-26T12:04:25&timezone=CET`](http://localhost:8000/calculate_solar_time_skyfield/?longitude=6.6327&latitude=46.5218&timestamp=2023-06-26T12:04:25&timezone=CET)
 
 
-#### Direct inclined irradiance
+##### Direct inclined irradiance
 
 - API endpoint to calculate the direct inclined irradiance:
 
@@ -120,6 +34,107 @@ Then, test some endpoints!
 ..
 ```
 
-#### Plot solar declination
+##### Plot solar declination
 
 - [Plot solar declination for 2023](http://localhost:8000/plot_solar_declination_one_year_bokeh?year=2023)
+
+
+## References
+
+### Solar geometry out there
+
+#### https://andrewmarsh.com/
+
+> Hands down, one awesome set of resources and interactive applications!
+
+##### Applications
+
+In https://drajmarsh.bitbucket.io/:
+
+- https://drajmarsh.bitbucket.io/earthsun.html
+- https://drajmarsh.bitbucket.io/sunpath2d.html
+- https://drajmarsh.bitbucket.io/sunpath3d.html
+
+##### Resources
+
+- https://andrewmarsh.com/articles/2019/significant-dates/
+- https://andrewmarsh.com/articles/2019/significant-times/
+
+#### NOAA
+
+- https://gml.noaa.gov/grad/solcalc/
+- https://gml.noaa.gov/grad/antuv/SolarCalc.jsp
+- https://gml.noaa.gov/grad/solcalc/solareqns.PDF
+- https://gml.noaa.gov/grad/solcalc/calcdetails.html
+- https://github.com/rlxone/SolarNOAA/blob/f044a6ba1ab1e5bdafd0d63d90f134d2192df7f5/Sources/Solar.swift#L286-L308
+
+#### Wikipedia
+
+- https://en.wikipedia.org/wiki/Position_of_the_Sun
+- https://en.wikipedia.org/wiki/Equation_of_time
+
+#### NREL
+
+- https://www.nrel.gov/docs/fy08osti/34302.pdf (NREL)
+
+
+#### Skyfield
+
+- https://astronomy.stackexchange.com/q/49580/51316
+- https://rhodesmill.org/skyfield/examples.html#what-time-is-solar-noon-when-the-sun-transits-the-meridian
+- https://techoverflow.net/2022/06/19/how-to-compute-sunrise-sunset-in-python-using-skyfield/
+- https://github.com/skyfielders/python-skyfield/discussions/648
+- https://rhodesmill.org/skyfield/time.html#utc-and-leap-seconds
+
+#### Other
+
+- https://unpkg.com/solar-calculator@0.1.0/index.js
+- https://github.com/aphalo/photobiology/blob/HEAD/R/sun.calc.r
+- https://github.com/allspiritseve/sun
+
+    > Sun is a solar calculator for Ruby based on the National Oceanic &
+    > Atmospheric Administration (NOAA) solar calculator. Sunrise and sunset
+    > results are apparent times and not actual times (due to atmospheric
+    > refraction, apparent sunrise occurs shortly before the sun crosses above the
+    > horizon and apparent sunset occurs shortly after the sun crosses below the
+    > horizon).
+
+    - https://github.com/mcxsic/noaa-solar-position
+
+    > Implementation of USA's National Oceanic and Atmospheric Administration
+    > (NOAA) Solar Calculator, allowing to find Sunrise, Sunset, Solar Noon and
+    > Solar Position for Any Place on Earth.
+
+    Implementation of sunrise, sunset and solar noon:
+
+    ``` js
+    var times = { sunrise: 0, sunset: 0, solarNoon: 0, state: 'day' };
+    times.sunrise = 720 - 4 * (longitude + ha1) - eqTime; // sunrise in minutes at UTC+0
+    times.sunrise += cbd.getTimezoneOffsetInMin(); // adjust to timezone, minutes
+    times.sunrise *= constants.MINUTES_TO_MILLIS; // convert to millis
+    times.sunrise += cbd.getTime(); // convert to millis
+    times.sunrise = new Moment(times.sunrise, cbd.getTimezoneOffsetInMin());
+
+    times.sunset = 720 - 4 * (longitude - ha1) - eqTime; // sunset in minutes at UTC+0
+    times.sunset += cbd.getTimezoneOffsetInMin(); // adjust to timezone, minutes
+    times.sunset *= constants.MINUTES_TO_MILLIS; // convert to millis
+    times.sunset += cbd.getTime();
+    times.sunset = new Moment(times.sunset, cbd.getTimezoneOffsetInMin());
+
+    times.solarNoon = 720 - 4 * longitude - eqTime; // solar noon in minutes at UTC+0
+    times.solarNoon += cbd.getTimezoneOffsetInMin(); // adjust to timezone, minutes
+    times.solarNoon *= constants.MINUTES_TO_MILLIS; // convert to millis
+    times.solarNoon += cbd.getTime();
+    times.solarNoon = new Moment(times.solarNoon, cbd.getTimezoneOffsetInMin());
+    ```
+#### PV Education
+
+- https://www.pveducation.org/pvcdrom/properties-of-sunlight/solar-time
+
+### Multi-processing
+
+- https://stackoverflow.com/a/69541317/1172302
+
+### Visuals
+
+-https://niwa.co.nz/our-services/online-services/solarview/solarviewexplanation
