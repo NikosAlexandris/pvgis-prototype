@@ -15,6 +15,14 @@ def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: fl
     return np.radians(angle)
 
 
+def convert_to_radians_fastapi(angle: float) -> float:
+    """Convert angle to radians."""
+    if type(angle) != float:
+        raise typer.BadParameter("Latitude should be a float!")
+
+    return np.radians(angle)
+
+
 def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
     """Convert angle from radians to degrees if requested."""
 
@@ -54,4 +62,19 @@ def round_float_values(obj, decimal_places=3):
         return obj
     else:
         return obj
+
+# def round_float_values(obj, decimal_places=3):
+#     if isinstance(obj, float):
+#         return round(obj, decimal_places)
+#     elif isinstance(obj, list):
+#         for i, v in enumerate(obj):
+#             if isinstance(v, dict):
+#                 for key, value in v.items():
+#                     if isinstance(value, float):
+#                         v[key] = round(value, decimal_places)
+#             elif isinstance(v, float):
+#                 obj[i] = round(v, decimal_places)
+#         return obj
+#     else:
+#         return obj
 
