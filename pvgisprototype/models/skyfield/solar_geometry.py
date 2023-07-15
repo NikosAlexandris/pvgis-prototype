@@ -1,3 +1,4 @@
+from devtools import debug
 import logging
 import typer
 from typing import Annotated
@@ -9,11 +10,11 @@ from datetime import datetime
 from datetime import timedelta
 import dateutil.parser
 from calendar import monthrange
-from ..utilities.conversions import convert_to_degrees_if_requested
-from ..utilities.conversions import convert_to_radians_if_requested
-from ..utilities.conversions import convert_to_radians
-from ..utilities.timestamp import now_datetime
-from ..utilities.timestamp import convert_to_timezone
+from ...api.utilities.conversions import convert_to_degrees_if_requested
+from ...api.utilities.conversions import convert_to_radians_if_requested
+from ...api.utilities.conversions import convert_to_radians
+from ...api.utilities.timestamp import now_utc_datetimezone
+from ...api.utilities.timestamp import convert_to_timezone
 
 
 def calculate_solar_position_skyfield(
@@ -25,7 +26,7 @@ def calculate_solar_position_skyfield(
             min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=convert_to_timezone)] = None,
@@ -68,6 +69,13 @@ def calculate_solar_position_skyfield(
     - https://rhodesmill.org/skyfield/time.html#utc-and-your-timezone
     - https://rhodesmill.org/skyfield/time.html#utc-and-leap-seconds
     """
+    # # Handle Me during input validation? -------------------------------------
+    # try:
+    #     timestamp = timezone.localize(timestamp)
+    # except Exception:
+    #     logging.warning(f'tzinfo already set for timestamp = {timestamp}')
+    # # Handle Me during input validation? -------------------------------------
+    # debug(locals())
 
     ephemeris = skyfield.api.load('de421.bsp')
     sun = ephemeris['Sun']
@@ -81,6 +89,7 @@ def calculate_solar_position_skyfield(
     requested_timestamp = timescale.from_datetime(timestamp)
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
 
+    debug(locals())
     return solar_position
 
 
@@ -93,7 +102,7 @@ def calculate_solar_altitude_azimuth_skyfield(
             min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=convert_to_timezone)] = None,
@@ -153,6 +162,7 @@ def calculate_solar_altitude_azimuth_skyfield(
         solar_altitude = solar_altitude.degrees
         solar_azimuth = solar_azimuth.degrees
 
+    debug(locals())
     return solar_altitude, solar_azimuth  # distance_to_sun
 
 
@@ -165,7 +175,7 @@ def calculate_hour_angle_skyfield(
             min=-90, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=convert_to_timezone)] = None,
@@ -211,5 +221,6 @@ def calculate_hour_angle_skyfield(
         hour_angle = hour_angle.radians
         solar_declination = solar_declination.radians
 
+    debug(locals())
     return hour_angle, solar_declination, output_units
 
