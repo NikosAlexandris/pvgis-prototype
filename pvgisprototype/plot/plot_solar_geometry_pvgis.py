@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 from pvgisprototype.api.data_structures import SolarGeometryDayConstants
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
-from pvgisprototype.api.geometry.solar_geometry_pvgis import calculate_solar_geometry_pvgis_constants
-from pvgisprototype.api.geometry.solar_geometry_pvgis import calculate_solar_geometry_pvgis_variables
+from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
+from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_variables
 import datetime
 import numpy as np
 import random
