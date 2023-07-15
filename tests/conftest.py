@@ -44,15 +44,15 @@ def create_minimal_netcdf(path_to_data: pathlib.Path, time=24, lon=2, lat=2):
     dataset.createDimension("lat", lat)
 
     # Additional global attributes
-    dataset.institution = "Your Institution"
-    dataset.source = "Your Source"
-    dataset.contributors = "Your Contributors"
-    dataset.contact = "Your Contact"
-    dataset.platform = "Your Platform"
-    dataset.processid = "Your Process ID"
-    dataset.project_id = "Your Project ID"
-    dataset.software = "Your Software"
-    dataset.title = "Your Title"
+    dataset.institution = "Institution"
+    dataset.source = "Source"
+    dataset.contributors = "Contributors"
+    dataset.contact = "Contact"
+    dataset.platform = "Platform"
+    dataset.processid = "Process ID"
+    dataset.project_id = "Project ID"
+    dataset.software = "Software"
+    dataset.title = "Title"
 
     # Create the time variable
     time_var = dataset.createVariable("time", np.float64, ("time",))
