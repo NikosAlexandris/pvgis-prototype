@@ -12,3 +12,15 @@ def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
             return func(**validated_input.dict())
         return wrapper
     return decorator
+
+
+def cache_result(func):
+    """Decorator to cache function results"""
+
+    def wrapper(*args, **kwargs):
+        cache_key = (func.__name__, args, frozenset(kwargs.items()))
+        if cache_key not in calculation_cache:
+            calculation_cache[cache_key] = func(*args, **kwargs)
+        return calculation_cache[cache_key]
+
+    return wrapper
