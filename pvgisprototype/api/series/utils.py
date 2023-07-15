@@ -1,0 +1,100 @@
+import warnings
+import typer
+import netCDF4
+from colorama import Fore, Style
+from .log import logger
+
+
+# Hardcodings
+# exclamation_mark = u'\N{heavy exclamation mark symbol}'
+exclamation_mark = u'\N{exclamation mark}'
+check_mark = u'\N{check mark}'
+x_mark = u'\N{Ballot Script X}'
+
+
+def get_scale_and_offset(netcdf):
+    """Get scale and offset values from a netCDF file
+    """
+    dataset = netCDF4.Dataset(netcdf)
+    netcdf_dimensions = set(dataset.dimensions)
+    netcdf_dimensions.update({'lon', 'longitude', 'lat', 'latitude'})  # all space dimensions?
+    netcdf_variables = set(dataset.variables)
+    variable = str(list(netcdf_variables.difference(netcdf_dimensions))[0])  # single variable name!
+
+    if 'scale_factor' in dataset[variable].ncattrs():
+        scale_factor = dataset[variable].scale_factor
+    else:
+        scale_factor = None
+
+    if 'add_offset' in dataset[variable].ncattrs():
+        add_offset = dataset[variable].add_offset
+    else:
+        add_offset = None
+
+    return (scale_factor, add_offset)
+
+
+def select_coordinates(
+        data_array,
+        longitude=None,
+        latitude=None,
+        time=None,
+        method='nearest',
+        tolerance=0.1
+        ):
+    """
+    Select single pair of coordinates from a data array
+    """
+    # ----------------------------------------------------------- Deduplicate me
+    # Ugly hack for when dimensions 'longitude', 'latitude' are not spelled out!
+    # Use `coords` : a time series of a single pair of coordinates has only a `time` dimension!
+    indexers = {}
+    dimensions = [dimension for dimension in data_array.coords if isinstance(dimension, str)]
+    if set(['lon', 'lat']) & set(dimensions):
+        x = 'lon'
+        y = 'lat'
+    elif set(['longitude', 'latitude']) & set(dimensions):
+        x = 'longitude'
+        y = 'latitude'
+
+    if (x and y):
+        logger.info(f'Dimensions  : {x}, {y}')
+
+    if not (longitude and latitude):
+        warning = Fore.YELLOW + f'{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates.' + Style.RESET_ALL
+        logger.warning(warning)
+        typer.echo(Fore.YELLOW + warning)
+
+        center_longitude = float(data_array[x][len(data_array[x])//2])
+        center_latitude = float(data_array[y][len(data_array[y])//2])
+        indexers[x] = center_longitude
+        indexers[y] = center_latitude
+
+        text_coordinates = Fore.GREEN + f'{check_mark} Center coordinates (longitude, latitude) : {center_longitude}, {center_latitude}.' + Style.RESET_ALL
+
+    else:
+        indexers[x] = longitude
+        indexers[y] = latitude
+        text_coordinates = Fore.GREEN + f'{check_mark} Coordinates : {longitude}, {latitude}.' + Style.RESET_ALL
+
+    try:
+        if not time:
+            data_array = data_array.sel(
+                    **indexers,
+                    method=method,
+                    )
+        else:
+            data_array = data_array.sel(
+                    time=time).sel(
+                            **indexers,
+                            method=method,
+                            tolerance=tolerance,
+                            )
+
+    except Exception as exc:
+        typer.echo(f"Something went wrong in selecting the data: {str(exc)}")
+        raise SystemExit(33)
+
+    logger.info(text_coordinates)
+    typer.echo(text_coordinates)
+    return data_array
