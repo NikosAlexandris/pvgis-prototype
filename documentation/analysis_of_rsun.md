@@ -1,8 +1,10 @@
 # Conversion to Python
 
-## `rsun_standalone_hourly_opt.cpp`
+## Programs & files
 
-Functions :
+### `rsun_standalone_hourly_opt.cpp`
+
+#### Functions
 
 |       | Function                                | start line | end  | name in Python                                             | Remakrs                                                   |
 |-------|-----------------------------------------|------------|------|------------------------------------------------------------|-----------------------------------------------------------|
@@ -25,7 +27,9 @@ Functions :
 
 average_SD() -> average_standard_deviation.py
 
-## rsun_base.c
+### `rsun_base.c`
+
+#### Functions
 
 | Function                                                           | Start line | End | Notes
 |--------------------------------------------------------------------|------------|-----|---------------------------------------------------------------------------------------------------------------------|
@@ -62,12 +66,13 @@ average_SD() -> average_standard_deviation.py
 | - [ ] small_functions_from_start_and_before_calculate_angle_loss.c |            |     |                                                                                                                     |
 | - [ ] temperature.c                                                |            |     |                                                                                                                     |
 
+## Reading the source code
 
-## Reading the old source code
+This section analysis thoroughly major functions of `rsun3`.
 
-### the optimizeSlope function
+### The `optimizeSlope` function
 
-
+``` c
 double optimizeSlope(
         double aspectInput,
         struct GridGeometry *gridGeom,
@@ -209,71 +214,109 @@ double optimizeSlope(
     //	printf("#Number of iterations: %d\n", iter);
     return newslope;
 }
+```
 
+### The `main` function
 
-### The main function
+PVGIS evaluates and tracks the performance of a solar power system.
+The superset algorithm that powers PVGIS
+is programmed in the `main()` function
+in the `rsun_standalone_hourly_opt.cpp` file.
+It is complex
+and makes use of different models of power calculations,
+each suited to different use cases.
+
 
 #### Overview
 
-1. Parses command-line arguments.
+It does the following:
 
-2. Checks which solar radiation database is requested. If it is none of SARAH
-   or SARAH2, a _time offset_ is flagged to be set (through a function later
-   on).
+1. define the `main()` function
 
+2. initialise variables
 
-   > At this point, a row and column offset indices are set which point to the
-   > pixel locatio to read data from all relevant datasets (elevatin, SIS, SID,
-   > temperature, wind speed and direction)
+3. parse input arguments
 
-3. Depending on the user's request, sets flags or battery capacity
-   related data are read (i.e. hourly consumption data, battery charge matrix, power
-   matrix (?)).
+4. identify pixel row and column offsets
 
-4. Reads the elevation for the fiven location.
+5. select energy model
 
-4. 
+6. read elevation data
+
+7. use horizon data
+
+8. set number of hours for iterations
+
+9. read SIS and SID data,
+   compute global irradiance
+
+10. read :
+    - spectral correction values
+    - temperature time series
+    - wind speed time series
+
+11. calculate solar geometry variables
+
+12. optimise slope if requested
+
+13. optimise slope and aspect if requested
+
+14. set slope and aspect depending on tracking type
+
+15. calculate total radiation
+
+16. calculate system performance
+
+    1. set up
+
+    2. select detailed model 2
+
+        1. If there is radiation on the day,
+           calculate the power produced
+           using polynomial fits and a Newton-Raphson iterative process?
+
+        2. Adjust the battery charge state
+           based on the power produced and consumed
+
+        3. Track battery's :
+           - full and empty states,
+           - power wasted,
+           - total energy,
+           - charge state
+
+    3. select detailed model 1
+
+        1. Use the specific function `EnergyContributionPerformanceModelMPP()`
+           to calculate energy contributions
+           and adjust the battery charge state
+      
+        2. Track the battery's :
+           - full and empty states,
+           - power wasted,
+           - total energy,
+           - charge state
+
+    4. select simple model
+
+        1. Calculate the power produced based on radiation and nominal power
+
+        2. Adjust the battery's charge state based on the power produced
+           and consumed
+        
+        3. Track battery's :
+           - full and empty states,
+           - power wasted,
+           - total energy,
+           - charge state
+
+    5. print performance details and statistics
+
+17. close the `main()` function
+
 
 #### Analysis
 
-The `main()` algorithm
-is evaluating and tracking the performance of a solar power system.
-It is complex and makes use of different models of power calculations,
-each suited to different use cases.
-It involves calculating for example:
-- power produced
-- managing a battery's charge state
-- dealing with excess and inadequate power situations.
-
-A simplified overview :
-
-1. Initialize performance tracking variables
-
-2. Calculate daily sum of radiation values
-
-3. Initialize monthly tracking variables
-
-4. Calculate nominal power based on the model in use
-
-5. For each day in the year:
-
-   1. If detailed model 2 is in use:
-      1. If there is radiation on the day, calculate power produced using polynomial fits and a Newton-Raphson iterative process
-      2. Adjust the battery charge state based on the power produced and consumed
-      3. Track battery full and empty states, power wasted, total energy, and battery charge state
-   
-   2. If detailed model 1 is in use:
-      1. Use a specific function `EnergyContributionPerformanceModelMPP()` to calculate energy contributions and adjust the battery charge state
-      2. Track battery full and empty states, power wasted, total energy, and battery charge state
-   
-   3. If no detailed model is in use:
-      1. Calculate power produced simply based on radiation and nominal power
-      2. Adjust the battery charge state based on the power produced and consumed
-      3. Track battery full and empty states, power wasted, total energy, and battery charge state
-
-6. Print performance tracking details and statistics
-
-### main(), again
+##### Initialise variables
 
 The beginning of the `main` function
 
@@ -284,9 +327,9 @@ The beginning of the `main` function
 
 - and parses command-line arguments.
 
-  1.Checks the number of command-line arguments (`argc`).
+  1. Checks the number of command-line arguments (`argc`).
 
-   If the number is less than 2, it prints a usage message and exits the program.
+    If the number is less than 2, it prints a usage message and exits the program.
 
   2. Initializes some variables and assigns default values to specific file paths:
 
@@ -299,7 +342,7 @@ The beginning of the `main` function
   sprintf(chargeMatrixFile, "%s/battery/%s", DATA_PATH_BASE, DEFAULT_CHARGE_MATRIX_FILE);
   ```
 
-  4. a `while` loop parses the command-line arguments using `getopt`:
+  3. a `while` loop parses the command-line arguments using `getopt`:
 
    ```cpp
    while ((c = getopt(argc, argv, "B:a:c:d:e:f:g:h:j:i:k:m:n:o:p:s:t:u:v:x:y:z:blqr")) != -1)
@@ -311,19 +354,31 @@ The beginning of the `main` function
    }
    ```
 
-   Inside the `switch` statement,
+   4. Inside the `switch` statement,
    it handles different command-line options
    (`-B`, `-a`, `-c`, `-d`, `-e`, `-f`, `-g`, `-h`, `-j`, `-i`, `-k`, `-l`, `-m`, `-n`, `-p`, `-s`, `-u`, `-v`, `-x`, `-o`, `-y`, `-z`, `-b`, `-q`, `-t`)
    and sets corresponding variables or performs specific operations.
 
-### Various checks
+##### Various checks
 
 The next section performs several checks and sets a series of variables
 
-1. The code checks if the `databasePrefix` is either "sarah_" or "sarah2_".
+1. Check which solar radiation database is requested.
+   If it is none of SARAH or SARAH2,
+   a _time offset_ is flagged to be set (through a function later on).
+   Specifically,
+   the code checks if the `databasePrefix` is either "sarah_" or "sarah2_".
    If it is not, `setUseTimeOffset(false)` is called.
    Otherwise, `setUseTimeOffset(true)` is called.
    This function uses a time offset based on the database prefix.
+
+   > At this point, a row and column offset indices are set which point to the
+   > pixel locatio to read data from all relevant datasets (elevatin, SIS, SID,
+   > temperature, wind speed and direction)
+
+-. Depending on the user's request,
+   sets flags or battery capacity related data are read
+   (i.e. hourly consumption data, battery charge matrix, power matrix (?)).
 
 2. The variables `elevationFileNumberNS` and `elevationFileNumberEW`
    are calculated based on the `fixedData.latitude` and `fixedData.longitude` values.
@@ -333,8 +388,13 @@ The next section performs several checks and sets a series of variables
    and assigning `FIRST_EAST_TILE + floor(fixedData.longitude/TILE_SIZE)`
    to `elevationFileNumberEW`.
 
-3. The variables `tileLatNorth` and `tileLonWest`
-   are calculated using the `elevationFileNumberNS`, `elevationFileNumberEW`,
+3. Set some elevation file indices for the North-South and East-West
+   directions.
+   These in turn are used to identify the PVGIS _tile_
+   within which the user-requested point is located.
+
+   The variables `tileLatNorth` and `tileLonWest` are calculated
+   using the `elevationFileNumberNS`, `elevationFileNumberEW`,
    and `TILE_SIZE` values.
    They represent the latitude and longitude of the top-left corner of a tile.
 
@@ -349,7 +409,7 @@ The next section performs several checks and sets a series of variables
 7. The function `initEfficiencyCoeffsWind` is called with the `coefficientsFilename` as an argument. 
    It appears to initialize efficiency coefficients related to wind.
 
-### More checks
+##### More checks
 
 1. `printSystemPerformance`
 
@@ -399,35 +459,36 @@ The next section performs several checks and sets a series of variables
 6. The variable `arrayNumInt` is calculated by dividing $0.75001$
    by `step` and adding 1.
 
-### Use of horizon heights
+##### Use of horizon heights
 
-If horizon heights are supplied (`useHorizonData()` is set to true),
+If horizon heights are supplied (`useHorizonData()` is set to `true`),
 the code performs the following steps:
 
-- Checks if `horizonStep` is greater than 0.
+- Checks if `horizonStep` is greater than `0`.
   If it is not, an error message is printed, and the program exits.
 
 - Sets the horizon number of intervals using `setHorizonNumInt()`
-  and rounds 360.00001 divided by `horizonStep`.
+  and rounds `360.00001` divided by `horizonStep`.
 
 - Allocates memory for `horizonArray` based on the horizon number of intervals.
 
 - Depending on the `horizonInfoType`:
 
-- If it is 1, the code reads data from a file specified by `horizonFileName`
-  using `ReadHorizonASCII()`.
+    - If it is `1`,
+    the code reads data from a file specified by `horizonFileName`
+    using `ReadHorizonASCII()`.
 
-- If it is 2, the code reads data from a file specified by `horizonFileName`
-  by parsing comma-separated values and storing them in `readHorizonArray`.
-  It then converts the values from degrees to radians,
-  rearranges the array,
-  and assigns it to `horizonArray`.
+    - If it is `2`,
+    the code reads data from a file specified by `horizonFileName`
+    by parsing comma-separated values and storing them in `readHorizonArray`.
+    It then converts the values from degrees to radians,
+    rearranges the array, and assigns it to `horizonArray`.
 
-- Otherwise, the code reads data using `ReadHorizon()`
-  based on the latitude, longitude, elevation file numbers,
-  and the horizon number of intervals.
+    - Otherwise, the code reads data using `ReadHorizon()`
+    based on the latitude, longitude, elevation file numbers,
+    and the horizon number of intervals.
 
-### Number of hourly values to consider
+##### Number of hourly values to consider
 
 This section initializes the `hourlyVarData` array
 for each hour of each day for the specified range of years.
@@ -475,7 +536,7 @@ for each hour of each day for the specified range of years.
    `yearOffset` is incremented by the product of 24 and `numDaysInYear`.
    It represents the offset for the next year's data.
 
-###  Reads `sis` and `sid` data
+##### Read `SIS` and `SID` data
 
 This section 
 
@@ -531,7 +592,7 @@ In detail
 11. A loop sets each value in the `spectralCorrectionValues` array to 1.
     This array has a size of 12.
 
-### Temperature & wind speed
+##### Read temperature & wind speed
 
 This section reads temperature and wind speed data,
 assigns the values to the `hourlyVarData` array,
@@ -596,7 +657,7 @@ and prepares for the calculation of geometry for the entire year.
     - location data,
     - and arrays for storing geometry information.
 
-#### Solar declination
+##### Calculate solar declination
 
 > - `sh` input to `brad_angle_irradiance()`
 > <-- `s0` from `joules_onetime()`
@@ -723,133 +784,227 @@ for(int pos=0; pos < 8760; pos++)
 by the `lumcline2()` function! 
 
 
-### Optimise inclination & orientation
+##### Tilt & orientation
 
 This section of the code 
 
-1. The code checks if `optimalAngle` is 1.
-   If so, it means that the slope is to be optimized for a given aspect.
+1. If `optimalAngle` is `1`.
+   optimise the slope for a given aspect.
 
-   1. `optimizeSlope()` is called with various parameters
-   in order to calculate the optimal slope which is stored
-   in the variable `calculatedSlope`.
+   1. Call `optimizeSlope()` with various parameters
+   to calculate the optimal slope and store it the variable `calculatedSlope`.
 
    2. If `calculatedSlope` is very small (`< 0.01`)
-   or the latitude close to `0`
+   or the latitude close to `0`,
    indicating convergence problems or issues with the optimization,
    a small default slope value of `0.001` is assigned to `newslope`.
 
    3. If the calculated slope is valid, it is assigned to `newslope`.
 
-   4. `updateGeometryYear()` is called to update the geometry variables
-   based on the new slope and aspect
-   (the existing aspect value is used in this case).
+   4. Call `updateGeometryYear()` to update the geometry variables
+   based on the new slope using, however, the existing aspect value.
 
-   **Important** in this function is that it calculates the solar declination
-   using the method presented by Jenco.
+   > **Important** in this function is that
+   it calculates the _solar declination_ using the method presented by Jenco.
 
-2. If `optimalAngle` is 2, it means that both the slope and aspect are to be optimized.
+2. If `optimalAngle` is `2`,
+   optimise both the slope and aspect angles.
 
-   - `optimizeSlopeAspect()` is called with various parameters to determine the optimal slope and aspect.
-   - The calculated values are stored in the variables `newslope` and `newaspect`.
+   - Call `optimizeSlopeAspect()` with various parameters
+     to determine the optimal slope and aspect.
 
-3. Depending on the `axisTrackingType`, the code prints the optimized or input values of slope and azimuth.
+   - Store the calculated values in the variables `newslope` and `newaspect`.
 
-   If `axisTrackingType` is
+3. Print the values of slope and azimuth depending on the `axisTrackingType`.
 
-   - $0$, it indicates a fixed tilt system, and both slope and azimuth are printed.
-   - $3$ or $5$, it indicates a single-axis tracking system, and only the slope is printed.
-   - _any other value_, it indicates a system without tracking, and neither the slope nor the azimuth is printed.
+   `axisTrackingType` =
 
-### Total radiation
+   - `0` indicates a fixed tilt system,
+     thus print both the slope and azimuth.
 
-The code finally calls the `calculate()` function to perform the actual calculation of the total radiation.
+   - `3` or `5` indicates a single-axis tracking system,
+     thus print only the slope.
 
-   - `calculate()` takes various parameters, including geometry, data, and options.
-   - The calculated total radiation is stored in the variable `totRad`.
+   - _any other value_ indicates a system without tracking,
+   this do not print any of the angle values.
 
-   **Important** in this function is that, unlike the `updateGeometryYear` (and
-   the first `calculateGeometryYear` functions),
-   it calculates the solar declination based on some alternative method.
-   That is, it does not use method presented by Jenco. This "alternative"
-   method, hardcodes the angle of incidence (see `AOIConstants`) which, in turn
-   does not take in to accound a more realistic approximation of the sun's
-   position.
+##### Total radiation
 
-###  Performance & energy consumption
+Finally, call the `calculate()` function
+with various parameters (geometry, data, and options)
+to calculate the total radiation and store it in the variable `totRad`.
 
-This section of the code calculates and analyzes the performance of a PV system based on solar radiation data and energy consumption.
+> **Important** in this function is that,
+unlike the `updateGeometryYear` and the `calculateGeometryYear` functions,
+it calculates the _solar declination_ based on an alternative method.
+That is, it does not use method presented by Jenco.
+This other method, uses a hardcoded angle of incidence (see `AOIConstants`)
+which does not account for a more realistic approximation of the sun's position.
+
+#####  Performance & energy consumption
+
+This section of the code calculates and analyzes the performance of a PV system
+based on solar radiation data and energy consumption.
 
 1. Initialization:
 
-   - Various variables are declared, such as `powerWasted`, `powerProduced`, `posInYear`, `powerOvershootMonth`, `totalEnergyMonth`, and `sumDays`.
+   - Various variables are declared, such as:
+
+        - `powerWasted`,
+        - `powerProduced`,
+        - `posInYear`,
+        - `powerOvershootMonth`,
+        - `totalEnergyMonth`,
+        - and `sumDays`.
+   
    - The `sumDays` array is initialized with zeros.
-   - Several arrays (`monthCounts`, `daysBatteryFullMonths`, `daysBatteryEmptyMonths`, `powerOvershootMonth`, `totalEnergyMonth`) are initialized with zeros.
+
+   - Several arrays are initialized with zeros, including:
+
+        - `monthCounts`,
+        - `daysBatteryFullMonths`,
+        - `daysBatteryEmptyMonths`,
+        - `powerOvershootMonth`,
+        - `totalEnergyMonth`
+
    - The `chargeHistogram` array is initialized with zeros.
-   - The variable `nomPower` is calculated based on the `useDetailedModel` flag and `pvPower` value.
+
+   - The nominal power variable `nomPower`
+   is calculated based on the `useDetailedModel` flag and `pvPower` value.
 
 2. Calculation loop:
 
    - The loop iterates `numValsToRead` times.
-   - The `sumDays` array is populated by summing the radiation values (`radiationVals`) for each day.
-   - Two nested loops iterate over the 12 months and set their respective counters to zero.
+   - The `sumDays` array is populated by summing the radiation values
+     (`radiationVals`) for each day.
+   - Two nested loops iterate over the 12 months and set their respective
+     counters to zero.
 
-3. Detailed model calculation (if `useDetailedModel` is 2):
+3. Energy model
 
-   - This section performs detailed calculations using a Newton-Raphson method for the given number of days (`numdays`).
-   - Inside the loop, there is an inner loop iterating over the 24 hours of each day.
-   - Various calculations are performed to determine the power produced by the solar system, including the temperature coefficient, voltage, current, and polynomial fits.
-   - The charge state of the battery is updated based on the power produced and consumed.
-   - If the charge state exceeds the energy capacity, it is clamped to the maximum, and the excess power is considered wasted.
-   - Statistics related to power overshot, power wasted, total energy, and charge state distribution are updated.
+    1. Detailed model calculation if `useDetailedModel` is `2`
 
-4. Performance model calculation (if `useDetailedModel` is 1):
-   - This section uses a performance model (EnergyContributionPerformanceModelMPP) to calculate the power contributions and losses for the given number of days.
-   - Inside the loop, there is an inner loop iterating over the 24 hours of each day.
-   - The performance model calculates the energy contribution, energy not captured, energy into and from the battery, and power missing.
-   - Similar to the detailed model, statistics are updated based on these calculations.
+    This section performs detailed calculations using a Newton-Raphson method
+    for the given number of days `numdays`.
 
-5. Simple model calculation (if `useDetailedModel` is not 1 or 2):
+   - An inner loop (inside the parent loop) iterates over the 24 hours of each
+     day.
 
-#### Detailed model calculation
+   - Various calculations are performed to determine the power produced by the
+     solar system, including the temperature coefficient, voltage, current, and
+     polynomial fits.
 
-If `useDetailedModel` is equal to 2, the code executes the detailed model calculation.
+   - The charge state of the battery is updated based on the power produced and
+     consumed.
+
+   - If the charge state exceeds the energy capacity, it is clamped to the
+     maximum, and the excess power is considered wasted.
+
+   - Statistics related to power overshot, power wasted, total energy, and
+     charge state distribution are updated.
+
+    2. Performance model calculation if `useDetailedModel` is `1`
+
+    This section uses the `EnergyContributionPerformanceModelMPP` model to
+    calculate the power contributions and losses for the given number of days.
+
+   - An inner loop (inside the parent loop) iterates over the 24 hours of each
+     day.
+   
+   - The performance model calculates the energy contribution, energy not
+     captured, energy into and from the battery, and power missing.
+
+   - Similar to the detailed model, statistics are updated based on these
+     calculations.
+
+    3. Simple model calculation if `useDetailedModel` is not `1` (n)or `2`
+
+###### Energy model
+
+If `useDetailedModel` is equal to `2`,
+the code executes the detailed model calculation.
 
 1. Initialization:
 
-   - Various variables are declared to store intermediate values during the calculations, such as `currFuncVal`, `voltFuncVal`, `currFuncDeriv`, `voltFuncDeriv`, `loadCurrent`, `locRadiation`, `locTemperature`, `residual`, `voltage`, `current`, `newcurrent`, `newvoltage`, `cableResistance`, `dampingFactor`, and `funcval`.
+   - Various variables are declared to store intermediate values during the
+   calculations, such as:
+
+   `currFuncVal`,
+   `voltFuncVal`,
+   `currFuncDeriv`,
+   `voltFuncDeriv`,
+   `loadCurrent`,
+   `locRadiation`,
+   `locTemperature`,
+   `residual`,
+   `voltage`,
+   `current`,
+   `newcurrent`,
+   `newvoltage`,
+   `cableResistance`,
+   `dampingFactor`,
+   and `funcval`.
 
 2. Loop over days:
 
    - The loop iterates `numdays` times.
-   - If the sum of radiation values for a particular day (`sumDays[i]`) is less than or equal to 0, the loop skips to the next iteration.
-   - Inside the loop, there is an inner loop iterating over the 24 hours of each day.
+   
+   - If the sum of radiation values for a particular day (`sumDays[i]`)
+     is less than or equal to `0`, the loop skips to the next iteration.
+   
+   - An inner loop iterates over the 24 hours of each day.
 
 3. Power production calculation:
 
-   - The code checks if the `locRadiation` value (radiation for the current hour) is below a certain cutoff value (`RADIATION_CUTOFF`).
-   - If the radiation is below the cutoff, the `powerProduced` is set to 0, indicating no power is produced.
-   - If the radiation is above the cutoff, the code performs a detailed power production calculation using the Newton-Raphson method.
-   - The calculations involve updating the voltage and current values iteratively until a convergence criterion (`residual`) is met.
+   - Check if the `locRadiation` value (radiation for the current hour)
+     is below a the cutoff value `RADIATION_CUTOFF`.
+
+   - If the radiation is below the cutoff,
+     the `powerProduced` is set to `0`, indicating no power is produced.
+   
+   - If the radiation is above the cutoff,
+     perform a detailed power production calculation
+     using the Newton-Raphson method.
+   
+   - The calculations involve
+     updating the voltage and current values iteratively
+     until the convergence criterion `residual` is met.
+   
    - The power produced is calculated as the product of voltage and current.
 
 4. Battery charge state update:
 
-   - The `chargeState` is updated by adding the power produced and subtracting the hourly consumption.
-   - If the charge state is negative, indicating insufficient energy, the battery is considered empty for the day. The deficit power is added to the `powerMissing` variable, and the charge state is set to zero.
-   - If the charge state exceeds the energy capacity, indicating excess energy, the battery is considered full for the day. The excess power is calculated as the difference between the charge state and the energy capacity, and it contributes to the `powerOvershoot` variable. The charge state is clamped to the energy capacity.
+   - The `chargeState` is updated
+     by adding the power produced and subtracting the hourly consumption.
+
+   - If the charge state is negative, indicating insufficient energy,
+     the battery is considered empty for the day.
+     The deficit power is added to the `powerMissing` variable,
+     and the charge state is set to zero.
+   
+   - If the charge state exceeds the energy capacity,
+     indicating excess energy, the battery is considered full for the day.
+     The excess power is calculated as the difference between the charge state
+     and the energy capacity,
+     and it contributes to the `powerOvershoot` variable.
+     The charge state is clamped to the energy capacity.
+   
    - If the charge state is within the capacity, no power is wasted.
 
 5. Accumulating statistics:
 
-   - The `totalEnergy` is updated by adding the net power produced (accounting for wasted power).
-   - The monthly statistics (`totalEnergyMonth` and `powerOvershootMonth`) are updated.
+   - The `totalEnergy` is updated by adding the net power produced
+     (accounting for wasted power).
 
-####  Energy Contribution Performance Model MPP
+   - The monthly statistics `totalEnergyMonth` and `powerOvershootMonth`
+     are updated.
+
+###### Energy Contribution Performance Model MPP
 
 > This section calculates the energy contribution from the PV system and losses, tracks the battery charge state, and accumulates statistics related to the battery's fullness, emptiness, energy production, and energy loss for each day and month for the given number of days based on a performance model (`EnergyContributionPerformanceModelMPP`)
 
-If `useDetailedModel` is equal to 1, a different detailed model calculation is run.
+If `useDetailedModel` is equal to 1,
+run a different detailed calculation model.
 
 1. Initialization:
 
@@ -905,31 +1060,36 @@ If `useDetailedModel` is equal to 1, a different detailed model calculation is r
 
    - The overall statistics, such as the number of days in each month (`monthCounts`), total number of days, percentage of days the battery was full, average energy lost when the battery was full, average potential energy production per month, average energy lost per month, average potential energy production, and percentage of energy lost, are printed at the end.
 
-#### Simple model calculation
+###### Simple model
 
 > This section simulates power generation, consumption, and battery behavior for a specific number of days, accumulating statistics such as total energy produced, battery full/empty days, and charge state distribution.
 
 When `useDetailedModel` is neither 2 nor 1,
 the code uses a simpler model.
+It iterates over the number of days `numdays`
+and Within each iteration of the loop,
+the code calculates
+the power production,
+the consumption,
+and battery charge state
+for each hour of the day.
 
-It iterates over the number of days `numdays`.
-
-Within each iteration of the loop,
-the code performs calculations related to power production, consumption, and battery charge state for each hour of the day.
-
-1. The variables `batteryFullThisDay` and `batteryEmptyThisDay` are set to false at the beginning of each day.
+1. The variables `batteryFullThisDay` and `batteryEmptyThisDay` are set to
+   false at the beginning of each day.
 
 2. A nested loop iterates over each hour of the day (from 0 to 23).
 
-   - Power production is calculated based on the radiation values and the nominal power.
+   - Power production is calculated based on the radiation values and the
+     nominal power:
    
-     ```
+     ``` c
      powerProduced = radiationVals[24*i+h]*nomPower;
      ```
 
-   - The charge state of the battery is updated by adding the power produced and subtracting the hourly consumption.
+   - The charge state of the battery is updated by adding the power produced
+     and subtracting the hourly consumption:
 
-     ```
+     ``` c
      chargeState+=powerProduced-hourlyConsumption[h];
      ```
 
@@ -938,9 +1098,9 @@ the code performs calculations related to power production, consumption, and bat
      - is negative (indicating that the battery is empty),
      the `batteryEmptyThisDay` flag is set to true,
      the deficit power is added to `powerMissing`,
-     and the charge state is set to 0.
+     and the charge state is set to `0`.
 
-       ```
+       ``` c
        if(chargeState<0)
        {
            batteryEmptyThisDay=true;
@@ -1024,8 +1184,40 @@ the code performs calculations related to power production, consumption, and bat
      }
      ```
 
+##### Statistics and metrics
 
-### Statistics and metrics
+In the final section of the main function,
+various statistics and metrics are printed.
+
+- `monthCounts` : the number of days for each month 
+
+- `count`: the total number of days simulated
+
+- `daysBatteryFullMonths` : the number of days with a full battery for each month
+
+- `100.*daysBatteryFull/count` : the percentage of days when the battery was full
+
+- `powerOvershoot/daysBatteryFull` **if** `daysBatteryFull > 0` :
+  the average energy lost per day when the battery was full
+
+  > Otherwise, a message indicating zero energy loss is printed.
+
+- `totalEnergyMonth[j]/monthCounts[j]` and `powerOvershootMonth[j]/monthCounts[j]` :
+  the average potential energy production and energy lost per day for each month
+
+- `totalEnergy/count` : the average potential energy production per day
+
+- `100*powerOvershoot/totalEnergy` : the percentage of energy lost
+
+- `daysBatteryEmptyMonths` : the number of days with missing power for each month
+
+- The charge state histogram showing the number of occurrences for each charge state range
+  (0-9%, 10-19%, ..., 90-99%).
+
+- `100.*totNumDaysEmpty/count` and `powerMissing/totNumDaysEmpty` **if** `totNumDaysEmpty > 0` :
+  the percentage of days when the battery was empty
+  and the average energy missing per day when the battery was empty 
+  **if** there were days when the battery was empty
 
 ```
 for(int j=0;j<12;j++)
@@ -1084,36 +1276,3 @@ if(totNumDaysEmpty>0)
             powerMissing/totNumDaysEmpty);
 }
 ```
-
-In the final section of the main function,
-various statistics and metrics are printed.
-
-- `monthCounts` : the number of days for each month 
-
-- `count`: the total number of days simulated
-
-- `daysBatteryFullMonths` : the number of days with a full battery for each month
-
-- `100.*daysBatteryFull/count` : the percentage of days when the battery was full
-
-- `powerOvershoot/daysBatteryFull` **if** `daysBatteryFull > 0` :
-  the average energy lost per day when the battery was full
-
-  > Otherwise, a message indicating zero energy loss is printed.
-
-- `totalEnergyMonth[j]/monthCounts[j]` and `powerOvershootMonth[j]/monthCounts[j]` :
-  the average potential energy production and energy lost per day for each month
-
-- `totalEnergy/count` : the average potential energy production per day
-
-- `100*powerOvershoot/totalEnergy` : the percentage of energy lost
-
-- `daysBatteryEmptyMonths` : the number of days with missing power for each month
-
-- The charge state histogram showing the number of occurrences for each charge state range
-  (0-9%, 10-19%, ..., 90-99%).
-
-- `100.*totNumDaysEmpty/count` and `powerMissing/totNumDaysEmpty` **if** `totNumDaysEmpty > 0` :
-  the percentage of days when the battery was empty
-  and the average energy missing per day when the battery was empty 
-  **if** there were days when the battery was empty
