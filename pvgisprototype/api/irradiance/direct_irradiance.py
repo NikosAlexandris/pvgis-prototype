@@ -33,12 +33,12 @@ import numpy as np
 from datetime import datetime
 from ..constants import AOI_CONSTANTS
 from ..geometry.solar_declination import calculate_solar_declination
-from ..geometry.solar_time import SolarTimeModels
+from ..geometry.time_models import SolarTimeModels
 from ..geometry.solar_time import model_solar_time
 from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_dictionary_to_table
 from ..utilities.timestamp import attach_timezone
-from ..utilities.timestamp import now_datetime
+from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from .angular_loss_factor import calculate_angular_loss_factor
 from .extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
@@ -139,16 +139,15 @@ def rayleigh_optical_thickness(
 
 @app.command('normal', no_args_is_help=True)
 def calculate_direct_normal_irradiance(
-        extraterrestial_irradiance: Annotated[float, typer.Argument(
-            help="The average annual solar radiation arriving at the top of the Earth's atmosphere, about 1361 W/m2",
-            min=1360)],
         linke_turbidity_factor: Annotated[float, typer.Argument(
-            help='A measure of atmospheric turbidity, equal to the ratio of total optical depth to the Rayleigh optical depth',
+            help='A measure of atmospheric turbidity',
             min=0, max=8)],
         optical_air_mass: float,
+        extraterrestial_irradiance: Annotated[float, typer.Argument(
+            help='The average solar radiation at the top of the atmosphere ~1360.8 W/m^2 (Kopp, 2011)',
+            min=1360)] = 1360.8,
         ):
-    """Calculate the direct normal irradiance attenuated by the cloudless
-    atmosphere
+    """Calculate the direct normal irradiance attenuated by the cloudless atmosphere
 
     This function implements the algorithm described by Hofierka
     :cite:`p:Hofierka2002`.
@@ -166,7 +165,8 @@ def calculate_direct_normal_irradiance(
         relative to a dry and clean atmosphere. It summarizes the turbidity of
         the atmosphere, and hence the attenuation of the direct beam solar
         radiation (WMO, 1981; Kasten, 1996). The larger the TL, the larger the
-        attenuation of the radiation by the clear sky atmosphere.
+        attenuation of the radiation by the clear sky atmosphere. It is equal
+        to the ratio of total optical depth to the Rayleigh optical depth.
 
     optical_air_mass: float
 
@@ -205,7 +205,7 @@ def calculate_direct_horizontal_irradiance(
         linke_turbidity_factor: float,
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
@@ -271,9 +271,9 @@ def calculate_direct_horizontal_irradiance(
 
     extraterrestial_irradiance = calculate_extraterrestrial_irradiance(day_of_year)
     direct_normal_irradiance = calculate_direct_normal_irradiance(
-            extraterrestial_irradiance=extraterrestial_irradiance,
             linke_turbidity_factor=linke_turbidity_factor,
             optical_air_mass=optical_air_mass,
+            extraterrestial_irradiance=extraterrestial_irradiance,
             )
     direct_horizontal_irradiance = direct_normal_irradiance * sine_solar_altitude
 
@@ -284,7 +284,7 @@ def calculate_direct_horizontal_irradiance(
 
 
 @app.command('inclined', no_args_is_help=True)
-def calculate_direct_inclined_irradiance(
+def calculate_direct_inclined_irradiance_pvgis(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
             min=-180, max=180)],
@@ -295,7 +295,7 @@ def calculate_direct_inclined_irradiance(
             min=0, max=8848)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
@@ -508,7 +508,7 @@ def calculate_direct_irradiance(
             min=0, max=90)],
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
-            default_factory=now_datetime)],
+            default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
