@@ -185,7 +185,7 @@ def random_datetimezone() -> tuple:
     minute = random.randint(0, 59)
     second = random.randint(0, 59)
     datetimestamp = datetime(year, month, day, hour, minute, second, tzinfo=ZoneInfo('UTC'))
-    timezone_str = random.choice(list(ZoneInfo.available_timezones()))
+    timezone_str = random.choice(list(zoneinfo.available_timezones()))
     timezone = ZoneInfo(timezone_str)
 
     return datetimestamp, timezone
