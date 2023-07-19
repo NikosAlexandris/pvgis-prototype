@@ -64,7 +64,7 @@ def now_local_datetimezone():
     """Get current local date and time and zone
     """
     print('I am runnning now the now_local_datetimezone() function!')
-    return datetime.now().astimezone(ZoneInfo.local())
+    return datetime.now().astimezone()
 
 
 def now_utc_datetimezone() -> datetime:
