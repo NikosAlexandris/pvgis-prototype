@@ -5,6 +5,7 @@ provided by the NOAA Global Monitoring Division
 
 See also: https://unpkg.com/solar-calculator@0.1.0/index.js
 """
+
 import logging
 from datetime import datetime
 from datetime import timedelta
@@ -43,7 +44,6 @@ from .solar_azimuth import calculate_solar_azimuth_noaa
 from .event_hour_angle import calculate_event_hour_angle_noaa
 from .event_time import calculate_event_time_noaa
 from .local_time import calculate_local_solar_time_noaa
-
 
 # REVIEW - ME
 # 

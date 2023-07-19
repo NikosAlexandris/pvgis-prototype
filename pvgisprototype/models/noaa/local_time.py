@@ -47,7 +47,6 @@ def calculate_local_solar_time_noaa(
     total_seconds = int(local_solar_time.total_seconds())
     local_solar_timestamp = datetime.utcfromtimestamp(total_seconds).time()
 
-
     # hours, remainder = divmod(total_seconds, 3600)
     # minutes, seconds = divmod(remainder, 60)
     # local_solar_timestamp = time(hour=hours, minute=minutes, second=seconds)
@@ -56,5 +55,4 @@ def calculate_local_solar_time_noaa(
     if verbose:
         typer.echo(f'Local solar time: {local_solar_timestamp}')
 
-    # debug(locals())
     return local_solar_timestamp, time_output_units

@@ -1,5 +1,3 @@
-from devtools import debug
-
 from .noaa_models import CalculateTrueSolarTimeNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
@@ -31,7 +29,6 @@ def calculate_true_solar_time_noaa(
     -------
     float: The true solar time
     """
-    # debug(locals())
     # if timezone != timestamp.tzinfo:
     #     try:
     #         timestamp = timestamp.astimezone(timezone)
@@ -49,10 +46,8 @@ def calculate_true_solar_time_noaa(
         timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
     )
 
-    # debug(locals())
     if time_output_units == 'minutes':
         if not 0 <= true_solar_time <= 1440:
             raise ValueError("The true solar time must range within [0, 1440] minutes")
 
-    # debug(locals())
     return true_solar_time, time_output_units

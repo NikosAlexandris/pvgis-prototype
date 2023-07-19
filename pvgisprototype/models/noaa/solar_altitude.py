@@ -21,7 +21,6 @@ def calculate_solar_altitude_noaa(
         ):
     """Calculate the solar zenith angle (φ) in radians
     """
-    # debug(locals())
     solar_hour_angle, _units = calculate_solar_hour_angle_noaa(
         longitude,
         timestamp,
@@ -34,7 +33,6 @@ def calculate_solar_altitude_noaa(
         timestamp,
         solar_hour_angle,
         apply_atmospheric_refraction,
-        # time_output_units,
         angle_units,
         angle_output_units,
             )  # radians
@@ -44,5 +42,4 @@ def calculate_solar_altitude_noaa(
 
     solar_altitude = convert_to_degrees_if_requested(solar_altitude,
                                                      angle_output_units)
-    # debug(locals())
     return solar_altitude, angle_output_units

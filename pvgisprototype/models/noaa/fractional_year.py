@@ -27,5 +27,4 @@ def calculate_fractional_year_noaa(
         if not 0 <= fractional_year < 360:
             raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
             
-    # debug(locals())
     return fractional_year, angle_output_units

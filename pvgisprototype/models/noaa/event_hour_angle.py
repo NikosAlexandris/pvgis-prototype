@@ -14,7 +14,6 @@ from math import acos
 def calculate_event_hour_angle_noaa(
         latitude: Latitude,
         timestamp: datetime,
-        # event: str,
         refracted_solar_zenith: float = 1.5853349194640094,  # radians
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',

@@ -31,23 +31,6 @@ app = typer.Typer(
 )
 
 
-def read_raster_data(netcdf: str, mask_and_scale=False):
-    """
-    """
-    try:
-        # logger.debug("%s", netcdf.name)
-        dataarray = xr.open_dataarray(
-                filename_or_obj=netcdf,
-                mask_and_scale=mask_and_scale,
-                )
-        return dataarray
-
-    except Exception as exc:
-        # typer.echo(f"Couldn't open {dataset_type.value} dataset: {str(exc)}")
-        typer.echo(f"Couldn't open dataset: {str(exc)}")
-        raise typer.Exit(code=33)
-
-
 @app.command()
 def query_location(
         netcdf: str,

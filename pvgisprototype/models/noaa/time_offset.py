@@ -76,8 +76,6 @@ def calculate_time_offset_noaa(
             Examples:
                 Mount Olympus is UTC + 2, hence LSTM = 15 * 2 = 30 deg. East
     """
-    # debug(locals())
-
     longitude_in_minutes = radians_to_time_minutes(longitude)  # time
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time, _units = calculate_equation_of_time_noaa(timestamp,
@@ -86,10 +84,8 @@ def calculate_time_offset_noaa(
                                                                )  # minutes
     time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time
 
-    # Validate output
     if not -720 <= time_offset <= 720:
         raise ValueError("The time offset must range within [-720, 720] minutes ?")
 
-    # debug(locals())
     return time_offset, time_output_units
 

@@ -30,7 +30,6 @@ def calculate_solar_azimuth_noaa(
     latitude: float
         The latitude in radians
     """
-    # debug(locals())
     solar_declination, _units = calculate_solar_declination_noaa(
             timestamp,
             angle_units,
@@ -44,7 +43,6 @@ def calculate_solar_azimuth_noaa(
         timestamp,
         solar_hour_angle,
         apply_atmospheric_refraction,
-        # time_output_units,
         angle_units,
         angle_output_units,
             )  # radians
@@ -59,8 +57,5 @@ def calculate_solar_azimuth_noaa(
         raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
 
     solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
-    # debug(locals())
 
     return solar_azimuth, angle_output_units
-
-

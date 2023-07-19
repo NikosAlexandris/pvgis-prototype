@@ -16,7 +16,6 @@ def calculate_solar_declination_noaa(
         angle_output_units: Optional[str] = 'radians'
 ) -> float:
     """Calculate the solar declination in radians"""
-    # debug(locals())
     fractional_year, _units = calculate_fractional_year_noaa(
             timestamp,
             angle_output_units = angle_units,
@@ -31,5 +30,5 @@ def calculate_solar_declination_noaa(
         + 0.00148 * sin(3 * fractional_year)
     )
     declination = convert_to_degrees_if_requested(declination, angle_output_units)
-    # debug(locals())
+
     return declination, angle_output_units

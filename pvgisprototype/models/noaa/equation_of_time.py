@@ -25,9 +25,7 @@ def calculate_equation_of_time_noaa(
         - 0.040849 * sin(2 * fractional_year)
     )
 
-    # Validate
     if not -20 <= equation_of_time <= 20:
         raise ValueError("The equation of time must be within the range [-20, 20] minutes")
 
-    # debug(locals())
     return equation_of_time, time_output_units
