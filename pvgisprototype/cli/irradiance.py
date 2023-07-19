@@ -20,7 +20,7 @@ app = typer.Typer(
 
 app.add_typer(global_irradiance, name="global", help='Estimate the global irradiance', no_args_is_help=True)
 app.add_typer(direct_irradiance, name="direct", help='Estimate the direct irradiance', no_args_is_help=True)
-app.add_typer(diffuse_irradiance, name="diffuse", help='Estimate the diffuse irradiance', no_args_is_help=True)
+app.add_typer(diffuse_irradiance, name="diffuse", help='Calculate the diffuse irradiance', no_args_is_help=True)
 app.add_typer(reflected_irradiance, name="reflected", help='Estimate the direct reflected radiation', no_args_is_help=True)
 app.add_typer(extraterrestrial_irradiance, name="extraterrestrial", help='Compute the solar constant for a day of the year', no_args_is_help=True)
 app.add_typer(angular_loss_factor, name="angular-loss", help='Calculate the angular loss factor for the direct horizontal irradiance', no_args_is_help=True)
