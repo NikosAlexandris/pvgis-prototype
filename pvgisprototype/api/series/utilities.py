@@ -1,8 +1,13 @@
+from devtools import debug
 import warnings
 import typer
 import netCDF4
 from colorama import Fore, Style
 from .log import logger
+import xarray as xr
+
+from pvgisprototype.models.noaa.noaa_models import Longitude
+from pvgisprototype.models.noaa.noaa_models import Latitude
 
 
 # Hardcodings
@@ -11,10 +16,38 @@ exclamation_mark = u'\N{exclamation mark}'
 check_mark = u'\N{check mark}'
 x_mark = u'\N{Ballot Script X}'
 
+def load_or_open_dataarray(function, filename_or_obj, mask_and_scale):
+    try:
+        dataarray = function(
+            filename_or_obj=filename_or_obj,
+            mask_and_scale=mask_and_scale,
+        )
+        # debug(locals())
+        return dataarray
+
+    except Exception as exc:
+        typer.echo(f"Could not load or open the data: {str(exc)}")
+        raise typer.Exit(code=33)
+
+
+def open_data_array(
+        netcdf: str,
+        mask_and_scale=False,
+        in_memory: bool = False,
+        ):
+    """
+    """
+    # debug(locals())
+    if in_memory:
+        print('In memory')
+        return load_or_open_dataarray(xr.load_dataarray, netcdf, mask_and_scale)
+    else:
+        print('Open file')
+        return load_or_open_dataarray(xr.open_dataarray, netcdf, mask_and_scale)
+
 
 def get_scale_and_offset(netcdf):
-    """Get scale and offset values from a netCDF file
-    """
+    """Get scale and offset values from a netCDF file"""
     dataset = netCDF4.Dataset(netcdf)
     netcdf_dimensions = set(dataset.dimensions)
     netcdf_dimensions.update({'lon', 'longitude', 'lat', 'latitude'})  # all space dimensions?
@@ -36,11 +69,12 @@ def get_scale_and_offset(netcdf):
 
 def select_coordinates(
         data_array,
-        longitude=None,
-        latitude=None,
-        time=None,
-        method='nearest',
-        tolerance=0.1
+        longitude: Longitude = None,
+        latitude: Latitude = None,
+        time: str = None,
+        method: str ='nearest',
+        tolerance: float = 0.1,
+        verbose: bool = False,
         ):
     """
     Select single pair of coordinates from a data array
