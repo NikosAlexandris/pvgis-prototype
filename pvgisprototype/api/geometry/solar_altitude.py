@@ -6,7 +6,6 @@ from datetime import datetime
 import math
 import numpy as np
 
-
 # from .data_structures import SolarGeometryDayConstants
 # from .data_structures import SolarGeometryDayVariables
 
@@ -21,6 +20,9 @@ from .solar_declination import calculate_solar_declination
 from .solar_time import model_solar_time
 from .solar_hour_angle import calculate_hour_angle
 
+from pvgisprototype.api.input_models import SolarAltitudeInput
+from pvgisprototype.api.decorators import validate_with_pydantic
+
 
 # app = typer.Typer(
 #     add_completion=False,
@@ -29,31 +31,35 @@ from .solar_hour_angle import calculate_hour_angle
 # )
 
 
-# @app.callback('altitude', no_args_is_help=True, help='Calculate solar altitude')
-def calculate_solar_altitude(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        latitude: Annotated[Optional[float], typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> float:
+@validate_with_pydantic(SolarAltitudeInput)
+def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
     """Compute various solar geometry variables.
-
     Parameters
     ----------
+    longitude : float
+        The longitude in degrees. This value will be converted to radians. 
+        It should be in the range [-180, 180].
+
+    latitude : float
+        The latitude in degrees. This value will be converted to radians. 
+        It should be in the range [-90, 90].
+    
+    timestamp : datetime, optional
+        The timestamp for which to calculate the solar altitude. 
+        If not provided, the current UTC time will be used.
+    
+    timezone : str, optional
+        The timezone to use for the calculation. 
+        If not provided, the system's local timezone will be used.
+    
+    output_units : str, default 'radians'
+        The units to use for the output solar geometry variables. 
+        This should be either 'degrees' or 'radians'.
+
+    Returns
+    -------
+    float
+        The calculated solar altitude.
     """
     solar_declination = calculate_solar_declination(
             timestamp,
