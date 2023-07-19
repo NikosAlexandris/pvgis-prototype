@@ -8,6 +8,7 @@ from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
 import xarray as xr
+import xarray_extras
 import numpy as np
 from distributed import LocalCluster, Client
 import dask
@@ -15,12 +16,17 @@ import dask
 import logging
 from .log import logger
 import warnings
-from .utils import get_scale_and_offset
-from .utils import select_coordinates
+from .utilities import open_data_array
+from .utilities import get_scale_and_offset
+from .utilities import select_coordinates
 from .plot import plot_series
 from .hardcodings import exclamation_mark
 from .hardcodings import check_mark
 from .hardcodings import x_mark
+
+from .statistics import calculate_series_statistics
+from .statistics import print_series_statistics
+from .statistics import export_statistics_to_csv
 
 
 app = typer.Typer(
@@ -29,34 +35,6 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f'󰞱  Work with time series',
 )
-
-
-# def read_time_series(
-#         netcdf,
-#         longitude,
-#         latitude,
-#         time,
-#         convert_longitude_360,
-#         output_filename,
-#         variable_name_as_suffix,
-#     ):
-#     """
-#     Plot location series
-#     """
-#     data_array = xr.open_dataarray(netcdf)
-#     data_array = select_coordinates(
-#             data_array=data_array,
-#             longitude=longitude,
-#             latitude=latitude,
-#             time=time,
-#             )
-#     if data_array.size == 1:
-#         single_value = float(data_array.values)
-#         warning = Fore.YELLOW + f'{exclamation_mark} The selection matches a single value : {single_value}' + Style.RESET_ALL
-#         typer.echo(Fore.YELLOW + warning)
-#         return single_value
-
-#     return data_array
 
 
 # @app.callback('series', invoke_without_command=True)
@@ -68,25 +46,37 @@ def select_time_series(
         netcdf: Annotated[Path, typer.Argument(help='Input netCDF file')],
         longitude: Annotated[float, typer.Argument(
             help='Longitude in decimal degrees ranging in',
-            min=-180, max=360)] = None,
+            min=-180, max=360)],
         latitude: Annotated[float, typer.Argument(
             help='Latitude in decimal degrees, south is negative',
-            min=-90, max=90)] = None,
+            min=-90, max=90)],
         time: Annotated[Optional[str], typer.Argument(
             help='Time of data to extract from series (note: use quotes)')] = None,
         convert_longitude_360: Annotated[bool, typer.Option(
             help='Convert range of longitude values to [0, 360]',
             rich_help_panel="Helpers")] = False,
+        mask_and_scale: Annotated[bool, typer.Option(
+            help="Mask and scale the series")] = False,
+        in_memory: Annotated[bool, typer.Option(
+            help='Load data into memory')] = False,
+        statistics: Annotated[bool, typer.Option(
+            help='Print summary statistics for the selected series')] = False,
+        # csv: Annotated[Path, typer.Option(
+        #     help='CSV output filename',
+        #     rich_help_panel='Output')] = 'series_in',
         output_filename: Annotated[Path, typer.Option(
             help='Figure output filename',
-            rich_help_panel='Options')] = 'series_in',
+            rich_help_panel='Output')] = 'series_in',
         variable_name_as_suffix: Annotated[bool, typer.Option(
             help='Suffix the output filename with the variable',
             rich_help_panel='Options')] = True,
+        verbose: Annotated[bool, typer.Option(
+            help='Be verbose!')] = False,
     ):
     """
     Plot location series
     """
+    # debug(locals())
     if convert_longitude_360:
         longitude = longitude % 360
 
@@ -94,7 +84,7 @@ def select_time_series(
         warning = Fore.YELLOW + f'{exclamation_mark} '
         warning += f'The longitude ' + Style.RESET_ALL
         warning += Fore.RED + f'{longitude} ' + f'is negative. ' + Style.RESET_ALL
-        warning += Fore.YELLOW + f'Consider using `--convert-longitude-360` if the dataset in question is such!' + Style.RESET_ALL
+        warning += Fore.YELLOW + f'If the dataset\'s longitude values range in [0, 360] consider using `--convert-longitude-360`!' + Style.RESET_ALL
         # logger.warning(warning)
         typer.echo(Fore.YELLOW + warning)
 
@@ -112,7 +102,13 @@ def select_time_series(
     if (longitude and latitude):
         logger.info(f'Coordinates : {longitude}, {latitude}')
 
-    data_array = xr.open_dataarray(netcdf)
+    # debug(locals())
+    data_array = open_data_array(
+            netcdf,
+            mask_and_scale,
+            in_memory,
+            )
+    # debug(locals())
     data_array = select_coordinates(
             data_array=data_array,
             longitude=longitude,
@@ -124,85 +120,115 @@ def select_time_series(
         single_value = float(data_array.values)
         warning = Fore.YELLOW + f'{exclamation_mark} The selection matches a single value : {single_value}' + Style.RESET_ALL
         logger.warning(warning)
-        typer.echo(Fore.YELLOW + warning)
+        if verbose:
+            typer.echo(Fore.YELLOW + warning)
         return single_value
 
-    typer.echo(data_array)
+    # # if statistics_to_csv:
+    # #     series_statistics = calculate_series_statistics(data_array)
+    # #     export_statistics_to_csv(series_statistics)
+
+    # if csv:
+    #     data_array.to_pandas().to_csv(csv)
+
+    # ---------------------------------------------------------- Remove Me ---
+    typer.echo(data_array.values)
+    # ---------------------------------------------------------- Remove Me ---
+
+    # echo statistics after series which might be Long!
+    if statistics:
+        series_statistics = calculate_series_statistics(data_array)
+        print_series_statistics(series_statistics)
+        # return print_series_statistics(series_statistics)
+
+    # if output_filename:
+    #     output_filename = Path(output_filename)
+    #     extension = output_filename.suffix.lower()
+
+    #     if extension.lower() == '.nc':
+    #         data_array.to_netcdf(output_filename)
+
+    #     elif extension.lower() == '.csv':
+    #         data_array.to_pandas().to_csv(output_filename)
+
+    #     else:
+    #         raise ValueError(f'Unsupported file extension: {extension}')
+
     return data_array
 
 
-@app.command('select-52',
-             no_args_is_help=True,
-             help='  Select PVGIS 5.2 native time series over a location',             
-             )
-def select_52_time_series(
-        pvgis_cube: Annotated[Path, typer.Argument(help='Input PVGIS <= 5.2 space-time cube file')],
-        longitude: Annotated[float, typer.Argument(
-            help='Longitude in decimal degrees ranging in',
-            min=-180, max=360)] = None,
-        latitude: Annotated[float, typer.Argument(
-            help='Latitude in decimal degrees, south is negative',
-            min=-90, max=90)] = None,
-        time: Annotated[Optional[str], typer.Argument(
-            help='Time of data to extract from series (note: use quotes)')] = None,
-        convert_longitude_360: Annotated[bool, typer.Option(
-            help='Convert range of longitude values to [0, 360]',
-            rich_help_panel="Helpers")] = False,
-        output_filename: Annotated[Path, typer.Option(
-            help='Figure output filename',
-            rich_help_panel='Options')] = 'series_in',
-        variable_name_as_suffix: Annotated[bool, typer.Option(
-            help='Suffix the output filename with the variable',
-            rich_help_panel='Options')] = True,
-    ):
-    """
-    Plot location series
-    """
-    if convert_longitude_360:
-        longitude = longitude % 360
+# @app.command('select-52',
+#              no_args_is_help=True,
+#              help='  Select PVGIS 5.2 native time series over a location',  
+#              )
+# def select_52_time_series(
+#         pvgis_cube: Annotated[Path, typer.Argument(help='Input PVGIS <= 5.2 space-time cube file')],
+#         longitude: Annotated[float, typer.Argument(
+#             help='Longitude in decimal degrees ranging in',
+#             min=-180, max=360)] = None,
+#         latitude: Annotated[float, typer.Argument(
+#             help='Latitude in decimal degrees, south is negative',
+#             min=-90, max=90)] = None,
+#         time: Annotated[Optional[str], typer.Argument(
+#             help='Time of data to extract from series (note: use quotes)')] = None,
+#         convert_longitude_360: Annotated[bool, typer.Option(
+#             help='Convert range of longitude values to [0, 360]',
+#             rich_help_panel="Helpers")] = False,
+#         output_filename: Annotated[Path, typer.Option(
+#             help='Figure output filename',
+#             rich_help_panel='Options')] = 'series_in',
+#         variable_name_as_suffix: Annotated[bool, typer.Option(
+#             help='Suffix the output filename with the variable',
+#             rich_help_panel='Options')] = True,
+#     ):
+#     """
+#     Plot location series
+#     """
+#     if convert_longitude_360:
+#         longitude = longitude % 360
 
-    if longitude < 0:
-        warning = Fore.YELLOW + f'{exclamation_mark} '
-        warning += f'The longitude ' + Style.RESET_ALL
-        warning += Fore.RED + f'{longitude} ' + f'is negative. ' + Style.RESET_ALL
-        warning += Fore.YELLOW + f'Consider using `--convert-longitude-360` if the dataset in question is such!' + Style.RESET_ALL
-        # logger.warning(warning)
-        typer.echo(Fore.YELLOW + warning)
+#     if longitude < 0:
+#         warning = Fore.YELLOW + f'{exclamation_mark} '
+#         warning += f'The longitude ' + Style.RESET_ALL
+#         warning += Fore.RED + f'{longitude} ' + f'is negative. ' + Style.RESET_ALL
+#         warning += Fore.YELLOW + f'Consider using `--convert-longitude-360` if the dataset in question is such!' + Style.RESET_ALL
+#         # logger.warning(warning)
+#         typer.echo(Fore.YELLOW + warning)
 
-    logger.handlers = []  # Remove any existing handlers
-    file_handler = logging.FileHandler(f'{output_filename}_{pvgis_cube.name}.log')
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s, %(msecs)d; %(levelname)-8s; %(lineno)4d: %(message)s", datefmt="%I:%M:%S")
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    logger.info(f'Dataset : {pvgis_cube.name}')
-    logger.info(f'Path to : {pvgis_cube.parent.absolute()}')
-    # scale_factor, add_offset = get_scale_and_offset(pvgis_cube)
-    # logger.info(f'Scale factor : {scale_factor}, Offset : {add_offset}')
+#     logger.handlers = []  # Remove any existing handlers
+#     file_handler = logging.FileHandler(f'{output_filename}_{pvgis_cube.name}.log')
+#     file_handler.setLevel(logging.INFO)
+#     formatter = logging.Formatter("%(asctime)s, %(msecs)d; %(levelname)-8s; %(lineno)4d: %(message)s", datefmt="%I:%M:%S")
+#     file_handler.setFormatter(formatter)
+#     logger.addHandler(file_handler)
+#     logger.info(f'Dataset : {pvgis_cube.name}')
+#     logger.info(f'Path to : {pvgis_cube.parent.absolute()}')
+#     # scale_factor, add_offset = get_scale_and_offset(pvgis_cube)
+#     # logger.info(f'Scale factor : {scale_factor}, Offset : {add_offset}')
 
-    if (longitude and latitude):
-        logger.info(f'Coordinates : {longitude}, {latitude}')
+#     if (longitude and latitude):
+#         logger.info(f'Coordinates : {longitude}, {latitude}')
 
-    # read time series cube -- without scaling as to not remove the nodata attribute
-    import pvgis
-    cube = pvgis.load_bz2_tile(pvgis_cube)  # it is a cube, not a tile
-    data_array = pvgis.da_from_bz2_tile(cube)
-    data_array = select_coordinates(
-            data_array=data_array,
-            longitude=longitude,
-            latitude=latitude,
-            time=time,
-            )
+#     # read time series cube -- without scaling as to not remove the nodata attribute
+#     import pvgis
+#     cube = pvgis.load_bz2_tile(pvgis_cube)  # it is a cube, not a tile
+#     data_array = pvgis.da_from_bz2_tile(cube)
+#     data_array = select_coordinates(
+#             data_array=data_array,
+#             longitude=longitude,
+#             latitude=latitude,
+#             time=time,
+#             )
 
-    if data_array.size == 1:
-        single_value = float(data_array.values)
-        warning = Fore.YELLOW + f'{exclamation_mark} The selection matches a single value : {single_value}' + Style.RESET_ALL
-        logger.warning(warning)
-        typer.echo(Fore.YELLOW + warning)
-        return single_value
+#     if data_array.size == 1:
+#         single_value = float(data_array.values)
+#         warning = Fore.YELLOW + f'{exclamation_mark} The selection matches a single value : {single_value}' + Style.RESET_ALL
+#         logger.warning(warning)
+#         typer.echo(Fore.YELLOW + warning)
+#         return single_value
 
-    typer.echo(data_array)
-    return data_array
+#     typer.echo(data_array)
+#     return data_array
 
 
 @app.command(
@@ -311,18 +337,22 @@ def uniplot(
         lines: bool = True,
         title: str = 'Uniplot',
         unit: str = 'Units',  #" °C")
+        verbose: Annotated[bool, typer.Option(
+            help='Be verbose!')] = False,
         ):
     """
     """
     from uniplot import plot
     data_array = select_time_series(
-            netcdf,
-            longitude,
-            latitude,
-            time,
-            convert_longitude_360,
-            output_filename,
-            variable_name_as_suffix,
+            netcdf=netcdf,
+            longitude=longitude,
+            latitude=latitude,
+            time=time,
+            convert_longitude_360=convert_longitude_360,
+            statistics=False,
+            output_filename=None,
+            variable_name_as_suffix=variable_name_as_suffix,
+            verbose=verbose,
             )
     supertitle = f'{data_array.long_name}'
     y_label = data_array.units
