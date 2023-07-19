@@ -58,8 +58,8 @@ calculation_cache = {}
 
 @validate_with_pydantic(CalculateSolarPositionNOAA)
 def calculate_noaa_solar_position(
-    longitude: float,
-    latitude: float,
+    longitude: Longitude,
+    latitude: Latitude,
     timestamp: datetime,
     timezone: str,
     refracted_solar_zenith: float = 1.5853349194640094,  # radians
@@ -88,7 +88,7 @@ def calculate_noaa_solar_position(
     time_offset, _units = calculate_time_offset_noaa(
             longitude,
             timestamp,
-            time_output_units,  # also for calculate_equation_of_time_noaa()
+            time_output_units,  # for calculate_equation_of_time_noaa()
             angle_units,  # for calculate_equation_of_time_noaa()
             )
     true_solar_time, _units = calculate_true_solar_time_noaa(

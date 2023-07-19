@@ -1,5 +1,7 @@
 from devtools import debug
 
+from .noaa_models import Longitude
+from .noaa_models import Latitude
 from .noaa_models import CalculateEventTimeNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
@@ -19,8 +21,8 @@ radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_
 
 @validate_with_pydantic(CalculateEventTimeNOAAInput)
 def calculate_event_time_noaa(
-        longitude: float,
-        latitude: float,
+        longitude: Longitude,
+        latitude: Latitude,
         timestamp: datetime,
         timezone: str,
         event: str,
@@ -121,4 +123,3 @@ def calculate_event_time_noaa(
 
     debug(locals())
     return event_datetime_utc, time_output_units
-
