@@ -1,3 +1,4 @@
+from devtools import debug
 """
 Global irradiance
 """
@@ -11,6 +12,7 @@ logging.basicConfig(
         logging.StreamHandler()  # Print log to the console
     ]
 )
+
 import typer
 from typer import Argument, Option
 from typing import Annotated
@@ -23,10 +25,17 @@ from pandas import Timestamp
 from ..utilities.conversions import convert_to_radians
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
+from ..series.statistics import calculate_series_statistics
+from ..series.statistics import print_series_statistics
+from ..series.statistics import export_statistics_to_csv
 from pathlib import Path
 
 import xarray as xr
 import numpy as np
+
+from scipy.stats import mode
+from rich.table import Table
+import csv
 
 
 class MethodsForInexactMatches(str, Enum):
@@ -41,17 +50,27 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f"Estimate the global solar irradiation",
+    help=f"Estimate the global irradiance time series",
 )
+
+
+def select_location_time_series(data_path, longitude, latitude, inexact_matches_method='nearest'):
+    data_array = xr.open_dataarray(data_path)
+    location_time_series = data_array.sel(
+            lon=longitude,
+            lat=latitude,
+            method=inexact_matches_method)
+    location_time_series.load()  # load into memory for fast processing
+    return location_time_series
 
 
 @app.callback(
         invoke_without_command=True,
         no_args_is_help=True,
         context_settings={"ignore_unknown_options": True})
-def calculate_global_irradiance(
-        sis: Path,
-        sid: Path,
+def estimate_global_irradiance(
+        shortwave: Annotated[Path, typer.Argument(
+            help='Global irradiance (Surface Incoming Shortwave Irradiance, `ssrd`')], 
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
             min=-180, max=180)],  # in PVGIS : coloffset
@@ -74,7 +93,7 @@ def calculate_global_irradiance(
             case_sensitive=False,
             help="Model to calculate solar position")] = MethodsForInexactMatches.nearest,
     ):
-    """Calculate the global irradiatiance incident on a solar surface.
+    """Calculate the global irradiance incident on a solar surface.
 
     Parameters
     ----------
@@ -95,48 +114,4 @@ def calculate_global_irradiance(
         # elevation_file_number_ns,
         # elevation_file_number_ew,
     """
-    sis_data_array = xr.open_dataarray(sis)
-    sid_data_array = xr.open_dataarray(sid)
-
-    sis_location_time_series = sis_data_array.sel(
-            lon=longitude,
-            lat=latitude,
-            method=inexact_matches_method)
-
-    sid_location_time_series = sid_data_array.sel(
-            lon=longitude,
-            lat=latitude,
-            method=inexact_matches_method)
-
-    sis_location_time_series.load()  # load into memory for fast processing
-    sid_location_time_series.load()
-
-    if start_time and end:
-        sis_location_time_series = sis_location_time_series.sel(time=slice(start_time, end_time)),
-        sis_location_time_series = sid_location_time_series.sel(time=slice(start_time, end_time)),
-
-
-    diffuse_irradiance = sis_location_time_series - sid_location_time_series
-    total_global_irradiance = sis_location_time_series.where(sis_location_time_series > 0).sum()  # sis_sum
-    average_global_irradiance = sis_location_time_series.where(sis_location_time_series > 0).mean()  # sis_sum
-
-    # in PVGIS' C code -- is this needed? ------------------------------------
-    # beam_coefficient = sid_time_series
-    # diff_coefficient = sis_time_series - sid_time_series
-    # hourly_var_data = xr.Dataset({
-    #         "beam_coefficient": beam_coefficient,
-    #         "diff_coefficient": diff_coefficient,
-    # })
-    # ------------------------------------------------------------------------
-
-    # print(f'diffuse: {diffuse_irradiance}')
-    print(f'diffuse: {diffuse_irradiance.values}')
-    # print(f'global: {global_irradiance}')
-    print(f'Total global: {total_global_irradiance.values}')
-    print(f'Average global: {average_global_irradiance.values}')
-
-    return total_global_irradiance, average_global_irradiance
-
-
-import xarray as xr
-import numpy as np
+    pass
