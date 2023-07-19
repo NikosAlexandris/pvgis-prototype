@@ -17,7 +17,6 @@ from datetime import time as datetime_time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 
-
 import numpy as np
 from math import pi
 from math import sin
