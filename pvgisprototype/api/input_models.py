@@ -85,24 +85,8 @@ class EarthOrbitInputModel(BaseModel):
 
 
 class SolarDeclinationInput(
-        # timestamp: Annotated[Optional[datetime], typer.Argument(
-        #     help='Timestamp',
-        #     default_factory=now_utc_datetimezone)],
-        # timezone: Annotated[Optional[str], typer.Option(
-        #     help='Timezone',
-        #     callback=convert_to_timezone)] = None,
         BaseTimeInputModel,
-        # days_in_a_year: float = 365.25,
-        # orbital_eccentricity: float = 0.03344,
-        # perigee_offset: float = 0.048869,
         EarthOrbitInputModel,
-        # output_units: Annotated[str, typer.Option(
-        #     '-o',
-        #     '--output-units',
-        #     show_default=True,
-        #     case_sensitive=False,
-        #     help="Output units for solar declination (degrees or radians)")] = 'radians',
-        BaseOutputUnitsModel,
+        BaseAngleOutputUnitsModel,
         ):
-    debug(locals())
     pass
