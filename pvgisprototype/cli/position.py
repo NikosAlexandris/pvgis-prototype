@@ -33,7 +33,6 @@ from ..models.jenco.solar_incidence import calculate_effective_solar_incidence_a
 from ..models.pyephem.solar_time import calculate_solar_time_ephem
 from ..api.geometry.solar_hour_angle import calculate_hour_angle
 from ..api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
-from ..api.geometry.solar_altitude import calculate_solar_altitude
 from ..api.geometry.solar_azimuth import calculate_solar_azimuth
 from ..api.geometry.solar_position import SolarPositionModels
 from ..api.geometry.solar_position import _parse_model
@@ -45,6 +44,7 @@ from .rich_help_panel_names import rich_help_panel_geometry_position
 from .rich_help_panel_names import rich_help_panel_geometry_refraction
 from .rich_help_panel_names import rich_help_panel_geometry_surface
 
+from pvgisprototype.api.input_models import SolarDeclinationInput
 
 console = Console()
 app = typer.Typer(
@@ -659,7 +659,7 @@ def azimuth(
 
 @app.command('declination', no_args_is_help=True, help='∢ Calculate the solar declination')
 def declination(
-        timestamp: Annotated[Optional[datetime], typer.Argument(
+        timestamp: Annotated[datetime, typer.Argument(
             help='Timestamp',
             default_factory=now_utc_datetimezone)],
         timezone: Annotated[Optional[str], typer.Option(
@@ -671,12 +671,12 @@ def declination(
         days_in_a_year: float = 365.25,
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
-        output_units: Annotated[str, typer.Option(
+        angle_output_units: Annotated[Optional[str], typer.Option(
             '-u',
-            '--units',
+            '--angle-output-units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar declination (degrees or radians)")] = 'radians',
+            help="Angular units for solar position calculations output (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
         random_time: Annotated[bool, typer.Option(
             '-r',
             '--random',
@@ -712,18 +712,19 @@ def declination(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    # debug(locals())
     solar_declination = calculate_solar_declination(
-        timestamp,
-        timezone,
-        days_in_a_year,
-        orbital_eccentricity,
-        perigee_offset,
-        output_units,
+        SolarDeclinationInput(
+            timestamp=timestamp,
+            timezone=timezone,
+            days_in_a_year=days_in_a_year,
+            orbital_eccentricity=orbital_eccentricity,
+            perigee_offset=perigee_offset,
+            angle_output_units=angle_output_units,
         )
+    )
 
     typer.echo(f'Date, time and zone: {timestamp} {timezone}')
-    typer.echo(f'Solar declination: {solar_declination} {output_units}')
+    typer.echo(f'Solar declination: {solar_declination} {angle_output_units}')
     # return solar_declination
 
 
