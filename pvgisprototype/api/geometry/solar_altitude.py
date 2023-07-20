@@ -1,4 +1,4 @@
-import typer
+# import typer
 from typing import Annotated
 from typing import Optional
 from enum import Enum
@@ -21,6 +21,7 @@ from .solar_time import model_solar_time
 from .solar_hour_angle import calculate_hour_angle
 
 from pvgisprototype.api.input_models import SolarAltitudeInput
+from pvgisprototype.api.input_models import SolarDeclinationInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
@@ -62,9 +63,11 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
         The calculated solar altitude.
     """
     solar_declination = calculate_solar_declination(
-            timestamp,
-            output_units=output_units,
-            )
+        SolarDeclinationInput(
+            timestamp=input.timestamp,
+            angle_output_units=input.output_units
+        )
+    )
     C31 = math.cos(latitude) * math.cos(solar_declination)
     C33 = math.sin(latitude) * math.sin(solar_declination)
     solar_time, _units = model_solar_time(
