@@ -69,8 +69,8 @@ def calculate_solar_hour_angle_noaa(
     if angle_output_units == 'radians' and not -pi <= solar_hour_angle <= pi:
         raise ValueError("The hour angle in radians must be within the range [-π, π]")
 
-    elif angle_output_units == 'degrees' and not -180 <= solar_hour_angle <= 180:
-        raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")
+    # elif angle_output_units == 'degrees' and not -180 <= solar_hour_angle <= 180:
+    #     raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")
 
     return solar_hour_angle, angle_output_units
 
