@@ -41,9 +41,8 @@ class BaseTimeOutputUnitsModel(BaseModel):
         return v
 
 
-# class BaseAngleOutputUnitsModel(BaseModel):  # Use this as in models/noaa/noaa_models.py
-class BaseOutputUnitsModel(BaseModel):
-    angle_output_units: Optional[str]
+class BaseAngleOutputUnitsModel(BaseModel):
+    angle_output_units: str
 
     @field_validator('angle_output_units')
     @classmethod
@@ -69,7 +68,7 @@ class BaseCoordinatesInputModel(Longitude, Latitude):
 class SolarAltitudeInput(
         BaseCoordinatesInputModel,
         BaseTimeInputModel,
-        BaseOutputUnitsModel,
+        BaseAngleOutputUnitsModel,
         ):
     pass
 
@@ -102,7 +101,54 @@ class SolarDeclinationInput(
         #     show_default=True,
         #     case_sensitive=False,
         #     help="Output units for solar declination (degrees or radians)")] = 'radians',
-        BaseOutputUnitsModel,
+        BaseAngleOutputUnitsModel,
         ):
     debug(locals())
+    pass
+
+
+class SolarTime(BaseModel):
+    solar_time: confloat(ge=0, le=86400)
+
+class SurfaceTilt(BaseModel):
+    surface_tilt: Optional[confloat(ge=0, le=90)] = 0
+
+class SolarDeclination(BaseModel):
+    solar_declination: Optional[confloat(ge=-90, le=90)] = 0          # XXX: Default value changed from 180 to 0
+
+
+class HourAngleInput(
+        # solar_time: Annotated[float, typer.Argument(
+        #     help='The solar time in decimal hours on a 24 hour base',
+        #     callback=convert_hours_to_seconds)],
+        SolarTime,
+        # output_units: Annotated[str, typer.Option(
+        #     '-u',
+        #     '--units',
+        #     show_default=True,
+        #     case_sensitive=False,
+        #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        BaseAngleOutputUnitsModel,
+        ):
+    pass
+
+
+class HourAngleSunriseInput(
+        # latitude: Annotated[Optional[float], typer.Argument(
+        #     min=-90, max=90)],
+        Latitude,
+        # surface_tilt: Annotated[Optional[float], typer.Argument(
+        #     min=0, max=90)] = 0,
+        SurfaceTilt,
+        # solar_declination: Annotated[Optional[float], typer.Argument(
+        #     min=-90, max=90)] = 180,                                  # XXX: Default value changed from 180 to 0
+        SolarDeclination,
+        # output_units: Annotated[str, typer.Option(
+        #     '-u',
+        #     '--units',
+        #     show_default=True,
+        #     case_sensitive=False,
+        #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        BaseAngleOutputUnitsModel,
+        ):
     pass
