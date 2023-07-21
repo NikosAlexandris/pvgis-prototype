@@ -68,8 +68,8 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
             angle_output_units=input.output_units
         )
     )
-    C31 = math.cos(latitude) * math.cos(solar_declination)
-    C33 = math.sin(latitude) * math.sin(solar_declination)
+    C31 = math.cos(input.latitude) * math.cos(solar_declination)
+    C33 = math.sin(input.latitude) * math.sin(solar_declination)
     solar_time, _units = model_solar_time(
             longitude=longitude,
             latitude=latitude,
