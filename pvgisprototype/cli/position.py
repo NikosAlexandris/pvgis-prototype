@@ -45,6 +45,8 @@ from .rich_help_panel_names import rich_help_panel_geometry_position
 from .rich_help_panel_names import rich_help_panel_geometry_refraction
 from .rich_help_panel_names import rich_help_panel_geometry_surface
 
+from pvgisprototype.api.input_models import HourAngleInput
+from pvgisprototype.api.input_models import HourAngleSunriseInput
 
 console = Console()
 app = typer.Typer(
@@ -986,9 +988,11 @@ def hour_angle(
     #
 
     hour_angle = calculate_hour_angle(
+        HourAngleInput(
             solar_time=solar_time,
-            output_units=output_units,
-            )
+            angle_output_units=output_units,
+        )
+    )
     typer.echo(f'Hour angle: {hour_angle} {output_units}')
 
 
@@ -999,7 +1003,7 @@ def hour_angle(
         surface_tilt: Annotated[Optional[float], typer.Argument(
             min=0, max=90)] = 0,
         solar_declination: Annotated[Optional[float], typer.Argument(
-            min=-90, max=90)] = 180,
+            min=-90, max=90)] = 0,                                                  # XXX: Default value changed from 180 to 0
         output_units: Annotated[str, typer.Option(
             '-u',
             '--units',
@@ -1022,11 +1026,14 @@ def hour_angle(
     #
 
     hour_angle = calculate_hour_angle_sunrise(
-            latitude,
-            surface_tilt,
-            solar_declination,
-            output_units=output_units,
-            )
+        HourAngleSunriseInput(
+            latitude=latitude,
+            surface_tilt=surface_tilt,
+            solar_declination=solar_declination,
+            angle_output_units=output_units,
+        )
+    )
+
     typer.echo(f'Solar time: {hour_angle} {output_units}')
 
 
