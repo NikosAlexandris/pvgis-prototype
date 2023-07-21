@@ -55,9 +55,9 @@ def calculate_solar_time_eot(
 
         - DeltaTUTC : Local time minus UTC, in hours, also equal to the time zone
         - B = 360 / 365 * (day_of_year - 81)  # in degrees
-        - Time correction factor = 4 * (longitude - LSTM) + EoT
+        - Time correction (TC) factor = 4 * (longitude - LSTM) + EoT
 
-    - Solar time (or local solar time) = LT +  TC / 60
+    - Solar time (or local solar time) = LT + TC / 60
     - Hour angle = 15 * (LST - 12)
 
     Notes
@@ -105,8 +105,6 @@ def calculate_solar_time_eot(
     time_correction_factor_hours = time_correction_factor / 60
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     solar_time = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600
-    hour_angle = 15 * (solar_time - 12)
     # ------------------------------------------------------------------------
     
-    # debug(locals())
     return solar_time, 'decimal hours'
