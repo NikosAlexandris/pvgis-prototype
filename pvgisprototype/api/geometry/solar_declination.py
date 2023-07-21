@@ -1,4 +1,5 @@
 import typer
+from typing import Optional
 from datetime import datetime
 from math import pi
 from math import sin
@@ -9,7 +10,39 @@ from pvgisprototype.api.input_models import SolarDeclinationInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
-# @validate_with_pydantic(SolarDeclinationInput)
+def calculate_fractional_year_pvis(
+        timestamp: datetime,
+        days_in_a_year: float,
+        angle_output_units: Optional[str] = "radians",
+        ) -> float:
+    """Calculate fractional year in radians
+
+    Notes
+    -----
+    In PVGIS' source code, this is called `day_angle`"""
+    year = timestamp.year
+    start_of_year = datetime(year=year, month=1, day=1)
+    day_of_year = timestamp.timetuple().tm_yday
+    fractional_year = 2 * pi * day_of_year / days_in_a_year
+
+    # NOAA's corresponding equation
+    # fractional_year = (
+    #     2
+    #     * pi
+    #     / 365
+    #     * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
+    # )
+
+    if not 0 <= fractional_year < 2 * pi:
+        raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
+
+    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
+    # if angle_output_units == 'degrees':
+    #     if not 0 <= fractional_year < 360:
+    #         raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
+            
+    return fractional_year, angle_output_units
+@validate_with_pydantic(SolarDeclinationInput)
 def calculate_solar_declination(input: SolarDeclinationInput) -> float:
     """Approximate the sun's declination for a given day of the year.
 
@@ -46,17 +79,17 @@ def calculate_solar_declination(input: SolarDeclinationInput) -> float:
     For more accurate calculations of solar position, comprehensive models like
     the Solar Position Algorithm (SPA) are typically used.
     """
-    year = input.timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1)
-    day_of_year = input.timestamp.timetuple().tm_yday
-    day_angle = 2 * pi * day_of_year / input.days_in_a_year
+    fractional_year, _ = calculate_fractional_year_pvis(
+            timestamp=input.timestamp,
+            days_in_a_year=input.days_in_a_year,
+            angle_output_units=input.angle_output_units,
+            )
     declination = asin(
             0.3978 * sin(
-                day_angle - 1.4 + input.orbital_eccentricity * sin(
-                    day_angle - input.perigee_offset
+                fractional_year - 1.4 + input.orbital_eccentricity * sin(
+                    fractional_year - input.perigee_offset
                     )
                 )
             )
-    declination = convert_to_degrees_if_requested(declination, input.angle_output_units)
 
     return declination
