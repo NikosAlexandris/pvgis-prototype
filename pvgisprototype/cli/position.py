@@ -613,7 +613,7 @@ def altitude(
     console.print(solar_position_table)
 
 
-@app.command('zenith', no_args_is_help=True, help='⦭ Calculate the solar zenith')
+@app.command('zenith', no_args_is_help=True, help=' Calculate the solar zenith')
 def zenith(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
@@ -715,12 +715,34 @@ def azimuth(
             case_sensitive=False,
             # callback=_parse_model,
             help="Model(s) to calculate solar azimuth.")] = SolarPositionModels.skyfield,
-        output_units: Annotated[str, typer.Option(
+        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
+            '-a',
+            '--atmospheric-refraction',
+            help='Apply atmospheric refraction functions',
+            )] = False,
+        time_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--output-units',
+            show_default=True,
+            case_sensitive=False,
+            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+        angle_units: Annotated[str, typer.Option(
             '-u',
             '--units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar azimuth (degrees or radians)")] = 'radians',
+            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+        angle_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for the calculated solar azimuth output (degrees or radians)")] = 'radians',
+        rounding_places: Annotated[Optional[int], typer.Option(
+            '-r',
+            '--rounding-places',
+            show_default=True,
+            help='Number of places to round results to.')] = 5,
         verbose: bool = False,
         ) -> float:
     """Calculate the solar azimuth angle
@@ -756,7 +778,10 @@ def azimuth(
             timestamp,
             timezone,
             model,
-            output_units,
+            apply_atmospheric_refraction,
+            time_output_units,
+            angle_units,
+            angle_output_units,
             )
     if verbose:
         solar_azimuth = f'Solar azimuth : {solar_azimuth}' 
@@ -820,14 +845,12 @@ def declination(
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     solar_declination = calculate_solar_declination(
-        SolarDeclinationInput(
             timestamp=timestamp,
             timezone=timezone,
             days_in_a_year=days_in_a_year,
             orbital_eccentricity=orbital_eccentricity,
             perigee_offset=perigee_offset,
             angle_output_units=angle_output_units,
-        )
     )
 
     typer.echo(f'Date, time and zone: {timestamp} {timezone}')
