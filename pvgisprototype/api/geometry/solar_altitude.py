@@ -9,7 +9,6 @@ import numpy as np
 # from .data_structures import SolarGeometryDayConstants
 # from .data_structures import SolarGeometryDayVariables
 
-
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
@@ -71,23 +70,21 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
     C31 = math.cos(input.latitude) * math.cos(solar_declination)
     C33 = math.sin(input.latitude) * math.sin(solar_declination)
     solar_time, _units = model_solar_time(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
+            longitude=input.longitude,
+            latitude=input.latitude,
+            timestamp=input.timestamp,
+            timezone=input.timezone,
+            model=SolarTimeModels.eot,  # returns time in hours
             )
-    
-    # hour_angle = np.radians(15) * (solar_time - 12)
-    # hour_angle = (solar_time - 12)
     hour_angle, _units = calculate_hour_angle(
             solar_time,
-            output_units,
+            input.output_units,
     )
     sine_solar_altitude = C31 * math.cos(hour_angle) + C33
     solar_altitude = np.arcsin(sine_solar_altitude) 
     solar_altitude = convert_to_degrees_if_requested(
             solar_altitude,
-            output_units,
+            input.output_units,
             )
 
     return solar_altitude, output_units
