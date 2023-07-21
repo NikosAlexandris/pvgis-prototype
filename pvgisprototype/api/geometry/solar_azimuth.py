@@ -4,7 +4,9 @@ from typing import Annotated
 from typing import Optional
 from enum import Enum
 from datetime import datetime
-import math
+from math import sin
+from math import cos
+from math import acos
 
 from pvgisprototype.api.input_models import SolarAzimuthInput
 from pvgisprototype.api.decorators import validate_with_pydantic
@@ -25,28 +27,28 @@ def calculate_solar_azimuth(input: SolarAzimuthInput) -> float:
     solar_azimuth: float
     """
     solar_declination = calculate_solar_declination(
-            timestamp=timestamp,
-            output_units=output_units,
+            timestamp=input.timestamp,
+            angle_output_units=input.output_units,
             )
-    C11 = math.sin(latitude) * math.cos(solar_declination)
-    C13 = -math.cos(latitude) * math.sin(solar_declination)
-    C22 = math.cos(solar_declination)
-    C31 = math.cos(latitude) * math.cos(solar_declination)
-    C33 = math.sin(latitude) * math.sin(solar_declination)
+    C11 = sin(input.latitude) * cos(solar_declination)
+    C13 = -cos(input.latitude) * sin(solar_declination)
+    C22 = cos(solar_declination)
+    C31 = cos(input.latitude) * cos(solar_declination)
+    C33 = sin(input.latitude) * sin(solar_declination)
     solar_time, _units = model_solar_time(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
+            longitude=input.longitude,
+            latitude=input.latitude,
+            timestamp=input.timestamp,
+            timezone=input.timezone,
             )
     hour_angle, _units = calculate_hour_angle(
             solar_time,
-            output_units,
+            input.output_units,
     )
-    cosine_solar_azimuth = (C11 * math.cos(hour_angle + C13)) / pow(
-    pow((C22 * math.sin(hour_angle)), 2) + pow((C11 * math.cos(hour_angle) + C13), 2), 0.5
+    cosine_solar_azimuth = (C11 * cos(hour_angle + C13)) / pow(
+    pow((C22 * sin(hour_angle)), 2) + pow((C11 * cos(hour_angle) + C13), 2), 0.5
 )
-    solar_azimuth = math.acos(cosine_solar_azimuth)
-    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, output_units)
+    solar_azimuth = acos(cosine_solar_azimuth)
+    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, input.output_units)
 
-    return solar_azimuth, output_units
+    return solar_azimuth, input.output_units
