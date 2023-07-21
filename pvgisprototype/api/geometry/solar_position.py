@@ -31,7 +31,7 @@ class SolarPositionModels(str, Enum):
     noaa = 'NOAA'
     pysolar = 'pysolar'
     pvis = 'pvis'
-    pvgis = 'PVGIS'
+    # pvgis = 'PVGIS'
     suncalc = 'suncalc'
     skyfield = 'Skyfield'
 
@@ -116,6 +116,22 @@ def model_solar_position(
 
     - All solar calculation functions return floating angular measurements in
       radians.
+
+
+    pysolar :
+
+    From https://pysolar.readthedocs.io:
+
+    - Altitude is reckoned with zero at the horizon. The altitude is positive
+      when the sun is above the horizon.
+
+    - Azimuth is reckoned with zero corresponding to north. Positive azimuth
+      estimates correspond to estimates east of north; negative estimates, or
+      estimates larger than 180 are west of north. In the northern hemisphere,
+      if we speak in terms of (altitude, azimuth), the sun comes up around
+      (0, 90), reaches (70, 180) around noon, and sets around (0, 270).
+
+    - The result is returned in degrees.
     """
     if model.value == SolarPositionModels.noaa:
 
@@ -171,14 +187,14 @@ def model_solar_position(
                 latitude_deg=latitude,  # this comes first
                 longitude_deg=longitude,
                 when=timestamp,
-                )
+                )  # returns degrees by default
         solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
 
         solar_azimuth = pysolar.solar.get_azimuth(
                 latitude_deg=longitude,  # this comes first
                 longitude_deg=latitude,
                 when=timestamp,
-                )
+                )  # returns degrees by default
         solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
     if model.value  == SolarPositionModels.pvis:
@@ -197,29 +213,29 @@ def model_solar_position(
                 output_units=angle_output_units,
                 )
 
-    if model.value  == SolarPositionModels.pvgis:
+    # if model.value  == SolarPositionModels.pvgis:
         
-        solar_declination = calculate_solar_declination(timestamp)
-        local_solar_time, _units = calculate_solar_time_pvgis(
-                longitude=longitude,
-                latitude=latitude,
-                timestamp=timestamp,
-                )
+    #     solar_declination = calculate_solar_declination(timestamp)
+    #     local_solar_time, _units = calculate_solar_time_pvgis(
+    #             longitude=longitude,
+    #             latitude=latitude,
+    #             timestamp=timestamp,
+    #             )
 
-        solar_geometry_pvgis_day_constants = calculate_solar_geometry_pvgis_constants(
-                longitude=longitude,
-                latitude=latitude,
-                local_solar_time=local_solar_time,
-                solar_declination=solar_declination,
-                )
+    #     solar_geometry_pvgis_day_constants = calculate_solar_geometry_pvgis_constants(
+    #             longitude=longitude,
+    #             latitude=latitude,
+    #             local_solar_time=local_solar_time,
+    #             solar_declination=solar_declination,
+    #             )
 
-        solar_altitude, solar_azimuth, sun_azimuth = calculate_solar_position_pvgis(
-                solar_geometry_pvgis_day_constants,
-                timestamp,
-                )
+    #     solar_altitude, solar_azimuth, sun_azimuth = calculate_solar_position_pvgis(
+    #             solar_geometry_pvgis_day_constants,
+    #             timestamp,
+    #             )
 
-        solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
-        solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
+    #     solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
+    #     solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
     debug(locals())
     return solar_altitude, solar_azimuth, angle_output_units  # redesign a safer output_units!

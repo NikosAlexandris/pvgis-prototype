@@ -20,7 +20,7 @@ from bokeh.resources import INLINE
 from bokeh.resources import CDN
 
 
-from .api.geometry.time.models import SolarTimeModels
+from .api.geometry.time_models import SolarTimeModels
 from .api.geometry.solar_time import calculate_solar_time
 
 from .api.utilities.conversions import convert_to_radians_fastapi

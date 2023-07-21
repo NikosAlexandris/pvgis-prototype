@@ -57,14 +57,6 @@ class Latitude(BaseModel):
     latitude: confloat(ge=-90, le=90)
 
 
-# class BaseLongitudeInputModel(BaseModel):
-#     longitude: Longitude
-
-
-# class BaseLatitudeInputModel(BaseModel):
-#     latitude: Latitude
-
-
 class BaseCoordinatesInputModel(Longitude, Latitude):
     pass
 
@@ -199,7 +191,7 @@ class CalculateEventHourAngleNOAAInput(
     @field_validator('refracted_solar_zenith')
     @classmethod
     def validate_refracted_solar_zenith(cls, v):
-        target_zenith = 1.5853349194640094  # approx. 90.833 degrees in radians
+        target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
         error_margin = 0.01
         if not (target_zenith - error_margin) <= v <= (target_zenith + error_margin):
             raise ValueError(
@@ -218,6 +210,7 @@ class CalculateEventTimeNOAAInput(
     BaseAngleOutputUnitsModel,
 ):
     pass
+
 
 class CalculateLocalSolarTimeNOAAInput(
     BaseCoordinatesInputModel,
@@ -242,7 +235,7 @@ class CalculateSolarPositionNOAA(
     @field_validator('refracted_solar_zenith')
     @classmethod
     def validate_refracted_solar_zenith(cls, v):
-        target_zenith = 1.5853349194640094  # approx. 90.833 degrees in radians
+        target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
         error_margin = 0.01
         if not (target_zenith - error_margin) <= v <= (target_zenith + error_margin):
             raise ValueError(

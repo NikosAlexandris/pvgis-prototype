@@ -29,6 +29,5 @@ def calculate_solar_declination_noaa(
         - 0.002697 * cos(3 * fractional_year)
         + 0.00148 * sin(3 * fractional_year)
     )
-    declination = convert_to_degrees_if_requested(declination, angle_output_units)
 
     return declination, angle_output_units

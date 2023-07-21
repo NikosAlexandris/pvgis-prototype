@@ -22,9 +22,9 @@ def calculate_fractional_year_noaa(
     if not 0 <= fractional_year < 2 * pi:
         raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
 
-    fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
-    if angle_output_units == 'degrees':
-        if not 0 <= fractional_year < 360:
-            raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
+    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
+    # if angle_output_units == 'degrees':
+    #     if not 0 <= fractional_year < 360:
+    #         raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
             
     return fractional_year, angle_output_units

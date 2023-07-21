@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import Depends, Query
 from zoneinfo import ZoneInfo
 
-from pvgisprototype.api.geometry.noaa.solar_position_noaa import calculate_noaa_solar_position
+from pvgisprototype.models.noaa.solar_position import calculate_noaa_solar_position
 
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone

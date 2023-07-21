@@ -1,4 +1,3 @@
-from devtools import debug
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import field_validator
@@ -66,10 +65,10 @@ class BaseCoordinatesInputModel(Longitude, Latitude):
 
 
 class SolarAltitudeInput(
-        BaseCoordinatesInputModel,
-        BaseTimeInputModel,
-        BaseAngleOutputUnitsModel,
-        ):
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    BaseAngleOutputUnitsModel,
+):
     pass
 
 

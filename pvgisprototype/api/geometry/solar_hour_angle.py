@@ -37,6 +37,18 @@ def calculate_hour_angle(
         Tuple containg (hour_angle, units). Hour angle is the angle (ω) at any
         instant through which the earth has to turn to bring the meridian of the
         observer directly in line with the sun's rays measured in radian.
+
+    Notes
+    -----
+
+    In PVGIS :
+        hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
+
+        which means:
+        - solar time is expected in seconds
+        - conversion to radians `* 0.0175` replaced by `pi / 180`
+
+    In this function:
     """
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175

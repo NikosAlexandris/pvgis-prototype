@@ -38,14 +38,13 @@ def calculate_hour_angle(
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
     hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
-    hour_angle = convert_to_degrees_if_requested(
-            hour_angle,
-            output_units,
-            )
+    # hour_angle = convert_to_degrees_if_requested(
+    #         hour_angle,
+    #         output_units,
+    #         )
     return hour_angle, output_units
 
 
-@app.callback()
 def calculate_hour_angle_sunrise(
         latitude: Annotated[Optional[float], typer.Argument(
             min=-90, max=90)],
