@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class SolarTimeModels(str, Enum):
     all = 'all'
     eot = 'EoT'
