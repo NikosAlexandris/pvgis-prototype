@@ -154,13 +154,13 @@ def calculate_solar_altitude_azimuth_skyfield(
             )
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
 
-    if output_units == 'radians':
-        solar_altitude = solar_altitude.radians
-        solar_azimuth = solar_azimuth.radians
+    # if output_units == 'radians':
+    solar_altitude = solar_altitude.radians
+    solar_azimuth = solar_azimuth.radians
 
-    if output_units == 'degrees':
-        solar_altitude = solar_altitude.degrees
-        solar_azimuth = solar_azimuth.degrees
+    # if output_units == 'degrees':
+    #     solar_altitude = solar_altitude.degrees
+    #     solar_azimuth = solar_azimuth.degrees
 
     debug(locals())
     return solar_altitude, solar_azimuth  # distance_to_sun

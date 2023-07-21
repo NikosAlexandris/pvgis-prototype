@@ -1,4 +1,5 @@
 from devtools import debug
+
 """
 The General Solar Position Calculations
 provided by the NOAA Global Monitoring Division
@@ -23,8 +24,6 @@ from typing import Callable
 from typing import Optional
 from typing import Tuple
 from typing import Union
-from ...api.utilities.conversions import convert_to_degrees_if_requested
-from ...api.utilities.conversions import convert_to_radians_if_requested
 from .decorators import validate_with_pydantic
 from .noaa_models import Longitude
 from .noaa_models import Latitude

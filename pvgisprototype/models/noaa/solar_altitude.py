@@ -11,7 +11,7 @@ from ...api.utilities.conversions import convert_to_degrees_if_requested
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
 def calculate_solar_altitude_noaa(
         longitude: float,
-        latitude: datetime,
+        latitude: float,
         timestamp: float,
         timezone: str,
         apply_atmospheric_refraction: bool = True,
@@ -33,13 +33,11 @@ def calculate_solar_altitude_noaa(
         timestamp,
         solar_hour_angle,
         apply_atmospheric_refraction,
-        angle_units,
-        angle_output_units,
+        angle_units='radians',
+        angle_output_units='radians',
             )  # radians
     solar_altitude = pi/2 - solar_zenith
     if not isfinite(solar_altitude) or not -pi/2 <= solar_altitude <= pi/2:
         raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
 
-    solar_altitude = convert_to_degrees_if_requested(solar_altitude,
-                                                     angle_output_units)
     return solar_altitude, angle_output_units

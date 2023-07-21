@@ -1,4 +1,3 @@
-from devtools import debug
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import field_validator
@@ -43,7 +42,19 @@ class BaseTimeOutputUnitsModel(BaseModel):
 
 # class BaseAngleOutputUnitsModel(BaseModel):  # Use this as in models/noaa/noaa_models.py
 class BaseOutputUnitsModel(BaseModel):
-    angle_output_units: Optional[str]
+    output_units: str
+
+    @field_validator('output_units')
+    @classmethod
+    def validate_angle_output_units(cls, v):
+        valid_units = ['radians', 'degrees']
+        if v not in valid_units:
+            raise ValueError(f"angle_output_units must be one of {valid_units}")
+        return v
+
+
+class BaseAngleOutputUnitsModel(BaseModel):
+    angle_output_units: str
 
     @field_validator('angle_output_units')
     @classmethod
@@ -67,10 +78,10 @@ class BaseCoordinatesInputModel(Longitude, Latitude):
 
 
 class SolarAltitudeInput(
-        BaseCoordinatesInputModel,
-        BaseTimeInputModel,
-        BaseOutputUnitsModel,
-        ):
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    BaseOutputUnitsModel,
+):
     pass
 
 
@@ -85,24 +96,8 @@ class EarthOrbitInputModel(BaseModel):
 
 
 class SolarDeclinationInput(
-        # timestamp: Annotated[Optional[datetime], typer.Argument(
-        #     help='Timestamp',
-        #     default_factory=now_utc_datetimezone)],
-        # timezone: Annotated[Optional[str], typer.Option(
-        #     help='Timezone',
-        #     callback=convert_to_timezone)] = None,
-        BaseTimeInputModel,
-        # days_in_a_year: float = 365.25,
-        # orbital_eccentricity: float = 0.03344,
-        # perigee_offset: float = 0.048869,
-        EarthOrbitInputModel,
-        # output_units: Annotated[str, typer.Option(
-        #     '-o',
-        #     '--output-units',
-        #     show_default=True,
-        #     case_sensitive=False,
-        #     help="Output units for solar declination (degrees or radians)")] = 'radians',
-        BaseOutputUnitsModel,
-        ):
-    debug(locals())
+    BaseTimeInputModel,
+    EarthOrbitInputModel,
+    BaseAngleOutputUnitsModel,
+):
     pass

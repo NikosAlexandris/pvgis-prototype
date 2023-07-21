@@ -124,16 +124,13 @@ def adjust_solar_zenith_for_atmospheric_refraction(
         solar_zenith -= atmospheric_refraction_adjustment_radians  # in radians
         # solar_zenith += function(solar_altitude)  # in radians
 
-    solar_zenith = convert_to_degrees_if_requested(solar_zenith, angle_output_units)
-
     # Reasonably increase the upper limit for the solar zenith
     # beyond π/2 radians to account for atmospheric refraction.
     # i.e. at 90.833 degrees or about π/2 + 0.0146 radians
     # which is the solar zenith angle when the center of the sun is at the horizon,
     # considering both its apparent size and atmospheric refraction.
-    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi:
-        # raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π/2 + 0.0146] radians')
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi}] radians')
+    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi + 0.0146:
+        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
 
     return solar_zenith, angle_output_units
 
@@ -160,17 +157,13 @@ def calculate_solar_zenith_noaa(
     solar_zenith = acos(cosine_solar_zenith)
     if apply_atmospheric_refraction:
         solar_zenith, _units = adjust_solar_zenith_for_atmospheric_refraction(
-                solar_zenith,
-                angle_output_units,
-                )  # in radians
-    solar_zenith = convert_to_degrees_if_requested(
             solar_zenith,
-            angle_output_units,
-            )
-
+            angle_output_units="radians",  # always in radians!
+        )
     # if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
     #     raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π + 0.0146] radians')
-    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi:
-        raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π] radians')
+    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi + 0.0146:
+        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
 
+    # solar_zenith = convert_to_degrees_if_requested(solar_zenith, angle_output_units)
     return solar_zenith, angle_output_units
