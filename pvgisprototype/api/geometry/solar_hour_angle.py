@@ -1,30 +1,20 @@
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import Tuple
 from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_degrees_if_requested
 from math import pi
+from math import acos
+from math import tan
 
-
-app = typer.Typer(
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f":timer_clock:  Calculate the hour angle time for a location and moment",
-)
+from pvgisprototype.api.input_models import HourAngleInput
+from pvgisprototype.api.input_models import HourAngleSunriseInput
 
 
 def calculate_hour_angle(
-        solar_time: Annotated[float, typer.Argument(
-            help='The solar time in decimal hours on a 24 hour base',
-            callback=convert_hours_to_seconds)],
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ):
+        input: HourAngleInput,
+        ) -> Tuple[float, str]:
     """Calculate the hour angle ω'
 
     ω = (ST / 3600 - 12) * 15 * pi / 180
@@ -32,44 +22,39 @@ def calculate_hour_angle(
     Parameters
     ----------
 
-    hour_angle: float
+    solar_time : float
         The solar time (ST) is a calculation of the passage of time based on the
         position of the Sun in the sky. It is expected to be decimal hours in a
         24 hour format and measured internally in seconds. 
+    
+    output_units: str, optional
+        Angle output units (degrees or radians).
 
     Returns
-    --------
+    -------
 
-    hour_angle: float
-        Hour angle is the angle (ω) at any instant through which the earth has
-        to turn to bring the meridian of the observer directly in line with the
-        sun's rays measured in radian.
+    Tuple(float, str)
+        Tuple containg (hour_angle, units). Hour angle is the angle (ω) at any
+        instant through which the earth has to turn to bring the meridian of the
+        observer directly in line with the sun's rays measured in radian.
     """
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
-    hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
+    hour_angle = (input.solar_time / 3600 - 12) * 15 * pi / 180
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
-            output_units,
+            input.angle_output_units,
             )
-    return hour_angle, output_units
+    return (
+        hour_angle,
+        input.angle_output_units,
+        )
 
 
-@app.callback()
+
 def calculate_hour_angle_sunrise(
-        latitude: Annotated[Optional[float], typer.Argument(
-            min=-90, max=90)],
-        surface_tilt: Annotated[Optional[float], typer.Argument(
-            min=0, max=90)] = 0,
-        solar_declination: Annotated[Optional[float], typer.Argument(
-            min=-90, max=90)] = 180,
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> float:
+        input: HourAngleSunriseInput,
+        ) -> Tuple[float, str]:
     """Calculate the hour angle (ω) at sunrise and sunset
 
     Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
@@ -97,22 +82,26 @@ def calculate_hour_angle_sunrise(
 
     Returns
     -------
-    hour_angle: float
-        Hour angle (ω) is the angle at any instant through which the earth has
-        to turn to bring the meridian of the observer directly in line with the
-        sun's rays measured in radian.
+
+    Tuple(float, str)
+        Tuple containg (hour_angle, units). Hour angle (ω) is the angle at any
+        instant through which the earth has to turn to bring the meridian of the
+        observer directly in line with the sun's rays measured in radian.
     """
     hour_angle = acos(
             -tan(
-                latitude - surface_tilt
+                input.latitude - input.surface_tilt
                 )
-            *tan(solar_declination)
+            *tan(input.solar_declination)
             )
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
-            output_units,
+            input.angle_output_units,
             )
-    return hour_angle
+    return (
+        hour_angle,
+        input.angle_output_units,
+        )
 
 
 if __name__ == "__main__":
