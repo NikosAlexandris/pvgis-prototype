@@ -1,4 +1,3 @@
-from devtools import debug
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import field_validator
@@ -43,7 +42,19 @@ class BaseTimeOutputUnitsModel(BaseModel):
 
 # class BaseAngleOutputUnitsModel(BaseModel):  # Use this as in models/noaa/noaa_models.py
 class BaseOutputUnitsModel(BaseModel):
-    angle_output_units: Optional[str]
+    output_units: str
+
+    @field_validator('output_units')
+    @classmethod
+    def validate_angle_output_units(cls, v):
+        valid_units = ['radians', 'degrees']
+        if v not in valid_units:
+            raise ValueError(f"angle_output_units must be one of {valid_units}")
+        return v
+
+
+class BaseAngleOutputUnitsModel(BaseModel):
+    angle_output_units: str
 
     @field_validator('angle_output_units')
     @classmethod
@@ -67,10 +78,10 @@ class BaseCoordinatesInputModel(Longitude, Latitude):
 
 
 class SolarAltitudeInput(
-        BaseCoordinatesInputModel,
-        BaseTimeInputModel,
-        BaseOutputUnitsModel,
-        ):
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    BaseOutputUnitsModel,
+):
     pass
 
 
@@ -85,8 +96,8 @@ class EarthOrbitInputModel(BaseModel):
 
 
 class SolarDeclinationInput(
-        BaseTimeInputModel,
-        EarthOrbitInputModel,
-        BaseAngleOutputUnitsModel,
-        ):
+    BaseTimeInputModel,
+    EarthOrbitInputModel,
+    BaseAngleOutputUnitsModel,
+):
     pass
