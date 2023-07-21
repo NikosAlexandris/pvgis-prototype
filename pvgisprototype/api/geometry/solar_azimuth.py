@@ -13,6 +13,7 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 from .solar_declination import calculate_solar_declination
 from .solar_time import model_solar_time
 from .solar_hour_angle import calculate_hour_angle
+from ..utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(SolarAzimuthInput)
