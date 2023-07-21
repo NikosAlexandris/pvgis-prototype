@@ -17,6 +17,7 @@ from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_to_degrees_if_requested
 from .solar_declination import calculate_solar_declination
 from .solar_time import model_solar_time
+from .time_models import SolarTimeModels
 from .solar_hour_angle import calculate_hour_angle
 
 from pvgisprototype.api.input_models import SolarAltitudeInput
@@ -76,6 +77,7 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
             timezone=input.timezone,
             model=SolarTimeModels.eot,  # returns time in hours
             )
+    solar_time *= 3600
     hour_angle, _units = calculate_hour_angle(
             solar_time,
             input.output_units,
@@ -87,4 +89,5 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
             input.output_units,
             )
 
-    return solar_altitude, output_units
+    debug(locals())
+    return solar_altitude, input.output_units
