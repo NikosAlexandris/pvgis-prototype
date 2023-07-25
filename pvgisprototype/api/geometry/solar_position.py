@@ -36,12 +36,6 @@ class SolarPositionModels(str, Enum):
     skyfield = 'Skyfield'
 
 
-app = typer.Typer(
-    add_completion=False,
-    add_help_option=True,
-    help=f"Calculate the solar altitude and azimuth for a day in the year",
-)
-
 
 def _parse_model(ctx: typer.Context, model: List[SolarPositionModels], param: typer.CallbackParam) -> List[SolarPositionModels]:
 
@@ -241,8 +235,6 @@ def model_solar_position(
     return solar_altitude, solar_azimuth, angle_output_units  # redesign a safer output_units!
 
 
-@app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
-@app.command('position')
 def calculate_solar_position(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,

@@ -25,13 +25,6 @@ from pvgisprototype.api.input_models import SolarDeclinationInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
-# app = typer.Typer(
-#     add_completion=False,
-#     add_help_option=True,
-#     help=f"Calculate solar altitude for a location and time",
-# )
-
-
 @validate_with_pydantic(SolarAltitudeInput)
 def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
     """Compute various solar geometry variables.

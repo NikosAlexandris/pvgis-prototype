@@ -43,11 +43,6 @@ from ...models.pvgis.solar_time import calculate_solar_time_pvgis
 from .time_models import SolarTimeModels
 
 
-app = typer.Typer(
-    add_completion=False,
-    add_help_option=True,
-    help=f"Calculate solar time for a location and moment in time",
-)
 
 
 def model_solar_time(
@@ -170,8 +165,6 @@ def model_solar_time(
     return (solar_time, units)
 
 
-# @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
-# @app.command('solar-time')
 def calculate_solar_time(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
