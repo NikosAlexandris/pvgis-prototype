@@ -28,6 +28,9 @@ class BaseTimeInputModel(BaseTimestampInputModel):
 class RandomTimeInputModel(BaseModel):
     random_time: bool
 
+class TimeOffsetModel(BaseModel):
+    time_offset_global: float = 0
+    hour_offset: float = 0
 
 class BaseTimeOutputUnitsModel(BaseModel):
     time_output_units: Optional[str] = None
