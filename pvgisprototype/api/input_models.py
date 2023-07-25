@@ -198,6 +198,53 @@ class HourAngleSunriseInput(
         ):
     pass
 
+
+class SolarPositionInput(
+    BaseCoordinatesInputModel,
+    # timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
+    #     help='Timestamp',
+    #     default_factory=now_utc_datetimezone)],
+    # timezone: Annotated[Optional[str], typer.Option(
+    #     help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+    #     callback=ctx_convert_to_timezone)] = None,
+    BaseTimeInputModel,
+    # model: Annotated[SolarPositionModels, typer.Option(
+    #     '-m',
+    #     '--model',
+    #     show_default=True,
+    #     show_choices=True,
+    #     case_sensitive=False,
+    #     help="Model to calculate solar position")] = SolarPositionModels.skyfield,
+    # apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
+    #     '-a',
+    #     '--atmospheric-refraction',
+    #     help='Apply atmospheric refraction functions',
+    #     )] = True,
+    SolarPositionInputModel,
+    # time_output_units: Annotated[str, typer.Option(
+    #     '-u',
+    #     '--output-units',
+    #     show_default=True,
+    #     case_sensitive=False,
+    #     help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+    BaseTimeOutputUnitsModel,
+    # angle_units: Annotated[str, typer.Option(
+    #     '-u',
+    #     '--units',
+    #     show_default=True,
+    #     case_sensitive=False,
+    #     help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+    BaseAngleInternalUnitsModel,
+    # angle_output_units: Annotated[str, typer.Option(
+    #     '-u',
+    #     '--units',
+    #     show_default=True,
+    #     case_sensitive=False,
+    #     help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
 class SolarTimeInput(
     BaseCoordinatesInputModel,
     # timestamp: Annotated[Optional[datetime], typer.Argument(
