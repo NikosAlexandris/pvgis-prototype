@@ -121,6 +121,7 @@ class EarthOrbitInputModel(BaseModel):
     days_in_a_year: float = 365.25
     orbital_eccentricity: float = 0.03344
     perigee_offset: float = 0.048869
+    eccentricity: float = 0.01672                       # NOTE: Added by gounaol. I am not sure if correct
 
 
 class SolarDeclinationInput(
