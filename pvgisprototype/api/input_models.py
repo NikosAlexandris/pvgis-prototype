@@ -198,9 +198,9 @@ class HourAngleSunriseInput(
         # surface_tilt: Annotated[Optional[float], typer.Argument(
         #     min=0, max=90)] = 0,
         SurfaceTilt,
+        SolarDeclinationModel,
         # solar_declination: Annotated[Optional[float], typer.Argument(
         #     min=-90, max=90)] = 180,                                  # XXX: Default value changed from 180 to 0
-        SolarDeclination,
         # output_units: Annotated[str, typer.Option(
         #     '-u',
         #     '--units',
