@@ -57,11 +57,27 @@ class BaseAngleOutputUnitsModel(BaseModel):
 
 
 class Longitude(BaseModel):
-    longitude: confloat(ge=-180, le=180)
+    longitude: confloat(ge=-pi, le=pi)
+    model_config = ConfigDict(
+        json_schema_extra = {
+            "units": "radians",
+        },
+    )
+    # @validator("longitude", always=True)                                 # TODO: Add me to manual
+    # def longitude_to_radians(cls, v: float,) -> float:
+    #     return math.radians(v)
 
 
 class Latitude(BaseModel):
-    latitude: confloat(ge=-90, le=90)
+    latitude: confloat(ge=-pi/2, le=pi/2)
+    model_config = ConfigDict(
+        json_schema_extra = {
+            "units": "radians",
+        },
+    )
+    # @validator("latitude", always=True)                                 # TODO: Add me to manual
+    # def latitude_to_radians(cls, v: float,) -> float:
+    #     return math.radians(v)
 
 
 class BaseCoordinatesInputModel(Longitude, Latitude):
