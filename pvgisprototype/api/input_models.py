@@ -96,6 +96,8 @@ class Latitude(BaseModel):
 class SolarPositionInputModel(BaseModel):
     model: SolarPositionModels
     apply_atmospheric_refraction: bool = True
+class SolarTimeInputModel(SolarPositionInputModel):
+    refracted_solar_zenith: float = 1.5853349194640094,  # radians
 class BaseCoordinatesInputModel(Longitude, Latitude):
     pass
 
