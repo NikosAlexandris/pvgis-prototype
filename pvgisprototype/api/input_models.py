@@ -93,6 +93,9 @@ class Latitude(BaseModel):
     #     return math.radians(v)
 
 
+class SolarPositionInputModel(BaseModel):
+    model: SolarPositionModels
+    apply_atmospheric_refraction: bool = True
 class BaseCoordinatesInputModel(Longitude, Latitude):
     pass
 
