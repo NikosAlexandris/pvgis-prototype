@@ -197,3 +197,62 @@ class HourAngleSunriseInput(
         BaseAngleOutputUnitsModel,
         ):
     pass
+
+class SolarTimeInput(
+    BaseCoordinatesInputModel,
+    # timestamp: Annotated[Optional[datetime], typer.Argument(
+    #     help='Timestamp',
+    #     default_factory=now_utc_datetimezone)],
+    # timezone: Annotated[Optional[str], typer.Option(
+    #     help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+    #     callback=ctx_convert_to_timezone)] = None,
+    BaseTimeInputModel,
+    # model: Annotated[SolarTimeModels, typer.Option(
+    #     '-m',
+    #     '--model',
+    #     help="Model to calculate solar position",
+    #     show_default=True,
+    #     show_choices=True,
+    #     case_sensitive=False)] = SolarTimeModels.skyfield,
+    # refracted_solar_zenith: float = 1.5853349194640094,  # radians
+    # apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
+    #     '-a',
+    #     '--atmospheric-refraction',
+    #     help='Apply atmospheric refraction functions',
+    #     )] = True,
+    SolarTimeInputModel,
+    # time_output_units: Annotated[str, typer.Option(
+    #     '-u',
+    #     '--output-units',
+    #     show_default=True,
+    #     case_sensitive=False,
+    #     help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+    BaseTimeOutputUnitsModel,
+    # angle_units: Annotated[str, typer.Option(
+    #     '-u',
+    #     '--units',
+    #     show_default=True,
+    #     case_sensitive=False,
+    #     help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+    BaseAngleInternalUnitsModel,
+    # angle_output_units: Annotated[str, typer.Option(
+    #     '-u',
+    #     '--units',
+    #     show_default=True,
+    #     case_sensitive=False,
+    #     help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
+    BaseAngleOutputUnitsModel,
+    # days_in_a_year: Annotated[float, typer.Option(
+    #     help='Days in a year')] = 365.25,
+    # perigee_offset: Annotated[float, typer.Option(
+    #     help='Perigee offset')] = 0.048869,
+    # eccentricity: Annotated[float, typer.Option(
+    #     help='Eccentricity')] = 0.01672,
+    EarthOrbitInputModel,
+    # time_offset_global: Annotated[float, typer.Option(
+    #     help='Global time offset')] = 0,
+    # hour_offset: Annotated[float, typer.Option(
+    #     help='Hour offset')] = 0,
+    TimeOffsetModel,
+):
+    pass
