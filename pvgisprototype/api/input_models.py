@@ -56,6 +56,19 @@ class BaseAngleOutputUnitsModel(BaseModel):
         return v
 
 
+class BaseAngleInternalUnitsModel(BaseModel):                                               # NOTE: Maybe deprecate
+    angle_units: str
+    model_config = ConfigDict(
+        description="""Angular units for internal calculations (degrees).""",
+    )
+
+    @field_validator('angle_units')
+    @classmethod
+    def validate_angle_units(cls, v):
+        valid_units = ['radians']
+        if v not in valid_units:
+            raise ValueError(f"angle_units must be {valid_units}")
+        return v
 class Longitude(BaseModel):
     longitude: confloat(ge=-pi, le=pi)
     model_config = ConfigDict(
