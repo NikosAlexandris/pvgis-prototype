@@ -144,8 +144,16 @@ class SolarDeclinationInput(
     pass
 
 
-class SolarTime(BaseModel):
+class SolarTimeModel(BaseModel):
     solar_time: confloat(ge=0, le=86400)
+    model_config = ConfigDict(
+        description="""The solar time (ST) is a calculation of the passage of time based
+        on the position of the Sun in the sky. It is expected to be decimal hours in a
+        24 hour format and measured internally in seconds.""",
+        json_schema_extra = {
+            "units": "seconds",
+        },
+    )
 
 class SurfaceTilt(BaseModel):
     surface_tilt: Optional[confloat(ge=0, le=90)] = 0
