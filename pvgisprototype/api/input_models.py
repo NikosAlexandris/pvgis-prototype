@@ -46,6 +46,9 @@ class BaseTimeOutputUnitsModel(BaseModel):
 
 class BaseAngleOutputUnitsModel(BaseModel):
     angle_output_units: str
+    model_config = ConfigDict(
+        description="""Output units for solar geometry variables (degrees or radians).""",
+    )
 
     @field_validator('angle_output_units')
     @classmethod
