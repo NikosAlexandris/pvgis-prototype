@@ -176,10 +176,10 @@ class SolarDeclinationModel(BaseModel):
     )
 
 class HourAngleInput(
+        SolarTimeModel,
         # solar_time: Annotated[float, typer.Argument(
         #     help='The solar time in decimal hours on a 24 hour base',
         #     callback=convert_hours_to_seconds)],
-        SolarTime,
         # output_units: Annotated[str, typer.Option(
         #     '-u',
         #     '--units',
