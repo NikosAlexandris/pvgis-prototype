@@ -25,15 +25,8 @@ from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_consta
 from ...models.noaa.solar_position import calculate_solar_altitude_noaa
 from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
 
+from .solar_models import SolarPositionModels
 
-class SolarPositionModels(str, Enum):
-    all = 'all'
-    noaa = 'NOAA'
-    pysolar = 'pysolar'
-    pvis = 'pvis'
-    # pvgis = 'PVGIS'
-    suncalc = 'suncalc'
-    skyfield = 'Skyfield'
 
 
 

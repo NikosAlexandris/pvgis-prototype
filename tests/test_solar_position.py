@@ -1,6 +1,6 @@
 import pytest
 from pvgisprototype.api.geometry.solar_position import calculate_solar_position
-from pvgisprototype.api.geometry.solar_position import SolarPositionModels
+from pvgisprototype.api.geometry.solar_models import SolarPositionModels
 from pvgisprototype.api.geometry.solar_position import calculate_solar_position_pvgis
 from pvgisprototype.api.data_structures import SolarGeometryDayConstants
 from pvgisprototype.api.data_structures import SolarGeometryDayVariables

@@ -34,7 +34,7 @@ from ..models.pyephem.solar_time import calculate_solar_time_ephem
 from ..api.geometry.solar_hour_angle import calculate_hour_angle
 from ..api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 from ..api.geometry.solar_azimuth import calculate_solar_azimuth
-from ..api.geometry.solar_position import SolarPositionModels
+from ..api.geometry.solar_models import SolarPositionModels
 from ..api.geometry.solar_position import _parse_model
 from ..api.geometry.solar_position import calculate_solar_position
 from ..api.geometry.solar_position import model_solar_position

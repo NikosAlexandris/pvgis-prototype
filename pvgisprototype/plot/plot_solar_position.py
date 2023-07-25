@@ -9,7 +9,7 @@ logging.basicConfig(
     ]
 )
 from typing import List
-from pvgisprototype.api.geometry.solar_position import SolarPositionModels
+from pvgisprototype.api.geometry.solar_models import SolarPositionModels
 from pvgisprototype.api.geometry.solar_position import model_solar_position
 from pvgisprototype.api.geometry.solar_position import calculate_solar_position
 from pvgisprototype.api.geometry.solar_position import calculate_solar_position_pvgis
