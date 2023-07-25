@@ -156,11 +156,24 @@ class SolarTimeModel(BaseModel):
     )
 
 class SurfaceTilt(BaseModel):
-    surface_tilt: Optional[confloat(ge=0, le=90)] = 0
+    surface_tilt: confloat(ge=-pi/2, le=pi/2) = 0
+    model_config = ConfigDict(
+        description="""Surface tilt (or slope) (β) is the angle between the inclined
+        surface (slope) and the horizontal plane.""",
+        json_schema_extra = {
+            "units": "radians",
+        },
+    )
 
-class SolarDeclination(BaseModel):
-    solar_declination: Optional[confloat(ge=-90, le=90)] = 0          # XXX: Default value changed from 180 to 0
-
+class SolarDeclinationModel(BaseModel):
+    solar_declination: confloat(ge=-0.4092797096, le=0.4092797096) = 0
+    model_config = ConfigDict(
+        description="""Solar declination (δ) is the angle between the equator and a
+        line drawn from the centre of the Earth to the centre of the sun.""",
+        json_schema_extra = {
+            "units": "radians",
+        },
+    )
 
 class HourAngleInput(
         # solar_time: Annotated[float, typer.Argument(
