@@ -6,6 +6,7 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 from datetime import datetime
 
+from .geometry.solar_models import SolarPositionModels
 
 class BaseTimestampInputModel(BaseModel):
     timestamp: datetime
