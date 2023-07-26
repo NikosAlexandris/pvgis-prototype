@@ -15,15 +15,8 @@ app = typer.Typer(
 
 
 def calculate_hour_angle(
-        solar_time: Annotated[float, typer.Argument(
-            help='The solar time in decimal hours on a 24 hour base',
-            callback=convert_hours_to_seconds)],
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        solar_time: time,
+        output_units: str = 'radians',
         ):
     """Calculate the hour angle ω'
 

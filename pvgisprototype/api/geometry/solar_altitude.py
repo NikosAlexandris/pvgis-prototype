@@ -33,7 +33,9 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 
 
 @validate_with_pydantic(SolarAltitudeInput)
-def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
+def calculate_solar_altitude(
+        input: SolarAltitudeInput,
+        ) -> float:
     """Compute various solar geometry variables.
     Parameters
     ----------
@@ -89,5 +91,4 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
             input.output_units,
             )
 
-    debug(locals())
     return solar_altitude, input.output_units
