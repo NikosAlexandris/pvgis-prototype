@@ -56,48 +56,6 @@ def _parse_model(
 def model_solar_position(
         input: SolarPositionInput,
     )-> Tuple[NamedTuple, NamedTuple]:
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
-            callback=ctx_convert_to_timezone)] = None,
-        model: Annotated[SolarPositionModels, typer.Option(
-            '-m',
-            '--model',
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False,
-            help="Model to calculate solar position")] = SolarPositionModels.skyfield,
-        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
-            '-a',
-            '--atmospheric-refraction',
-            help='Apply atmospheric refraction functions',
-            )] = True,
-        time_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
-        angle_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
-        angle_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
     """
     The solar altitude angle measures from the horizon up towards the zenith
     (positive, and down towards the nadir (negative)). The altitude is zero all
@@ -261,49 +219,49 @@ def model_solar_position(
 
 
 def calculate_solar_position(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
-            callback=ctx_convert_to_timezone)] = None,
-        models: Annotated[List[SolarPositionModels], typer.Option(
-            '-m',
-            '--models',
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False,
-            callback=_parse_model,
-            help="Model(s) to calculate solar position.")] = [SolarPositionModels.skyfield],
-        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
-            '-a',
-            '--atmospheric-refraction',
-            help='Apply atmospheric refraction functions',
-            )] = True,
-        time_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
-        angle_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
-        angle_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
+    longitude: Annotated[float, typer.Argument(
+        callback=convert_to_radians,
+        min=-180, max=180)],
+    latitude: Annotated[float, typer.Argument(
+        callback=convert_to_radians,
+        min=-90, max=90)],
+    timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
+        help='Timestamp',
+        default_factory=now_utc_datetimezone)],
+    timezone: Annotated[Optional[str], typer.Option(
+        help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+        callback=ctx_convert_to_timezone)] = None,
+    models: Annotated[List[SolarPositionModels], typer.Option(
+        '-m',
+        '--models',
+        show_default=True,
+        show_choices=True,
+        case_sensitive=False,
+        callback=_parse_model,
+        help="Model(s) to calculate solar position.")] = [SolarPositionModels.skyfield],
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
+        '-a',
+        '--atmospheric-refraction',
+        help='Apply atmospheric refraction functions',
+        )] = True,
+    time_output_units: Annotated[str, typer.Option(
+        '-u',
+        '--output-units',
+        show_default=True,
+        case_sensitive=False,
+        help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+    angle_units: Annotated[str, typer.Option(
+        '-u',
+        '--units',
+        show_default=True,
+        case_sensitive=False,
+        help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+    angle_output_units: Annotated[str, typer.Option(
+        '-u',
+        '--units',
+        show_default=True,
+        case_sensitive=False,
+        help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
 ):
     """
     Calculates the solar position using all models and returns the results in a table.
