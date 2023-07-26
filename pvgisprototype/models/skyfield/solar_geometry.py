@@ -75,7 +75,6 @@ def calculate_solar_position_skyfield(
     # except Exception:
     #     logging.warning(f'tzinfo already set for timestamp = {timestamp}')
     # # Handle Me during input validation? -------------------------------------
-    # debug(locals())
 
     ephemeris = skyfield.api.load('de421.bsp')
     sun = ephemeris['Sun']
@@ -89,7 +88,6 @@ def calculate_solar_position_skyfield(
     requested_timestamp = timescale.from_datetime(timestamp)
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
 
-    debug(locals())
     return solar_position
 
 
@@ -162,7 +160,6 @@ def calculate_solar_altitude_azimuth_skyfield(
     #     solar_altitude = solar_altitude.degrees
     #     solar_azimuth = solar_azimuth.degrees
 
-    debug(locals())
     return solar_altitude, solar_azimuth  # distance_to_sun
 
 
@@ -221,6 +218,5 @@ def calculate_hour_angle_skyfield(
         hour_angle = hour_angle.radians
         solar_declination = solar_declination.radians
 
-    debug(locals())
     return hour_angle, solar_declination, output_units
 

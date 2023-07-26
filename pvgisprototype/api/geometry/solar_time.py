@@ -110,7 +110,6 @@ def model_solar_time(
     # if local and timestamp is not None and timezone is not None:
     #     timestamp = timezone.localize(timestamp)
 
-    # debug(locals())
     if model.value == SolarTimeModels.eot:
 
         solar_time = calculate_solar_time_eot(
@@ -235,7 +234,6 @@ def calculate_solar_time(
     """
     Calculates the solar time using all models and returns the results in a table.
     """
-    # debug(locals())
     results = []
     for model in models:
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration

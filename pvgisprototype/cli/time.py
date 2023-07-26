@@ -165,7 +165,6 @@ def solar_time(
     if SolarTimeModels.all in model:
         model = [model for model in SolarTimeModels if model != SolarTimeModels.all]
 
-    # debug(locals())
     solar_time  = calculate_solar_time(
             longitude,
             latitude,
@@ -183,7 +182,6 @@ def solar_time(
             time_offset_global,
             hour_offset,
             )
-    # debug(locals())
     solar_time_table = Table('Model', 'Solar time', 'Units',
                                  box=box.SIMPLE_HEAD)
     for model_result in solar_time:
@@ -197,7 +195,6 @@ def solar_time(
                 str(units),
         )
 
-    # debug(locals())
     console.print(solar_time_table)
 
 

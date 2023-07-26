@@ -54,7 +54,6 @@ def _parse_model(ctx: typer.Context, model: List[SolarPositionModels], param: ty
     if SolarPositionModels.all in model:
         # Return all models except for the 'all' itself!
         model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-    # debug(locals())
     print(f"Return model: {model}")
     return model
 
@@ -237,7 +236,6 @@ def model_solar_position(
     #     solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
     #     solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
-    debug(locals())
     return solar_altitude, solar_azimuth, angle_output_units  # redesign a safer output_units!
 
 
@@ -291,7 +289,6 @@ def calculate_solar_position(
     """
     Calculates the solar position using all models and returns the results in a table.
     """
-    debug(locals())
     results = []
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration

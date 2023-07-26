@@ -43,8 +43,8 @@ from .rich_help_panel_names import rich_help_panel_geometry_time
 from .rich_help_panel_names import rich_help_panel_geometry_position
 from .rich_help_panel_names import rich_help_panel_geometry_refraction
 from .rich_help_panel_names import rich_help_panel_geometry_surface
-
 from pvgisprototype.api.input_models import SolarDeclinationInput
+
 
 console = Console()
 app = typer.Typer(

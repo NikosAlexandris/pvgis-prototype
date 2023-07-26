@@ -76,7 +76,6 @@ def select_time_series(
     """
     Plot location series
     """
-    # debug(locals())
     if convert_longitude_360:
         longitude = longitude % 360
 
@@ -102,13 +101,11 @@ def select_time_series(
     if (longitude and latitude):
         logger.info(f'Coordinates : {longitude}, {latitude}')
 
-    # debug(locals())
     data_array = open_data_array(
             netcdf,
             mask_and_scale,
             in_memory,
             )
-    # debug(locals())
     data_array = select_coordinates(
             data_array=data_array,
             longitude=longitude,
