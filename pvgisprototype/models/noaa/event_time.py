@@ -1,7 +1,7 @@
 from devtools import debug
 
-from .noaa_models import Longitude
-from .noaa_models import Latitude
+from .noaa_models import Longitude_in_Radians
+from .noaa_models import Latitude_in_Radians
 from .noaa_models import CalculateEventTimeNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
@@ -21,8 +21,8 @@ radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_
 
 @validate_with_pydantic(CalculateEventTimeNOAAInput)
 def calculate_event_time_noaa(
-        longitude: Longitude,
-        latitude: Latitude,
+        longitude: Longitude_in_Radians,
+        latitude: Latitude_in_Radians,
         timestamp: datetime,
         timezone: str,
         event: str,
@@ -68,25 +68,24 @@ def calculate_event_time_noaa(
     - All angles in radians
     - cosine(90.833) = -0.9629159426075866
     """
-    debug(locals())
-    equation_of_time, _ = calculate_equation_of_time_noaa(
+    equation_of_time, equation_of_time_units = calculate_equation_of_time_noaa(
             timestamp,
             time_output_units,
             angle_units,
             )  # minutes
-    solar_declination , _ = calculate_solar_declination_noaa(
+    solar_declination , solar_declination_units = calculate_solar_declination_noaa(
             timestamp,
             angle_units,  # for calculate_fractional_year_noaa()
             angle_output_units
             )  # radians
-    solar_hour_angle, _ = calculate_solar_hour_angle_noaa(
+    solar_hour_angle, solar_hour_angle_units = calculate_solar_hour_angle_noaa(
             longitude,
             timestamp,
             timezone,
             time_output_units,
             angle_output_units,
             )  # radians
-    solar_zenith, _ = calculate_solar_zenith_noaa(
+    solar_zenith, solar_zenith_units = calculate_solar_zenith_noaa(
             latitude,
             timestamp,
             solar_hour_angle,
@@ -95,7 +94,7 @@ def calculate_event_time_noaa(
             angle_units,
             angle_output_units,
             )  # radians
-    event_hour_angle, _ = calculate_event_hour_angle_noaa(
+    event_hour_angle, event_hour_angle_units = calculate_event_hour_angle_noaa(
             latitude,
             timestamp,
             refracted_solar_zenith,
@@ -121,5 +120,4 @@ def calculate_event_time_noaa(
     event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(minutes=event_time)
     event_datetime_utc = attach_requested_timezone(event_datetime)  # assign UTC
 
-    debug(locals())
     return event_datetime_utc, time_output_units
