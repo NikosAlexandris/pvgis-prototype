@@ -82,7 +82,7 @@ def model_solar_time(
                 input.hour_offset,
                 )
 
-    if model.value == SolarTimeModels.ephem:
+    if input.model.value == SolarTimeModels.ephem:
 
         solar_time = calculate_solar_time_ephem(
             input.longitude,
@@ -91,7 +91,7 @@ def model_solar_time(
             input.timezone,
             )
 
-    if model.value == SolarTimeModels.pvgis:
+    if input.model.value == SolarTimeModels.pvgis:
 
         solar_time = calculate_solar_time_pvgis(
             input.longitude,
@@ -184,30 +184,41 @@ def calculate_solar_time(
         hour_offset: Annotated[float, typer.Option(
             help='Hour offset')] = 0,
 ):
+    """Calculates the solar time using all models and returns the results in a table.
+
+    Parameters
+    ----------
+
+    
+    Returns
+    -------
+    _type_
+        _description_
     """
-    Calculates the solar time using all models and returns the results in a table.
-    """
+
     # debug(locals())
     results = []
     for model in models:
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
-            solar_time, units = model_solar_time(
-                    longitude,
-                    latitude,
-                    timestamp,
-                    timezone,
-                    model,
-                    refracted_solar_zenith,
-                    apply_atmospheric_refraction,
-                    time_output_units,
-                    angle_units,
-                    angle_output_units,
-                    days_in_a_year,
-                    perigee_offset,
-                    eccentricity,
-                    time_offset_global,
-                    hour_offset,
-                    )
+            solar_time = model_solar_time(
+                SolarTimeInput(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamp=timestamp,
+                    timezone=timezone,
+                    model=model,
+                    refracted_solar_zenith=refracted_solar_zenith,
+                    apply_atmospheric_refraction=apply_atmospheric_refraction,
+                    time_output_units=time_output_units,
+                    angle_units=angle_units,
+                    angle_output_units=angle_output_units,
+                    days_in_a_year=days_in_a_year,
+                    perigee_offset=perigee_offset,
+                    eccentricity=eccentricity,
+                    time_offset_global=time_offset_global,
+                    hour_offset=hour_offset,
+                )
+            )
             results.append({
                 'Model': model.value,
                 'Solar time': solar_time.value,

@@ -11,8 +11,10 @@ from math import tan
 from pvgisprototype.api.input_models import HourAngleInput
 from pvgisprototype.api.input_models import HourAngleSunriseInput
 from pvgisprototype.api.named_tuples import generate
+from pvgisprototype.api.decorators import validate_with_pydantic
 
 
+@validate_with_pydantic(HourAngleInput)
 def calculate_hour_angle(
         input: HourAngleInput,
     ) -> NamedTuple:
@@ -65,6 +67,7 @@ def calculate_hour_angle(
     return hour_angle
 
 
+@validate_with_pydantic(HourAngleSunriseInput)
 def calculate_hour_angle_sunrise(
         input: HourAngleSunriseInput,
     ) -> NamedTuple:

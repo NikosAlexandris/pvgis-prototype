@@ -46,7 +46,7 @@ from .rich_help_panel_names import rich_help_panel_geometry_surface
 
 from pvgisprototype.api.input_models import HourAngleInput
 from pvgisprototype.api.input_models import HourAngleSunriseInput
-from pvgisprototype.api.input_models import SolarDeclinationInput
+
 
 console = Console()
 app = typer.Typer(
