@@ -856,7 +856,7 @@ def declination(
     )
 
     typer.echo(f'Date, time and zone: {timestamp} {timezone}')
-    typer.echo(f'Solar declination: {solar_declination} {angle_output_units}')
+    typer.echo(f'Solar declination: {solar_declination.value} {solar_declination.unit}')            # FIXME: typer?
     # return solar_declination
 
 
@@ -1124,7 +1124,7 @@ def hour_angle(
             angle_output_units=output_units,
         )
     )
-    typer.echo(f'Hour angle: {hour_angle} {output_units}')
+    typer.echo(f'Hour angle: {hour_angle.value} {hour_angle.unit}')              # FIXME: typer ?!
 
 
 @app.command('sunrise', no_args_is_help=True, help=':sunrise: Calculate the hour angle (ω) at sun rise and set')
@@ -1165,7 +1165,7 @@ def hour_angle(
         )
     )
 
-    typer.echo(f'Solar time: {hour_angle} {output_units}')
+    typer.echo(f'Solar time: {hour_angle.value} {hour_angle.unit}')              # FIXME: typer ?
 
 
 if __name__ == "__main__":

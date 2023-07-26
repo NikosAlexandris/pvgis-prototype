@@ -24,13 +24,14 @@ def calculate_solar_declination_noaa(
                 )
         declination = (
         0.006918
-        - 0.399912 * cos(fractional_year)
-        + 0.070257 * sin(fractional_year)
-        - 0.006758 * cos(2 * fractional_year)
-        + 0.000907 * sin(2 * fractional_year)
-        - 0.002697 * cos(3 * fractional_year)
-        + 0.00148 * sin(3 * fractional_year)
-    )
+        - 0.399912 * cos(fractional_year.value)
+        + 0.070257 * sin(fractional_year.value)
+        - 0.006758 * cos(2 * fractional_year.value)
+        + 0.000907 * sin(2 * fractional_year.value)
+        - 0.002697 * cos(3 * fractional_year.value)
+        + 0.00148 * sin(3 * fractional_year.value)
+        )
+
         declination = generate(
                 'declination'.upper(),
                 (declination, angle_output_units),

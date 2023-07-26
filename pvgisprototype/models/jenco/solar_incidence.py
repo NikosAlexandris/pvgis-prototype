@@ -163,8 +163,8 @@ def calculate_solar_incidence_jenco(
         perigee_offset,
         angle_output_units,
         )
-    c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination)
-    c_inclined_33 = sine_relative_inclined_latitude * sin(solar_declination)
+    c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.value)
+    c_inclined_33 = sine_relative_inclined_latitude * sin(solar_declination.value)
     
     hour_angle, _units = calculate_solar_hour_angle_noaa(
         longitude,

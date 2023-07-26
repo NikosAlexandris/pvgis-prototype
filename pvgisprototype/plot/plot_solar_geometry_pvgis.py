@@ -32,7 +32,7 @@ def plot_sunrise_sunset(longitude: float, latitude: float, start_date: datetime.
                 longitude=longitude,
                 latitude=latitude,
                 local_solar_time=12,  # Assuming local solar time as noon
-                solar_declination=solar_declination,
+                solar_declination=solar_declination.value,
                 time_offset=0.0  # Assuming time offset as 0
                 )
         sunrise_times.append(solar_geometry_day_constants.sunrise_time)
@@ -75,7 +75,7 @@ def plot_solar_geometry_pvgis_variables(longitude:float, latitude: float, start_
             longitude=longitude,
             latitude=latitude,
             local_solar_time=12,  # Assuming local solar time as noon
-            solar_declination=solar_declination,
+            solar_declination=solar_declination.value,
             time_offset=0.0  # Assuming time offset as 0
         )
         solar_geometry_day_variables = calculate_solar_geometry_pvgis_variables(

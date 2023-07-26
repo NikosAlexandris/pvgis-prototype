@@ -32,18 +32,18 @@ def calculate_solar_azimuth_noaa(
     latitude: float
         The latitude in radians
     """
-    solar_declination, _units = calculate_solar_declination_noaa(
+    solar_declination = calculate_solar_declination_noaa(
             timestamp,
             angle_units,
             angle_output_units,
             )  # radians
-    solar_hour_angle, _units = calculate_solar_hour_angle_noaa(
+    solar_hour_angle = calculate_solar_hour_angle_noaa(
         longitude, timestamp, timezone, time_output_units, angle_output_units
     )  # radians
-    solar_zenith, _units = calculate_solar_zenith_noaa(
+    solar_zenith = calculate_solar_zenith_noaa(
         latitude,
         timestamp,
-        solar_hour_angle,
+        solar_hour_angle.value,
         apply_atmospheric_refraction,
         angle_units,
         angle_output_units,
@@ -55,12 +55,12 @@ def calculate_solar_azimuth_noaa(
     #     - 180 and 360 degrees when the `solar_hour_angle`, is positive (afternoon). 
 
     cosine_solar_azimuth = (
-        sin(solar_declination) - sin(latitude) * cos(solar_zenith)
-    ) / (cos(latitude) * sin(solar_zenith))
+        sin(solar_declination.value) - sin(latitude) * cos(solar_zenith.value)
+    ) / (cos(latitude) * sin(solar_zenith.value))
     solar_azimuth = acos(cosine_solar_azimuth)
 
     # adjust azimuth range for the afternoon
-    if solar_hour_angle > 0:  
+    if solar_hour_angle.value > 0:  
         solar_azimuth = 2*pi - solar_azimuth
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:

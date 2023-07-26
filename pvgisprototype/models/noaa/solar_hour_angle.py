@@ -62,11 +62,11 @@ def calculate_solar_hour_angle_noaa(
     to radians. A circle is 360 degrees, dividing by 1440 minutes in a day
     equals to 0.25.
     """
-    true_solar_time, _units = calculate_true_solar_time_noaa(
+    true_solar_time = calculate_true_solar_time_noaa(
         longitude, timestamp, timezone, time_output_units
     )  # in minutes
 
-    solar_hour_angle = (true_solar_time - 720) * (pi / 720)
+    solar_hour_angle = (true_solar_time.value - 720) * (pi / 720)
 
     if angle_output_units == 'radians' and not -pi <= solar_hour_angle <= pi:
         raise ValueError("The hour angle in radians must be within the range [-π, π]")

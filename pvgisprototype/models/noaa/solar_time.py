@@ -38,14 +38,14 @@ def calculate_true_solar_time_noaa(
     #         logging.warning(f'Unknown timezone: {e}')
     #         raise
     
-    time_offset, _units = calculate_time_offset_noaa(
+    time_offset = calculate_time_offset_noaa(
             longitude,
             timestamp,
             time_output_units,
             angle_units,
             )  # in minutes
     true_solar_time = (
-        timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
+        timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.value
     )
 
     if time_output_units == 'minutes':

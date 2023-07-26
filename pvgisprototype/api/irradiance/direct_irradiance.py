@@ -237,8 +237,8 @@ def calculate_direct_horizontal_irradiance(
 
     day_of_year = timestamp.timetuple().tm_yday
     solar_declination = calculate_solar_declination(timestamp)
-    C31 = math.cos(latitude) * math.cos(solar_declination)
-    C33 = math.sin(latitude) * math.sin(solar_declination)
+    C31 = math.cos(latitude) * math.cos(solar_declination.value)
+    C33 = math.sin(latitude) * math.sin(solar_declination.value)
 
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
@@ -410,8 +410,8 @@ def calculate_direct_inclined_irradiance_pvgis(
 
     # calculate solar declination + C3x geometry parameters
     solar_declination = calculate_solar_declination(timestamp)
-    C31 = math.cos(latitude) * math.cos(solar_declination)
-    C33 = math.sin(latitude) * math.sin(solar_declination)
+    C31 = math.cos(latitude) * math.cos(solar_declination.value)
+    C33 = math.sin(latitude) * math.sin(solar_declination.value)
 
     # calculate solar altitude
     solar_time, _units = model_solar_time(
@@ -432,8 +432,8 @@ def calculate_direct_inclined_irradiance_pvgis(
 
     # calculate C3x geometry parameters for inclined surface
     relative_latitude = math.asin(sine_relative_latitude)
-    C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination)
-    C33_inclined = math.sin(relative_latitude) * math.sin(solar_declination)
+    C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination.value)
+    C33_inclined = math.sin(relative_latitude) * math.sin(solar_declination.value)
 
     # calculate solar incidence angle
     solar_incidence_angle = C31_inclined * math.cos (hour_angle - relative_longitude) + C33_inclined
@@ -449,7 +449,7 @@ def calculate_direct_inclined_irradiance_pvgis(
         try:
             angular_loss_factor = calculate_angular_loss_factor(
                     solar_altitude,
-                    solar_declination,
+                    solar_declination.value,
                     )
             direct_inclined_irradiance = modified_direct_horizontal_irradiance * angular_loss_factor
 

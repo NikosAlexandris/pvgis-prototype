@@ -80,11 +80,11 @@ def calculate_time_offset_noaa(
     """
     longitude_in_minutes = radians_to_time_minutes(longitude)  # time
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
-    equation_of_time, _units = calculate_equation_of_time_noaa(timestamp,
+    equation_of_time = calculate_equation_of_time_noaa(timestamp,
                                                                time_output_units,
                                                                angle_units,
                                                                )  # minutes
-    time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time
+    time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time.value
 
     if not -720 <= time_offset <= 720:
         raise ValueError("The time offset must range within [-720, 720] minutes ?")

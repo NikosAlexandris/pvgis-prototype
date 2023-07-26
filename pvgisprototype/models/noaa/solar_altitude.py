@@ -6,6 +6,8 @@ from .solar_zenith import calculate_solar_zenith_noaa
 from math import pi
 from math import isfinite
 from ...api.utilities.conversions import convert_to_degrees_if_requested
+from typing import NamedTuple
+from pvgisprototype.api.named_tuples import generate
 
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
@@ -18,26 +20,30 @@ def calculate_solar_altitude_noaa(
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-        ):
+        )-> NamedTuple:
     """Calculate the solar zenith angle (φ) in radians
     """
-    solar_hour_angle, _units = calculate_solar_hour_angle_noaa(
+    solar_hour_angle = calculate_solar_hour_angle_noaa(
         longitude,
         timestamp,
         timezone,
         time_output_units,
         angle_output_units,
     )
-    solar_zenith, _units = calculate_solar_zenith_noaa(
+    solar_zenith = calculate_solar_zenith_noaa(
         latitude,
         timestamp,
-        solar_hour_angle,
+        solar_hour_angle.value,
         apply_atmospheric_refraction,
         angle_units='radians',
         angle_output_units='radians',
             )  # radians
-    solar_altitude = pi/2 - solar_zenith
+    solar_altitude = pi/2 - solar_zenith.value
     if not isfinite(solar_altitude) or not -pi/2 <= solar_altitude <= pi/2:
         raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
 
-    return solar_altitude, angle_output_units
+    solar_altitude = generate(
+        'solar_altitude'.upper(),
+        (solar_altitude, angle_output_units),
+    )
+    return solar_altitude

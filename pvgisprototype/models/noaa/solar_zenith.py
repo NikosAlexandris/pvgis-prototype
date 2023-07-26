@@ -153,13 +153,13 @@ def calculate_solar_zenith_noaa(
         angle_output_units: str = 'radians',
         )-> NamedTuple:
     """Calculate the solar zenith angle (φ) in radians """
-    solar_declination, _units = calculate_solar_declination_noaa(
+    solar_declination = calculate_solar_declination_noaa(
             timestamp,
             angle_units,
             angle_output_units,
             )
-    cosine_solar_zenith = sin(latitude) * sin(solar_declination) + cos(latitude) * cos(
-        solar_declination
+    cosine_solar_zenith = sin(latitude) * sin(solar_declination.value) + cos(latitude) * cos(
+        solar_declination.value
     ) * cos(solar_hour_angle)
 
     solar_zenith = generate(
@@ -168,13 +168,13 @@ def calculate_solar_zenith_noaa(
     )
 
     if apply_atmospheric_refraction:
-        solar_zenith, _units = adjust_solar_zenith_for_atmospheric_refraction(
-            solar_zenith,
+        solar_zenith = adjust_solar_zenith_for_atmospheric_refraction(
+            solar_zenith.value,
             angle_output_units="radians",  # always in radians!
         )
-    # if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
+    # if not isfinite(solar_zenith.value) or not 0 <= solar_zenith.value <= pi/2 + 0.0146:
     #     raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π + 0.0146] radians')
-    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi + 0.0146:
+    if not isfinite(solar_zenith.value) or not 0 <= solar_zenith.value <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
 
     # solar_zenith = convert_to_degrees_if_requested(solar_zenith, angle_output_units)

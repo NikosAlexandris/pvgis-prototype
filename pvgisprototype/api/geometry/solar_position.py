@@ -3,6 +3,8 @@ import typer
 from typing import Annotated
 from typing import Optional
 from typing import List
+from typing import Tuple
+from typing import NamedTuple
 from enum import Enum
 import numpy as np
 import datetime
@@ -47,6 +49,8 @@ def _parse_model(ctx: typer.Context, model: List[SolarPositionModels], param: ty
 
 
 def model_solar_position(
+        input: SolarPositionInput,
+    )-> Tuple[NamedTuple, NamedTuple]:
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
             min=-180, max=180)],
@@ -89,7 +93,6 @@ def model_solar_position(
             show_default=True,
             case_sensitive=False,
             help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
-        ):
     """
     The solar altitude angle measures from the horizon up towards the zenith
     (positive, and down towards the nadir (negative)). The altitude is zero all
@@ -213,7 +216,7 @@ def model_solar_position(
     #             longitude=longitude,
     #             latitude=latitude,
     #             local_solar_time=local_solar_time,
-    #             solar_declination=solar_declination,
+    #             solar_declination=solar_declination.value,
     #             )
 
     #     solar_altitude, solar_azimuth, sun_azimuth = calculate_solar_position_pvgis(
@@ -225,7 +228,7 @@ def model_solar_position(
     #     solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
     debug(locals())
-    return solar_altitude, solar_azimuth, angle_output_units  # redesign a safer output_units!
+    return solar_altitude, solar_azimuth
 
 
 def calculate_solar_position(
@@ -280,22 +283,24 @@ def calculate_solar_position(
     results = []
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
-            solar_altitude, solar_azimuth, units = model_solar_position(
-                longitude,
-                latitude,
-                timestamp,
-                timezone,
-                model,
-                apply_atmospheric_refraction,
-                time_output_units,
-                angle_units,
-                angle_output_units,
+            solar_altitude, solar_azimuth = model_solar_position(
+                SolarPositionInput(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamp=timestamp,
+                    timezone=timezone,
+                    model=model,
+                    apply_atmospheric_refraction=apply_atmospheric_refraction,
+                    time_output_units=time_output_units,
+                    angle_units=angle_units,
+                    angle_output_units=angle_output_units,
+                )
             )
             results.append({
                 'Model': model.value,
-                'Altitude': solar_altitude,
-                'Azimuth': solar_azimuth,
-                'Units': units,  # Don't trust me -- Redesign Me!
+                'Altitude': solar_altitude.value,
+                'Azimuth': solar_azimuth.value,
+                'Units': solar_altitude.unit,  # Don't trust me -- Redesign Me!
             })
 
     return results
