@@ -1,4 +1,5 @@
 from devtools import debug
+from pvgisprototype.cli.debug import debug_if_needed
 
 """
 Important sun and solar surface geometry parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
@@ -80,6 +81,7 @@ def main(
         no_args_is_help=True,
         help=':sun: :clock12: :triangular_ruler: NOAA\'s general solar position calculations',
 )
+@debug_if_needed(app)
 def noaa(
         ctx: typer.Context,
         longitude: Annotated[float, typer.Argument(
@@ -182,6 +184,7 @@ def noaa(
         no_args_is_help=True,
         help='⦩⦬ Calculate solar position parameters (altitude, azimuth)',
  )
+@debug_if_needed(app)
 def position(
         ctx: typer.Context,
         longitude: Annotated[float, typer.Argument(
@@ -302,6 +305,7 @@ def position(
 
 
 @app.command('altitude', no_args_is_help=True, help='⦩ Calculate the solar altitude')
+@debug_if_needed(app)
 def altitude(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
@@ -411,6 +415,7 @@ def altitude(
 
 
 @app.command('zenith', no_args_is_help=True, help=' Calculate the solar zenith')
+@debug_if_needed(app)
 def zenith(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
@@ -529,6 +534,7 @@ def zenith(
 
 
 @app.command('azimuth', no_args_is_help=True, help='⦬ Calculate the solar azimuth')
+@debug_if_needed(app)
 def azimuth(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
