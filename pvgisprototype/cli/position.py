@@ -15,6 +15,7 @@ from rich import box
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import math
+from math import radians
 import numpy as np
 from ..api.utilities.timestamp import now_utc_datetimezone
 from ..api.utilities.timestamp import now_local_datetimezone
@@ -74,10 +75,11 @@ def main(
         state["verbose"] = True
 
 
+
 @app.command(
         no_args_is_help=True,
         help=':sun: :clock12: :triangular_ruler: NOAA\'s general solar position calculations',
- )
+)
 def noaa(
         ctx: typer.Context,
         longitude: Annotated[float, typer.Argument(
@@ -129,6 +131,7 @@ def noaa(
     user_requested_timestamp = None
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
+    
     utc_zoneinfo = ZoneInfo("UTC")
     if timestamp.tzinfo != utc_zoneinfo:
 
@@ -378,22 +381,11 @@ def altitude(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
     
-    # debug(locals())
-    # solar_altitude, _, units = model_solar_position(
-    #         longitude,
-    #         latitude,
-    #         timestamp,
-    #         timezone,
-    #         model,
-    #         apply_atmospheric_refraction,
-    #         time_output_units,
-    #         angle_units,
-    #         angle_output_units,
-    #         )
-    # Why does the callback function `_parse_model` not work? 
+    # Why does the callback function `_parse_model` not work? ----------------
     if SolarPositionModels.all in model:
-        model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-
+        model = [
+            model for model in SolarPositionModels if model != SolarPositionModels.all
+        ]
     solar_position = calculate_solar_position(
         longitude,
         latitude,
@@ -500,19 +492,29 @@ def zenith(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    # debug(locals())
-    solar_altitude, _, _units = model_solar_position(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            model,
-            apply_atmospheric_refraction,
-            output_units,
-            )
-    solar_zenith = radians(90) - solar_altitude
-    typer.echo(f'Solar zenith: {solar_zenith} {output_units}')
-    # return solar_zenith
+    # Why does the callback function `_parse_model` not work? ----------------
+    if SolarPositionModels.all in model:
+        model = [
+            model for model in SolarPositionModels if model != SolarPositionModels.all
+        ]
+    solar_position = calculate_solar_position(
+        longitude,
+        latitude,
+        timestamp,
+        timezone,
+        model,
+        apply_atmospheric_refraction,
+        time_output_units,
+        angle_units,
+        angle_output_units,
+    )
+    for model_result in solar_position:
+        solar_altitude = model_result.get('Altitude', None)
+        if solar_altitude is not None:
+            if angle_output_units == 'degrees':
+                model_result['Zenith'] = 90 - solar_altitude
+            else:
+                model_result['Zenith'] = radians(90) - solar_altitude
     print_solar_position_table(
         longitude,
         latitude,
@@ -615,21 +617,22 @@ def azimuth(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    _, solar_azimuth, units = model_solar_position(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            model,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
-            )
-    if verbose:
-        solar_azimuth = f'Solar azimuth : {solar_azimuth}' 
-    typer.echo(f'{solar_azimuth} {units}')
-    # return solar_azimuth
+    # Why does the callback function `_parse_model` not work? ----------------
+    if SolarPositionModels.all in model:
+        model = [
+            model for model in SolarPositionModels if model != SolarPositionModels.all
+        ]
+    solar_position = calculate_solar_position(
+        longitude,
+        latitude,
+        timestamp,
+        timezone,
+        model,
+        apply_atmospheric_refraction,
+        time_output_units,
+        angle_units,
+        angle_output_units,
+    )
     print_solar_position_table(
         longitude,
         latitude,
