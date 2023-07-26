@@ -247,7 +247,7 @@ def convert_hours_to_seconds(hours: float):
     return hours * 3600
 
 
-def timestamp_to_decimal_hours(timestamp: float, timezone_string: str = 'UTC') -> float:
+def datetime_to_decimal_hours(timestamp: float, timezone_string: str = 'UTC') -> float:
     dt = datetime.fromtimestamp(timestamp, ZoneInfo(timezone_string))
     decimal_hours = dt.hour + dt.minute / 60 + dt.second / 3600
 
