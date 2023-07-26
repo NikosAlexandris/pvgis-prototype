@@ -254,8 +254,36 @@ def timestamp_to_decimal_hours(timestamp: float, timezone_string: str = 'UTC') -
     return decimal_hours
 
 
+def convert_hours_to_datetime_time(value: float) -> time:
+    if value < 0 or value > 24:
+        raise typer.BadParameter(f'Value {value} is out of the expected range [0, 24] hours.')
+
+    hours = int(value)
+    minutes = int((value - hours) * 60)
+    seconds = int(((value - hours) * 60 - minutes) * 60)
+
+    return time(hours, minutes, seconds)
+
+
 def timestamp_to_decimal_hours(t):
     return t.hour + t.minute / 60 + t.second / 3600 + t.microsecond / 3600000000
+
+
+def timestamp_to_minutes(timestamp: datetime) -> float:
+    """Convert a datetime object to minutes.
+
+    Parameters
+    ----------
+    timestamp : datetime
+        A datetime object.
+
+    Returns
+    -------
+    float
+        The equivalent number of minutes.
+    """
+    total_seconds = timestamp.hour * 3600 + timestamp.minute * 60 + timestamp.second
+    return total_seconds / 60
 
 
 def get_day_from_hour_of_year(year: int, hour_of_year: int):
