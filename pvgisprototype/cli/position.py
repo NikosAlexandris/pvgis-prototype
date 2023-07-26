@@ -1136,6 +1136,7 @@ def hour_angle(
 @app.command('sunrise', no_args_is_help=True, help=':sunrise: Calculate the hour angle (ω) at sun rise and set')
 def hour_angle(
         latitude: Annotated[Optional[float], typer.Argument(
+            callback=convert_to_radians,
             min=-90, max=90)],
         surface_tilt: Annotated[Optional[float], typer.Argument(
             min=0, max=90)] = 0,
