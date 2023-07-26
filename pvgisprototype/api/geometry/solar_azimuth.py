@@ -13,6 +13,7 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 from .solar_declination import calculate_solar_declination
 from .solar_time import model_solar_time
 from .solar_hour_angle import calculate_hour_angle
+from ..utilities.timestamp import timestamp_to_decimal_hours
 from ..utilities.conversions import convert_to_degrees_if_requested
 
 
@@ -36,12 +37,13 @@ def calculate_solar_azimuth(input: SolarAzimuthInput) -> float:
     C22 = cos(solar_declination)
     C31 = cos(input.latitude) * cos(solar_declination)
     C33 = sin(input.latitude) * sin(solar_declination)
-    solar_time, _units = model_solar_time(
+    solar_time = model_solar_time(
             longitude=input.longitude,
             latitude=input.latitude,
             timestamp=input.timestamp,
             timezone=input.timezone,
             )
+    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle, _units = calculate_hour_angle(
             solar_time,
             input.output_units,

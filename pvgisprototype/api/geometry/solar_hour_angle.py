@@ -4,6 +4,7 @@ from typing import Optional
 from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_degrees_if_requested
 from math import pi
+from ..utilities.timestamp import timestamp_to_decimal_hours
 
 
 app = typer.Typer(
@@ -50,7 +51,8 @@ def calculate_hour_angle(
 
     In this function:
     """
-    hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
+    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
+    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
     return hour_angle, output_units
 
 

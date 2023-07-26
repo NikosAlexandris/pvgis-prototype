@@ -258,6 +258,10 @@ def timestamp_to_decimal_hours(timestamp: float, timezone_string: str = 'UTC') -
     return decimal_hours
 
 
+def timestamp_to_decimal_hours(t):
+    return t.hour + t.minute / 60 + t.second / 3600 + t.microsecond / 3600000000
+
+
 def get_day_from_hour_of_year(year: int, hour_of_year: int):
     """Get day of year from hour of year."""
     start_of_year = np.datetime64(f'{year}-01-01')

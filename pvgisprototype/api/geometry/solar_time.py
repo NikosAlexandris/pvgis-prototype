@@ -113,7 +113,7 @@ def model_solar_time(
     # debug(locals())
     if model.value == SolarTimeModels.eot:
 
-        solar_time, units = calculate_solar_time_eot(
+        solar_time = calculate_solar_time_eot(
                 longitude,
                 latitude,
                 timestamp,
@@ -127,7 +127,7 @@ def model_solar_time(
 
     if model.value == SolarTimeModels.ephem:
 
-        solar_time, units = calculate_solar_time_ephem(
+        solar_time = calculate_solar_time_ephem(
             longitude,
             latitude,
             timestamp,
@@ -136,7 +136,7 @@ def model_solar_time(
 
     if model.value == SolarTimeModels.pvgis:
 
-        solar_time, units = calculate_solar_time_pvgis(
+        solar_time = calculate_solar_time_pvgis(
             longitude,
             latitude,
             timestamp,
@@ -145,7 +145,7 @@ def model_solar_time(
 
     if model.value == SolarTimeModels.noaa:
 
-        solar_time, units = calculate_local_solar_time_noaa(
+        solar_time, solar_time_units = calculate_local_solar_time_noaa(
             longitude,
             latitude,
             timestamp,
@@ -160,7 +160,12 @@ def model_solar_time(
 
     if model.value == SolarTimeModels.skyfield:
 
-        solar_time, units = calculate_solar_time_skyfield(
+        # --------------------------------------------------- expects degrees!
+        longitude = convert_to_degrees_if_requested(longitude, 'degrees')
+        latitude = convert_to_degrees_if_requested(latitude, 'degrees')
+        # expects degrees ! --------------------------------------------------
+
+        solar_time = calculate_solar_time_skyfield(
             longitude,
             latitude,
             timestamp,
@@ -168,6 +173,7 @@ def model_solar_time(
             )
 
     return (solar_time, units)
+    return solar_time
 
 
 # @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
@@ -234,7 +240,7 @@ def calculate_solar_time(
     results = []
     for model in models:
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
-            solar_time, units = model_solar_time(
+            solar_time = model_solar_time(
                     longitude,
                     latitude,
                     timestamp,
@@ -254,7 +260,7 @@ def calculate_solar_time(
             results.append({
                 'Model': model.value,
                 'Solar time': solar_time,
-                'Units': units,  # Don't trust me -- Redesign Me!
+                'Units': 'something',  # Don't trust me -- Redesign Me!
             })
 
     # debug(locals())

@@ -20,7 +20,7 @@ from .solar_declination import calculate_solar_declination
 from ...models.skyfield.solar_geometry import calculate_solar_position_skyfield
 from ...models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
-from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
+# from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
 from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from ...models.noaa.solar_position import calculate_solar_altitude_noaa
 from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
