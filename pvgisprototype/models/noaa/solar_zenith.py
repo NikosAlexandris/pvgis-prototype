@@ -1,4 +1,6 @@
 from .noaa_models import Latitude_in_Radians
+from .noaa_models import SolarAltitude_in_Radians
+from .noaa_models import SolarZenith_in_Radians
 from .noaa_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from .noaa_models import CalculateSolarZenithNOAAInput
 from .decorators import validate_with_pydantic
@@ -16,7 +18,7 @@ from math import pi
 
 
 def atmospheric_refraction_for_high_solar_altitude(
-    solar_altitude: float,
+    solar_altitude: SolarAltitude_in_Radians,
 ) -> float:
     """
     Calculate the atmospheric refraction adjustment for high solar_altitudes.
@@ -37,7 +39,9 @@ def atmospheric_refraction_for_high_solar_altitude(
     return radians(adjustment_in_degrees)
 
 
-def atmospheric_refraction_for_near_horizon(solar_altitude: float) -> float:
+def atmospheric_refraction_for_near_horizon(
+    solar_altitude: SolarAltitude_in_Radians,
+) -> float:
     """
     Calculate the atmospheric refraction adjusment for near horizon.
 
@@ -61,7 +65,9 @@ def atmospheric_refraction_for_near_horizon(solar_altitude: float) -> float:
     return radians(adjustment_in_degrees)
 
 
-def atmospheric_refraction_for_below_horizon(solar_altitude: float) -> float:
+def atmospheric_refraction_for_below_horizon(
+    solar_altitude: SolarAltitude_in_Radians,
+) -> float:
     """
     Calculate the atmospheric refraction adjustment for below horizon.
 
@@ -81,7 +87,7 @@ def atmospheric_refraction_for_below_horizon(solar_altitude: float) -> float:
 
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction(
-        solar_zenith: float,
+        solar_zenith: SolarZenith_in_Radians,
         angle_output_units: str = 'radians',
         ) -> float:
     """Adjust solar zenith for atmospheric refraction
@@ -96,7 +102,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     Parameters
     ----------
     solar_zenith: float
-        The solar zenith angle in degrees
+        The solar zenith angle in radians
 
     Returns
     -------
@@ -133,6 +139,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
 
+    # solar_zenith = convert_to_degrees_if_requested(solar_zenith, angle_output_units)
     return solar_zenith, angle_output_units
 
 
@@ -163,8 +170,8 @@ def calculate_solar_zenith_noaa(
         )
     # if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi/2 + 0.0146:
     #     raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π + 0.0146] radians')
-    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi + 0.0146:
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
+    if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi + 0.01745:
+        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')
 
     # solar_zenith = convert_to_degrees_if_requested(solar_zenith, angle_output_units)
     return solar_zenith, angle_output_units
