@@ -1,15 +1,18 @@
+from .noaa_models import Longitude_in_Radians
+from .noaa_models import Latitude_in_Radians
 from .noaa_models import CalculateLocalSolarTimeNOAAInput
 from .decorators import validate_with_pydantic
 from .event_time import calculate_event_time_noaa
 from datetime import datetime
+from datetime import timedelta
 from datetime import time
 
 
 @validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
 def calculate_local_solar_time_noaa(
-        longitude: float,
-        latitude: float,
-        timestamp: float,
+        longitude: Longitude_in_Radians,
+        latitude: Latitude_in_Radians,
+        timestamp: datetime,
         timezone: str,
         refracted_solar_zenith: float = 1.5853349194640094,  # radians
         apply_atmospheric_refraction: bool = False,
