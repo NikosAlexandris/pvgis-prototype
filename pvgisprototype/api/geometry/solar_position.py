@@ -135,7 +135,7 @@ def model_solar_position(
     """
     if model.value == SolarPositionModels.noaa:
 
-        solar_altitude, units = calculate_solar_altitude_noaa(
+        solar_altitude, solar_altitude_units = calculate_solar_altitude_noaa(
                 longitude,
                 latitude,
                 timestamp,
@@ -147,7 +147,7 @@ def model_solar_position(
                 )
         solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
-        solar_azimuth, units = calculate_solar_azimuth_noaa(
+        solar_azimuth, solar_azimuth_units = calculate_solar_azimuth_noaa(
                 longitude,
                 latitude,
                 timestamp,
@@ -199,14 +199,14 @@ def model_solar_position(
 
     if model.value  == SolarPositionModels.pvis:
 
-        solar_altitude, _units = calculate_solar_altitude(
+        solar_altitude, solar_altitude_units = calculate_solar_altitude(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
                 output_units=angle_output_units,
                 )
-        solar_azimuth, _units = calculate_solar_azimuth(
+        solar_azimuth, solar_azimuth_units = calculate_solar_azimuth(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
