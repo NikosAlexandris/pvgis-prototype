@@ -1,3 +1,4 @@
+from .noaa_models import Latitude_in_Radians
 from .noaa_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from .noaa_models import CalculateSolarZenithNOAAInput
 from .decorators import validate_with_pydantic
@@ -137,7 +138,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
 
 @validate_with_pydantic(CalculateSolarZenithNOAAInput)
 def calculate_solar_zenith_noaa(
-        latitude: float,
+        latitude: Latitude_in_Radians,
         timestamp: datetime,
         solar_hour_angle: float,
         apply_atmospheric_refraction: bool = False,

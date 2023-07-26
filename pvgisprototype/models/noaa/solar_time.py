@@ -1,3 +1,4 @@
+from .noaa_models import Longitude_in_Radians
 from .noaa_models import CalculateTrueSolarTimeNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
@@ -8,7 +9,7 @@ from .time_offset import calculate_time_offset_noaa
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
 def calculate_true_solar_time_noaa(
-        longitude: float,
+        longitude: Longitude_in_Radians, 
         timestamp: datetime, 
         timezone: Optional[ZoneInfo],
         time_output_units: str = 'minutes',

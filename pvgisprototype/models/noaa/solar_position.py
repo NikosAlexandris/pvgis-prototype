@@ -27,6 +27,8 @@ from typing import Union
 from .decorators import validate_with_pydantic
 from .noaa_models import Longitude
 from .noaa_models import Latitude
+from .noaa_models import Longitude_in_Radians
+from .noaa_models import Latitude_in_Radians
 from .noaa_models import CalculateSolarPositionNOAA
 from zoneinfo import ZoneInfo
 
@@ -57,8 +59,8 @@ calculation_cache = {}
 
 @validate_with_pydantic(CalculateSolarPositionNOAA)
 def calculate_noaa_solar_position(
-    longitude: Longitude,
-    latitude: Latitude,
+    longitude: Longitude_in_Radians,
+    latitude: Latitude_in_Radians,
     timestamp: datetime,
     timezone: str,
     refracted_solar_zenith: float = 1.5853349194640094,  # radians

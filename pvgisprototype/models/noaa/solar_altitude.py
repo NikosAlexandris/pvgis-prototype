@@ -1,3 +1,5 @@
+from .noaa_models import Longitude_in_Radians
+from .noaa_models import Latitude_in_Radians
 from .noaa_models import CalculateSolarAltitudeNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
@@ -10,8 +12,8 @@ from ...api.utilities.conversions import convert_to_degrees_if_requested
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
 def calculate_solar_altitude_noaa(
-        longitude: float,
-        latitude: float,
+        longitude: Longitude_in_Radians,
+        latitude: Latitude_in_Radians,
         timestamp: float,
         timezone: str,
         apply_atmospheric_refraction: bool = True,
