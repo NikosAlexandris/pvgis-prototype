@@ -3,6 +3,8 @@ from rich.table import Table
 from rich.progress import track
 from rich import box
 import numpy as np
+from typing import NamedTuple
+from pvgisprototype.api.named_tuples import generate
 
 
 def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
@@ -23,15 +25,38 @@ def convert_to_radians_fastapi(angle: float) -> float:
     return np.radians(angle)
 
 
-def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
-    """Convert angle from radians to degrees if requested."""
+# def convert_to_degrees_if_requested(angle: float, output_units: str) -> float:
+#     """Convert angle from radians to degrees if requested."""
+#     return np.degrees(angle) if output_units == 'degrees' else angle
 
-    return np.degrees(angle) if output_units == 'degrees' else angle
+def convert_to_degrees_if_requested(named_tuple: NamedTuple, output_units: str) -> NamedTuple:
+    """Convert angle from radians to degrees if requested, and create a new named tuple with
+    updated value and unit."""
+    if named_tuple.unit == 'degrees':
+        return named_tuple
+    else:
+        value_in_degrees = np.degrees(named_tuple.value) if output_units == 'degrees' else named_tuple.value
+        return generate(type(named_tuple).__name__.upper(), (value_in_degrees, 'degrees'))
 
 
-def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
-    """Convert angle from degrees to radians if requested."""
-    return np.radians(angle) if output_units == 'radians' else angle
+
+# def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
+#     """Convert angle from degrees to radians if requested."""
+#     return np.radians(angle) if output_units == 'radians' else angle
+
+def convert_to_radians_if_requested(named_tuple: NamedTuple, output_units: str) -> NamedTuple:
+    """Convert angle from degrees to radians if requested, and create a new named tuple with
+    updated value and unit."""
+    if named_tuple.unit == 'radians':
+        return named_tuple
+    else:
+        value_in_radians = np.radians(named_tuple.value) if output_units == 'radians' else named_tuple.value
+        return generate(type(named_tuple).__name__.upper(), (value_in_radians, 'radians'))
+
+
+
+        
+
 
 
 def convert_dictionary_to_table(dictionary):
