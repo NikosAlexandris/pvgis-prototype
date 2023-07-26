@@ -169,5 +169,60 @@ def calculate_diffuse_irradiance(
         print_series_statistics(data_statistics)
         # export_statistics_to_csv(data_statistics, 'diffuse_irradiance')
 
-    # debug(locals())
+    # # debug(locals())
     return diffuse_irradiance
+import math
+
+def calculate_angle_loss():
+    # Replace with your function
+    pass
+
+AOIConstants = [0, 0]  # Replace with your values
+
+def drad_angle_irradiance(sh, bh, sunVarGeom, sunSlopeGeom, sunRadVar):
+    locSinSolarAltitude = sunVarGeom['sinSolarAltitude']
+    cosslope = math.cos(sunSlopeGeom['slope'])
+    sinslope = math.sin(sunSlopeGeom['slope'])
+
+    dh = sunRadVar['cdh']
+    gh = bh + dh
+    if sunSlopeGeom['aspect'] != 'UNDEF' and sunSlopeGeom['slope'] != 0.:
+        kb = bh / (sunRadVar['G_norm_extra'] * locSinSolarAltitude)
+        r_sky = (1. + cosslope) / 2.
+        a_ln = sunVarGeom['solarAzimuth'] - sunSlopeGeom['aspect']
+        ln = a_ln
+        if a_ln > math.pi:
+            ln = a_ln - 2 * math.pi
+        elif a_ln < -math.pi:
+            ln = a_ln + 2 * math.pi
+        a_ln = ln
+        fg = sinslope - sunSlopeGeom['slope'] * cosslope - math.pi * math.sin(sunSlopeGeom['slope'] / 2.) ** 2
+        if sunVarGeom['isShadow'] or sh <= 0.:
+            fx = r_sky + fg * 0.252271
+        elif sunVarGeom['solarAltitude'] >= 0.1:
+            fx = ((0.00263 - kb * (0.712 + 0.6883 * kb)) * fg + r_sky) * (1. - kb) + kb * sh / locSinSolarAltitude
+        else:
+            fx = ((0.00263 - 0.712 * kb - 0.6883 * kb * kb) * fg + r_sky) * (1. - kb) + kb * sinslope * math.cos(a_ln) / (0.1 - 0.008 * sunVarGeom['solarAltitude'])
+        dr = dh * fx
+        rr = sunRadVar['alb'] * gh * (1 - cosslope) / 2.
+    else:
+        dr = dh
+        rr = 0.
+
+    diff_radiations = [dr, dr]
+    refl_radiations = [rr, rr]
+
+    if calculate_angle_loss():
+        c1 = 4. / (3. * math.pi)
+        diff_coeff_angleloss = sinslope + (math.pi - sunSlopeGeom['slope'] - sinslope) / (1 + cosslope)
+        refl_coeff_angleloss = sinslope + (sunSlopeGeom['slope'] - sinslope) / (1 - cosslope)
+
+        diff_loss_factor = 1. - math.exp(-(c1 * diff_coeff_angleloss + AOIConstants[0] * diff_coeff_angleloss ** 2) / AOIConstants[1])
+        refl_loss_factor = 1. - math.exp(-(c1 * refl_coeff_angleloss + AOIConstants[0] * refl_coeff_angleloss ** 2) / AOIConstants[1])
+
+        dr *= diff_loss_factor
+        rr *= refl_loss_factor
+        diff_radiations[0] = dr
+        refl_radiations[0] = rr
+
+    return dr, diff_radiations, refl_radiations
