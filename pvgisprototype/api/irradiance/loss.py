@@ -10,7 +10,7 @@ logging.basicConfig(
 import typer
 from typing_extensions import Annotated
 import math
-
+from math import exp
 
 app = typer.Typer(
     add_completion=False,
@@ -18,12 +18,13 @@ app = typer.Typer(
     help=f"Angular loss factor",
 )
 
+
 @app.callback(invoke_without_command=True)
 def calculate_angular_loss_factor(
-        solar_altitude: Annotated[float, typer.Argument(
+        sine_solar_incidence_angle: Annotated[float, typer.Argument(
             help='Solar altitude in degrees °',
             min=0, max=90)],
-        solar_declination: float,
+        angle_of_incidence_constant: float = 0.155,
     ):
     """Calculate the angular loss factor for the direct horizontal radiation based
     on the solar altitude and declination
@@ -36,10 +37,10 @@ def calculate_angular_loss_factor(
     Parameters
     ----------
 
-    solar_declination: float
+    angle_of_incidence_constant: float
         In degrees (°).
-    solar_altitude: float
-        solar altitude angle in degrees (°).
+    sine_solar_incidence_angle: float
+        sine of solar incidence angle in degrees (°).
 
     Returns
     -------
@@ -51,10 +52,10 @@ def calculate_angular_loss_factor(
     The adjustment involves:
 
     1. computes the fraction of radiation that is _not_ lost due to
-    the `solar_altitude` angle divided by the `solar_declination` ranging between
+    the `solar_incidence_angle` angle divided by the `solar_declination` ranging between
     0 (complete loss) and 1 (no loss):
 
-        `( 1 - exp( -solar_altitude / solar_declination ) )`
+        `( 1 - exp( -solar_incidence_angle / angle_of_incidence_constant ) )`
 
         - The exponential function `exp`, raises the mathematical constant `e`
           (approximately 2.71828) to the power of the given argument.
@@ -73,8 +74,10 @@ def calculate_angular_loss_factor(
     (over-amplification or under-amplification).
     """
     try:
-        angular_loss = 1 - math.exp( -solar_altitude / solar_declination )
-        normalisation_term =  1 / ( 1 - math.exp( -1 / solar_declination))
+        # The `-` in `-sine_solar_incidence_angle` is maybe the _workaround_ for the trigonometry error!
+        angular_loss = 1 - exp( - sine_solar_incidence_angle / angle_of_incidence_constant )
+        # --------------------------------------------------------------------
+        normalisation_term =  1 / ( 1 - exp( -1 / angle_of_incidence_constant))
         angular_loss_factor = angular_loss / normalisation_term
         typer.echo(f'Angular loss factor : {angular_loss_factor}')
         return angular_loss_factor
