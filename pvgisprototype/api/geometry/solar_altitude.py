@@ -1,6 +1,7 @@
 # import typer
 from typing import Annotated
 from typing import Optional
+from typing import NamedTuple
 from enum import Enum
 from datetime import datetime
 import math
@@ -22,11 +23,12 @@ from .solar_hour_angle import calculate_hour_angle
 
 from pvgisprototype.api.input_models import SolarAltitudeInput
 from pvgisprototype.api.input_models import SolarDeclinationInput
+from pvgisprototype.api.named_tuples import generate
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
 @validate_with_pydantic(SolarAltitudeInput)
-def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
+def calculate_solar_altitude(input: SolarAltitudeInput) -> NamedTuple:
     """Compute various solar geometry variables.
     Parameters
     ----------
@@ -61,8 +63,8 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
             angle_output_units=input.output_units
         )
     )
-    C31 = math.cos(input.latitude) * math.cos(solar_declination)
-    C33 = math.sin(input.latitude) * math.sin(solar_declination)
+    C31 = math.cos(input.latitude) * math.cos(solar_declination.value)
+    C33 = math.sin(input.latitude) * math.sin(solar_declination.value)
     solar_time, _units = model_solar_time(
             longitude=input.longitude,
             latitude=input.latitude,
@@ -76,11 +78,15 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> float:
             input.output_units,
     )
     sine_solar_altitude = C31 * math.cos(hour_angle) + C33
-    solar_altitude = np.arcsin(sine_solar_altitude) 
+    solar_altitude = np.arcsin(sine_solar_altitude)
+    solar_altitude = generate(
+        'solar_altitude'.upper(),
+        (solar_altitude, input.output_units),
+    )
     solar_altitude = convert_to_degrees_if_requested(
             solar_altitude,
             input.output_units,
             )
 
     debug(locals())
-    return solar_altitude, input.output_units
+    return solar_altitude

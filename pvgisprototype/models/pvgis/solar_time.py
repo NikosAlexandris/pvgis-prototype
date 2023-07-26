@@ -1,6 +1,7 @@
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import NamedTuple
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import numpy as np
@@ -10,6 +11,7 @@ from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.image_offset_prototype import get_image_offset
+from pvgisprototype.api.named_tuples import generate
 
 
 def calculate_solar_time_pvgis(
@@ -29,7 +31,7 @@ def calculate_solar_time_pvgis(
         perigee_offset: float = 0.048869,
         eccentricity: float = 0.165,  # from the C code
         time_slot_offset_global: float = 0,
-) -> float:
+) -> NamedTuple:
     """Calculate the solar time.
 
     1. Map the day of the year onto the circumference of a circle, essentially
@@ -74,5 +76,9 @@ def calculate_solar_time_pvgis(
     hour_offset = time_slot_offset_global + longitude / 15 + image_offset  # for `solar_time`
     solar_time = hour_of_day + time_offset + hour_offset
     
+    solar_time = generate(
+        'solar_time'.upper(),
+        (solar_time, 'decimal hours'),
+    )
     # debug(locals())
-    return solar_time, 'decimal hours'
+    return solar_time

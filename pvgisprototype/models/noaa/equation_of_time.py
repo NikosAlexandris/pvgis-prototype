@@ -4,6 +4,8 @@ from datetime import datetime
 from .fractional_year import calculate_fractional_year_noaa 
 from math import sin
 from math import cos
+from typing import NamedTuple
+from pvgisprototype.api.named_tuples import generate
 
 
 # @cache_result
@@ -12,7 +14,7 @@ def calculate_equation_of_time_noaa(
     timestamp: datetime,
     time_output_units: str = 'minutes',
     angle_units: str = 'radians',
-) -> float:
+) -> NamedTuple:
     """Calculate the equation of time in minutes"""
     fractional_year, _units = calculate_fractional_year_noaa(
         timestamp, angle_units
@@ -28,4 +30,8 @@ def calculate_equation_of_time_noaa(
     if not -20 <= equation_of_time <= 20:
         raise ValueError("The equation of time must be within the range [-20, 20] minutes")
 
-    return equation_of_time, time_output_units
+    equation_of_time = generate(
+        'equation_of_time'.upper(),
+        (equation_of_time, time_output_units),
+        )
+    return equation_of_time

@@ -1,6 +1,7 @@
 from devtools import debug
 import typer
 from typing import Annotated
+from typing import NamedTuple
 from functools import partial
 from datetime import datetime
 from datetime import timezone
@@ -8,6 +9,7 @@ from math import sin
 from math import cos
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+from pvgisprototype.api.named_tuples import generate
 
 
 def calculate_solar_declination_hargreaves(
@@ -19,7 +21,7 @@ def calculate_solar_declination_hargreaves(
             show_default=True,
             case_sensitive=False,
             help="Output units for solar declination (degrees or radians)")] = 'radians',
-        ) -> float:
+        ) -> NamedTuple:
     """Approximate the solar declination based on the Hargreaves formula.
 
                          ⎛360   ⎛                    ⎛360            ⎞⎞⎞
@@ -50,7 +52,7 @@ def calculate_solar_declination_hargreaves(
     # year = timestamp.year
     # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timezone.utc)
     day_of_year = timestamp.timetuple().tm_yday
-    declination = 23.45 * sin(
+    declination_value_in_degrees = 23.45 * sin(
         radians(
             360
             / days_in_a_year
@@ -62,6 +64,7 @@ def calculate_solar_declination_hargreaves(
             )
         )
     )
+    declination = generate('declination'.upper(), (declination_value_in_degrees, 'degrees'))
     declination = convert_to_radians_if_requested(declination, output_units)
 
     return declination

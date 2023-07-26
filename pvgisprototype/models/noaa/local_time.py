@@ -3,6 +3,8 @@ from .decorators import validate_with_pydantic
 from .event_time import calculate_event_time_noaa
 from datetime import datetime
 from datetime import time
+from typing import NamedTuple
+from pvgisprototype.api.named_tuples import generate
 
 
 @validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
@@ -17,7 +19,7 @@ def calculate_local_solar_time_noaa(
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
         verbose: str = False,
-    ) -> float:
+    ) -> NamedTuple:
     """
     Returns
     -------
@@ -55,4 +57,9 @@ def calculate_local_solar_time_noaa(
     if verbose:
         typer.echo(f'Local solar time: {local_solar_timestamp}')
 
-    return local_solar_timestamp, time_output_units
+    solar_time = generate(
+        'solar_time'.upper(),
+        (local_solar_timestamp, time_output_units),
+    )
+
+    return solar_time

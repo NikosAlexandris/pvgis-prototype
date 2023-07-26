@@ -7,6 +7,7 @@ from math import asin
 from ..utilities.conversions import convert_to_degrees_if_requested
 
 from pvgisprototype.api.input_models import SolarDeclinationInput
+from pvgisprototype.api.named_tuples import generate
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
@@ -36,12 +37,19 @@ def calculate_fractional_year_pvis(
     if not 0 <= fractional_year < 2 * pi:
         raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
 
+    fractional_year = generate(
+        'fractional_year'.upper(),
+        (fractional_year, angle_output_units)
+    )
+
     # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
     # if angle_output_units == 'degrees':
     #     if not 0 <= fractional_year < 360:
     #         raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
-            
-    return fractional_year, angle_output_units
+    
+    return fractional_year
+
+
 @validate_with_pydantic(SolarDeclinationInput)
 def calculate_solar_declination(input: SolarDeclinationInput) -> float:
     """Approximate the sun's declination for a given day of the year.
@@ -79,17 +87,21 @@ def calculate_solar_declination(input: SolarDeclinationInput) -> float:
     For more accurate calculations of solar position, comprehensive models like
     the Solar Position Algorithm (SPA) are typically used.
     """
-    fractional_year, _ = calculate_fractional_year_pvis(
+    fractional_year = calculate_fractional_year_pvis(
             timestamp=input.timestamp,
             days_in_a_year=input.days_in_a_year,
             angle_output_units=input.angle_output_units,
             )
     declination = asin(
             0.3978 * sin(
-                fractional_year - 1.4 + input.orbital_eccentricity * sin(
-                    fractional_year - input.perigee_offset
+                fractional_year.value - 1.4 + input.orbital_eccentricity * sin(
+                    fractional_year.value - input.perigee_offset
                     )
                 )
             )
-
+    
+    declination = generate(
+        'solar_declination'.upper(),
+        (declination, input.angle_output_units)
+    )
     return declination

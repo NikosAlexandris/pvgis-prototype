@@ -1,6 +1,7 @@
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import NamedTuple
 from datetime import datetime
 from datetime import time as datetime_time
 from datetime import timedelta
@@ -16,6 +17,7 @@ from skyfield.api import load
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.named_tuples import generate
 
 
 def calculate_solar_time_skyfield(
@@ -32,7 +34,7 @@ def calculate_solar_time_skyfield(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
         verbose: bool = False,
-        ):
+        )-> NamedTuple:
     """
     Returns
     -------
@@ -74,5 +76,10 @@ def calculate_solar_time_skyfield(
         typer.echo(f'Solar noon: {solar_noon_string}')
         typer.echo(f'Local solar time: {local_solar_time}')
 
+    solar_time = generate(
+        'solar_time'.upper(),
+        (decimal_hours, 'decimal hours'),
+    )
+
     # debug(locals())
-    return decimal_hours, 'decimal hours'
+    return solar_time

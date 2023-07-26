@@ -15,6 +15,9 @@ from ...api.utilities.conversions import convert_to_radians_if_requested
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import convert_to_timezone
+from typing import Tuple
+from typing import NamedTuple
+from pvgisprototype.api.named_tuples import generate
 
 
 def calculate_solar_position_skyfield(
@@ -36,7 +39,7 @@ def calculate_solar_position_skyfield(
             show_default=True,
             case_sensitive=False,
             help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> float:
+        ) -> NamedTuple:
     """Calculate sun position
 
     Notes
@@ -89,6 +92,10 @@ def calculate_solar_position_skyfield(
     requested_timestamp = timescale.from_datetime(timestamp)
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
 
+    solar_position = generate(
+        'solar_position'.upper(),
+        (solar_position, output_units),                   # NOTE: Is this unit correct? It is not used anywhere
+    )
     debug(locals())
     return solar_position
 
@@ -112,7 +119,7 @@ def calculate_solar_altitude_azimuth_skyfield(
             show_default=True,
             case_sensitive=False,
             help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> float:
+        ) -> Tuple[NamedTuple, NamedTuple]:
     """Calculate sun position
 
     Notes
@@ -152,7 +159,7 @@ def calculate_solar_altitude_azimuth_skyfield(
             timezone,
             output_units,
             )
-    solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
+    solar_altitude, solar_azimuth, distance_to_sun = solar_position.value.altaz()       # TODO: Must be tested
 
     # if output_units == 'radians':
     solar_altitude = solar_altitude.radians
@@ -162,8 +169,18 @@ def calculate_solar_altitude_azimuth_skyfield(
     #     solar_altitude = solar_altitude.degrees
     #     solar_azimuth = solar_azimuth.degrees
 
+    solar_altitude = generate(
+        'solar_altitude'.upper(),
+        (solar_altitude, output_units),
+    )
+
+    solar_azimuth = generate(
+        'solar_azimuth'.upper(),
+        (solar_azimuth, output_units),
+    )
+
     debug(locals())
-    return solar_altitude, solar_azimuth  # distance_to_sun
+    return solar_altitude, solar_azimuth   # distance_to_sun
 
 
 def calculate_hour_angle_skyfield(

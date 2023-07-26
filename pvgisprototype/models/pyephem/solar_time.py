@@ -1,10 +1,12 @@
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import NamedTuple
 from datetime import datetime
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.named_tuples import generate
 import ephem
 from math import pi
 
@@ -22,7 +24,7 @@ def calculate_solar_time_ephem(
             help='Timezone',
             callback=ctx_convert_to_timezone)] = None,
         verbose: bool = False,
-        ):
+        )-> NamedTuple:
     """Calculate the solar time using PyEphem
 
     The position of the Sun in the sky changes slightly day to day due to the
@@ -140,5 +142,10 @@ def calculate_solar_time_ephem(
         typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
         typer.echo(f'Mean solar time: {solar_time}')
 
+    solar_time = generate(
+        'solar_time'.upper(),
+        (solar_time, 'decimal hours'),
+    )
+
     # debug(locals())
-    return solar_time, 'decimal hours'  # norm for 24h
+    return solar_time  # norm for 24h

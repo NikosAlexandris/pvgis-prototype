@@ -7,6 +7,7 @@ from datetime import timezone
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
+from pvgisprototype.api.named_tuples import generate
 
 def calculate_solar_declination_pvgis(
         timestamp: Annotated[Optional[datetime], typer.Argument(
@@ -53,5 +54,10 @@ def calculate_solar_declination_pvgis(
         perigee_offset,
         output_units,
         )
+    
+    solar_declination = generate(
+        type(solar_declination).__name__.upper(),
+        (- solar_declination.value, solar_declination.units),
+    )
 
-    return - solar_declination
+    return solar_declination

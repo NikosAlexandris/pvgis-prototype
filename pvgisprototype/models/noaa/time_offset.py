@@ -3,6 +3,8 @@ from datetime import datetime
 from .decorators import validate_with_pydantic
 from math import pi
 from .equation_of_time import calculate_equation_of_time_noaa
+from typing import NamedTuple
+from pvgisprototype.api.named_tuples import generate
 
 
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
@@ -14,7 +16,7 @@ def calculate_time_offset_noaa(
         timestamp: datetime, 
         time_output_units: str = 'minutes',  # redesign me!
         angle_units: str = 'radians',
-    ) -> float:
+    ) -> NamedTuple:
     """Calculate the time offset for NOAA's solar position calculations
     measured in minutes.
 
@@ -87,5 +89,9 @@ def calculate_time_offset_noaa(
     if not -720 <= time_offset <= 720:
         raise ValueError("The time offset must range within [-720, 720] minutes ?")
 
-    return time_offset, time_output_units
+    time_offset = generate(
+        'time_offset'.upper(),
+        (time_offset, time_output_units)
+    )
+    return time_offset
 

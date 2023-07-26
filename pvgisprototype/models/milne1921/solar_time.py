@@ -1,11 +1,13 @@
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import NamedTuple
 from datetime import datetime
 from datetime import timedelta
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.named_tuples import generate
 from math import radians
 from math import sin
 from math import cos
@@ -33,7 +35,7 @@ def calculate_solar_time_eot(
             help='Global time offset')] = 0,
         hour_offset: Annotated[float, typer.Option(
             help='Hour offset')] = 0,
-):
+)-> NamedTuple:
     """Calculate the solar time.
 
     - Local Time (LT)
@@ -107,4 +109,8 @@ def calculate_solar_time_eot(
     solar_time = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600
     # ------------------------------------------------------------------------
     
-    return solar_time, 'decimal hours'
+    solar_time = generate(
+        'solar_time'.upper(),
+        (solar_time, 'decimal hours'),
+    )
+    return solar_time

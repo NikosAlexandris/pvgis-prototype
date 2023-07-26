@@ -1,7 +1,9 @@
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import NamedTuple
 from ...utilities.timestamp import convert_hours_to_seconds
+from pvgisprototype.api.named_tuples import generate
 
 
 def calculate_hour_angle(
@@ -14,7 +16,7 @@ def calculate_hour_angle(
             show_default=True,
             case_sensitive=False,
             help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ):
+        )-> NamedTuple:
     """Calculate the hour angle ω'
 
     ω = (ST / 3600 - 12) * 15 * pi / 180
@@ -38,11 +40,15 @@ def calculate_hour_angle(
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
     hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
+    hour_angle = generate(
+        'hour_angle'.upper(),
+        (hour_angle, output_units),
+    )
     # hour_angle = convert_to_degrees_if_requested(
     #         hour_angle,
     #         output_units,
     #         )
-    return hour_angle, output_units
+    return hour_angle
 
 
 def calculate_hour_angle_sunrise(
@@ -58,7 +64,7 @@ def calculate_hour_angle_sunrise(
             show_default=True,
             case_sensitive=False,
             help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> float:
+        ) -> NamedTuple:
     """Calculate the hour angle (ω) at sunrise and sunset
 
     Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
@@ -86,22 +92,26 @@ def calculate_hour_angle_sunrise(
 
     Returns
     -------
-    hour_angle: float
+    hour_angle_sunrise: float
         Hour angle (ω) is the angle at any instant through which the earth has
         to turn to bring the meridian of the observer directly in line with the
         sun's rays measured in radian.
     """
-    hour_angle = acos(
+    hour_angle_sunrise_value = acos(
             -tan(
                 latitude - surface_tilt
                 )
             *tan(solar_declination)
             )
-    hour_angle = convert_to_degrees_if_requested(
-            hour_angle,
+    hour_angle_sunrise = generate(
+        'hour_angle_sunrise'.upper(),
+        (hour_angle_sunrise_value, output_units),
+    )
+    hour_angle_sunrise = convert_to_degrees_if_requested(
+            hour_angle_sunrise,
             output_units,
             )
-    return hour_angle
+    return hour_angle_sunrise
 
 
 if __name__ == "__main__":
