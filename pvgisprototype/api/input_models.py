@@ -60,7 +60,7 @@ class BaseAngleOutputUnitsModel(BaseModel):
 
 
 class BaseAngleInternalUnitsModel(BaseModel):                                               # NOTE: Maybe deprecate
-    angle_units: str
+    angle_units: str = 'radians'
     model_config = ConfigDict(
         description="""Angular units for internal calculations (degrees).""",
     )
