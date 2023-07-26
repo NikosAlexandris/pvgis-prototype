@@ -172,7 +172,6 @@ def model_solar_time(
             timezone,
             )
 
-    return (solar_time, units)
     return solar_time
 
 
