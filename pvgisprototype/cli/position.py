@@ -644,7 +644,7 @@ def zenith(
             '--atmospheric-refraction',
             help='Apply atmospheric refraction functions',
             )] = False,
-        output_units: Annotated[str, typer.Option(
+        angle_output_units: Annotated[str, typer.Option(
             '-u',
             '--units',
             show_default=True,
