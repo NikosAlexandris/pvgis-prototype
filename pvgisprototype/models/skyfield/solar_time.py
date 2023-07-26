@@ -14,8 +14,11 @@ from skyfield.api import E
 from skyfield.api import wgs84
 from skyfield.api import load
 from ...api.utilities.conversions import convert_to_radians
+from ...api.utilities.conversions import convert_to_degrees
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
+from .input_models import CalculateTrueSolarTimeSkyfieldInputModel
+from .decorators import validate_with_pydantic
 
 
 # @validate_with_pydantic(CalculateTrueSolarTimeSkyfieldInputModel)
@@ -91,21 +94,17 @@ from ...api.utilities.timestamp import ctx_convert_to_timezone
 
 #     # debug(locals())
 #     return local_solar_time
+
+
+@validate_with_pydantic(CalculateTrueSolarTimeSkyfieldInputModel)
 def calculate_solar_time_skyfield(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
+        longitude: float,
+        latitude: float,
+        timestamp: datetime,
+        timezone: str,
         verbose: bool = False,
         ):
+
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
         try:
@@ -142,6 +141,7 @@ def calculate_solar_time_skyfield(
         hours_since_solar_noon = (timestamp - next_solar_noon.utc_datetime().replace(tzinfo=ZoneInfo('UTC'))).total_seconds() / 3600
 
     local_solar_time = previous_solar_noon.utc_datetime() + timedelta(hours=hours_since_solar_noon)
+
     # if verbose:
         
     previous_solar_noon_string = previous_solar_noon.astimezone(timezone).strftime('%Y-%m-%d %H:%M:%S')
