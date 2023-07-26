@@ -1,15 +1,14 @@
-from typing import Optional
 from datetime import datetime
 from fastapi import Depends, Query
+from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+from pvgisprototype.api.utilities.timestamp import convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.models.noaa.solar_position import calculate_noaa_solar_position
+from typing import Optional
 from zoneinfo import ZoneInfo
 
-from pvgisprototype.models.noaa.solar_position import calculate_noaa_solar_position
 
-from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import convert_to_timezone
-
-async def noaa_solar_position(
+async def get_calculate_noaa_solar_position(
     longitude: float = Query(..., ge=-180, le=180),
     latitude: float = Query(..., ge=-90, le=90),
     timestamp: Optional[datetime] = Query(None),
@@ -22,7 +21,6 @@ async def noaa_solar_position(
     rounding_places: Optional[int] = Query(5),
     verbose: bool = Query(False)
 ):
-
     longitude = convert_to_radians_fastapi(longitude)
     latitude = convert_to_radians_fastapi(latitude)
 
@@ -45,7 +43,5 @@ async def noaa_solar_position(
         angle_units,
         angle_output_units,
     )
-
-    # ... all the rest of your function logic
 
     return {"solar_position_table": solar_position_calculations}
