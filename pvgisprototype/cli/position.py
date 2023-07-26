@@ -675,17 +675,20 @@ def zenith(
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     # debug(locals())
-    solar_altitude, _, _units = model_solar_position(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            model,
-            apply_atmospheric_refraction,
-            output_units,
-            )
-    solar_zenith = radians(90) - solar_altitude
-    typer.echo(f'Solar zenith: {solar_zenith} {output_units}')
+    solar_altitude, _ = model_solar_position(
+        SolarPositionInput(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=model,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            angle_output_units=angle_output_units,
+        )
+    )
+
+    solar_zenith = np.radians(90) - solar_altitude.value
+    typer.echo(f'Solar zenith: {solar_zenith} {angle_output_units}')
     # return solar_zenith
 
 
@@ -774,20 +777,23 @@ def azimuth(
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     # debug(locals())
-    _, solar_azimuth, units = model_solar_position(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            model,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
-            )
+    _, solar_azimuth = model_solar_position(
+        SolarPositionInput(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=model,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
+        )
+    )
     if verbose:
-        solar_azimuth = f'Solar azimuth : {solar_azimuth}' 
-    typer.echo(f'{solar_azimuth} {units}')
+        typer.echo(f'Solar azimuth : {solar_azimuth.value} {solar_azimuth.unit}')
+    else:
+        typer.echo(f'{solar_azimuth.value} {solar_azimuth.unit}')
     # return solar_azimuth
 
 

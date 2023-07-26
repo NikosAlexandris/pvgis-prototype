@@ -166,7 +166,7 @@ def calculate_solar_incidence_jenco(
     c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.value)
     c_inclined_33 = sine_relative_inclined_latitude * sin(solar_declination.value)
     
-    hour_angle, _units = calculate_solar_hour_angle_noaa(
+    hour_angle = calculate_solar_hour_angle_noaa(
         longitude,
         timestamp,
         timezone,
@@ -180,7 +180,7 @@ def calculate_solar_incidence_jenco(
     )
     
     sine_solar_incidence = (
-        c_inclined_31 * cos(hour_angle - relative_longitude) + c_inclined_33
+        c_inclined_31 * cos(hour_angle.value - relative_longitude) + c_inclined_33
     )
     
     return asin(sine_solar_incidence)

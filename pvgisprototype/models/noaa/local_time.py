@@ -33,7 +33,7 @@ def calculate_local_solar_time_noaa(
     #     except Exception as e:
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # ------------------------------------------------------------------------
-    solar_noon_timestamp, units = calculate_event_time_noaa(
+    solar_noon_timestamp = calculate_event_time_noaa(
             longitude,
             latitude,
             timestamp,
@@ -45,7 +45,7 @@ def calculate_local_solar_time_noaa(
             angle_units,
             angle_output_units,
             )
-    local_solar_time = timestamp - solar_noon_timestamp
+    local_solar_time = timestamp - solar_noon_timestamp.value
     total_seconds = int(local_solar_time.total_seconds())
     local_solar_timestamp = datetime.utcfromtimestamp(total_seconds).time()
 
