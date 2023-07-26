@@ -43,16 +43,21 @@ def calculate_local_solar_time_noaa(
             angle_units,
             angle_output_units,
             )
-    local_solar_time = timestamp - solar_noon_timestamp
-    total_seconds = int(local_solar_time.total_seconds())
-    local_solar_timestamp = datetime.utcfromtimestamp(total_seconds).time()
 
+    if timestamp < solar_noon_timestamp:
+        previous_solar_noon_timestamp = solar_noon_timestamp - timedelta(days=1)
+        local_solar_time_delta = timestamp - previous_solar_noon_timestamp
+
+    else:
+        local_solar_time_delta = timestamp - solar_noon_timestamp
+
+    total_seconds = int(local_solar_time_delta.total_seconds())
     # hours, remainder = divmod(total_seconds, 3600)
     # minutes, seconds = divmod(remainder, 60)
     # local_solar_timestamp = time(hour=hours, minute=minutes, second=seconds)
-    # local_solar_time_ = local_solar_timestamp.strftime("%H:%M:%S")
 
     if verbose:
         typer.echo(f'Local solar time: {local_solar_timestamp}')
 
-    return local_solar_timestamp, time_output_units
+    local_solar_time = timestamp + timedelta(seconds=total_seconds)
+    return local_solar_time, time_output_units

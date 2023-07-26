@@ -29,18 +29,11 @@ def calculate_true_solar_time_noaa(
     -------
     float: The true solar time
     """
-    # if timezone != timestamp.tzinfo:
-    #     try:
-    #         timestamp = timestamp.astimezone(timezone)
-    #     except pytz.UnknownTimeZoneError as e:
-    #         logging.warning(f'Unknown timezone: {e}')
-    #         raise
-    
     time_offset, _units = calculate_time_offset_noaa(
-            longitude,
-            timestamp,
-            time_output_units,
-            angle_units,
+            longitude=longitude,
+            timestamp=timestamp,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
             )  # in minutes
     true_solar_time = (
         timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset
@@ -50,4 +43,17 @@ def calculate_true_solar_time_noaa(
         if not 0 <= true_solar_time <= 1440:
             raise ValueError("The true solar time must range within [0, 1440] minutes")
 
-    return true_solar_time, time_output_units
+    # Convert to datetime object
+    hours, remainder = divmod(true_solar_time, 60)
+    minutes, seconds = divmod(remainder * 60, 60)
+    true_solar_time = datetime(
+            year=timestamp.year,
+            month=timestamp.month,
+            day=timestamp.day,
+            hour=int(hours),
+            minute=int(minutes),
+            second=int(seconds),
+            tzinfo=timestamp.tzinfo,
+            )
+
+    return true_solar_time
