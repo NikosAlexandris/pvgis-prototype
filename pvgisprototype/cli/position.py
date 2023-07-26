@@ -21,6 +21,7 @@ from ..api.utilities.timestamp import now_local_datetimezone
 from ..api.utilities.timestamp import ctx_convert_to_timezone
 from ..api.utilities.timestamp import attach_timezone
 from ..api.utilities.timestamp import convert_hours_to_seconds
+from ..api.utilities.timestamp import convert_hours_to_datetime_time
 from ..api.utilities.timestamp import random_datetimezone
 from ..api.utilities.timestamp import ctx_attach_requested_timezone
 from ..api.utilities.conversions import convert_to_radians
@@ -100,13 +101,11 @@ def noaa(
             help='Apply atmospheric refraction functions',
             )] = True,
         time_output_units: Annotated[str, typer.Option(
-            '-u',
             '--time-output-units',
             show_default=True,
             case_sensitive=False,
             help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
         angle_units: Annotated[str, typer.Option(
-            '-u',
             '--angle-units',
             show_default=True,
             case_sensitive=False,
@@ -311,14 +310,6 @@ def altitude(
         timezone: Annotated[Optional[str], typer.Option(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
-        # model: Annotated[SolarPositionModels, typer.Option(
-        #     '-m',
-        #     '--model',
-        #     show_default=True,
-        #     show_choices=True,
-        #     case_sensitive=False,
-        #     # callback=_parse_model,
-        #     help="Model(s) to calculate solar position.")] = SolarPositionModels.skyfield,
         model: Annotated[List[SolarPositionModels], typer.Option(
             '-m',
             '--model',
@@ -333,13 +324,11 @@ def altitude(
             help='Apply atmospheric refraction functions',
             )] = False,
         time_output_units: Annotated[str, typer.Option(
-            '-u',
             '--output-units',
             show_default=True,
             case_sensitive=False,
             help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
         angle_units: Annotated[str, typer.Option(
-            '-u',
             '--units',
             show_default=True,
             case_sensitive=False,
@@ -441,25 +430,43 @@ def zenith(
         timezone: Annotated[Optional[str], typer.Option(
             help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
             callback=ctx_convert_to_timezone)] = None,
-        model: Annotated[SolarPositionModels, typer.Option(
+        model: Annotated[List[SolarPositionModels], typer.Option(
             '-m',
             '--model',
             show_default=True,
             show_choices=True,
             case_sensitive=False,
             # callback=_parse_model,
-            help="Model(s) to calculate solar zenith.")] = SolarPositionModels.skyfield,
+            help="Model(s) to calculate solar position.")] = [SolarPositionModels.skyfield],
         apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
             '-a',
             '--atmospheric-refraction',
             help='Apply atmospheric refraction functions',
             )] = False,
-        output_units: Annotated[str, typer.Option(
+        time_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--output-units',
+            show_default=True,
+            case_sensitive=False,
+            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
+        angle_units: Annotated[str, typer.Option(
             '-u',
             '--units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar zenith (degrees or radians)")] = 'radians',
+            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
+        angle_output_units: Annotated[str, typer.Option(
+            '-u',
+            '--units',
+            show_default=True,
+            case_sensitive=False,
+            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
+        rounding_places: Annotated[Optional[int], typer.Option(
+            '-r',
+            '--rounding-places',
+            show_default=True,
+            help='Number of places to round results to.')] = 5,
+        verbose: bool = False,
         ) -> float:
     """Calculate the solar zenith angle
 
@@ -535,14 +542,14 @@ def azimuth(
         perigee_offset: float = 0.048869,
         eccentricity: float = 0.01672,
         hour_offset: float = 0,
-        model: Annotated[SolarPositionModels, typer.Option(
+        model: Annotated[List[SolarPositionModels], typer.Option(
             '-m',
             '--model',
             show_default=True,
             show_choices=True,
             case_sensitive=False,
             # callback=_parse_model,
-            help="Model(s) to calculate solar azimuth.")] = SolarPositionModels.skyfield,
+            help="Model(s) to calculate solar position.")] = [SolarPositionModels.skyfield],
         apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
             '-a',
             '--atmospheric-refraction',
@@ -954,7 +961,7 @@ def incidence_jenco(
 def hour_angle(
         solar_time: Annotated[float, typer.Argument(
             help='The solar time in decimal hours on a 24 hour base',
-            callback=convert_hours_to_seconds)],
+            callback=convert_hours_to_datetime_time)],
         output_units: Annotated[str, typer.Option(
             '-u',
             '--units',
@@ -1025,5 +1032,4 @@ if __name__ == "__main__":
     # import sys
     # commands = {'all', 'altitude', 'azimuth'}
     # sys.argv.insert(1, 'all') if sys.argv[1] not in commands else None
-    # debug(locals())
     app()
