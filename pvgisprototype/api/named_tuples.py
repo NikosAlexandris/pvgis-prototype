@@ -19,6 +19,7 @@ class NamedTupleTypes(Enum):
     SOLAR_ZENITH = namedtuple('solar_zenith', ['value', 'unit'])
     SOLAR_POSITION = namedtuple('solar_position', ['value', 'unit'])
     COMPASS_SOLAR_AZIMUTH = namedtuple('compass_solar_azimuth', ['value', 'unit'])
+    EVENT_TIME = namedtuple('event_time', ['value', 'unit'])
 
 
 def generate(named_tuple_type:str, value_unit_pair:Tuple[float, str])-> NamedTuple:
