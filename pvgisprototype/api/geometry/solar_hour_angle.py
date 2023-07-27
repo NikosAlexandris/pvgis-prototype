@@ -12,12 +12,14 @@ from pvgisprototype.api.input_models import HourAngleInput
 from pvgisprototype.api.input_models import HourAngleSunriseInput
 from pvgisprototype.api.named_tuples import generate
 from pvgisprototype.api.decorators import validate_with_pydantic
+from ..utilities.timestamp import timestamp_to_decimal_hours
 
 
 @validate_with_pydantic(HourAngleInput)
 def calculate_hour_angle(
-        input: HourAngleInput,
-    ) -> NamedTuple:
+        solar_time: time,
+        output_units: str = 'radians',
+        ) -> NamedTuple:
     """Calculate the hour angle ω'
 
     ω = (ST / 3600 - 12) * 15 * pi / 180
@@ -55,7 +57,8 @@ def calculate_hour_angle(
     """
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
-    hour_angle = (input.solar_time / 3600 - 12) * 15 * pi / 180
+    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
+    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
     hour_angle = generate(
         'hour_angle'.upper(),
         (hour_angle, input.angle_output_units),

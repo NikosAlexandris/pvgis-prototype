@@ -16,9 +16,13 @@ def calculate_equation_of_time_noaa(
     angle_units: str = 'radians',
 ) -> NamedTuple:
     """Calculate the equation of time in minutes"""
-    fractional_year, _units = calculate_fractional_year_noaa(
-        timestamp, angle_units
+    fractional_year, fractional_year_units = calculate_fractional_year_noaa(
+        timestamp=timestamp,
+        angle_output_units=angle_units
     )
+    if not fractional_year_units == angle_units:
+        raise ValueError("The fractional year value must be in radians")
+
     equation_of_time = 229.18 * (
         0.000075
         + 0.001868 * cos(fractional_year)

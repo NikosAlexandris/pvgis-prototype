@@ -90,11 +90,13 @@ def plot_solar_declination_five_years(
 def plot_solar_declination_one_year_bokeh(
         year: int,
         title: str = 'Annual Variation of Solar Declination',
-        output_units: str = 'radians',
+        angle_output_units: str = 'radians',
         ):
     timestamps = [datetime(year, 1, 1) + timedelta(days=i) for i in range((datetime(year+1, 1, 1) - datetime(year, 1, 1)).days)]
     timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime
-    solar_declinations, solar_declinations_pvgis, solar_declinations_hargreaves = calculate_solar_declinations(timestamps, output_units)
+    solar_declinations = calculate_solar_declination(timestamps, angle_output_units)
+    solar_declinations_pvgis = calculate_solar_declination_pvgis(timestamps, angle_output_units)
+    solar_declinations_hargreaves = calculate_solar_declination_hargreaves(timestamps, angle_output_units)
 
     fig = figure(width=800, height=600, title=title, x_axis_type="datetime")
     p1 = fig.line(timestamps_float, solar_declinations, line_width=4, alpha=0.7, color='#00BFFF')

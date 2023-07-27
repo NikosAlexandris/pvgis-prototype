@@ -53,8 +53,16 @@ class Longitude(BaseModel):
     longitude: confloat(ge=-180, le=180)
 
 
+class Longitude_in_Radians(BaseModel):
+    longitude: confloat(ge=-pi, le=pi)  # -pi to pi
+
+
 class Latitude(BaseModel):
     latitude: confloat(ge=-90, le=90)
+
+
+class Latitude_in_Radians(BaseModel):
+    latitude: confloat(ge=-pi/2, le=pi/2)  # -pi/2 to pi/2
 
 
 class BaseCoordinatesInputModel(Longitude, Latitude):
@@ -74,7 +82,7 @@ class BaseAngleUnitsModel(BaseModel):
 
 
 class BaseAngleOutputUnitsModel(BaseModel):
-    angle_output_units: str
+    angle_output_units: Optional[str] = "radians"
 
     @field_validator('angle_output_units')
     @classmethod
@@ -85,9 +93,26 @@ class BaseAngleOutputUnitsModel(BaseModel):
         return v
 
 
+class AngleInRadiansOutputUnitsModel(BaseModel):
+    """
+    The angle in radians output units argument is passed along with the
+    returned value. This is not a real test. Hopefully, and however, it helps
+    for clarity and understanding of what the function should return.
+    """
+    angle_output_units: str = "radians"
+
+    @field_validator('angle_output_units')
+    @classmethod
+    def validate_angle_output_units(cls, v):
+        valid_units = ['radians']
+        if v not in valid_units:
+            raise ValueError(f"angle_output_units must be one of {valid_units}")
+        return v
+
+
 class CalculateFractionalYearNOAAInput(
     BaseTimestampInputModel,
-    BaseAngleOutputUnitsModel,
+    AngleInRadiansOutputUnitsModel,
 ):
     pass
 
@@ -102,7 +127,6 @@ class CalculateEquationOfTimeNOAAInput(
 
 class CalculateSolarDeclinationNOAAInput(
     BaseTimestampInputModel,
-    BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
@@ -134,9 +158,14 @@ class CalculateSolarHourAngleNOAAInput(
     pass
 
 
-class AdjustSolarZenithForAtmosphericRefractionNOAAInput(BaseAngleOutputUnitsModel):
-    solar_zenith: float
+class SolarZenith_in_Radians(BaseModel):
+    solar_zenith: confloat(ge=0, le=pi+0.01745)
 
+
+class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
+    SolarZenith_in_Radians,
+    BaseAngleOutputUnitsModel,
+):
     @field_validator('solar_zenith')
     @classmethod
     def solar_zenith_range(cls, v):
@@ -157,6 +186,10 @@ class CalculateSolarZenithNOAAInput(
     BaseAngleOutputUnitsModel,
 ):
     solar_hour_angle: float
+
+
+class SolarAltitude_in_Radians(BaseModel):
+    solar_altitude: confloat(ge=-0.01745, le=pi/2)
 
 
 class CalculateSolarAltitudeNOAAInput(

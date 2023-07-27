@@ -22,7 +22,7 @@ from .solar_declination import calculate_solar_declination
 from ...models.skyfield.solar_geometry import calculate_solar_position_skyfield
 from ...models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
-from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
+# from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
 from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from ...models.noaa.solar_position import calculate_solar_altitude_noaa
 from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
@@ -47,7 +47,6 @@ def _parse_model(
     if SolarPositionModels.all in model:
         # Return all models except for the 'all' itself!
         model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-    # debug(locals())
     print(f"Return model: {model}")
     return model
 
@@ -266,7 +265,6 @@ def calculate_solar_position(
     """
     Calculates the solar position using all models and returns the results in a table.
     """
-    debug(locals())
     results = []
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration

@@ -22,7 +22,6 @@ def load_or_open_dataarray(function, filename_or_obj, mask_and_scale):
             filename_or_obj=filename_or_obj,
             mask_and_scale=mask_and_scale,
         )
-        # debug(locals())
         return dataarray
 
     except Exception as exc:
@@ -37,7 +36,6 @@ def open_data_array(
         ):
     """
     """
-    # debug(locals())
     if in_memory:
         print('In memory')
         return load_or_open_dataarray(xr.load_dataarray, netcdf, mask_and_scale)

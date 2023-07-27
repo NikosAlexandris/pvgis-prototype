@@ -17,6 +17,16 @@ def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: fl
     return np.radians(angle)
 
 
+def convert_to_degrees(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
+    """Convert angle to degrees."""
+    if ctx.resilient_parsing:
+        return
+    if type(angle) != float:
+        raise typer.BadParameter("Latitude should be a float!")
+
+    return np.degrees(angle)
+
+
 def convert_to_radians_fastapi(angle: float) -> float:
     """Convert angle to radians."""
     if type(angle) != float:

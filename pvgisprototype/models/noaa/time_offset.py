@@ -1,3 +1,4 @@
+from .noaa_models import Longitude_in_Radians
 from .noaa_models import CalculateTimeOffsetNOAAInput
 from datetime import datetime
 from .decorators import validate_with_pydantic
@@ -12,13 +13,12 @@ radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_
 
 @validate_with_pydantic(CalculateTimeOffsetNOAAInput)
 def calculate_time_offset_noaa(
-        longitude: float, 
+        longitude: Longitude_in_Radians, 
         timestamp: datetime, 
         time_output_units: str = 'minutes',  # redesign me!
         angle_units: str = 'radians',
     ) -> NamedTuple:
-    """Calculate the time offset for NOAA's solar position calculations
-    measured in minutes.
+    """Calculate the time offset (minutes) for NOAA's solar position calculations.
 
     The time offset (in minutes) incorporates the Equation of Time and accounts
     for the variation of the Local Solar Time (LST) within a given time zone
@@ -26,10 +26,13 @@ def calculate_time_offset_noaa(
 
     Parameters
     ----------
-    timestamp: datetime
-        The timestamp to calculate offset for
     longitude: float
-        The longitude for calculation
+        The longitude for calculation in radians (note: differs from the original
+        equation which expects degrees).
+
+    timestamp: datetime
+        The timestamp to calculate the offset for
+
     equation_of_time: float
         The equation of time value for calculation
 
@@ -57,9 +60,9 @@ def calculate_time_offset_noaa(
         `TC = 4 * (Longitude - LSTM) + EoT`
 
         where:
-            - TC       : Time Correction Factor, minutes
-            - Longitude: Geographical Longitude, degrees
-            - LSTM     : Local Standard Time Meridian, degrees * hours
+            - TC        : Time Correction Factor, minutes
+            - Longitude : Geographical Longitude, degrees
+            - LSTM      : Local Standard Time Meridian, degrees * hours
 
                 where:
                 - `LSTM = 15 degrees * ΔTUTC`
@@ -68,17 +71,19 @@ def calculate_time_offset_noaa(
                     - ΔTUTC = LT - UTC, hours
 
                         where:
-                        - LT : Local Time
-                        - UTC: Universal Coordinated Time
-                        - difference of LT from UTC in hours
+                        - ΔTUTC : difference of LT from UTC in hours
+                        - LT    : Local Time
+                        - UTC   : Universal Coordinated Time
 
-            - The factor of 4 minutes comes from the fact that the Earth
+            - The factor 4 (minutes) comes from the fact that the Earth
               rotates 1° every 4 minutes.
 
             Examples:
                 Mount Olympus is UTC + 2, hence LSTM = 15 * 2 = 30 deg. East
     """
     longitude_in_minutes = radians_to_time_minutes(longitude)  # time
+
+    # This will be 0 for UTC, obviously! Review-Me! --------------------------
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(timestamp,
                                                                time_output_units,
@@ -87,7 +92,7 @@ def calculate_time_offset_noaa(
     time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time.value
 
     if not -720 <= time_offset <= 720:
-        raise ValueError("The time offset must range within [-720, 720] minutes ?")
+        raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
 
     time_offset = generate(
         'time_offset'.upper(),

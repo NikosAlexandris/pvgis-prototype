@@ -3,6 +3,7 @@ from typing import Annotated
 from typing import Optional
 from typing import NamedTuple
 from datetime import datetime
+from datetime import timedelta
 from zoneinfo import ZoneInfo
 import numpy as np
 
@@ -74,7 +75,8 @@ def calculate_solar_time_pvgis(
 
     # adding longitude to UTC produces mean solar time!
     hour_offset = time_slot_offset_global + longitude / 15 + image_offset  # for `solar_time`
-    solar_time = hour_of_day + time_offset + hour_offset
+    time_correction_factor_hours = hour_of_day + time_offset + hour_offset
+    solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     
     solar_time = generate(
         'solar_time'.upper(),

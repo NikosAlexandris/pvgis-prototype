@@ -44,7 +44,7 @@ def test_calculate_solar_declination(
         calculate_solar_declination(
             timestamp=timestamp,
             timezone=None,
-            output_units="degrees",
+            angle_output_units="degrees",
         ),
         tolerance,
     )

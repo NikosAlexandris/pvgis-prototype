@@ -3,6 +3,7 @@ from typing import Annotated
 from typing import Optional
 from typing import NamedTuple
 from datetime import datetime
+from datetime import timedelta
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
@@ -132,8 +133,9 @@ def calculate_solar_time_ephem(
     # ------------------------------------------------------------------------
 
     # norm -> normalise to 24h
-    solar_time = ephem.hours(hour_angle + ephem.hours('12:00')).norm
-    solar_time = solar_time * 24 / pi / 2  # convert to decimal hours
+    solar_time_hours = ephem.hours(hour_angle + ephem.hours('12:00')).norm
+    solar_time_decimal_hours = solar_time_hours * 24 / pi / 2  # convert to decimal hours
+    solar_time_datetime = timestamp + timedelta(hours=solar_time_hours)
 
     if verbose:
         typer.echo(f'Local sidereal time: {sidereal_time}')
@@ -142,10 +144,10 @@ def calculate_solar_time_ephem(
         typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
         typer.echo(f'Mean solar time: {solar_time}')
 
-    solar_time = generate(
+    solar_time_datetime = generate(
         'solar_time'.upper(),
-        (solar_time, 'decimal hours'),
+        (solar_time_datetime, 'decimal hours'),         # FIXME: Are untis correct?
     )
 
     # debug(locals())
-    return solar_time  # norm for 24h
+    return solar_time_datetime

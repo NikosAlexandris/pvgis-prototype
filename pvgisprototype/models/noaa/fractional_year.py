@@ -11,7 +11,7 @@ from pvgisprototype.api.named_tuples import generate
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
 def calculate_fractional_year_noaa(
         timestamp: datetime,
-        angle_output_units: Optional[str] = "radians",
+        angle_output_units: str = "radians",  # Returned, not used!
         ) -> NamedTuple:
     """Calculate fractional year in radians """
     fractional_year = (
@@ -21,8 +21,12 @@ def calculate_fractional_year_noaa(
         * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
     )
 
+    # slightly less than 0 ?
+    if -pi/365 <= fractional_year < 0:  # for example, consider values > -1e-6 as close enough to 0
+        fractional_year = 0
+
     if not 0 <= fractional_year < 2 * pi:
-        raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
+        raise ValueError(f'The calculated fractional year {fractional_year} is outside the expected range [0, 2*pi] radians')
 
     fractional_year = generate(
         'fractional_year'.upper(),

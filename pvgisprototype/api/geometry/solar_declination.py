@@ -46,11 +46,11 @@ def calculate_fractional_year_pvis(
     # if angle_output_units == 'degrees':
     #     if not 0 <= fractional_year < 360:
     #         raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
-    
+            
     return fractional_year
 
 
-@validate_with_pydantic(SolarDeclinationInput)
+@validate_with_pydantic(SolarDeclinationInput, expand_args=False)
 def calculate_solar_declination(input: SolarDeclinationInput) -> float:
     """Approximate the sun's declination for a given day of the year.
 

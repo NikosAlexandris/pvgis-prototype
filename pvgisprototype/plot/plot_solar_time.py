@@ -215,7 +215,6 @@ def plot_solar_time_one_year_bokeh(
         models,
         location,
         ):
-    # debug(locals())
     timestamps = [datetime(year, 1, 1) + timedelta(days=i) for i in range((datetime(year+1, 1, 1) - datetime(year, 1, 1)).days)]
     timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime
 

@@ -14,6 +14,7 @@ from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
 from ..utilities.timestamp import convert_hours_to_seconds
+from ..utilities.timestamp import timestamp_to_decimal_hours
 from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_to_degrees_if_requested
 from .solar_declination import calculate_solar_declination
@@ -63,17 +64,18 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> NamedTuple:
             angle_output_units=input.output_units
         )
     )
-    C31 = math.cos(input.latitude) * math.cos(solar_declination.value)
-    C33 = math.sin(input.latitude) * math.sin(solar_declination.value)
-    solar_time, _units = model_solar_time(
+    C31 = math.cos(input.latitude) * math.cos(solar_declination)
+    C33 = math.sin(input.latitude) * math.sin(solar_declination)
+    solar_time = model_solar_time(
             longitude=input.longitude,
             latitude=input.latitude,
             timestamp=input.timestamp,
             timezone=input.timezone,
-            model=SolarTimeModels.eot,  # returns time in hours
+            model=SolarTimeModels.eot,  # returns datetime.time object
             )
-    solar_time *= 3600
-    hour_angle, _units = calculate_hour_angle(
+    # solar_time *= 3600
+    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
+    hour_angle, hour_angle_units = calculate_hour_angle(
             solar_time,
             input.output_units,
     )

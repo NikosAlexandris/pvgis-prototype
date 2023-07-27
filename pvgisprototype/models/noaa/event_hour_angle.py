@@ -1,8 +1,9 @@
 from devtools import debug
 
+from typing import Tuple
 from .noaa_models import CalculateEventHourAngleNOAAInput
 from .decorators import validate_with_pydantic
-from .noaa_models import Latitude
+from .noaa_models import Latitude_in_Radians
 from datetime import datetime
 from .solar_declination import calculate_solar_declination_noaa
 from math import cos
@@ -14,15 +15,54 @@ from pvgisprototype.api.named_tuples import generate
 
 @validate_with_pydantic(CalculateEventHourAngleNOAAInput)
 def calculate_event_hour_angle_noaa(
-        latitude: Latitude,
+        latitude: Latitude_in_Radians,
         timestamp: datetime,
         refracted_solar_zenith: float = 1.5853349194640094,  # radians
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-        ):
+        ) -> Tuple:
     """
+    Calculates the event hour angle using the NOAA method.
+
+    Parameters
+    ----------
+    latitude : Latitude
+        The geographic latitude for which to calculate the event hour angle.
+
+    timestamp : datetime
+        The date and time for which to calculate the event hour angle.
+    
+    refracted_solar_zenith : float, optional
+        The zenith of the sun, adjusted for atmospheric refraction. Defaults to
+        1.5853349194640094 radians, which corresponds to 90.833 degrees. This
+        is the zenith at sunrise or sunset, adjusted for the approximate
+        correction for atmospheric refraction at those times, and the size of
+        the solar disk.
+    
+    angle_units : str, optional
+        The unit in which the angles are input. Defaults to 'radians'.
+    
+    angle_output_units : str, optional
+        The unit in which the output angle should be returned. Defaults to
+        'radians'.
+
+    Returns
+    -------
+    event_hour_angle : float
+        The calculated event hour angle.
+    
+    angle_output_units : str
+        The unit of the output angle.
+
+    Notes
+    -----
+    The function implements NOAA calculations for the solar declination and
+    the event hour angle. The solar declination is calculated first in radians,
+    followed by the event hour angle in radians.
+
+    Commented out: If the output units are 'degrees', the function
+    will convert the calculated event hour angle from radians to degrees.
     """
-    debug(locals())
     solar_declination = calculate_solar_declination_noaa(
             timestamp,
             angle_units,
@@ -46,5 +86,4 @@ def calculate_event_hour_angle_noaa(
     #             )
     # # ------------------------------------------------------------------------
 
-    debug(locals())
     return event_hour

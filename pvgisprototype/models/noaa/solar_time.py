@@ -1,3 +1,4 @@
+from .noaa_models import Longitude_in_Radians
 from .noaa_models import CalculateTrueSolarTimeNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
@@ -10,7 +11,7 @@ from pvgisprototype.api.named_tuples import generate
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
 def calculate_true_solar_time_noaa(
-        longitude: float,
+        longitude: Longitude_in_Radians, 
         timestamp: datetime, 
         timezone: Optional[ZoneInfo],
         time_output_units: str = 'minutes',
@@ -30,14 +31,7 @@ def calculate_true_solar_time_noaa(
     Returns
     -------
     float: The true solar time
-    """
-    # if timezone != timestamp.tzinfo:
-    #     try:
-    #         timestamp = timestamp.astimezone(timezone)
-    #     except pytz.UnknownTimeZoneError as e:
-    #         logging.warning(f'Unknown timezone: {e}')
-    #         raise
-    
+    """    
     time_offset = calculate_time_offset_noaa(
             longitude,
             timestamp,
@@ -52,9 +46,20 @@ def calculate_true_solar_time_noaa(
         if not 0 <= true_solar_time <= 1440:
             raise ValueError("The true solar time must range within [0, 1440] minutes")
 
+    # Convert to datetime object
+    hours, remainder = divmod(true_solar_time, 60)
+    minutes, seconds = divmod(remainder * 60, 60)
+    true_solar_time = datetime(
+            year=timestamp.year,
+            month=timestamp.month,
+            day=timestamp.day,
+            hour=int(hours),
+            minute=int(minutes),
+            second=int(seconds),
+            tzinfo=timestamp.tzinfo,
+            )
     true_solar_time = generate(
         'true_solar_time'.upper(),
         (true_solar_time, time_output_units),
     )
-
     return true_solar_time

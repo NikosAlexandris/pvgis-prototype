@@ -106,7 +106,8 @@ def calculate_solar_time_eot(
     time_correction_factor = 4 * (longitude - local_standard_meridian_time) + equation_of_time
     time_correction_factor_hours = time_correction_factor / 60
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
-    solar_time = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600
+    solar_time_decimal_hours = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600
+    hour_angle = 15 * (solar_time_decimal_hours - 12)
     # ------------------------------------------------------------------------
     
     solar_time = generate(

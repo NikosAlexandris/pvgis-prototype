@@ -2,16 +2,17 @@ from .noaa_models import CalculateSolarHourAngleNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
 from typing import Optional
-from .noaa_models import Longitude
+from .noaa_models import Longitude_in_Radians
 from .solar_time import calculate_true_solar_time_noaa
 from math import pi
 from typing import NamedTuple
 from pvgisprototype.api.named_tuples import generate
+from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 
 
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
 def calculate_solar_hour_angle_noaa(
-        longitude: Longitude,
+        longitude: Longitude_in_Radians,
         timestamp: datetime, 
         timezone: Optional[str], 
         time_output_units: Optional[str] = 'minutes',

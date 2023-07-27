@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 models = [
         SolarPositionModels.pysolar,
         SolarPositionModels.pvis,
-        SolarPositionModels.pvgis,
+        # SolarPositionModels.pvgis,
         SolarPositionModels.skyfield,
         SolarPositionModels.suncalc,
 ]
