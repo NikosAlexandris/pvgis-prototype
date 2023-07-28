@@ -66,16 +66,23 @@ class BaseTimeInputModel(BaseTimestampInputModel):
         return v
 
 
-    ModelToDict,
-
-
-
-
-    pass
-
-
 class CalculateTrueSolarTimeSkyfieldInputModel(
+    ModelToDict,
     BaseCoordinatesInputModel,
     BaseTimeInputModel,
 ):
     pass
+
+
+class SolarPositionInput(
+    CalculateTrueSolarTimeSkyfieldInputModel):
+    # output_units: str = 'radians'
+    pass
+
+
+class SolarAltitudeInput(SolarPositionInput):
+    pass
+
+
+class HourAngleInput(SolarPositionInput):
+    angle_output_units: float

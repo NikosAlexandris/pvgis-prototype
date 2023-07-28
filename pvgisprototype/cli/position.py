@@ -49,6 +49,7 @@ from .rich_help_panel_names import rich_help_panel_geometry_surface
 
 from pvgisprototype.api.input_models import HourAngleInput
 from pvgisprototype.api.input_models import HourAngleSunriseInput
+from pvgisprototype.api.input_models import SolarPositionInput
 
 from .print import print_table
 from .print import print_solar_position_table

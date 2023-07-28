@@ -6,6 +6,8 @@ from typing import Optional
 from typing import Union
 from zoneinfo import ZoneInfo
 from datetime import datetime
+from datetime import time
+from math import pi
 from pydantic import validator
 
 from .geometry.solar_models import SolarPositionModels
@@ -120,8 +122,9 @@ class BaseAngleInternalUnitsModel(BaseModel):                                   
 
 
 class SolarPositionInputModel(BaseModel):
-    model: SolarPositionModels
+    model: SolarPositionModels = SolarPositionModels.skyfield
     apply_atmospheric_refraction: bool = True
+
 class SolarTimeInputModel(SolarPositionInputModel):
     refracted_solar_zenith: float = 1.5853349194640094,  # radians
 
@@ -145,7 +148,6 @@ class EarthOrbitInputModel(BaseModel):
     days_in_a_year: float = 365.25
     orbital_eccentricity: float = 0.03344
     perigee_offset: float = 0.048869
-    eccentricity: float = 0.01672                       # NOTE: Added by gounaol. I am not sure if correct
 
 
 class SolarDeclinationInput(
@@ -168,13 +170,13 @@ class SolarDeclinationInput(
         #     case_sensitive=False,
         #     help="Output units for solar declination (degrees or radians)")] = 'radians',
         BaseAngleOutputUnitsModel,
-        ):
-    debug(locals())
-    pass
+    ):
+        # debug(locals())
+        pass
 
 
 class SolarTimeModel(BaseModel):
-    solar_time: confloat(ge=0, le=86400)
+    solar_time: time     # confloat(ge=0, le=86400)
     model_config = ConfigDict(
         description="""The solar time (ST) is a calculation of the passage of time based
         on the position of the Sun in the sky. It is expected to be decimal hours in a
@@ -194,6 +196,10 @@ class SurfaceTilt(BaseModel):
         },
     )
 
+class SurfaceOrientation(BaseModel):
+    surface_orientation: confloat(ge=-pi/2, le=pi/2) = 0
+
+
 class SolarDeclinationModel(BaseModel):
     solar_declination: confloat(ge=-0.4092797096, le=0.4092797096) = 0
     model_config = ConfigDict(
@@ -207,9 +213,6 @@ class SolarDeclinationModel(BaseModel):
 class HourAngleInput(
         ModelToDict,
         SolarTimeModel,
-        # solar_time: Annotated[float, typer.Argument(
-        #     help='The solar time in decimal hours on a 24 hour base',
-        #     callback=convert_hours_to_seconds)],
         # output_units: Annotated[str, typer.Option(
         #     '-u',
         #     '--units',
@@ -217,8 +220,8 @@ class HourAngleInput(
         #     case_sensitive=False,
         #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
         BaseAngleOutputUnitsModel,
-        ):
-    pass
+    ):
+        pass
 
 
 class HourAngleSunriseInput(
@@ -245,6 +248,12 @@ class HourAngleSunriseInput(
 
 class SolarPositionInput(
     ModelToDict,
+    # longitude: Annotated[float, typer.Argument(
+    #     callback=convert_to_radians,
+    #     min=-180, max=180)],
+    # latitude: Annotated[float, typer.Argument(
+    #     callback=convert_to_radians,
+    #     min=-90, max=90)],
     BaseCoordinatesInputModel,
     # timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
     #     help='Timestamp',
@@ -292,6 +301,12 @@ class SolarPositionInput(
 
 class SolarTimeInput(
     ModelToDict,
+    # longitude: Annotated[float, typer.Argument(
+    #     callback=convert_to_radians,
+    #     min=-180, max=180)],
+    # latitude: Annotated[float, typer.Argument(
+    #     callback=convert_to_radians,
+    #     min=-90, max=90)],
     BaseCoordinatesInputModel,
     # timestamp: Annotated[Optional[datetime], typer.Argument(
     #     help='Timestamp',
@@ -349,3 +364,37 @@ class SolarTimeInput(
     TimeOffsetModel,
 ):
     pass
+
+
+class SolarIncidenceStandarInput(
+    Latitude,
+    SolarDeclinationModel,
+    BaseAngleOutputUnitsModel,
+):
+    surface_orientation: float = 0
+    hour_angle: float
+
+
+class SolarIncidenceInput(SolarTimeInput):
+    random_time: bool = False
+    hour_angle: float
+    surface_tilt: float = 0
+    surface_orientation: float = 0
+    rounding_places: int = 5
+    verbose: bool = False
+
+
+class FractionalYearInput(
+    ModelToDict,
+    BaseTimestampInputModel,
+    BaseAngleInternalUnitsModel,
+):
+    pass
+
+
+class RelativeLongitudeInput(
+    Latitude,
+    SurfaceTilt,
+    SurfaceOrientation,
+):
+    angle_output_units: str = 'radians'
