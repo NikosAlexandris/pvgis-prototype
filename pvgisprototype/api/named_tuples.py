@@ -12,7 +12,7 @@ class NamedTupleTypes(Enum):
     SOLAR_TIME = namedtuple('solar_time', ['value', 'unit'])
     SOLAR_ALTITUDE = namedtuple('solar_altitude', ['value', 'unit'])
     SOLAR_AZIMUTH = namedtuple('solar_azimuth', ['value', 'unit'])
-    SOLAR_DECLINATION = namedtuple('declination', ['value', 'unit'])                # TODO: Decide if 'solar_declination' or just 'declination'
+    SOLAR_DECLINATION = namedtuple('solar_declination', ['value', 'unit'])                # TODO: Decide if 'solar_declination' or just 'declination'
     FRACTIONAL_YEAR = namedtuple('fractional_year', ['value', 'unit'])
     EQUATION_OF_TIME = namedtuple('equation_of_time', ['value', 'unit'])
     TIME_OFFSET = namedtuple('time_offset', ['value', 'unit'])
@@ -22,6 +22,7 @@ class NamedTupleTypes(Enum):
     SOLAR_POSITION = namedtuple('solar_position', ['value', 'unit'])
     COMPASS_SOLAR_AZIMUTH = namedtuple('compass_solar_azimuth', ['value', 'unit'])
     EVENT_TIME = namedtuple('event_time', ['value', 'unit'])
+    SOLAR_INCIDENCE = namedtuple('solar_incidence', ['value', 'unit'])
 
 
 def generate(named_tuple_type:str, value_unit_pair:Tuple[float, str])-> NamedTuple:
@@ -55,7 +56,7 @@ def generate(named_tuple_type:str, value_unit_pair:Tuple[float, str])-> NamedTup
     ValueError
         If named_tuple_type does not match any of the names in the NamedTupleTypes.
     """
-
+    named_tuple_type = named_tuple_type.upper()
     if named_tuple_type in NamedTupleTypes.__members__:
         named_tuple_class = NamedTupleTypes[named_tuple_type].value
         return named_tuple_class(*value_unit_pair)
