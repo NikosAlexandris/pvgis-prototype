@@ -5,6 +5,8 @@ from enum import Enum
 
 
 class NamedTupleTypes(Enum):
+    LATITUDE = namedtuple('latitude', ['value', 'unit'])
+    LONGITUDE = namedtuple('longitude', ['value', 'unit'])
     HOUR_ANGLE_SUNRISE = namedtuple('hour_angle_sunrise', ['value', 'unit'])
     HOUR_ANGLE = namedtuple('hour_angle', ['value', 'unit'])
     SOLAR_TIME = namedtuple('solar_time', ['value', 'unit'])

@@ -3,10 +3,14 @@ from pydantic import ConfigDict
 from pydantic import field_validator
 from pydantic import confloat
 from typing import Optional
+from typing import Union
 from zoneinfo import ZoneInfo
 from datetime import datetime
+from pydantic import validator
 
 from .geometry.solar_models import SolarPositionModels
+from pvgisprototype.api.named_tuples import generate
+
 
 class ModelToDict(BaseModel):
     def dict_with_namedtuple(self):
@@ -14,6 +18,36 @@ class ModelToDict(BaseModel):
         for k, v in self:
             d[k] = v
         return d
+
+
+class Longitude(BaseModel):
+    longitude: Union[confloat(ge=-pi, le=pi), tuple]
+
+    @validator("longitude", always=True)
+    def longitude_named_tuple(cls, input) -> Union[confloat(ge=-pi, le=pi), tuple]:
+        if isinstance(input, tuple):
+            return generate('longitude', (input[0], input[1]))
+        elif isinstance(input, float):
+            return generate('longitude', (input, 'radians'))
+        else:
+            raise ValueError("Unsupported longitude type provided")
+
+
+class Latitude(BaseModel):
+    latitude: Union[confloat(ge=-pi/2, le=pi/2), tuple]
+
+    @validator("latitude", always=True)
+    def latitude_named_tuple(cls, input) -> Union[confloat(ge=-pi/2, le=pi/2), tuple]:
+        if isinstance(input, tuple):
+            return generate('latitude', (input[0], input[1]))
+        elif isinstance(input, float):
+            return generate('latitude', (input, 'radians'))
+        else:
+            raise ValueError("Unsupported latitude type provided")
+
+
+class BaseCoordinatesInputModel(Longitude, Latitude):
+    pass
 
 
 class BaseTimestampInputModel(BaseModel):
@@ -80,28 +114,9 @@ class BaseAngleInternalUnitsModel(BaseModel):                                   
         if v not in valid_units:
             raise ValueError(f"angle_units must be {valid_units}")
         return v
-class Longitude(BaseModel):
-    longitude: confloat(ge=-pi, le=pi)
-    model_config = ConfigDict(
-        json_schema_extra = {
-            "units": "radians",
-        },
-    )
-    # @validator("longitude", always=True)                                 # TODO: Add me to manual
-    # def longitude_to_radians(cls, v: float,) -> float:
-    #     return math.radians(v)
 
 
-class Latitude(BaseModel):
-    latitude: confloat(ge=-pi/2, le=pi/2)
-    model_config = ConfigDict(
-        json_schema_extra = {
-            "units": "radians",
-        },
-    )
-    # @validator("latitude", always=True)                                 # TODO: Add me to manual
-    # def latitude_to_radians(cls, v: float,) -> float:
-    #     return math.radians(v)
+
 
 
 class SolarPositionInputModel(BaseModel):
@@ -109,8 +124,8 @@ class SolarPositionInputModel(BaseModel):
     apply_atmospheric_refraction: bool = True
 class SolarTimeInputModel(SolarPositionInputModel):
     refracted_solar_zenith: float = 1.5853349194640094,  # radians
-class BaseCoordinatesInputModel(Longitude, Latitude):
-    pass
+
+
 
 
 class SolarAltitudeInput(
