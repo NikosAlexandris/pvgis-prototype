@@ -28,6 +28,7 @@ from ..api.utilities.timestamp import random_datetimezone
 from ..api.utilities.timestamp import ctx_attach_requested_timezone
 from ..api.utilities.conversions import convert_to_radians
 from ..api.utilities.conversions import convert_to_degrees_if_requested
+from ..api.utilities.conversions import convert_float_to_degrees_if_requested
 from ..api.utilities.conversions import round_float_values
 from ..api.geometry.solar_declination import calculate_solar_declination
 from ..models.standard.solar_incidence import calculate_solar_incidence
@@ -292,8 +293,8 @@ def position(
             time_output_units,
             angle_output_units,
             )
-    longitude = convert_to_degrees_if_requested(longitude, angle_output_units)
-    latitude = convert_to_degrees_if_requested(latitude, angle_output_units)
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     print_solar_position_table(
         longitude,
         latitude,

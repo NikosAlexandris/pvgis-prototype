@@ -5,7 +5,7 @@ from typing import NamedTuple
 from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_degrees_if_requested
 from datetime import time
-from math import pi
+from math import radians
 from math import acos
 from math import tan
 
@@ -60,7 +60,7 @@ def calculate_hour_angle(
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+    hour_angle = radians(15) * (solar_time_decimal_hours - 12)
     hour_angle = generate('hour_angle', (hour_angle, 'radians'))
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
