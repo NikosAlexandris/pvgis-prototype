@@ -155,13 +155,11 @@ def calculate_solar_zenith_noaa(
         solar_hour_angle: float,
         apply_atmospheric_refraction: bool = False,
         # time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
         angle_output_units: str = 'radians',
         )-> NamedTuple:
     """Calculate the solar zenith angle (φ) in radians """
     solar_declination = calculate_solar_declination_noaa(
             timestamp,
-            angle_units,
             angle_output_units,
             )
     cosine_solar_zenith = sin(latitude) * sin(solar_declination.value) + cos(latitude) * cos(

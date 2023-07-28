@@ -174,7 +174,6 @@ def solar_time(
             refracted_solar_zenith,
             apply_atmospheric_refraction,
             time_output_units,
-            angle_units,
             angle_output_units,
             days_in_a_year,
             perigee_offset,

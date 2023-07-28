@@ -20,7 +20,6 @@ def calculate_solar_altitude_noaa(
         timezone: str,
         apply_atmospheric_refraction: bool = True,
         time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
         angle_output_units: str = 'radians',
         )-> NamedTuple:
     """Calculate the solar zenith angle (φ) in radians
@@ -37,7 +36,6 @@ def calculate_solar_altitude_noaa(
         timestamp,
         solar_hour_angle.value,
         apply_atmospheric_refraction,
-        angle_units='radians',
         angle_output_units='radians',
             )  # radians
     solar_altitude = pi/2 - solar_zenith.value

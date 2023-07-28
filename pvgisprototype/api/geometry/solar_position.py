@@ -248,7 +248,6 @@ def calculate_solar_position(
                     model=model,
                     apply_atmospheric_refraction=apply_atmospheric_refraction,
                     time_output_units=time_output_units,
-                    angle_units=angle_units,
                     angle_output_units=angle_output_units,
             )
             results.append({

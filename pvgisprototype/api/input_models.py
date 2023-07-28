@@ -272,14 +272,14 @@ class SolarPositionInput(
     #     show_default=True,
     #     case_sensitive=False,
     #     help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
-    BaseTimeOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
     # angle_units: Annotated[str, typer.Option(
     #     '-u',
     #     '--units',
     #     show_default=True,
     #     case_sensitive=False,
     #     help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
-    BaseAngleInternalUnitsModel,
+    # BaseAngleInternalUnitsModel,
     # angle_output_units: Annotated[str, typer.Option(
     #     '-u',
     #     '--units',
@@ -327,7 +327,7 @@ class SolarTimeInput(
     #     show_default=True,
     #     case_sensitive=False,
     #     help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
-    BaseAngleInternalUnitsModel,
+    # BaseAngleInternalUnitsModel,
     # angle_output_units: Annotated[str, typer.Option(
     #     '-u',
     #     '--units',

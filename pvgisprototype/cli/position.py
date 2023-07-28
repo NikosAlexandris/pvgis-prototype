@@ -289,7 +289,6 @@ def position(
             model,
             apply_atmospheric_refraction,
             time_output_units,
-            angle_units,
             angle_output_units,
             )
     longitude = convert_to_degrees_if_requested(longitude, angle_output_units)
@@ -513,7 +512,6 @@ def zenith(
         model,
         apply_atmospheric_refraction,
         time_output_units,
-        angle_units,
         angle_output_units,
     )
     for model_result in solar_position:
@@ -639,7 +637,6 @@ def azimuth(
         model,
         apply_atmospheric_refraction,
         time_output_units,
-        angle_units,
         angle_output_units,
     )
     print_solar_position_table(

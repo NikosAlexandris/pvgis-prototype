@@ -115,7 +115,7 @@ def correct_linke_turbidity_factor(linke_turbidity_factor):
 
 def calculate_refracted_solar_altitude(
         solar_altitude: float,
-        angle_units: str = 'degrees',
+        angle_input_units: str = 'degrees',
         angle_output_units: str = 'degrees',
         ):
     """Adjust the solar altitude angle for atmospheric refraction
@@ -134,19 +134,22 @@ def calculate_refracted_solar_altitude(
 
     This function implements the algorithm described by Hofierka :cite:`p:hofierka2002`.
     """
-    atmospheric_refraction = (
-            0.061359
-            * (0.1594 + 1.123 * solar_altitude + 0.065656 * pow(solar_altitude, 2))
-            / (1 + 28.9344 * solar_altitude + 277.3971 * pow(solar_altitude, 2))
-            )
-    refracted_solar_altitude = solar_altitude + atmospheric_refraction
+    if angle_input_units == 'degrees':
+        atmospheric_refraction = (
+                0.061359
+                * (0.1594 + 1.123 * solar_altitude + 0.065656 * pow(solar_altitude, 2))
+                / (1 + 28.9344 * solar_altitude + 277.3971 * pow(solar_altitude, 2))
+                )
+        refracted_solar_altitude = solar_altitude + atmospheric_refraction
+    else:
+        raise ValueError
 
     # debug(locals())
     return refracted_solar_altitude, angle_output_units
 
 
 @validate_with_pydantic(OpticalAirMassInputModel, expand_args=True)
-def calculate_optical_air_mass(elevation, refracted_solar_altitude, angle_units) -> float:
+def calculate_optical_air_mass(elevation, refracted_solar_altitude) -> float:
     """Approximate the relative optical air mass.
 
     This function implements the algorithm described by Minzer et al. [1]_ 
@@ -391,12 +394,12 @@ def calculate_direct_horizontal_irradiance(
     # expects solar altitude in degrees!
     refracted_solar_altitude, refracted_solar_altitude_units = calculate_refracted_solar_altitude(
             solar_altitude=solar_altitude_in_degrees,
-            angle_units=solar_altitude_angle_units,
+            # angle_units=solar_altitude_angle_units,
             )
     optical_air_mass = calculate_optical_air_mass(
             elevation=elevation,
             refracted_solar_altitude=refracted_solar_altitude,
-            angle_units=solar_altitude_angle_units,
+            # angle_units=solar_altitude_angle_units,
             )
     # debug(locals())
 
