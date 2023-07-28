@@ -182,9 +182,12 @@ def calculate_solar_incidence_jenco(
     sine_solar_incidence = (
         c_inclined_31 * cos(hour_angle.value - relative_longitude) + c_inclined_33
     )
-    
-    return asin(sine_solar_incidence)
-    # return solar_incidence
+
+    solar_incidence = generate(
+        'solar_incidence',
+        (asin(sine_solar_incidence), angle_output_units),
+    )
+    return solar_incidence
 
 
 def interpolate_horizon_height(

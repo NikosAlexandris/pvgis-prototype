@@ -59,7 +59,7 @@ def calculate_hour_angle(
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
-    hour_angle = generate('hour_angle', (hour_angle, angle_output_units))
+    hour_angle = generate('hour_angle', (hour_angle, 'radians'))
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
             input.angle_output_units,
@@ -112,7 +112,7 @@ def calculate_hour_angle_sunrise(
             )
     hour_angle_sunrise = generate(
         'hour_angle_sunrise',
-        (hour_angle_sunrise, input.angle_output_units),
+        (hour_angle_sunrise, angle_output_units),
     )
     hour_angle_sunrise = convert_to_degrees_if_requested(
             hour_angle_sunrise,

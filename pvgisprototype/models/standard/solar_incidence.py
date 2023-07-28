@@ -98,4 +98,8 @@ def calculate_solar_incidence(
         * sin(hour_angle)
         * sin(surface_slope)
     )
+    solar_incidence = generate(
+        'solar_incidence',
+        (solar_incidence, angle_output_units)
+    )
     return solar_incidence
