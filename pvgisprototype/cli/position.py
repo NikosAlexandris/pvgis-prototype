@@ -1014,7 +1014,7 @@ def hour_angle(
             min=0, max=90)] = 0,
         solar_declination: Annotated[Optional[float], typer.Argument(
             min=-90, max=90)] = 0,                                                  # XXX: Default value changed from 180 to 0
-        output_units: Annotated[str, typer.Option(
+        angle_output_units: Annotated[str, typer.Option(
             '-u',
             '--units',
             show_default=True,
@@ -1040,7 +1040,7 @@ def hour_angle(
             latitude=latitude,
             surface_tilt=surface_tilt,
             solar_declination=solar_declination,
-            angle_output_units=output_units,
+            angle_output_units=angle_output_units,
         )
     )
 
