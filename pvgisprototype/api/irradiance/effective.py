@@ -297,8 +297,7 @@ def calculate_effective_irradiance(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            output_units=output_units
-        )
+            angle_output_units=angle_output_units
     )
     incidence_angle = calculate_solar_incidence_angle()
 

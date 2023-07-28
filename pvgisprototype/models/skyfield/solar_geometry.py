@@ -233,21 +233,21 @@ def calculate_hour_angle_skyfield(
             latitude,
             timestamp,
             timezone,
-            output_units,
+            angle_output_units,
             )
     hour_angle, solar_declination, distance_to_sun = solar_position.hadec()
 
-    if output_units == 'minutes':
+    if angle_output_units == 'minutes':
         hour_angle = hour_angle.minutes
         solar_declination = solar_declination.minutes
 
-    if output_units == 'hours':
+    if angle_output_units == 'hours':
         hour_angle = hour_angle.hours
         solar_declination = solar_declination.hours
 
-    if output_units == 'radians':
+    if angle_output_units == 'radians':
         hour_angle = hour_angle.radians
         solar_declination = solar_declination.radians
 
-    return hour_angle, solar_declination, output_units
+    return hour_angle, solar_declination, angle_output_units
 
