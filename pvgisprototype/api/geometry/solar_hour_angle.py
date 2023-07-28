@@ -8,6 +8,7 @@ from math import pi
 from math import acos
 from math import tan
 
+from pvgisprototype.api.input_models import Latitude
 from pvgisprototype.api.input_models import HourAngleInput
 from pvgisprototype.api.input_models import HourAngleSunriseInput
 from pvgisprototype.api.named_tuples import generate
@@ -62,14 +63,17 @@ def calculate_hour_angle(
     hour_angle = generate('hour_angle', (hour_angle, 'radians'))
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
-            input.angle_output_units,
+            angle_output_units,
             )
     return hour_angle
 
 
 @validate_with_pydantic(HourAngleSunriseInput, expand_args=True)
 def calculate_hour_angle_sunrise(
-        input: HourAngleSunriseInput,
+        latitude: Latitude,
+        surface_tilt: float = 0,
+        solar_declination: float = 0,
+        angle_output_units: str = 'radians',
     ) -> NamedTuple:
     """Calculate the hour angle (ω) at sunrise and sunset
 
@@ -106,9 +110,9 @@ def calculate_hour_angle_sunrise(
     """
     hour_angle_sunrise = acos(
             -tan(
-                input.latitude - input.surface_tilt
+                latitude.value - surface_tilt
                 )
-            *tan(input.solar_declination)
+            *tan(solar_declination)
             )
     hour_angle_sunrise = generate(
         'hour_angle_sunrise',
@@ -116,7 +120,7 @@ def calculate_hour_angle_sunrise(
     )
     hour_angle_sunrise = convert_to_degrees_if_requested(
             hour_angle_sunrise,
-            input.angle_output_units,
+            angle_output_units,
             )
     return hour_angle_sunrise
 

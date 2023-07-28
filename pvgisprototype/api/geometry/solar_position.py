@@ -28,6 +28,8 @@ from ...models.noaa.solar_position import calculate_solar_altitude_noaa
 from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
 
 from .solar_models import SolarPositionModels
+from pvgisprototype.api.input_models import Latitude
+from pvgisprototype.api.input_models import Longitude
 from pvgisprototype.api.input_models import SolarPositionInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
@@ -53,7 +55,14 @@ def _parse_model(
 
 @validate_with_pydantic(SolarPositionInput, expand_args=True)
 def model_solar_position(
-        input: SolarPositionInput,
+        longitude: Longitude,
+        latitude: Latitude,
+        timestamp: datetime,
+        timezone: str = None,
+        model: SolarPositionModels = SolarPositionModels.skyfield,
+        apply_atmospheric_refraction: bool = True,
+        time_output_units: str = 'minutes',
+        angle_output_units: str = 'radians',
     )-> Tuple[NamedTuple, NamedTuple]:
     """
     The solar altitude angle measures from the horizon up towards the zenith
@@ -85,108 +94,106 @@ def model_solar_position(
 
     - The result is returned with units.
     """
-    if input.model.value == SolarPositionModels.noaa:
+    if model.value == SolarPositionModels.noaa:
 
         solar_altitude = calculate_solar_altitude_noaa(
-                input.longitude,
-                input.latitude,
-                input.timestamp,
-                input.timezone,
-                input.apply_atmospheric_refraction,
-                input.time_output_units,
-                input.angle_units,
-                input.angle_output_units,
+                longitude,
+                latitude,
+                timestamp,
+                timezone,
+                apply_atmospheric_refraction,
+                time_output_units,
+                angle_output_units,
                 )
         solar_altitude = convert_to_degrees_if_requested(
             solar_altitude,
-            input.angle_output_units,
+            angle_output_units,
             )
 
         solar_azimuth = calculate_solar_azimuth_noaa(
-                input.longitude,
-                input.latitude,
-                input.timestamp,
-                input.timezone,
-                input.apply_atmospheric_refraction,
-                input.time_output_units,
-                input.angle_units,
-                input.angle_output_units,
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            apply_atmospheric_refraction,
+            time_output_units,
+            angle_output_units,
                 )
         solar_azimuth = convert_to_degrees_if_requested(
             solar_azimuth,
-            input.angle_output_units,
+            angle_output_units,
             )
     
-    if input.model.value == SolarPositionModels.skyfield:
+    if model.value == SolarPositionModels.skyfield:
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
-                input.longitude,
-                input.latitude,
-                input.timestamp,
-                input.timezone,
-                input.angle_output_units,
+                longitude=longitude,
+                latitude=latitude,
+                timestamp=timestamp,
+                timezone=timezone,
+                angle_output_units=angle_output_units,
                 )
         solar_azimuth = convert_to_degrees_if_requested(
             solar_azimuth,
-            input.angle_output_units,
+            angle_output_units,
             )
         solar_altitude = convert_to_degrees_if_requested(
             solar_altitude,
-            input.angle_output_units,
+            angle_output_units,
             )
     
-    if input.model.value == SolarPositionModels.suncalc:
+    if model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth, solar_altitude = suncalc.get_position(            # FIXME: Must return two named tuples (maybe wrap this func?)
-                date=input.timestamp,  # this comes first here!
-                lng=input.longitude,
-                lat=input.latitude,
+                date=timestamp,  # this comes first here!
+                lng=longitude,
+                lat=latitude,
                 ).values()
         solar_azimuth = convert_to_degrees_if_requested(
             solar_azimuth,
-            input.angle_output_units,
+            angle_output_units,
             )
         solar_altitude = convert_to_degrees_if_requested(
             solar_altitude,
-            input.angle_output_units,
+            angle_output_units,
             )
     
-    if input.model.value  == SolarPositionModels.pysolar:
+    if model.value  == SolarPositionModels.pysolar:
 
-        timestamp = attach_timezone(input.timestamp, input.timezone)
+        timestamp = attach_timezone(timestamp, timezone)
         solar_altitude = pysolar.solar.get_altitude(                    # FIXME: Must return a named tuple (maybe wrap this func?)
-                latitude_deg=input.latitude,  # this comes first
-                longitude_deg=input.longitude,
+                latitude_deg=latitude,  # this comes first
+                longitude_deg=longitude,
                 when=timestamp,
                 )  # returns degrees by default
         solar_altitude = convert_to_radians_if_requested(
             solar_altitude,
-            input.angle_output_units,
+            angle_output_units,
             )
 
         solar_azimuth = pysolar.solar.get_azimuth(
-                latitude_deg=input.longitude,  # this comes first        # FIXME: Must return a named tuple (maybe wrap this func?)
-                longitude_deg=input.latitude,
+                latitude_deg=longitude,  # this comes first        # FIXME: Must return a named tuple (maybe wrap this func?)
+                longitude_deg=latitude,
                 when=timestamp,
                 )  # returns degrees by default
         solar_azimuth = convert_to_radians_if_requested(
             solar_azimuth,
-            input.angle_output_units,
+            angle_output_units,
             )
 
-    if input.model.value  == SolarPositionModels.pvis:
+    if model.value  == SolarPositionModels.pvis:
 
         solar_altitude = calculate_solar_altitude(
-                longitude=input.longitude,
-                latitude=input.latitude,
-                timestamp=input.timestamp,
-                timezone=input.timezone,
-                output_units=input.angle_output_units,
+                longitude=longitude,
+                latitude=latitude,
+                timestamp=timestamp,
+                timezone=timezone,
+                angle_output_units=angle_output_units,
                 )
         solar_azimuth = calculate_solar_azimuth(
-                longitude=input.longitude,
-                latitude=input.latitude,
-                timestamp=input.timestamp,
-                output_units=input.angle_output_units,
+                longitude=longitude,
+                latitude=latitude,
+                timestamp=timestamp,
+                angle_output_units=angle_output_units,
                 )
 
     # if model.value  == SolarPositionModels.pvgis:
@@ -269,7 +276,6 @@ def calculate_solar_position(
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
             solar_altitude, solar_azimuth = model_solar_position(
-                SolarPositionInput(
                     longitude=longitude,
                     latitude=latitude,
                     timestamp=timestamp,
@@ -279,7 +285,6 @@ def calculate_solar_position(
                     time_output_units=time_output_units,
                     angle_units=angle_units,
                     angle_output_units=angle_output_units,
-                )
             )
             results.append({
                 'Model': model.value,

@@ -43,15 +43,30 @@ from ...models.pyephem.solar_time import calculate_solar_time_ephem
 from ...models.pvgis.solar_time import calculate_solar_time_pvgis
 from .time_models import SolarTimeModels
 
+from pvgisprototype.api.input_models import Longitude
+from pvgisprototype.api.input_models import Latitude
 from pvgisprototype.api.input_models import SolarTimeInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
-@validate_with_pydantic(SolarTimeInput)
+@validate_with_pydantic(SolarTimeInput, expand_args=True)
 def model_solar_time(
-        input: SolarTimeInput
+        longitude: Longitude,
+        latitude: Latitude,
+        timestamp: datetime,
+        timezone: str = None,
+        model: SolarTimeModels = SolarTimeModels.skyfield,
+        refracted_solar_zenith: float = 1.5853349194640094,  # radians
+        apply_atmospheric_refraction: bool = True,
+        time_output_units: str = 'minutes',
+        angle_output_units: str = 'radians',
+        days_in_a_year: float = 365.25,
+        perigee_offset: float = 0.048869,
+        orbital_eccentricity: float = 0.03344,
+        time_offset_global: float = 0,
+        hour_offset: float = 0,
     )-> NamedTuple:
-    """Calculates the sola time and returns the calculated value and the units.
+    """Calculates the solar time and returns the calculated value and the units.
 
     Parameters
     ----------
@@ -68,65 +83,64 @@ def model_solar_time(
     #     timestamp = timezone.localize(timestamp)
 
     # debug(locals())
-    if input.model.value == SolarTimeModels.eot:
+    if model.value == SolarTimeModels.eot:
 
         solar_time = calculate_solar_time_eot(
-                input.longitude,
-                input.latitude,
-                input.timestamp,
-                input.timezone,
-                input.days_in_a_year,
-                input.perigee_offset,
-                input.eccentricity,
-                input.time_offset_global,
-                input.hour_offset,
+                longitude,
+                latitude,
+                timestamp,
+                timezone,
+                days_in_a_year,
+                perigee_offset,
+                orbital_eccentricity,
+                time_offset_global,
+                hour_offset,
                 )
 
-    if input.model.value == SolarTimeModels.ephem:
+    if model.value == SolarTimeModels.ephem:
 
         solar_time = calculate_solar_time_ephem(
-            input.longitude,
-            input.latitude,
-            input.timestamp,
-            input.timezone,
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
             )
 
-    if input.model.value == SolarTimeModels.pvgis:
+    if model.value == SolarTimeModels.pvgis:
 
         solar_time = calculate_solar_time_pvgis(
-            input.longitude,
-            input.latitude,
-            input.timestamp,
-            input.timezone,
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
             )
 
-    if input.model.value == SolarTimeModels.noaa:
+    if model.value == SolarTimeModels.noaa:
 
         solar_time = calculate_local_solar_time_noaa(
-            input.longitude,
-            input.latitude,
-            input.timestamp,
-            input.timezone,
-            input.refracted_solar_zenith,
-            input.apply_atmospheric_refraction,
-            input.time_output_units,
-            input.angle_units,
-            input.angle_output_units,
+            longitude,
+            latitude,
+            timestamp,
+            timezone,
+            refracted_solar_zenith,
+            apply_atmospheric_refraction,
+            time_output_units,
+            angle_output_units,
             # verbose,
             )
 
-    if input.model.value == SolarTimeModels.skyfield:
+    if model.value == SolarTimeModels.skyfield:
 
         # --------------------------------------------------- expects degrees!
-        longitude = convert_to_degrees_if_requested(input.longitude, 'degrees')
-        latitude = convert_to_degrees_if_requested(input.latitude, 'degrees')
+        longitude = convert_to_degrees_if_requested(longitude, 'degrees')
+        latitude = convert_to_degrees_if_requested(latitude, 'degrees')
         # expects degrees ! --------------------------------------------------
 
         solar_time = calculate_solar_time_skyfield(
             longitude,
             latitude,
-            input.timestamp,
-            input.timezone,
+            timestamp,
+            timezone,
             )
 
     return solar_time
@@ -202,22 +216,21 @@ def calculate_solar_time(
     for model in models:
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
             solar_time = model_solar_time(
-                    longitude,
-                    latitude,
-                    timestamp,
-                    timezone,
-                    model,
-                    refracted_solar_zenith,
-                    apply_atmospheric_refraction,
-                    time_output_units,
-                    angle_units,
-                    angle_output_units,
-                    days_in_a_year,
-                    perigee_offset,
-                    eccentricity,
-                    time_offset_global,
-                    hour_offset,
-                    )
+                longitude=longitude,
+                latitude=latitude,
+                timestamp=timestamp,
+                timezone=timezone,
+                model=model,
+                refracted_solar_zenith=refracted_solar_zenith,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                time_output_units=time_output_units,
+                angle_output_units=angle_output_units,
+                days_in_a_year=days_in_a_year,
+                perigee_offset=perigee_offset,
+                orbital_eccentricity=orbital_eccentricity,
+                time_offset_global=time_offset_global,
+                hour_offset=hour_offset,
+            )
             results.append({
                 'Model': model.value,
                 'Solar time': solar_time.value,
