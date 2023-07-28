@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from functools import wraps
-from typing import Callable, Type
+from typing import Callable
+from typing import Type
 
 
 # def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
@@ -53,7 +54,7 @@ def validate_with_pydantic(input_model: Type[BaseModel], expand_args: bool = Fal
                 input_data = {**kwargs, **dict(zip(func.__annotations__.keys(), args))}
                 validated_input = input_model(**input_data)
             if expand_args:
-                return func(**validated_input.dict())
+                return func(**validated_input.dict_with_namedtuple())
             else:
                 return func(validated_input)  # Pass the entire instance instead of expanding it
         return wrapper

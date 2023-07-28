@@ -15,7 +15,7 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 from ..utilities.timestamp import timestamp_to_decimal_hours
 
 
-@validate_with_pydantic(HourAngleInput)
+@validate_with_pydantic(HourAngleInput, expand_args=True)
 def calculate_hour_angle(
         solar_time: time,
         output_units: str = 'radians',
@@ -67,7 +67,7 @@ def calculate_hour_angle(
     return hour_angle
 
 
-@validate_with_pydantic(HourAngleSunriseInput)
+@validate_with_pydantic(HourAngleSunriseInput, expand_args=True)
 def calculate_hour_angle_sunrise(
         input: HourAngleSunriseInput,
     ) -> NamedTuple:

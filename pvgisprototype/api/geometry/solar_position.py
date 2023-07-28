@@ -51,7 +51,7 @@ def _parse_model(
     return model
 
 
-@validate_with_pydantic(SolarPositionInput)
+@validate_with_pydantic(SolarPositionInput, expand_args=True)
 def model_solar_position(
         input: SolarPositionInput,
     )-> Tuple[NamedTuple, NamedTuple]:

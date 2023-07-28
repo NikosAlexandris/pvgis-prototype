@@ -1,5 +1,6 @@
 import typer
 from typing import Optional
+from typing import NamedTuple
 from datetime import datetime
 from math import pi
 from math import sin
@@ -7,10 +8,12 @@ from math import asin
 from ..utilities.conversions import convert_to_degrees_if_requested
 
 from pvgisprototype.api.input_models import SolarDeclinationInput
+from pvgisprototype.api.input_models import FractionalYearInput
 from pvgisprototype.api.named_tuples import generate
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
+@validate_with_pydantic(FractionalYearInput, expand_args=True)
 def calculate_fractional_year_pvis(
         timestamp: datetime,
         days_in_a_year: float,
@@ -47,7 +50,7 @@ def calculate_fractional_year_pvis(
     return fractional_year
 
 
-@validate_with_pydantic(SolarDeclinationInput, expand_args=False)
+@validate_with_pydantic(SolarDeclinationInput, expand_args=True)
 def calculate_solar_declination(input: SolarDeclinationInput) -> float:
     """Approximate the sun's declination for a given day of the year.
 

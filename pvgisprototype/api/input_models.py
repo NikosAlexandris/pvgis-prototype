@@ -8,6 +8,14 @@ from datetime import datetime
 
 from .geometry.solar_models import SolarPositionModels
 
+class ModelToDict(BaseModel):
+    def dict_with_namedtuple(self):
+        d = {}
+        for k, v in self:
+            d[k] = v
+        return d
+
+
 class BaseTimestampInputModel(BaseModel):
     timestamp: datetime
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -106,6 +114,7 @@ class BaseCoordinatesInputModel(Longitude, Latitude):
 
 
 class SolarAltitudeInput(
+    ModelToDict,
     BaseCoordinatesInputModel,
     BaseTimeInputModel,
     BaseAngleOutputUnitsModel,
@@ -125,6 +134,7 @@ class EarthOrbitInputModel(BaseModel):
 
 
 class SolarDeclinationInput(
+        ModelToDict,
         # timestamp: Annotated[Optional[datetime], typer.Argument(
         #     help='Timestamp',
         #     default_factory=now_utc_datetimezone)],
@@ -180,6 +190,7 @@ class SolarDeclinationModel(BaseModel):
     )
 
 class HourAngleInput(
+        ModelToDict,
         SolarTimeModel,
         # solar_time: Annotated[float, typer.Argument(
         #     help='The solar time in decimal hours on a 24 hour base',
@@ -196,6 +207,7 @@ class HourAngleInput(
 
 
 class HourAngleSunriseInput(
+        ModelToDict,
         # latitude: Annotated[Optional[float], typer.Argument(
         #     min=-90, max=90)],
         Latitude,
@@ -217,6 +229,7 @@ class HourAngleSunriseInput(
 
 
 class SolarPositionInput(
+    ModelToDict,
     BaseCoordinatesInputModel,
     # timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
     #     help='Timestamp',
@@ -263,6 +276,7 @@ class SolarPositionInput(
     pass
 
 class SolarTimeInput(
+    ModelToDict,
     BaseCoordinatesInputModel,
     # timestamp: Annotated[Optional[datetime], typer.Argument(
     #     help='Timestamp',

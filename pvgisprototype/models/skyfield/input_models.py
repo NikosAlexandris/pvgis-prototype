@@ -7,6 +7,14 @@ from pydantic import confloat
 from typing import Optional
 from zoneinfo import ZoneInfo
 
+class ModelToDict(BaseModel):
+    def dict_with_namedtuple(self):
+        d = {}
+        for k, v in self:
+            d[k] = v
+        return d
+
+
 
 class BaseTimestampInputModel(BaseModel):
     timestamp: datetime
@@ -27,6 +35,7 @@ class BaseTimeInputModel(BaseTimestampInputModel):
 
 class Longitude(BaseModel):
     longitude: confloat(ge=-180, le=180)
+    ModelToDict,
 
 
 class Latitude(BaseModel):

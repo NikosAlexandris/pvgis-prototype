@@ -20,7 +20,7 @@ from ..utilities.timestamp import timestamp_to_decimal_hours
 from ..utilities.conversions import convert_to_degrees_if_requested
 
 
-@validate_with_pydantic(SolarAzimuthInput)
+@validate_with_pydantic(SolarAzimuthInput, expand_args=True)
 def calculate_solar_azimuth(input: SolarAzimuthInput) -> NamedTuple:
     """Compute various solar geometry variables.
 

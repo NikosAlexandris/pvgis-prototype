@@ -28,7 +28,7 @@ from pvgisprototype.api.named_tuples import generate
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
-@validate_with_pydantic(SolarAltitudeInput)
+@validate_with_pydantic(SolarAltitudeInput, expand_args=True)
 def calculate_solar_altitude(input: SolarAltitudeInput) -> NamedTuple:
     """Compute various solar geometry variables.
     Parameters
