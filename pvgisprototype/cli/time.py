@@ -130,7 +130,7 @@ def solar_time(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
+        orbital_eccentricity: Annotated[float, typer.Option(
             help='Eccentricity')] = 0.01672,
         time_offset_global: Annotated[float, typer.Option(
             help='Global time offset')] = 0,
@@ -178,7 +178,7 @@ def solar_time(
             angle_output_units,
             days_in_a_year,
             perigee_offset,
-            eccentricity,
+            orbital_eccentricity,
             time_offset_global,
             hour_offset,
             )

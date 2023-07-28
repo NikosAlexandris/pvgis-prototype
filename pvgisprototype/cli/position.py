@@ -556,7 +556,7 @@ def azimuth(
             callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: float = 365.25,
         perigee_offset: float = 0.048869,
-        eccentricity: float = 0.01672,
+        orbital_eccentricity: float = 0.01672,
         hour_offset: float = 0,
         model: Annotated[List[SolarPositionModels], typer.Option(
             '-m',

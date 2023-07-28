@@ -319,7 +319,7 @@ def calculate_direct_horizontal_irradiance(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
+        orbital_eccentricity: Annotated[float, typer.Option(
             help='Eccentricity')] = 0.01672,
         time_offset_global: Annotated[float, typer.Option(
             help='Global time offset')] = 0,
@@ -352,7 +352,7 @@ def calculate_direct_horizontal_irradiance(
             timestamp=timestamp,
             timezone=timezone,
             days_in_a_year=days_in_a_year,
-            orbital_eccentricity=eccentricity,
+            orbital_eccentricity=orbital_eccentricity,
             perigee_offset=perigee_offset,
             angle_output_units=angle_output_units,
             )
@@ -372,7 +372,7 @@ def calculate_direct_horizontal_irradiance(
             model=solar_time_model,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
+            orbital_eccentricity=orbital_eccentricity,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset
     )
@@ -455,7 +455,7 @@ def calculate_direct_inclined_irradiance_pvgis(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
+        orbital_eccentricity: Annotated[float, typer.Option(
             help='Eccentricity')] = 0.01672,
         time_offset_global: Annotated[float, typer.Option(
             help='Global time offset')] = 0,
@@ -552,7 +552,7 @@ def calculate_direct_inclined_irradiance_pvgis(
             timestamp=timestamp,
             timezone=timezone,
             days_in_a_year=days_in_a_year,
-            orbital_eccentricity=eccentricity,
+            orbital_eccentricity=orbital_eccentricity,
             perigee_offset=perigee_offset,
             angle_output_units=angle_output_units,
             )
@@ -570,7 +570,7 @@ def calculate_direct_inclined_irradiance_pvgis(
             model=solar_time_model,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
+            orbital_eccentricity=orbital_eccentricity,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset
     )

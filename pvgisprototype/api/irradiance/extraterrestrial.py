@@ -29,7 +29,7 @@ def calculate_extraterrestrial_irradiance(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
+        orbital_eccentricity: Annotated[float, typer.Option(
             help='Eccentricity')] = 0.01672,
         random_day: Annotated[bool, typer.Option(
             '-r',
@@ -109,7 +109,7 @@ def calculate_extraterrestrial_irradiance(
         day_of_year = random_day_of_year(int(days_in_a_year))
     # ------------------------------------------------------------------------
     position_of_earth = 2 * math.pi * day_of_year / days_in_a_year
-    distance_correction_factor = 1 + eccentricity * math.cos(position_of_earth - perigee_offset)
+    distance_correction_factor = 1 + orbital_eccentricity * math.cos(position_of_earth - perigee_offset)
     extraterrestial_irradiance = solar_constant * distance_correction_factor
 
     # typer.echo(f'Extraterrestrial irradiance: {extraterrestial_irradiance}')

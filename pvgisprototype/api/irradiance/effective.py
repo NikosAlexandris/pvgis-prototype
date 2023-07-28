@@ -161,7 +161,7 @@ def calculate_effective_irradiance(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
+        orbital_eccentricity: Annotated[float, typer.Option(
             help='Eccentricity')] = 0.01672,
         time_offset_global: Annotated[float, typer.Option(
             help='Global time offset')] = 0,

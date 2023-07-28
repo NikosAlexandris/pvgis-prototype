@@ -22,7 +22,7 @@ async def get_calculate_solar_time(
     angle_output_units: Optional[str] = 'radians',
     days_in_a_year: float = Query(365.25, description="Days in a year"),
     perigee_offset: float = Query(0.048869, description="Perigee offset"),
-    eccentricity: float = Query(0.01672, description="Eccentricity"),
+    orbital_eccentricity: float = Query(0.01672, description="Eccentricity"),
     time_offset_global: float = Query(0, description="Global time offset"),
     hour_offset: float = Query(0, description="Hour offset"),
 ):
@@ -51,7 +51,7 @@ async def get_calculate_solar_time(
             angle_output_units,
             days_in_a_year,
             perigee_offset,
-            eccentricity,
+            orbital_eccentricity,
             time_offset_global,
             hour_offset,
             )
