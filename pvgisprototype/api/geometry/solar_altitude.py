@@ -57,7 +57,7 @@ def calculate_solar_altitude(
         The timezone to use for the calculation. 
         If not provided, the system's local timezone will be used.
     
-    output_units : str, default 'radians'
+    angle_output_units : str, default 'radians'
         The units to use for the output solar geometry variables. 
         This should be either 'degrees' or 'radians'.
 

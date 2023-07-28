@@ -395,15 +395,14 @@ def altitude(
             model for model in SolarPositionModels if model != SolarPositionModels.all
         ]
     solar_position = calculate_solar_position(
-        longitude,
-        latitude,
-        timestamp,
-        timezone,
-        model,
-        apply_atmospheric_refraction,
-        time_output_units,
-        angle_units,
-        angle_output_units,
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        models=model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        time_output_units=time_output_units,
+        angle_output_units=angle_output_units,
     )
     print_solar_position_table(
         longitude,
@@ -959,16 +958,16 @@ def incidence_jenco(
     angle of incidence is 0°.
     """
     effective_solar_incidence_angle = calculate_effective_solar_incidence_angle(
-        longitude,
-        latitude,
-        hour_angle,
-        surface_tilt,
-        surface_orientation,
-        solar_azimuth,
-        solar_altitude,
-        shadow_indicator,
-        horizon_heights,
-        horizon_interval,
+        longitude=longitude,
+        latitude=latitude,
+        hour_angle=hour_angle,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        solar_azimuth=solar_azimuth,
+        solar_altitude=solar_altitude,
+        shadow_indicator=shadow_indicator,
+        horizon_heights=horizon_heights,
+        horizon_interval=horizon_interval,
     )
 
     return effective_solar_incidence_angle
@@ -1001,10 +1000,8 @@ def hour_angle(
     #
 
     hour_angle = calculate_hour_angle(
-        HourAngleInput(
-            solar_time=solar_time,
-            angle_output_units=output_units,
-        )
+        solar_time=solar_time,
+        angle_output_units=output_units,
     )
     typer.echo(f'Hour angle: {hour_angle.value} {hour_angle.unit}')              # FIXME: typer ?!
 

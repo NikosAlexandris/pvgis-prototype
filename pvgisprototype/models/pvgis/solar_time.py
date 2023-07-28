@@ -13,8 +13,11 @@ from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.image_offset_prototype import get_image_offset
 from pvgisprototype.api.named_tuples import generate
+from pvgisprototype.api.input_models import SolarTimeInput
+from pvgisprototype.api.decorators import validate_with_pydantic
 
 
+@validate_with_pydantic(SolarTimeInput)
 def calculate_solar_time_pvgis(
         longitude: Annotated[float, typer.Argument(
             callback=convert_to_radians,
@@ -31,7 +34,7 @@ def calculate_solar_time_pvgis(
         days_in_a_year: float = 365.25,
         perigee_offset: float = 0.048869,
         orbital_eccentricity: float = 0.165,  # from the C code
-        time_slot_offset_global: float = 0,
+        time_offset_global: float = 0,
 ) -> NamedTuple:
     """Calculate the solar time.
 
@@ -74,7 +77,7 @@ def calculate_solar_time_pvgis(
     image_offset = get_image_offset(longitude, latitude)  # for `hour_offset`
 
     # adding longitude to UTC produces mean solar time!
-    hour_offset = time_slot_offset_global + longitude / 15 + image_offset  # for `solar_time`
+    hour_offset = time_offset_global + longitude / 15 + image_offset  # for `solar_time`
     time_correction_factor_hours = hour_of_day + time_offset + hour_offset
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     

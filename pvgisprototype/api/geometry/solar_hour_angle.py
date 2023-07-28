@@ -4,6 +4,7 @@ from typing import Optional
 from typing import NamedTuple
 from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_degrees_if_requested
+from datetime import time
 from math import pi
 from math import acos
 from math import tan
@@ -18,8 +19,8 @@ from ..utilities.timestamp import timestamp_to_decimal_hours
 
 @validate_with_pydantic(HourAngleInput, expand_args=True)
 def calculate_hour_angle(
-        solar_time: time,
-        output_units: str = 'radians',
+            solar_time: time,
+            angle_output_units: str = 'radians',
         ) -> NamedTuple:
     """Calculate the hour angle ω'
 

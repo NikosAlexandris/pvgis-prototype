@@ -15,10 +15,11 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 
 @validate_with_pydantic(FractionalYearInput, expand_args=True)
 def calculate_fractional_year_pvis(
-        timestamp: datetime,
-        days_in_a_year: float,
-        angle_output_units: Optional[str] = "radians",
-        ) -> float:
+            timestamp: datetime,
+            days_in_a_year: float = 365.25,
+            angle_units: str = 'radians',
+            angle_output_units: str = 'radians',
+        ) -> NamedTuple:
     """Calculate fractional year in radians
 
     Notes

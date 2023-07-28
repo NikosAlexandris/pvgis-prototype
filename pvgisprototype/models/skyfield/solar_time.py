@@ -20,6 +20,8 @@ from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.named_tuples import generate
 from .input_models import CalculateTrueSolarTimeSkyfieldInputModel
+from .input_models import Latitude
+from .input_models import Longitude
 from .decorators import validate_with_pydantic
 
 
@@ -98,14 +100,14 @@ from .decorators import validate_with_pydantic
 #     return local_solar_time
 
 
-@validate_with_pydantic(CalculateTrueSolarTimeSkyfieldInputModel)
+@validate_with_pydantic(CalculateTrueSolarTimeSkyfieldInputModel, expand_args=True)
 def calculate_solar_time_skyfield(
-        longitude: float,
-        latitude: float,
+        longitude: Longitude,
+        latitude: Latitude,
         timestamp: datetime,
-        timezone: str,
+        timezone: str = None,
         verbose: bool = False,
-        ) -> NamedTuple:
+    ) -> NamedTuple:
 
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -124,7 +126,7 @@ def calculate_solar_time_skyfield(
     ephemeris = load('de421.bsp')
     sun = ephemeris['Sun']
     # location = wgs84.latlon(latitude * N, longitude * W) ? ----------------
-    location = wgs84.latlon(latitude * N, longitude * E)
+    location = wgs84.latlon(latitude.value * N, longitude.value * E)
     f = almanac.meridian_transits(ephemeris, sun, location)
     times, events = almanac.find_discrete(midnight_time, next_midnight_time, f)
     

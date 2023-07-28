@@ -2,30 +2,38 @@ from devtools import debug
 import typer
 from typing import Annotated
 from typing import Optional
+from typing import NamedTuple
 from datetime import datetime
 from datetime import timezone
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
 from pvgisprototype.api.named_tuples import generate
+from pvgisprototype.api.input_models import SolarDeclinationInput
+from pvgisprototype.api.decorators import validate_with_pydantic
 
+
+@validate_with_pydantic(SolarDeclinationInput)
 def calculate_solar_declination_pvgis(
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
+        timestamp: datetime,
+        # : Annotated[Optional[datetime], typer.Argument(
+        #     help='Timestamp',
+        #     default_factory=now_utc_datetimezone)],
+        timezone: str = None,
+        # : Annotated[Optional[str], typer.Option(
+        #     help='Timezone',
+        #     callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: float = 365.25,
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
-        output_units: Annotated[str, typer.Option(
-            '-o',
-            '--output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar declination (degrees or radians)")] = 'radians',
-        ) -> float:
+        output_units: str = 'radians',
+        # : Annotated[str, typer.Option(
+        #     '-o',
+        #     '--output-units',
+        #     show_default=True,
+        #     case_sensitive=False,
+        #     help="Output units for solar declination (degrees or radians)")] = 'radians',
+        ) -> NamedTuple:
     """Approximate the sun's declination for a given day of the year.
 
     This function is a 1:1 transfer of the solar declination calculation

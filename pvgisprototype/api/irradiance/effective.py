@@ -292,8 +292,7 @@ def calculate_effective_irradiance(
     """
 
     in_shade = is_surface_in_shade()
-    solar_altitude, _ = calculate_solar_altitude(
-        SolarAltitudeInput(
+    solar_altitude = calculate_solar_altitude(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,

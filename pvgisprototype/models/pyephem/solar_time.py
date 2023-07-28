@@ -8,22 +8,32 @@ from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.named_tuples import generate
+from pvgisprototype.api.input_models import SolarTimeInput
+from pvgisprototype.api.input_models import Latitude
+from pvgisprototype.api.input_models import Longitude
+from pvgisprototype.api.decorators import validate_with_pydantic
 import ephem
 from math import pi
 
+
+@validate_with_pydantic(SolarTimeInput)
 def calculate_solar_time_ephem(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
+        longitude: Longitude,
+        # : Annotated[float, typer.Argument(
+        #     callback=convert_to_radians,
+        #     min=-180, max=180)],
+        latitude: Latitude,
+        # : Annotated[float, typer.Argument(
+        #     callback=convert_to_radians,
+        #     min=-90, max=90)],
+        timestamp: datetime,
+        # : Annotated[Optional[datetime], typer.Argument(
+            # help='Timestamp',
+            # # default_factory=now_utc_datetimezone)],
+        timezone: str = None,
+        # # # : Annotated[Optional[str], typer.Option(
+            # # help='Timezone',
+            # # callback=ctx_convert_to_timezone)] = None,
         verbose: bool = False,
         )-> NamedTuple:
     """Calculate the solar time using PyEphem
@@ -142,7 +152,7 @@ def calculate_solar_time_ephem(
         typer.echo(f'Sun right ascension: {sun.ra}')
         typer.echo(f'Hour angle: {hour_angle}')
         typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
-        typer.echo(f'Mean solar time: {solar_time}')
+        # typer.echo(f'Mean solar time: {solar_time}')
 
     solar_time_datetime = generate(
         'solar_time',

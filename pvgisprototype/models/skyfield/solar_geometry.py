@@ -18,27 +18,33 @@ from ...api.utilities.timestamp import convert_to_timezone
 from typing import Tuple
 from typing import NamedTuple
 from pvgisprototype.api.named_tuples import generate
+from .input_models import SolarPositionInput
+from .input_models import SolarAltitudeInput
+from .input_models import HourAngleInput
+from .input_models import Latitude
+from .input_models import Longitude
+from .decorators import validate_with_pydantic
 
 
+@validate_with_pydantic(SolarPositionInput, expand_args=True)
 def calculate_solar_position_skyfield(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        latitude: Annotated[Optional[float], typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=convert_to_timezone)] = None,
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        longitude: Longitude,
+        latitude: Latitude,
+        timestamp: datetime,
+        # : Annotated[Optional[datetime], typer.Argument(
+        #     help='Timestamp',
+        #     default_factory=now_utc_datetimezone)],
+        timezone: str = None,
+        # : Annotated[Optional[str], typer.Option(
+        #     help='Timezone',
+        #     callback=convert_to_timezone)] = None,
+        angle_output_units: str = 'radians',
+        # : Annotated[str, typer.Option(
+        #     '-u',
+        #     '--units',
+        #     show_default=True,
+        #     case_sensitive=False,
+        #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
         ) -> NamedTuple:
     """Calculate sun position
 
@@ -84,7 +90,7 @@ def calculate_solar_position_skyfield(
     earth = ephemeris['Earth']
     N = skyfield.api.N
     W = skyfield.api.W
-    location = skyfield.api.wgs84.latlon(latitude * N, longitude * W)  # W or E ?
+    location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value * W)  # W or E ?
 
     # the sun position as seen from the observer
     timescale = skyfield.api.load.timescale()
@@ -99,25 +105,25 @@ def calculate_solar_position_skyfield(
     return solar_position
 
 
+@validate_with_pydantic(SolarAltitudeInput, expand_args=True)
 def calculate_solar_altitude_azimuth_skyfield(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        latitude: Annotated[Optional[float], typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=convert_to_timezone)] = None,
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        longitude: Longitude,
+        latitude: Latitude,
+        timestamp: datetime,
+        # : Annotated[Optional[datetime], typer.Argument(
+        #     help='Timestamp',
+        #     default_factory=now_utc_datetimezone)],
+        timezone: str = None,
+        # : Annotated[Optional[str], typer.Option(
+        #     help='Timezone',
+        #     callback=convert_to_timezone)] = None,
+        angle_output_units: str = 'radians',
+        # : Annotated[str, typer.Option(
+        #     '-u',
+        #     '--units',
+        #     show_default=True,
+        #     case_sensitive=False,
+        #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
         ) -> Tuple[NamedTuple, NamedTuple]:
     """Calculate sun position
 
@@ -152,11 +158,11 @@ def calculate_solar_altitude_azimuth_skyfield(
     - https://rhodesmill.org/skyfield/time.html#utc-and-leap-seconds
     """
     solar_position = calculate_solar_position_skyfield(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            output_units,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            angle_output_units=angle_output_units,
             )
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.value.altaz()       # TODO: Must be tested
 
@@ -182,25 +188,31 @@ def calculate_solar_altitude_azimuth_skyfield(
     return solar_altitude, solar_azimuth   # distance_to_sun
 
 
+@validate_with_pydantic(HourAngleInput)
 def calculate_hour_angle_skyfield(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        latitude: Annotated[Optional[float], typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=convert_to_timezone)] = None,
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        longitude: Longitude,
+        # : Annotated[float, typer.Argument(
+        #     callback=convert_to_radians,
+        #     min=-90, max=90)],
+        latitude: Latitude,
+        # : Annotated[Optional[float], typer.Argument(
+        #     callback=convert_to_radians,
+        #     min=-90, max=90)],
+        timestamp: datetime,
+        # : Annotated[Optional[datetime], typer.Argument(
+        #     help='Timestamp',
+        #     default_factory=now_utc_datetimezone)],
+        timezone: str = None,
+        # : Annotated[Optional[str], typer.Option(
+        #     help='Timezone',
+        #     callback=convert_to_timezone)] = None,
+        angle_output_units: str = 'radians',
+        # : Annotated[str, typer.Option(
+        #     '-u',
+        #     '--units',
+        #     show_default=True,
+        #     case_sensitive=False,
+        #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
         ) -> float:
     """Calculate the hour angle ω'
 

@@ -13,24 +13,24 @@ from ...api.geometry.solar_declination import calculate_solar_declination
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import ctx_attach_requested_timezone
+from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.api.input_models import RelativeLongitudeInput
+from pvgisprototype.api.input_models import SolarIncidenceInput
+from pvgisprototype.api.input_models import Longitude
+from pvgisprototype.api.input_models import Latitude
+from pvgisprototype.api.named_tuples import generate
 
 
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 
-app = typer.Typer(
-    add_completion=True,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f":triangular_ruler:  Calculate effective solar incidence angle (Jenco, 1992)",
-)
-
-
+@validate_with_pydantic(RelativeLongitudeInput, expand_args=True)
 def calculate_relative_longitude(
-        latitude: float,
-        surface_tilt: float,
-        surface_orientation: float,
-        ) -> float:
+        latitude: Latitude,
+        surface_tilt: float = 0,
+        surface_orientation: float = 0,
+        angle_output_units: str = 'radians',
+    ) -> float:
     """
     """
     # tangent_relative_longitude = -(
@@ -62,61 +62,30 @@ def calculate_relative_longitude(
         tangent_relative_longitude_denominator
     )
 
-    return atan(tangent_relative_longitude)
+    relative_longitude = generate(
+        'relative_longitude',
+        (atan(tangent_relative_longitude), angle_output_units)
+    )
+    return relative_longitude
 
 
+@validate_with_pydantic(SolarIncidenceInput, expand_args=True)
 def calculate_solar_incidence_jenco(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone,
-            callback=ctx_attach_requested_timezone,
-            )],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
-            callback=ctx_convert_to_timezone)] = None,
-        random_time: Annotated[bool, typer.Option(
-            '-r',
-            '--random',
-            '--random-time',
-            help="Generate a random date, time and timezone to demonstrate calculation")] = False,
-        hour_angle: Annotated[float, typer.Argument(
-            help="Solar hour angle in radians")] = None,
-        surface_tilt: Annotated[float, typer.Argument(
-            help="Tilt of the surface in degrees")] = None,
-        surface_orientation: Annotated[float, typer.Argument(
-            help="Orientation of the surface (azimuth angle in degrees)")] = None,
+        longitude: Longitude,
+        latitude: Latitude,
+        timestamp: datetime,
+        timezone: str = None,
+        random_time: bool = False,
+        hour_angle: float = None,
+        surface_tilt: float = None,
+        surface_orientation: float = None,
         days_in_a_year: float = 365.25,
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
-        time_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--time-output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
-        angle_units: Annotated[str, typer.Option(
-            '-u',
-            '--angle-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
-        angle_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--angle-output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for solar position calculations output (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
-        rounding_places: Annotated[Optional[int], typer.Option(
-            '-r',
-            '--rounding-places',
-            show_default=True,
-            help='Number of places to round results to.')] = 5,
+        time_output_units: str = 'minutes',
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians',
+        rounding_places: int = 5,
         verbose: bool = False,
     ) -> float:
     """Calculate the solar incidence based on sun's position and surface geometry.
@@ -190,6 +159,7 @@ def calculate_solar_incidence_jenco(
     return solar_incidence
 
 
+# @validate_with_pydantic()
 def interpolate_horizon_height(
         solar_azimuth: Annotated[float, typer.Argument(..., help="The azimuth angle of the sun.")],
         horizon_heights: Annotated[List[float], typer.Argument(..., help="List of horizon height values.")],

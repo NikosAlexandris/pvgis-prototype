@@ -8,33 +8,27 @@ from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.named_tuples import generate
+from pvgisprototype.api.input_models import Longitude
+from pvgisprototype.api.input_models import Latitude
+from pvgisprototype.api.input_models import SolarTimeInput
+from pvgisprototype.api.decorators import validate_with_pydantic
 from math import radians
 from math import sin
 from math import cos
 import numpy as np
 
 
+@validate_with_pydantic(SolarTimeInput, expand_args=True)
 def calculate_solar_time_eot(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians, min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians, min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
-        days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year')] = 365.25,
-        perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
-            help='Eccentricity')] = 0.01672,
-        time_offset_global: Annotated[float, typer.Option(
-            help='Global time offset')] = 0,
-        hour_offset: Annotated[float, typer.Option(
-            help='Hour offset')] = 0,
+        longitude: Longitude,
+        latitude: Latitude,
+        timestamp: datetime,
+        timezone: str = None,
+        days_in_a_year: float = 365.25,
+        perigee_offset: float = 0.048869,
+        orbital_eccentricity: float = 0.03344,
+        time_offset_global: float = 0,
+        hour_offset: float = 0,
 )-> NamedTuple:
     """Calculate the solar time.
 

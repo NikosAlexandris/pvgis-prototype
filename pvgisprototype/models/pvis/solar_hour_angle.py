@@ -4,18 +4,25 @@ from typing import Optional
 from typing import NamedTuple
 from ...utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.named_tuples import generate
+from pvgisprototype.api.input_models import HourAngleInput
+from pvgisprototype.api.input_models import HourAngleSunriseInput
+from pvgisprototype.api.input_models import Latitude
+from pvgisprototype.api.decorators import validate_with_pydantic
 
 
+@validate_with_pydantic(HourAngleInput)
 def calculate_hour_angle(
-        solar_time: Annotated[float, typer.Argument(
-            help='The solar time in decimal hours on a 24 hour base',
-            callback=convert_hours_to_seconds)],
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        solar_time: float,
+        # : Annotated[float, typer.Argument(
+        #     help='The solar time in decimal hours on a 24 hour base',
+        #     callback=convert_hours_to_seconds)],
+        angle_output_units: str = 'radians',
+        # : Annotated[str, typer.Option(
+        #     '-u',
+        #     '--units',
+        #     show_default=True,
+        #     case_sensitive=False,
+        #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
         )-> NamedTuple:
     """Calculate the hour angle ω'
 
@@ -48,19 +55,24 @@ def calculate_hour_angle(
     return hour_angle
 
 
+@validate_with_pydantic(HourAngleSunriseInput)
 def calculate_hour_angle_sunrise(
-        latitude: Annotated[Optional[float], typer.Argument(
-            min=-90, max=90)],
-        surface_tilt: Annotated[Optional[float], typer.Argument(
-            min=0, max=90)] = 0,
-        solar_declination: Annotated[Optional[float], typer.Argument(
-            min=-90, max=90)] = 180,
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+        latitude: Latitude,
+        # : Annotated[Optional[float], typer.Argument(
+        #     min=-90, max=90)],
+        surface_tilt: float = 0,
+        # : Annotated[Optional[float], typer.Argument(
+        #     min=0, max=90)] = 0,
+        solar_declination: float = 180,
+        # : Annotated[Optional[float], typer.Argument(
+        #     min=-90, max=90)] = 180,
+        output_units: str = 'radians',
+        # : Annotated[str, typer.Option(
+        #     '-u',
+        #     '--units',
+        #     show_default=True,
+        #     case_sensitive=False,
+        #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
         ) -> NamedTuple:
     """Calculate the hour angle (ω) at sunrise and sunset
 

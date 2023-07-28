@@ -30,13 +30,6 @@ from ...api.utilities.timestamp import now_utc_datetimezone
 from .solar_time import calculate_solar_time_pvgis
 
 
-app = typer.Typer(
-    add_completion=False,
-    add_help_option=True,
-    help=f"Calculate solar geometry parameters for a day in a year",
-)
-
-
 # from : rsun_base.cpp
 # function : com_par_const()
 def calculate_solar_geometry_pvgis_constants(
@@ -125,7 +118,6 @@ def parse_solar_geometry_constants_class(dict):
 # REDESIGN-ME -----------------------------------------------------------------
 # from: rsun_base.cpp
 # function : com_par()
-@app.callback(invoke_without_command=True)
 def calculate_solar_geometry_pvgis_variables(
         # solar_geometry_day_constants: SolarGeometryDayConstants,
         solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],

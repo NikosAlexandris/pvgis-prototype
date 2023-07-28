@@ -33,7 +33,13 @@ def plot_solar_time(longitude, latitude, location, timezone, model):
 
     for model in models:
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
-            solar_time, unit = model_solar_time(longitude, latitude, timestamp, timezone, model)
+            solar_time, unit = model_solar_time(
+                longitude,
+                latitude,
+                timestamp,
+                timezone,
+                model,
+            )
             radii.append(solar_time)
             labels.append(model.name)
 
@@ -225,7 +231,13 @@ def plot_solar_time_one_year_bokeh(
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
             model_results = []
             for timestamp in timestamps:
-                solar_time, unit = model_solar_time(longitude, latitude, timestamp, timezone, SolarTimeModels(model))
+                solar_time, unit = model_solar_time(
+                    longitude,
+                    latitude,
+                    timestamp,
+                    timezone,
+                    SolarTimeModels(model),
+                )
                 model_results.append(solar_time)
             results[model.value] = model_results
 
