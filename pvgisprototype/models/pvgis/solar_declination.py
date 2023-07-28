@@ -56,7 +56,7 @@ def calculate_solar_declination_pvgis(
         )
     
     solar_declination = generate(
-        type(solar_declination).__name__.upper(),
+        type(solar_declination).__name__,
         (- solar_declination.value, solar_declination.units),
     )
 

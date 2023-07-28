@@ -145,8 +145,8 @@ def calculate_solar_time_ephem(
         typer.echo(f'Mean solar time: {solar_time}')
 
     solar_time_datetime = generate(
-        'solar_time'.upper(),
-        (solar_time_datetime, 'decimal hours'),         # FIXME: Are untis correct?
+        'solar_time',
+        (solar_time_datetime, 'datetime'),         # FIXME: Remove units !!
     )
 
     # debug(locals())

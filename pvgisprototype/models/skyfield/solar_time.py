@@ -155,7 +155,7 @@ def calculate_solar_time_skyfield(
     typer.echo(f'Local solar time: {local_solar_time}')
 
     local_solar_time = generate(
-        'solar_time'.upper(),
+        'solar_time',
         (local_solar_time, 'decimal hours'),
     )
     return local_solar_time 

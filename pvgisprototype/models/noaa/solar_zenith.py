@@ -142,7 +142,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
 
     solar_zenith = generate(
-        'solar_zenith'.upper(),
+        'solar_zenith',
         (solar_zenith, angle_output_units),
     )
     return solar_zenith
@@ -169,7 +169,7 @@ def calculate_solar_zenith_noaa(
     ) * cos(solar_hour_angle)
 
     solar_zenith = generate(
-        'solar_zenith'.upper(),
+        'solar_zenith',
         (acos(cosine_solar_zenith), angle_output_units)
     )
 

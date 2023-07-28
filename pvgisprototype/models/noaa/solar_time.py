@@ -59,7 +59,7 @@ def calculate_true_solar_time_noaa(
             tzinfo=timestamp.tzinfo,
             )
     true_solar_time = generate(
-        'true_solar_time'.upper(),
+        'true_solar_time',
         (true_solar_time, time_output_units),
     )
     return true_solar_time

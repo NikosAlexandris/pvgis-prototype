@@ -110,8 +110,5 @@ def calculate_solar_time_eot(
     hour_angle = 15 * (solar_time_decimal_hours - 12)
     # ------------------------------------------------------------------------
     
-    solar_time = generate(
-        'solar_time'.upper(),
-        (solar_time, 'decimal hours'),
-    )
+    solar_time = generate('solar_time', (solar_time, 'decimal hours'))
     return solar_time

@@ -33,7 +33,7 @@ def calculate_solar_declination_noaa(
         )
 
         declination = generate(
-                'declination'.upper(),
+                'solar_declination',
                 (declination, angle_output_units),
         )
         return declination

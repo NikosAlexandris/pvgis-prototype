@@ -78,9 +78,6 @@ def calculate_solar_time_pvgis(
     time_correction_factor_hours = hour_of_day + time_offset + hour_offset
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     
-    solar_time = generate(
-        'solar_time'.upper(),
-        (solar_time, 'decimal hours'),
-    )
+    solar_time = generate('solar_time', (solar_time, 'decimal hours'))
     # debug(locals())
     return solar_time

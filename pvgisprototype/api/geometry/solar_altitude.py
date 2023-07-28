@@ -81,14 +81,11 @@ def calculate_solar_altitude(input: SolarAltitudeInput) -> NamedTuple:
     )
     sine_solar_altitude = C31 * math.cos(hour_angle) + C33
     solar_altitude = np.arcsin(sine_solar_altitude)
-    solar_altitude = generate(
-        'solar_altitude'.upper(),
-        (solar_altitude, input.output_units),
-    )
     solar_altitude = convert_to_degrees_if_requested(
             solar_altitude,
             input.output_units,
             )
 
+    solar_altitude = generate('solar_altitude', (solar_altitude, angle_output_units))
     debug(locals())
     return solar_altitude

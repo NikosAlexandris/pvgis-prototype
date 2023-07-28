@@ -55,10 +55,7 @@ def calculate_solar_azimuth(input: SolarAzimuthInput) -> NamedTuple:
     pow((C22 * sin(hour_angle.value)), 2) + pow((C11 * cos(hour_angle.value) + C13), 2), 0.5
 )
     solar_azimuth = acos(cosine_solar_azimuth)
-    solar_azimuth = generate(
-        'solar_azimuth'.upper(),
-        (solar_azimuth, input.output_units),
-    )
+    solar_azimuth = generate('solar_azimuth', (solar_azimuth, angle_output_units))
     solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, input.output_units)
 
     return solar_azimuth

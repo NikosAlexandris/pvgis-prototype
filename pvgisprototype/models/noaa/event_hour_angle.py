@@ -73,10 +73,7 @@ def calculate_event_hour_angle_noaa(
     ) - tan(latitude) * tan(solar_declination.value)
     event_hour_angle = acos(cosine_event_hour_angle)  # radians
 
-    event_hour = generate(
-        'event_time'.upper(),
-        (event_hour_angle, angle_output_units),
-    )
+    event_hour = generate('event_time', (event_hour_angle, angle_output_units))
 
     # # ------------------------------------------------------------------------
     # if angle_output_units == 'degrees':  # is this ever needed?

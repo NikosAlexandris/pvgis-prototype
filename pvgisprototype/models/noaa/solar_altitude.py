@@ -44,8 +44,5 @@ def calculate_solar_altitude_noaa(
     if not isfinite(solar_altitude) or not -pi/2 <= solar_altitude <= pi/2:
         raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
 
-    solar_altitude = generate(
-        'solar_altitude'.upper(),
-        (solar_altitude, angle_output_units),
-    )
+    solar_altitude = generate('solar_altitude', (solar_altitude, angle_output_units))
     return solar_altitude

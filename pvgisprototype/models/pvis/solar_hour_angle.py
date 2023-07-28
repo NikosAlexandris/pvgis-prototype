@@ -40,10 +40,7 @@ def calculate_hour_angle(
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
     hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
-    hour_angle = generate(
-        'hour_angle'.upper(),
-        (hour_angle, output_units),
-    )
+    hour_angle = generate('hour_angle', (hour_angle, output_units))
     # hour_angle = convert_to_degrees_if_requested(
     #         hour_angle,
     #         output_units,
@@ -104,7 +101,7 @@ def calculate_hour_angle_sunrise(
             *tan(solar_declination)
             )
     hour_angle_sunrise = generate(
-        'hour_angle_sunrise'.upper(),
+        'hour_angle_sunrise',
         (hour_angle_sunrise_value, output_units),
     )
     hour_angle_sunrise = convert_to_degrees_if_requested(

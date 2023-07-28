@@ -122,10 +122,7 @@ def calculate_event_time_noaa(
     event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(minutes=event_time)
     event_datetime_utc = attach_requested_timezone(event_datetime)  # assign UTC
 
-    event_time = generate(
-        'event_time'.upper(),
-        (event_datetime_utc, time_output_units),
-    )
+    event_time = generate('event_time',(event_datetime_utc, time_output_units))
 
     debug(locals())
     return event_time

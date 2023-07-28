@@ -92,8 +92,8 @@ def calculate_solar_position_skyfield(
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
 
     solar_position = generate(
-        'solar_position'.upper(),
-        (solar_position, output_units),                   # NOTE: Is this unit correct? It is not used anywhere
+        'solar_position',
+        (solar_position, angle_output_units),                   # NOTE: Is this unit correct? It is not used anywhere
     )
     debug(locals())
     return solar_position
@@ -169,13 +169,13 @@ def calculate_solar_altitude_azimuth_skyfield(
     #     solar_azimuth = solar_azimuth.degrees
 
     solar_altitude = generate(
-        'solar_altitude'.upper(),
-        (solar_altitude, output_units),
+        'solar_altitude',
+        (solar_altitude, angle_output_units),
     )
 
     solar_azimuth = generate(
-        'solar_azimuth'.upper(),
-        (solar_azimuth, output_units),
+        'solar_azimuth',
+        (solar_azimuth, angle_output_units),
     )
 
     debug(locals())

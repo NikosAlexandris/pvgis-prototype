@@ -64,7 +64,7 @@ def calculate_solar_declination_hargreaves(
             )
         )
     )
-    declination = generate('declination'.upper(), (declination_value_in_degrees, 'degrees'))
+    declination = generate('declination', (declination_value_in_degrees, 'degrees'))
     declination = convert_to_radians_if_requested(declination, output_units)
 
     return declination

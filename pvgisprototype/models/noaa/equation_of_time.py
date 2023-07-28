@@ -35,7 +35,7 @@ def calculate_equation_of_time_noaa(
         raise ValueError("The equation of time must be within the range [-20, 20] minutes")
 
     equation_of_time = generate(
-        'equation_of_time'.upper(),
+        'equation_of_time',
         (equation_of_time, time_output_units),
         )
     return equation_of_time

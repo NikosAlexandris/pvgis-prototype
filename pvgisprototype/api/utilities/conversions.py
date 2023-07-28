@@ -46,7 +46,7 @@ def convert_to_degrees_if_requested(named_tuple: NamedTuple, output_units: str) 
         return named_tuple
     else:
         value_in_degrees = np.degrees(named_tuple.value) if output_units == 'degrees' else named_tuple.value
-        return generate(type(named_tuple).__name__.upper(), (value_in_degrees, 'degrees'))
+        return generate(type(named_tuple).__name__, (value_in_degrees, 'degrees'))
 
 
 
@@ -61,7 +61,7 @@ def convert_to_radians_if_requested(named_tuple: NamedTuple, output_units: str) 
         return named_tuple
     else:
         value_in_radians = np.radians(named_tuple.value) if output_units == 'radians' else named_tuple.value
-        return generate(type(named_tuple).__name__.upper(), (value_in_radians, 'radians'))
+        return generate(type(named_tuple).__name__, (value_in_radians, 'radians'))
 
 
 

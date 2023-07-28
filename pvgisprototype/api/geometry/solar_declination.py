@@ -37,10 +37,7 @@ def calculate_fractional_year_pvis(
     if not 0 <= fractional_year < 2 * pi:
         raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
 
-    fractional_year = generate(
-        'fractional_year'.upper(),
-        (fractional_year, angle_output_units)
-    )
+    fractional_year = generate('fractional_year', (fractional_year, angle_output_units))
 
     # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
     # if angle_output_units == 'degrees':
@@ -100,8 +97,5 @@ def calculate_solar_declination(input: SolarDeclinationInput) -> float:
                 )
             )
     
-    declination = generate(
-        'solar_declination'.upper(),
-        (declination, input.angle_output_units)
-    )
+    declination = generate('solar_declination', (declination, angle_output_units))
     return declination

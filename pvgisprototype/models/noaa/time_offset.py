@@ -95,7 +95,7 @@ def calculate_time_offset_noaa(
         raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
 
     time_offset = generate(
-        'time_offset'.upper(),
+        'time_offset',
         (time_offset, time_output_units)
     )
     return time_offset

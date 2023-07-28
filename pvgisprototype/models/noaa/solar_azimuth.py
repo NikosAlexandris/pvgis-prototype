@@ -72,7 +72,7 @@ def calculate_solar_azimuth_noaa(
     compass_solar_azimuth = 2*pi - solar_azimuth
 
     compass_solar_azimuth = generate(
-        'compass_solar_azimuth'.upper(),
+        'compass_solar_azimuth',
         (compass_solar_azimuth, angle_output_units)
     )    
 

@@ -76,7 +76,7 @@ def calculate_solar_hour_angle_noaa(
     #     raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")
 
     solar_hour_angle = generate(
-        'solar_hour_angle'.upper(),
+        'solar_hour_angle',
         (solar_hour_angle, angle_output_units)
     )
     return solar_hour_angle
