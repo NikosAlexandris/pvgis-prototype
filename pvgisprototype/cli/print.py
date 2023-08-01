@@ -10,16 +10,14 @@ from typing import List
 
 def print_table(headers: List[str], data: List[List[str]]):
     """Create and print a table with provided headers and data."""
-    console = Console()
-
     table = Table(show_header=True, header_style="bold magenta", box=box.SIMPLE_HEAD)
-
     for header in headers:
         table.add_column(header)
 
     for row_data in data:
         table.add_row(*row_data)
 
+    console = Console()
     console.print(table)
 
 
