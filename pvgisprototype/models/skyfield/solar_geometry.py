@@ -18,26 +18,24 @@ from ...api.utilities.timestamp import convert_to_timezone
 
 
 def calculate_solar_position_skyfield(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        latitude: Annotated[Optional[float], typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=convert_to_timezone)] = None,
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> float:
-    """Calculate sun position
+    longitude: float,
+    latitude: float,
+    timestamp: Optional[datetime],
+    timezone: Optional[str],
+    output_units: str,
+) -> float:
+    """Calculate sun position above the local horizon using Skyfield.
+
+    Returns
+    -------
+    solar_altitude:
+        Altitude measures the angle above or below the horizon. The
+        zenith is at +90°, an object on the horizon’s great circle is at 0°,
+        and the nadir beneath your feet is at −90°.
+
+    solar_azimuth:
+        Azimuth measures the angle around the sky from the north pole: 0° means
+        exactly north, 90° is east, 180° is south, and 270° is west.
 
     Notes
     -----
