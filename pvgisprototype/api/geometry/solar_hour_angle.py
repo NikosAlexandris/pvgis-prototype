@@ -4,6 +4,10 @@ from typing import Optional
 from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_degrees_if_requested
 from math import pi
+from math import radians
+from math import acos
+from math import tan
+from datetime import time
 from ..utilities.timestamp import timestamp_to_decimal_hours
 
 
@@ -17,7 +21,7 @@ app = typer.Typer(
 
 def calculate_hour_angle(
         solar_time: time,
-        output_units: str = 'radians',
+        angle_output_units: str = 'radians',
         ):
     """Calculate the hour angle ω'
 
@@ -51,25 +55,18 @@ def calculate_hour_angle(
 
     In this function:
     """
+    # a datetime.time object
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
-    return hour_angle, output_units
+    hour_angle = radians(15) * (solar_time_decimal_hours - 12)
 
+    return hour_angle, angle_output_units
 
 def calculate_hour_angle_sunrise(
-        latitude: Annotated[Optional[float], typer.Argument(
-            min=-90, max=90)],
-        surface_tilt: Annotated[Optional[float], typer.Argument(
-            min=0, max=90)] = 0,
-        solar_declination: Annotated[Optional[float], typer.Argument(
-            min=-90, max=90)] = 180,
-        output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> float:
+    latitude: float,
+    surface_tilt: float,
+    solar_declination: float,
+    angle_output_units: str,
+) -> float:
     """Calculate the hour angle (ω) at sunrise and sunset
 
     Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
@@ -110,9 +107,10 @@ def calculate_hour_angle_sunrise(
             )
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
-            output_units,
+            angle_output_units,
             )
-    return hour_angle
+
+    return hour_angle, angle_output_units
 
 
 if __name__ == "__main__":
