@@ -3,12 +3,17 @@ from typing import Annotated
 from typing import Optional
 from enum import Enum
 from datetime import datetime
-import math
+from zoneinfo import ZoneInfo
+from math import cos
+from math import sin
+from math import asin
 import numpy as np
 
 # from .data_structures import SolarGeometryDayConstants
 # from .data_structures import SolarGeometryDayVariables
 
+from pvgisprototype.models.noaa.noaa_models import Longitude_in_Radians
+from pvgisprototype.models.noaa.noaa_models import Latitude_in_Radians
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
@@ -33,9 +38,19 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 # )
 
 
-@validate_with_pydantic(SolarAltitudeInput)
+@validate_with_pydantic(SolarAltitudeInput, expand_args=True)
 def calculate_solar_altitude(
-        input: SolarAltitudeInput,
+        longitude: Longitude_in_Radians,
+        latitude: Latitude_in_Radians,
+        timestamp: datetime,
+        timezone: ZoneInfo,
+        days_in_a_year: float,
+        perigee_offset: float,
+        eccentricity: float,
+        time_offset_global: int,
+        hour_offset: int,
+        solar_time_model: SolarTimeModels,
+        angle_output_units: str,
         ) -> float:
     """Compute various solar geometry variables.
     Parameters
@@ -67,12 +82,16 @@ def calculate_solar_altitude(
     """
     solar_declination = calculate_solar_declination(
         SolarDeclinationInput(
-            timestamp=input.timestamp,
-            angle_output_units=input.output_units
+            timestamp=timestamp,
+            timezone=timezone,
+            days_in_a_year=days_in_a_year,
+            eccentricity=eccentricity,
+            perigee_offset=perigee_offset,
+            angle_output_units=angle_output_units,
         )
     )
-    C31 = math.cos(input.latitude) * math.cos(solar_declination)
-    C33 = math.sin(input.latitude) * math.sin(solar_declination)
+    C31 = cos(latitude) * cos(solar_declination)
+    C33 = sin(latitude) * sin(solar_declination)
     solar_time = model_solar_time(
             longitude=longitude,
             latitude=latitude,
@@ -94,13 +113,9 @@ def calculate_solar_altitude(
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle, hour_angle_units = calculate_hour_angle(
             solar_time,
-            input.output_units,
+            angle_output_units,
     )
-    sine_solar_altitude = C31 * math.cos(hour_angle) + C33
-    solar_altitude = np.arcsin(sine_solar_altitude) 
-    solar_altitude = convert_to_degrees_if_requested(
-            solar_altitude,
-            input.output_units,
-            )
+    sine_solar_altitude = C31 * cos(hour_angle) + C33
+    solar_altitude = asin(sine_solar_altitude)
 
-    return solar_altitude, input.output_units
+    return solar_altitude, angle_output_units
