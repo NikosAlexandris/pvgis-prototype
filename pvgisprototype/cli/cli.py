@@ -18,7 +18,7 @@ from .rich_help_panel_names import rich_help_panel_performance
 from . import energy
 from .rich_help_panel_names import rich_help_panel_series
 # from . import series
-from ..api.series import series
+from . import series
 from . import irradiance
 from . import meteorology
 # from .plot import uniplot
