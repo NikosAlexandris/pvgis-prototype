@@ -72,113 +72,113 @@ def calculate_noaa_solar_position(
     """
     """
     result = {}
-    fractional_year, _units = calculate_fractional_year_noaa(
-            timestamp,
-            angle_output_units
+    fractional_year, fractional_year_units = calculate_fractional_year_noaa(
+            timestamp=timestamp,
+            angle_output_units=angle_output_units
             )
-    equation_of_time, _units = calculate_equation_of_time_noaa(
-            timestamp,
-            time_output_units,
-            angle_units,  # for calculate_fractional_year_noaa()
+    equation_of_time, equation_of_time_units = calculate_equation_of_time_noaa(
+            timestamp=timestamp,
+            time_output_units=time_output_units,
+            angle_units=angle_units,  # for calculate_fractional_year_noaa()
             )
-    solar_declination, _units = calculate_solar_declination_noaa(
-            timestamp,
-            angle_units,  # for calculate_fractional_year_noaa()
-            angle_output_units
+    solar_declination, solar_declination_units = calculate_solar_declination_noaa(
+            timestamp=timestamp,
+            angle_units=angle_units,  # for calculate_fractional_year_noaa()
+            angle_output_units=angle_output_units,
             )
-    time_offset, _units = calculate_time_offset_noaa(
-            longitude,
-            timestamp,
-            time_output_units,  # for calculate_equation_of_time_noaa()
-            angle_units,  # for calculate_equation_of_time_noaa()
+    time_offset, time_offset_units = calculate_time_offset_noaa(
+            longitude=longitude,
+            timestamp=timestamp,
+            time_output_units=time_output_units,  # for calculate_equation_of_time_noaa()
+            angle_units=angle_units,  # for calculate_equation_of_time_noaa()
             )
-    true_solar_time, _units = calculate_true_solar_time_noaa(
-            longitude,
-            timestamp,
-            timezone,
-            time_output_units,
+    true_solar_time = calculate_true_solar_time_noaa(
+            longitude=longitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            time_output_units=time_output_units,
             )
-    solar_hour_angle, _units = calculate_solar_hour_angle_noaa(
-            longitude,
-            timestamp,
-            timezone,
-            time_output_units,
-            angle_output_units,
+    solar_hour_angle, solar_hour_angle_units = calculate_solar_hour_angle_noaa(
+            longitude=longitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            time_output_units=time_output_units,
+            angle_output_units=angle_output_units
             )
-    solar_zenith, _units = calculate_solar_zenith_noaa(
-            latitude,
-            timestamp,
-            solar_hour_angle,
-            apply_atmospheric_refraction,
-            angle_units,
-            angle_output_units,
+    solar_zenith, solar_zenith_units = calculate_solar_zenith_noaa(
+            latitude=latitude,
+            timestamp=timestamp,
+            solar_hour_angle=solar_hour_angle,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
             )
-    solar_altitude, _units = calculate_solar_altitude_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
+    solar_altitude, solar_altitude_units = calculate_solar_altitude_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
     )
-    solar_azimuth, _units = calculate_solar_azimuth_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
+    solar_azimuth, solar_azimuth_units = calculate_solar_azimuth_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
             )
-    sunrise_time, _units = calculate_event_time_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            'sunrise',
-            refracted_solar_zenith,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
+    sunrise_time, sunrise_time_units = calculate_event_time_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            event='sunrise',
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
             )
-    solar_noon_time, _units = calculate_event_time_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            'noon',
-            refracted_solar_zenith,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
+    solar_noon_time, solar_noon_time_units = calculate_event_time_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            event='noon',
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
             )
-    local_solar_time, _units = calculate_local_solar_time_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            refracted_solar_zenith,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
+    local_solar_time, local_solar_time_units = calculate_local_solar_time_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
             )
-    sunset_time, _units = calculate_event_time_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            'sunset',
-            refracted_solar_zenith,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
+    sunset_time, sunset_time_units = calculate_event_time_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            event='sunset',
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
             )
     result['fractional_year'] = fractional_year
     result['equation_of_time'] = equation_of_time

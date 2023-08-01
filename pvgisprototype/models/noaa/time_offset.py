@@ -78,6 +78,29 @@ def calculate_time_offset_noaa(
 
             Examples:
                 Mount Olympus is UTC + 2, hence LSTM = 15 * 2 = 30 deg. East
+
+    Notes
+    -----
+
+    The time offset in minutes ranges in
+
+        [ -720 (Longitude) - 840 (TimeZone) - 20 (Equation of Time) = -1580,
+          +720 (Longitude) + 840 (TimeZone) + 20 (Equation of Time) = 1580 ]
+
+    The valid ranges of the components that contribute to the time offset are:
+
+    - Geographical longitude ranges from west to east in [-180, 180] degrees.
+      A day is approximately 1440 minutes, hence converting the degrees to minutes,
+      the longitude ranges in [-720, 720] minutes.
+
+    - The timezone offset from the Coordinated Universal Time (UTC),
+      considering time zones that are offset by unusual amounts of time from
+      UTC, ranges  from west of UTC to east of UTC in [-12, 14] hours or [-720,
+      840] minutes.
+
+    - The Equation of Time accounts for the variations in the Earth's orbital
+      speed and axial tilt. It varies throughout the year, but is typically
+      within the range of about -20 minutes to +20 minutes.
     """
     longitude_in_minutes = radians_to_time_minutes(longitude)  # time
 

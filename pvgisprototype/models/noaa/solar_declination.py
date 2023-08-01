@@ -12,13 +12,12 @@ from math import cos
 @validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
 def calculate_solar_declination_noaa(
         timestamp: datetime,
-        angle_units: Optional[str] = 'radians',
         angle_output_units: Optional[str] = 'radians'
 ) -> float:
     """Calculate the solar declination in radians"""
     fractional_year, _units = calculate_fractional_year_noaa(
             timestamp,
-            angle_output_units = angle_units,
+            angle_output_units = angle_output_units,
             )
     declination = (
         0.006918

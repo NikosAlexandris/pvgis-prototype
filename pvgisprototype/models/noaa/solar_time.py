@@ -30,7 +30,7 @@ def calculate_true_solar_time_noaa(
     -------
     float: The true solar time
     """
-    time_offset, _units = calculate_time_offset_noaa(
+    time_offset, time_offset_units = calculate_time_offset_noaa(
             longitude=longitude,
             timestamp=timestamp,
             time_output_units=time_output_units,
@@ -41,8 +41,8 @@ def calculate_true_solar_time_noaa(
     )
 
     if time_output_units == 'minutes':
-        if not 0 <= true_solar_time <= 1440:
-            raise ValueError("The true solar time must range within [0, 1440] minutes")
+        if not 0 <= true_solar_time <= 1580:
+            raise ValueError(f'The true solar time must range within [0, {1440+20}] minutes')
 
     # Convert to datetime object
     hours, remainder = divmod(true_solar_time, 60)

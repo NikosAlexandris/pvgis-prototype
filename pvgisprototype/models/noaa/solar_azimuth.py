@@ -59,9 +59,9 @@ def calculate_solar_azimuth_noaa(
     ) / (cos(latitude) * sin(solar_zenith))
     solar_azimuth = acos(cosine_solar_azimuth)
 
-    # adjust azimuth range for the afternoon
-    if solar_hour_angle > 0:  
-        solar_azimuth = 2*pi - solar_azimuth
+    # # adjust azimuth range for the afternoon
+    # if solar_hour_angle > 0:  
+    #     solar_azimuth = 2*pi - solar_azimuth
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
         raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
