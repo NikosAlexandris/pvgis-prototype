@@ -1,6 +1,7 @@
 import typer
 from typing import Optional
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from math import pi
 from math import sin
 from math import asin
@@ -44,8 +45,15 @@ def calculate_fractional_year_pvis(
     return fractional_year, angle_output_units
 
 
-@validate_with_pydantic(SolarDeclinationInput, expand_args=False)
-def calculate_solar_declination(input: SolarDeclinationInput) -> float:
+@validate_with_pydantic(SolarDeclinationInput, expand_args=True)
+def calculate_solar_declination(
+        timestamp: datetime,
+        timezone: ZoneInfo,
+        days_in_a_year: float,
+        eccentricity: float,
+        perigee_offset: float,
+        angle_output_units: str,
+        ) -> float:
     """Approximate the sun's declination for a given day of the year.
 
     The solar declination is the angle between the Sun's rays and the
@@ -82,14 +90,14 @@ def calculate_solar_declination(input: SolarDeclinationInput) -> float:
     the Solar Position Algorithm (SPA) are typically used.
     """
     fractional_year, _ = calculate_fractional_year_pvis(
-            timestamp=input.timestamp,
-            days_in_a_year=input.days_in_a_year,
-            angle_output_units=input.angle_output_units,
+            timestamp=timestamp,
+            days_in_a_year=days_in_a_year,
+            angle_output_units=angle_output_units,
             )
     declination = asin(
             0.3978 * sin(
-                fractional_year - 1.4 + input.eccentricity * sin(
-                    fractional_year - input.perigee_offset
+                fractional_year - 1.4 + eccentricity * sin(
+                    fractional_year - perigee_offset
                     )
                 )
             )
