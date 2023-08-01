@@ -1,3 +1,4 @@
+from devtools import debug
 import logging
 logging.basicConfig(
     level=logging.ERROR,
@@ -11,6 +12,8 @@ import typer
 from typing_extensions import Annotated
 import math
 from math import exp
+from math import pi
+
 
 app = typer.Typer(
     add_completion=False,
@@ -19,8 +22,13 @@ app = typer.Typer(
 )
 
 
+AOIConstants = []
+AOIConstants.append(-0.074)
+AOIConstants.append(0.155)
+
+
 @app.callback(invoke_without_command=True)
-def calculate_angular_loss_factor(
+def calculate_angular_loss_factor_for_direct_irradiance(
         sine_solar_incidence_angle: Annotated[float, typer.Argument(
             help='Solar altitude in degrees °',
             min=0, max=90)],
@@ -86,3 +94,25 @@ def calculate_angular_loss_factor(
         logging.error(f"Zero Division Error: {e}")
         typer.echo("Error: Division by zero in calculating the angular loss factor.")
         return 1
+
+
+def calculate_angular_loss_factor_for_nondirect_irradiance(
+    angular_loss_coefficient,
+    solar_incidence_angle_1 = AOIConstants[0],
+    solar_incidence_angle_2 = AOIConstants[1],
+):
+    """
+    Here,
+    - solar_incidence_angle_1 == AOIConstants[0]
+    - solar_incidence_angle_2 == AOIConstants[1]
+    """
+    c1 = 4 / (3 * pi)
+    loss_factor = 1 - exp(
+        -(
+            c1 * angular_loss_coefficient
+            + solar_incidence_angle_1 * angular_loss_coefficient ** 2
+        )
+        / solar_incidence_angle_2
+    )
+        
+    return loss_factor
