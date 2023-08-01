@@ -326,12 +326,11 @@ def calculate_direct_horizontal_irradiance(
         hour_offset: Annotated[float, typer.Option(
             help='Hour offset')] = 0,
         solar_time_model: Annotated[SolarTimeModels, typer.Option(
-            '-m',
-            '--solar-time-model',
             help="Model to calculate solar position",
             show_default=True,
             show_choices=True,
-            case_sensitive=False)] = SolarTimeModels.skyfield,
+            case_sensitive=False,
+            rich_help_panel=rich_help_panel_solar_time)] = SolarTimeModels.skyfield,
         angle_output_units: Annotated[str, typer.Option(
             '-u',
             '--units',
@@ -359,27 +358,6 @@ def calculate_direct_horizontal_irradiance(
     C31 = cos(latitude) * cos(solar_declination)
     C33 = sin(latitude) * sin(solar_declination)
 
-    year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
-    hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
-    # -------------------------------------------------------------------------
-    # solar_time, solar_time_units = model_solar_time(
-    solar_time = model_solar_time(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            model=solar_time_model,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset
-    )
-    # debug(locals())
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
-    # -------------------------------------------------------------------------
 
     sine_solar_altitude = C31 * math.cos(hour_angle) + C33
     solar_altitude = math.asin(sine_solar_altitude)
@@ -445,12 +423,11 @@ def calculate_direct_inclined_irradiance_pvgis(
             case_sensitive=False,
             help="Method to calculate the solar declination")] = 'jenco',
         solar_time_model: Annotated[SolarTimeModels, typer.Option(
-            '--solar-time-model',
             help="Model to calculate solar position",
-            # callback=validate_solar_time_model,
             show_default=True,
             show_choices=True,
-            case_sensitive=False)] = SolarTimeModels.skyfield,
+            case_sensitive=False,
+            rich_help_panel=rich_help_panel_solar_time)] = SolarTimeModels.skyfield,
         days_in_a_year: Annotated[float, typer.Option(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
@@ -560,8 +537,6 @@ def calculate_direct_inclined_irradiance_pvgis(
     C33 = sin(latitude) * sin(solar_declination)
 
     # calculate solar altitude
-    # # debug(locals())
-    # solar_time, solar_time_units = model_solar_time(
     solar_time = model_solar_time(
             longitude=longitude,
             latitude=latitude,

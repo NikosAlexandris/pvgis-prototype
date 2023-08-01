@@ -77,6 +77,10 @@ class BaseCoordinatesInputModel(Longitude, Latitude):
     pass
 
 
+class SolarTimeModel(BaseModel):
+    solar_time_model: SolarTimeModels
+
+
 class SolarAltitudeInput(
     BaseCoordinatesInputModel,
     BaseTimeInputModel,

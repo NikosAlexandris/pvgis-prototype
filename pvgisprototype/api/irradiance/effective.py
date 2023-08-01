@@ -294,13 +294,19 @@ def calculate_effective_irradiance(
     in_shade = is_surface_in_shade()
     solar_altitude, _ = calculate_solar_altitude(
         SolarAltitudeInput(
+    solar_time = model_solar_time(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            output_units=output_units
-        )
+            model=solar_time_model,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity=eccentricity,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset
     )
+    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     incidence_angle = calculate_solar_incidence_angle()
 
     # direct_horizontal_radiation = get_direct_horizontal_radiation()

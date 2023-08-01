@@ -36,6 +36,9 @@ import numpy as np
 from scipy.stats import mode
 from rich.table import Table
 import csv
+from pvgisprototype.api.geometry.time_models import SolarTimeModels
+from ..geometry.solar_time import model_solar_time
+from ..utilities.timestamp import timestamp_to_decimal_hours
 
 
 class MethodsForInexactMatches(str, Enum):
@@ -224,5 +227,18 @@ def drad_angle_irradiance(sh, bh, sunVarGeom, sunSlopeGeom, sunRadVar):
         rr *= refl_loss_factor
         diff_radiations[0] = dr
         refl_radiations[0] = rr
+        solar_time = model_solar_time(
+                longitude=longitude,
+                latitude=latitude,
+                timestamp=timestamp,
+                timezone=timezone,
+                model=solar_time_model,
+                days_in_a_year=days_in_a_year,
+                perigee_offset=perigee_offset,
+                eccentricity=eccentricity,
+                time_offset_global=time_offset_global,
+                hour_offset=hour_offset
+        )
+        solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
 
     return dr, diff_radiations, refl_radiations

@@ -17,8 +17,8 @@ from ..utilities.timestamp import timestamp_to_decimal_hours
 from ..utilities.conversions import convert_to_radians
 from ..utilities.conversions import convert_to_degrees_if_requested
 from .solar_declination import calculate_solar_declination
-from .solar_time import model_solar_time
 from .time_models import SolarTimeModels
+from .solar_time import model_solar_time
 from .solar_hour_angle import calculate_hour_angle
 
 from pvgisprototype.api.input_models import SolarAltitudeInput
@@ -74,13 +74,23 @@ def calculate_solar_altitude(
     C31 = math.cos(input.latitude) * math.cos(solar_declination)
     C33 = math.sin(input.latitude) * math.sin(solar_declination)
     solar_time = model_solar_time(
-            longitude=input.longitude,
-            latitude=input.latitude,
-            timestamp=input.timestamp,
-            timezone=input.timezone,
-            model=SolarTimeModels.eot,  # returns datetime.time object
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=solar_time_model,  # returns datetime.time object
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity=eccentricity,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset
             )
-    # solar_time *= 3600
+    # year = timestamp.year
+    # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
+    # hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+    # # -------------------------------------------------------------------------
+    # solar_time = model_solar_time(
+    # )
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle, hour_angle_units = calculate_hour_angle(
             solar_time,
