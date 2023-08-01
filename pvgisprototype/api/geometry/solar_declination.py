@@ -88,7 +88,7 @@ def calculate_solar_declination(input: SolarDeclinationInput) -> float:
             )
     declination = asin(
             0.3978 * sin(
-                fractional_year - 1.4 + input.orbital_eccentricity * sin(
+                fractional_year - 1.4 + input.eccentricity * sin(
                     fractional_year - input.perigee_offset
                     )
                 )
