@@ -1,9 +1,11 @@
 import typer
 from typing_extensions import Annotated
-import math
+from math import pi
+from math import cos
 import numpy as np
 from .constants import SOLAR_CONSTANT
 from ...api.utilities.timestamp import random_day_of_year
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
 
 
 app = typer.Typer(
@@ -17,7 +19,7 @@ app = typer.Typer(
     invoke_without_command=True,
     no_args_is_help=True,
 )
-def calculate_extraterrestrial_irradiance(
+def calculate_extraterrestrial_normal_irradiance(
         day_of_year: Annotated[float, typer.Argument(
             min=1,
             max=366,
@@ -26,11 +28,14 @@ def calculate_extraterrestrial_irradiance(
             help="The mean solar electromagnetic radiation at the top of the atmosphere (~1360.8 W/m2) one astronomical unit (au) away from the Sun.",
             min=1360)] = SOLAR_CONSTANT,
         days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year')] = 365.25,
+            help='Days in a year',
+            rich_help_panel=rich_help_panel_earth_orbit)] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset')] = 0.048869,
+            help='Perigee offset',
+            rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
         eccentricity: Annotated[float, typer.Option(
-            help='Eccentricity')] = 0.01672,
+            help='Eccentricity',
+            rich_help_panel=rich_help_panel_earth_orbit)] = 0.01672,
         random_day: Annotated[bool, typer.Option(
             '-r',
             '--random-day',
@@ -108,9 +113,9 @@ def calculate_extraterrestrial_irradiance(
     if random_day:
         day_of_year = random_day_of_year(int(days_in_a_year))
     # ------------------------------------------------------------------------
-    position_of_earth = 2 * math.pi * day_of_year / days_in_a_year
-    distance_correction_factor = 1 + eccentricity * math.cos(position_of_earth - perigee_offset)
-    extraterrestial_irradiance = solar_constant * distance_correction_factor
+    position_of_earth = 2 * pi * day_of_year / days_in_a_year
+    distance_correction_factor = 1 + eccentricity * cos(position_of_earth - perigee_offset)
+    extraterrestial_normal_irradiance = solar_constant * distance_correction_factor
 
     # typer.echo(f'Extraterrestrial irradiance: {extraterrestial_irradiance}')
-    return extraterrestial_irradiance
+    return extraterrestial_normal_irradiance
