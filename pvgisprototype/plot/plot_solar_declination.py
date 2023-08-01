@@ -94,7 +94,7 @@ def plot_solar_declination_one_year_bokeh(
         ):
     timestamps = [datetime(year, 1, 1) + timedelta(days=i) for i in range((datetime(year+1, 1, 1) - datetime(year, 1, 1)).days)]
     timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime
-    solar_declinations = calculate_solar_declination(timestamps, angle_output_units)
+    solar_declinations = calculate_solar_declination(timestamp=timestamps, angle_output_units=angle_output_units)
     solar_declinations_pvgis = calculate_solar_declination_pvgis(timestamps, angle_output_units)
     solar_declinations_hargreaves = calculate_solar_declination_hargreaves(timestamps, angle_output_units)
 
