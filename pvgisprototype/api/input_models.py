@@ -5,6 +5,7 @@ from pydantic import confloat
 from typing import Optional
 from zoneinfo import ZoneInfo
 from datetime import datetime
+from pvgisprototype.api.geometry.time_models import SolarTimeModels
 
 
 class BaseTimestampInputModel(BaseModel):
@@ -77,6 +78,17 @@ class BaseCoordinatesInputModel(Longitude, Latitude):
     pass
 
 
+class EarthOrbitInputModel(BaseModel):
+    days_in_a_year: float = 365.25
+    eccentricity: float = 0.03344
+    perigee_offset: float = 0.048869
+
+
+class TimeOffsetInputModel(BaseModel):
+    time_offset_global: float
+    hour_offset: float
+
+
 class SolarTimeModel(BaseModel):
     solar_time_model: SolarTimeModels
 
@@ -84,19 +96,32 @@ class SolarTimeModel(BaseModel):
 class SolarAltitudeInput(
     BaseCoordinatesInputModel,
     BaseTimeInputModel,
+    EarthOrbitInputModel,
+    TimeOffsetInputModel,
+    SolarTimeModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+class SolarTimeInput(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    EarthOrbitInputModel,
     BaseOutputUnitsModel,
 ):
     pass
 
 
-class SolarAzimuthInput(SolarAltitudeInput):
+class SolarAzimuthInput(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    TimeOffsetInputModel,
+    SolarTimeModel,
+    EarthOrbitInputModel,
+    BaseAngleOutputUnitsModel,
+):
     pass
-
-
-class EarthOrbitInputModel(BaseModel):
-    days_in_a_year: float = 365.25
-    orbital_eccentricity: float = 0.03344
-    perigee_offset: float = 0.048869
 
 
 class SolarDeclinationInput(
