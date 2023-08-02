@@ -8,6 +8,7 @@ from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
 
+
 def calculate_solar_declination_pvgis(
         timestamp: Annotated[Optional[datetime], typer.Argument(
             help='Timestamp',
