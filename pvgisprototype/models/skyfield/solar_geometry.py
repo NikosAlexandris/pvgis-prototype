@@ -1,4 +1,3 @@
-from devtools import debug
 import logging
 import typer
 from typing import Annotated
@@ -73,7 +72,6 @@ def calculate_solar_position_skyfield(
     # except Exception:
     #     logging.warning(f'tzinfo already set for timestamp = {timestamp}')
     # # Handle Me during input validation? -------------------------------------
-
     ephemeris = skyfield.api.load('de421.bsp')
     sun = ephemeris['Sun']
     earth = ephemeris['Earth']
