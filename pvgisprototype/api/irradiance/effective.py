@@ -41,6 +41,8 @@ from ..geometry.solar_time import model_solar_time
 from ..utilities.timestamp import timestamp_to_decimal_hours
 from .direct import calculate_direct_horizontal_irradiance
 
+from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+
 model_constants=[]
 model_constants.append(94.804)
 model_constants.append(3.151)
@@ -197,6 +199,7 @@ def calculate_effective_irradiance(
         help='Apply atmospheric refraction functions',
         rich_help_panel=rich_help_panel_advanced_options,
         )] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
     albedo: Annotated[Optional[float], typer.Option(
         min=0,
         help='Mean ground albedo',
@@ -382,12 +385,16 @@ def calculate_effective_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity=eccentricity,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_time_model=solar_time_model,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
         angle_output_units=angle_output_units,
         )
     solar_declination = calculate_solar_declination(
@@ -404,11 +411,16 @@ def calculate_effective_irradiance(
             timestamp=timestamp,
             timezone=timezone,
             model=solar_time_model,
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity=eccentricity,
             time_offset_global=time_offset_global,
-            hour_offset=hour_offset
+            hour_offset=hour_offset,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
     )
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
@@ -435,7 +447,7 @@ def calculate_effective_irradiance(
                 elevation=elevation,
                 timestamp=timestamp,
                 timezone=timezone,
-                time_series=direct_horizontal_irradiance,
+                direct_horizontal_component=direct_horizontal_irradiance,
                 mask_and_scale=mask_and_scale,
                 inexact_matches_method=inexact_matches_method,
                 tolerance=tolerance,

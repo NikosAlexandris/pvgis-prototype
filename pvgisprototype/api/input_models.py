@@ -51,6 +51,18 @@ class BaseOutputUnitsModel(BaseModel):
         valid_units = ['radians', 'degrees']
         if v not in valid_units:
             raise ValueError(f"angle_output_units must be one of {valid_units}")
+
+
+class BaseAngleUnitsModel(BaseModel):
+    angle_units: str
+
+    @field_validator('angle_units')
+    @classmethod
+    def validate_angle_units(cls, v):
+        valid_units = ['radians', 'degrees']
+        if v not in valid_units:
+            raise ValueError(f"angle_output_units must be one of {valid_units}")
+        return v
         return v
 
 
