@@ -127,7 +127,7 @@ def main(
         no_args_is_help=True,
         help=':sun: :clock12: :triangular_ruler: NOAA\'s general solar position calculations',
 )
-@debug_if_needed(app)
+# @debug_if_needed(app)
 def noaa(
     ctx: typer.Context,
     longitude: Annotated[float, typer_argument_longitude],
@@ -199,7 +199,7 @@ def noaa(
         no_args_is_help=True,
         help='⦩⦬ Calculate solar position parameters (altitude, azimuth)',
  )
-@debug_if_needed(app)
+# @debug_if_needed(app)
 def position(
     ctx: typer.Context,
     longitude: Annotated[float, typer_argument_longitude],
@@ -292,12 +292,8 @@ def position(
     )
 
 
-@app.command(
-        'altitude',
-        no_args_is_help=True,
-        help='⦩ Calculate the solar altitude',
-        )
-@debug_if_needed(app)
+@app.command('altitude', no_args_is_help=True, help='⦩ Calculate the solar altitude')
+# @debug_if_needed(app)
 def altitude(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -368,7 +364,7 @@ def altitude(
 
 
 @app.command('zenith', no_args_is_help=True, help=' Calculate the solar zenith')
-@debug_if_needed(app)
+# @debug_if_needed(app)
 def zenith(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -459,7 +455,7 @@ def zenith(
 
 
 @app.command('azimuth', no_args_is_help=True, help='⦬ Calculate the solar azimuth')
-@debug_if_needed(app)
+# @debug_if_needed(app)
 def azimuth(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -722,22 +718,22 @@ def incidence_jenco(
         surface_orientation = random.uniform(0, 360)
 
     solar_incidence_angle = calculate_solar_incidence_jenco(
-        longitude,
-        latitude,
-        timestamp,
-        timezone,
-        random_time,
-        hour_angle,
-        surface_tilt,
-        surface_orientation,
-        days_in_a_year,
-        eccentricity,
-        perigee_offset,
-        time_output_units,
-        angle_units,
-        angle_output_units,
-        rounding_places,
-        verbose,
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        random_time=random_time,
+        hour_angle=hour_angle,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        days_in_a_year=days_in_a_year,
+        orbital_eccentricity=orbital_eccentricity,
+        perigee_offset=perigee_offset,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        rounding_places=rounding_places,
+        verbose=verbose,
     )
 
     typer.echo(f'Solar incidence angle {solar_incidence_angle} {angle_output_units}')

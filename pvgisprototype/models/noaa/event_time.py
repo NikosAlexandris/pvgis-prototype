@@ -1,7 +1,7 @@
 from devtools import debug
 
-from .noaa_models import Longitude_in_Radians
-from .noaa_models import Latitude_in_Radians
+# from .noaa_models import LongitudeModel_in_Radians
+# from .noaa_models import LatitudeModel_in_Radians
 from .noaa_models import CalculateEventTimeNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
@@ -14,8 +14,10 @@ from math import pi
 from datetime import time
 from datetime import timedelta
 from ...api.utilities.timestamp import attach_requested_timezone
-from typing import NamedTuple
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import EventTime
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import Longitude
 
 # TODO: Maybe create a function that accepts a named_tuple and checks existing units
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
@@ -23,8 +25,8 @@ radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_
 
 @validate_with_pydantic(CalculateEventTimeNOAAInput)
 def calculate_event_time_noaa(
-        longitude: Longitude_in_Radians,
-        latitude: Latitude_in_Radians,
+        longitude: Longitude,   # radians
+        latitude: Latitude, # radians
         timestamp: datetime,
         timezone: str,
         event: str,
@@ -33,7 +35,7 @@ def calculate_event_time_noaa(
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-        )-> NamedTuple:
+    )-> EventTime:
     """Calculate the sunrise or sunset
 
     For the special case of sunrise or sunset, the zenith is set to 90.833 deg.
@@ -122,7 +124,7 @@ def calculate_event_time_noaa(
     event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(minutes=event_time)
     event_datetime_utc = attach_requested_timezone(event_datetime)  # assign UTC
 
-    event_time = generate('event_time',(event_datetime_utc, time_output_units))
+    event_time = EventTime(value=event_datetime_utc, unit=time_output_units)
 
     debug(locals())
     return event_time

@@ -1,19 +1,21 @@
-from .noaa_models import Longitude_in_Radians
-from .noaa_models import Latitude_in_Radians
+# from .noaa_models import LongitudeModel_in_Radians
+# from .noaa_models import LatitudeModel_in_Radians
 from .noaa_models import CalculateLocalSolarTimeNOAAInput
 from .decorators import validate_with_pydantic
 from .event_time import calculate_event_time_noaa
 from datetime import datetime
 from datetime import timedelta
 from datetime import time
-from typing import NamedTuple
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import SolarTime
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
 
 
 @validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
 def calculate_local_solar_time_noaa(
-        longitude: Longitude_in_Radians,
-        latitude: Latitude_in_Radians,
+        longitude: Longitude,   # radians
+        latitude: Latitude, # radians
         timestamp: datetime,
         timezone: str,
         refracted_solar_zenith: float = 1.5853349194640094,  # radians
@@ -22,7 +24,7 @@ def calculate_local_solar_time_noaa(
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
         verbose: str = False,
-    ) -> NamedTuple:
+    ) -> SolarTime:
     """
     Returns
     -------
@@ -66,6 +68,6 @@ def calculate_local_solar_time_noaa(
 
     local_solar_time = timestamp + timedelta(seconds=total_seconds)
 
-    solar_time = generate('solar_time', (local_solar_time, time_output_units))
+    solar_time = SolarTime(value=local_solar_time, unit='datetime?')
 
     return solar_time

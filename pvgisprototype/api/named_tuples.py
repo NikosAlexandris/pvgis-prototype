@@ -12,7 +12,7 @@ class NamedTupleTypes(Enum):
     SOLAR_TIME = namedtuple('solar_time', ['value', 'unit'])
     SOLAR_ALTITUDE = namedtuple('solar_altitude', ['value', 'unit'])
     SOLAR_AZIMUTH = namedtuple('solar_azimuth', ['value', 'unit'])
-    SOLAR_DECLINATION = namedtuple('solar_declination', ['value', 'unit'])                # TODO: Decide if 'solar_declination' or just 'declination'
+    SOLAR_DECLINATION = namedtuple('solar_declination', ['value', 'unit'])
     FRACTIONAL_YEAR = namedtuple('fractional_year', ['value', 'unit'])
     EQUATION_OF_TIME = namedtuple('equation_of_time', ['value', 'unit'])
     TIME_OFFSET = namedtuple('time_offset', ['value', 'unit'])
@@ -23,6 +23,8 @@ class NamedTupleTypes(Enum):
     COMPASS_SOLAR_AZIMUTH = namedtuple('compass_solar_azimuth', ['value', 'unit'])
     EVENT_TIME = namedtuple('event_time', ['value', 'unit'])
     SOLAR_INCIDENCE = namedtuple('solar_incidence', ['value', 'unit'])
+    ORBITAL_ECCENTRICITY = namedtuple('orbital_eccentricity', ['value', 'unit'])
+    PERIGEE_OFFSET = namedtuple('perigee_offset', ['value', 'unit'])
 
 
 def generate(named_tuple_type:str, value_unit_pair:Tuple[float, str])-> NamedTuple:

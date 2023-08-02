@@ -12,7 +12,6 @@ import typer
 from typing import Annotated
 from typing import Optional
 from typing import List
-from typing import NamedTuple
 from datetime import datetime
 from datetime import time as datetime_time
 from datetime import timedelta
@@ -43,8 +42,10 @@ from ...models.pyephem.solar_time import calculate_solar_time_ephem
 from ...models.pvgis.solar_time import calculate_solar_time_pvgis
 from .time_models import SolarTimeModels
 
-from pvgisprototype.api.input_models import Longitude
-from pvgisprototype.api.input_models import Latitude
+from pvgisprototype.api.data_classes import SolarTime
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
+
 from pvgisprototype.api.input_models import SolarTimeInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
@@ -65,7 +66,7 @@ def model_solar_time(
         orbital_eccentricity: float = 0.03344,
         time_offset_global: float = 0,
         hour_offset: float = 0,
-    )-> NamedTuple:
+    )-> SolarTime:
     """Calculates the solar time and returns the calculated value and the units.
 
     Parameters

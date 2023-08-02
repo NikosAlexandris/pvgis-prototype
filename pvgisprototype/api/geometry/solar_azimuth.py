@@ -2,7 +2,6 @@ from devtools import debug
 import typer
 from typing import Annotated
 from typing import Optional
-from typing import NamedTuple
 from enum import Enum
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -10,10 +9,11 @@ from math import sin
 from math import cos
 from math import acos
 
-from pvgisprototype.api.input_models import Longitude
-from pvgisprototype.api.input_models import Latitude
+from pvgisprototype.api.data_classes import SolarAzimuth
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
+
 from pvgisprototype.api.input_models import SolarAzimuthInput
-from pvgisprototype.api.named_tuples import generate
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from .solar_declination import calculate_solar_declination
@@ -42,8 +42,10 @@ def calculate_solar_azimuth(
         ) -> NamedTuple:
     """Compute various solar geometry variables.
 
-    Parameters
-    ----------
+        Returns
+        -------
+        solar_azimuth: float
+
 
     Returns
     -------

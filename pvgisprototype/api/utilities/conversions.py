@@ -5,7 +5,8 @@ from rich import box
 from math import degrees
 from math import radians
 import numpy as np
-from typing import NamedTuple
+from typing import Any
+from dataclasses import replace
 from pvgisprototype.api.named_tuples import generate
 
 
@@ -42,26 +43,24 @@ def convert_float_to_degrees_if_requested(angle: float, output_units: str) -> fl
     return degrees(angle) if output_units == 'degrees' else angle
 
 
-def convert_to_degrees_if_requested(named_tuple: NamedTuple, output_units: str) -> NamedTuple:
+def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
     """Convert angle from radians to degrees if requested, and create a new named tuple with
     updated value and unit."""
-    if output_units == 'degrees' and not named_tuple.unit == 'degrees':
-        value_in_degrees = degrees(named_tuple.value)
-        named_tuple = generate(type(named_tuple).__name__, (value_in_degrees, 'degrees'))
-    return named_tuple
+    if output_units == 'degrees' and not data_class.unit == 'degrees':
+        data_class = replace(data_class, value=degrees(data_class.value), unit='degrees')
+    return data_class
 
 
 # def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
 #     """Convert angle from degrees to radians if requested."""
 #     return np.radians(angle) if output_units == 'radians' else angle
 
-def convert_to_radians_if_requested(named_tuple: NamedTuple, output_units: str) -> NamedTuple:
+def convert_to_radians_if_requested(data_class: Any, output_units: str) -> Any:
     """Convert angle from degrees to radians if requested, and create a new named tuple with
     updated value and unit."""
-    if output_units == 'radians' and not named_tuple.unit == 'radians':
-        value_in_radians = radians(named_tuple.value)
-        named_tuple = generate(type(named_tuple).__name__, (value_in_radians, 'radians'))
-    return named_tuple
+    if output_units == 'radians' and not data_class.unit == 'radians':
+        data_class = replace(data_class, value=radians(data_class.value), unit='radians')
+    return data_class
 
 
 

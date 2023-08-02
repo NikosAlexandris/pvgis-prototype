@@ -4,7 +4,6 @@ from typing import Annotated
 from typing import Optional
 from typing import List
 from typing import Tuple
-from typing import NamedTuple
 from enum import Enum
 import numpy as np
 import datetime
@@ -28,9 +27,12 @@ from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_consta
 from ...models.noaa.solar_position import calculate_solar_altitude_noaa
 from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
 
+from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.data_classes import SolarAzimuth
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import Longitude
+
 from .solar_models import SolarPositionModels
-from pvgisprototype.api.input_models import Latitude
-from pvgisprototype.api.input_models import Longitude
 from pvgisprototype.api.input_models import SolarPositionInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
@@ -64,7 +66,7 @@ def model_solar_position(
         apply_atmospheric_refraction: bool = True,
         time_output_units: str = 'minutes',
         angle_output_units: str = 'radians',
-    )-> Tuple[NamedTuple, NamedTuple]:
+    )-> Tuple[SolarAltitude, SolarAzimuth]:
     """
     The solar altitude angle measures from the horizon up towards the zenith
     (positive, and down towards the nadir (negative)). The altitude is zero all

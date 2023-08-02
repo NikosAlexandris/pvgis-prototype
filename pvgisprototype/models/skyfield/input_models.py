@@ -8,53 +8,59 @@ from typing import Optional
 from typing import Union
 from zoneinfo import ZoneInfo
 from pydantic import validator
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import Longitude
 
 
-class ModelToDict(BaseModel):
-    def dict_with_namedtuple(self):
+class ValidatedInputToDict(BaseModel):
+    def pydantic_model_to_dict(self):
         d = {}
         for k, v in self:
             d[k] = v
         return d
 
 
-class Longitude(BaseModel):
-    longitude: Union[confloat(ge=-pi, le=pi), tuple]
+class LongitudeModel(BaseModel):
+    longitude: Union[confloat(ge=-pi, le=pi), Longitude]
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    @validator("longitude", always=True)
-    def longitude_named_tuple(cls, input) -> Union[confloat(ge=-pi, le=pi), tuple]:
-        if isinstance(input, tuple):
-            return generate('longitude', (input[0], input[1]))
+    @field_validator("longitude")
+    def longitude_named_tuple(cls, input) -> Longitude:
+        if isinstance(input, Longitude):
+            return input
         elif isinstance(input, float):
-            return generate('longitude', (input, 'radians'))
+            return Longitude(value=input, unit='radians')
         else:
-            raise ValueError("Unsupported longitude type provided")
+            raise ValueError("Unsupported `longitude` type provided")
 
 
-class Latitude(BaseModel):
-    latitude: Union[confloat(ge=-pi/2, le=pi/2), tuple]
+class LatitudeModel(BaseModel):
+    latitude: Union[confloat(ge=-pi/2, le=pi/2), Latitude]
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    @validator("latitude", always=True)
-    def latitude_named_tuple(cls, input) -> Union[confloat(ge=-pi/2, le=pi/2), tuple]:
-        if isinstance(input, tuple):
-            return generate('latitude', (input[0], input[1]))
+    @field_validator("latitude")
+    def latitude_named_tuple(cls, input) -> Latitude:
+        if isinstance(input, Latitude):
+            return input
         elif isinstance(input, float):
-            return generate('latitude', (input, 'radians'))
+            return Latitude(value=input, unit='radians')
         else:
-            raise ValueError("Unsupported latitude type provided")
+            raise ValueError("Unsupported `latitude` type provided")
 
 
-class BaseCoordinatesInputModel(Longitude, Latitude):
-    pass
-
-
-class BaseTimestampInputModel(BaseModel):
+class BaseTimestampModel(BaseModel):
     timestamp: datetime
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
-class BaseTimeInputModel(BaseTimestampInputModel):
+
+
+class BaseCoordinatesInput(LongitudeModel, LatitudeModel):
+    pass
+
+
+class BaseTimeInput(BaseTimestampModel):
     timezone: Optional[ZoneInfo] = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -66,16 +72,16 @@ class BaseTimeInputModel(BaseTimestampInputModel):
         return v
 
 
-class CalculateTrueSolarTimeSkyfieldInputModel(
-    ModelToDict,
-    BaseCoordinatesInputModel,
-    BaseTimeInputModel,
+class CalculateTrueSolarTimeSkyfieldInput(
+    ValidatedInputToDict,
+    BaseCoordinatesInput,
+    BaseTimeInput,
 ):
     pass
 
 
 class SolarPositionInput(
-    CalculateTrueSolarTimeSkyfieldInputModel):
+    CalculateTrueSolarTimeSkyfieldInput):
     # output_units: str = 'radians'
     pass
 

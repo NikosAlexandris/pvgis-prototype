@@ -49,6 +49,7 @@ from datetime import timezone
 from datetime import time
 from typing import Annotated
 from typing import Optional
+from typing import Union
 import calendar
 import random
 import typer
@@ -56,8 +57,10 @@ import zoneinfo
 from zoneinfo import ZoneInfo
 from rich import print
 
+from pvgisprototype.api.named_tuples import generate
 
-app = typer.Typer()
+
+# app = typer.Typer()
 
 
 def parse_timestamp(timestamp_string):

@@ -3,24 +3,24 @@ from devtools import debug
 from typing import Tuple
 from .noaa_models import CalculateEventHourAngleNOAAInput
 from .decorators import validate_with_pydantic
-from .noaa_models import Latitude_in_Radians
 from datetime import datetime
 from .solar_declination import calculate_solar_declination_noaa
 from math import cos
 from math import tan
 from math import acos
-from typing import NamedTuple
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import EventTime
+from pvgisprototype.api.data_classes import Latitude
 
 
 @validate_with_pydantic(CalculateEventHourAngleNOAAInput)
 def calculate_event_hour_angle_noaa(
-        latitude: Latitude_in_Radians,
+        latitude: Latitude, # radians
         timestamp: datetime,
         refracted_solar_zenith: float = 1.5853349194640094,  # radians
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-        ) -> Tuple:
+    ) -> EventTime:
     """
     Calculates the event hour angle using the NOAA method.
 
@@ -73,7 +73,7 @@ def calculate_event_hour_angle_noaa(
     ) - tan(latitude) * tan(solar_declination.value)
     event_hour_angle = acos(cosine_event_hour_angle)  # radians
 
-    event_hour = generate('event_time', (event_hour_angle, angle_output_units))
+    event_hour = EventTime(value=event_hour_angle, unit=angle_output_units)
 
     # # ------------------------------------------------------------------------
     # if angle_output_units == 'degrees':  # is this ever needed?

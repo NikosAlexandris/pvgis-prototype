@@ -22,10 +22,10 @@ def validate_with_pydantic(input_model: Type[BaseModel], expand_args: bool = Fal
                 # If the passed argument is already an instance of the expected model, skip validation
                 validated_input = args[0]
             else:
-                input_data = {**kwargs, **dict(zip(func.__annotations__.keys(), args))}
+                input_data = {**kwargs, **dict(zip(func.__annotations__.keys(), args))}     # PASSED
                 validated_input = input_model(**input_data)
             if expand_args:
-                return func(**validated_input.dict_with_namedtuple())
+                return func(**validated_input.pydantic_model_to_dict())
             else:
                 return func(validated_input)  # Pass the entire instance instead of expanding it
         return wrapper

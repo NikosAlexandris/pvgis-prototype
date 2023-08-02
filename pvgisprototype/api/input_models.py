@@ -11,71 +11,86 @@ from math import pi
 from pydantic import validator
 
 from .geometry.solar_models import SolarPositionModels
+<<<<<<< Updated upstream
 from pvgisprototype.api.geometry.time_models import SolarTimeModels
 from pvgisprototype.api.named_tuples import generate
+=======
+>>>>>>> Stashed changes
+
+from pvgisprototype.api.data_classes import OrbitalEccentricity
+from pvgisprototype.api.data_classes import PerigeeOffset
+from pvgisprototype.api.data_classes import RefractedSolarZenith
+from pvgisprototype.api.data_classes import SurfaceTilt
+from pvgisprototype.api.data_classes import SurfaceOrientation
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import HourAngleSunrise
+from pvgisprototype.api.data_classes import SolarTime
+from pvgisprototype.api.data_classes import TrueSolarTime
+from pvgisprototype.api.data_classes import EquationOfTime
+from pvgisprototype.api.data_classes import FractionalYear
+from pvgisprototype.api.data_classes import TimeOffset
+from pvgisprototype.api.data_classes import EventTime
+from pvgisprototype.api.data_classes import HourAngle
+from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.data_classes import SolarAzimuth
+from pvgisprototype.api.data_classes import CompassSolarAzimuth
+from pvgisprototype.api.data_classes import SolarDeclination
+from pvgisprototype.api.data_classes import SolarIncidence
+from pvgisprototype.api.data_classes import SolarHourAngle
+from pvgisprototype.api.data_classes import SolarZenith
+from pvgisprototype.api.data_classes import SolarPosition
 
 
-class ModelToDict(BaseModel):
-    def dict_with_namedtuple(self):
+class ValidatedInputToDict(BaseModel):
+    def pydantic_model_to_dict(self):
         d = {}
         for k, v in self:
             d[k] = v
         return d
 
 
-class Longitude(BaseModel):
-    longitude: Union[confloat(ge=-pi, le=pi), tuple]
+class LongitudeModel(BaseModel):
+    longitude: Union[confloat(ge=-pi, le=pi), Longitude]
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    @validator("longitude", always=True)
-    def longitude_named_tuple(cls, input) -> Union[confloat(ge=-pi, le=pi), tuple]:
-        if isinstance(input, tuple):
-            return generate('longitude', (input[0], input[1]))
+    @field_validator("longitude")
+    def longitude_named_tuple(cls, input) -> Longitude:
+        if isinstance(input, Longitude):
+            return input
         elif isinstance(input, float):
-            return generate('longitude', (input, 'radians'))
+            return Longitude(value=input, unit='radians')
         else:
-            raise ValueError("Unsupported longitude type provided")
+            raise ValueError("Unsupported `longitude` type provided")
 
 
-class Latitude(BaseModel):
-    latitude: Union[confloat(ge=-pi/2, le=pi/2), tuple]
+class LatitudeModel(BaseModel):
+    latitude: Union[confloat(ge=-pi/2, le=pi/2), Latitude]
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    @validator("latitude", always=True)
-    def latitude_named_tuple(cls, input) -> Union[confloat(ge=-pi/2, le=pi/2), tuple]:
-        if isinstance(input, tuple):
-            return generate('latitude', (input[0], input[1]))
+    @field_validator("latitude")
+    def latitude_named_tuple(cls, input) -> Latitude:
+        if isinstance(input, Latitude):
+            return input
         elif isinstance(input, float):
-            return generate('latitude', (input, 'radians'))
+            return Latitude(value=input, unit='radians')
         else:
-            raise ValueError("Unsupported latitude type provided")
+            raise ValueError("Unsupported `latitude` type provided")
 
 
-class BaseCoordinatesInputModel(Longitude, Latitude):
-    pass
-
-
-class BaseTimestampInputModel(BaseModel):
+class BaseTimestampModel(BaseModel):
     timestamp: datetime
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
-class BaseTimeInputModel(BaseTimestampInputModel):
-    timezone: Optional[ZoneInfo] = None
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    @field_validator('timezone')
-    @classmethod
-    def validate_timezone(cls, v):
-        if v is not None and not isinstance(v, ZoneInfo):
-            raise ValueError("The `timezone` must be a valid `zoneinfo.ZoneInfo` object.")
-        return v
-
-
-class RandomTimeInputModel(BaseModel):
+class RandomTimeModel(BaseModel):
     random_time: bool
+
 
 class TimeOffsetModel(BaseModel):
     time_offset_global: float = 0
     hour_offset: float = 0
+
 
 class BaseTimeOutputUnitsModel(BaseModel):
     time_output_units: Optional[str] = None
@@ -102,7 +117,7 @@ class BaseAngleOutputUnitsModel(BaseModel):
         if v not in valid_units:
             raise ValueError(f"angle_output_units must be one of {valid_units}")
         return v
-
+    
 
 class BaseAngleInternalUnitsModel(BaseModel):                                               # NOTE: Maybe deprecate
     angle_units: str = 'radians'
@@ -119,41 +134,108 @@ class BaseAngleInternalUnitsModel(BaseModel):                                   
         return v
 
 
-
-
-
-class SolarPositionInputModel(BaseModel):
+class SolarPositionModel(BaseModel):
     model: SolarPositionModels = SolarPositionModels.skyfield
     apply_atmospheric_refraction: bool = True
 
-class SolarTimeInputModel(SolarPositionInputModel):
-    refracted_solar_zenith: float = 1.5853349194640094,  # radians
 
-
-
-
-class EarthOrbitInputModel(BaseModel):
-    days_in_a_year: float = 365.25
-    eccentricity: float = 0.03344
+class EarthOrbitModel(BaseModel):
+    days_in_a_year: float = 365.25                                      # TODO: Validator for this value if never changes
+    orbital_eccentricity: float = 0.03344
     perigee_offset: float = 0.048869
-
-
-class TimeOffsetInputModel(BaseModel):
-    time_offset_global: float
-    hour_offset: float
-
+        
 
 class SolarTimeModel(BaseModel):
-    solar_time_model: SolarTimeModels
+    solar_time: time
+    model_config = ConfigDict(
+        description="""The solar time (ST) is a calculation of the passage of time based
+        on the position of the Sun in the sky. It is expected to be decimal hours in a
+        24 hour format and measured internally in seconds.""",
+    )
+
+
+class SurfaceTiltModel(BaseModel):
+    surface_tilt: Union[confloat(ge=-pi/2, le=pi/2), SurfaceTilt]
+    model_config = ConfigDict(
+        description="""Surface tilt (or slope) (β) is the angle between the inclined
+        surface (slope) and the horizontal plane.""",
+    )
+
+    @field_validator("surface_tilt")
+    def surface_tilt_named_tuple(cls, input) -> SurfaceTilt:
+        if isinstance(input, type(SurfaceTilt)):
+            return input
+        elif isinstance(input, float):
+            return SurfaceTilt(value=input, unit='radians')
+        else:
+            raise ValueError("Unsupported surface_tilt type provided")
+
+
+class SurfaceOrientationModel(BaseModel):
+    surface_orientation: confloat(ge=-pi/2, le=pi/2) = 0
+
+
+class SolarDeclinationModel(BaseModel):
+    solar_declination: Union[confloat(ge=-0.4092797096, le=0.4092797096), SolarDeclination]
+    model_config = ConfigDict(
+        description="""Solar declination (δ) is the angle between the equator and a
+        line drawn from the centre of the Earth to the centre of the sun.""",
+    )
+    @field_validator("solar_declination")
+    def solar_declination_named_tuple(cls, input) -> SolarDeclination:
+        if isinstance(input, type(SolarDeclination)):
+            return input
+        elif isinstance(input, float):
+            return SolarDeclination(value=input, unit='radians')
+        else:
+            raise ValueError("Unsupported solar_declination type provided")
+        
+# class HourAngleModel(BaseModel):
+#     hour_angle: Union[confloat(ge=0, le=1), HourAngle]
+#     model_config = ConfigDict(
+#         description="""Solar hour angle.""",
+#     )
+
+
+
+
+
+class BaseCoordinatesInput(
+    LongitudeModel,
+    LatitudeModel,
+):
+    pass
+
+
+class BaseTimeInput(BaseTimestampModel):
+    timezone: Optional[ZoneInfo] = None
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @field_validator('timezone')
+    @classmethod
+    def validate_timezone(cls, v):
+        if v is not None and not isinstance(v, ZoneInfo):
+            raise ValueError("The `timezone` must be a valid `zoneinfo.ZoneInfo` object.")
+        return v
+
+
+class SolarTimeInput(SolarPositionModel):
+    refracted_solar_zenith: Union[float, RefractedSolarZenith]
+
+    @field_validator("refracted_solar_zenith")
+    def refracted_solar_zenith_named_tuple(cls, input) -> RefractedSolarZenith:
+        if isinstance(input, RefractedSolarZenith):
+            return input
+        elif isinstance(input, float):
+            return RefractedSolarZenith(value=input, unit='radians')
+        else:
+            raise ValueError("Unsupported `refracted_solar_zenith` type provided")
 
 
 class SolarAltitudeInput(
-    ModelToDict,
-    BaseCoordinatesInputModel,
-    BaseTimeInputModel,
-    EarthOrbitInputModel,
-    TimeOffsetInputModel,
-    SolarTimeModel,
+    ValidatedInputToDict,
+    BaseCoordinatesInput,
+    BaseTimeInput,
     BaseAngleOutputUnitsModel,
 ):
     pass
@@ -180,18 +262,15 @@ class SolarAzimuthInput(
 
 
 class SolarDeclinationInput(
-        ModelToDict,
+        ValidatedInputToDict,
         # timestamp: Annotated[Optional[datetime], typer.Argument(
         #     help='Timestamp',
         #     default_factory=now_utc_datetimezone)],
         # timezone: Annotated[Optional[str], typer.Option(
         #     help='Timezone',
         #     callback=convert_to_timezone)] = None,
-        BaseTimeInputModel,
-        # days_in_a_year: float = 365.25,
-        # orbital_eccentricity: float = 0.03344,
-        # perigee_offset: float = 0.048869,
-        EarthOrbitInputModel,
+        BaseTimeInput,
+        EarthOrbitModel,
         # output_units: Annotated[str, typer.Option(
         #     '-o',
         #     '--output-units',
@@ -200,47 +279,11 @@ class SolarDeclinationInput(
         #     help="Output units for solar declination (degrees or radians)")] = 'radians',
         BaseAngleOutputUnitsModel,
     ):
-        # debug(locals())
         pass
 
 
-class SolarTimeModel(BaseModel):
-    solar_time: time     # confloat(ge=0, le=86400)
-    model_config = ConfigDict(
-        description="""The solar time (ST) is a calculation of the passage of time based
-        on the position of the Sun in the sky. It is expected to be decimal hours in a
-        24 hour format and measured internally in seconds.""",
-        json_schema_extra = {
-            "units": "seconds",
-        },
-    )
-
-class SurfaceTilt(BaseModel):
-    surface_tilt: confloat(ge=-pi/2, le=pi/2) = 0
-    model_config = ConfigDict(
-        description="""Surface tilt (or slope) (β) is the angle between the inclined
-        surface (slope) and the horizontal plane.""",
-        json_schema_extra = {
-            "units": "radians",
-        },
-    )
-
-class SurfaceOrientation(BaseModel):
-    surface_orientation: confloat(ge=-pi/2, le=pi/2) = 0
-
-
-class SolarDeclinationModel(BaseModel):
-    solar_declination: confloat(ge=-0.4092797096, le=0.4092797096) = 0
-    model_config = ConfigDict(
-        description="""Solar declination (δ) is the angle between the equator and a
-        line drawn from the centre of the Earth to the centre of the sun.""",
-        json_schema_extra = {
-            "units": "radians",
-        },
-    )
-
 class HourAngleInput(
-        ModelToDict,
+        ValidatedInputToDict,
         SolarTimeModel,
         # output_units: Annotated[str, typer.Option(
         #     '-u',
@@ -254,13 +297,13 @@ class HourAngleInput(
 
 
 class HourAngleSunriseInput(
-        ModelToDict,
+        ValidatedInputToDict,
         # latitude: Annotated[Optional[float], typer.Argument(
         #     min=-90, max=90)],
-        Latitude,
+        LatitudeModel,
         # surface_tilt: Annotated[Optional[float], typer.Argument(
         #     min=0, max=90)] = 0,
-        SurfaceTilt,
+        SurfaceTiltModel,
         SolarDeclinationModel,
         # solar_declination: Annotated[Optional[float], typer.Argument(
         #     min=-90, max=90)] = 180,                                  # XXX: Default value changed from 180 to 0
@@ -276,21 +319,21 @@ class HourAngleSunriseInput(
 
 
 class SolarPositionInput(
-    ModelToDict,
+    ValidatedInputToDict,
     # longitude: Annotated[float, typer.Argument(
     #     callback=convert_to_radians,
     #     min=-180, max=180)],
     # latitude: Annotated[float, typer.Argument(
     #     callback=convert_to_radians,
     #     min=-90, max=90)],
-    BaseCoordinatesInputModel,
+    BaseCoordinatesInput,
     # timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
     #     help='Timestamp',
     #     default_factory=now_utc_datetimezone)],
     # timezone: Annotated[Optional[str], typer.Option(
     #     help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
     #     callback=ctx_convert_to_timezone)] = None,
-    BaseTimeInputModel,
+    BaseTimeInput,
     # model: Annotated[SolarPositionModels, typer.Option(
     #     '-m',
     #     '--model',
@@ -303,7 +346,7 @@ class SolarPositionInput(
     #     '--atmospheric-refraction',
     #     help='Apply atmospheric refraction functions',
     #     )] = True,
-    SolarPositionInputModel,
+    SolarPositionModel,
     # time_output_units: Annotated[str, typer.Option(
     #     '-u',
     #     '--output-units',
@@ -328,22 +371,23 @@ class SolarPositionInput(
 ):
     pass
 
+
 class SolarTimeInput(
-    ModelToDict,
+    ValidatedInputToDict,
     # longitude: Annotated[float, typer.Argument(
     #     callback=convert_to_radians,
     #     min=-180, max=180)],
     # latitude: Annotated[float, typer.Argument(
     #     callback=convert_to_radians,
     #     min=-90, max=90)],
-    BaseCoordinatesInputModel,
+    BaseCoordinatesInput,
     # timestamp: Annotated[Optional[datetime], typer.Argument(
     #     help='Timestamp',
     #     default_factory=now_utc_datetimezone)],
     # timezone: Annotated[Optional[str], typer.Option(
     #     help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
     #     callback=ctx_convert_to_timezone)] = None,
-    BaseTimeInputModel,
+    BaseTimeInput,
     # model: Annotated[SolarTimeModels, typer.Option(
     #     '-m',
     #     '--model',
@@ -357,7 +401,7 @@ class SolarTimeInput(
     #     '--atmospheric-refraction',
     #     help='Apply atmospheric refraction functions',
     #     )] = True,
-    SolarTimeInputModel,
+    SolarTimeInput,
     # time_output_units: Annotated[str, typer.Option(
     #     '-u',
     #     '--output-units',
@@ -385,7 +429,7 @@ class SolarTimeInput(
     #     help='Perigee offset')] = 0.048869,
     # orbital_eccentricity: Annotated[float, typer.Option(
     #     help='Eccentricity')] = 0.01672,
-    EarthOrbitInputModel,
+    EarthOrbitModel,
     # time_offset_global: Annotated[float, typer.Option(
     #     help='Global time offset')] = 0,
     # hour_offset: Annotated[float, typer.Option(
@@ -395,35 +439,54 @@ class SolarTimeInput(
     pass
 
 
-class SolarIncidenceStandarInput(
-    Latitude,
+class SolarIncidenceStandardInput(
+    LatitudeModel,
     SolarDeclinationModel,
     BaseAngleOutputUnitsModel,
+    SurfaceOrientationModel,
 ):
-    surface_orientation: float = 0
+    hour_angle: float
+
+class SolarIncidenceJencoInput(
+    BaseCoordinatesInput,
+    BaseTimeInput,
+    RandomTimeModel,
+    SurfaceTiltModel,
+    SurfaceOrientationModel,
+    EarthOrbitModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleInternalUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
     hour_angle: float
 
 
-class SolarIncidenceInput(SolarTimeInput):
+
+class SolarIncidenceInput(
+    SolarTimeInput,
+    SurfaceTiltModel,
+    SurfaceOrientationModel,
+):
     random_time: bool = False
     hour_angle: float
-    surface_tilt: float = 0
-    surface_orientation: float = 0
     rounding_places: int = 5
     verbose: bool = False
 
 
+
+
 class FractionalYearInput(
-    ModelToDict,
-    BaseTimestampInputModel,
+    ValidatedInputToDict,
+    BaseTimestampModel,
     BaseAngleInternalUnitsModel,
 ):
     pass
 
 
 class RelativeLongitudeInput(
-    Latitude,
-    SurfaceTilt,
-    SurfaceOrientation,
+    LatitudeModel,
+    SurfaceTiltModel,
+    SurfaceOrientationModel,
+    BaseAngleOutputUnitsModel,
 ):
-    angle_output_units: str = 'radians'
+    pass

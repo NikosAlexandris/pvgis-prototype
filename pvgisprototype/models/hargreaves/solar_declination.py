@@ -1,7 +1,6 @@
 from devtools import debug
 import typer
 from typing import Annotated
-from typing import NamedTuple
 from functools import partial
 from datetime import datetime
 from datetime import timezone
@@ -9,17 +8,20 @@ from math import sin
 from math import cos
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+
+from pvgisprototype.api.data_classes import SolarDeclination
+
 from pvgisprototype.api.input_models import SolarAltitudeInput
 from pvgisprototype.api.named_tuples import generate
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
-@validate_with_pydantic(SolarAltitudeInput)
+@validate_with_pydantic(SolarAltitudeInput, expand_args=True)
 def calculate_solar_declination_hargreaves(
         timestamp: datetime = partial(datetime.now, tz=timezone.utc),
         days_in_a_year: float = 365.25,
         angle_output_units: str = 'radians',
-    ) -> NamedTuple:
+    ) -> SolarDeclination:
     """Approximate the solar declination based on the Hargreaves formula.
 
                          ⎛360   ⎛                    ⎛360            ⎞⎞⎞
@@ -62,7 +64,8 @@ def calculate_solar_declination_hargreaves(
             )
         )
     )
-    declination = generate('declination', (declination_value_in_degrees, 'degrees'))
+    # declination = generate('declination', )
+    declination = SolarDeclination(value=declination_value_in_degrees, unit='degrees')
     declination = convert_to_radians_if_requested(declination, angle_output_units)
 
     return declination

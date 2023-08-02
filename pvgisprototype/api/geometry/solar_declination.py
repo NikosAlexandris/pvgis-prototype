@@ -1,15 +1,17 @@
 import typer
 from typing import Optional
-from typing import NamedTuple
 from datetime import datetime
 from math import pi
 from math import sin
 from math import asin
 from ..utilities.conversions import convert_to_degrees_if_requested
 
+from pvgisprototype.api.data_classes import SolarDeclination
+from pvgisprototype.api.data_classes import FractionalYear
+
 from pvgisprototype.api.input_models import SolarDeclinationInput
 from pvgisprototype.api.input_models import FractionalYearInput
-from pvgisprototype.api.named_tuples import generate
+
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
@@ -19,7 +21,7 @@ def calculate_fractional_year_pvis(
             days_in_a_year: float = 365.25,
             angle_units: str = 'radians',
             angle_output_units: str = 'radians',
-        ) -> NamedTuple:
+        ) -> FractionalYear:
     """Calculate fractional year in radians
 
     Notes
@@ -41,9 +43,9 @@ def calculate_fractional_year_pvis(
     if not 0 <= fractional_year < 2 * pi:
         raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
 
-    fractional_year = generate('fractional_year', (fractional_year, angle_output_units))
+    fractional_year = FractionalYear(value=fractional_year, unit='radians')
 
-    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
+    fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
     # if angle_output_units == 'degrees':
     #     if not 0 <= fractional_year < 360:
     #         raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
@@ -58,8 +60,8 @@ def calculate_solar_declination(
         days_in_a_year: float = 365.25,
         orbital_eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
-        angle_output_units: float = 365.25,
-    ) -> NamedTuple:
+        angle_output_units: str = 'radians',
+    ) -> SolarDeclination:
     """Approximate the sun's declination for a given day of the year.
 
     The solar declination is the angle between the Sun's rays and the
@@ -76,7 +78,7 @@ def calculate_solar_declination(
     Parameters
     ----------
     day_of_year: int
-        The day of the year (ranging from 1 to 365 or 366 in a leap year).
+        The day of the year (ranging froSolarAzimuthm 1 to 365 or 366 in a leap year).
 
     Returns
     -------
@@ -98,7 +100,7 @@ def calculate_solar_declination(
     fractional_year = calculate_fractional_year_pvis(
             timestamp=timestamp,
             days_in_a_year=days_in_a_year,
-            angle_output_units=angle_output_units,
+            angle_output_units='radians',
             )
     declination = asin(
             0.3978 * sin(
@@ -107,6 +109,6 @@ def calculate_solar_declination(
                     )
                 )
             )
-    
-    declination = generate('solar_declination', (declination, angle_output_units))
+    declination = SolarDeclination(value=declination, unit='radians')
+    declination = convert_to_degrees_if_requested(declination, angle_output_units)
     return declination

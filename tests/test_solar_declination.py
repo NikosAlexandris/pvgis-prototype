@@ -21,33 +21,36 @@ based on a given formula or lookup table ?
 
 
 test_cases = [
-    (datetime.datetime(2023, 1, 1), -23.38044),  # Around vernal equinox
-    (datetime.datetime(2023, 3, 20), 0),  # Around vernal equinox
-    (datetime.datetime(2023, 3, 21), 0),  # Around vernal equinox
-    (datetime.datetime(2023, 6, 20), 23.44),  # Around summer solstice
-    (datetime.datetime(2023, 6, 21), 23.44),  # Around summer solstice
-    (datetime.datetime(2023, 9, 22), 0),  # Around autumnal equinox
-    (datetime.datetime(2023, 9, 23), 0),  # Around autumnal equinox
-    (datetime.datetime(2023, 12, 21), -23.44),  # Around winter solstice
-    (datetime.datetime(2023, 12, 22), -23.44),  # Around winter solstice
-    (datetime.datetime(2023, 12, 30), -16.428456),  # Around winter solstice
+    (datetime.datetime(2023, 1, 1), -23.38044, 'degrees'),  # Around vernal equinox
+    (datetime.datetime(2023, 3, 20), 0, 'degrees'),  # Around vernal equinox
+    (datetime.datetime(2023, 3, 21), 0, 'degrees'),  # Around vernal equinox
+    (datetime.datetime(2023, 6, 20), 23.44, 'degrees'),  # Around summer solstice
+    (datetime.datetime(2023, 6, 21), 23.44, 'degrees'),  # Around summer solstice
+    (datetime.datetime(2023, 9, 22), 0, 'degrees'),  # Around autumnal equinox
+    (datetime.datetime(2023, 9, 23), 0, 'degrees'),  # Around autumnal equinox
+    (datetime.datetime(2023, 12, 21), -23.44, 'degrees'),  # Around winter solstice
+    (datetime.datetime(2023, 12, 22), -23.44, 'degrees'),  # Around winter solstice
+    (datetime.datetime(2023, 12, 30), -16.428456, 'degrees'),  # Around winter solstice
 ]
 tolerances = [1, 0.1]
-@pytest.mark.parametrize( "timestamp, expected", test_cases)
+@pytest.mark.parametrize( "timestamp, expected_value, expected_unit", test_cases)
 @pytest.mark.parametrize('tolerance', tolerances)
 def test_calculate_solar_declination(
         timestamp: datetime.datetime,
-        expected: float,
+        expected_value: float,
+        expected_unit: str,
         tolerance: float,
         ):
-    assert expected == pytest.approx(
-        calculate_solar_declination(
+    calculated = calculate_solar_declination(
             timestamp=timestamp,
             timezone=None,
             angle_output_units="degrees",
-        ),
+        )
+    assert expected_value == pytest.approx(
+        calculated.value,
         tolerance,
     )
+    assert expected_unit == calculated.unit
     # assert pytest.approx(calculate_solar_declination(timestamp, output_units='degrees'), 0.1) == expected
 
 

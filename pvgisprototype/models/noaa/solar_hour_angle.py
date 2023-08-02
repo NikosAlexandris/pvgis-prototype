@@ -2,22 +2,24 @@ from .noaa_models import CalculateSolarHourAngleNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
 from typing import Optional
-from .noaa_models import Longitude_in_Radians
+# from .noaa_models import LongitudeModel_in_Radians
 from .solar_time import calculate_true_solar_time_noaa
 from math import pi
-from typing import NamedTuple
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import SolarHourAngle
+from pvgisprototype.api.data_classes import Longitude
+
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 
 
-@validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
+@validate_with_pydantic(CalculateSolarHourAngleNOAAInput, expand_args=True)
 def calculate_solar_hour_angle_noaa(
-        longitude: Longitude_in_Radians,
+        longitude: Longitude,
         timestamp: datetime, 
         timezone: Optional[str], 
         time_output_units: Optional[str] = 'minutes',
         angle_output_units: Optional[str] = 'radians',
-        ) -> NamedTuple:
+    ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
 
     The solar hour angle calculation converts the local solar time (LST) into
@@ -76,9 +78,9 @@ def calculate_solar_hour_angle_noaa(
     # elif angle_output_units == 'degrees' and not -180 <= solar_hour_angle <= 180:
     #     raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")
 
-    solar_hour_angle = generate(
-        'solar_hour_angle',
-        (solar_hour_angle, angle_output_units)
+    solar_hour_angle = SolarHourAngle(
+        value=solar_hour_angle,
+        input=angle_output_units,
     )
     return solar_hour_angle
 

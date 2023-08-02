@@ -1,7 +1,6 @@
 import typer
 from typing import Annotated
 from typing import Optional
-from typing import NamedTuple
 from datetime import datetime
 from datetime import time as datetime_time
 from datetime import timedelta
@@ -18,10 +17,12 @@ from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.conversions import convert_to_degrees
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.named_tuples import generate
-from .input_models import CalculateTrueSolarTimeSkyfieldInputModel
-from .input_models import Latitude
-from .input_models import Longitude
+
+from pvgisprototype.api.data_classes import SolarTime
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import Longitude
+
+from .input_models import CalculateTrueSolarTimeSkyfieldInput
 from .decorators import validate_with_pydantic
 
 
@@ -100,14 +101,14 @@ from .decorators import validate_with_pydantic
 #     return local_solar_time
 
 
-@validate_with_pydantic(CalculateTrueSolarTimeSkyfieldInputModel, expand_args=True)
+@validate_with_pydantic(CalculateTrueSolarTimeSkyfieldInput, expand_args=True)
 def calculate_solar_time_skyfield(
         longitude: Longitude,
         latitude: Latitude,
         timestamp: datetime,
         timezone: str = None,
         verbose: bool = False,
-    ) -> NamedTuple:
+    ) -> SolarTime:
 
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -156,8 +157,4 @@ def calculate_solar_time_skyfield(
 
     typer.echo(f'Local solar time: {local_solar_time}')
 
-    local_solar_time = generate(
-        'solar_time',
-        (local_solar_time, 'decimal hours'),
-    )
-    return local_solar_time 
+    return SolarTime(value=local_solar_time, unit='decimal hours') 
