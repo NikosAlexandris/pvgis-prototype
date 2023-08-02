@@ -1,4 +1,3 @@
-from devtools import debug
 """
 Date, time and zones
 --------------------
@@ -51,6 +50,7 @@ from typing import Annotated
 from typing import Optional
 import calendar
 import random
+# import time
 import typer
 import zoneinfo
 from zoneinfo import ZoneInfo
@@ -210,7 +210,6 @@ def convert_to_timezone(timezone_string: str) -> ZoneInfo:
     """Convert string to ZoneInfo object."""
     print(f'[yellow]i[/yellow] Executing convert_to_timezone()')
 
-
     if timezone_string is None:
         print(f'  [yellow]>[/yellow] No timezone requested [red]?[/red]')  # Convert to warning!
         print(f'  [yellow]>[/yellow] Setting timezone to [red]UTC[/red]')
@@ -240,7 +239,6 @@ def attach_timezone(
         timezone_string: Optional[str] = None
 ) -> datetime:
     """Convert datetime object to timezone-aware."""
-
     if timestamp is None:
         timestamp = datetime.now(ZoneInfo('UTC'))  # Default to UTC
 
