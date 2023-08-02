@@ -140,9 +140,13 @@ class SolarTimeInput(
 class SolarAzimuthInput(
     BaseCoordinatesInputModel,
     BaseTimeInputModel,
+    ApplyAtmosphericRefraction,
+    RefractedSolarZenith,
+    EarthOrbitInputModel,
     TimeOffsetInputModel,
     SolarTimeModel,
-    EarthOrbitInputModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass

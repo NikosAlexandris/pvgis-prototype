@@ -25,6 +25,7 @@ from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
 from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from ...models.noaa.solar_position import calculate_solar_altitude_noaa
 from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
+from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 
 
 class SolarPositionModels(str, Enum):
@@ -91,6 +92,7 @@ def model_solar_position(
             '--atmospheric-refraction',
             help='Apply atmospheric refraction functions',
             )] = True,
+        refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
         days_in_a_year: Annotated[float, typer.Option(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
@@ -217,30 +219,38 @@ def model_solar_position(
     if model.value  == SolarPositionModels.pvis:
 
         solar_altitude, solar_altitude_units = calculate_solar_altitude(
-                longitude=longitude,
-                latitude=latitude,
-                timestamp=timestamp,
-                timezone=timezone,
-                days_in_a_year=days_in_a_year,
-                perigee_offset=perigee_offset,
-                eccentricity=eccentricity,
-                time_offset_global=time_offset_global,
-                hour_offset=hour_offset,
-                solar_time_model=solar_time_model,
-                angle_output_units=angle_output_units,
-                )
-        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
-        solar_azimuth, solar_azimuth_units = calculate_solar_azimuth(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity=eccentricity,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_time_model=solar_time_model,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
+            )
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
+        solar_azimuth, solar_azimuth_units = calculate_solar_azimuth(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity=eccentricity,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset,
+            solar_time_model=solar_time_model,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
             angle_output_units=angle_output_units,
         )
         solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
