@@ -1,4 +1,3 @@
-from devtools import debug
 """
 Important sun and solar surface geometry parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
 """
@@ -194,7 +193,6 @@ def solar_time(
                 str(solar_time),
                 str(units),
         )
-
     console.print(solar_time_table)
 
 
