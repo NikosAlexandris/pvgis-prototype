@@ -1,4 +1,3 @@
-from devtools import debug
 import logging
 logging.basicConfig(
     level=logging.ERROR,
@@ -8,8 +7,6 @@ logging.basicConfig(
         logging.StreamHandler()  # Print log to the console
     ]
 )
-import typer
-from typing import Annotated
 from typing import Optional
 from typing import List
 from datetime import datetime
@@ -41,69 +38,26 @@ from ...models.milne1921.solar_time import calculate_solar_time_eot
 from ...models.pyephem.solar_time import calculate_solar_time_ephem
 from ...models.pvgis.solar_time import calculate_solar_time_pvgis
 from .time_models import SolarTimeModels
-
-
-app = typer.Typer(
-    add_completion=False,
-    add_help_option=True,
-    help=f"Calculate solar time for a location and moment in time",
-)
+from pvgisprototype.models.noaa.noaa_models import Longitude_in_Radians
+from pvgisprototype.models.noaa.noaa_models import Latitude_in_Radians
 
 
 def model_solar_time(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
-            callback=ctx_convert_to_timezone)] = None,
-        model: Annotated[SolarTimeModels, typer.Option(
-            '-m',
-            '--model',
-            help="Model to calculate solar position",
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False)] = SolarTimeModels.skyfield,
-        refracted_solar_zenith: float = 1.5853349194640094,  # radians
-        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
-            '-a',
-            '--atmospheric-refraction',
-            help='Apply atmospheric refraction functions',
-            )] = True,
-        time_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
-        angle_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
-        angle_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
-        days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year')] = 365.25,
-        perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
-            help='Eccentricity')] = 0.01672,
-        time_offset_global: Annotated[float, typer.Option(
-            help='Global time offset')] = 0,
-        hour_offset: Annotated[float, typer.Option(
-            help='Hour offset')] = 0,
+        longitude: Longitude_in_Radians,
+        latitude: Latitude_in_Radians,
+        timestamp: datetime,
+        timezone: ZoneInfo,
+        model: SolarTimeModels,
+        refracted_solar_zenith: float,
+        apply_atmospheric_refraction: Optional[bool],
+        days_in_a_year: float,
+        perigee_offset: float,
+        eccentricity: float,
+        time_offset_global: int,
+        hour_offset: int,
+        time_output_units: str,
+        angle_units: str,
+        angle_output_units: str,
         ):
     """
     """
@@ -171,69 +125,31 @@ def model_solar_time(
             timezone,
             )
 
+    # return (solar_time, units)
     return solar_time
 
 
-# @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
-# @app.command('solar-time')
 def calculate_solar_time(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[ZoneInfo], typer.Option(
-            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
-            callback=ctx_convert_to_timezone)] = None,
-        models: Annotated[List[SolarTimeModels], typer.Option(
-            '-m',
-            '--model',
-            help="Model to calculate solar position",
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False)] = [SolarTimeModels.skyfield],
+        longitude: Longitude_in_Radians,
+        latitude: Latitude_in_Radians,
+        timestamp: datetime,
+        timezone: ZoneInfo,
+        models: List[SolarTimeModels] = [SolarTimeModels.skyfield],
         refracted_solar_zenith: float = 1.5853349194640094,  # radians
-        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
-            '-a',
-            '--atmospheric-refraction',
-            help='Apply atmospheric refraction functions',
-            )] = True,
-        time_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]")] = 'minutes',
-        angle_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for internal calculations (degrees or radians) - :warning: [bold red]Keep fingers away![/bold red]")] = 'radians',
-        angle_output_units: Annotated[str, typer.Option(
-            '-u',
-            '--units',
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
-        days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year')] = 365.25,
-        perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
-            help='Eccentricity')] = 0.01672,
-        time_offset_global: Annotated[float, typer.Option(
-            help='Global time offset')] = 0,
-        hour_offset: Annotated[float, typer.Option(
-            help='Hour offset')] = 0,
+        apply_atmospheric_refraction: Optional[bool] = True,
+        days_in_a_year: float = 365.25,
+        perigee_offset: float = 0.048869,
+        eccentricity: float = 0.01672,
+        time_offset_global: int = 0,
+        hour_offset: int = 0,
+        time_output_units: str = 'minutes',
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians'
 ):
     """
     Calculates the solar time using all models and returns the results in a table.
     """
+    # # debug(locals())
     results = []
     for model in models:
         if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
