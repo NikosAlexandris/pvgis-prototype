@@ -108,6 +108,16 @@ def solar_time(
             '--atmospheric-refraction',
             help='Apply atmospheric refraction functions',
             )] = True,
+        days_in_a_year: Annotated[float, typer.Option(
+            help='Days in a year')] = 365.25,
+        perigee_offset: Annotated[float, typer.Option(
+            help='Perigee offset')] = 0.048869,
+        eccentricity: Annotated[float, typer.Option(
+            help='Eccentricity')] = 0.01672,
+        time_offset_global: Annotated[float, typer.Option(
+            help='Global time offset')] = 0,
+        hour_offset: Annotated[float, typer.Option(
+            help='Hour offset')] = 0,
         time_output_units: Annotated[str, typer.Option(
             '-u',
             '--output-units',
@@ -126,16 +136,6 @@ def solar_time(
             show_default=True,
             case_sensitive=False,
             help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
-        days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year')] = 365.25,
-        perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset')] = 0.048869,
-        orbital_eccentricity: Annotated[float, typer.Option(
-            help='Eccentricity')] = 0.01672,
-        time_offset_global: Annotated[float, typer.Option(
-            help='Global time offset')] = 0,
-        hour_offset: Annotated[float, typer.Option(
-            help='Hour offset')] = 0,
         ):
     """Calculate the solar time.
 

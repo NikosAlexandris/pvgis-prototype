@@ -4,16 +4,18 @@ from typing import Optional
 from typing import NamedTuple
 from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_degrees_if_requested
-from datetime import time
+from math import pi
 from math import radians
 from math import acos
 from math import tan
+from datetime import time
 
 from pvgisprototype.api.input_models import Latitude
 from pvgisprototype.api.input_models import HourAngleInput
 from pvgisprototype.api.input_models import HourAngleSunriseInput
 from pvgisprototype.api.named_tuples import generate
 from pvgisprototype.api.decorators import validate_with_pydantic
+
 from ..utilities.timestamp import timestamp_to_decimal_hours
 
 
@@ -68,6 +70,7 @@ def calculate_hour_angle(
             )
     return hour_angle
 
+    return hour_angle, angle_output_units
 
 @validate_with_pydantic(HourAngleSunriseInput, expand_args=True)
 def calculate_hour_angle_sunrise(

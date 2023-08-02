@@ -9,6 +9,7 @@ meteorology:
   - tmy
 """
 import typer
+from .messages import NOT_IMPLEMENTED
 
 
 app = typer.Typer(
@@ -19,7 +20,9 @@ app = typer.Typer(
 )
 
 
+@app.callback(
+        help='')
 def read_raster_data(netcdf: str, mask_and_scale=False):
     """
     """
-    pass
+    print(f"{NOT_IMPLEMENTED}")

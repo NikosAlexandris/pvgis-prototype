@@ -14,7 +14,6 @@ from pvgisprototype.api.named_tuples import generate
 @validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
 def calculate_solar_declination_noaa(
         timestamp: datetime,
-        angle_units: Optional[str] = 'radians',
         angle_output_units: Optional[str] = 'radians'
 ) -> NamedTuple:
         """Calculate the solar declination in radians"""

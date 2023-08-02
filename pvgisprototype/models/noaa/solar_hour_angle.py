@@ -67,7 +67,8 @@ def calculate_solar_hour_angle_noaa(
         longitude, timestamp, timezone, time_output_units
     )  # in minutes
 
-    solar_hour_angle = (true_solar_time.value - 720) * (pi / 720)       # FIXME; Calculation between datetime and float
+    true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
+    solar_hour_angle = (true_solar_time_minutes - 720) * (pi / 720)
 
     if angle_output_units == 'radians' and not -pi <= solar_hour_angle <= pi:
         raise ValueError("The hour angle in radians must be within the range [-π, π]")

@@ -13,6 +13,7 @@ import pathlib
 import os
 from .example_pv_estimation_output import csv_to_list_of_dictionaries
 from rich import print
+from .messages import NOT_IMPLEMENTED
 
 
 app = typer.Typer(
@@ -607,7 +608,8 @@ def estimate_grid_connected_pv(
     return 0
 
 
-@app.command('tracking', no_args_is_help=True, help=":satellite_antenna: Estimate PV power output for a system not connected to the grid")
+# @app.command('tracking', no_args_is_help=True, help=":satellite_antenna: Estimate PV power output for a system not connected to the grid")
+@app.command('tracking', help=":satellite_antenna: Estimate PV power output for a system not connected to the grid")
 def estimate_tracking_pv():
     """Estimate the energy production of a tracking PV system connected to the electricity grid
 
@@ -641,10 +643,11 @@ def estimate_tracking_pv():
       both that coming directly from the sun and that coming from the rest of
       the sky.
     """
-    pass
+    print(f"{NOT_IMPLEMENTED}")
 
 
-@app.command('offgrid', no_args_is_help=True, help=':battery:  Estimate PV power output for a system not connected to the grid')
+# @app.command('offgrid', no_args_is_help=True, help=':battery:  Estimate PV power output for a system not connected to the grid')
+@app.command('offgrid', help=':battery:  Estimate PV power output for a system not connected to the grid')
 def estimate_offgrid_pv():
     """Estimate the energy production of a PV system that is not connected to
     the electricity grid but instead relies on battery storage
@@ -656,4 +659,4 @@ def estimate_offgrid_pv():
     electricity consumption for the system to simulate the flow of energy to
     the users and into and out of the battery.
     """
-    pass
+    print(f"{NOT_IMPLEMENTED}")

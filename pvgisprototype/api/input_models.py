@@ -11,6 +11,7 @@ from math import pi
 from pydantic import validator
 
 from .geometry.solar_models import SolarPositionModels
+from pvgisprototype.api.geometry.time_models import SolarTimeModels
 from pvgisprototype.api.named_tuples import generate
 
 
@@ -131,23 +132,51 @@ class SolarTimeInputModel(SolarPositionInputModel):
 
 
 
+class EarthOrbitInputModel(BaseModel):
+    days_in_a_year: float = 365.25
+    eccentricity: float = 0.03344
+    perigee_offset: float = 0.048869
+
+
+class TimeOffsetInputModel(BaseModel):
+    time_offset_global: float
+    hour_offset: float
+
+
+class SolarTimeModel(BaseModel):
+    solar_time_model: SolarTimeModels
+
+
 class SolarAltitudeInput(
     ModelToDict,
     BaseCoordinatesInputModel,
     BaseTimeInputModel,
+    EarthOrbitInputModel,
+    TimeOffsetInputModel,
+    SolarTimeModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
 
 
-class SolarAzimuthInput(SolarAltitudeInput):
+class SolarTimeInput(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    EarthOrbitInputModel,
+    BaseOutputUnitsModel,
+):
     pass
 
 
-class EarthOrbitInputModel(BaseModel):
-    days_in_a_year: float = 365.25
-    orbital_eccentricity: float = 0.03344
-    perigee_offset: float = 0.048869
+class SolarAzimuthInput(
+    BaseCoordinatesInputModel,
+    BaseTimeInputModel,
+    TimeOffsetInputModel,
+    SolarTimeModel,
+    EarthOrbitInputModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
 
 
 class SolarDeclinationInput(

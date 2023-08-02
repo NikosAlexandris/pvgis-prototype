@@ -60,6 +60,19 @@ from rich import print
 app = typer.Typer()
 
 
+def parse_timestamp(timestamp_string):
+    if timestamp_string:
+        formats = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%Y-%m', '%Y']
+        for fmt in formats:
+            try:
+                return datetime.strptime(timestamp_string, fmt)
+            except ValueError:
+                pass
+        raise ValueError(f"Invalid timestamp format: {timestamp_string}")
+    else:
+        return None
+
+
 def now_local_datetimezone():
     """Get current local date and time and zone
     """

@@ -24,7 +24,7 @@ def calculate_solar_declination_pvgis(
         #     help='Timezone',
         #     callback=ctx_convert_to_timezone)] = None,
         days_in_a_year: float = 365.25,
-        orbital_eccentricity: float = 0.03344,
+        eccentricity: float = 0.03344,
         perigee_offset: float = 0.048869,
         output_units: str = 'radians',
         # : Annotated[str, typer.Option(
@@ -58,7 +58,7 @@ def calculate_solar_declination_pvgis(
         timestamp,
         timezone,
         days_in_a_year,
-        orbital_eccentricity,
+        eccentricity,
         perigee_offset,
         output_units,
         )

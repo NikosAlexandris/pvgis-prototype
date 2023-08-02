@@ -46,7 +46,18 @@ def calculate_solar_position_skyfield(
         #     case_sensitive=False,
         #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
         ) -> NamedTuple:
-    """Calculate sun position
+    """Calculate sun position above the local horizon using Skyfield.
+
+    Returns
+    -------
+    solar_altitude:
+        Altitude measures the angle above or below the horizon. The
+        zenith is at +90°, an object on the horizon’s great circle is at 0°,
+        and the nadir beneath your feet is at −90°.
+
+    solar_azimuth:
+        Azimuth measures the angle around the sky from the north pole: 0° means
+        exactly north, 90° is east, 180° is south, and 270° is west.
 
     Notes
     -----
