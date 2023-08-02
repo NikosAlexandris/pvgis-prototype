@@ -93,12 +93,24 @@ class SolarTimeModel(BaseModel):
     solar_time_model: SolarTimeModels
 
 
+class ApplyAtmosphericRefraction(BaseModel):
+    apply_atmospheric_refraction: bool
+
+
+class RefractedSolarZenith(BaseModel):
+    refracted_solar_zenith: float
+
+
 class SolarAltitudeInput(
     BaseCoordinatesInputModel,
     BaseTimeInputModel,
+    ApplyAtmosphericRefraction,
+    RefractedSolarZenith,
     EarthOrbitInputModel,
     TimeOffsetInputModel,
     SolarTimeModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
