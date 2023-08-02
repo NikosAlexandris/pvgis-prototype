@@ -60,4 +60,3 @@ MAX_STATES = 20
 chargeMatrix = [0.0] * (MAX_CURRENTS * MAX_STATES)
 
 systemEfficiency_global = 1.0
-
