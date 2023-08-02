@@ -12,12 +12,14 @@ from datetime import time
 from pvgisprototype.api.data_classes import HourAngle
 from pvgisprototype.api.data_classes import HourAngleSunrise
 from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import HourAngle
+from pvgisprototype.api.data_classes import HourAngleSunrise
+from pvgisprototype.api.data_classes import Latitude
 
 from pvgisprototype.api.input_models import HourAngleInput
 from pvgisprototype.api.input_models import HourAngleSunriseInput
 
 from pvgisprototype.api.decorators import validate_with_pydantic
-
 from ..utilities.timestamp import timestamp_to_decimal_hours
 
 

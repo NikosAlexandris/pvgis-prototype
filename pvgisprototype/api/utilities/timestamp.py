@@ -60,9 +60,6 @@ from rich import print
 from pvgisprototype.api.named_tuples import generate
 
 
-# app = typer.Typer()
-
-
 def parse_timestamp(timestamp_string):
     if timestamp_string:
         formats = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%Y-%m', '%Y']

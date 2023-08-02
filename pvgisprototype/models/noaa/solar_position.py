@@ -25,6 +25,10 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 from .decorators import validate_with_pydantic
+from .noaa_models import Longitude
+from .noaa_models import Latitude
+from .noaa_models import Longitude_in_Radians
+from .noaa_models import Latitude_in_Radians
 from .noaa_models import CalculateSolarPositionNOAAInput
 from zoneinfo import ZoneInfo
 

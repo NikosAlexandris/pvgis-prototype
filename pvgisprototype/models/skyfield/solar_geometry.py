@@ -45,7 +45,7 @@ def calculate_solar_position_skyfield(
         #     show_default=True,
         #     case_sensitive=False,
         #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> NamedTuple:
+    ) -> SolarPosition:
     """Calculate sun position above the local horizon using Skyfield.
 
     Returns

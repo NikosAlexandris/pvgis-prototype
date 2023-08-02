@@ -111,7 +111,7 @@ def calculate_time_offset_noaa(
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp,
-        'minutes',
+        time_output_units,
         angle_units,
         )  # minutes
     time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time.value
