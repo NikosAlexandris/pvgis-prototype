@@ -43,6 +43,7 @@ def calculate_true_solar_time_noaa(
     )
 
     if time_output_units == 'minutes':
+        # if not 0 <= true_solar_time <= 1440:
         if not 0 <= true_solar_time <= 1580:
             raise ValueError(f'The true solar time must range within [0, {1440+20}] minutes')
 

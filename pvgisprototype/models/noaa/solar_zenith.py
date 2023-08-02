@@ -180,9 +180,8 @@ def calculate_solar_zenith_noaa(
             angle_output_units="radians",  # always in radians!
         )
     # if not isfinite(solar_zenith.value) or not 0 <= solar_zenith.value <= pi/2 + 0.0146:
-    #     raise ValueError('The `solar_zenith` should be a finite number ranging in [0, π + 0.0146] radians')
     if not isfinite(solar_zenith.value) or not 0 <= solar_zenith.value <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
-
     # solar_zenith = convert_to_degrees_if_requested(solar_zenith, angle_output_units)
+
     return solar_zenith

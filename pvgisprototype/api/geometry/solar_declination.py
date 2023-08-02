@@ -1,6 +1,8 @@
+from devtools import debug
 import typer
 from typing import Optional
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from math import pi
 from math import sin
 from math import asin
@@ -42,26 +44,21 @@ def calculate_fractional_year_pvis(
 
     if not 0 <= fractional_year < 2 * pi:
         raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
-
     fractional_year = FractionalYear(value=fractional_year, unit='radians')
-
-    fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
-    # if angle_output_units == 'degrees':
-    #     if not 0 <= fractional_year < 360:
-    #         raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')
+    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
             
     return fractional_year
 
 
 @validate_with_pydantic(SolarDeclinationInput, expand_args=True)
 def calculate_solar_declination(
-        timestamp: datetime,
-        timezone: str = None,
-        days_in_a_year: float = 365.25,
-        orbital_eccentricity: float = 0.03344,
-        perigee_offset: float = 0.048869,
-        angle_output_units: str = 'radians',
-    ) -> SolarDeclination:
+    timestamp: datetime,
+    timezone: ZoneInfo,
+    days_in_a_year: float = 365.25,
+    orbital_eccentricity: float = 0.03344,
+    perigee_offset: float = 0.048869,
+    angle_output_units: str = "radians",
+) -> SolarDeclination:
     """Approximate the sun's declination for a given day of the year.
 
     The solar declination is the angle between the Sun's rays and the
@@ -110,5 +107,6 @@ def calculate_solar_declination(
                 )
             )
     declination = SolarDeclination(value=declination, unit='radians')
-    declination = convert_to_degrees_if_requested(declination, angle_output_units)
+    # declination = convert_to_degrees_if_requested(declination, angle_output_units)
+
     return declination

@@ -1,5 +1,3 @@
-# from .noaa_models import LongitudeModel_in_Radians
-# from .noaa_models import LatitudeModel_in_Radians
 from .noaa_models import CalculateSolarAltitudeNOAAInput
 from .decorators import validate_with_pydantic
 from datetime import datetime
@@ -39,7 +37,7 @@ def calculate_solar_altitude_noaa(
         solar_hour_angle.value,
         apply_atmospheric_refraction,
         angle_output_units='radians',
-            )  # radians
+    )  # radians
     solar_altitude = pi/2 - solar_zenith.value
     if not isfinite(solar_altitude) or not -pi/2 <= solar_altitude <= pi/2:
         raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')

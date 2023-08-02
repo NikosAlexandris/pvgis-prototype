@@ -65,6 +65,39 @@ from ..geometry.solar_time import model_solar_time
 from ..utilities.timestamp import timestamp_to_decimal_hours
 from .constants import SOLAR_CONSTANT
 
+from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
+from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
+from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer_parameters import typer_option_statistics
+from pvgisprototype.cli.typer_parameters import typer_option_csv
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_argument_linke_turbidity_factor
+from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
+from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
+from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
+from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
+from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
+from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
+from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
+from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
+from pvgisprototype.cli.typer_parameters import typer_option_eccentricity
+from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
+from pvgisprototype.cli.typer_parameters import typer_option_angle_units
+from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
+from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
+
 
 AOIConstants = []
 AOIConstants.append(-0.074)
@@ -112,42 +145,19 @@ def select_location_time_series(data_path, longitude, latitude, inexact_matches_
         rich_help_panel=rich_help_panel_series_irradiance,
         )
 def calculate_diffuse_horizontal_component_from_sarah(
-        shortwave: Annotated[Path, typer.Argument(
-            help='Global horizontal irradiance (Surface Incoming Shortwave Irradiance (SIS), `ssrd`')], 
-        direct: Annotated[Path, typer.Argument(
-            help='Direct (or beam) horizontal irradiance (Surface Incoming Direct radiation (SID), `fdir`)')],
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],  # in PVGIS : coloffset
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],  # in PVGIS : rowoffset
-        timestamp: Annotated[Optional[str], typer.Argument(
-            help='Timestamp',
-            callback=parse_timestamp)] = None,
-        start_time: Annotated[Optional[datetime], typer.Option(
-            help='Start date of the period')] = None,
-        end_time: Annotated[Optional[datetime], typer.Option(
-            help='End date of the period')] = None,
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
-        inexact_matches_method: Annotated[MethodsForInexactMatches, typer.Option(
-            '--method-for-inexact-matches',
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False,
-            rich_help_panel=rich_help_panel_advanced_options,
-            help="Model to calculate solar position")] = MethodsForInexactMatches.nearest,
-        statistics: Annotated[bool, typer.Option(
-            help='Print summary statistics for the selected series',
-            rich_help_panel="Output",)] = False,
-        csv: Annotated[Optional[Path], typer.Option(
-            help='CSV output filename',
-            rich_help_panel="Output")] = 'series_in',
-        verbose: Annotated[bool, typer.Option(
-            help='Be verbose!')] = False,
-    ):
+    shortwave: Annotated[Path, typer_argument_shortwave_irradiance],
+    direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
     time series.
 
@@ -295,8 +305,8 @@ def calculate_term_n(
         rich_help_panel=rich_help_panel_toolbox,
         )
 def calculate_diffuse_sky_irradiance(
-        surface_tilt: float,
         n: float,
+        surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
         ):
     """Calculate the diffuse sky irradiance
 
@@ -340,10 +350,7 @@ def calculate_diffuse_sky_irradiance(
         rich_help_panel=rich_help_panel_toolbox,
         )
 def diffuse_transmission_function(
-        linke_turbidity_factor: Annotated[float, typer.Argument(
-            help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity',
-            min=0, max=8,
-            rich_help_panel=rich_help_panel_advanced_options)] = 2,  # 2 to get going for now
+    linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
         ):
     """ Diffuse transmission function
     """
@@ -355,7 +362,7 @@ def diffuse_transmission_function(
 
 
 def diffuse_solar_altitude_coefficients(
-        linke_turbidity_factor: float,
+    linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
         ):
     """
     """
@@ -392,10 +399,8 @@ def diffuse_solar_altitude_coefficients(
         rich_help_panel=rich_help_panel_toolbox,
         )
 def diffuse_solar_altitude_function(
-        solar_altitude: float,
-        linke_turbidity_factor: Annotated[float, typer.Argument(
-            help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity',
-            min=0, max=8)] = 2,  # 2 to get going for now
+    solar_altitude: Annotated[float, typer_argument_solar_altitude],
+    linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
         ):
     """Diffuse solar altitude function Fd"""
     a1, a2, a3 = diffuse_solar_altitude_coefficients(linke_turbidity_factor)
@@ -413,90 +418,33 @@ def diffuse_solar_altitude_function(
         rich_help_panel=rich_help_panel_series_irradiance,
         )
 def calculate_diffuse_inclined_irradiance(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
         elevation: Annotated[float, typer.Argument(
             min=0, max=8848,
             help='Elevation',)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone,
-            callback=ctx_attach_requested_timezone,
-            )],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
-        surface_tilt: Annotated[Optional[float], typer.Option(
-            min=0, max=90,
-            help='Solar surface tilt angle',
-            callback=convert_to_radians,
-            rich_help_panel=rich_help_panel_geometry_surface)] = 45,
-        surface_orientation: Annotated[Optional[float], typer.Option(
-            min=0, max=360,
-            help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]',
-            callback=convert_to_radians,
-            rich_help_panel=rich_help_panel_geometry_surface)] = 180,  # from North!
-        linke_turbidity_factor: Annotated[float, typer.Option(
-            help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity',
-            min=0, max=8,
-            rich_help_panel=rich_help_panel_atmospheric_properties,
-            )] = 2,  # 2 to get going for now
-        apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
-            '--atmospheric-refraction',
-            help='Apply atmospheric refraction functions',
-            rich_help_panel=rich_help_panel_atmospheric_properties,
-            )] = True,
-        direct_horizontal_irradiance: Annotated[Optional[Path], typer.Option(
-            help='Read horizontal irradiance time series data from a file',)] = None,
-        apply_angular_loss_factor: Annotated[Optional[bool], typer.Option(
-            help='Apply angular loss function',
-            rich_help_panel=rich_help_panel_advanced_options)] = True,
-        solar_time_model: Annotated[SolarTimeModels, typer.Option(
-            help="Model to calculate solar position",
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False,
-            rich_help_panel=rich_help_panel_solar_time)] = SolarTimeModels.skyfield,
-        time_offset_global: Annotated[float, typer.Option(
-            help='Global time offset',
-            rich_help_panel=rich_help_panel_solar_time)] = 0,
-        hour_offset: Annotated[float, typer.Option(
-            help='Hour offset',
-            rich_help_panel=rich_help_panel_solar_time)] = 0,
-        solar_constant: Annotated[float, typer.Option(
-            help="The mean solar electromagnetic radiation at the top of the atmosphere (~1360.8 W/m2) one astronomical unit (au) away from the Sun.",
-            min=1360,
-            rich_help_panel=rich_help_panel_earth_orbit)] = SOLAR_CONSTANT,
-        days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 365.25,
-        perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
-            help='Eccentricity',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 0.01672,
-        time_output_units: Annotated[str, typer.Option(
-            show_default=True,
-            case_sensitive=False,
-            help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]",
-            rich_help_panel=rich_help_panel_output)] = 'minutes',
-        angle_units: Annotated[str, typer.Option(
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for internal solar geometry calculations. :warning: [bold red]Keep fingers away![/bold red]",
-            rich_help_panel=rich_help_panel_output,
-            )] = 'radians',
-        angle_output_units: Annotated[str, typer.Option(
-            show_default=True,
-            case_sensitive=False,
-            help="Angular units for solar geometry calculations (degrees or radians). :warning: [bold red]Under development[/red bold]",
-            rich_help_panel=rich_help_panel_output,
-            )] = 'radians',
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = 45,
+    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = 180,
+    linke_turbidity_factor: Annotated[float, typer_option_linke_turbidity_factor] = 2,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer.Option(
+        help='Read horizontal irradiance time series data from a file',)] = None,
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
+    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface
 
@@ -562,14 +510,18 @@ def calculate_diffuse_inclined_irradiance(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity=eccentricity,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_time_model=solar_time_model,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
             angle_output_units=angle_output_units,
-        )
+            )
 
         # on a horizontal surface : G0h = G0 sin(h0)
         extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(solar_altitude)
@@ -606,11 +558,16 @@ def calculate_diffuse_inclined_irradiance(
                 timestamp=timestamp,
                 timezone=timezone,
                 model=solar_time_model,
+                refracted_solar_zenith=refracted_solar_zenith,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
                 days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity=eccentricity,
                 time_offset_global=time_offset_global,
-                hour_offset=hour_offset
+                hour_offset=hour_offset,
+                time_output_units=time_output_units,
+                angle_units=angle_units,
+                angle_output_units=angle_output_units,
         )
         solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
         hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)

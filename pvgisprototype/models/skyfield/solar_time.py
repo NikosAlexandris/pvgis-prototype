@@ -47,7 +47,6 @@ from .decorators import validate_with_pydantic
 #     -------
 #     (decimal_hours, units): float, str
 #     """
-#     # debug(locals())
 #     # Handle Me during input validation? -------------------------------------
 #     if timezone != timestamp.tzinfo:
 #         try:
@@ -95,9 +94,7 @@ from .decorators import validate_with_pydantic
 #     # total_seconds = int(local_solar_time_delta.total_seconds())
 #     # local_solar_datetime = datetime.utcfromtimestamp(total_seconds)
 #     # local_solar_timestamp = datetime.utcfromtimestamp(total_seconds).time()
-    
 
-#     # debug(locals())
 #     return local_solar_time
 
 
@@ -150,11 +147,10 @@ def calculate_solar_time_skyfield(
     # if verbose:
         
     previous_solar_noon_string = previous_solar_noon.astimezone(timezone).strftime('%Y-%m-%d %H:%M:%S')
-    typer.echo(f'Previous solar noon: {previous_solar_noon_string}')
+    # typer.echo(f'Previous solar noon: {previous_solar_noon_string}')
 
     next_solar_noon_string = next_solar_noon.astimezone(timezone).strftime('%Y-%m-%d %H:%M:%S')
-    typer.echo(f'Next solar noon: {next_solar_noon_string}')
-
-    typer.echo(f'Local solar time: {local_solar_time}')
+    # typer.echo(f'Next solar noon: {next_solar_noon_string}')
+    # typer.echo(f'Local solar time: {local_solar_time}')
 
     return SolarTime(value=local_solar_time, unit='decimal hours') 

@@ -97,7 +97,6 @@ def calculate_solar_time_eot(
     # ------------------------------------------------------------------------
     longitude = np.degrees(longitude)  # this equation of time requires degrees!
     # ------------------------------------------------------------------------
-
     time_correction_factor = 4 * (longitude - local_standard_meridian_time) + equation_of_time
     time_correction_factor_hours = time_correction_factor / 60
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)

@@ -28,69 +28,79 @@ from pvgisprototype.models.noaa.noaa_models import Latitude_in_Radians
 
 @validate_with_pydantic(SolarAzimuthInput, expand_args=True)
 def calculate_solar_azimuth(
-            longitude: Longitude,
-            latitude: Latitude,
-            timestamp: datetime,
-            timezone: ZoneInfo,
-            days_in_a_year: float,
-            perigee_offset: float,
-            eccentricity: float,
-            time_offset_global: int,
-            hour_offset: int,
-            solar_time_model: SolarTimeModels,
-            angle_output_units: str,
-        ) -> SolarAzimuth:
-        """Compute various solar geometry variables.
+    longitude: Longitude,
+    latitude: Latitude,
+    # longitude: Longitude_in_Radians,
+    # latitude: Latitude_in_Radians,
+    timestamp: datetime,
+    timezone: ZoneInfo,
+    apply_atmospheric_refraction: bool,
+    refracted_solar_zenith: float,
+    days_in_a_year: float,
+    perigee_offset: float,
+    eccentricity: float,
+    time_offset_global: int,
+    hour_offset: int,
+    solar_time_model: SolarTimeModels,
+    time_output_units: str,
+    angle_units: str,
+    angle_output_units: str,
+) -> SolarAzimuth:
+    """Compute various solar geometry variables.
 
-        Returns
-        -------
-        solar_azimuth: float
+    Returns
+    -------
+    solar_azimuth: float
 
 
-        Returns
-        -------
-        solar_azimuth: float
+    Returns
+    -------
+    solar_azimuth: float
 
-        Notes
-        -----
-
-        According to ... solar azimuth is measured from East!
-        Conflicht with Jenvco 1992?
-
-        """
-        solar_declination = calculate_solar_declination(
-                timestamp=timestamp,
-                angle_output_units=angle_output_units,
-                )
-        C11 = sin(latitude) * cos(solar_declination.value)
-        C13 = -cos(latitude) * sin(solar_declination.value)
-        C22 = cos(solar_declination.value)
-        C31 = cos(latitude) * cos(solar_declination.value)
-        C33 = sin(latitude) * sin(solar_declination.value)
-        solar_time = model_solar_time(
-                longitude=longitude,
-                latitude=latitude,
-                timestamp=timestamp,
-                timezone=timezone,
-                model=solar_time_model,  # returns datetime.time object
-                days_in_a_year=days_in_a_year,
-                perigee_offset=perigee_offset,
-                eccentricity=eccentricity,
-                time_offset_global=time_offset_global,
-                hour_offset=hour_offset
-                )
-        solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.value)
-        hour_angle = calculate_hour_angle(
-                solar_time=solar_time.value,
-                angle_output_units=angle_output_units,
-        )
-        cosine_solar_azimuth = (C11 * cos(hour_angle.value + C13)) / pow(
+    Notes
+    -----
+    According to ... solar azimuth is measured from East!
+    Conflicht with Jenvco 1992?
+    """
+    solar_declination = calculate_solar_declination(
+        timestamp=timestamp,
+        angle_output_units=angle_output_units,
+    )
+    C11 = sin(latitude) * cos(solar_declination.value)
+    C13 = -cos(latitude) * sin(solar_declination.value)
+    C22 = cos(solar_declination.value)
+    C31 = cos(latitude) * cos(solar_declination.value)
+    C33 = sin(latitude) * sin(solar_declination.value)
+    solar_time = model_solar_time(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        model=solar_time_model,  # returns datetime.time object
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
+        eccentricity=eccentricity,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+    )
+    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.value)
+    hour_angle = calculate_hour_angle(
+        solar_time=solar_time.value,
+        angle_output_units=angle_output_units,
+    )
+    cosine_solar_azimuth = (C11 * cos(hour_angle.value + C13)) / pow(
         pow((C22 * sin(hour_angle.value)), 2)
         + pow((C11 * cos(hour_angle.value) + C13), 2),
-        0.5)
-        solar_azimuth = acos(cosine_solar_azimuth)
-        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit='radians')
-        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+        0.5,
+    )
+    solar_azimuth = acos(cosine_solar_azimuth)
+    solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="radians")
+    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
 
-        return solar_azimuth
+    return solar_azimuth
 

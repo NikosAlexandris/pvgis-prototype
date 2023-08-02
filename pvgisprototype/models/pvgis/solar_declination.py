@@ -9,7 +9,6 @@ from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
 
 from pvgisprototype.api.data_classes import SolarDeclination
-
 from pvgisprototype.api.input_models import SolarDeclinationInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
