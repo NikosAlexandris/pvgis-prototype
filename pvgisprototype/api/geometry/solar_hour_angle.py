@@ -1,3 +1,4 @@
+from devtools import debug
 import typer
 from typing import Annotated
 from typing import Optional
@@ -58,8 +59,13 @@ def calculate_hour_angle(
     # a datetime.time object
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = radians(15) * (solar_time_decimal_hours - 12)
+    # hour_angle = convert_to_degrees_if_requested(
+    #         hour_angle,
+    #         output_units,
+    #         )
 
     return hour_angle, angle_output_units
+
 
 def calculate_hour_angle_sunrise(
     latitude: float,

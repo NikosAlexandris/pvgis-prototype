@@ -89,7 +89,7 @@ def test_calculate_direct_inclined_irradiance_pvgis(location, parameters):
         str(longitude),
         str(latitude),
         str(elevation),
-        str(timestamp),
+        # str(timestamp),
         '--linke-turbidity-factor',
         str(linke_turbidity_factor),
         '--surface-tilt',
