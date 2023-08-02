@@ -1,15 +1,16 @@
 import typer
 from typing import Annotated
 from typing import Optional
-from typing import NamedTuple
 from datetime import datetime
 from datetime import timedelta
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.named_tuples import generate
-from pvgisprototype.api.input_models import Longitude
-from pvgisprototype.api.input_models import Latitude
+
+from pvgisprototype.api.data_classes import SolarTime
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
+
 from pvgisprototype.api.input_models import SolarTimeInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 from math import radians
@@ -29,7 +30,7 @@ def calculate_solar_time_eot(
         orbital_eccentricity: float = 0.03344,
         time_offset_global: float = 0,
         hour_offset: float = 0,
-)-> NamedTuple:
+)-> SolarTime:
     """Calculate the solar time.
 
     - Local Time (LT)
@@ -104,5 +105,4 @@ def calculate_solar_time_eot(
     hour_angle = 15 * (solar_time_decimal_hours - 12)
     # ------------------------------------------------------------------------
     
-    solar_time = generate('solar_time', (solar_time, 'decimal hours'))
-    return solar_time
+    return SolarTime(solar_time, 'decimal hours')

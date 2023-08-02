@@ -5,18 +5,19 @@ from datetime import datetime
 from typing import Optional
 from zoneinfo import ZoneInfo
 from .time_offset import calculate_time_offset_noaa
-from typing import NamedTuple
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import TrueSolarTime
+from pvgisprototype.api.data_classes import Longitude
 
 
-@validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
+@validate_with_pydantic(CalculateTrueSolarTimeNOAAInput, expand_args=True)
 def calculate_true_solar_time_noaa(
         longitude: Longitude_in_Radians, 
         timestamp: datetime, 
         timezone: Optional[ZoneInfo],
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
-    ) -> NamedTuple:
+    ) -> TrueSolarTime:
     """Calculate the true solar time.
 
     Parameters
@@ -58,8 +59,8 @@ def calculate_true_solar_time_noaa(
             second=int(seconds),
             tzinfo=timestamp.tzinfo,
             )
-    true_solar_time = generate(
-        'true_solar_time',
-        (true_solar_time, time_output_units),
+    true_solar_time = TrueSolarTime(
+        value=true_solar_time,
+        unit=time_output_units,
     )
     return true_solar_time

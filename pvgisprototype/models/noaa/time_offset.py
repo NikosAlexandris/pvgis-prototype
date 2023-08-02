@@ -4,20 +4,21 @@ from datetime import datetime
 from .decorators import validate_with_pydantic
 from math import pi
 from .equation_of_time import calculate_equation_of_time_noaa
-from typing import NamedTuple
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import TimeOffset
+from pvgisprototype.api.data_classes import Longitude
 
 
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 
 
-@validate_with_pydantic(CalculateTimeOffsetNOAAInput)
+@validate_with_pydantic(CalculateTimeOffsetNOAAInput, expand_args=True)
 def calculate_time_offset_noaa(
         longitude: Longitude_in_Radians, 
         timestamp: datetime, 
         time_output_units: str = 'minutes',  # redesign me!
         angle_units: str = 'radians',
-    ) -> NamedTuple:
+    ) -> TimeOffset:
     """Calculate the time offset (minutes) for NOAA's solar position calculations.
 
     The time offset (in minutes) incorporates the Equation of Time and accounts
@@ -81,11 +82,12 @@ def calculate_time_offset_noaa(
             Examples:
                 Mount Olympus is UTC + 2, hence LSTM = 15 * 2 = 30 deg. East
     """
-    longitude_in_minutes = radians_to_time_minutes(longitude)  # time
+    longitude_in_minutes = radians_to_time_minutes(longitude.value)  # time
 
     # This will be 0 for UTC, obviously! Review-Me! --------------------------
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
-    equation_of_time = calculate_equation_of_time_noaa(timestamp,
+    equation_of_time = calculate_equation_of_time_noaa(
+        timestamp,
                                                                time_output_units,
                                                                angle_units,
                                                                )  # minutes
@@ -94,9 +96,5 @@ def calculate_time_offset_noaa(
     if not -720 <= time_offset <= 720:
         raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
 
-    time_offset = generate(
-        'time_offset',
-        (time_offset, time_output_units)
-    )
-    return time_offset
+    return TimeOffset(value=time_offset, unit='minutes')
 

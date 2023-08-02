@@ -15,13 +15,16 @@ from math import degrees
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 from math import isfinite
 from math import pi
-from typing import NamedTuple
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import SolarZenith
+from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.data_classes import AtmosphericRefraction
+from pvgisprototype.api.data_classes import Latitude
 
 
 def atmospheric_refraction_for_high_solar_altitude(
     solar_altitude: SolarAltitude_in_Radians,
-) -> float:
+) -> AtmosphericRefraction:
     """
     Calculate the atmospheric refraction adjustment for high solar_altitudes.
 
@@ -38,12 +41,12 @@ def atmospheric_refraction_for_high_solar_altitude(
         + 0.000086 / (tangent_solar_altitude**5)
     ) / 3600  # 1 degree / 3600 seconds
 
-    return radians(adjustment_in_degrees)
+    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
 
 
 def atmospheric_refraction_for_near_horizon(
     solar_altitude: SolarAltitude_in_Radians,
-) -> float:
+) -> AtmosphericRefraction:
     """
     Calculate the atmospheric refraction adjusment for near horizon.
 
@@ -64,12 +67,12 @@ def atmospheric_refraction_for_near_horizon(
         )
     ) / 3600  # 1 degree / 3600 seconds
 
-    return radians(adjustment_in_degrees)
+    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
 
 
 def atmospheric_refraction_for_below_horizon(
     solar_altitude: SolarAltitude_in_Radians,
-) -> float:
+) -> AtmosphericRefraction:
     """
     Calculate the atmospheric refraction adjustment for below horizon.
 
@@ -84,14 +87,14 @@ def atmospheric_refraction_for_below_horizon(
         -20.774 / tangent_solar_altitude
     ) / 3600  # 1 degree / 3600 seconds
 
-    return radians(adjustment_in_degrees)
+    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
 
 
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction(
         solar_zenith: SolarZenith_in_Radians,
         angle_output_units: str = 'radians',
-        ) -> NamedTuple:
+    ) -> SolarZenith:
     """Adjust solar zenith for atmospheric refraction
 
     The effects of the atmosphere vary with atmospheric pressure, humidity, and
@@ -141,9 +144,9 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     if not isfinite(solar_zenith) or not 0 <= solar_zenith <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
 
-    solar_zenith = generate(
-        'solar_zenith',
-        (solar_zenith, angle_output_units),
+    solar_zenith = SolarZenith(
+        value=solar_zenith,
+        unit=angle_output_units,
     )
     return solar_zenith
 
@@ -156,7 +159,7 @@ def calculate_solar_zenith_noaa(
         apply_atmospheric_refraction: bool = False,
         # time_output_units: str = 'minutes',
         angle_output_units: str = 'radians',
-        )-> NamedTuple:
+    ) -> SolarZenith:
     """Calculate the solar zenith angle (φ) in radians """
     solar_declination = calculate_solar_declination_noaa(
             timestamp,
@@ -166,9 +169,9 @@ def calculate_solar_zenith_noaa(
         solar_declination.value
     ) * cos(solar_hour_angle)
 
-    solar_zenith = generate(
-        'solar_zenith',
-        (acos(cosine_solar_zenith), angle_output_units)
+    solar_zenith = SolarZenith(
+        value=acos(cosine_solar_zenith),
+        unit=angle_output_units,
     )
 
     if apply_atmospheric_refraction:

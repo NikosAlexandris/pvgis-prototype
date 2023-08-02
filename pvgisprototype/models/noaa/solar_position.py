@@ -29,7 +29,7 @@ from .noaa_models import Longitude
 from .noaa_models import Latitude
 from .noaa_models import Longitude_in_Radians
 from .noaa_models import Latitude_in_Radians
-from .noaa_models import CalculateSolarPositionNOAA
+from .noaa_models import CalculateSolarPositionNOAAInput
 from zoneinfo import ZoneInfo
 
 from .fractional_year import calculate_fractional_year_noaa 
@@ -46,6 +46,10 @@ from .event_hour_angle import calculate_event_hour_angle_noaa
 from .event_time import calculate_event_time_noaa
 from .local_time import calculate_local_solar_time_noaa
 
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
+
+
 # REVIEW - ME
 # 
 # 1. Return the result without `output_units` : they are asked in the input!
@@ -57,7 +61,7 @@ degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
 calculation_cache = {}
 
 
-@validate_with_pydantic(CalculateSolarPositionNOAA)
+@validate_with_pydantic(CalculateSolarPositionNOAAInput)
 def calculate_noaa_solar_position(
     longitude: Longitude_in_Radians,
     latitude: Latitude_in_Radians,
@@ -73,8 +77,8 @@ def calculate_noaa_solar_position(
     """
     result = {}
     fractional_year = calculate_fractional_year_noaa(
-            timestamp,
-            angle_output_units
+            timestamp=timestamp,
+            angle_output_units=angle_output_units
             )
     equation_of_time = calculate_equation_of_time_noaa(
             timestamp,
@@ -114,14 +118,13 @@ def calculate_noaa_solar_position(
             angle_output_units,
             )
     solar_altitude = calculate_solar_altitude_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_output_units=angle_output_units,
     )
     solar_azimuth = calculate_solar_azimuth_noaa(
             longitude,

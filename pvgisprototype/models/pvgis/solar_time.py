@@ -1,7 +1,6 @@
 import typer
 from typing import Annotated
 from typing import Optional
-from typing import NamedTuple
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
@@ -12,30 +11,25 @@ from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.image_offset_prototype import get_image_offset
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import SolarTime
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import Longitude
 from pvgisprototype.api.input_models import SolarTimeInput
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 
 @validate_with_pydantic(SolarTimeInput)
 def calculate_solar_time_pvgis(
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        latitude: Annotated[Optional[float], typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[ZoneInfo], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
+        longitude: Latitude,
+        latitude: Longitude,
+        timestamp: datetime,
+        timezone: ZoneInfo = None,
         days_in_a_year: float = 365.25,
         perigee_offset: float = 0.048869,
         orbital_eccentricity: float = 0.165,  # from the C code
         time_offset_global: float = 0,
-) -> NamedTuple:
+    ) -> SolarTime:
     """Calculate the solar time.
 
     1. Map the day of the year onto the circumference of a circle, essentially
@@ -81,6 +75,5 @@ def calculate_solar_time_pvgis(
     time_correction_factor_hours = hour_of_day + time_offset + hour_offset
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     
-    solar_time = generate('solar_time', (solar_time, 'decimal hours'))
     # debug(locals())
-    return solar_time
+    return SolarTime(value=solar_time, unit='decimal hours')

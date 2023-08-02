@@ -14,11 +14,15 @@ from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import ctx_attach_requested_timezone
 from pvgisprototype.api.decorators import validate_with_pydantic
+
+from pvgisprototype.api.data_classes import RelativeLongitude
+from pvgisprototype.api.data_classes import SolarIncidence
+from pvgisprototype.api.data_classes import HorizonHeight
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
+
 from pvgisprototype.api.input_models import RelativeLongitudeInput
-from pvgisprototype.api.input_models import SolarIncidenceInput
-from pvgisprototype.api.input_models import Longitude
-from pvgisprototype.api.input_models import Latitude
-from pvgisprototype.api.named_tuples import generate
+from pvgisprototype.api.input_models import SolarIncidenceJencoInput
 
 
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
@@ -30,7 +34,7 @@ def calculate_relative_longitude(
         surface_tilt: float = 0,
         surface_orientation: float = 0,
         angle_output_units: str = 'radians',
-    ) -> float:
+    ) -> RelativeLongitude:
     """
     """
     # tangent_relative_longitude = -(
@@ -62,9 +66,9 @@ def calculate_relative_longitude(
         tangent_relative_longitude_denominator
     )
 
-    relative_longitude = generate(
-        'relative_longitude',
-        (atan(tangent_relative_longitude), angle_output_units)
+    relative_longitude = RelativeLongitude(
+        value=atan(tangent_relative_longitude),
+        unit=angle_output_units,
     )
     return relative_longitude
 
@@ -87,7 +91,7 @@ def calculate_solar_incidence_jenco(
         angle_output_units: str = 'radians',
         rounding_places: int = 5,
         verbose: bool = False,
-    ) -> float:
+    ) -> SolarIncidence:
     """Calculate the solar incidence based on sun's position and surface geometry.
 
     Parameters
@@ -152,9 +156,9 @@ def calculate_solar_incidence_jenco(
         c_inclined_31 * cos(hour_angle.value - relative_longitude) + c_inclined_33
     )
 
-    solar_incidence = generate(
-        'solar_incidence',
-        (asin(sine_solar_incidence), angle_output_units),
+    solar_incidence = SolarIncidence(
+        value=asin(sine_solar_incidence),
+        unit=angle_output_units
     )
     return solar_incidence
 
@@ -164,7 +168,7 @@ def interpolate_horizon_height(
         solar_azimuth: Annotated[float, typer.Argument(..., help="The azimuth angle of the sun.")],
         horizon_heights: Annotated[List[float], typer.Argument(..., help="List of horizon height values.")],
         horizon_interval: Annotated[float, typer.Argument(..., help="Interval between successive horizon data points.")]
-    ) -> float:
+    ) -> HorizonHeight:
     """Interpolate the height of the horizon at the sun's azimuth angle.
 
     Parameters
@@ -194,7 +198,7 @@ def interpolate_horizon_height(
         + (position_in_interval - position_before)
         * horizon_heights[position_after]
     )
-    return horizon_height
+    return HorizonHeight(horizon_height, 'meters')                          # FIXME: Is it meters?
 
 
 def is_the_solar_surface_in_shade(

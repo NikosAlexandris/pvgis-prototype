@@ -29,16 +29,16 @@ def generate_timestamps(start_date: datetime, end_date: datetime):
 
 def calculate_declinations(timestamps, output_units="radians"):
     solar_declinations = np.vectorize(calculate_solar_declination)(
-        timestamps, output_units=output_units
+        timestamps, angle_output_units=output_units
     )  # output_units='degrees'
 
     solar_declinations_pvgis = np.vectorize(calculate_solar_declination_pvgis)(
-        timestamps, output_units=output_units
+        timestamps, angle_output_units=output_units
     )  # output_units='degrees'
 
     solar_declinations_hargreaves = np.vectorize(
         calculate_solar_declination_hargreaves
-    )(timestamps, output_units=output_units)
+    )(timestamps, angle_output_units=output_units)
 
     return solar_declinations, solar_declinations_pvgis, solar_declinations_hargreaves
     

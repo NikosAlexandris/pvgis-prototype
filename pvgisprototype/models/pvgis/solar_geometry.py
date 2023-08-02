@@ -39,7 +39,7 @@ def calculate_solar_geometry_pvgis_constants(
         solar_declination: float,
         time_offset: float = 0,
         EPS: float = 1e-5
-        ) -> SolarGeometryDayConstants:
+    ) -> SolarGeometryDayConstants:
     """Calculate solar geometry constants for a given latitude based on PVGIS' C code
 
     Returns

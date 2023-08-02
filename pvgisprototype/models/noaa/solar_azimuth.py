@@ -12,8 +12,10 @@ from math import acos
 from math import pi
 from math import isfinite
 from ...api.utilities.conversions import convert_to_degrees_if_requested
-from typing import NamedTuple
-from pvgisprototype.api.named_tuples import generate
+
+from pvgisprototype.api.data_classes import CompassSolarAzimuth
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
@@ -26,7 +28,7 @@ def calculate_solar_azimuth_noaa(
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-        )-> NamedTuple:
+    )-> CompassSolarAzimuth:
     """Calculate the solar azimith (θ) in radians
 
     Parameters
@@ -71,10 +73,13 @@ def calculate_solar_azimuth_noaa(
 
     compass_solar_azimuth = 2*pi - solar_azimuth
 
-    compass_solar_azimuth = generate(
-        'compass_solar_azimuth',
-        (compass_solar_azimuth, angle_output_units)
+    compass_solar_azimuth = CompassSolarAzimuth(
+        value=compass_solar_azimuth,
+        unit='radians',
     )    
 
-    # return solar_azimuth, angle_output_units
+    compass_solar_azimuth = convert_to_degrees_if_requested(
+        compass_solar_azimuth,
+        angle_output_units,
+        )
     return compass_solar_azimuth

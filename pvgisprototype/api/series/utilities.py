@@ -6,8 +6,8 @@ from colorama import Fore, Style
 from .log import logger
 import xarray as xr
 
-from pvgisprototype.models.noaa.noaa_models import Longitude
-from pvgisprototype.models.noaa.noaa_models import Latitude
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import Longitude
 
 
 # Hardcodings

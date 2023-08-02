@@ -1,42 +1,26 @@
 import typer
 from typing import Annotated
 from typing import Optional
-from typing import NamedTuple
 from math import sin, cos, acos
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.named_tuples import generate
-from pvgisprototype.api.input_models import Latitude
-from pvgisprototype.api.input_models import SolarIncidenceStandarInput
+
+from pvgisprototype.api.data_classes import SolarIncidence
+from pvgisprototype.api.data_classes import Latitude
+
+from pvgisprototype.api.input_models import SolarIncidenceStandardInput
 
 
-@validate_with_pydantic(SolarIncidenceStandarInput)
+@validate_with_pydantic(SolarIncidenceStandardInput)
 def calculate_solar_incidence(
         latitude: Latitude,
-        # : Annotated[Optional[float], typer.Argument(
-        #     callback=convert_to_radians,
-        #     min=-90, max=90)],
         solar_declination: float = 0,
-        # : Annotated[Optional[float], typer.Argument(
-        #     min=0, max=90)] = 0,
         surface_tilt: float = 0,
-        # : Annotated[Optional[float], typer.Argument(
-        #     min=0, max=90)] = 0,
         surface_orientation: float = 180,
-        # : Annotated[Optional[float], typer.Argument(
-        #     min=0, max=360)] = 180,
         hour_angle: float = None,
-        # : Annotated[Optional[float], typer.Argument(
-        #     min=0, max=1)] = None,
         angle_output_units: str = 'radians',
-        # : Annotated[str, typer.Option(
-            # '-u',
-            # '--units',
-            # show_default=True,
-            # case_sensitive=False,
-            # help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
-        ) -> NamedTuple:
+    ) -> SolarIncidence:
     """Calculate the angle of incidence (θ) between the direction of the sun
     ray and the line normal to the surface measured in radian.
 
@@ -110,8 +94,4 @@ def calculate_solar_incidence(
         * sin(hour_angle)
         * sin(surface_slope)
     )
-    solar_incidence = generate(
-        'solar_incidence',
-        (solar_incidence, angle_output_units)
-    )
-    return solar_incidence
+    return SolarIncidence(value=solar_incidence, unit=angle_output_units)
