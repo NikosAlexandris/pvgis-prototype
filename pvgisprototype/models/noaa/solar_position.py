@@ -97,7 +97,7 @@ def calculate_noaa_solar_position(
             timestamp=timestamp,
             timezone=timezone,
             time_output_units=time_output_units,
-            )
+            ) # in minutes
     solar_hour_angle, solar_hour_angle_units = calculate_solar_hour_angle_noaa(
             longitude=longitude,
             timestamp=timestamp,
