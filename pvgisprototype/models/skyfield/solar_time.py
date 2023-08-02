@@ -42,7 +42,6 @@ from .decorators import validate_with_pydantic
 #     -------
 #     (decimal_hours, units): float, str
 #     """
-#     # debug(locals())
 #     # Handle Me during input validation? -------------------------------------
 #     if timezone != timestamp.tzinfo:
 #         try:
@@ -90,10 +89,10 @@ from .decorators import validate_with_pydantic
 #     # total_seconds = int(local_solar_time_delta.total_seconds())
 #     # local_solar_datetime = datetime.utcfromtimestamp(total_seconds)
 #     # local_solar_timestamp = datetime.utcfromtimestamp(total_seconds).time()
-    
 
-#     # debug(locals())
 #     return local_solar_time
+
+
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeSkyfieldInputModel)
