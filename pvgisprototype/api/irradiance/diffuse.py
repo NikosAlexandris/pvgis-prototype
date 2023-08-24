@@ -186,21 +186,24 @@ def calculate_diffuse_horizontal_component_from_sarah(
         # elevation_file_number_ew,
     """
 #     global_data_array = xr.open_dataarray(shortwave)  # global is a reserved word!
-    global_location_time_series = select_location_time_series(
+    global_irradiance_location_time_series = select_location_time_series(
         shortwave, longitude, latitude
     )
-    global_location_time_series.load()  # load into memory for fast processing
-    direct_location_time_series = select_location_time_series(
+    global_irradiance_location_time_series.load()  # load into memory for fast processing
+    direct_irradiance_location_time_series = select_location_time_series(
         direct, longitude, latitude
     )
-    direct_location_time_series.load()
+    direct_irradiance_location_time_series.load()
 
     if timestamp:
         # convert timestamp to ISO format string without fractional seconds
         time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        global_location_time_series = global_location_time_series.sel(time=time)
-        direct_location_time_series = direct_location_time_series.sel(time=time)
-
+        global_irradiance_location_time_series = (
+            global_irradiance_location_time_series.sel(time=time)
+        )
+        direct_irradiance_location_time_series = (
+            direct_irradiance_location_time_series.sel(time=time)
+        )
     if start_time or end_time:
         # If only start_time is provided, end_time defaults to the end of the series
         if start_time and not end_time:
@@ -218,11 +221,15 @@ def calculate_diffuse_horizontal_component_from_sarah(
             # if isinstance(end_time, datetime):
             end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
     
-        global_location_time_series = global_location_time_series.sel(time=slice(start_time, end_time))
-        direct_location_time_series = direct_location_time_series.sel(time=slice(start_time, end_time))
+        global_irradiance_location_time_series = (
+            global_irradiance_location_time_series.sel(time=slice(start_time, end_time))
+        )
+        direct_irradiance_location_time_series = (
+            direct_irradiance_location_time_series.sel(time=slice(start_time, end_time))
+        )
 
     diffuse_horizontal_irradiance = (
-        global_location_time_series - direct_location_time_series
+        global_irradiance_location_time_series - direct_irradiance_location_time_series
     )
 
     # in PVGIS' C code -- is this needed? ------------------------------------
