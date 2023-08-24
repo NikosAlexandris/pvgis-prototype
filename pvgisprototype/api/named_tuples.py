@@ -23,7 +23,7 @@ class NamedTupleTypes(Enum):
     COMPASS_SOLAR_AZIMUTH = namedtuple('compass_solar_azimuth', ['value', 'unit'])
     EVENT_TIME = namedtuple('event_time', ['value', 'unit'])
     SOLAR_INCIDENCE = namedtuple('solar_incidence', ['value', 'unit'])
-    ORBITAL_ECCENTRICITY = namedtuple('orbital_eccentricity', ['value', 'unit'])
+    ORBITAL_ECCENTRICITY = namedtuple('eccentricity_correction_factor', ['value', 'unit'])
     PERIGEE_OFFSET = namedtuple('perigee_offset', ['value', 'unit'])
 
 
