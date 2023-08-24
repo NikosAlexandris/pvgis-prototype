@@ -5,63 +5,58 @@ from typing import List
 from typing import Tuple
 from enum import Enum
 import numpy as np
-import datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from math import pi
 import suncalc
 import pysolar
+from ..utilities.conversions import convert_float_to_degrees_if_requested
 from ..utilities.conversions import convert_to_degrees_if_requested
+from ..utilities.conversions import convert_float_to_radians_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
 from ..utilities.conversions import convert_to_radians
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
-from .time_models import SolarTimeModels
-from .solar_altitude import calculate_solar_altitude
-from .solar_azimuth import calculate_solar_azimuth
-from .solar_declination import calculate_solar_declination
-from ...models.skyfield.solar_geometry import calculate_solar_position_skyfield
-from ...models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
-from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
-# from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
-from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
-from ...models.noaa.solar_position import calculate_solar_altitude_noaa
-from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
-from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 
-from pvgisprototype.api.data_classes import SolarAltitude
-from pvgisprototype.api.data_classes import SolarAzimuth
+from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.api.function_models import ModelSolarPositionInputModel
 from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.data_classes import SolarAzimuth
 
-from .solar_models import SolarPositionModels
-from pvgisprototype.api.input_models import SolarPositionInput
-from pvgisprototype.api.decorators import validate_with_pydantic
+from .models import SolarTimeModels
+from .models import SolarPositionModels
 
+from pvgisprototype.models.noaa.solar_position import calculate_solar_declination_noaa
+from pvgisprototype.models.noaa.solar_position import calculate_solar_altitude_noaa
+from pvgisprototype.models.noaa.solar_position import calculate_solar_azimuth_noaa
+from pvgisprototype.models.pvis.solar_declination import calculate_solar_declination_pvis
+from pvgisprototype.models.pvis.solar_altitude import calculate_solar_altitude_pvis
+from pvgisprototype.models.pvis.solar_azimuth import calculate_solar_azimuth_pvis
 
-def _parse_model(
-        ctx: typer.Context,
-        model: List[SolarPositionModels],
-        param: typer.CallbackParam,
-    ) -> List[SolarPositionModels]:
-
-    print(f'ctx : {ctx}')
-    print(f'param : {param}')
-    print(f'model : {model}')
-    print()
-    if ctx.resilient_parsing:
-        return
-    if SolarPositionModels.all in model:
-        # Return all models except for the 'all' itself!
-        model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-    print(f"Return model: {model}")
-    return model
+from ...models.skyfield.solar_geometry import calculate_solar_position_skyfield
+from ...models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
+# from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
+# from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
+from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 
 
-@validate_with_pydantic(SolarPositionInput, expand_args=True)
+def convert_south_to_north_degrees_convention(azimuth_south_degrees):
+    return (azimuth_south_degrees + 180) % 360
+
+
+def convert_south_to_north_radians_convention(azimuth_south_radians):
+    return (azimuth_south_radians + pi) % 2 * pi
+
+
+@validate_with_pydantic(ModelSolarPositionInputModel, expand_args=True)
 def model_solar_position(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str,
+    timezone: ZoneInfo,
     model: SolarPositionModels,
     apply_atmospheric_refraction: bool,
     refracted_solar_zenith: float,
@@ -70,9 +65,8 @@ def model_solar_position(
     hour_offset: float,
     days_in_a_year: float,
     perigee_offset: float,
-    eccentricity: float,
+    eccentricity_correction_factor: float,
     time_output_units: str,
-    angle_units: str,
     angle_units: str,
     angle_output_units: str,
 ) -> Tuple[SolarAltitude, SolarAzimuth]:
@@ -109,34 +103,43 @@ def model_solar_position(
     if model.value == SolarPositionModels.noaa:
 
         solar_altitude = calculate_solar_altitude_noaa(
-                longitude=longitude,
-                latitude=latitude,
-                timestamp=timestamp,
-                timezone=timezone,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                time_output_units=time_output_units,
-                angle_output_units=angle_output_units,
-                )
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_output_units=angle_output_units,
+        )
         solar_altitude = convert_to_degrees_if_requested(
             solar_altitude,
             angle_output_units,
-            )
-
+        )
         solar_azimuth = calculate_solar_azimuth_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_output_units,
-                )
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
+        )
         solar_azimuth = convert_to_degrees_if_requested(
             solar_azimuth,
             angle_output_units,
-            )
+        )
+        solar_declination = calculate_solar_declination_noaa(
+            timestamp=timestamp,
+            angle_output_units=angle_output_units
+        )
+        solar_declination = convert_to_degrees_if_requested(
+            solar_declination,
+            angle_output_units,
+        )
     
     if model.value == SolarPositionModels.skyfield:
+
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude=longitude,
                 latitude=latitude,
@@ -152,53 +155,69 @@ def model_solar_position(
             solar_altitude,
             angle_output_units,
             )
-    
+        solar_declination = None
+
     if model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
-        solar_azimuth, solar_altitude = suncalc.get_position(
+        solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
-            lng=longitude,
-            lat=latitude,
-        ).values()
+            lng=longitude.value,
+            lat=latitude.value,
+        ).values()  # zero points to south
+        solar_azimuth = convert_south_to_north_radians_convention(
+            solar_azimuth_south_radians_convention
+        )
+        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="radians")
         solar_azimuth = convert_to_degrees_if_requested(
             solar_azimuth, angle_output_units
         )
+        solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
         solar_altitude = convert_to_degrees_if_requested(
             solar_altitude, angle_output_units
         )
+        solar_declination = None
 
     if model.value == SolarPositionModels.pysolar:
+
         timestamp = attach_timezone(timestamp, timezone)
+        longitude_in_degrees = convert_float_to_degrees_if_requested(longitude.value, 'degrees')
+        latitude_in_degrees = convert_float_to_degrees_if_requested(latitude.value, 'degrees')
+
         solar_altitude = pysolar.solar.get_altitude(
-            latitude_deg=latitude,  # this comes first
-            longitude_deg=longitude,
+            latitude_deg=latitude_in_degrees,  # this comes first
+            longitude_deg=longitude_in_degrees,
             when=timestamp,
         )  # returns degrees by default
+        # required by output function
+        solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
         solar_altitude = convert_to_radians_if_requested(
             solar_altitude, angle_output_units
         )
 
         solar_azimuth = pysolar.solar.get_azimuth(
-            latitude_deg=longitude,  # this comes first
-            longitude_deg=latitude,
+            latitude_deg=latitude_in_degrees,  # this comes first
+            longitude_deg=longitude_in_degrees,
             when=timestamp,
         )  # returns degrees by default
+        # required by output function
+        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="degrees")
         solar_azimuth = convert_to_radians_if_requested(
             solar_azimuth, angle_output_units
         )
+        solar_declination = None
 
     if model.value  == SolarPositionModels.pvis:
 
-        solar_altitude, solar_altitude_units = calculate_solar_altitude(
+        solar_altitude = calculate_solar_altitude_pvis(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
+            refracted_solar_zenith=refracted_solar_zenith.value,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_time_model=solar_time_model,
@@ -207,16 +226,17 @@ def model_solar_position(
             angle_output_units=angle_output_units,
             )
         solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
-        solar_azimuth, solar_azimuth_units = calculate_solar_azimuth(
+
+        solar_azimuth = calculate_solar_azimuth_pvis(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
+            refracted_solar_zenith=refracted_solar_zenith.value,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_time_model=solar_time_model,
@@ -225,6 +245,19 @@ def model_solar_position(
             angle_output_units=angle_output_units,
         )
         solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+
+        solar_declination = calculate_solar_declination_pvis(
+            timestamp=timestamp,
+            timezone=timezone,
+            days_in_a_year=days_in_a_year,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            perigee_offset=perigee_offset,
+            angle_output_units=angle_output_units,
+        )
+        solar_declination = convert_to_degrees_if_requested(
+            solar_declination,
+            angle_output_units,
+        )
 
     # if model.value  == SolarPositionModels.pvgis:
         
@@ -250,18 +283,30 @@ def model_solar_position(
     #     solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
     #     solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
-    debug(locals())
-    return solar_altitude, solar_azimuth
+    position = (
+            solar_declination if solar_declination is not None else None,
+            solar_altitude,
+            solar_azimuth
+    )
+    return position
 
 
 def calculate_solar_position(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str = None,
+    timezone: ZoneInfo = None,
     models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
+    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
+    refracted_solar_zenith: float = 1.5853349194640094,
+    days_in_a_year: float = 365.25,
+    perigee_offset: float = 0.048869,
+    eccentricity_correction_factor: float = 0.01672,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
     time_output_units: str = 'minutes',
+    angle_units: str = 'radians',
     angle_output_units: str = 'radians',
 ) -> List:
     """
@@ -270,28 +315,34 @@ def calculate_solar_position(
     results = []
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
-            solar_altitude, solar_azimuth = model_solar_position(
+            solar_declination, solar_altitude, solar_azimuth = model_solar_position(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
                 model=model,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                refracted_solar_zenith=refracted_solar_zenith,
                 solar_time_model=solar_time_model,
-                days_in_a_year=days_in_a_year,
-                perigee_offset=perigee_offset,
-                eccentricity=eccentricity,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                days_in_a_year=days_in_a_year,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
                 time_output_units=time_output_units,
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
             )
             results.append({
                 'Model': model.value,
-                'Altitude': solar_altitude.value,
-                'Azimuth': solar_azimuth.value,
-                'Units': solar_altitude.unit,  # Don't trust me -- Redesign Me!
+                # 'Declination': solar_declination.value,
+                'Declination' if solar_declination is not None else None: solar_declination.value if solar_declination is not None else None,
+                # 'Altitude': solar_altitude.value,
+                'Altitude': solar_altitude.value if solar_altitude is not None else None,
+                # 'Azimuth': solar_azimuth.value,
+                'Azimuth': solar_azimuth.value if solar_azimuth is not None else None,
+                'Units': angle_output_units
+                # zenith_val = model_result.get('Zenith', '') if zenith is not None else None
             })
 
     return results
