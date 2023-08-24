@@ -621,7 +621,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     #
     # ----------------------------------------------------- make it a function
 
-    if not direct_horizontal_component:  # from a time series dataset
+    if not direct_horizontal_component:
         direct_horizontal_irradiance = calculate_direct_horizontal_irradiance(
                 longitude=longitude,  # required by some of the solar time algorithms
                 latitude=latitude,
@@ -630,12 +630,12 @@ def calculate_direct_inclined_irradiance_pvgis(
                 timezone=timezone,
                 linke_turbidity_factor=linke_turbidity_factor,
                 )
-    else:
+    else:  # read from a time series dataset
         time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        longitude_for_selection = convert_to_degrees_if_requested(longitude, 'degrees')
-        latitude_for_selection = convert_to_degrees_if_requested(latitude, 'degrees')
+        longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
+        latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
         direct_horizontal_irradiance = select_time_series(
-                time_series=time_series,
+                time_series=direct_horizontal_component,
                 longitude=longitude_for_selection,
                 latitude=latitude_for_selection,
                 time=time,
