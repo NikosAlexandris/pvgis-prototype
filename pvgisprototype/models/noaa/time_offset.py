@@ -16,6 +16,7 @@ radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_
 def calculate_time_offset_noaa(
         longitude: Longitude, 
         timestamp: datetime, 
+        timezone: ZoneInfo,
         time_output_units: str = 'minutes',  # redesign me!
         angle_units: str = 'radians',
     ) -> TimeOffset:
