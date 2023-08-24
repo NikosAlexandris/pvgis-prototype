@@ -147,8 +147,8 @@ def select_location_time_series(
 def calculate_diffuse_horizontal_component_from_sarah(
     shortwave: Annotated[Path, typer_argument_shortwave_irradiance],
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
