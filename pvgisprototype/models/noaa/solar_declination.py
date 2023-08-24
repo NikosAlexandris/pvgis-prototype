@@ -1,8 +1,8 @@
-from .noaa_models import CalculateSolarDeclinationNOAAInput
 from typing import Optional
 from datetime import datetime
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
+from .noaa_models import CalculateSolarDeclinationNOAAInput
 from .fractional_year import calculate_fractional_year_noaa 
 from math import sin
 from math import cos
@@ -11,7 +11,7 @@ from pvgisprototype.api.data_classes import SolarDeclination
 
 
 # @cache_result
-@validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
+@validate_with_pydantic(CalculateSolarDeclinationNOAAInput, expand_args=True)
 def calculate_solar_declination_noaa(
         timestamp: datetime,
         angle_output_units: Optional[str] = 'radians'
@@ -37,4 +37,3 @@ def calculate_solar_declination_noaa(
                 angle_output_units,
                 )
         return declination
-

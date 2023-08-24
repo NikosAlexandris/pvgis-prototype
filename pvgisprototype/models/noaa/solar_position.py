@@ -25,11 +25,6 @@ from typing import Callable
 from typing import Optional
 from typing import Tuple
 from typing import Union
-from .noaa_models import Longitude
-from .noaa_models import Latitude
-from .noaa_models import Longitude_in_Radians
-from .noaa_models import Latitude_in_Radians
-from .noaa_models import CalculateSolarPositionNOAAInput
 
 from .fractional_year import calculate_fractional_year_noaa 
 from .equation_of_time import calculate_equation_of_time_noaa
@@ -46,6 +41,7 @@ from .event_time import calculate_event_time_noaa
 from .local_time import calculate_local_solar_time_noaa
 
 from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.models.noaa.noaa_models import CalculateSolarPositionNOAAInput
 from pvgisprototype.api.data_classes import Longitude
 from pvgisprototype.api.data_classes import Latitude
 
@@ -55,7 +51,7 @@ degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
 calculation_cache = {}
 
 
-@validate_with_pydantic(CalculateSolarPositionNOAAInput)
+@validate_with_pydantic(CalculateSolarPositionNOAAInput, expand_args=True)
 def calculate_noaa_solar_position(
     longitude: Longitude,       # radians 
     latitude: Latitude,         # radians

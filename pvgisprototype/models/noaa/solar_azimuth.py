@@ -1,24 +1,22 @@
-# from .noaa_models import LongitudeModel_in_Radians
-# from .noaa_models import LatitudeModel_in_Radians
-from .noaa_models import CalculateSolarAzimuthNOAAInput
 from datetime import datetime
-from .solar_declination import calculate_solar_declination_noaa
-from .solar_hour_angle import calculate_solar_hour_angle_noaa
-from .solar_zenith import calculate_solar_zenith_noaa
 from math import sin
 from math import cos
 from math import acos
 from math import pi
 from math import isfinite
 from ...api.utilities.conversions import convert_to_degrees_if_requested
+from .solar_declination import calculate_solar_declination_noaa
+from .solar_hour_angle import calculate_solar_hour_angle_noaa
+from .solar_zenith import calculate_solar_zenith_noaa
 
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.data_classes import CompassSolarAzimuth
+from .noaa_models import CalculateSolarAzimuthNOAAInput
+from pvgisprototype.api.data_classes import SolarAzimuth
 from pvgisprototype.api.data_classes import Longitude
 from pvgisprototype.api.data_classes import Latitude
 
 
-@validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
+@validate_with_pydantic(CalculateSolarAzimuthNOAAInput, expand_args=True)
 def calculate_solar_azimuth_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude,     # radians
@@ -28,7 +26,7 @@ def calculate_solar_azimuth_noaa(
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-    )-> CompassSolarAzimuth:
+    )-> SolarAzimuth:
     """Calculate the solar azimith (θ) in radians
 
     Parameters

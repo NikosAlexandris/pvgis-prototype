@@ -1,18 +1,15 @@
-# from .noaa_models import LongitudeModel_in_Radians
-# from .noaa_models import LatitudeModel_in_Radians
-from .noaa_models import CalculateLocalSolarTimeNOAAInput
-from .event_time import calculate_event_time_noaa
 from datetime import datetime
 from datetime import timedelta
 from datetime import time
 from pvgisprototype.api.decorators import validate_with_pydantic
-
-from pvgisprototype.api.data_classes import SolarTime
+from .noaa_models import CalculateLocalSolarTimeNOAAInput
 from pvgisprototype.api.data_classes import Longitude
 from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import SolarTime
+from .event_time import calculate_event_time_noaa
 
 
-@validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
+@validate_with_pydantic(CalculateLocalSolarTimeNOAAInput, expand_args=True)
 def calculate_local_solar_time_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude, # radians

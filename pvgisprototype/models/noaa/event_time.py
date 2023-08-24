@@ -1,29 +1,26 @@
 from devtools import debug
-
-# from .noaa_models import LongitudeModel_in_Radians
-# from .noaa_models import LatitudeModel_in_Radians
-from .noaa_models import CalculateEventTimeNOAAInput
 from datetime import datetime
+from math import pi
+from datetime import time
+from datetime import timedelta
 from pvgisprototype.api.decorators import validate_with_pydantic
+from .noaa_models import CalculateEventTimeNOAAInput
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import EventTime
 from .equation_of_time import calculate_equation_of_time_noaa
 from .solar_declination import calculate_solar_declination_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
 from .solar_zenith import calculate_solar_zenith_noaa
 from .event_hour_angle import calculate_event_hour_angle_noaa
-from math import pi
-from datetime import time
-from datetime import timedelta
 from ...api.utilities.timestamp import attach_requested_timezone
 
-from pvgisprototype.api.data_classes import EventTime
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
 
 # TODO: Maybe create a function that accepts a named_tuple and checks existing units
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 
 
-@validate_with_pydantic(CalculateEventTimeNOAAInput)
+@validate_with_pydantic(CalculateEventTimeNOAAInput, expand_args=True)
 def calculate_event_time_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude, # radians
