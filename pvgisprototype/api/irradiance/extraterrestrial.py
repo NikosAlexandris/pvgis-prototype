@@ -1,3 +1,6 @@
+from typing import Optional
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
+from datetime import datetime
 import typer
 from typing_extensions import Annotated
 from math import pi
@@ -20,10 +23,13 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 def calculate_extraterrestrial_normal_irradiance(
-        day_of_year: Annotated[float, typer.Argument(
-            min=1,
-            max=366,
-            help='Day of year')] = None,
+        timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+        # timezone: Annotated[Optional[str], typer_option_timezone] = None,
+        # Make `day_of_year` optional ?
+        # day_of_year: Annotated[float, typer.Argument(
+        #     min=1,
+        #     max=366,
+        #     help='Day of year')] = None,
         solar_constant: Annotated[float, typer.Argument(
             help="The mean solar electromagnetic radiation at the top of the atmosphere (~1360.8 W/m2) one astronomical unit (au) away from the Sun.",
             min=1360)] = SOLAR_CONSTANT,
@@ -33,7 +39,7 @@ def calculate_extraterrestrial_normal_irradiance(
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset',
             rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
+        eccentricity_correction_factor: Annotated[float, typer.Option(
             help='Eccentricity',
             rich_help_panel=rich_help_panel_earth_orbit)] = 0.01672,
         random_day: Annotated[bool, typer.Option(
@@ -68,7 +74,7 @@ def calculate_extraterrestrial_normal_irradiance(
         January 2 at 8:18pm or day number 2.8408. In angular units :
         2*pi * 2.8408 / 365.25 = 0.048869.
 
-    orbital_eccentricity: float
+    eccentricity_correction_factor: float
         For Earth this is currently about 0.01672, and so the distance to the
         sun varies by +/- 0.01672 from the mean distance (1AU). Thus, the
         amplitude of the function over the year is: 2*eccentricity = 0.03344.
@@ -113,8 +119,9 @@ def calculate_extraterrestrial_normal_irradiance(
     if random_day:
         day_of_year = random_day_of_year(int(days_in_a_year))
     # ------------------------------------------------------------------------
+    day_of_year = timestamp.timetuple().tm_yday
     position_of_earth = 2 * pi * day_of_year / days_in_a_year
-    distance_correction_factor = 1 + eccentricity * cos(position_of_earth - perigee_offset)
+    distance_correction_factor = 1 + eccentricity_correction_factor * cos(position_of_earth - perigee_offset)
     extraterrestial_normal_irradiance = solar_constant * distance_correction_factor
 
     # typer.echo(f'Extraterrestrial irradiance: {extraterrestial_irradiance}')
