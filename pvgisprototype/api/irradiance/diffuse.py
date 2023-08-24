@@ -140,10 +140,10 @@ def select_location_time_series(
 
 
 @app.command(
-        'from-sarah',
-        no_args_is_help=True,
-        rich_help_panel=rich_help_panel_series_irradiance,
-        )
+    'from-sarah',
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
 def calculate_diffuse_horizontal_component_from_sarah(
     shortwave: Annotated[Path, typer_argument_shortwave_irradiance],
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
@@ -243,7 +243,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
 
     if diffuse_horizontal_irradiance.size == 1:
         single_value = float(diffuse_horizontal_irradiance.values)
-        warning = Fore.YELLOW + f'{exclamation_mark} The selection matches a single value : {single_value}' + Style.RESET_ALL
+        warning = Fore.YELLOW + f'{exclamation_mark} The selection matches the single value : {single_value}' + Style.RESET_ALL
         logging.warning(warning)
         if verbose:
             typer.echo(Fore.YELLOW + warning)
