@@ -161,7 +161,10 @@ def adjust_elevation(
 # ensure value ranges in [-pi, pi]
 range_in_minus_plus_pi = lambda radians: (radians + pi) % (2 * pi) - pi
 
-def correct_linke_turbidity_factor(linke_turbidity_factor):
+
+def correct_linke_turbidity_factor(
+    linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
+):
     """Calculate the air mass 2 Linke atmospheric turbidity factor"""
     # debug(locals())
     return -0.8662 * linke_turbidity_factor
