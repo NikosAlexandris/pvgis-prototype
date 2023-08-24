@@ -171,10 +171,10 @@ def correct_linke_turbidity_factor(
 
 
 def calculate_refracted_solar_altitude(
-        solar_altitude: float,
-        angle_input_units: str = 'degrees',
-        angle_output_units: str = 'radians',
-        ):
+    solar_altitude: Annotated[float, typer_argument_solar_altitude],
+    angle_input_units: Annotated[str, typer_option_angle_units] = 'degrees',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+):
     """Adjust the solar altitude angle for atmospheric refraction
 
                        ⎛                                  2⎞
@@ -195,15 +195,15 @@ def calculate_refracted_solar_altitude(
         raise ValueError
     atmospheric_refraction = (
             0.061359
-            * (0.1594 + 1.123 * solar_altitude + 0.065656 * pow(solar_altitude, 2))
-            / (1 + 28.9344 * solar_altitude + 277.3971 * pow(solar_altitude, 2))
+            * (0.1594 + 1.123 *solar_altitude.value + 0.065656 * pow(solar_altitude.value, 2))
+            / (1 + 28.9344 *solar_altitude.value + 277.3971 * pow(solar_altitude.value, 2))
             )
-    refracted_solar_altitude = solar_altitude + atmospheric_refraction
-    refracted_solar_altitude = convert_to_radians_if_requested(refracted_solar_altitude,
+    refracted_solar_altitude =solar_altitude.value + atmospheric_refraction
+    refracted_solar_altitude = convert_float_to_radians_if_requested(refracted_solar_altitude,
                                     angle_output_units)
 
     # debug(locals())
-    return refracted_solar_altitude, angle_output_units
+    return refracted_solar_altitude
 
 
 @validate_with_pydantic(OpticalAirMassInputModel, expand_args=True)
