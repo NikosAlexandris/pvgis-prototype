@@ -576,7 +576,7 @@ def calculate_diffuse_inclined_irradiance(
             surface_tilt,
             surface_orientation,
             hour_angle,
-            output_units=angle_output_units,
+            angle_output_units=angle_output_units,
         )
         if sin(solar_incidence_angle.value) < 0 and solar_altitude.value >=0:
 
@@ -657,5 +657,7 @@ def calculate_diffuse_inclined_irradiance(
     # ---------------------------------------------------------- Remove Me ---
     typer.echo(diffuse_irradiance)
     # ---------------------------------------------------------- Remove Me ---
+    if verbose:
+        print(locals())
 
     return diffuse_irradiance
