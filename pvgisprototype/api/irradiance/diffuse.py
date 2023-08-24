@@ -590,17 +590,21 @@ def calculate_diffuse_inclined_irradiance(
 
             else:  # if solar_altitude < 0.1:
                 # requires the solar azimuth
-                solar_azimuth, solar_azimuth_units = calculate_solar_azimuth(
+                solar_azimuth = calculate_solar_azimuth(
                     longitude=longitude,
                     latitude=latitude,
                     timestamp=timestamp,
                     timezone=timezone,
+                    apply_atmospheric_refraction=apply_atmospheric_refraction,
+                    refracted_solar_zenith=refracted_solar_zenith,
                     days_in_a_year=days_in_a_year,
                     perigee_offset=perigee_offset,
                     eccentricity_correction_factor=eccentricity_correction_factor,
                     time_offset_global=time_offset_global,
                     hour_offset=hour_offset,
                     solar_time_model=solar_time_model,
+                    time_output_units=time_output_units,
+                    angle_units=angle_units,
                     angle_output_units=angle_output_units,
                 )
 
@@ -609,7 +613,7 @@ def calculate_diffuse_inclined_irradiance(
                 # ALN : angle between the vertical surface containing the normal to the
                 #   surface and vertical surface passing through the centre of the solar
                 #   disc [rad]
-                azimuth_difference = solar_azimuth - surface_orientation
+                azimuth_difference = solar_azimuth.value - surface_orientation
                 azimuth_difference = atan2(sin(azimuth_difference), cos(azimuth_difference))
                 diffuse_inclined_irradiance = diffuse_horizontal_component * (
                     diffuse_sky_irradiance * (1 - kb)
