@@ -124,8 +124,8 @@ def calculate_ground_reflected_inclined_irradiance(
     )
 
     # G0
-    day_of_year = timestamp.timetuple().tm_yday
-    extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(day_of_year)
+    # day_of_year = timestamp.timetuple().tm_yday
+    extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(timestamp)
 
     # extraterrestrial on a horizontal surface requires the solar altitude
     # solar_altitude, solar_altitude_units = calculate_solar_altitude(
