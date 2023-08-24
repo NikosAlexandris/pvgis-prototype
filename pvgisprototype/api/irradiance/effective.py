@@ -292,8 +292,16 @@ def calculate_effective_irradiance(
        to the beam, diffuse, and reflected radiation.
     """
     in_shade = is_surface_in_shade()
-    solar_altitude = calculate_solar_altitude(
+    solar_declination = model_solar_declination(
+        timestamp=timestamp,
+        timezone=timezone,
+        model=solar_declination_model,
+        days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        perigee_offset=perigee_offset,
+        angle_output_units=angle_output_units,
+    )
+    solar_altitude = model_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -309,45 +317,38 @@ def calculate_effective_irradiance(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
-        )
-    solar_declination = calculate_solar_declination(
-            timestamp=timestamp,
-            timezone=timezone,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            angle_output_units=angle_output_units,
-            )
+    )
     solar_time = model_solar_time(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            model=solar_time_model,
-            refracted_solar_zenith=refracted_solar_zenith,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        model=solar_time_model,
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
     )
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
     solar_incidence_angle = calculate_solar_incidence(
-        latitude,
-        solar_declination,
-        surface_tilt,
-        surface_orientation,
-        hour_angle,
-        output_units=angle_output_units,
+        latitude=latitude,
+        solar_declination=solar_declination,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        hour_angle=hour_angle,
+        angle_output_units=angle_output_units,
         )
 
-    if solar_altitude > 0.0:  # the sun is above the horizon
+    if solar_altitude.value > 0.0:  # the sun is above the horizon
 
-        if solar_altitude < 0.04:  # for very low sun angles
+        if solar_altitude.value < 0.04:  # for very low sun angles
             direct_horizontal_component = 0.0  # direct radiation is negligible
         
         # if not in_shade and solar_incidence > 0:
@@ -367,7 +368,7 @@ def calculate_effective_irradiance(
                 surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
                 linke_turbidity_factor=linke_turbidity_factor,
-                solar_incidence_angle_model=solar_incidence_angle_model,
+                solar_incidence_model=solar_incidence_model,
                 solar_time_model=solar_time_model,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
@@ -443,4 +444,5 @@ def calculate_effective_irradiance(
     # ?
     efficiency_coefficient = max(efficiency_coefficient, 0.0)  # limit to zero
     
-    return efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
+    result = efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
+    return result
