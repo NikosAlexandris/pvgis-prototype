@@ -116,12 +116,14 @@ def select_coordinates(
                     method=method,
                     )
         else:
+            # Review-Me ------------------------------------------------------
             data_array = data_array.sel(
-                    time=time).sel(
-                            **indexers,
-                            method=method,
-                            tolerance=tolerance,
-                            )
+                    time=time, method=method).sel(
+                        **indexers,
+                        method=method,
+                        tolerance=tolerance,
+                    )
+            # Review-Me ------------------------------------------------------
 
     except Exception as exc:
         typer.echo(f"Something went wrong in selecting the data: {str(exc)}")
