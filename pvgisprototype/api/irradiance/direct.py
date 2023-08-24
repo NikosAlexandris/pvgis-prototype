@@ -294,10 +294,7 @@ def rayleigh_optical_thickness(
 
 @app.command('normal', no_args_is_help=True)
 def calculate_direct_normal_irradiance(
-        day_of_year: Annotated[float, typer.Argument(
-            min=1,
-            max=366,
-            help='Day of year')] = None,
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
         linke_turbidity_factor: Annotated[float, typer.Argument(
             help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity',
             min=0, max=8)] = 2,  # 2 to get going for now
@@ -353,7 +350,8 @@ def calculate_direct_normal_irradiance(
     }
     """
     extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(
-        day_of_year=day_of_year,
+        # day_of_year=timestamp.timetuple().tm_yday,  # make `day_of_year` optional ?
+        timestamp=timestamp,
         solar_constant=solar_constant,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
