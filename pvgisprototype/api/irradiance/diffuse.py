@@ -349,6 +349,12 @@ def diffuse_transmission_function(
     )
 
 
+@app.command(
+        'diffuse-altitude-coefficients',
+        no_args_is_help=True,
+        help=f'☀∡ Calculate the diffuse solar altitude coefficients',
+        rich_help_panel=rich_help_panel_toolbox,
+        )
 def diffuse_solar_altitude_coefficients(
     linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
         ):
