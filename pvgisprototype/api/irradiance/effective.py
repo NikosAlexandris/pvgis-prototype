@@ -43,6 +43,7 @@ from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer_parameters import typer_option_eccentricity
 
 model_constants=[]
 model_constants.append(94.804)
@@ -237,9 +238,6 @@ def calculate_effective_irradiance(
     perigee_offset: Annotated[float, typer.Option(
         help='Perigee offset',
         rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
-    eccentricity: Annotated[float, typer.Option(
-        help='Eccentricity',
-        rich_help_panel=rich_help_panel_earth_orbit)] = 0.01672,
     time_output_units: Annotated[str, typer.Option(
         show_default=True,
         case_sensitive=False,
@@ -257,6 +255,7 @@ def calculate_effective_irradiance(
         help="Angular units for solar geometry calculations (degrees or radians). :warning: [bold red]Under development[/red bold]",
         rich_help_panel=rich_help_panel_output,
         )] = 'radians',
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
     horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     system_efficiency: Optional[float] = 0.86,
     efficiency: Annotated[Optional[float], typer.Option(
@@ -383,6 +382,7 @@ def calculate_effective_irradiance(
     """
     in_shade = is_surface_in_shade()
     solar_altitude = calculate_solar_altitude(
+        eccentricity_correction_factor=eccentricity_correction_factor,
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -391,7 +391,7 @@ def calculate_effective_irradiance(
         refracted_solar_zenith=refracted_solar_zenith,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_time_model=solar_time_model,
@@ -403,7 +403,6 @@ def calculate_effective_irradiance(
             timestamp=timestamp,
             timezone=timezone,
             days_in_a_year=days_in_a_year,
-            orbital_eccentricity=eccentricity,
             perigee_offset=perigee_offset,
             angle_output_units=angle_output_units,
             )
@@ -417,12 +416,12 @@ def calculate_effective_irradiance(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+        eccentricity_correction_factor=eccentricity_correction_factor,
     )
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
@@ -463,7 +462,7 @@ def calculate_effective_irradiance(
                 hour_offset=hour_offset,
                 days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
-                eccentricity=eccentricity,
+                eccentricity_correction_factor=eccentricity_correction_factor,
                 angle_output_units=angle_output_units,
                 verbose=verbose,
             )
@@ -487,7 +486,7 @@ def calculate_effective_irradiance(
             solar_constant=solar_constant,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
@@ -511,7 +510,7 @@ def calculate_effective_irradiance(
             solar_constant=solar_constant,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
