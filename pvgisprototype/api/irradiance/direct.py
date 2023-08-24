@@ -477,7 +477,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
-    solar_incidence_angle_model: Annotated[SolarIncidenceAngleMethod, typer_option_solar_incidence_angle_model] = SolarIncidenceAngleMethod.jenco,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
@@ -661,7 +661,7 @@ def calculate_direct_inclined_irradiance_pvgis(
         raise ValueError
 
     # "Simpler" way to calculate the inclined solar declination?
-    if solar_incidence_angle_model == 'PVGIS':
+    if solar_incidence_model == 'PVGIS':
 
         # In the old C source code, the following runs if:
         # --------------------------------- Review & Add ?
@@ -688,7 +688,7 @@ def calculate_direct_inclined_irradiance_pvgis(
             logging.error(f"Which Error? {e}")
             raise ValueError
 
-    typer.echo(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} based on {solar_incidence_angle_model})')  # B0c
+    typer.echo(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} (based on {solar_incidence_model})')  # B0c
 
     return modified_direct_horizontal_irradiance
 
