@@ -1,124 +1,197 @@
-from typing import Annotated
-from typing import Optional
-from enum import Enum
+from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import cos
 from math import sin
-from math import arcsin
-import numpy as np
-
-from pvgisprototype.models.noaa.noaa_models import Longitude_in_Radians
-from pvgisprototype.models.noaa.noaa_models import Latitude_in_Radians
-from pvgisprototype.api.input_models import SolarAltitudeInput
-from pvgisprototype.api.input_models import SolarDeclinationInput
+from math import asin
+from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
-from ..utilities.timestamp import now_utc_datetimezone
-from ..utilities.timestamp import ctx_convert_to_timezone
-from ..utilities.timestamp import attach_timezone
-from ..utilities.timestamp import convert_hours_to_seconds
-from ..utilities.timestamp import timestamp_to_decimal_hours
-from ..utilities.conversions import convert_to_radians
-from ..utilities.conversions import convert_to_degrees_if_requested
-from .solar_declination import calculate_solar_declination
-from .time_models import SolarTimeModels
-from .solar_time import model_solar_time
-from .solar_hour_angle import calculate_hour_angle
-
-from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.function_models import ModelSolarAltitudeInputModel
 from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.api.data_classes import SolarAltitude
+from .models import SolarPositionModels
+from .models import SolarTimeModels
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+from pvgisprototype.api.utilities.timestamp import attach_timezone
+
+from pvgisprototype.models.noaa.solar_position import calculate_solar_altitude_noaa
+from pvgisprototype.models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
+import suncalc
+import pysolar
+from pvgisprototype.models.pvis.solar_altitude import calculate_solar_altitude_pvis
+# from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_position_pvgis
 
 
-@validate_with_pydantic(SolarAltitudeInput, expand_args=True)
-def calculate_solar_altitude(
-        longitude: Longitude,
-        latitude: Latitude,
-        # longitude: Longitude_in_Radians,
-        # latitude: Latitude_in_Radians,
-        timestamp: datetime,
-        timezone: ZoneInfo,
-        apply_atmospheric_refraction: bool,
-        refracted_solar_zenith: float,
-        days_in_a_year: float,
-        perigee_offset: float,
-        eccentricity: float,
-        time_offset_global: int,
-        hour_offset: int,
-        solar_time_model: SolarTimeModels,
-        time_output_units: str,
-        angle_units: str,
-        angle_output_units: str,
-    ) -> SolarAltitude:
-    """Compute various solar geometry variables.
-    Parameters
-    ----------
-    longitude : float
-        The longitude in degrees. This value will be converted to radians. 
-        It should be in the range [-180, 180].
-
-    latitude : float
-        The latitude in degrees. This value will be converted to radians. 
-        It should be in the range [-90, 90].
-    
-    timestamp : datetime, optional
-        The timestamp for which to calculate the solar altitude. 
-        If not provided, the current UTC time will be used.
-    
-    timezone : str, optional
-        The timezone to use for the calculation. 
-        If not provided, the system's local timezone will be used.
-    
-    angle_output_units : str, default 'radians'
-        The units to use for the output solar geometry variables. 
-        This should be either 'degrees' or 'radians'.
-
-    Returns
-    -------
-    float
-        The calculated solar altitude.
+@validate_with_pydantic(ModelSolarAltitudeInputModel, expand_args=True)
+def model_solar_altitude(
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: str,
+    model: SolarPositionModels,
+    apply_atmospheric_refraction: bool,
+    refracted_solar_zenith: float,
+    solar_time_model: SolarTimeModels,
+    time_offset_global: float,
+    hour_offset: float,
+    days_in_a_year: float,
+    perigee_offset: float,
+    eccentricity_correction_factor: float,
+    time_output_units: str,
+    angle_units: str,
+    angle_output_units: str,
+) -> SolarAltitude:
     """
-    solar_declination = calculate_solar_declination(
-        timestamp=timestamp,
-        timezone=timezone,
-        days_in_a_year=days_in_a_year,
-        eccentricity=eccentricity,
-        perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
-    )
-    C31 = cos(latitude) * cos(solar_declination.value)
-    C33 = sin(latitude) * sin(solar_declination.value)
-    solar_time = model_solar_time(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        model=solar_time_model,  # returns datetime.time object
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
-    )
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = calculate_hour_angle(
-            solar_time=solar_time,
-            angle_output_units='radians',
-    )
-    sine_solar_altitude = C31 * cos(hour_angle.value) + C33
-    solar_altitude = asin(sine_solar_altitude)
+    The solar altitude angle measures from the horizon up towards the zenith
+    (positive, and down towards the nadir (negative)). The altitude is zero all
+    along the great circle between zenith and nadir.
 
-    solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
-    solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
-    # solar_altitude = convert_to_degrees_if_requested(
-    #         solar_altitude,
-    #         output_units,
-    #         )
+    Notes
+    -----
+
+    - All solar calculation functions return floating angular measurements in
+      radians.
+
+    pysolar :
+
+    From https://pysolar.readthedocs.io:
+
+    - Altitude is reckoned with zero at the horizon. The altitude is positive
+      when the sun is above the horizon.
+
+    - The result is returned with units.
+    """
+    if model.value == SolarPositionModels.noaa:
+
+        solar_altitude = calculate_solar_altitude_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_output_units=angle_output_units,
+        )
+        solar_altitude = convert_to_degrees_if_requested(
+            solar_altitude,
+            angle_output_units,
+        )
+
+    if model.value == SolarPositionModels.skyfield:
+        solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
+                longitude=longitude,
+                latitude=latitude,
+                timestamp=timestamp,
+                timezone=timezone,
+                angle_output_units=angle_output_units,
+                )
+        solar_altitude = convert_to_degrees_if_requested(
+            solar_altitude,
+            angle_output_units,
+            )
+
+    if model.value == SolarPositionModels.suncalc:
+        # note : first azimuth, then altitude
+        solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
+            date=timestamp,  # this comes first here!
+            lng=longitude.value,
+            lat=latitude.value,
+        ).values()  # zero points to south
+        solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+        solar_altitude = convert_to_degrees_if_requested(
+            solar_altitude, angle_output_units
+        )
+
+    if model.value == SolarPositionModels.pysolar:
+
+        timestamp = attach_timezone(timestamp, timezone)
+        longitude_in_degrees = convert_float_to_degrees_if_requested(longitude.value, 'degrees')
+        latitude_in_degrees = convert_float_to_degrees_if_requested(latitude.value, 'degrees')
+
+        solar_altitude = pysolar.solar.get_altitude(
+            latitude_deg=latitude_in_degrees,  # this comes first
+            longitude_deg=longitude_in_degrees,
+            when=timestamp,
+        )  # returns degrees by default
+        # required by output function
+        solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
+        solar_altitude = convert_to_radians_if_requested(
+            solar_altitude, angle_output_units
+        )
+
+    if model.value  == SolarPositionModels.pvis:
+
+        solar_altitude = calculate_solar_altitude_pvis(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith.value,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset,
+            solar_time_model=solar_time_model,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
+            )
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
     return solar_altitude
+
+
+def calculate_solar_altitude(
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: ZoneInfo,
+    models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
+    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    apply_atmospheric_refraction: bool = True,
+    refracted_solar_zenith: float = 1.5853349194640094,
+    days_in_a_year: float = 365.25,
+    perigee_offset: float = 0.048869,
+    eccentricity_correction_factor: float = 0.01672,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    time_output_units: str = 'minutes',
+    angle_units: str = 'radians',
+    angle_output_units: str = 'radians',
+) -> List:
+    """
+    Calculates the solar position using all models and returns the results in a table.
+    """
+    results = []
+    for model in models:
+        if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
+            solar_altitude = model_solar_altitude(
+                longitude=longitude,
+                latitude=latitude,
+                timestamp=timestamp,
+                timezone=timezone,
+                model=model,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                refracted_solar_zenith=refracted_solar_zenith,
+                solar_time_model=solar_time_model,
+                time_offset_global=time_offset_global,
+                hour_offset=hour_offset,
+                days_in_a_year=days_in_a_year,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
+                time_output_units=time_output_units,
+                angle_units=angle_units,
+                angle_output_units=angle_output_units,
+            )
+            results.append({
+                'Model': model.value,
+                'Altitude': solar_altitude.value,
+                'Units': solar_altitude.unit,  # Don't trust me -- Redesign Me!
+            })
+
+    return results
