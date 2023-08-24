@@ -495,7 +495,7 @@ def calculate_diffuse_inclined_irradiance(
         extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(timestamp)
 
         # extraterrestrial on a horizontal surface requires the solar altitude
-        solar_altitude, solar_altitude_units = calculate_solar_altitude(
+        solar_altitude = model_solar_altitude(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
@@ -511,10 +511,12 @@ def calculate_diffuse_inclined_irradiance(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-            )
+        )
 
         # on a horizontal surface : G0h = G0 sin(h0)
-        extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(solar_altitude)
+        extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(
+            solar_altitude.value
+        )
 
         # proportion between direct (beam) and extraterrestrial irradiance : Kb
         kb = direct_horizontal_component / extraterrestial_horizontal_irradiance
@@ -522,8 +524,8 @@ def calculate_diffuse_inclined_irradiance(
         # Dhc [W.m-2]
         diffuse_horizontal_component = (
             extraterrestial_normal_irradiance
-            * diffuse_transmission_function(solar_altitude)
-            * diffuse_solar_altitude_function(solar_altitude, linke_turbidity_factor)
+            * diffuse_transmission_function(solar_altitude.value)
+            * diffuse_solar_altitude_function(solar_altitude.value, linke_turbidity_factor)
         )
 
         # the N term
@@ -534,9 +536,10 @@ def calculate_diffuse_inclined_irradiance(
         )
 
         # surface in shade, requires : solar declination for/and incidence angles
-        solar_declination = calculate_solar_declination(
+        solar_declination = model_solar_declination(
                 timestamp=timestamp,
                 timezone=timezone,
+                model=solar_declination_model,
                 days_in_a_year=days_in_a_year,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 perigee_offset=perigee_offset,
