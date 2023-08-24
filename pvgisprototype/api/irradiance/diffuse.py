@@ -490,8 +490,9 @@ def calculate_diffuse_inclined_irradiance(
     # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
 
         # G0
-        day_of_year = timestamp.timetuple().tm_yday
-        extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(day_of_year)
+        # day_of_year = timestamp.timetuple().tm_yday
+        # extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(day_of_year)
+        extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(timestamp)
 
         # extraterrestrial on a horizontal surface requires the solar altitude
         solar_altitude, solar_altitude_units = calculate_solar_altitude(
