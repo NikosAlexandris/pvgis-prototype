@@ -312,10 +312,8 @@ def calculate_direct_normal_irradiance(
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset',
             rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
-            help='Eccentricity',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 0.01672,
         ):
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
     """Calculate the direct normal irradiance attenuated by the cloudless atmosphere
 
     This function implements the algorithm described by Hofierka
@@ -359,7 +357,7 @@ def calculate_direct_normal_irradiance(
         solar_constant=solar_constant,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
     )
     direct_normal_irradiance = extraterrestial_normal_irradiance * exp(
             correct_linke_turbidity_factor(linke_turbidity_factor)
@@ -387,7 +385,7 @@ def calculate_direct_horizontal_irradiance(
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -417,7 +415,7 @@ def calculate_direct_horizontal_irradiance(
         refracted_solar_zenith=refracted_solar_zenith,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_time_model=solar_time_model,
@@ -450,7 +448,7 @@ def calculate_direct_horizontal_irradiance(
             solar_constant=solar_constant,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            eccentricity=eccentricity,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             )
     direct_horizontal_irradiance = direct_normal_irradiance * sin(solar_altitude)
 
@@ -484,7 +482,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -571,7 +569,7 @@ def calculate_direct_inclined_irradiance_pvgis(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         time_output_units=time_output_units,
@@ -588,7 +586,7 @@ def calculate_direct_inclined_irradiance_pvgis(
             timestamp=timestamp,
             timezone=timezone,
             days_in_a_year=days_in_a_year,
-            orbital_eccentricity=orbital_eccentricity,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,
             angle_output_units=angle_output_units,
             )
@@ -602,7 +600,7 @@ def calculate_direct_inclined_irradiance_pvgis(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
-            orbital_eccentricity=orbital_eccentricity,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             time_output_units=time_output_units,
@@ -721,6 +719,7 @@ def calculate_direct_irradiance(
             show_choices=True,
             case_sensitive=False,
             help="Direct irradiance component to calculate")] = 'inclined',
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
     ):
     """Calculate the direct irradiatiance incident on a solar surface.
 
