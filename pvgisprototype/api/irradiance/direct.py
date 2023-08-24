@@ -111,7 +111,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_met
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 
-console = Console()
+
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=False,
@@ -119,17 +119,13 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f"Estimate the direct solar radiation",
 )
+console = Console()
 
 
 class DirectIrradianceComponents(str, Enum):
     normal = 'normal'
     on_horizontal_surface = 'horizontal'
     on_inclined_surface = 'inclined'
-
-
-class SolarIncidenceAngleMethod(str, Enum):
-    jenco = 'Jenco'
-    simple = 'PVGIS'
 
 
 class MethodsForInexactMatches(str, Enum):
