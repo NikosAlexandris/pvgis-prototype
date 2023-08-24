@@ -122,8 +122,15 @@ class MethodsForInexactMatches(str, Enum):
     nearest = 'nearest' # use nearest valid index value
 
 
-def select_location_time_series(data_path, longitude, latitude, inexact_matches_method='nearest'):
-    data_array = xr.open_dataarray(data_path)
+def select_location_time_series(
+    time_series_filename: Annotated[Path, typer_argument_time_series],
+    # longitude: Annotated[Longitude, typer_argument_longitude_in_degrees],
+    # latitude: Annotated[Latitude, typer_argument_latitude_in_degrees],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+):
+    data_array = xr.open_dataarray(time_series_filename)
     location_time_series = data_array.sel(
             lon=longitude,
             lat=latitude,
