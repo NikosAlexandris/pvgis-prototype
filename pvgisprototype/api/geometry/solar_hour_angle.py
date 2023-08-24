@@ -1,3 +1,4 @@
+from devtools import debug
 from typing import Annotated
 from typing import Optional
 from math import pi
@@ -12,19 +13,19 @@ from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import HourAngle
 from pvgisprototype.api.data_classes import HourAngleSunrise
 from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.input_models import HourAngleInput
-from pvgisprototype.api.input_models import HourAngleSunriseInput
+from pvgisprototype.api.function_models import CalculateHourAngleInputModel
+from pvgisprototype.api.function_models import CalculateHourAngleSunriseInputModel
 from pvgisprototype.api.decorators import validate_with_pydantic
 from ..utilities.timestamp import timestamp_to_decimal_hours
 from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_degrees_if_requested
 
 
-@validate_with_pydantic(HourAngleInput, expand_args=True)
+@validate_with_pydantic(CalculateHourAngleInputModel, expand_args=True)
 def calculate_hour_angle(
     solar_time: time,
     angle_output_units: str = "radians",
-) -> HourAngle:
+):
     """Calculate the hour angle ω'
 
     ω = (ST / 3600 - 12) * 15 * pi / 180
@@ -51,6 +52,52 @@ def calculate_hour_angle(
     Notes
     -----
 
+    The hour angle ω (elsewhere symbolised with `h`) of a point on the earth’s
+    surface is defined as the angle through which the earth would turn to bring
+    the meridian of the point directly under the sun. The hour angle at local
+    solar noon is zero, with each 360/24 or 15° of longitude equivalent to 1 h,
+    afternoon hours being designated as positive. Expressed symbolically, the
+    hour angle in degrees is:
+
+        h = ±0.25 (Number of minutes from local solar noon)
+
+    where the plus sign applies to afternoon hours and the minus sign to
+    morning hours.
+
+    The hour angle can also be obtained from the AST; that is, the corrected
+    local solar time:
+
+        h = (AST - 12) * 15
+
+    At local solar noon, AST = 12 and h = 0°. Therefore, from Eq <<(2.3)<<, the
+    LST (the time shown by our clocks at local solar noon) is:
+
+        LST = 12 - ET ∓ 4 * (SL - LL)
+
+    Example 1
+
+    The equation for LST at local solar noon for Nicosia, Cyprus is:
+
+        LST = 12 - ET - 13.32 (minutes)
+
+    Example 2
+
+    Given the ET for March 10 (N = 69) is calculated from Eq (2.1), in which
+    the factor B is obtained from Eq <<(2.2)<< as:
+        
+        B = 360 / 364 * (N-81) = 360 / 364 * (69- 81) = -11.87
+        
+        ET = 9.87 * sin(2*B) - 7.53 * cos(B) - 1.5 * sin(B) =
+           = 9.87 * sin(-2 * 11.87) - 7.53 * cos(-11.87) - 1.5 * sin(-11.87)
+           = -11.04min ∼ -11min
+
+    The standard meridian for Athens is 30°E longitude.
+
+    The apparent solar time on March 10 at 2:30 pm for the city of Athens,
+    Greece (23°40′E longitude) is 
+
+        AST = 14:30−4(30−23.66)−0:11=14:30−0:25−0:11=13:54,or1:54pm
+
     In PVGIS :
         hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
 
@@ -65,10 +112,11 @@ def calculate_hour_angle(
     hour_angle = HourAngle(value=hour_angle, unit='radians')
     # hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
 
+    # debug(locals())
     return hour_angle
 
 
-@validate_with_pydantic(HourAngleSunriseInput, expand_args=True)
+@validate_with_pydantic(CalculateHourAngleSunriseInputModel, expand_args=True)
 def calculate_hour_angle_sunrise(
     latitude: Latitude,
     surface_tilt: float = 0,
@@ -116,8 +164,5 @@ def calculate_hour_angle_sunrise(
     #     hour_angle_sunrise,
     #     angle_output_units,
     # )
+
     return hour_angle_sunrise
-
-
-if __name__ == "__main__":
-    typer.run(main)
