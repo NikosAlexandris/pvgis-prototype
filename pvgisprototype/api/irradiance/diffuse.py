@@ -186,18 +186,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
         # elevation_file_number_ew,
     """
 #     global_data_array = xr.open_dataarray(shortwave)  # global is a reserved word!
-#     global_location_time_series = global_data_array.sel(
-#             lon=longitude,
-#             lat=latitude,
-#             method=inexact_matches_method)
-#     global_location_time_series.load()  # load into memory for fast processing
-
-#     direct_data_array = xr.open_dataarray(direct)
-#     direct_location_time_series = direct_data_array.sel(
-#             lon=longitude,
-#             lat=latitude,
-#             method=inexact_matches_method)
-#     direct_location_time_series.load()
     global_location_time_series = select_location_time_series(
         shortwave, longitude, latitude
     )
@@ -213,13 +201,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
         global_location_time_series = global_location_time_series.sel(time=time)
         direct_location_time_series = direct_location_time_series.sel(time=time)
 
-    # if start_time and end_time:
-    #     global_location_time_series = (
-    #         global_location_time_series.sel(time=slice(start_time, end_time)),
-    #     )
-    #     direct_location_time_series = (
-    #         direct_location_time_series.sel(time=slice(start_time, end_time)),
-    #     )
     if start_time or end_time:
         # If only start_time is provided, end_time defaults to the end of the series
         if start_time and not end_time:
