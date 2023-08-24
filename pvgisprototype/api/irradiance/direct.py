@@ -380,7 +380,7 @@ def calculate_direct_horizontal_irradiance(
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
-    solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
@@ -404,7 +404,7 @@ def calculate_direct_horizontal_irradiance(
 
         `Bhc = B0c sin(h0)`
     """
-    solar_altitude, solar_altitude_units = calculate_solar_altitude(
+    solar_altitude = model_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -427,7 +427,8 @@ def calculate_direct_horizontal_irradiance(
             solar_altitude,
             expected_solar_altitude_units,  # Here!
             )
-    refracted_solar_altitude, refracted_solar_altitude_units = calculate_refracted_solar_altitude(
+    # refracted_solar_altitude, refracted_solar_altitude_units = calculate_refracted_solar_altitude(
+    refracted_solar_altitude = calculate_refracted_solar_altitude(
             solar_altitude=solar_altitude_in_degrees,
             angle_input_units=expected_solar_altitude_units,
             angle_output_units='radians',  # Here in radians!
@@ -438,17 +439,18 @@ def calculate_direct_horizontal_irradiance(
             angle_units=expected_solar_altitude_units,  # and Here!
             )
     # --------------------------------------expects solar altitude in degrees!
-    day_of_year = timestamp.timetuple().tm_yday
     direct_normal_irradiance = calculate_direct_normal_irradiance(
             optical_air_mass=optical_air_mass,
             linke_turbidity_factor=linke_turbidity_factor,
-            day_of_year=day_of_year,
+            # day_of_year=day_of_year,  # day_of_year = timestamp.timetuple().tm_yday
+            # day_of_year=timestamp.timetuple().tm_yday,
+            timestamp=timestamp,
             solar_constant=solar_constant,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             )
-    direct_horizontal_irradiance = direct_normal_irradiance * sin(solar_altitude)
+    direct_horizontal_irradiance = direct_normal_irradiance * sin(solar_altitude.value)
 
     # table_with_inputs = convert_dictionary_to_table(locals())
     # console.print(table_with_inputs)
@@ -473,11 +475,12 @@ def calculate_direct_inclined_irradiance_pvgis(
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvis,
     solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
-    solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
@@ -555,9 +558,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     #                          * sin(half_pi + surface_orientation)
     #                          + sin(latitude)
     #                          * sin(half_pi - surface_tilt)
-
-    # calculate solar altitude
-    solar_altitude, solar_altitude_units = calculate_solar_altitude(
+    solar_altitude = model_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -574,15 +575,16 @@ def calculate_direct_inclined_irradiance_pvgis(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
-    sine_solar_altitude = sin(solar_altitude)
+    sine_solar_altitude = sin(solar_altitude.value)
 
     # make it a function -----------------------------------------------------
     #
 
     # calculate solar declination + C3x geometry parameters
-    solar_declination = calculate_solar_declination(
+    solar_declination = model_solar_declination(
             timestamp=timestamp,
             timezone=timezone,
+            model=solar_declination_model,
             days_in_a_year=days_in_a_year,
             eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,
