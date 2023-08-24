@@ -139,132 +139,43 @@ def calculate_efficiency(
        help=f'Calculate the clear-sky ground reflected irradiance',
        )
 def calculate_effective_irradiance(
-    longitude: Annotated[float, typer.Argument(
-        callback=convert_to_radians,
-        min=-180, max=180)],
-    latitude: Annotated[float, typer.Argument(
-        callback=convert_to_radians,
-        min=-90, max=90)],
-    elevation: Annotated[float, typer.Argument(
-        min=0, max=8848,
-        help='Elevation',)],
-    timestamp: Annotated[Optional[datetime], typer.Argument(
-        help='Timestamp',
-        default_factory=now_utc_datetimezone)],
-    direct_horizontal_irradiance: Annotated[Path, typer.Option(
-        help='Path to direct horizontal irradiance time series (Surface Incoming Direct radiation (SID), `fdir`)',
-        rich_help_panel=rich_help_panel_series_irradiance,
-        )] = None,
-    temperature: Annotated[float, typer.Argument(
-        help="Ambient temperature in degrees Celsius.")] = 25,
-    wind_speed: Annotated[float, typer.Argument(
-        help="Wind speed in meters per second.")] = 0,
-    mask_and_scale: Annotated[bool, typer.Option(
-        help="Mask and scale the series",
-        rich_help_panel=rich_help_panel_series_irradiance,
-        )] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer.Option(
-        '--method-for-inexact-matches',
-        show_default=True,
-        show_choices=True,
-        case_sensitive=False,
-        rich_help_panel=rich_help_panel_series_irradiance,
-        help="Model to calculate solar position")] = MethodsForInexactMatches.nearest,
-    tolerance: Annotated[float, typer.Option(
-        # help=f'Maximum distance between original and new labels for inexact matches. See nearest-neighbor-lookups Xarray documentation',
-        help=f'Maximum distance between original and new labels for inexact matches. See [nearest-neighbor-lookups](https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups) @ Xarray documentation',
-        rich_help_panel=rich_help_panel_series_irradiance,
-        )] = 0.1,
-    in_memory: Annotated[bool, typer.Option(
-        help='Load data into memory',
-        rich_help_panel=rich_help_panel_series_irradiance,
-        )] = False,
-    timezone: Annotated[Optional[str], typer.Option(
-        help='Timezone',
-        callback=ctx_convert_to_timezone)] = None,
-    surface_tilt: Annotated[Optional[float], typer.Option(
-        min=0, max=90,
-        help='Solar surface tilt angle',
-        callback=convert_to_radians,
-        rich_help_panel=rich_help_panel_geometry_surface)] = 45,
-    surface_orientation: Annotated[Optional[float], typer.Option(
-        min=0, max=360,
-        help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]',
-        callback=convert_to_radians,
-        rich_help_panel=rich_help_panel_geometry_surface)] = 180,  # from North!
-    linke_turbidity_factor: Annotated[float, typer.Option(
-        help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity',
-        min=0, max=8,
-        rich_help_panel=rich_help_panel_atmospheric_properties,
-        )] = 2,  # 2 to get going for now
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer.Option(
-        '--atmospheric-refraction',
-        help='Apply atmospheric refraction functions',
-        rich_help_panel=rich_help_panel_advanced_options,
-        )] = True,
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer_argument_direct_horizontal_irradiance] = None,
+    temperature: Annotated[float, typer_argument_temperature_time_series] = 25,
+    wind_speed: Annotated[float, typer_argument_wind_speed_time_series] = 0,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
+    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
+    linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
-    albedo: Annotated[Optional[float], typer.Option(
-        min=0,
-        help='Mean ground albedo',
-        rich_help_panel=rich_help_panel_advanced_options)] = 2,
-    apply_angular_loss_factor: Annotated[Optional[bool], typer.Option(
-        help='Apply angular loss function',
-        rich_help_panel=rich_help_panel_advanced_options)] = True,
-    solar_incidence_angle_model: Annotated[SolarIncidenceAngleMethod, typer.Option(
-        '--incidence-angle-model',
-        show_default=True,
-        show_choices=True,
-        case_sensitive=False,
-        help="Method to calculate the solar declination")] = 'jenco',
-    solar_time_model: Annotated[SolarTimeModels, typer.Option(
-        help="Model to calculate solar position",
-        show_default=True,
-        show_choices=True,
-        case_sensitive=False,
-        rich_help_panel=rich_help_panel_solar_time)] = SolarTimeModels.skyfield,
-    time_offset_global: Annotated[float, typer.Option(
-        help='Global time offset',
-        rich_help_panel=rich_help_panel_solar_time)] = 0,
-    hour_offset: Annotated[float, typer.Option(
-        help='Hour offset',
-        rich_help_panel=rich_help_panel_solar_time)] = 0,
-    solar_constant: Annotated[float, typer.Option(
-        help="The mean solar electromagnetic radiation at the top of the atmosphere (~1360.8 W/m2) one astronomical unit (au) away from the Sun.",
-        min=1360,
-        rich_help_panel=rich_help_panel_earth_orbit)] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer.Option(
-        help='Days in a year',
-        rich_help_panel=rich_help_panel_earth_orbit)] = 365.25,
-    perigee_offset: Annotated[float, typer.Option(
-        help='Perigee offset',
-        rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
-    time_output_units: Annotated[str, typer.Option(
-        show_default=True,
-        case_sensitive=False,
-        help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]",
-        rich_help_panel=rich_help_panel_output)] = 'minutes',
-    angle_units: Annotated[str, typer.Option(
-        show_default=True,
-        case_sensitive=False,
-        help="Angular units for internal solar geometry calculations. :warning: [bold red]Keep fingers away![/bold red]",
-        rich_help_panel=rich_help_panel_output,
-        )] = 'radians',
-    angle_output_units: Annotated[str, typer.Option(
-        show_default=True,
-        case_sensitive=False,
-        help="Angular units for solar geometry calculations (degrees or radians). :warning: [bold red]Under development[/red bold]",
-        rich_help_panel=rich_help_panel_output,
-        )] = 'radians',
+    albedo: Annotated[Optional[float], typer_option_albedo] = 2,
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvis,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.skyfield,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     system_efficiency: Optional[float] = 0.86,
-    efficiency: Annotated[Optional[float], typer.Option(
-        '-e',
-        help='Apply efficieny',
-        rich_help_panel=rich_help_panel_efficiency,
-        )] = None,
-    verbose: Annotated[bool, typer.Option(
-        help='Be verbose!')] = False,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
     ):
     """Calculate hourly radiation values for a specific moment in time.
     
