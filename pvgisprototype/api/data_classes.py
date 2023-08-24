@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class OrbitalEccentricity:
+class EccentricityCorrectionFactor:
     value: float = 0.03344
     unit: str = 'radians'
 
