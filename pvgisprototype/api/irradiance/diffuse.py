@@ -402,7 +402,7 @@ def diffuse_solar_altitude_function(
 @app.command(
         'inclined',
         no_args_is_help=True,
-        help=f'☀∡ Calculate the diffuse solar altitude angle',
+        help=f'☀∡ Calculate the diffuse irradiance incident on a tilted surface',
         rich_help_panel=rich_help_panel_series_irradiance,
         )
 def calculate_diffuse_inclined_irradiance(
