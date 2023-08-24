@@ -78,6 +78,7 @@ from .constants import SOLAR_CONSTANT
 
 # from pvgisprototype.api.series.utilities import select_coordinates
 from pvgisprototype.cli.series import select_time_series
+from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
@@ -112,6 +113,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 
 console = Console()
 app = typer.Typer(
+    cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",

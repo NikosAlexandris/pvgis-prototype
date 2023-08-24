@@ -65,6 +65,7 @@ from ..geometry.solar_time import model_solar_time
 from ..utilities.timestamp import timestamp_to_decimal_hours
 from .constants import SOLAR_CONSTANT
 
+from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -102,14 +103,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 AOIConstants = []
 AOIConstants.append(-0.074)
 AOIConstants.append(0.155)
-
-
-class OrderCommands(TyperGroup):
-  def list_commands(self, ctx: Context):
-    """Return list of commands in the order appear.
-    See: https://github.com/tiangolo/typer/issues/428#issuecomment-1238866548
-    """
-    return list(self.commands)    # get commands using self.commands
 
 
 app = typer.Typer(

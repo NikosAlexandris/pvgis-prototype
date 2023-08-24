@@ -41,6 +41,7 @@ from ..geometry.solar_time import model_solar_time
 from ..utilities.timestamp import timestamp_to_decimal_hours
 from .direct import calculate_direct_horizontal_irradiance
 
+from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 
 model_constants=[]
@@ -59,6 +60,7 @@ AOIConstants.append(0.155)
 
 
 app = typer.Typer(
+    cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
