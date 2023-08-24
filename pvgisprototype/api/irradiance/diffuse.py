@@ -257,7 +257,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         data_statistics = calculate_series_statistics(diffuse_horizontal_irradiance)
         print_series_statistics(data_statistics, title='Diffuse horizontal irradiance from SARAH')
         if csv:
-            export_statistics_to_csv(data_statistics, 'diffuse_horizontal_component')
+            export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
 
     return diffuse_horizontal_irradiance
 
