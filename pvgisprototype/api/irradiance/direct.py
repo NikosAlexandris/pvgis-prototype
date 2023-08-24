@@ -141,8 +141,10 @@ class MethodsForInexactMatches(str, Enum):
 #     return value
 
 
-@validate_with_pydantic(Elevation, expand_args=True)
-def adjust_elevation(elevation: float):
+# @validate_with_pydantic(Elevation, expand_args=True)
+def adjust_elevation(
+    elevation: Annotated[float, typer_argument_elevation],
+):
     """Some correction for the given solar altitude 
 
     [1]_
@@ -153,7 +155,7 @@ def adjust_elevation(elevation: float):
     .. [1] Hofierka, 2002
     """
     # debug(locals())
-    return exp(-elevation / 8434.5)
+    return exp(-elevation.value / 8434.5)
 
 
 # ensure value ranges in [-pi, pi]
