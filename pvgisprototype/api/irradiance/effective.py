@@ -15,13 +15,14 @@ from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irrad
 # from pvgisprototype.api.irradiance.reflected import calculate_reflected_inclined_irradiance_pvgis
 
 from datetime import datetime
-from pvgisprototype.api.geometry.solar_altitude import calculate_solar_altitude
-from pvgisprototype.api.input_models import SolarAltitudeInput
-from pvgisprototype.api.geometry.time_models import SolarTimeModels
+from pvgisprototype.api.function_models import ModelSolarPositionInputModel
+from pvgisprototype.api.geometry.models import SolarDeclinationModels
+from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarTimeModels
 from ..utilities.conversions import convert_to_radians
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.irradiance.direct import SolarIncidenceAngleMethod
+from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from .constants import SOLAR_CONSTANT
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
@@ -35,15 +36,49 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 
 from pvgisprototype.api.irradiance.diffuse import  calculate_diffuse_inclined_irradiance
 from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_inclined_irradiance
-from pvgisprototype.models.standard.solar_incidence import calculate_solar_incidence
-from ..geometry.solar_declination import calculate_solar_declination
+from pvgisprototype.models.pvis.solar_incidence import calculate_solar_incidence
+from pvgisprototype.api.geometry.solar_declination import model_solar_declination
+from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
 from ..geometry.solar_time import model_solar_time
 from ..utilities.timestamp import timestamp_to_decimal_hours
 from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_elevation
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
+from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_temperature_time_series
+from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_time_series
+from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
+from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
+from pvgisprototype.cli.typer_parameters import typer_option_tolerance
+from pvgisprototype.cli.typer_parameters import typer_option_in_memory
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
+from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer_parameters import typer_option_albedo
+from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
+from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
+from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
+from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
+from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity
+from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
+from pvgisprototype.cli.typer_parameters import typer_option_angle_units
+from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
+from pvgisprototype.cli.typer_parameters import typer_option_efficiency
+from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
 model_constants=[]
 model_constants.append(94.804)
@@ -445,4 +480,5 @@ def calculate_effective_irradiance(
     efficiency_coefficient = max(efficiency_coefficient, 0.0)  # limit to zero
     
     result = efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
+    debug(locals())
     return result
