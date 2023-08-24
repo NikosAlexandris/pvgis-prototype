@@ -55,17 +55,18 @@ def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
 #     """Convert angle from degrees to radians if requested."""
 #     return np.radians(angle) if output_units == 'radians' else angle
 
+
+def convert_float_to_radians_if_requested(angle: float, output_units: str) -> float:
+    """Convert angle from radians to radians if requested."""
+    return radians(angle) if output_units == 'radians' else angle
+
+
 def convert_to_radians_if_requested(data_class: Any, output_units: str) -> Any:
     """Convert angle from degrees to radians if requested, and create a new named tuple with
     updated value and unit."""
     if output_units == 'radians' and not data_class.unit == 'radians':
         data_class = replace(data_class, value=radians(data_class.value), unit='radians')
     return data_class
-
-
-
-        
-
 
 
 def convert_dictionary_to_table(dictionary):
@@ -97,6 +98,7 @@ def round_float_values(obj, decimal_places=3):
     else:
         return obj
 
+
 # def round_float_values(obj, decimal_places=3):
 #     if isinstance(obj, float):
 #         return round(obj, decimal_places)
@@ -111,4 +113,3 @@ def round_float_values(obj, decimal_places=3):
 #         return obj
 #     else:
 #         return obj
-
