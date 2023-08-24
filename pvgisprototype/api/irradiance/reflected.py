@@ -90,7 +90,7 @@ def calculate_ground_reflected_inclined_irradiance(
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -119,7 +119,7 @@ def calculate_ground_reflected_inclined_irradiance(
         solar_constant=solar_constant,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
     )
 
@@ -138,7 +138,7 @@ def calculate_ground_reflected_inclined_irradiance(
         refracted_solar_zenith=refracted_solar_zenith,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_time_model=solar_time_model,
