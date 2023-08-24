@@ -46,12 +46,16 @@ from math import atan
 import numpy as np
 from datetime import datetime
 from ..constants import AOI_CONSTANTS
-from ..geometry.solar_declination import calculate_solar_declination
-from ..geometry.solar_altitude import calculate_solar_altitude
-from ..geometry.time_models import SolarTimeModels
+from pvgisprototype.api.geometry.solar_declination import model_solar_declination
+from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
+from ..geometry.models import SolarDeclinationModels
+from ..geometry.models import SolarIncidenceModels
+from ..geometry.models import SolarTimeModels
 from ..geometry.solar_time import model_solar_time
 from ..utilities.conversions import convert_to_radians
+from ..utilities.conversions import convert_float_to_degrees_if_requested
 from ..utilities.conversions import convert_to_degrees_if_requested
+from ..utilities.conversions import convert_float_to_radians_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
 from ..utilities.conversions import convert_dictionary_to_table
 from ..utilities.timestamp import now_utc_datetimezone
@@ -61,11 +65,8 @@ from ..utilities.timestamp import ctx_attach_requested_timezone
 from ..utilities.timestamp import parse_timestamp
 from .loss import calculate_angular_loss_factor_for_direct_irradiance
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
-from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 
-from .input_models import OpticalAirMassInputModel
-from .input_models import Elevation
-from .input_models import IrradianceInputModel
+from pvgisprototype.api.function_models import CalculateOpticalAirMassInputModel
 from pvgisprototype.api.decorators import validate_with_pydantic
 
 from pydantic import BaseModel
@@ -82,22 +83,28 @@ from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
+from pvgisprototype.cli.typer_parameters import typer_argument_refracted_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_argument_linke_turbidity_factor
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
+from pvgisprototype.cli.typer_parameters import typer_option_optical_air_mass
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_option_albedo
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_component
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_angle_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
-from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
+# from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
+from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity
@@ -688,38 +695,58 @@ def calculate_direct_inclined_irradiance_pvgis(
 
     typer.echo(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} (based on {solar_incidence_model})')  # B0c
 
+    debug(locals())
     return modified_direct_horizontal_irradiance
-
 
 
 # from: rsun_base.c
 # function name: brad_angle_irradiance
 # @app.command('direct', no_args_is_help=True)
 def calculate_direct_irradiance(
-        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
-        # direct_horizontal_radiation: Annotated[float, typer.Argument(
-        #     help='Direct normal radiation in W/m²',
-        #     min=-9000, max=1000)],  # `sh` which comes from `s0`
-        # direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
-        #     help='Direct normal radiation coefficient (dimensionless)',
-        #     min=0, max=1)],  # bh = sunRadVar->cbh;
-        solar_altitude: Annotated[float, typer.Argument(
-            help='Solar altitude in degrees °',
-            min=0, max=90)],
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
-        component: Annotated[DirectIrradianceComponents, typer.Option(
-            '-c',
-            '--component',
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False,
-            help="Direct irradiance component to calculate")] = 'inclined',
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    # solar_altitude: Annotated[float, typer.Argument(
+    #     help='Solar altitude in degrees °',
+    #     min=0, max=90)],
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    component: Annotated[DirectIrradianceComponents, typer.Option(
+        '-c',
+        '--component',
+        show_default=True,
+        show_choices=True,
+        case_sensitive=False,
+        help="Direct irradiance component to calculate")] = 'inclined',
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_component] = None,
+    # direct_horizontal_radiation: Annotated[float, typer.Argument(
+    #     help='Direct normal radiation in W/m²',
+    #     min=-9000, max=1000)],  # `sh` which comes from `s0`
+    # direct_horizontal_radiation_coefficient: Annotated[float, typer.Argument(
+    #     help='Direct normal radiation coefficient (dimensionless)',
+    #     min=0, max=1)],  # bh = sunRadVar->cbh;
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
+    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
+    linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
     ):
     """Calculate the direct irradiatiance incident on a solar surface.
 
