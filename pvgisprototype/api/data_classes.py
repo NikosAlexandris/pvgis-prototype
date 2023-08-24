@@ -14,6 +14,12 @@ class PerigeeOffset:
 
 
 @dataclass(frozen=True)
+class RefractedSolarAltitude:
+    value: float
+    unit: str = 'radians'
+
+
+@dataclass(frozen=True)
 class RefractedSolarZenith:
     value: float = 1.5853349194640094
     unit: str = 'radians'
@@ -129,8 +135,14 @@ class CompassSolarAzimuth:
 
 @dataclass(frozen=True)
 class SolarDeclination:
-    value: float = 0
+    value: float
     unit: str = 'radians'
+
+
+@dataclass(frozen=True)
+class Elevation:
+    value: float
+    unit: str = 'meters'
 
 
 @dataclass(frozen=True)
@@ -149,6 +161,7 @@ class SolarZenith:
 class SolarPosition:
     value: float
     unit: str
+
 
 @dataclass(frozen=True)
 class HorizonHeight:
