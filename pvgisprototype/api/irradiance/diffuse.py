@@ -408,9 +408,7 @@ def diffuse_solar_altitude_function(
 def calculate_diffuse_inclined_irradiance(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-        elevation: Annotated[float, typer.Argument(
-            min=0, max=8848,
-            help='Elevation',)],
+    elevation: Annotated[float, typer_argument_elevation],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = 45,
@@ -421,6 +419,7 @@ def calculate_diffuse_inclined_irradiance(
     direct_horizontal_irradiance: Annotated[Optional[Path], typer.Option(
         help='Read horizontal irradiance time series data from a file',)] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvis,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
@@ -432,6 +431,8 @@ def calculate_diffuse_inclined_irradiance(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[Optional[bool], typer_option_verbose]= False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface
