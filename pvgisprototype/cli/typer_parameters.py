@@ -22,6 +22,14 @@ from .rich_help_panel_names import rich_help_panel_output
 from .rich_help_panel_names import rich_help_panel_time_series
 
 
+class OrderCommands(TyperGroup):
+  def list_commands(self, ctx: Context):
+    """Return list of commands in the order appear.
+    See: https://github.com/tiangolo/typer/issues/428#issuecomment-1238866548
+    """
+    return list(self.commands)    # get commands using self.commands
+
+
 # Generic
 
 typer_option_verbose = typer.Option(

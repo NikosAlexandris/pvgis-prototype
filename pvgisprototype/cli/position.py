@@ -20,6 +20,7 @@ import numpy as np
 # from rich.console import Console
 from rich.table import Table
 from rich import box
+from .typer_parameters import OrderCommands
 from .typer_parameters import typer_argument_longitude
 from .typer_parameters import typer_argument_latitude
 from .typer_parameters import typer_argument_timestamp
@@ -87,20 +88,13 @@ from .print import print_noaa_solar_position_table
 
 # console = Console()
 app = typer.Typer(
+    cls=OrderCommands,
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
     help=f":triangular_ruler:  Calculate solar geometry parameters for a location and moment in time",
 )
 state = {"verbose": False}
-
-
-class OrderCommands(TyperGroup):
-  def list_commands(self, ctx: Context):
-    """Return list of commands in the order appear.
-    See: https://github.com/tiangolo/typer/issues/428#issuecomment-1238866548
-    """
-    return list(self.commands)    # get commands using self.commands
 
 
 @app.callback()

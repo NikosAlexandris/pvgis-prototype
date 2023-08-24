@@ -26,14 +26,16 @@ from ..api.geometry.time_models import SolarTimeModels
 from ..api.geometry.solar_time import calculate_solar_time
 from ..api.geometry.solar_hour_angle import calculate_hour_angle
 
+from .typer_parameters import OrderCommands
 
-console = Console()
 app = typer.Typer(
+    cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
     help=f":timer_clock:  Calculate the solar time for a location and moment",
 )
+console = Console()
 
 
 # @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})

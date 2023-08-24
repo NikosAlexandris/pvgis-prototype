@@ -13,14 +13,7 @@ from ..api.irradiance.diffuse import app as diffuse_irradiance
 from ..api.irradiance.reflected import app as reflected_irradiance
 from ..api.irradiance.loss import app as angular_loss_factor
 from ..api.irradiance.effective import app as effective_irradiance
-
-
-class OrderCommands(TyperGroup):
-  def list_commands(self, ctx: Context):
-    """Return list of commands in the order appear.
-    See: https://github.com/tiangolo/typer/issues/428#issuecomment-1238866548
-    """
-    return list(self.commands)    # get commands using self.commands
+from .typer_parameters import OrderCommands
 
 
 app = typer.Typer(
