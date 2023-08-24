@@ -3,7 +3,7 @@ import typer
 from typing import Annotated
 from typing import Optional
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
-from pvgisprototype.api.geometry.time_models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModels
 from ..utilities.conversions import convert_to_radians
 from datetime import datetime
 from ..utilities.timestamp import now_utc_datetimezone
@@ -15,9 +15,8 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_su
 from pathlib import Path
 from .direct import calculate_direct_horizontal_irradiance
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
-from pvgisprototype.api.geometry.solar_altitude import calculate_solar_altitude
-from pvgisprototype.api.geometry.solar_azimuth import calculate_solar_azimuth
-from pvgisprototype.models.standard.solar_incidence import calculate_solar_incidence
+from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
+from pvgisprototype.models.pvis.solar_incidence import calculate_solar_incidence
 from math import sin
 from math import cos
 from .diffuse import diffuse_transmission_function
@@ -129,7 +128,8 @@ def calculate_ground_reflected_inclined_irradiance(
     extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(day_of_year)
 
     # extraterrestrial on a horizontal surface requires the solar altitude
-    solar_altitude, solar_altitude_units = calculate_solar_altitude(
+    # solar_altitude, solar_altitude_units = calculate_solar_altitude(
+    solar_altitude = model_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -148,13 +148,13 @@ def calculate_ground_reflected_inclined_irradiance(
         )
 
     # on a horizontal surface : G0h = G0 sin(h0)
-    extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(solar_altitude)
+    extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(solar_altitude.value)
 
     # Dhc [W.m-2]
     diffuse_horizontal_component = (
         extraterrestial_normal_irradiance
-        * diffuse_transmission_function(solar_altitude)
-        * diffuse_solar_altitude_function(solar_altitude, linke_turbidity_factor)
+        * diffuse_transmission_function(solar_altitude.value)
+        * diffuse_solar_altitude_function(solar_altitude.value, linke_turbidity_factor)
     )
     global_horizontal_irradiance = direct_horizontal_component + diffuse_horizontal_component
 
