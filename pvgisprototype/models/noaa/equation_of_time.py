@@ -1,5 +1,5 @@
+from pvgisprototype.api.decorators import validate_with_pydantic
 from .noaa_models import CalculateEquationOfTimeNOAAInput
-from .decorators import validate_with_pydantic
 from datetime import datetime
 from .fractional_year import calculate_fractional_year_noaa 
 from math import sin

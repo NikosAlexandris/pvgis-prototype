@@ -2,12 +2,12 @@ from devtools import debug
 
 from typing import Tuple
 from .noaa_models import CalculateEventHourAngleNOAAInput
-from .decorators import validate_with_pydantic
 from datetime import datetime
 from .solar_declination import calculate_solar_declination_noaa
 from math import cos
 from math import tan
 from math import acos
+from pvgisprototype.api.decorators import validate_with_pydantic
 
 from pvgisprototype.api.data_classes import EventTime
 from pvgisprototype.api.data_classes import Latitude

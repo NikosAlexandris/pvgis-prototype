@@ -3,7 +3,6 @@
 # from .noaa_models import SolarZenithModel_in_Radians
 from .noaa_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from .noaa_models import CalculateSolarZenithNOAAInput
-from .decorators import validate_with_pydantic
 from datetime import datetime
 from .solar_declination import calculate_solar_declination_noaa
 from math import sin
@@ -15,6 +14,7 @@ from math import degrees
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 from math import isfinite
 from math import pi
+from pvgisprototype.api.decorators import validate_with_pydantic
 
 from pvgisprototype.api.data_classes import SolarZenith
 from pvgisprototype.api.data_classes import SolarAltitude

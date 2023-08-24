@@ -3,8 +3,8 @@ from devtools import debug
 # from .noaa_models import LongitudeModel_in_Radians
 # from .noaa_models import LatitudeModel_in_Radians
 from .noaa_models import CalculateEventTimeNOAAInput
-from .decorators import validate_with_pydantic
 from datetime import datetime
+from pvgisprototype.api.decorators import validate_with_pydantic
 from .equation_of_time import calculate_equation_of_time_noaa
 from .solar_declination import calculate_solar_declination_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_noaa

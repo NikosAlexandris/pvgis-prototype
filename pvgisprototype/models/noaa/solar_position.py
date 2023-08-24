@@ -25,7 +25,6 @@ from typing import Callable
 from typing import Optional
 from typing import Tuple
 from typing import Union
-from .decorators import validate_with_pydantic
 from .noaa_models import Longitude
 from .noaa_models import Latitude
 from .noaa_models import Longitude_in_Radians
@@ -46,6 +45,7 @@ from .event_hour_angle import calculate_event_hour_angle_noaa
 from .event_time import calculate_event_time_noaa
 from .local_time import calculate_local_solar_time_noaa
 
+from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.data_classes import Longitude
 from pvgisprototype.api.data_classes import Latitude
 

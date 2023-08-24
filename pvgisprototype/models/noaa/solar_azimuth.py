@@ -1,7 +1,6 @@
 # from .noaa_models import LongitudeModel_in_Radians
 # from .noaa_models import LatitudeModel_in_Radians
 from .noaa_models import CalculateSolarAzimuthNOAAInput
-from .decorators import validate_with_pydantic
 from datetime import datetime
 from .solar_declination import calculate_solar_declination_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
@@ -13,6 +12,7 @@ from math import pi
 from math import isfinite
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 
+from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.data_classes import CompassSolarAzimuth
 from pvgisprototype.api.data_classes import Longitude
 from pvgisprototype.api.data_classes import Latitude

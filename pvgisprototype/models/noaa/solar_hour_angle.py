@@ -1,5 +1,4 @@
 from .noaa_models import CalculateSolarHourAngleNOAAInput
-from .decorators import validate_with_pydantic
 from datetime import datetime
 from typing import Optional
 # from .noaa_models import LongitudeModel_in_Radians
@@ -7,6 +6,7 @@ from .solar_time import calculate_true_solar_time_noaa
 from math import pi
 
 from pvgisprototype.api.data_classes import SolarHourAngle
+from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.data_classes import Longitude
 
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes

@@ -2,7 +2,7 @@ from .noaa_models import CalculateSolarDeclinationNOAAInput
 from typing import Optional
 from datetime import datetime
 from ...api.utilities.conversions import convert_to_degrees_if_requested
-from .decorators import validate_with_pydantic
+from pvgisprototype.api.decorators import validate_with_pydantic
 from .fractional_year import calculate_fractional_year_noaa 
 from math import sin
 from math import cos

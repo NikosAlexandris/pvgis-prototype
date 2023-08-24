@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from .decorators import validate_with_pydantic
+from pvgisprototype.api.decorators import validate_with_pydantic
 from .noaa_models import CalculateFractionalYearNOAAInput
 from math import pi
 from ...api.utilities.conversions import convert_to_degrees_if_requested

@@ -1,11 +1,11 @@
 from .noaa_models import CalculateSolarAltitudeNOAAInput
-from .decorators import validate_with_pydantic
 from datetime import datetime
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
 from .solar_zenith import calculate_solar_zenith_noaa
 from math import pi
 from math import isfinite
 from ...api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.decorators import validate_with_pydantic
 
 from pvgisprototype.api.data_classes import SolarAltitude
 from pvgisprototype.api.data_classes import Longitude

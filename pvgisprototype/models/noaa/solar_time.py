@@ -1,8 +1,8 @@
 from .noaa_models import CalculateTrueSolarTimeNOAAInput
-from .decorators import validate_with_pydantic
 from datetime import datetime
 from typing import Optional
 from zoneinfo import ZoneInfo
+from pvgisprototype.api.decorators import validate_with_pydantic
 from .time_offset import calculate_time_offset_noaa
 
 from pvgisprototype.api.data_classes import TrueSolarTime

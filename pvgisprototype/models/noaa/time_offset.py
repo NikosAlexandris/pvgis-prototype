@@ -1,8 +1,8 @@
 # from .noaa_models import LongitudeModel_in_Radians
 from .noaa_models import CalculateTimeOffsetNOAAInput
 from datetime import datetime
-from .decorators import validate_with_pydantic
 from math import pi
+from pvgisprototype.api.decorators import validate_with_pydantic
 from .equation_of_time import calculate_equation_of_time_noaa
 
 from pvgisprototype.api.data_classes import TimeOffset
