@@ -273,8 +273,8 @@ def calculate_optical_air_mass(
 
 
 def rayleigh_optical_thickness(
-        optical_air_mass: float,
-        ):
+    optical_air_mass: Annotated[float, typer_option_optical_air_mass] = 2,
+):
     """
     δ R(m) = 1/(6.6296 + 1.7513m - 0.1202m2 + 0.0065m3 - 0.00013m4)
     This function implements the algorithm described by Hofierka, 2002 [1]_
