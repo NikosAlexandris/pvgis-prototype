@@ -206,8 +206,12 @@ def calculate_refracted_solar_altitude(
     return refracted_solar_altitude
 
 
-@validate_with_pydantic(OpticalAirMassInputModel, expand_args=True)
-def calculate_optical_air_mass(elevation, refracted_solar_altitude) -> float:
+@validate_with_pydantic(CalculateOpticalAirMassInputModel, expand_args=True)
+def calculate_optical_air_mass(
+    elevation: Annotated[float, typer_argument_elevation],
+    refracted_solar_altitude: Annotated[float, typer_argument_refracted_solar_altitude],
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+) -> float:
     """Approximate the relative optical air mass.
 
     This function implements the algorithm described by Minzer et al. [1]_ 
@@ -259,9 +263,9 @@ def calculate_optical_air_mass(elevation, refracted_solar_altitude) -> float:
     """
     # debug(locals())
     optical_air_mass = adjust_elevation(elevation) / (
-            sin(refracted_solar_altitude)
+            sin(refracted_solar_altitude.value)
             + 0.50572
-            * math.pow((refracted_solar_altitude + 6.07995), -1.6364)
+            * math.pow((refracted_solar_altitude.value + 6.07995), -1.6364)
             )
 
     # debug(locals())
