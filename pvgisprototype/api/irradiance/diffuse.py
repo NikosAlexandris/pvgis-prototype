@@ -290,10 +290,10 @@ def calculate_term_n(
         'sky-irradiance',
         no_args_is_help=True,
         help=f'⇊ Calculate the diffuse clear-sky irradiance',
-        rich_help_panel=rich_help_panel_toolbox,
+        rich_help_panel=rich_help_panel_series_irradiance,
         )
 def calculate_diffuse_sky_irradiance(
-        n: float,
+        n: Annotated[float, typer_argument_term_n],
         surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
         ):
     """Calculate the diffuse sky irradiance
