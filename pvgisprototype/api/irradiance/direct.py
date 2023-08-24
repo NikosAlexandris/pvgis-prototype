@@ -304,22 +304,13 @@ def rayleigh_optical_thickness(
 @app.command('normal', no_args_is_help=True)
 def calculate_direct_normal_irradiance(
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
-        linke_turbidity_factor: Annotated[float, typer.Argument(
-            help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity',
-            min=0, max=8)] = 2,  # 2 to get going for now
-        optical_air_mass: float = 2,
-        solar_constant: Annotated[float, typer.Argument(
-            help="The mean solar electromagnetic radiation at the top of the atmosphere (~1360.8 W/m2) one astronomical unit (au) away from the Sun.",
-            min=1360,
-            rich_help_panel=rich_help_panel_earth_orbit)] = SOLAR_CONSTANT,
-        days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 365.25,
-        perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
-        ):
+    linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
+    optical_air_mass: Annotated[float, typer_option_optical_air_mass] = 2,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
+):
     """Calculate the direct normal irradiance attenuated by the cloudless atmosphere
 
     This function implements the algorithm described by Hofierka
