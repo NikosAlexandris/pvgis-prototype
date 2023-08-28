@@ -1,4 +1,6 @@
 import typer
+from typer.core import TyperGroup
+from click import Context
 from typing import Annotated
 from typing import Optional
 # from typing import Path
@@ -20,6 +22,9 @@ from .rich_help_panel_names import rich_help_panel_earth_orbit
 from .rich_help_panel_names import rich_help_panel_atmospheric_properties
 from .rich_help_panel_names import rich_help_panel_output
 from .rich_help_panel_names import rich_help_panel_time_series
+from .rich_help_panel_names import rich_help_panel_efficiency
+from .rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.api.geometry.models import SolarIncidenceModels
 
 
 class OrderCommands(TyperGroup):
@@ -27,34 +32,44 @@ class OrderCommands(TyperGroup):
     """Return list of commands in the order appear.
     See: https://github.com/tiangolo/typer/issues/428#issuecomment-1238866548
     """
-    return list(self.commands)    # get commands using self.commands
-
-
-# Generic
-
-typer_option_verbose = typer.Option(
-    help='Verbose output',
-    rich_help_panel=rich_help_panel_output,
-    # default_factory=False,
-)
+    return list(self.commands)
 
 
 # Where?
 
+longitude_typer_help=f'Longitude in decimal degrees ranging in [-180, 360]. [yellow]If ranging in [0, 360], consider the `--convert-longitude-360` option.[/yellow]'
+longitude_minimum=-180
+longitude_maximum=180  # in PVGIS : coloffset
 typer_argument_longitude = typer.Argument(
+    min=longitude_minimum,
+    max=longitude_maximum,
+    help=longitude_typer_help,
     callback=convert_to_radians,
-    # min=-180, max=180  # in PVGIS : coloffset
-    min=-180, max=360,
-    help=f'Longitude in decimal degrees ranging in [-180, 360]. [yellow]Longitude ranging in [0, 360]? Consider using the `--convert-longitude-360` option.[/yellow]',
 )
+typer_argument_longitude_in_degrees = typer.Argument(
+    min=longitude_minimum,
+    max=longitude_maximum,
+    help=longitude_typer_help,
+)
+latitude_typer_help='Latitude in decimal degrees ranging in [-90, 90]'
+latitude_minimum=-90
+latitude_maximum=90  # in PVGIS : rowoffset
 typer_argument_latitude = typer.Argument(
-    # min=-90, max=90  # in PVGIS : rowoffset
-    help='Latitude in decimal degrees, south is negative',
+    min=latitude_minimum,
+    max=latitude_maximum,
+    help=latitude_typer_help,
     callback=convert_to_radians,
 )
-
+typer_argument_latitude_in_degrees = typer.Argument(
+    min=latitude_minimum,
+    max=latitude_maximum,
+    help=latitude_typer_help,
+)
+elevation_minimum=0
+elevation_maximum=8848
 typer_argument_elevation = typer.Argument(
-    min=0, max=8848,
+    min=elevation_minimum,
+    max=elevation_maximum,
     help='Elevation',
     # rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory=0,
@@ -68,80 +83,139 @@ typer_argument_timestamp = typer.Argument(
     default_factory=now_utc_datetimezone,
 )
 typer_option_start_time = typer.Option(
-    help='Start date of the period',
+    help='Start timestamp of the period',
     default_factory = None,
 )
 typer_option_end_time = typer.Option(
-    help='End date of the period',
+    help='End timestamp of the period',
     default_factory = None,
 )
 typer_option_timezone = typer.Option(
     # help='Timezone (e.g., "Europe/Athens"). Set _local_ to use the system\'s time zone',
-    help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
+    help="Timezone (e.g., 'Europe/Athens'). Use the system's time zone via the --local option.",
     callback=ctx_convert_to_timezone,
     # default_factory=None,
 )
 typer_option_local_time = typer.Option(
-    help='Use the system\'s local time zone',
+    help="Use the system's local time zone",
     callback=now_local_datetimezone
 )
 typer_option_random_time = typer.Option(
-    '--random-time',
-    '--random',
-    help="Generate a random date, time and timezone to demonstrate calculation"
+    # '--random-time',
+    # '--random',
+    help='Generate a random date, time and timezone to demonstrate calculation'
 )
+RANDOM_DAY_FLAG = False
+typer_option_random_day = typer.Option(
+    # '--random-day',
+    # '--random',
+    help='Generate a random day to demonstrate calculation',
+    # default_factory=RANDOM_DAY_FLAG
+)
+# day_of_year: Annotated[float, typer.Argument(
+#     min=1,
+#     max=366,
+#     help='Day of year')] = None,
 
 
 # Solar geometry
 
 typer_argument_solar_declination = typer.Argument(
-    min=0, max=90,
+    min=0,
+    max=90,
+    help='Solar declination angle',
+)
+typer_option_solar_declination_model = typer.Option(
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    # callback=_parse_model,  # This did not work!
+    # help="Model(s) to calculate solar declination."
+    help='Model to calculate the solar declination angle',
+    # rich_help_panel=rich_help_panel_solar_declination,
+    rich_help_panel=rich_help_panel_solar_position,
 )
 
+solar_constant_typer_help='Top-of-Atmosphere mean solar electromagnetic radiation (W/m2) 1 au (astronomical unit) away from the Sun.'  #  (~1360.8 W/m2)
+solar_constant_minimum=1360
+SOLAR_CONSTANT = 1360.8
 typer_argument_solar_constant = typer.Argument(
-    min=1360,
-    help="Top-of-Atmosphere mean solar electromagnetic radiation, ~1360.8 W/m2, 1 au (astronomical unit) away from the Sun.",
+    min=solar_constant_minimum,
+    help=solar_constant_typer_help,
+    rich_help_panel=rich_help_panel_earth_orbit,
+    # default_factory = SOLAR_CONSTANT,
+)
+typer_option_solar_constant = typer.Option(
+    min=solar_constant_minimum,
+    help=solar_constant_typer_help,
     rich_help_panel=rich_help_panel_earth_orbit,
     # default_factory = SOLAR_CONSTANT,
 )
 
-typer_option_solar_incidence_angle_model = typer.Option(
-    '--incidence-angle-model',
+SOLAR_INCIDENCE_ANGLE_MODEL=SolarIncidenceModels.jenco
+typer_option_solar_incidence_model = typer.Option(
+    '--solar-incidence-model',
     show_default=True,
     show_choices=True,
     case_sensitive=False,
-    help="Method to calculate the solar declination",
-    # default_factory= SolarIncidenceAngleMethod.jenco,
+    help='Method to calculate the solar incidence angle',
+    rich_help_panel=rich_help_panel_solar_position,
+    # default_factory=SOLAR_INCIDENCE_ANGLE_MODEL,
 )
 
 # Solar surface
 
+surface_tilt_typer_help='Solar surface tilt angle'
+surface_tilt_minimum=0
+surface_tilt_maximum=90
+SURFACE_TILT=45  # degrees
 typer_argument_surface_tilt = typer.Argument(
-    min=0, max=90,
-    help='Solar surface tilt angle',
+    min=surface_tilt_minimum,
+    max=surface_tilt_maximum,
+    help=surface_tilt_typer_help,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = 45,
+    # default_factory = SOLAR_TILT,
 )
 typer_option_surface_tilt = typer.Option(
-    min=0, max=90,
-    help='Solar surface tilt angle',
+    min=surface_tilt_minimum,
+    max=surface_tilt_maximum,
+    help=surface_tilt_typer_help,
     callback=convert_to_radians,
+    rich_help_panel=rich_help_panel_geometry_surface,
+    # default_factory = SURFACE_TILT,
+)
+typer_option_random_surface_tilt = typer.Option(
+    # min=0, max=90,
+    help='Random solar surface tilt angle',
+    # callback=random_surface_tilt,
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = 45,
 )
-
+surface_orientation_typer_help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]'
+surface_orientation_minimum=0
+surface_orientation_maximum=360
+SURFACE_ORIENTATION=180  # Due south, counting from North
 typer_argument_surface_orientation = typer.Argument(
-    min=0, max=360,
-    help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]',
+    min=surface_orientation_minimum,
+    max=surface_orientation_maximum,
+    help=surface_orientation_typer_help,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = 180,  # from North!
+    # default_factory = SURFACE_ORIENTATION
 )
 typer_option_surface_orientation = typer.Option(
-    min=0, max=360,
-    help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]',
+    min=0,
+    max=360,
+    help=surface_orientation_typer_help,
     callback=convert_to_radians,
+    rich_help_panel=rich_help_panel_geometry_surface,
+    # default_factory = SURFACE_ORIENTATION
+)
+typer_option_random_surface_orientation = typer.Option(
+    # min=0, max=360,
+    help='Random solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]',
+    # callback=random_surface_orientation,
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = 180,  # from North!
 )
@@ -152,7 +226,8 @@ typer_argument_solar_time = typer.Argument(
     rich_help_panel=rich_help_panel_solar_time,
 )
 typer_argument_hour_angle = typer.Argument(
-    min=0, max=1,
+    min=0,
+    max=1,
     help="Solar hour angle in radians",
     # default_factory=None,
 )
@@ -162,7 +237,6 @@ typer_argument_hour_angle = typer.Argument(
 
 typer_option_solar_position_model = typer.Option(
     '--solar-position-model',
-    '-m',
     show_default=True,
     show_choices=True,
     case_sensitive=False,
@@ -175,6 +249,10 @@ typer_option_solar_position_model = typer.Option(
 typer_argument_solar_altitude = typer.Argument(
     help='Solar altitude'
 )
+typer_argument_refracted_solar_altitude = typer.Argument(
+    help='Refracted solar altitude'
+)
+
 
 # Solar time
 
@@ -185,6 +263,7 @@ typer_option_solar_time_model = typer.Option(
     case_sensitive=False,
     help="Model to calculate solar time",
     rich_help_panel=rich_help_panel_solar_time,
+    # default_factory=[SolarTimeModels.skyfield],
 )
 typer_option_global_time_offset = typer.Option(
     help='Global time offset',
@@ -196,15 +275,21 @@ typer_option_hour_offset = typer.Option(
     rich_help_panel=rich_help_panel_solar_time,
     # default_factory=0
 )
+
+
+# Earth orbit
+
+DAYS_IN_A_YEAR = 365
 typer_option_days_in_a_year = typer.Option(
-    help='Days in a year',
+    help='Number of days in a year',
     rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=365.25,
+    # default_factory=days_in_a_year_default,
 )
+PERIGEE_OFFSET = 0.048869
 typer_option_perigee_offset = typer.Option(
     help='Perigee offset',
     rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=0.048869,
+    # default_factory=PERIGEE_OFFSET,
 )
 ECCENTRICITY_CORRECTION_FACTOR = 0.03344
 typer_option_eccentricity_correction_factor = typer.Option(
@@ -214,33 +299,45 @@ typer_option_eccentricity_correction_factor = typer.Option(
 )
 
 
-help_for_linke_turbidity_factor='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
+# Atmospheric properties
+
+linke_turbidity_factor_typer_help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
+linke_turbidity_minimum=0
+linke_turbidity_maximum=8
 typer_argument_linke_turbidity_factor = typer.Argument(
-    help=help_for_linke_turbidity_factor,
-    min=0, max=8,
+    min=linke_turbidity_minimum,
+    max=linke_turbidity_maximum,
+    help=linke_turbidity_factor_typer_help,
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=2,  # 2 to get going for now
 )
 typer_option_linke_turbidity_factor = typer.Option(
-    help=help_for_linke_turbidity_factor,
-    min=0, max=8,
+    min=linke_turbidity_minimum,
+    max=linke_turbidity_maximum,
+    help=linke_turbidity_factor_typer_help,
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=2,  # 2 to get going for now
 )
+optical_air_mass_typer_unit = 'unitless'
+typer_option_optical_air_mass = typer.Option(
+    help=f'Relative optical air mass [{optical_air_mass_typer_unit}]',
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+    # default_factory=2,
+)
 
+ATMOSPHERIC_REFRACTION_FLAG = True
 typer_option_apply_atmospheric_refraction = typer.Option(
     '--apply-atmospheric-refraction',
-    '-a',
     help='Apply atmospheric refraction functions',
     rich_help_panel=rich_help_panel_atmospheric_properties,
-    # default_factory=True,
+    # default_factory=ATMOSPHERIC_REFRACTION_FLAG,
 )
+REFRACTED_SOLAR_ZENITH_ANGLE=1.5853349194640094  # radians
 typer_option_refracted_solar_zenith = typer.Option(
-    help=f'Default atmospheric refraction for solar zenith...',
+    help=f'Default refracted solar zenith angle (in radians) for sun -rise and -set events',
     rich_help_panel=rich_help_panel_atmospheric_properties,
-    # default_factory=1.5853349194640094,  # radians
+    # default_factory=REFRACTED_SOLAR_ZENITH_ANGLE,
 )
-
 typer_option_albedo = typer.Option(
     min=0,
     help='Mean ground albedo',
@@ -254,27 +351,50 @@ typer_argument_shortwave_irradiance = typer.Argument(
     help='Global horizontal irradiance (Surface Incoming Shortwave Irradiance (SIS), `ssrd`',
 )
 typer_argument_direct_horizontal_irradiance = typer.Argument(
-    help='Direct (or beam) horizontal irradiance (Surface Incoming Direct radiation (SID), `fdir`)',
+    help='Direct (or beam) horizontal irradiance (Surface Incoming Direct radiation (SID), `fdir`',
+    rich_help_panel=rich_help_panel_series_irradiance,
+    # default_factory=None,
 )
 typer_option_direct_horizontal_component = typer.Option(
-    help='Read horizontal irradiance time series data from a file',
+    # help='Path to direct horizontal irradiance time series (Surface Incoming Direct radiation (SID), `fdir`)',
+    help='Read horizontal irradiance time series from a file',
+    rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory = Path(),
 )
-
+the_term_n_unit='unitless'
+typer_argument_term_n = typer.Argument(
+    help=f'The term N for the calculation of the sky dome fraction viewed by a tilted surface [{the_term_n_unit}]'
+)
 typer_option_apply_angular_loss_factor = typer.Option(
     help='Apply angular loss function',
     rich_help_panel=rich_help_panel_advanced_options,
     # default_factory = True,
 )
+typer_option_efficiency = typer.Option(
+    '--efficiency-factor',
+    '-e',
+    help='Efficiency factor',
+    rich_help_panel=rich_help_panel_efficiency,
+    # rich_help_panel=rich_help_panel_series_irradiance,
+    # default_factory=None,
+)
 
 
 # Output options
+
+typer_option_verbose = typer.Option(
+    # '--verbose',
+    # '-v',
+    help='Show details while executing commands',
+    rich_help_panel=rich_help_panel_output,
+    # default_factory=False,
+)
 
 typer_option_rounding_places = typer.Option(
     '--rounding-places',
     '-r',
     show_default=True,
-    help='Number of places to round results to.',
+    help='Number of digits to round results to',
     rich_help_panel=rich_help_panel_output,
     # default_factory=5,
 )
@@ -284,7 +404,7 @@ typer_option_rounding_places = typer.Option(
 
 typer_option_time_output_units = typer.Option(
     '--time-output-units',
-    '-t',
+    '-tou',
     show_default=True,
     case_sensitive=False,
     # help="Time units for output and internal calculations (seconds, minutes or hours)"
@@ -293,7 +413,7 @@ typer_option_time_output_units = typer.Option(
 )
 typer_option_angle_units = typer.Option(
     '--angle-input-units',
-    '-i',
+    '-aiu',
     show_default=True,
     case_sensitive=False,
     # help="Angular units for internal calculations (degrees or radians)"
@@ -302,7 +422,7 @@ typer_option_angle_units = typer.Option(
 )
 typer_option_angle_output_units = typer.Option(
     '--angle-ouput-units',
-    '-u',
+    '-aou',
     show_default=True,
     case_sensitive=False,
     # help="Angular units for the calculated solar azimuth output (degrees or radians)"
@@ -361,12 +481,25 @@ typer_option_inexact_matches_method = typer.Option(
 )
 typer_option_tolerance = typer.Option(
     # help=f'Maximum distance between original and new labels for inexact matches. See nearest-neighbor-lookups Xarray documentation',
-    help=f'Maximum distance between original and new labels for inexact matches. See [nearest-neighbor-lookups](https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups) @ Xarray documentation',
+    # help=f'Maximum distance between original and new labels for inexact matches. See [nearest-neighbor-lookups](https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups) @ Xarray documentation',
+    help=f'Maximum distance between original & new labels for inexact matches. See https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups',
     rich_help_panel=rich_help_panel_time_series,
     # default_factory=0.1,
 )
 
 
+# Meteorological variables
+
+typer_argument_temperature_time_series = typer.Argument(
+    help="Ambient temperature in Celsius degrees.",
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=25,
+)
+typer_argument_wind_speed_time_series = typer.Argument(
+    help="Wind speed in meters per second.",
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=0,
+)
 
 # Helpers
 
