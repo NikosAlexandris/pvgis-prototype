@@ -1,16 +1,24 @@
+from devtools import debug
+from typing import Union
+from typing import Sequence
+import numpy as np
 from datetime import datetime
 from math import sin
 from math import cos
 from math import acos
 from math import pi
 from math import isfinite
-from ...api.utilities.conversions import convert_to_degrees_if_requested
-from .solar_declination import calculate_solar_declination_noaa
-from .solar_hour_angle import calculate_solar_hour_angle_noaa
-from .solar_zenith import calculate_solar_zenith_noaa
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_noaa
+from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_time_series_noaa
+from pvgisprototype.models.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
+from pvgisprototype.models.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.models.noaa.solar_zenith import calculate_solar_zenith_noaa
+from pvgisprototype.models.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
 
 from pvgisprototype.api.decorators import validate_with_pydantic
-from .noaa_models import CalculateSolarAzimuthNOAAInput
+from pvgisprototype.models.noaa.noaa_models import CalculateSolarAzimuthNOAAInput
+from pvgisprototype.models.noaa.noaa_models import CalculateSolarAzimuthNOAATimeSeriesInput
 from pvgisprototype.api.data_classes import SolarAzimuth
 from pvgisprototype.api.data_classes import Longitude
 from pvgisprototype.api.data_classes import Latitude
@@ -35,58 +43,98 @@ def calculate_solar_azimuth_noaa(
         The latitude in radians
     """
     solar_declination = calculate_solar_declination_noaa(
-            timestamp,
-            angle_units,
-            'radians',
-            )  # radians
+        timestamp,
+        angle_units,
+        'radians',
+    )
     solar_hour_angle = calculate_solar_hour_angle_noaa(
         longitude, timestamp, timezone, time_output_units, angle_output_units
-    )  # radians
+    )
     solar_zenith = calculate_solar_zenith_noaa(
-        latitude,
-        timestamp,
-        solar_hour_angle.value,
-        apply_atmospheric_refraction,
-        angle_units,
-        angle_output_units,
-            )  # radians
-    # ------------------------------------------------------------------------
-    # cosine_pi_minus_solar_azimuth = - (sin(latitude) * cos(solar_zenith) - sin(solar_declination)) / (
-    #     cos(latitude) * sin(solar_zenith)
-    # )
-    # cosine_pi_minus_solar_azimuth = max(-1, min(1, cosine_pi_minus_solar_azimuth))
-    # solar_azimuth = pi - pi_minus_solar_azimuth 
-    # ------------------------------------------------------------------------
+        latitude=latitude,
+        timestamp=timestamp,
+        solar_hour_angle=solar_hour_angle,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        angle_output_units='radians',
+    )
+                     # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    # cos(180 - θ) = - ----------------------------------------------------------
+                     #            cos(latitude) * sin(solar_zenith)
 
-    # This formulas uses cosine,
-    # so the _azimuth angle_ as shown by a calculator will always be positive
-    # and should be interpreted as the angle between :
-    #     - 0 and 180 degrees when the `solar_hour angle` is negative (morning)
-    #     - 180 and 360 degrees when the `solar_hour_angle`, is positive (afternoon). 
 
-    cosine_solar_azimuth = (
-        sin(solar_declination.value) - sin(latitude) * cos(solar_zenith.value)
-    ) / (cos(latitude) * sin(solar_zenith.value))
+                     # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+        # - cos(θ) = - ------------------------------------------------------------
+                     #            cos(latitude) * sin(solar_zenith)
+
+
+                   # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # cos(θ) = ----------------------------------------------------------
+                   #             cos(latitude) * sin(solar_zenith)
+
+
+    # numerator = sin(solar_declination.value) - sin(latitude.value) * cos(solar_zenith.value)
+    numerator = sin(latitude.value) * cos(solar_zenith.value) - sin(solar_declination.value)
+    denominator = cos(latitude.value) * sin(solar_zenith.value)
+    # try else raise ... ?
+    cosine_solar_azimuth = numerator / denominator
     solar_azimuth = acos(cosine_solar_azimuth)
-
-    # # adjust azimuth range for the afternoon
-    # if solar_hour_angle > 0:  
-    #     solar_azimuth = 2*pi - solar_azimuth
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
         raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
 
-    # solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+    solar_azimuth = SolarAzimuth(
+            value=solar_azimuth,
+            unit='radians',
+            )
+    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
 
-    compass_solar_azimuth = 2*pi - solar_azimuth
+    return solar_azimuth
 
-    compass_solar_azimuth = CompassSolarAzimuth(
-        value=compass_solar_azimuth,
-        unit='radians',
-    )    
 
-    compass_solar_azimuth = convert_to_degrees_if_requested(
-        compass_solar_azimuth,
-        angle_output_units,
-        )
-    return compass_solar_azimuth
+@validate_with_pydantic(CalculateSolarAzimuthNOAATimeSeriesInput, expand_args=True)
+def calculate_solar_azimuth_time_series_noaa(
+        longitude: Longitude,   # radians
+        latitude: Latitude,     # radians
+        timestamps: Union[float, Sequence[float]],
+        timezone: str,
+        apply_atmospheric_refraction: bool = True,
+        time_output_units: str = 'minutes',
+        angle_units: str = 'radians',
+        angle_output_units: str = 'radians',
+    )-> np.ndarray:
+    """Calculate the solar azimuth (θ) in radians for a time series"""
+
+    solar_declination_series = calculate_solar_declination_time_series_noaa(
+        timestamps,
+        angle_units,
+        'radians',
+    )
+    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+        longitude, timestamps, timezone, time_output_units, angle_output_units
+    )
+    solar_zenith_series = calculate_solar_zenith_time_series_noaa(
+        latitude=latitude,
+        timestamps=timestamps,
+        solar_hour_angle_series=solar_hour_angle_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        angle_output_units='radians',
+    )
+
+    solar_azimuth_series = []
+    for solar_declination, solar_zenith in zip(solar_declination_series, solar_zenith_series):
+        numerator = sin(latitude.value) * cos(solar_zenith.value) - sin(solar_declination.value)
+        denominator = cos(latitude.value) * sin(solar_zenith.value)
+        cosine_solar_azimuth = numerator / denominator
+        solar_azimuth = acos(cosine_solar_azimuth)
+
+        if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
+            raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
+
+        solar_azimuth = SolarAzimuth(
+                value=solar_azimuth,
+                unit='radians',
+                )
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+        solar_azimuth_series.append(solar_azimuth)
+
+    return np.array(solar_azimuth_series, dtype=object)
