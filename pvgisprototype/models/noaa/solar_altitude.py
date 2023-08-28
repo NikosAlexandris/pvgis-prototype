@@ -17,7 +17,7 @@ def calculate_solar_altitude_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude,     # radians
         timestamp: float,
-        timezone: str,
+        timezone: ZoneInfo,
         apply_atmospheric_refraction: bool = True,
         time_output_units: str = 'minutes',
         angle_output_units: str = 'radians',

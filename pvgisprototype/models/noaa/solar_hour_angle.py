@@ -16,10 +16,10 @@ from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 def calculate_solar_hour_angle_noaa(
         longitude: Longitude,
         timestamp: datetime, 
-        timezone: Optional[str], 
         time_output_units: Optional[str] = 'minutes',
         angle_output_units: Optional[str] = 'radians',
     ) -> SolarHourAngle:
+    timezone: Optional[ZoneInfo] = None, 
     """Calculate the solar hour angle in radians.
 
     The solar hour angle calculation converts the local solar time (LST) into

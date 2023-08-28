@@ -6,12 +6,12 @@ from pvgisprototype.models.jenco.solar_incidence import calculate_effective_sola
 from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pvgisprototype.api.data_classes import SolarIncidence
 from .models import SolarIncidenceModels
 from .models import SolarTimeModels
 from typing import List
 from pathlib import Path
-from zoneinfo import ZoneInfo
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
@@ -113,7 +113,7 @@ def calculate_solar_incidence(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str = None,
+    timezone: ZoneInfo = None,
     random_time: bool = False,
     solar_incidence_models: List[SolarIncidenceModels] = [SolarIncidenceModels.jenco],
     surface_tilt: float = 45,
