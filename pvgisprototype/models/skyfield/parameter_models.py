@@ -49,18 +49,16 @@ class LatitudeModel(BaseModel):
             raise ValueError("Unsupported `latitude` type provided")
 
 
-class BaseTimestampModel(BaseModel):
+class BaseCoordinates(LongitudeModel, LatitudeModel):
+    pass
+
+
+class BaseTimestamp(BaseModel):
     timestamp: datetime
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
-
-
-class BaseCoordinatesInput(LongitudeModel, LatitudeModel):
-    pass
-
-
-class BaseTimeInput(BaseTimestampModel):
+class BaseTime(BaseTimestamp):
     timezone: Optional[ZoneInfo] = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -70,25 +68,3 @@ class BaseTimeInput(BaseTimestampModel):
         if v is not None and not isinstance(v, ZoneInfo):
             raise ValueError("The `timezone` must be a valid `zoneinfo.ZoneInfo` object.")
         return v
-
-
-class CalculateTrueSolarTimeSkyfieldInput(
-    ValidatedInputToDict,
-    BaseCoordinatesInput,
-    BaseTimeInput,
-):
-    pass
-
-
-class SolarPositionInput(
-    CalculateTrueSolarTimeSkyfieldInput):
-    # output_units: str = 'radians'
-    pass
-
-
-class SolarAltitudeInput(SolarPositionInput):
-    pass
-
-
-class HourAngleInput(SolarPositionInput):
-    angle_output_units: float
