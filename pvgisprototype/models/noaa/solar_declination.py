@@ -1,11 +1,16 @@
 from typing import Optional
+from typing import Union
+from typing import Sequence
 from datetime import datetime
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
-from .noaa_models import CalculateSolarDeclinationNOAAInput
+from pvgisprototype.models.noaa.noaa_models import CalculateSolarDeclinationNOAAInput
+from pvgisprototype.models.noaa.noaa_models import CalculateSolarDeclinationNOAATimeSeriesInput
 from .fractional_year import calculate_fractional_year_noaa 
+from pvgisprototype.models.noaa.fractional_year import calculate_fractional_year_time_series_noaa
 from math import sin
 from math import cos
+import numpy as np
 
 from pvgisprototype.api.data_classes import SolarDeclination
 
@@ -37,3 +42,41 @@ def calculate_solar_declination_noaa(
                 angle_output_units,
                 )
         return declination
+
+
+@validate_with_pydantic(CalculateSolarDeclinationNOAATimeSeriesInput, expand_args=True)
+def calculate_solar_declination_time_series_noaa(
+        timestamps: Union[datetime, Sequence[datetime]],
+        angle_output_units: str = "radians"
+) -> Union[SolarDeclination, np.ndarray]:
+
+    # timestamps = np.atleast_1d(timestamps)  # timestamps as array
+    fractional_years = calculate_fractional_year_time_series_noaa(
+        timestamps=timestamps,
+        angle_output_units="radians",
+    )
+    fractional_years = np.array([item.value for item in fractional_years])
+    declinations = (
+        0.006918
+        - 0.399912 * np.cos(fractional_years)
+        + 0.070257 * np.sin(fractional_years)
+        - 0.006758 * np.cos(2 * fractional_years)
+        + 0.000907 * np.sin(2 * fractional_years)
+        - 0.002697 * np.cos(3 * fractional_years)
+        + 0.00148 * np.sin(3 * fractional_years)
+    )
+    declinations = [
+        SolarDeclination(value=declination, unit="radians")
+        for declination in declinations
+    ]
+
+    if angle_output_units == "degrees":
+        declinations = [
+            convert_to_degrees_if_requested(declination, angle_output_units)
+            for declination in declinations
+        ]
+
+    if np.isscalar(timestamps):
+        return declinations[0]
+    else:
+        return np.array(declinations, dtype=object)
