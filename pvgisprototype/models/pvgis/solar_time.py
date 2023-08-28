@@ -15,11 +15,11 @@ from ...api.utilities.image_offset_prototype import get_image_offset
 from pvgisprototype.api.data_classes import SolarTime
 from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.input_models import SolarTimeInput
 from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.api.function_models import CalculateSolarTimePVGISInputModel
 
 
-@validate_with_pydantic(SolarTimeInput)
+@validate_with_pydantic(CalculateSolarTimePVGISInputModel, expand_args=True)
 def calculate_solar_time_pvgis(
         longitude: Latitude,
         latitude: Longitude,
@@ -29,7 +29,7 @@ def calculate_solar_time_pvgis(
         perigee_offset: float = 0.048869,
         eccentricity_correction_factor: float = 0.165,  # from the C code
         time_offset_global: float = 0,
-    ) -> SolarTime:
+    ):
     """Calculate the solar time.
 
     1. Map the day of the year onto the circumference of a circle, essentially
@@ -76,4 +76,5 @@ def calculate_solar_time_pvgis(
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     
     # debug(locals())
-    return SolarTime(value=solar_time, unit='decimal hours')
+    # return SolarTime(value=solar_time, unit='decimal hours')
+    return solar_time
