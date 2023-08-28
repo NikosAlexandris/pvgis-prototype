@@ -1,3 +1,4 @@
+from devtools import debug
 from datetime import datetime
 from ..api.utilities.conversions import convert_to_degrees_if_requested
 from ..api.utilities.conversions import round_float_values
@@ -28,9 +29,11 @@ def print_solar_position_table(
     timezone,
     solar_position,
     rounding_places,
+    declination=None,
     altitude=None,
     azimuth=None,
     zenith=None,
+    incidence=None,
     user_requested_timestamp=None,
     user_requested_timezone=None,
 ):
@@ -45,12 +48,16 @@ def print_solar_position_table(
     if user_requested_timestamp and user_requested_timezone:
         columns.extend(["Local Time", "Local Zone"])
     columns.append("Model")
+    if declination is not None:
+        columns.append("Declination")
     if altitude is not None:
         columns.append("Altitude")
     if azimuth is not None:
         columns.append("Azimuth")
     if zenith is not None:
         columns.append("Zenith")
+    if incidence is not None:
+        columns.append("Incidence")
     columns.append("Units")
 
     # Create the table
@@ -58,12 +65,14 @@ def print_solar_position_table(
 
     for model_result in rounded_solar_position:
         model_name = model_result.get('Model', '')
-        altitude_val = model_result.get('Altitude', '') if altitude is not None else None
-        azimuth_val = model_result.get('Azimuth', '') if azimuth is not None else None
-        zenith_val = model_result.get('Zenith', '') if zenith is not None else None
+        declination_value = model_result.get('Declination', 'NA') if declination is not None else None
+        altitude_value = model_result.get('Altitude', '') if altitude is not None else None
+        azimuth_value = model_result.get('Azimuth', '') if azimuth is not None else None
+        zenith_value = model_result.get('Zenith', '') if zenith is not None else None
+        incidence_value = model_result.get('Incidence', '') if incidence is not None else None
         units = model_result.get('Units', '')
 
-        # list of values in a row
+        # list values in a row
         row = [str(longitude), str(latitude), str(timestamp), str(timezone)]
 
        # ---------------------------------------------------- Implement-Me---
@@ -76,14 +85,17 @@ def print_solar_position_table(
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
         row.append(model_name)
-        if altitude_val is not None:
-            row.append(str(altitude_val))
-        if azimuth_val is not None:
-            row.append(str(azimuth_val))
-        if zenith_val is not None:
-            row.append(str(zenith_val))
+        if declination_value is not None:
+            row.append(str(declination_value))
+        if altitude_value is not None:
+            row.append(str(altitude_value))
+        if azimuth_value is not None:
+            row.append(str(azimuth_value))
+        if zenith_value is not None:
+            row.append(str(zenith_value))
+        if incidence_value is not None:
+            row.append(str(incidence_value))
         row.append(str(units))
-
         table.add_row(*row)
 
     console.print(table)
