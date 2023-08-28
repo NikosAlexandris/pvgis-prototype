@@ -36,7 +36,7 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 
 from pvgisprototype.api.irradiance.diffuse import  calculate_diffuse_inclined_irradiance
 from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_inclined_irradiance
-from pvgisprototype.models.pvis.solar_incidence import calculate_solar_incidence
+from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
 from ..geometry.solar_time import model_solar_time
@@ -48,6 +48,9 @@ from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
+from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_temperature_time_series
 from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_time_series
@@ -55,7 +58,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
-from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
@@ -178,6 +180,9 @@ def calculate_effective_irradiance(
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_argument_direct_horizontal_irradiance] = None,
     temperature: Annotated[float, typer_argument_temperature_time_series] = 25,
     wind_speed: Annotated[float, typer_argument_wind_speed_time_series] = 0,
@@ -185,7 +190,6 @@ def calculate_effective_irradiance(
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     in_memory: Annotated[bool, typer_option_in_memory] = False,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
@@ -210,7 +214,7 @@ def calculate_effective_irradiance(
     system_efficiency: Optional[float] = 0.86,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[bool, typer_option_verbose] = False,
     ):
     """Calculate hourly radiation values for a specific moment in time.
     
@@ -372,15 +376,31 @@ def calculate_effective_irradiance(
     )
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
-    solar_incidence_angle = calculate_solar_incidence(
+    solar_incidence_angle = model_solar_incidence(
+        longitude=longitude,
         latitude=latitude,
-        solar_declination=solar_declination,
+        timestamp=timestamp,
+        timezone=timezone,
+        solar_time_model=solar_time_model,
+        solar_incidence_model=solar_incidence_model,
+        hour_angle=hour_angle,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
-        hour_angle=hour_angle,
+        # shadow_indicator=shadow_indicator,
+        # horizon_heights=horizon_heights,
+        # horizon_interval=horizon_interval,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
         angle_output_units=angle_output_units,
-        )
+        verbose=verbose,
+    )
 
     if solar_altitude.value > 0.0:  # the sun is above the horizon
 
