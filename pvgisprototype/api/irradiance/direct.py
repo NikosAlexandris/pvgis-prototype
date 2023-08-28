@@ -314,7 +314,7 @@ def calculate_direct_normal_irradiance(
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
     optical_air_mass: Annotated[float, typer_option_optical_air_mass] = 2,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365,  # 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
 ):
@@ -388,7 +388,7 @@ def calculate_direct_horizontal_irradiance(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365,  # 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
