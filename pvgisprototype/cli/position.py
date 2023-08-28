@@ -403,8 +403,10 @@ def zenith(
 
     Parameters
     ----------
-    solar_geometry_day_constants : SolarGeometryDayConstants
-        The input solar geometry constants.
+
+    Returns
+    -------
+
     """
     # Initialize with None ---------------------------------------------------
     user_requested_timestamp = None
@@ -427,7 +429,7 @@ def zenith(
         model = [
             model for model in SolarPositionModels if model != SolarPositionModels.all
         ]
-    solar_position = calculate_solar_position(
+    solar_altitude = calculate_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -444,7 +446,7 @@ def zenith(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
-    for model_result in solar_position:
+    for model_result in solar_altitude:
         solar_altitude = model_result.get('Altitude', None)
         if solar_altitude is not None:
             if angle_output_units == 'degrees':
@@ -456,7 +458,7 @@ def zenith(
         latitude,
         timestamp,
         timezone,
-        solar_position,
+        solar_altitude,
         rounding_places,
         zenith=True,
         user_requested_timestamp=user_requested_timestamp, 
