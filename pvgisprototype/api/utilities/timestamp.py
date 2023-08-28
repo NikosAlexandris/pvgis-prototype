@@ -103,8 +103,8 @@ def attach_requested_timezone(
         return timestamp
 
     if timezone is None:
-        print(f'[yellow]i[/yellow] No timezone requested! Set to [red]UTC[/red].') 
         timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+        print(f'  [yellow]i[/yellow] Timezone not requested! Set to [red]{timezone_aware_timestamp.tzinfo}[/red].') 
 
     else:
         try:
@@ -129,7 +129,7 @@ def ctx_attach_requested_timezone(
     print(f'[yellow]i[/yellow] Context: {ctx.params}')
     print(f'  [yellow]>[/yellow] Executing ctx_attach_requested_timezone()')
     timezone = ctx.params.get('timezone')
-    print(f'  [yellow]>[/yellow] User defined `timezone` input argument = {timezone}')
+    print(f'  [yellow]>[/yellow] User defined input parameter `timezone` = {timezone}')
     print(f'  [green]>[/green] Callback function sets : {attach_requested_timezone(timestamp, timezone)}')
     return attach_requested_timezone(timestamp, timezone)
 
