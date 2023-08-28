@@ -65,6 +65,4 @@ def calculate_local_solar_time_noaa(
 
     local_solar_time = timestamp + timedelta(seconds=total_seconds)
 
-    solar_time = SolarTime(value=local_solar_time, unit='datetime?')
-
-    return solar_time
+    return local_solar_time
