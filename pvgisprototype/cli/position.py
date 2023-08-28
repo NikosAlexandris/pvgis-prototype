@@ -202,10 +202,11 @@ def position(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365,  #365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
@@ -252,15 +253,15 @@ def position(
     if SolarPositionModels.all in model:
         model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
 
-    debug(locals())
     solar_position = calculate_solar_position(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
         models=model,  # could be named models!
-        solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
@@ -270,8 +271,8 @@ def position(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
-    longitude = convert_to_degrees_if_requested(longitude, angle_output_units)
-    latitude = convert_to_degrees_if_requested(latitude, angle_output_units)
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     print_solar_position_table(
         longitude,
         latitude,
@@ -279,8 +280,10 @@ def position(
         timezone,
         solar_position,
         rounding_places,
+        declination=True,
         altitude=True,
         azimuth=True,
+        zenith=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
     )
