@@ -7,7 +7,9 @@ from typing import Tuple
 from enum import Enum
 
 from .typer_parameters import typer_argument_longitude
+from .typer_parameters import typer_argument_longitude_in_degrees
 from .typer_parameters import typer_argument_latitude
+from .typer_parameters import typer_argument_latitude_in_degrees
 from .typer_parameters import typer_argument_time_series
 from .typer_parameters import typer_argument_time
 from .typer_parameters import typer_option_convert_longitude_360
@@ -66,14 +68,15 @@ class MethodsForInexactMatches(str, Enum):
 
 
 # @app.callback('series', invoke_without_command=True)
-@app.command('select',
-             no_args_is_help=True,
-             help='  Select time series over a location',             
-             )
+@app.command(
+    'select',
+    no_args_is_help=True,
+    help='  Select time series over a location',             
+)
 def select_time_series(
     time_series: Annotated[Path, typer_argument_time_series],
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
     time: Annotated[Optional[str], typer_argument_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
@@ -95,8 +98,8 @@ def select_time_series(
     if longitude < 0:
         warning = Fore.YELLOW + f'{exclamation_mark} '
         warning += f'The longitude ' + Style.RESET_ALL
-        warning += Fore.RED + f'{longitude} ' + f'is negative. ' + Style.RESET_ALL
-        warning += Fore.YELLOW + f'If the dataset\'s longitude values range in [0, 360] consider using `--convert-longitude-360`!' + Style.RESET_ALL
+        warning += f'{longitude} ' + Fore.RED + f'is negative. ' + Style.RESET_ALL
+        warning += Fore.YELLOW + f'If the input dataset\'s longitude values range in [0, 360], consider using `--convert-longitude-360`!' + Style.RESET_ALL
         # logger.warning(warning)
         typer.echo(Fore.YELLOW + warning)
 
