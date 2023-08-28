@@ -155,16 +155,16 @@ def noaa(
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     solar_position_calculations = calculate_noaa_solar_position(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            refracted_solar_zenith,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
-            )
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+    )
     # Convert output timestamp back to the user-requested timezone
     try:
         timestamp = user_requested_timestamp
@@ -185,13 +185,10 @@ def noaa(
         verbose=verbose,
     )
 
-# @app.callback(
-#         'all',
-#         invoke_without_command=True,
 @app.command(
         'overview',
         no_args_is_help=True,
-        help='⦩⦬ Calculate solar position parameters (altitude, azimuth)',
+        help='⦩⦬ Calculate important solar position parameters',
  )
 # @debug_if_needed(app)
 def position(
