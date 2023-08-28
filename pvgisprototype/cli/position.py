@@ -577,6 +577,11 @@ def declination(
     -------
     solar_declination: float
     """
+    # Initialize with None ---------------------------------------------------
+    user_requested_timestamp = None
+    user_requested_timezone = None
+    # -------------------------------------------- Smarter way to do this? ---
+
     # Possible to move to a callback? ----------------------------------------
     if random_time:
         timestamp, timezone = random_datetimezone()
@@ -593,37 +598,32 @@ def declination(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
+    # Why does the callback function `_parse_model` not work? ----------------
+    if SolarDeclinationModels.all in model:
+        model = [
+            model for model in SolarDeclinationModels if model != SolarDeclinationModels.all
+        ]
     solar_declination = calculate_solar_declination(
-            timestamp=timestamp,
-            timezone=timezone,
-            days_in_a_year=days_in_a_year,
-            eccentricity=eccentricity,
-            perigee_offset=perigee_offset,
-            angle_output_units=angle_output_units,
+        timestamp=timestamp,
+        timezone=timezone,
+        models=model,
+        days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        perigee_offset=perigee_offset,
+        angle_output_units=angle_output_units,
     )
+    print_solar_position_table(
+        longitude=None,
+        latitude=None,
+        timestamp=timestamp,
+        timezone=timezone,
+        solar_position=solar_declination,
+        rounding_places=rounding_places,
+        declination=True,
+        user_requested_timestamp=user_requested_timestamp, 
+        user_requested_timezone=user_requested_timezone,
+        )
 
-    solar_declination = convert_to_degrees_if_requested(
-            solar_declination,
-            angle_output_units)
-
-    # table = Table(show_header=True, header_style="bold magenta")
-    # table.add_column("Date, time and zone")
-    # table.add_column("Solar declination")
-    # table.add_column("Units")
-    # table.add_row(str(timestamp), str(solar_declination), str(angle_output_units))
-
-    headers = [
-            "Date, time, zone",
-            "Solar declination",
-            "Units"
-            ]
-    data = [
-            [str(timestamp),
-             str(solar_declination),
-             str(angle_output_units)]
-            ]
-    print_table(headers, data)
 
 @app.command('surface-orientation', no_args_is_help=True, help=':compass: Calculate the solar surface orientation (azimuth)')
 def surface_orientation():
