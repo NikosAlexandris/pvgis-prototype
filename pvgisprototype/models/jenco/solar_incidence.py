@@ -9,11 +9,10 @@ from math import asin
 from math import atan
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ..noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
-from ...api.geometry.solar_declination import calculate_solar_declination
+from ...api.geometry.solar_declination import calculate_solar_declination_pvis
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import ctx_attach_requested_timezone
-from pvgisprototype.api.decorators import validate_with_pydantic
 
 from pvgisprototype.api.data_classes import RelativeLongitude
 from pvgisprototype.api.data_classes import SolarIncidence
@@ -21,14 +20,15 @@ from pvgisprototype.api.data_classes import HorizonHeight
 from pvgisprototype.api.data_classes import Longitude
 from pvgisprototype.api.data_classes import Latitude
 
-from pvgisprototype.api.input_models import RelativeLongitudeInput
-from pvgisprototype.api.input_models import SolarIncidenceJencoInput
+from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.api.function_models import CalculateRelativeLongitudeInputModel
+from pvgisprototype.api.function_models import CalculateSolarIncidenceJencoInputModel
 
 
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 
-@validate_with_pydantic(RelativeLongitudeInput, expand_args=True)
+@validate_with_pydantic(CalculateRelativeLongitudeInputModel, expand_args=True)
 def calculate_relative_longitude(
         latitude: Latitude,
         surface_tilt: float = 0,
@@ -49,16 +49,16 @@ def calculate_relative_longitude(
     #         )
 
     tangent_relative_longitude_numerator = -(
-        sin(surface_tilt)
-        * sin(surface_orientation)
+        sin(surface_tilt.value)
+        * sin(surface_orientation.value)
     )
 
     tangent_relative_longitude_denominator = (
-            sin(latitude)
-        * sin(surface_tilt)
-        * cos(surface_orientation)
-        + cos(latitude)
-        * cos(surface_tilt)
+            sin(latitude.value)
+        * sin(surface_tilt.value)
+        * cos(surface_orientation.value)
+        + cos(latitude.value)
+        * cos(surface_tilt.value)
     )
     
     tangent_relative_longitude = (
@@ -73,7 +73,7 @@ def calculate_relative_longitude(
     return relative_longitude
 
 
-@validate_with_pydantic(SolarIncidenceJencoInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarIncidenceJencoInputModel, expand_args=True)
 def calculate_solar_incidence_jenco(
         longitude: Longitude,
         latitude: Latitude,
@@ -89,7 +89,6 @@ def calculate_solar_incidence_jenco(
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-        rounding_places: int = 5,
         verbose: bool = False,
     ) -> SolarIncidence:
     """Calculate the solar incidence based on sun's position and surface geometry.
@@ -121,18 +120,18 @@ def calculate_solar_incidence_jenco(
 
     """
     sine_relative_inclined_latitude = - (
-        cos(latitude)
-        * sin(surface_tilt)
-        * cos(surface_orientation)
-        + sin(latitude)
-        * cos(surface_tilt)
+        cos(latitude.value)
+        * sin(surface_tilt.value)
+        * cos(surface_orientation.value)
+        + sin(latitude.value)
+        * cos(surface_tilt.value)
     )
     relative_inclined_latitude = asin(sine_relative_inclined_latitude)
-    solar_declination = calculate_solar_declination(
+    solar_declination = calculate_solar_declination_pvis(
         timestamp,
         timezone,
         days_in_a_year,
-        orbital_eccentricity,
+        eccentricity_correction_factor,
         perigee_offset,
         angle_output_units,
         )
@@ -153,7 +152,7 @@ def calculate_solar_incidence_jenco(
     )
     
     sine_solar_incidence = (
-        c_inclined_31 * cos(hour_angle.value - relative_longitude) + c_inclined_33
+        c_inclined_31 * cos(hour_angle.value - relative_longitude.value) + c_inclined_33
     )
 
     solar_incidence = SolarIncidence(
@@ -201,7 +200,7 @@ def interpolate_horizon_height(
     return HorizonHeight(horizon_height, 'meters')                          # FIXME: Is it meters?
 
 
-def is_the_solar_surface_in_shade(
+def is_surface_in_shade(
         shadow_indicator: Annotated[Optional[int], typer.Argument(None, help="Shadow data indicating presence of shadow.")],
         solar_altitude: Annotated[float, typer.Argument(..., help="The altitude of the sun.")],
         solar_azimuth: Annotated[float, typer.Argument(..., help="The azimuth angle of the sun.")],
@@ -299,7 +298,7 @@ def calculate_effective_solar_incidence_angle(
 
     in which 720 is minutes, whereas 60 is hours in PVGIS' C++ code.
     """
-    in_shade = is_the_solar_surface_in_shade(
+    in_shade = is_surface_in_shade(
             shadow_indicator,
             solar_altitude,
             solar_azimuth,
