@@ -1,16 +1,29 @@
+from typing import List
+from typing import Optional
+from typing import Union
+from typing import Sequence
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from math import pi
-from pydantic import ConfigDict
 from pydantic import field_validator
 from pydantic import BaseModel
 from pydantic import confloat
-from typing import Optional
-from typing import Union
-from zoneinfo import ZoneInfo
-from pydantic import validator
+import numpy as np
 
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
+# from pvgisprototype.api.data_classes import SolarZenith
+from pvgisprototype.api.parameter_models import SolarHourAngleModel
+from pvgisprototype.api.parameter_models import SolarHourAngleSeriesModel
+
+# When?
+from pvgisprototype.api.parameter_models import BaseTimestampModel
+from pvgisprototype.api.parameter_models import BaseTimestampSeriesModel
+from pvgisprototype.api.parameter_models import BaseTimeModel
+from pvgisprototype.api.parameter_models import BaseTimeSeriesModel
+
+# Where?
+from pvgisprototype.api.parameter_models import LongitudeModel
+from pvgisprototype.api.parameter_models import LatitudeModel
+from pvgisprototype.api.parameter_models import BaseCoordinatesModel
 
 
 class ValidatedInputToDict(BaseModel):
@@ -20,23 +33,6 @@ class ValidatedInputToDict(BaseModel):
             d[k] = v
         return d
     
-
-class BaseTimestampModel(BaseModel):
-    timestamp: datetime
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-
-class BaseTimeInput(BaseTimestampModel):
-    timezone: Optional[ZoneInfo] = None
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    @field_validator('timezone')
-    @classmethod
-    def validate_timezone(cls, v):
-        if v is not None and not isinstance(v, ZoneInfo):
-            raise ValueError("The `timezone` must be a valid `zoneinfo.ZoneInfo` object.")
-        return v
-
 
 class BaseTimeEventModel(BaseModel):
     event: str
@@ -60,47 +56,6 @@ class BaseTimeOutputUnitsModel(BaseModel):
         if v not in valid_units:
             raise ValueError(f"time_output_units must be one of {valid_units}")
         return v
-
-
-class LongitudeModel(BaseModel):
-    longitude: Union[confloat(ge=-pi, le=pi), Longitude]
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    @field_validator("longitude")
-    def longitude_named_tuple(cls, input) -> Longitude:
-        if isinstance(input, Longitude):
-            return input
-        elif isinstance(input, float):
-            return Longitude(value=input, unit='radians')
-        else:
-            raise ValueError("Unsupported `longitude` type provided")
-
-
-# class LongitudeModel_in_Radians(BaseModel):
-#     longitude: confloat(ge=-pi, le=pi)  # -pi to pi
-
-
-class LatitudeModel(BaseModel):
-    latitude: Union[confloat(ge=-pi/2, le=pi/2), Latitude]
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    @field_validator("latitude")
-    def latitude_named_tuple(cls, input) -> Latitude:
-        if isinstance(input, Latitude):
-            return input
-        elif isinstance(input, float):
-            return Latitude(value=input, unit='radians')
-        else:
-            raise ValueError("Unsupported `latitude` type provided")
-
-
-
-# class LatitudeModel_in_Radians(BaseModel):
-#     latitude: confloat(ge=-pi/2, le=pi/2)  # -pi/2 to pi/2
-
-
-class BaseCoordinatesInput(LongitudeModel, LatitudeModel):
-    pass
 
 
 class BaseAngleUnitsModel(BaseModel):
@@ -152,6 +107,14 @@ class CalculateFractionalYearNOAAInput(
     pass
 
 
+class CalculateFractionalYearNOAATimeSeriesInput(  # merge above here-in!
+    ValidatedInputToDict,
+    BaseTimestampSeriesModel,  # != BaseTimestampModel
+    AngleInRadiansOutputUnitsModel,
+):
+    pass
+
+
 class CalculateEquationOfTimeNOAAInput(
     ValidatedInputToDict,
     BaseTimestampModel,
@@ -162,7 +125,16 @@ class CalculateEquationOfTimeNOAAInput(
 
 
 class CalculateSolarDeclinationNOAAInput(
+    ValidatedInputToDict,
     BaseTimestampModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+class CalculateSolarDeclinationNOAATimeSeriesInput(  # merge above here-in
+    ValidatedInputToDict,
+    BaseTimestampSeriesModel,  # != BaseTimestampModel
     BaseAngleOutputUnitsModel,
 ):
     pass
@@ -171,7 +143,7 @@ class CalculateSolarDeclinationNOAAInput(
 class CalculateTimeOffsetNOAAInput(
     ValidatedInputToDict,
     LongitudeModel,
-    BaseTimestampModel,
+    BaseTimeModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
 ):
@@ -181,7 +153,16 @@ class CalculateTimeOffsetNOAAInput(
 class CalculateTrueSolarTimeNOAAInput(
     ValidatedInputToDict,
     LongitudeModel,
-    BaseTimeInput,
+    BaseTimeModel,
+    BaseTimeOutputUnitsModel,
+):
+    pass
+
+
+class CalculateTrueSolarTimeNOAATimeSeriesInput(
+    ValidatedInputToDict,
+    LongitudeModel,
+    BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
 ):
     pass
@@ -190,19 +171,34 @@ class CalculateTrueSolarTimeNOAAInput(
 class CalculateSolarHourAngleNOAAInput(
     ValidatedInputToDict,
     LongitudeModel,
-    BaseTimeInput,
+    BaseTimeModel,
     BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
 
 
-class SolarZenithModel_in_Radians(BaseModel):
-    solar_zenith: confloat(ge=0, le=pi+0.01745)
+class CalculateSolarHourAngleNOAATimeSeriesInput(
+    ValidatedInputToDict,
+    LongitudeModel,
+    BaseTimeSeriesModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+class SolarZenithModel(BaseModel):
+    solar_zenith: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
+
+
+class SolarZenithSeriesModel(BaseModel):  # merge above here-in
+    solar_zenith_series: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
 
 
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
-    SolarZenithModel_in_Radians,
+    ValidatedInputToDict,
+    SolarZenithModel,
     BaseAngleOutputUnitsModel,
 ):
     @field_validator('solar_zenith')
@@ -213,18 +209,43 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
         return v
 
 
+class AdjustSolarZenithForAtmosphericRefractionNOAATimeSeriesInput(
+    ValidatedInputToDict,
+    SolarZenithSeriesModel,
+    BaseAngleOutputUnitsModel,
+):
+    @field_validator('solar_zenith_series')
+    def solar_zenith_range(cls, v):
+        v_array = np.atleast_1d(v)  # Ensure v is treated as an array
+        if not np.all((0 <= v_array) & (v_array <= np.pi)):  # Adjust the condition to work with an array
+            raise ValueError('solar_zenith must range within [0, π]')
+        return v  # Return the original value or array
+
+
 class BaseApplyAtmosphericRefractionModel(BaseModel):
     apply_atmospheric_refraction: bool
 
 
 class CalculateSolarZenithNOAAInput(
+    ValidatedInputToDict,
     LatitudeModel,
     BaseTimestampModel,
+    SolarHourAngleModel,
     BaseApplyAtmosphericRefractionModel,
-    BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
-    solar_hour_angle: float
+    pass
+
+
+class CalculateSolarZenithNOAATimeSeriesInput(
+    ValidatedInputToDict,
+    LatitudeModel,
+    BaseTimestampSeriesModel,  # != BaseTimestampModel
+    SolarHourAngleSeriesModel,
+    BaseApplyAtmosphericRefractionModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
 
 
 class SolarAltitudeModel_in_Radians(BaseModel):
@@ -233,8 +254,20 @@ class SolarAltitudeModel_in_Radians(BaseModel):
 
 class CalculateSolarAltitudeNOAAInput(
     ValidatedInputToDict,
-    BaseCoordinatesInput,
-    BaseTimeInput,
+    BaseCoordinatesModel,
+    BaseTimeModel,
+    BaseApplyAtmosphericRefractionModel,
+    BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+class CalculateSolarAltitudeNOAATimeSeriesInput(
+    ValidatedInputToDict,
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
     BaseApplyAtmosphericRefractionModel,
     BaseTimeOutputUnitsModel,
     # BaseAngleUnitsModel,
@@ -244,8 +277,9 @@ class CalculateSolarAltitudeNOAAInput(
 
 
 class CalculateSolarAzimuthNOAAInput(
-    BaseCoordinatesInput,
-    BaseTimeInput,
+    ValidatedInputToDict,
+    BaseCoordinatesModel,
+    BaseTimeModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -253,7 +287,21 @@ class CalculateSolarAzimuthNOAAInput(
     pass
 
 
+class CalculateSolarAzimuthNOAATimeSeriesInput(
+    ValidatedInputToDict,
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+
+
 class CalculateEventHourAngleNOAAInput(
+    ValidatedInputToDict,
     LatitudeModel,
     BaseTimestampModel,
     BaseAngleUnitsModel,
@@ -274,10 +322,11 @@ class CalculateEventHourAngleNOAAInput(
 
 
 class CalculateEventTimeNOAAInput(
-    BaseCoordinatesInput,
-    BaseTimeInput,
-    BaseApplyAtmosphericRefractionModel,
+    ValidatedInputToDict,
+    BaseCoordinatesModel,
+    BaseTimeModel,
     BaseTimeEventModel,
+    BaseApplyAtmosphericRefractionModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -286,8 +335,9 @@ class CalculateEventTimeNOAAInput(
 
 
 class CalculateLocalSolarTimeNOAAInput(
-    BaseCoordinatesInput,
-    BaseTimeInput,
+    ValidatedInputToDict,
+    BaseCoordinatesModel,
+    BaseTimeModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -296,13 +346,14 @@ class CalculateLocalSolarTimeNOAAInput(
 
 
 class CalculateSolarPositionNOAAInput(
-    BaseCoordinatesInput,
-    BaseTimeInput,
+    ValidatedInputToDict,
+    BaseCoordinatesModel,
+    BaseTimeModel,
     BaseApplyAtmosphericRefractionModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
-        ):
+):
     refracted_solar_zenith: float
 
     @field_validator('refracted_solar_zenith')
