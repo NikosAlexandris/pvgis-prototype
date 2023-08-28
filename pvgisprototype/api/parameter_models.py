@@ -4,11 +4,15 @@ from pydantic import field_validator
 from pydantic import confloat
 from typing import Optional
 from typing import Union
+from typing import Sequence
+from typing import List
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import time
 from math import pi
 from pydantic import validator
+import numpy as np
+from numpy import ndarray
 
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
@@ -91,7 +95,26 @@ class BaseTimestampModel(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
+class BaseTimestampSeriesModel(BaseModel):
+    timestamps: Union[datetime, Sequence[datetime]]
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
 class BaseTimeModel(BaseTimestampModel):
+    timezone: Optional[ZoneInfo] = None
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @field_validator("timezone")
+    @classmethod
+    def validate_timezone(cls, v):
+        if v is not None and not isinstance(v, ZoneInfo):
+            raise ValueError(
+                "The `timezone` must be `None` or a valid `zoneinfo.ZoneInfo` object."
+            )
+        return v
+
+
+class BaseTimeSeriesModel(BaseTimestampSeriesModel):
     timezone: Optional[ZoneInfo] = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -206,8 +229,10 @@ class SolarPositionModel(BaseModel):
     model: SolarPositionModels = SolarPositionModels.skyfield
     apply_atmospheric_refraction: bool = True
 
+
 class DaysInAYearModel(BaseModel):
     days_in_a_year: float = 365.25  # TODO: Validator for this value if never changes
+
 
 class EarthOrbitModel(DaysInAYearModel):
     eccentricity_correction_factor: float = 0.03344
@@ -283,6 +308,24 @@ class SolarHourAngleModel(BaseModel):
             return SolarHourAngle(value=input, unit="radians")
         else:
             raise ValueError("Unsupported solar_hour_angle type provided")
+
+
+class SolarHourAngleSeriesModel(BaseModel):
+    solar_hour_angle_series: Union[Sequence[SolarHourAngle], ndarray]
+    model_config = ConfigDict(
+        description="Solar hour angle series.",
+        arbitrary_types_allowed=True,
+    )
+
+    @field_validator("solar_hour_angle_series")
+    def solar_hour_angle_named_tuple(cls, input) -> Union[Sequence[SolarHourAngle], ndarray]:
+        if isinstance(input, list) and all(isinstance(item, SolarHourAngle) for item in input):
+            return input
+        elif isinstance(input, ndarray) and all(isinstance(item, SolarHourAngle) for item in input):
+            return input
+        else:
+            raise ValueError("Unsupported solar_hour_angle_series type provided")
+
 
 class ApplyAtmosphericRefraction(BaseModel):
     apply_atmospheric_refraction: bool
