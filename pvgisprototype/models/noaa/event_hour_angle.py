@@ -67,8 +67,8 @@ def calculate_event_hour_angle_noaa(
             angle_output_units,
             )  # radians
     cosine_event_hour_angle = cos(refracted_solar_zenith) / (
-        cos(latitude) * cos(solar_declination.value)
-    ) - tan(latitude) * tan(solar_declination.value)
+        cos(latitude.value) * cos(solar_declination.value)
+    ) - tan(latitude.value) * tan(solar_declination.value)
     event_hour_angle = acos(cosine_event_hour_angle)  # radians
 
     event_hour = EventTime(value=event_hour_angle, unit=angle_output_units)
