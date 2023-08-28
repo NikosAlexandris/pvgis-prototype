@@ -486,7 +486,7 @@ def azimuth(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     verbose: Annotated[Optional[bool], typer_option_verbose]= False,
-        ) -> float:
+) -> float:
     """Calculate the solar azimuth angle
 
     The solar azimuth angle (Az) specifies the east-west orientation of the
@@ -523,7 +523,7 @@ def azimuth(
         model = [
             model for model in SolarPositionModels if model != SolarPositionModels.all
         ]
-    solar_position = calculate_solar_position(
+    solar_azimuth = calculate_solar_azimuth(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -533,7 +533,7 @@ def azimuth(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         time_output_units=time_output_units,
@@ -541,12 +541,12 @@ def azimuth(
         angle_output_units=angle_output_units,
     )
     print_solar_position_table(
-        longitude,
-        latitude,
-        timestamp,
-        timezone,
-        solar_position,
-        rounding_places,
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        solar_position=solar_azimuth,
+        rounding_places=rounding_places,
         azimuth=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
@@ -558,11 +558,14 @@ def declination(
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     local_time: Annotated[bool, typer_option_local_time] = False,
+    random_time: Annotated[bool, typer_option_random_time] = False,
+    model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    random_time: Annotated[bool, typer_option_random_time] = False,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
         ) -> float:
     """Calculat the solar declination angle 
 
