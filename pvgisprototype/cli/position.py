@@ -663,45 +663,13 @@ def incidence(
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    solar_declination: Annotated[Optional[float], typer_argument_solar_declination] = 0,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 0,
-    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
-    hour_angle: Annotated[Optional[float], typer_argument_hour_angle] = None,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-):
-    """Calculate the angle of solar incidence
-
-    The angle of incidence (also known as theta) is the angle between the
-    direct beam of sunlight and the line perpendicular (normal) to the surface.
-    If the sun is directly overhead and the surface is flat (horizontal), the
-    angle of incidence is 0°.
-    """
-
-    #
-    # Update Me
-    #
-
-    import random
-
-    if not surface_tilt:
-        surface_tilt = random.uniform(0, 90)  # Returns a random floating point number in the range [0, 90)
-
-    if not surface_orientation:
-        surface_orientation = random.uniform(0, 360)  # Returns a random floating point number in the range [0, 360)
-
-    return None
-
-
-@app.command('incidence-jenco', no_args_is_help=True, help='Calculate the solar incidence angle')
-def incidence_jenco(
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    solar_incidence_model: Annotated[List[SolarIncidenceModels], typer_option_solar_incidence_model] = [SolarIncidenceModels.jenco],
     random_time: Annotated[bool, typer_option_random_time] = False,
     hour_angle: Annotated[Optional[float], typer_argument_hour_angle] = None,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 0,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
+    random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
+    random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
