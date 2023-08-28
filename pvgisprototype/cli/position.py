@@ -686,38 +686,70 @@ def incidence(
     If the sun is directly overhead and the surface is flat (horizontal), the
     angle of incidence is 0°.
     """
+    # Initialize with None ---------------------------------------------------
+    user_requested_timestamp = None
+    user_requested_timezone = None
+    # -------------------------------------------- Smarter way to do this? ---
+
+    # Convert the input timestamp to UTC, for _all_ internal calculations
+    utc_zoneinfo = ZoneInfo("UTC")
+    if timestamp.tzinfo != utc_zoneinfo:
+
+        # Note the input timestamp and timezone
+        user_requested_timestamp = timestamp
+        user_requested_timezone = timezone
+
+        timestamp = timestamp.astimezone(utc_zoneinfo)
+        typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     # --------------------------------------------------------------- Idea ---
     # if not given, optimise tilt and orientation... ?
     # ------------------------------------------------------------------------
-    import random
 
-    if not surface_tilt:
-        surface_tilt = random.uniform(0, 90)
+    if random_surface_tilt:
+        import random
+        surface_tilt = random.uniform(0, math.pi/2)  # radians
 
-    if not surface_orientation:
-        surface_orientation = random.uniform(0, 360)
+    if random_surface_orientation:
+        import random
+        surface_tilt = random.vonmisesvariate(math.pi, kappa=0)  # radians
 
-    solar_incidence_angle = calculate_solar_incidence_jenco(
+    # Why does the callback function `_parse_model` not work? ----------------
+    if SolarPositionModels.all in solar_incidence_model:
+        solar_incidence_model = [
+            model for model in SolarPositionModels if solar_incidence_model != SolarPositionModels.all
+        ]
+    solar_incidence = calculate_solar_incidence(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        random_time=random_time,
-        hour_angle=hour_angle,
+        solar_incidence_models=solar_incidence_model,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
+        # time_offset_global=time_offset_global,
+        # hour_offset=hour_offset,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
-        rounding_places=rounding_places,
         verbose=verbose,
     )
 
-    typer.echo(f'Solar incidence angle {solar_incidence_angle} {angle_output_units}')
+    # typer.echo(f'Solar incidence angle {solar_incidence} {angle_output_units}')
+    print_solar_position_table(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        solar_position=solar_incidence,
+        rounding_places=rounding_places,
+        incidence=True,
+        user_requested_timestamp=user_requested_timestamp, 
+        user_requested_timezone=user_requested_timezone
+    )
 
 
 @app.command(
