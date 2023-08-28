@@ -206,13 +206,13 @@ typer_option_perigee_offset = typer.Option(
     rich_help_panel=rich_help_panel_earth_orbit,
     # default_factory=0.048869,
 )
-typer_option_eccentricity = typer.Option(
-    help='Eccentricity',
+ECCENTRICITY_CORRECTION_FACTOR = 0.03344
+typer_option_eccentricity_correction_factor = typer.Option(
+    help='Eccentricity correction factor',
     rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=0.01672,
+    # default_factory=0.ECCENTRICITY_CORRECTION_FACTOR,
 )
 
-typer_option_orbital_eccentricity = typer.Option(0.03344)
 
 help_for_linke_turbidity_factor='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
 typer_argument_linke_turbidity_factor = typer.Argument(

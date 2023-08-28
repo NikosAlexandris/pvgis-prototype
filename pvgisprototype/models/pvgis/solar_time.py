@@ -27,7 +27,7 @@ def calculate_solar_time_pvgis(
         timezone: ZoneInfo = None,
         days_in_a_year: float = 365.25,
         perigee_offset: float = 0.048869,
-        orbital_eccentricity: float = 0.165,  # from the C code
+        eccentricity_correction_factor: float = 0.165,  # from the C code
         time_offset_global: float = 0,
     ) -> SolarTime:
     """Calculate the solar time.
@@ -64,7 +64,7 @@ def calculate_solar_time_pvgis(
     # approximation like the Equation of Time?!
     time_offset = - 0.128 \
                   * np.sin(day_of_year_in_radians - perigee_offset) \
-                  - orbital_eccentricity \
+                  - eccentricity_correction_factor \
                   * np.sin(2 * day_of_year_in_radians + 0.34383)
 
     # Complicated implementation borrowed from SPECMAGIC!

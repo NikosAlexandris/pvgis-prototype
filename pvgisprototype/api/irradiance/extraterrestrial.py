@@ -9,6 +9,8 @@ import numpy as np
 from .constants import SOLAR_CONSTANT
 from ...api.utilities.timestamp import random_day_of_year
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
+from pvgisprototype.cli.typer_parameters import ECCENTRICITY_CORRECTION_FACTOR
 
 
 app = typer.Typer(
@@ -39,14 +41,12 @@ def calculate_extraterrestrial_normal_irradiance(
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset',
             rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
-        eccentricity_correction_factor: Annotated[float, typer.Option(
-            help='Eccentricity',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 0.01672,
         random_day: Annotated[bool, typer.Option(
             '-r',
             '--random-day',
             help="Generate a random day to demonstrate calculation")] = False,
         ) -> float:
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     """Calculate the extraterrestial irradiance for the given day of the year.
 
     The solar constant is a flux density measuring the amount of solar

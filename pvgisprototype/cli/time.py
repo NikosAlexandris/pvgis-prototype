@@ -27,6 +27,7 @@ from ..api.geometry.solar_time import calculate_solar_time
 from ..api.geometry.solar_hour_angle import calculate_hour_angle
 
 from .typer_parameters import OrderCommands
+from .typer_parameters import typer_option_eccentricity_correction_factor
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -113,8 +114,6 @@ def solar_time(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset')] = 0.048869,
-        eccentricity: Annotated[float, typer.Option(
-            help='Eccentricity')] = 0.01672,
         time_offset_global: Annotated[float, typer.Option(
             help='Global time offset')] = 0,
         hour_offset: Annotated[float, typer.Option(
@@ -138,6 +137,7 @@ def solar_time(
             case_sensitive=False,
             help="Angular units for solar position calculations output (degrees or radians)")] = 'radians',
         ):
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     """Calculate the solar time.
 
     1. Map the day of the year onto the circumference of a circle, essentially
@@ -178,11 +178,11 @@ def solar_time(
             angle_output_units,
             days_in_a_year,
             perigee_offset,
-            orbital_eccentricity,
             time_offset_global,
             hour_offset,
             )
     solar_time_table = Table('Model', 'Solar time', 'Units',
+        eccentricity_correction_factor=eccentricity_correction_factor,
                                  box=box.SIMPLE_HEAD)
     for model_result in solar_time:
         # typer.echo(f'Solar time: {solar_time} {units} ({timezone})')

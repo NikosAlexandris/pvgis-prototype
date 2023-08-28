@@ -38,7 +38,7 @@ from .typer_parameters import typer_option_global_time_offset
 from .typer_parameters import typer_option_hour_offset
 from .typer_parameters import typer_option_days_in_a_year
 from .typer_parameters import typer_option_perigee_offset
-from .typer_parameters import typer_option_eccentricity
+from .typer_parameters import typer_option_eccentricity_correction_factor
 from .typer_parameters import typer_option_apply_atmospheric_refraction
 from .typer_parameters import typer_option_refracted_solar_zenith
 from .typer_parameters import typer_option_time_output_units
@@ -207,7 +207,7 @@ def position(
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -263,7 +263,7 @@ def position(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         time_output_units=time_output_units,
@@ -295,6 +295,7 @@ def altitude(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -341,6 +342,7 @@ def altitude(
         timezone=timezone,
         models=model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         time_output_units=time_output_units,
         angle_output_units=angle_output_units,
     )
@@ -371,7 +373,7 @@ def zenith(
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -421,7 +423,7 @@ def zenith(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
-        eccentricity=eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         time_output_units=time_output_units,
@@ -462,7 +464,7 @@ def azimuth(
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -542,7 +544,7 @@ def declination(
     local_time: Annotated[bool, typer_option_local_time] = False,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     random_time: Annotated[bool, typer_option_random_time] = False,
         ) -> float:
@@ -582,6 +584,7 @@ def declination(
             eccentricity=eccentricity,
             perigee_offset=perigee_offset,
             angle_output_units=angle_output_units,
+        eccentricity_correction_factor=eccentricity_correction_factor,
     )
 
     solar_declination = convert_to_degrees_if_requested(
@@ -685,7 +688,7 @@ def incidence_jenco(
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -721,7 +724,7 @@ def incidence_jenco(
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         days_in_a_year=days_in_a_year,
-        orbital_eccentricity=orbital_eccentricity,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
         time_output_units=time_output_units,
         angle_units=angle_units,

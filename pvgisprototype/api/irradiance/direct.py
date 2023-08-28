@@ -107,7 +107,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.cli.typer_parameters import typer_option_eccentricity
+from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
@@ -316,7 +316,7 @@ def calculate_direct_normal_irradiance(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
 ):
     """Calculate the direct normal irradiance attenuated by the cloudless atmosphere
 
@@ -390,7 +390,7 @@ def calculate_direct_horizontal_irradiance(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -490,7 +490,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -741,7 +741,7 @@ def calculate_direct_irradiance(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity] = 0.01672,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',

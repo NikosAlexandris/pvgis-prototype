@@ -131,7 +131,7 @@ def calculate_solar_geometry_pvgis_variables(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset')] = 0.048869,
-        orbital_eccentricity: Annotated[float, typer.Option(
+        eccentricity_correction_factor: Annotated[float, typer.Option(
             help='Eccentricity')] = 0.01672,
         hour_offset: Annotated[float, typer.Option(
             help='Hour offset')] = 0,
@@ -175,7 +175,7 @@ def calculate_solar_geometry_pvgis_variables(
             hour_of_year,
             days_in_a_year,
             perigee_offset,
-            orbital_eccentricity,
+            eccentricity_correction_factor,
             hour_offset
     )
     # approximate sun position in the sky (`solar_time`), convert to angle
@@ -265,7 +265,7 @@ def calculate_solar_position_pvgis(
             help='Days in a year')] = 365.25,
         perigee_offset: Annotated[float, typer.Option(
             help='Perigee offset')] = 0.048869,
-        orbital_eccentricity: Annotated[float, typer.Option(
+        eccentricity_correction_factor: Annotated[float, typer.Option(
             help='Eccentricity')] = 0.01672,
         hour_offset: Annotated[float, typer.Option(
             help='Hour offset')] = 0,
@@ -317,7 +317,7 @@ def calculate_solar_position_pvgis(
             timezone,
             days_in_a_year,
             perigee_offset,
-            orbital_eccentricity,
+            eccentricity_correction_factor,
             hour_offset
     )
 
