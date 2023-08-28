@@ -1,31 +1,28 @@
-import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
 from datetime import timedelta
+from math import pi
+import ephem
+
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
-
 from pvgisprototype.api.data_classes import SolarTime
 from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
-
-from pvgisprototype.api.input_models import SolarTimeInput
-
 from pvgisprototype.api.decorators import validate_with_pydantic
-import ephem
-from math import pi
+from pvgisprototype.api.function_models import CalculateSolarTimeEphemInputModel
 
 
-@validate_with_pydantic(SolarTimeInput)
+@validate_with_pydantic(CalculateSolarTimeEphemInputModel)
 def calculate_solar_time_ephem(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
     timezone: str = None,
     verbose: bool = False,
-  )-> SolarTime:
+  ):
   """Calculate the solar time using PyEphem
 
   The position of the Sun in the sky changes slightly day to day due to the
@@ -145,4 +142,5 @@ def calculate_solar_time_ephem(
       # typer.echo(f'Mean solar time: {solar_time}')
 
   # debug(locals())
-  return SolarTime(value=solar_time_datetime, unit='datetime?')
+  # return SolarTime(value=solar_time_datetime, unit='datetime?')
+  return solar_time_datetime
