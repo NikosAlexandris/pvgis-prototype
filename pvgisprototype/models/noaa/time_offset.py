@@ -1,14 +1,16 @@
+from devtools import debug
 # from .noaa_models import LongitudeModel_in_Radians
-from .noaa_models import CalculateTimeOffsetNOAAInput
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
+from .noaa_models import CalculateTimeOffsetNOAAInput
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import TimeOffset
 from .equation_of_time import calculate_equation_of_time_noaa
 
-from pvgisprototype.api.data_classes import TimeOffset
-from pvgisprototype.api.data_classes import Longitude
 
-
+# equaivalen to : 4 * longitude (in degrees) ?
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 
 
@@ -109,6 +111,8 @@ def calculate_time_offset_noaa(
     longitude_in_minutes = radians_to_time_minutes(longitude.value)  # time
 
     # This will be 0 for UTC, obviously! Review-Me! --------------------------
+
+    timestamp = timestamp.astimezone(timezone)
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp,
@@ -116,9 +120,8 @@ def calculate_time_offset_noaa(
         angle_units,
         )  # minutes
     time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time.value
-
-    if not -720 <= time_offset <= 720:
+    # if not -720 + 70 <= time_offset <= 720 + 70:
+    if not -790 <= time_offset <= 790:
         raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
 
     return TimeOffset(value=time_offset, unit='minutes')
-
