@@ -3,23 +3,25 @@ from typing import Annotated
 from typing import Optional
 from datetime import datetime
 from datetime import timedelta
-from ...api.utilities.conversions import convert_to_radians
-from ...api.utilities.timestamp import now_utc_datetimezone
-from ...api.utilities.timestamp import ctx_convert_to_timezone
 
-from pvgisprototype.api.data_classes import SolarTime
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
-
-from pvgisprototype.api.input_models import SolarTimeInput
-from pvgisprototype.api.decorators import validate_with_pydantic
 from math import radians
+from math import degrees
 from math import sin
 from math import cos
 import numpy as np
 
+from ...api.utilities.conversions import convert_to_radians
+from ...api.utilities.timestamp import now_utc_datetimezone
+from ...api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.data_classes import SolarTime
+from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.api.function_models import CalculateSolarTimeEoTInputModel
 
-@validate_with_pydantic(SolarTimeInput, expand_args=True)
+
+
+@validate_with_pydantic(CalculateSolarTimeEoTInputModel, expand_args=True)
 def calculate_solar_time_eot(
         longitude: Longitude,
         latitude: Latitude,
@@ -30,7 +32,7 @@ def calculate_solar_time_eot(
         eccentricity_correction_factor: float = 0.03344,
         time_offset_global: float = 0,
         hour_offset: float = 0,
-)-> SolarTime:
+):
     """Calculate the solar time.
 
     - Local Time (LT)
@@ -95,7 +97,7 @@ def calculate_solar_time_eot(
     equation_of_time = 9.87 * sin(2*b) - 7.53 * cos(b) - 1.5 * sin(b)
 
     # ------------------------------------------------------------------------
-    longitude = np.degrees(longitude)  # this equation of time requires degrees!
+    longitude = degrees(longitude)  # this equation of time requires degrees!
     # ------------------------------------------------------------------------
     time_correction_factor = 4 * (longitude - local_standard_meridian_time) + equation_of_time
     time_correction_factor_hours = time_correction_factor / 60
@@ -104,4 +106,6 @@ def calculate_solar_time_eot(
     hour_angle = 15 * (solar_time_decimal_hours - 12)
     # ------------------------------------------------------------------------
     
-    return SolarTime(solar_time, 'decimal hours')
+    debug(locals())
+    # return SolarTime(solar_time, 'decimal hours')
+    return solar_time
