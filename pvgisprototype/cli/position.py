@@ -29,10 +29,13 @@ from .typer_parameters import typer_option_local_time
 from .typer_parameters import typer_option_random_time
 from .typer_parameters import typer_argument_solar_declination
 from .typer_parameters import typer_argument_surface_tilt
+from .typer_parameters import typer_option_random_surface_tilt
 from .typer_parameters import typer_argument_surface_orientation
+from .typer_parameters import typer_option_random_surface_orientation
 from .typer_parameters import typer_argument_hour_angle
 from .typer_parameters import typer_argument_solar_time
 from .typer_parameters import typer_option_solar_position_model
+from .typer_parameters import typer_option_solar_incidence_model
 from .typer_parameters import typer_option_solar_time_model
 from .typer_parameters import typer_option_global_time_offset
 from .typer_parameters import typer_option_hour_offset
@@ -58,16 +61,17 @@ from ..api.utilities.conversions import convert_to_degrees_if_requested
 from ..api.utilities.conversions import convert_float_to_degrees_if_requested
 from ..api.utilities.conversions import round_float_values
 from ..api.geometry.solar_declination import calculate_solar_declination
-from ..models.standard.solar_incidence import calculate_solar_incidence
-from ..models.jenco.solar_incidence import calculate_solar_incidence_jenco
-from ..models.jenco.solar_incidence import calculate_effective_solar_incidence_angle
+from ..api.geometry.solar_incidence import calculate_solar_incidence
 from ..models.pyephem.solar_time import calculate_solar_time_ephem
 from ..api.geometry.solar_hour_angle import calculate_hour_angle
 from ..api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
+from ..api.geometry.solar_altitude import calculate_solar_altitude
 from ..api.geometry.solar_azimuth import calculate_solar_azimuth
-from ..api.geometry.solar_position import SolarPositionModels
-from ..api.geometry.time_models import SolarTimeModels
-from ..api.geometry.solar_position import _parse_model
+from ..api.geometry.models import SolarDeclinationModels
+from ..api.geometry.models import SolarIncidenceModels
+from ..api.geometry.models import SolarPositionModels
+from ..api.geometry.models import SolarTimeModels
+# from ..api.geometry.solar_position import _parse_model
 from ..api.geometry.solar_position import calculate_solar_position
 from ..api.geometry.solar_position import model_solar_position
 from ..models.noaa.solar_position import calculate_noaa_solar_position
@@ -100,8 +104,7 @@ state = {"verbose": False}
 @app.callback()
 def main(
     ctx: typer.Context,
-    verbose: Annotated[Optional[bool], typer.Option(
-        help="Show details while executing commands")] = False,
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
     debug: Annotated[Optional[bool], typer.Option(
         "--debug",
         help="Enable debug mode")] = False,
@@ -851,5 +854,4 @@ if __name__ == "__main__":
     # import sys
     # commands = {'all', 'altitude', 'azimuth'}
     # sys.argv.insert(1, 'all') if sys.argv[1] not in commands else None
-    # # debug(locals())
     app()
