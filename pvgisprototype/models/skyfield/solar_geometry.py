@@ -16,6 +16,11 @@ from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import convert_to_timezone
 from typing import Tuple
 
+from pvgisprototype.models.skyfield.decorators import validate_with_pydantic
+from pvgisprototype.models.skyfield.function_models import CalculateSolarPositionSkyfieldInputModel
+from pvgisprototype.models.skyfield.function_models import CalculateSolarAltitudeAzimuthSkyfieldInputModel
+from pvgisprototype.models.skyfield.function_models import CalculateHourAngleSkyfieldInput
+
 from pvgisprototype.api.data_classes import SolarPosition
 from pvgisprototype.api.data_classes import SolarAltitude
 from pvgisprototype.api.data_classes import SolarAzimuth
@@ -24,26 +29,14 @@ from pvgisprototype.api.data_classes import SolarDeclination
 from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
 
-from .input_models import SolarPositionInput
-from .input_models import SolarAltitudeInput
-from .input_models import HourAngleInput
 
-from .decorators import validate_with_pydantic
-
-
-@validate_with_pydantic(SolarPositionInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel, expand_args=True)
 def calculate_solar_position_skyfield(
         longitude: Longitude,
         latitude: Latitude,
         timestamp: datetime,
         timezone: str = None,
         angle_output_units: str = 'radians',
-        # : Annotated[str, typer.Option(
-        #     '-u',
-        #     '--units',
-        #     show_default=True,
-        #     case_sensitive=False,
-        #     help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
     ) -> SolarPosition:
     """Calculate sun position above the local horizon using Skyfield.
 
@@ -94,23 +87,30 @@ def calculate_solar_position_skyfield(
     # except Exception:
     #     logging.warning(f'tzinfo already set for timestamp = {timestamp}')
     # # Handle Me during input validation? -------------------------------------
-    ephemeris = skyfield.api.load('de421.bsp')
-    sun = ephemeris['Sun']
-    earth = ephemeris['Earth']
+    planets = skyfield.api.load('de421.bsp')
+    sun = planets['Sun']
+    earth = planets['Earth']
     N = skyfield.api.N
     W = skyfield.api.W
-    location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value * W)  # W or E ?
+    E = skyfield.api.E
 
-    # the sun position as seen from the observer
+    if longitude.value < 0:
+        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value * W)  # W or E ?
+    if longitude.value > 0:
+        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value * E)  # W or E ?
+    else:
+        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value)  # ?
+
+    # sun position seen from observer location
     timescale = skyfield.api.load.timescale()
     requested_timestamp = timescale.from_datetime(timestamp)
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
 
-    solar_position = SolarPosition(value=solar_position, unit=angle_output_units)
+    # solar_position = SolarPosition(value=solar_position, unit=angle_output_units)
     return solar_position
 
 
-@validate_with_pydantic(SolarAltitudeInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAltitudeAzimuthSkyfieldInputModel, expand_args=True)
 def calculate_solar_altitude_azimuth_skyfield(
         longitude: Longitude,
         latitude: Latitude,
@@ -118,69 +118,38 @@ def calculate_solar_altitude_azimuth_skyfield(
         timezone: str = None,
         angle_output_units: str = 'radians',
     ) -> Tuple[SolarAltitude, SolarAzimuth]:
-    """Calculate sun position
-
-    Notes
-    -----
-
-    For the implementation, see also:
-    https://techoverflow.net/2022/06/19/how-to-compute-position-of-sun-in-the-sky-in-python-using-skyfield/
-
-    Factors influencing the accuracy of the calculation using Skyfield:
-
-    - Skyfield considers:
-
-        - The slight shift in position caused by light speed
-        - The very very slight shift in position caused by earth’s gravity
-
-    - Skyfield does not consider:
-
-        - Atmospheric distortions shifting the sun’s position
-        - The extent of the sun’s disk causing the sun to emanate not from a
-          point but apparently from an area
-
-    Notes
-    -----
-
-    To consider:
-
-    - https://rhodesmill.org/skyfield/almanac.html#elevated-vantage-points
-    - The `Time` class in Skyfield (i.e. `timescale()`) only uses UTC for input
-      and output
-    - https://rhodesmill.org/skyfield/time.html#utc-and-your-timezone
-    - https://rhodesmill.org/skyfield/time.html#utc-and-leap-seconds
-    """
+    """Calculate sun position"""
     solar_position = calculate_solar_position_skyfield(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            angle_output_units=angle_output_units,
-            )
-    solar_altitude, solar_azimuth, distance_to_sun = solar_position.value.altaz()
-
-    # # if output_units == 'radians':
-    # solar_altitude = solar_altitude.radians
-    # solar_azimuth = solar_azimuth.radians
-
-    # if output_units == 'degrees':
-    #     solar_altitude = solar_altitude.degrees
-    #     solar_azimuth = solar_azimuth.degrees
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        angle_output_units=angle_output_units,
+    )
+    solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
 
     solar_altitude = SolarAltitude(
-        value=solar_altitude,
-        unit=angle_output_units,
+        value=solar_altitude.radians,
+        unit='radians',
     )
+    solar_altitude = convert_to_degrees_if_requested(
+        solar_altitude,
+        angle_output_units,
+        )
 
     solar_azimuth = SolarAzimuth(
-        value=solar_azimuth,
-        unit=angle_output_units,
+        value=solar_azimuth.radians,
+        unit='radians',
     )
+    solar_azimuth = convert_to_degrees_if_requested(
+        solar_azimuth,
+        angle_output_units,
+        )
 
     return solar_altitude, solar_azimuth   # distance_to_sun
 
 
-@validate_with_pydantic(HourAngleInput)
+@validate_with_pydantic(CalculateHourAngleSkyfieldInput)
 def calculate_hour_angle_skyfield(
         longitude: Longitude,
         latitude: Latitude,
@@ -227,4 +196,3 @@ def calculate_hour_angle_skyfield(
     solar_declination = SolarDeclination(value=solar_declination, unit=angle_output_units)
 
     return hour_angle, solar_declination
-
