@@ -56,7 +56,7 @@ def calculate_noaa_solar_position(
     longitude: Longitude,       # radians 
     latitude: Latitude,         # radians
     timestamp: datetime,
-    timezone: str,
+    timezone: str = None,
     refracted_solar_zenith: float = 1.5853349194640094,  # radians
     apply_atmospheric_refraction: bool = False,
     time_output_units: str = 'minutes',
@@ -103,7 +103,6 @@ def calculate_noaa_solar_position(
         timestamp=timestamp,
         solar_hour_angle=solar_hour_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
     solar_altitude = calculate_solar_altitude_noaa(
