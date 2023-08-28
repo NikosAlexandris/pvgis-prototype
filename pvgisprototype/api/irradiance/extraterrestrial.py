@@ -1,16 +1,24 @@
-from typing import Optional
-from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
-from datetime import datetime
 import typer
 from typing_extensions import Annotated
+from typing import Optional
+from datetime import datetime
 from math import pi
 from math import cos
 import numpy as np
-from .constants import SOLAR_CONSTANT
 from ...api.utilities.timestamp import random_day_of_year
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
+from pvgisprototype.cli.typer_parameters import SOLAR_CONSTANT
+from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
+from pvgisprototype.cli.typer_parameters import DAYS_IN_A_YEAR
+from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
+from pvgisprototype.cli.typer_parameters import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.cli.typer_parameters import typer_option_random_day
+from pvgisprototype.cli.typer_parameters import RANDOM_DAY_FLAG
 
 
 app = typer.Typer(
@@ -25,28 +33,15 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 def calculate_extraterrestrial_normal_irradiance(
-        timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
-        # timezone: Annotated[Optional[str], typer_option_timezone] = None,
-        # Make `day_of_year` optional ?
-        # day_of_year: Annotated[float, typer.Argument(
-        #     min=1,
-        #     max=366,
-        #     help='Day of year')] = None,
-        solar_constant: Annotated[float, typer.Argument(
-            help="The mean solar electromagnetic radiation at the top of the atmosphere (~1360.8 W/m2) one astronomical unit (au) away from the Sun.",
-            min=1360)] = SOLAR_CONSTANT,
-        days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 365.25,
-        perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset',
-            rich_help_panel=rich_help_panel_earth_orbit)] = 0.048869,
-        random_day: Annotated[bool, typer.Option(
-            '-r',
-            '--random-day',
-            help="Generate a random day to demonstrate calculation")] = False,
-        ) -> float:
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    # timezone: Annotated[Optional[str], typer_option_timezone],
+    # Make `day_of_year` optional ?
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    random_day: Annotated[bool, typer_option_random_day] = RANDOM_DAY_FLAG
+) -> float:
     """Calculate the extraterrestial irradiance for the given day of the year.
 
     The solar constant is a flux density measuring the amount of solar
