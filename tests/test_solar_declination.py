@@ -1,7 +1,8 @@
+from devtools import debug
 import pytest
 import matplotlib.pyplot as plt
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
-from pvgisprototype.plot.plot_solar_declination import plot_solar_declination
+from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_five_years
 import numpy as np
@@ -32,26 +33,33 @@ test_cases = [
     (datetime.datetime(2023, 12, 22), -23.44, 'degrees'),  # Around winter solstice
     (datetime.datetime(2023, 12, 30), -16.428456, 'degrees'),  # Around winter solstice
 ]
+models = [
+    SolarDeclinationModels.pvis,
+    SolarDeclinationModels.noaa,
+]
 tolerances = [1, 0.1]
-@pytest.mark.parametrize( "timestamp, expected_value, expected_unit", test_cases)
+@pytest.mark.parametrize('timestamp, expected_value, expected_unit', test_cases)
+@pytest.mark.parametrize('model', models)
 @pytest.mark.parametrize('tolerance', tolerances)
 def test_calculate_solar_declination(
-        timestamp: datetime.datetime,
-        expected_value: float,
-        expected_unit: str,
-        tolerance: float,
-        ):
+    timestamp: datetime.datetime,
+    expected_value: float,
+    expected_unit: str,
+    model: SolarDeclinationModels,
+    tolerance: float,
+):
     calculated = calculate_solar_declination(
-            timestamp=timestamp,
-            timezone=None,
-            angle_output_units="degrees",
-        )
-    assert expected_value == pytest.approx(
-        calculated.value,
-        tolerance,
+        timestamp=timestamp,
+        timezone=None,
+        models=[model],  # pass as a list!
+        angle_output_units="degrees",
     )
-    assert expected_unit == calculated.unit
-    # assert pytest.approx(calculate_solar_declination(timestamp, output_units='degrees'), 0.1) == expected
+    model_result = calculated[0]
+    model_name = model_result.get("Model", "")
+    calculated_value = model_result.get("Declination", "NA")
+    calculated_unit = model_result.get("Units", "")
+    assert pytest.approx(expected_value, tolerance) == calculated_value
+    assert expected_unit == calculated_unit
 
 
 # Set a seed to ensure agreement of plots between tests!
