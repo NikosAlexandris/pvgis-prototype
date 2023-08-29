@@ -24,7 +24,7 @@ from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.data_classes.models import Latitude
 
 
-@validate_with_pydantic(CalculateSolarAzimuthNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
 def calculate_solar_azimuth_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude,     # radians
