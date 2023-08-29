@@ -9,6 +9,17 @@ from rich import box
 from typing import List
 
 
+DECLINATION_COLUMN_NAME = 'Declination'
+HOUR_ANGLE_COLUMN_NAME = 'Hour Angle'
+ZENITH_COLUMN_NAME = 'Zenith'
+ALTITUDE_COLUMN_NAME = 'Altitude'
+AZIMUTH_COLUMN_NAME = 'Azimuth'
+INCIDENCE_COLUMN_NAME = 'Incidence'
+UNITS_COLUMN_NAME = 'Units'
+UNITLESSS_COLUMN_NAME = 'Unitless'
+NOT_AVAILABLE_COLUMN_NAME = 'NA'
+
+
 def print_table(headers: List[str], data: List[List[str]]):
     """Create and print a table with provided headers and data."""
     table = Table(show_header=True, header_style="bold magenta", box=box.SIMPLE_HEAD)
@@ -42,7 +53,7 @@ def print_solar_position_table(
 
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
-    rounded_solar_position = round_float_values(solar_position, rounding_places)
+    rounded_table = round_float_values(table, rounding_places)
 
     # Define the list of column names
     columns = ["Longitude", "Latitude", "Time", "Zone"]
@@ -50,30 +61,32 @@ def print_solar_position_table(
         columns.extend(["Local Time", "Local Zone"])
     columns.append("Model")
     if declination is not None:
-        columns.append("Declination")
-    if altitude is not None:
-        columns.append("Altitude")
-    if azimuth is not None:
-        columns.append("Azimuth")
+        columns.append(DECLINATION_COLUMN_NAME)
+    if hour_angle is not None:
+        columns.append(HOUR_ANGLE_COLUMN_NAME)
     if zenith is not None:
-        columns.append("Zenith")
+        columns.append(ZENITH_COLUMN_NAME)
+    if altitude is not None:
+        columns.append(ALTITUDE_COLUMN_NAME)
+    if azimuth is not None:
+        columns.append(AZIMUTH_COLUMN_NAME)
     if incidence is not None:
-        columns.append("Incidence")
-    columns.append("Units")
+        columns.append(INCIDENCE_COLUMN_NAME)
+    columns.append(UNITS_COLUMN_NAME)
 
     # Create the table
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
-    for model_result in rounded_solar_position:
+    for model_result in rounded_table:
         model_name = model_result.get('Model', '')
-        declination_value = model_result.get('Declination', 'NA') if declination is not None else None
-        altitude_value = model_result.get('Altitude', '') if altitude is not None else None
-        azimuth_value = model_result.get('Azimuth', '') if azimuth is not None else None
-        zenith_value = model_result.get('Zenith', '') if zenith is not None else None
-        incidence_value = model_result.get('Incidence', '') if incidence is not None else None
-        units = model_result.get('Units', '')
+        declination_value = model_result.get(DECLINATION_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination is not None else None
+        hour_angle_value = model_result.get(HOUR_ANGLE_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle is not None else None
+        zenith_value = model_result.get(ZENITH_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith is not None else None
+        altitude_value = model_result.get(ALTITUDE_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude is not None else None
+        azimuth_value = model_result.get(AZIMUTH_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth is not None else None
+        incidence_value = model_result.get(INCIDENCE_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence is not None else None
+        units = model_result.get(UNITS_COLUMN_NAME, UNITLESSS_COLUMN_NAME)
 
-        # list values in a row
         row = [str(longitude), str(latitude), str(timestamp), str(timezone)]
 
        # ---------------------------------------------------- Implement-Me---
@@ -88,12 +101,14 @@ def print_solar_position_table(
         row.append(model_name)
         if declination_value is not None:
             row.append(str(declination_value))
+        if hour_angle_value is not None:
+            row.append(str(hour_angle_value))
+        if zenith_value is not None:
+            row.append(str(zenith_value))
         if altitude_value is not None:
             row.append(str(altitude_value))
         if azimuth_value is not None:
             row.append(str(azimuth_value))
-        if zenith_value is not None:
-            row.append(str(zenith_value))
         if incidence_value is not None:
             row.append(str(incidence_value))
         row.append(str(units))
@@ -149,10 +164,10 @@ def print_noaa_solar_position_table(
         str(timestamp),
         str(timezone),
         "NOAA",  # Model name
-        str(solar_position_calculations['time_offset']),
-        str(convert_to_degrees_if_requested(rounded_solar_position_calculations['solar_altitude'],
+        str(solar_position_calculations['time_offset'].value),
+        str(convert_to_degrees_if_requested(rounded_solar_position_calculations['solar_altitude'].value,
                                             angle_output_units)),
-        str(rounded_solar_position_calculations['solar_azimuth']),
+        str(rounded_solar_position_calculations['solar_azimuth'].value),
         str(solar_position_calculations['sunrise_time']),
         str(solar_position_calculations['noon_time']),
         str(solar_position_calculations['local_solar_time']),
@@ -176,8 +191,8 @@ def print_noaa_solar_position_table(
           # solar_position_calculations['true_solar_time']
           # solar_position_calculations['solar_hour_angle']
           # solar_position_calculations['solar_zenith']
-            "Altitude",
-            "Azimuth",
+            ALTITUDE_COLUMN_NAME,
+            AZIMUTH_COLUMN_NAME,
             "Sunrise",
             'Noon',
             'Local solar time',
@@ -211,6 +226,5 @@ def print_noaa_solar_position_table(
             Time Offset: {solar_position_calculations['time_offset']}
             True Solar Time: {solar_position_calculations['true_solar_time']}
             Solar Hour Angle: {solar_position_calculations['solar_hour_angle']}
-            Solar Zenith: {solar_position_calculations['solar_zenith']}
-            """
+            Solar Zenith: {solar_position_calculations['solar_zenith']} """
             console.print(Panel(verbose_info, title="Verbose Information"))
