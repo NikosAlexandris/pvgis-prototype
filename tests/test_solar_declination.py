@@ -31,7 +31,8 @@ test_cases = [
     (datetime.datetime(2023, 9, 23), 0, 'degrees'),  # Around autumnal equinox
     (datetime.datetime(2023, 12, 21), -23.44, 'degrees'),  # Around winter solstice
     (datetime.datetime(2023, 12, 22), -23.44, 'degrees'),  # Around winter solstice
-    (datetime.datetime(2023, 12, 30), -16.428456, 'degrees'),  # Around winter solstice
+    # (datetime.datetime(2023, 12, 30), -16.428456, 'degrees'),  # Around winter solstice
+    (datetime.datetime(2023, 12, 30), -23.44, 'degrees'),  # Around winter solstice
 ]
 models = [
     SolarDeclinationModels.pvis,
@@ -77,10 +78,22 @@ def test_plot_solar_declination():
 
 
 random_year = random.randint(2005, 2023)
+@pytest.mark.mpl_image_compare  # instructs use of a baseline image
+def test_plot_solar_declination():
+    assert plot_solar_declination(
+            # start_date,
+            # end_date,
+            year=random_year,
+            title=f'Solar Declination {random_year}',
+            output_units='radians',
+            )
+
+
+random_year = random.randint(2005, 2023)
 @pytest.mark.mpl_image_compare
 def test_plot_solar_declination_five_years():
     assert plot_solar_declination_five_years(
             start_year=random_year,
             title="Five-Year Variation of Solar Declination",
-            output_units='degrees',
+            output_units='radians',
             )
