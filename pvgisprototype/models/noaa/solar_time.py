@@ -1,5 +1,6 @@
 from devtools import debug
 from datetime import datetime
+from datetime import timedelta
 from zoneinfo import ZoneInfo
 from typing import Optional
 from typing import Union
@@ -72,18 +73,18 @@ def calculate_true_solar_time_noaa(
         if not -1580 <= true_solar_time <= 1580:
             raise ValueError(f'The calculated true solar time `{true_solar_time}` is out of the expected range [-720, 720] minutes!')
 
-    # Convert to datetime object
-    hours, remainder = divmod(true_solar_time, 60)
-    minutes, seconds = divmod(remainder * 60, 60)
+    time_offset_timedelta = timedelta(minutes=true_solar_time)
+    true_solar_datetime = timestamp + time_offset_timedelta
     true_solar_time = datetime(
-            year=timestamp.year,
-            month=timestamp.month,
-            day=timestamp.day,
-            hour=int(hours),
-            minute=int(minutes),
-            second=int(seconds),
-            tzinfo=timestamp.tzinfo,
+            year=true_solar_datetime.year,
+            month=true_solar_datetime.month,
+            day=true_solar_datetime.day,
+            hour=int(true_solar_datetime.hour),
+            minute=int(true_solar_datetime.minute),
+            second=int(true_solar_datetime.second),
+            tzinfo=true_solar_datetime.tzinfo,
             )
+
     return true_solar_time
 
 
