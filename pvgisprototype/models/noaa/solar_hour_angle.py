@@ -37,6 +37,7 @@ def calculate_solar_hour_angle_noaa(
 
     Since the Earth rotates 15° per hour, each hour away from solar noon
     corresponds to an angular motion of the sun in the sky of 15°.
+
     Practically, the calculation converts a timestamp into a solar time.
 
     Parameters
@@ -66,8 +67,8 @@ def calculate_solar_hour_angle_noaa(
         `hour_angle = true_solar_time * 0.25 - 180`
 
     In the present implementation, we calculate the solar hour angle directly
-    to radians. A circle is 360 degrees, dividing by 1440 minutes in a day
-    equals to 0.25.
+    to radians. A circle is 360 degrees, dividing by 1440 minutes in a day,
+    each minute equals to 0.25 radians.
     """
     true_solar_time = calculate_true_solar_time_noaa(
         longitude, timestamp, timezone, time_output_units
@@ -77,7 +78,7 @@ def calculate_solar_hour_angle_noaa(
     solar_hour_angle = (true_solar_time_minutes - 720) * (pi / 720)
 
     if angle_output_units == 'radians' and not -pi <= solar_hour_angle <= pi:
-        raise ValueError("The hour angle in radians must range within [-π, π]")
+        raise ValueError(f'The hour angle in radians must range within [{-pi}, {pi}]')
 
     # elif angle_output_units == 'degrees' and not -180 <= solar_hour_angle <= 180:
     #     raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")
