@@ -107,7 +107,7 @@ app.add_typer(
     rich_help_panel=rich_help_panel_geometry,
 )
 app.add_typer(
-    time.app,
+    surface.app,
     name="surface",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_geometry,
