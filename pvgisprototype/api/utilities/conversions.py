@@ -60,13 +60,24 @@ def convert_float_to_radians_if_requested(angle: float, output_units: str) -> fl
     return radians(angle) if output_units == 'radians' else angle
 
 
-def convert_to_radians_if_requested(data_class: Any, output_units: str) -> Any:
-    """Convert angle from degrees to radians if requested, and create a new named tuple with
-    updated value and unit."""
-    if output_units == 'radians' and not data_class.unit == 'radians':
-        data_class.value = radians(data_class.value)
-        data_class.unit = 'radians'
-    return data_class
+def convert_to_radians_if_requested(data_input: Any, output_units: str) -> Any:
+    """Convert angle from degrees to radians for a single or an array of custom data structures if requested."""
+    debug(locals())
+    if output_units != 'radians':
+        return data_input
+
+    if isinstance(data_input, np.ndarray):
+        for data_class in data_input:
+            if data_class.unit != 'radians':
+                data_class.value = radians(data_class.value)
+                data_class.unit = 'radians'
+    else:
+        if data_input.unit != 'radians':
+            # data_class = replace(data_class, value=radians(data_class.value), unit='radians')
+            data_input.value = radians(data_input.value)
+            data_input.unit = 'radians'
+            
+    return data_input
 
 
 def convert_dictionary_to_table(dictionary):
