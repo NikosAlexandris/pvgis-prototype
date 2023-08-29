@@ -759,43 +759,6 @@ def incidence(
     )
 
 
-@app.command(
-    'incidence-effective',
-    no_args_is_help=True,
-    help='Calculate the effective solar incidence angle considering shadows',
-)
-def incidence_effective(
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    solar_declination: Annotated[Optional[float], typer_argument_solar_declination] = 0,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 0,
-    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
-    hour_angle: Annotated[Optional[float], typer_argument_hour_angle] = None,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-        ):
-    """Calculate the angle of incidence
-
-    The angle of incidence (also known as theta) is the angle between the
-    direct beam of sunlight and the line perpendicular (normal) to the surface.
-    If the sun is directly overhead and the surface is flat (horizontal), the
-    angle of incidence is 0°.
-    """
-    effective_solar_incidence_angle = calculate_effective_solar_incidence_angle(
-        longitude=longitude,
-        latitude=latitude,
-        hour_angle=hour_angle,
-        surface_tilt=surface_tilt,
-        surface_orientation=surface_orientation,
-        solar_azimuth=solar_azimuth,
-        solar_altitude=solar_altitude,
-        shadow_indicator=shadow_indicator,
-        horizon_heights=horizon_heights,
-        horizon_interval=horizon_interval,
-    )
-
-    return effective_solar_incidence_angle
-
-
 @app.command('hour-angle', no_args_is_help=True, help=':clock12: :globe_with_meridians: Calculate the hour angle (ω)')
 def hour_angle(
     solar_time: Annotated[float, typer_argument_solar_time],
