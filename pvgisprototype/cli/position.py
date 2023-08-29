@@ -343,7 +343,7 @@ def altitude(
         model = [
             model for model in SolarPositionModels if model != SolarPositionModels.all
         ]
-    solar_position = calculate_solar_altitude(
+    solar_altitude = calculate_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
