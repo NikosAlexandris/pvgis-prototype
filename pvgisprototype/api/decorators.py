@@ -1,7 +1,7 @@
-from pydantic import BaseModel
-from functools import wraps
-from typing import Callable
 from typing import Type
+from pydantic import BaseModel
+from typing import Callable
+from functools import wraps
 
 
 def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
@@ -14,11 +14,11 @@ def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
             else:
                 input_data = {**kwargs, **dict(zip(func.__annotations__.keys(), args))}
                 validated_input = input_model(**input_data)
-
             dictionary_input = {}
-            for k,v in validated_input:
+            for k, v in validated_input:
                 dictionary_input[k] = v
             return func(**dictionary_input)
-        
+
         return wrapper
+
     return decorator
