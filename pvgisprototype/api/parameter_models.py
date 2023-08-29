@@ -324,8 +324,8 @@ class ApplyAtmosphericRefraction(BaseModel):
     apply_atmospheric_refraction: bool
 
 
-class RefractedSolarAltitudeInput(BaseModel):
-    refracted_solar_altitude: float
+class RefractedSolarAltitudeModel(BaseModel):
+    refracted_solar_altitude: Union[float, RefractedSolarAltitude]
 
     @field_validator("refracted_solar_altitude")
     def refracted_solar_altitude_named_tuple(cls, input) -> RefractedSolarAltitude:
@@ -337,8 +337,8 @@ class RefractedSolarAltitudeInput(BaseModel):
             raise ValueError("Unsupported `refracted_solar_altitude` type provided")
 
 
-class RefractedSolarZenithInput(BaseModel):
-    refracted_solar_zenith: Optional[float]
+class RefractedSolarZenithModel(BaseModel):
+    refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith]
 
     @field_validator("refracted_solar_zenith")
     def refracted_solar_zenith_named_tuple(cls, input) -> RefractedSolarZenith:

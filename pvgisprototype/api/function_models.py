@@ -8,7 +8,7 @@ from .parameter_models import BaseTimeModel
 
 # Atmospheric effects
 from .parameter_models import ApplyAtmosphericRefraction
-from .parameter_models import RefractedSolarZenithInput
+from .parameter_models import RefractedSolarZenithModel
 
 # Earth orbit
 from .parameter_models import DaysInAYearModel
@@ -26,7 +26,7 @@ from .parameter_models import ElevationModel
 
 # Solar geometry
 
-from .parameter_models import RefractedSolarAltitudeInput
+from .parameter_models import RefractedSolarAltitudeModel
 from .parameter_models import SolarDeclinationModel
 from .parameter_models import SolarPositionModel
 
@@ -128,7 +128,7 @@ class CalculateSolarAltitudePVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     SolarTimeModelModel,
@@ -143,7 +143,7 @@ class CalculateSolarAzimuthPVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     SolarTimeModelModel,
@@ -160,7 +160,7 @@ class ModelSolarAltitudeInputModel(
     SolarPositionModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     BaseTimeOutputUnitsModel,
@@ -176,7 +176,7 @@ class ModelSolarAzimuthInputModel(
     SolarPositionModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     BaseTimeOutputUnitsModel,
@@ -192,7 +192,7 @@ class ModelSolarPositionInputModel(
     SolarPositionModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     BaseTimeOutputUnitsModel,
@@ -240,7 +240,7 @@ class CalculateSolarIncidenceJencoInputModel(
 
 class CalculateOpticalAirMassInputModel(
     ElevationModel,
-    RefractedSolarAltitudeInput,
+    RefractedSolarAltitudeModel,
     BaseAngleUnitsModel
 ):
     pass
