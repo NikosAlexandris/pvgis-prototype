@@ -30,7 +30,7 @@ from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
 
 
-@validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel)
 def calculate_solar_position_skyfield(
         longitude: Longitude,
         latitude: Latitude,
@@ -110,7 +110,7 @@ def calculate_solar_position_skyfield(
     return solar_position
 
 
-@validate_with_pydantic(CalculateSolarAltitudeAzimuthSkyfieldInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarAltitudeAzimuthSkyfieldInputModel)
 def calculate_solar_altitude_azimuth_skyfield(
         longitude: Longitude,
         latitude: Latitude,

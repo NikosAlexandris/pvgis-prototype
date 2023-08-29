@@ -11,7 +11,7 @@ from pvgisprototype.api.data_classes import Longitude
 from .time_offset import calculate_time_offset_noaa
 
 
-@validate_with_pydantic(CalculateTrueSolarTimeNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
 def calculate_true_solar_time_noaa(
         longitude: Longitude,   # radians
         timestamp: datetime, 
@@ -87,7 +87,7 @@ def calculate_true_solar_time_noaa(
     return true_solar_time
 
 
-@validate_with_pydantic(CalculateTrueSolarTimeNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(CalculateTrueSolarTimeNOAATimeSeriesInput)
 def calculate_true_solar_time_time_series_noaa(
         longitude: Longitude,   # radians
         timestamps: Union[datetime, Sequence[datetime]], 

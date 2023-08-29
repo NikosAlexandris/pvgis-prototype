@@ -33,7 +33,7 @@ def convert_south_to_north_radians_convention(azimuth_south_radians):
     return (azimuth_south_radians + pi) % 2 * pi
 
 
-@validate_with_pydantic(ModelSolarAzimuthInputModel, expand_args=True)
+@validate_with_pydantic(ModelSolarAzimuthInputModel)
 def model_solar_azimuth(
     longitude: Longitude,
     latitude: Latitude,

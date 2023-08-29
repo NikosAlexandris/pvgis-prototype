@@ -14,7 +14,7 @@ from .equation_of_time import calculate_equation_of_time_noaa
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 
 
-@validate_with_pydantic(CalculateTimeOffsetNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateTimeOffsetNOAAInput)
 def calculate_time_offset_noaa(
         longitude: Longitude, 
         timestamp: datetime, 

@@ -17,7 +17,7 @@ from pvgisprototype.models.noaa.solar_position import calculate_local_solar_time
 from pvgisprototype.models.skyfield.solar_time import calculate_solar_time_skyfield
 
 
-@validate_with_pydantic(ModelSolarTimeInputModel, expand_args=True)
+@validate_with_pydantic(ModelSolarTimeInputModel)
 def model_solar_time(
     longitude: Longitude,
     latitude: Latitude,

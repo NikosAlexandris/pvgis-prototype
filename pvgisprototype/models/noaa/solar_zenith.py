@@ -94,8 +94,7 @@ def atmospheric_refraction_for_below_horizon(
     return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
 
 
-@validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput,
-                        expand_args=True)
+@validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction(
         solar_zenith: float,  # radians
         angle_output_units: str = 'radians',
@@ -157,7 +156,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     return solar_zenith
 
 
-@validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAATimeSeriesInput)
 def adjust_solar_zenith_for_atmospheric_refraction_time_series(
         solar_zenith_series: np.ndarray,  # radians
         angle_output_units: str = 'radians',
@@ -196,7 +195,7 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     return adjusted_solar_zeniths
 
 
-@validate_with_pydantic(CalculateSolarZenithNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarZenithNOAAInput)
 def calculate_solar_zenith_noaa(
         latitude: Latitude,  # radians
         timestamp: datetime,
@@ -230,7 +229,7 @@ def calculate_solar_zenith_noaa(
     return solar_zenith
 
 
-@validate_with_pydantic(CalculateSolarZenithNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarZenithNOAATimeSeriesInput)
 def calculate_solar_zenith_time_series_noaa(
         latitude: Latitude,  # radians
         timestamps: Union[datetime, Sequence[datetime]],

@@ -17,7 +17,7 @@ from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
-@validate_with_pydantic(CalculateSolarAltitudePVISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
 def calculate_solar_altitude_pvis(
         longitude: Longitude,
         latitude: Latitude,

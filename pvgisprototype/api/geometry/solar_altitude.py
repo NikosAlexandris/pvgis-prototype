@@ -25,7 +25,7 @@ from pvgisprototype.models.pvis.solar_altitude import calculate_solar_altitude_p
 # from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_position_pvgis
 
 
-@validate_with_pydantic(ModelSolarAltitudeInputModel, expand_args=True)
+@validate_with_pydantic(ModelSolarAltitudeInputModel)
 def model_solar_altitude(
     longitude: Longitude,
     latitude: Latitude,

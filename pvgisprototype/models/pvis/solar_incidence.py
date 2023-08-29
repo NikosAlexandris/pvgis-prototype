@@ -10,7 +10,7 @@ from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.function_models import CalculateSolarIncidenceInputModel
 
 
-@validate_with_pydantic(CalculateSolarIncidenceInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarIncidenceInputModel)
 def calculate_solar_incidence(
         latitude: Latitude,
         solar_declination: float = 0,

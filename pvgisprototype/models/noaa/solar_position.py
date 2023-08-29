@@ -51,7 +51,7 @@ degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
 calculation_cache = {}
 
 
-@validate_with_pydantic(CalculateSolarPositionNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarPositionNOAAInput)
 def calculate_noaa_solar_position(
     longitude: Longitude,       # radians 
     latitude: Latitude,         # radians

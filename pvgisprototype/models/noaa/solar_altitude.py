@@ -21,7 +21,7 @@ from .solar_zenith import calculate_solar_zenith_noaa
 from .solar_zenith import calculate_solar_zenith_time_series_noaa
 
 
-@validate_with_pydantic(CalculateSolarAltitudeNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
 def calculate_solar_altitude_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude,     # radians
@@ -57,7 +57,7 @@ def calculate_solar_altitude_noaa(
     return solar_altitude
 
 
-@validate_with_pydantic(CalculateSolarAltitudeNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAltitudeNOAATimeSeriesInput)
 def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,  # radians
     latitude: Latitude,  # radians

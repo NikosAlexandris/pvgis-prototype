@@ -25,7 +25,7 @@ from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
 
 
-@validate_with_pydantic(CalculateSolarTimeSkyfieldInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarTimeSkyfieldInputModel)
 def calculate_solar_time_skyfield(
         longitude: Longitude,
         latitude: Latitude,

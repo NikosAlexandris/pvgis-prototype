@@ -9,7 +9,7 @@ from pvgisprototype.api.data_classes import SolarTime
 from .event_time import calculate_event_time_noaa
 
 
-@validate_with_pydantic(CalculateLocalSolarTimeNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
 def calculate_local_solar_time_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude, # radians

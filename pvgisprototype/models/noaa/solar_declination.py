@@ -16,7 +16,7 @@ from pvgisprototype.api.data_classes import SolarDeclination
 
 
 # @cache_result
-@validate_with_pydantic(CalculateSolarDeclinationNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
 def calculate_solar_declination_noaa(
         timestamp: datetime,
         angle_output_units: Optional[str] = 'radians'
@@ -44,7 +44,7 @@ def calculate_solar_declination_noaa(
         return declination
 
 
-@validate_with_pydantic(CalculateSolarDeclinationNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarDeclinationNOAATimeSeriesInput)
 def calculate_solar_declination_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
         angle_output_units: str = "radians"

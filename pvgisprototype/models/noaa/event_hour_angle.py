@@ -11,7 +11,7 @@ from pvgisprototype.api.data_classes import EventTime
 from .solar_declination import calculate_solar_declination_noaa
 
 
-@validate_with_pydantic(CalculateEventHourAngleNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateEventHourAngleNOAAInput)
 def calculate_event_hour_angle_noaa(
         latitude: Latitude, # radians
         timestamp: datetime,

@@ -91,7 +91,7 @@ def calculate_solar_azimuth_noaa(
     return solar_azimuth
 
 
-@validate_with_pydantic(CalculateSolarAzimuthNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAzimuthNOAATimeSeriesInput)
 def calculate_solar_azimuth_time_series_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude,     # radians

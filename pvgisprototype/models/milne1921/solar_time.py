@@ -21,7 +21,7 @@ from pvgisprototype.api.function_models import CalculateSolarTimeEoTInputModel
 
 
 
-@validate_with_pydantic(CalculateSolarTimeEoTInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarTimeEoTInputModel)
 def calculate_solar_time_eot(
         longitude: Longitude,
         latitude: Latitude,

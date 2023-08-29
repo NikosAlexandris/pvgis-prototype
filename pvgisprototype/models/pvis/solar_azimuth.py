@@ -25,7 +25,7 @@ def convert_east_to_north_radians_convention(azimuth_east_radians):
     return (azimuth_east_radians + 3 * pi / 2) % (2 * pi)
 
 
-@validate_with_pydantic(CalculateSolarAzimuthPVISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarAzimuthPVISInputModel)
 def calculate_solar_azimuth_pvis(
     longitude: Longitude,
     latitude: Latitude,

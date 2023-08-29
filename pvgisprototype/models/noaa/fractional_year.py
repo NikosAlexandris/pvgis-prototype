@@ -13,7 +13,7 @@ from pvgisprototype.api.data_classes import FractionalYear
 import numpy as np
 
 
-@validate_with_pydantic(CalculateFractionalYearNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateFractionalYearNOAAInput)
 def calculate_fractional_year_noaa(
         timestamp: datetime,
         angle_output_units: str = "radians",  # Returned, not used!
@@ -43,7 +43,7 @@ def calculate_fractional_year_noaa(
     return fractional_year
 
 
-@validate_with_pydantic(CalculateFractionalYearNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(CalculateFractionalYearNOAATimeSeriesInput)
 def calculate_fractional_year_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
         angle_output_units: str = "radians"

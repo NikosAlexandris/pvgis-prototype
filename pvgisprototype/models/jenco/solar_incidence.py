@@ -28,7 +28,7 @@ from pvgisprototype.api.function_models import CalculateSolarIncidenceJencoInput
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 
-@validate_with_pydantic(CalculateRelativeLongitudeInputModel, expand_args=True)
+@validate_with_pydantic(CalculateRelativeLongitudeInputModel)
 def calculate_relative_longitude(
         latitude: Latitude,
         surface_tilt: float = 0,
@@ -73,7 +73,7 @@ def calculate_relative_longitude(
     return relative_longitude
 
 
-@validate_with_pydantic(CalculateSolarIncidenceJencoInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarIncidenceJencoInputModel)
 def calculate_solar_incidence_jenco(
         longitude: Longitude,
         latitude: Latitude,

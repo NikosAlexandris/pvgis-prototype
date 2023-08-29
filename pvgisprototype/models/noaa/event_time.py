@@ -20,7 +20,7 @@ from ...api.utilities.timestamp import attach_requested_timezone
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 
 
-@validate_with_pydantic(CalculateEventTimeNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateEventTimeNOAAInput)
 def calculate_event_time_noaa(
     longitude: Longitude,   # radians
     latitude: Latitude, # radians

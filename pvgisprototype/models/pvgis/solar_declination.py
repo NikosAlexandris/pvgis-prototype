@@ -13,7 +13,7 @@ from pvgisprototype.api.function_models import CalculateSolarDeclinationPVISInpu
 from pvgisprototype.api.data_classes import SolarDeclination
 
 
-@validate_with_pydantic(CalculateSolarDeclinationPVISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
 def calculate_solar_declination_pvgis(
     timestamp: datetime,
     timezone: str = None,

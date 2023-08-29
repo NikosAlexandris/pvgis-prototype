@@ -14,7 +14,7 @@ from pvgisprototype.api.data_classes import SolarDeclination
 # from pvgisprototype.api.named_tuples import generate
 
 
-@validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)
 def calculate_solar_declination_hargreaves(
         timestamp: datetime = partial(datetime.now, tz=timezone.utc),
         days_in_a_year: float = 365.25,

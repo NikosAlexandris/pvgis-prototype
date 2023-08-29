@@ -9,7 +9,7 @@ from pvgisprototype.api.data_classes import EquationOfTime
 
 
 # @cache_result
-@validate_with_pydantic(CalculateEquationOfTimeNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateEquationOfTimeNOAAInput)
 def calculate_equation_of_time_noaa(
     timestamp: datetime,
     time_output_units: str = 'minutes',

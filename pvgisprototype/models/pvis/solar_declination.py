@@ -14,7 +14,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_noaa
 
 
-@validate_with_pydantic(CalculateFractionalYearPVISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateFractionalYearPVISInputModel)
 def calculate_fractional_year_pvis(
     timestamp: datetime,
     days_in_a_year: float = 365.25,
@@ -48,7 +48,7 @@ def calculate_fractional_year_pvis(
     return fractional_year
 
 
-@validate_with_pydantic(CalculateSolarDeclinationPVISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
 def calculate_solar_declination_pvis(
     timestamp: datetime,
     timezone: ZoneInfo,

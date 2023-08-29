@@ -19,7 +19,7 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateSolarTimePVGISInputModel
 
 
-@validate_with_pydantic(CalculateSolarTimePVGISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarTimePVGISInputModel)
 def calculate_solar_time_pvgis(
         longitude: Latitude,
         latitude: Longitude,

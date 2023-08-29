@@ -148,7 +148,7 @@ class MethodsForInexactMatches(str, Enum):
 #     return value
 
 
-# @validate_with_pydantic(Elevation, expand_args=True)
+# @validate_with_pydantic(Elevation)
 def adjust_elevation(
     elevation: Annotated[float, typer_argument_elevation],
 ):
@@ -213,7 +213,7 @@ def calculate_refracted_solar_altitude(
     return refracted_solar_altitude
 
 
-@validate_with_pydantic(CalculateOpticalAirMassInputModel, expand_args=True)
+@validate_with_pydantic(CalculateOpticalAirMassInputModel)
 def calculate_optical_air_mass(
     elevation: Annotated[float, typer_argument_elevation],
     refracted_solar_altitude: Annotated[float, typer_argument_refracted_solar_altitude],

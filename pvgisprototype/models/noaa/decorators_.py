@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Callable, Type
 
 
-def validate_with_pydantic(input_model: Type[BaseModel], expand_args: bool = False) -> Callable:
+def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
