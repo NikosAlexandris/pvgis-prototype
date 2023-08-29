@@ -38,13 +38,12 @@ def convert_to_radians_fastapi(angle: float) -> float:
 
 
 def convert_float_to_degrees_if_requested(angle: float, output_units: str) -> float:
-    """Convert angle from radians to degrees if requested."""
+    """Convert angle from radians to degrees if requested"""
     return degrees(angle) if output_units == 'degrees' else angle
 
 
 def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
-    """Convert angle from radians to degrees if requested, and create a new named tuple with
-    updated value and unit."""
+    """Convert angle from radians to degrees if requested"""
     if output_units == 'degrees' and not data_class.unit == 'degrees':
         data_class.value = degrees(data_class.value)
         data_class.unit = 'degrees'
@@ -57,7 +56,7 @@ def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
 
 
 def convert_float_to_radians_if_requested(angle: float, output_units: str) -> float:
-    """Convert angle from radians to radians if requested."""
+    """Convert angle from radians to radians if requested"""
     return radians(angle) if output_units == 'radians' else angle
 
 
