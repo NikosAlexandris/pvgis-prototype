@@ -48,7 +48,7 @@ from datetime import datetime
 from ..constants import AOI_CONSTANTS
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.data_classes import RefractedSolarAltitude
+from pvgisprototype.api.data_classes.models import RefractedSolarAltitude
 from ..geometry.models import SolarDeclinationModels
 from ..geometry.models import SolarIncidenceModels
 from ..geometry.models import SolarTimeModels
@@ -260,7 +260,7 @@ def calculate_refracted_solar_altitude_time_series(
     return refracted_solar_altitude_series
 
 
-@validate_with_pydantic(CalculateOpticalAirMassInputModel, expand_args=True)
+@validate_with_pydantic(CalculateOpticalAirMassInputModel)
 def calculate_optical_air_mass(
     elevation: Annotated[float, typer_argument_elevation],
     refracted_solar_altitude: Annotated[float, typer_argument_refracted_solar_altitude],
