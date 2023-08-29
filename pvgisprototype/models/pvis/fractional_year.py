@@ -1,11 +1,8 @@
-from devtools import debug
+from datetime import date
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateFractionalYearPVISInputModel
-from pvgisprototype.api.data_classes import FractionalYear
-from pvgisprototype.cli.typer_parameters import DAYS_IN_A_YEAR
 from datetime import datetime
-from datetime import date
-from datetime import timedelta
+from pvgisprototype.api.data_classes.models import FractionalYear
 from math import pi
 from math import isclose
 
@@ -21,7 +18,7 @@ def days_in_year(year):
     return delta.days
 
 
-@validate_with_pydantic(CalculateFractionalYearPVISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateFractionalYearPVISInputModel)
 def calculate_fractional_year_pvis(
     timestamp: datetime,
     angle_units: str = 'radians',
