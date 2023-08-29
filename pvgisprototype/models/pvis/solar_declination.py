@@ -1,13 +1,11 @@
-from devtools import debug
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from math import sin
-from math import asin
-
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateSolarDeclinationPVISInputModel
-from pvgisprototype.api.data_classes import SolarDeclination
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from pvgisprototype.api.data_classes.models import SolarDeclination
 from pvgisprototype.models.pvis.fractional_year import calculate_fractional_year_pvis
+from math import sin
+from math import asin
 
 
 @validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
@@ -55,17 +53,19 @@ def calculate_solar_declination_pvis(
     the Solar Position Algorithm (SPA) are typically used.
     """
     fractional_year = calculate_fractional_year_pvis(
-            timestamp=timestamp,
-            days_in_a_year=days_in_a_year,
-            angle_output_units='radians',
-            )
+        timestamp=timestamp,
+        days_in_a_year=days_in_a_year,
+        angle_output_units="radians",
+    )
     solar_declination = asin(
-            0.3978 * sin(
-                fractional_year.value - 1.4 + eccentricity_correction_factor * sin(
-                    fractional_year.value - perigee_offset
-                    )
-                )
-            )
-    solar_declination = SolarDeclination(value=solar_declination, unit='radians')
+        0.3978
+        * sin(
+            fractional_year.value
+            - 1.4
+            + eccentricity_correction_factor
+            * sin(fractional_year.value - perigee_offset)
+        )
+    )
+    solar_declination = SolarDeclination(value=solar_declination, unit="radians")
 
     return solar_declination
