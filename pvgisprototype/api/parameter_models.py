@@ -288,7 +288,7 @@ class SurfaceOrientationModel(BaseModel):
 #     )
 
 class SolarHourAngleModel(BaseModel):
-    solar_hour_angle: Union[confloat(ge=0, le=2*pi), SolarHourAngle]
+    solar_hour_angle: Union[confloat(ge=-pi, le=pi), SolarHourAngle]
     model_config = ConfigDict(
         description="""Solar hour angle.""",
     )
