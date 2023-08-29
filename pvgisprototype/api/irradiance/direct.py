@@ -198,16 +198,22 @@ def calculate_refracted_solar_altitude(
 
     This function implements the algorithm described by Hofierka :cite:`p:hofierka2002`.
     """
-    if not angle_input_units == 'degrees':
-        raise ValueError
+    if angle_input_units != "degrees":
+        raise ValueError(f"Only `degrees` are supported for `angle_input_units`.")
+
     atmospheric_refraction = (
-            0.061359
-            * (0.1594 + 1.123 *solar_altitude.value + 0.065656 * pow(solar_altitude.value, 2))
-            / (1 + 28.9344 *solar_altitude.value + 277.3971 * pow(solar_altitude.value, 2))
-            )
-    refracted_solar_altitude =solar_altitude.value + atmospheric_refraction
-    refracted_solar_altitude = convert_float_to_radians_if_requested(refracted_solar_altitude,
-                                    angle_output_units)
+        0.061359
+        * (
+            0.1594
+            + 1.123 * solar_altitude.value
+            + 0.065656 * pow(solar_altitude.value, 2)
+        )
+        / (1 + 28.9344 * solar_altitude.value + 277.3971 * pow(solar_altitude.value, 2))
+    )
+    refracted_solar_altitude = solar_altitude.value + atmospheric_refraction
+    refracted_solar_altitude = convert_float_to_radians_if_requested(
+        refracted_solar_altitude, angle_output_units
+    )
 
     # debug(locals())
     return refracted_solar_altitude
