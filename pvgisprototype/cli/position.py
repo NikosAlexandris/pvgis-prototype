@@ -121,80 +121,12 @@ def main(
 
 
 @app.command(
-        no_args_is_help=True,
-        help=':sun: :clock12: :triangular_ruler: NOAA\'s general solar position calculations',
-)
-# @debug_if_needed(app)
-def noaa(
-    ctx: typer.Context,
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
-    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
-):
-    """
-    """
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamp = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-    
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamp.tzinfo != utc_zoneinfo:
-
-        # Note the input timestamp and timezone
-        user_requested_timestamp = timestamp
-        user_requested_timezone = timezone
-
-        timestamp = timestamp.astimezone(utc_zoneinfo)
-        timezone = utc_zoneinfo
-        typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
-
-    solar_position_calculations = calculate_noaa_solar_position(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
-    )
-    # Convert output timestamp back to the user-requested timezone
-    try:
-        timestamp = user_requested_timestamp
-        timezone = user_requested_timezone
-    except:
-        print(f'I guess there where no user requested timestamp and zone')
-
-    print_noaa_solar_position_table(
-        longitude,
-        latitude,
-        timestamp,
-        timezone,
-        solar_position_calculations, 
-        rounding_places, 
-        user_requested_timestamp=user_requested_timestamp, 
-        user_requested_timezone=user_requested_timezone,
-        angle_output_units=angle_output_units,
-        verbose=verbose,
-    )
-
-@app.command(
         'overview',
         no_args_is_help=True,
         help='⦩⦬ Calculate important solar position parameters',
  )
 # @debug_if_needed(app)
-def position(
+def overview(
     ctx: typer.Context,
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -274,18 +206,88 @@ def position(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     print_solar_position_table(
-        longitude,
-        latitude,
-        timestamp,
-        timezone,
-        solar_position,
-        rounding_places,
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        table=solar_position,
+        rounding_places=rounding_places,
         declination=True,
+        hour_angle=True,
+        zenith=True,
         altitude=True,
         azimuth=True,
-        zenith=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
+    )
+
+
+@app.command(
+        no_args_is_help=True,
+        help=':sun: :clock12: :triangular_ruler: NOAA\'s general solar position calculations',
+)
+# @debug_if_needed(app)
+def noaa(
+    ctx: typer.Context,
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+):
+    """
+    """
+    # Initialize with None ---------------------------------------------------
+    user_requested_timestamp = None
+    user_requested_timezone = None
+    # -------------------------------------------- Smarter way to do this? ---
+    
+    utc_zoneinfo = ZoneInfo("UTC")
+    if timestamp.tzinfo != utc_zoneinfo:
+
+        # Note the input timestamp and timezone
+        user_requested_timestamp = timestamp
+        user_requested_timezone = timezone
+
+        timestamp = timestamp.astimezone(utc_zoneinfo)
+        timezone = utc_zoneinfo
+        typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
+
+    solar_position_calculations = calculate_noaa_solar_position(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+    )
+    # Convert output timestamp back to the user-requested timezone
+    try:
+        timestamp = user_requested_timestamp
+        timezone = user_requested_timezone
+    except:
+        print(f'I guess there where no user requested timestamp and zone')
+
+    print_noaa_solar_position_table(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        solar_position_calculations=solar_position_calculations, 
+        rounding_places=rounding_places,
+        user_requested_timestamp=user_requested_timestamp, 
+        user_requested_timezone=user_requested_timezone,
+        angle_output_units=angle_output_units,
+        verbose=verbose,
     )
 
 
