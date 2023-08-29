@@ -62,7 +62,6 @@ def convert_float_to_radians_if_requested(angle: float, output_units: str) -> fl
 
 def convert_to_radians_if_requested(data_input: Any, output_units: str) -> Any:
     """Convert angle from degrees to radians for a single or an array of custom data structures if requested."""
-    debug(locals())
     if output_units != 'radians':
         return data_input
 
