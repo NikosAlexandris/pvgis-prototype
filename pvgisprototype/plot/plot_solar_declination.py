@@ -140,11 +140,11 @@ def plot_solar_declination_five_years(
 ):
     start_date = datetime(start_year, 1, 1)
     end_date = datetime(start_year + 5, 1, 1)
-    fig = plot_solar_declination(
+    figure = plot_solar_declination(
         start_date=start_date, end_date=end_date, title=title, output_units=output_units
     )
     # fig.savefig(f"solar_declination_{start_year}_to_{end_date.year}.png")
-    return fig
+    return figure
 
 
 def plot_solar_declination_one_year_bokeh(
