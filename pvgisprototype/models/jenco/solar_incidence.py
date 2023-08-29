@@ -24,6 +24,8 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateRelativeLongitudeInputModel
 from pvgisprototype.api.function_models import CalculateSolarIncidenceJencoInputModel
 
+import numpy as np
+
 
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
@@ -204,22 +206,52 @@ def calculate_solar_incidence_jenco(
     return solar_incidence
 
 
-    )
-    relative_longitude = calculate_relative_longitude(
-        latitude,
-        surface_tilt,
-        surface_orientation
-    )
-    
-    sine_solar_incidence = (
-        c_inclined_31 * cos(hour_angle.value - relative_longitude.value) + c_inclined_33
-    )
+def calculate_solar_incidence_time_series_jenco(
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamps: np.array,
+    timezone: Optional[ZoneInfo] = None,
+    surface_tilt: float = 45,
+    surface_orientation: float = 180,
+    time_output_units: str = 'minutes',
+    angle_output_units: str = 'radians',
+) -> np.array:
+    solar_incidence_angle_series = np.empty_like(timestamps, dtype=float)
 
-    solar_incidence = SolarIncidence(
-        value=asin(sine_solar_incidence),
-        unit=angle_output_units
+    solar_declination_series = calculate_solar_declination_time_series_noaa(
+        timestamps=timestamps,
+        angle_output_units=angle_output_units,
     )
-    return solar_incidence
+    solar_declination_series = np.array([item.value for item in solar_declination_series])
+    sine_relative_inclined_latitude = -(
+        cos(latitude.value) * sin(surface_tilt) * cos(surface_orientation)
+        + sin(latitude.value) * cos(surface_tilt)
+    )
+    relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
+    c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
+        solar_declination_series
+    )
+    c_inclined_33_series = sine_relative_inclined_latitude * np.sin(
+        solar_declination_series
+    )
+    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+        longitude=longitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        time_output_units=time_output_units,
+        angle_output_units=angle_output_units,
+    )
+    solar_hour_angle_series = np.array([item.value for item in solar_hour_angle_series])
+    relative_longitude = calculate_relative_longitude(
+        latitude, surface_tilt, surface_orientation
+    )
+    sine_solar_incidence_series = (
+        c_inclined_31_series * np.cos(solar_hour_angle_series - relative_longitude.value)
+        + c_inclined_33_series
+    )
+    solar_incidence_angle_series = np.arcsin(sine_solar_incidence_series)
+
+    return solar_incidence_angle_series
 
 
 # @validate_with_pydantic()
