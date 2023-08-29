@@ -48,6 +48,7 @@ from datetime import datetime
 from ..constants import AOI_CONSTANTS
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
+from pvgisprototype.api.data_classes import RefractedSolarAltitude
 from ..geometry.models import SolarDeclinationModels
 from ..geometry.models import SolarIncidenceModels
 from ..geometry.models import SolarTimeModels
@@ -220,7 +221,7 @@ def calculate_refracted_solar_altitude(
 
 
 def calculate_refracted_solar_altitude_time_series(
-    solar_altitudes: np.ndarray,
+    solar_altitude_series: np.ndarray,
     angle_input_units: str = 'degrees',
     angle_output_units: str = 'radians',
 ):
@@ -231,24 +232,30 @@ def calculate_refracted_solar_altitude_time_series(
     if angle_input_units != "degrees":
         raise ValueError("Only degrees are supported for angle_input_units.")
 
-    # Vectorized calculation of atmospheric refraction
+    solar_altitude_values = np.array(
+        [solar_altitude.value for solar_altitude in solar_altitude_series]
+    )
     atmospheric_refraction = (
         0.061359
         * (
             0.1594
-            + 1.123 * solar_altitude_series
-            + 0.065656 * np.power(solar_altitude_series, 2)
+            + 1.123 * solar_altitude_values
+            + 0.065656 * np.power(solar_altitude_values, 2)
         )
         / (
             1
-            + 28.9344 * solar_altitude_series
-            + 277.3971 * np.power(solar_altitude_series, 2)
+            + 28.9344 * solar_altitude_values
+            + 277.3971 * np.power(solar_altitude_values, 2)
         )
     )
-    refracted_solar_altitude_series = solar_altitude_series + atmospheric_refraction
-    refracted_solar_altitude_series = convert_to_radians_if_requested(
-        refracted_solar_altitude_series, angle_output_units
-    )
+    refracted_solar_altitude_values = solar_altitude_values + atmospheric_refraction
+    refracted_solar_altitude_series = [
+        RefractedSolarAltitude(value=value, unit="radians") for value in refracted_solar_altitude_values
+    ]
+    refracted_solar_altitude_series = [
+        convert_to_degrees_if_requested(altitude, angle_output_units)
+        for altitude in refracted_solar_altitude_series
+    ]
 
     return refracted_solar_altitude_series
 
