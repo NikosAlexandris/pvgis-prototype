@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
+from zoneinfo import ZoneInfo
+from math import radians
 
 from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
@@ -12,8 +14,9 @@ from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_su
 from pvgisprototype.models.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.models.milne1921.solar_time import calculate_solar_time_eot
 from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_time_pvgis
-from pvgisprototype.api.geometry.time_models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModels
 
+from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 
@@ -114,7 +117,17 @@ def test_calculate_solar_time(
         timezone,
         model,
         expected_solar_time):
-    result = calculate_solar_time(longitude, latitude, timestamp, timezone, model)
+    longitude = radians(longitude)
+    latitude = radians(latitude)
+    timezone = ZoneInfo(timezone)
+    result = calculate_solar_time(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        models=[model],
+    )
+    debug(locals())
     assert result == pytest.approx(expected_solar_time)
 
 
