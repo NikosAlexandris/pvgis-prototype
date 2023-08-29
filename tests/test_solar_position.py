@@ -1,7 +1,7 @@
 import pytest
 from pvgisprototype.api.geometry.solar_position import calculate_solar_position
-from pvgisprototype.api.geometry.solar_models import SolarPositionModels
-from pvgisprototype.api.geometry.solar_position import calculate_solar_position_pvgis
+from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_position_pvgis
 from pvgisprototype.api.data_structures import SolarGeometryDayConstants
 from pvgisprototype.api.data_structures import SolarGeometryDayVariables
 from pvgisprototype.plot.plot_solar_position import plot_daily_solar_position
@@ -12,14 +12,16 @@ from pvgisprototype.plot.plot_solar_position import plot_daily_solar_azimuth
 from pvgisprototype.plot.plot_solar_position import plot_yearly_solar_position
 from pvgisprototype.plot.plot_solar_position import plot_analemma
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 
 models = [
+        SolarPositionModels.noaa,
         SolarPositionModels.pysolar,
         SolarPositionModels.pvis,
         # SolarPositionModels.pvgis,
-        SolarPositionModels.skyfield,
         SolarPositionModels.suncalc,
+        SolarPositionModels.skyfield,
 ]
 dates = [
         datetime.now().replace(tzinfo=timezone.utc, year=year) for year in range(2000, 2010)
@@ -41,8 +43,9 @@ invalid_coordinates = [
 def test_calculate_solar_position(model):
     longitude = 0.0
     latitude = 0.0
-    timestamp = datetime.now().replace(tzinfo=timezone.utc)
-    altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
+    utc_zoneinfo = ZoneInfo('UTC')
+    timestamp = datetime.now(utc_zoneinfo)
+    timezone = utc_zoneinfo
     # handling the 'pvgis' model
     if model == calculate_solar_position_pvgis:
         solar_geometry_day_constants = SolarGeometryDayConstants(
@@ -77,8 +80,34 @@ def test_calculate_solar_position(model):
         # assert sun_azimuth == expected_sun_azimuth
 
     else:
-        assert isinstance(altitude, float)
-        assert isinstance(azimuth, float)
+        solar_position = calculate_solar_position(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            models=[model],
+        )
+        print(f' Result : {solar_position}')
+        for model_result in solar_position:
+            model_name = model_result.get('Model', None)
+            declination = model_result.get('Declination', None)
+            if declination is not None:
+                assert isinstance(declination, float)
+            altitude = model_result.get('Altitude', None)
+            if altitude is not None:
+                assert isinstance(altitude, float)
+            azimuth = model_result.get('Azimuth', None)
+            if azimuth is not None:
+                assert isinstance(azimuth, float)
+            zenith = model_result.get('Zenith', None)
+            if zenith is not None:
+                assert isinstance(zenith, float)
+            incidence = model_result.get('Incidence', None)
+            if incidence is not None:
+                assert isinstance(incidence, float)
+            units = model_result.get('Units', None)
+            if units is not None:
+                assert isinstance(units, str)
 
 
 # @pytest.mark.parametrize("longitude, latitude", valid_coordinates)
