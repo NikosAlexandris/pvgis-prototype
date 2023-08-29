@@ -61,10 +61,12 @@ def model_solar_incidence(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
         )
-        hour_angle = calculate_hour_angle(
-            solar_time=solar_time,
-            angle_output_units=angle_output_units,
-        )
+        if not hour_angle:
+            hour_angle = calculate_hour_angle(
+                solar_time=solar_time,
+                angle_output_units=angle_output_units,
+            )
+            hour_angle = hour_angle.value
         solar_incidence = calculate_solar_incidence_jenco(
             longitude=longitude,
             latitude=latitude,
