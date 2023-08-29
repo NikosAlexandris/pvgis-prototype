@@ -77,7 +77,6 @@ def calculate_solar_declination(
     angle_output_units: str = 'radians',
 ) -> List:
     """Calculate the solar declination angle"""
-    debug(locals())
     results = []
     for model in models:
         if model != SolarDeclinationModels.all:  # ignore 'all' in the enumeration
