@@ -10,15 +10,15 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
-from pvgisprototype.cli.typer_parameters import SOLAR_CONSTANT
+from pvgisprototype.api.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
-from pvgisprototype.cli.typer_parameters import DAYS_IN_A_YEAR
+from pvgisprototype.api.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.cli.typer_parameters import PERIGEE_OFFSET
+from pvgisprototype.api.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer_parameters import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.cli.typer_parameters import typer_option_random_day
-from pvgisprototype.cli.typer_parameters import RANDOM_DAY_FLAG
+from pvgisprototype.api.constants import RANDOM_DAY_FLAG_DEFAULT
 
 
 app = typer.Typer(
@@ -40,7 +40,7 @@ def calculate_extraterrestrial_normal_irradiance(
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    random_day: Annotated[bool, typer_option_random_day] = RANDOM_DAY_FLAG
+    random_day: Annotated[bool, typer_option_random_day] = RANDOM_DAY_FLAG_DEFAULT
 ) -> float:
     """Calculate the extraterrestial irradiance for the given day of the year.
 
