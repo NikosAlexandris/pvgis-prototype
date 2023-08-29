@@ -17,31 +17,35 @@ from numpy import ndarray
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
-from pvgisprototype.api.data_classes import EccentricityCorrectionFactor
-from pvgisprototype.api.data_classes import PerigeeOffset
-from pvgisprototype.api.data_classes import RefractedSolarAltitude
-from pvgisprototype.api.data_classes import RefractedSolarZenith
-from pvgisprototype.api.data_classes import SurfaceTilt
-from pvgisprototype.api.data_classes import SurfaceOrientation
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import HourAngleSunrise
-from pvgisprototype.api.data_classes import SolarTime
-from pvgisprototype.api.data_classes import TrueSolarTime
-from pvgisprototype.api.data_classes import EquationOfTime
-from pvgisprototype.api.data_classes import FractionalYear
-from pvgisprototype.api.data_classes import TimeOffset
-from pvgisprototype.api.data_classes import EventTime
-from pvgisprototype.api.data_classes import HourAngle
-from pvgisprototype.api.data_classes import SolarAltitude
-from pvgisprototype.api.data_classes import SolarAzimuth
-from pvgisprototype.api.data_classes import CompassSolarAzimuth
-from pvgisprototype.api.data_classes import SolarDeclination
-from pvgisprototype.api.data_classes import SolarIncidence
-from pvgisprototype.api.data_classes import SolarHourAngle
-from pvgisprototype.api.data_classes import SolarZenith
-from pvgisprototype.api.data_classes import SolarPosition
-from pvgisprototype.api.data_classes import Elevation
+from pvgisprototype.api.data_classes.models import EccentricityCorrectionFactor
+from pvgisprototype.api.data_classes.models import PerigeeOffset
+from pvgisprototype.api.data_classes.models import RefractedSolarAltitude
+from pvgisprototype.api.data_classes.models import RefractedSolarZenith
+from pvgisprototype.api.data_classes.models import SurfaceTilt
+from pvgisprototype.api.data_classes.models import SurfaceOrientation
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import HourAngleSunrise
+from pvgisprototype.api.data_classes.models import SolarTime
+from pvgisprototype.api.data_classes.models import TrueSolarTime
+from pvgisprototype.api.data_classes.models import EquationOfTime
+from pvgisprototype.api.data_classes.models import FractionalYear
+from pvgisprototype.api.data_classes.models import TimeOffset
+from pvgisprototype.api.data_classes.models import EventTime
+from pvgisprototype.api.data_classes.models import HourAngle
+from pvgisprototype.api.data_classes.models import SolarAltitude
+from pvgisprototype.api.data_classes.models import SolarAzimuth
+from pvgisprototype.api.data_classes.models import CompassSolarAzimuth
+from pvgisprototype.api.data_classes.models import SolarDeclination
+from pvgisprototype.api.data_classes.models import SolarIncidence
+from pvgisprototype.api.data_classes.models import SolarHourAngle
+from pvgisprototype.api.data_classes.models import SolarZenith
+from pvgisprototype.api.data_classes.models import SolarPosition
+from pvgisprototype.api.data_classes.models import Elevation
+
+from pvgisprototype.api.constants import DAYS_IN_A_YEAR
+from pvgisprototype.api.constants import PERIGEE_OFFSET
+from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
 
 
 # Where?
@@ -171,17 +175,6 @@ class BaseAngleInternalUnitsModel(BaseModel):  # NOTE: Maybe deprecate
         return v
 
 
-# class BaseOutputUnitsModel(BaseModel):
-#     output_units: str
-
-#     @field_validator("output_units")
-#     @classmethod
-#     def validate_angle_output_units(cls, v):
-#         valid_units = ["radians", "degrees"]
-#         if v not in valid_units:
-#             raise ValueError(f"angle_output_units must be one of {valid_units}")
-
-
 class BaseAngleOutputUnitsModel(BaseModel):
     angle_output_units: str
     model_config = ConfigDict(
@@ -224,12 +217,12 @@ class SolarPositionModel(BaseModel):
 
 
 class DaysInAYearModel(BaseModel):
-    days_in_a_year: float = 365.25  # TODO: Validator for this value if never changes
+    days_in_a_year: float = DAYS_IN_A_YEAR  # TODO: Validator 
 
 
 class EarthOrbitModel(DaysInAYearModel):
-    eccentricity_correction_factor: float = 0.03344
-    perigee_offset: float = 0.048869
+    perigee_offset: float = PERIGEE_OFFSET
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR
 
 
 class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
@@ -237,7 +230,6 @@ class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
 
 
 class SolarTimeModel(BaseModel):
-    # solar_time: Union[confloat(ge=0, le=24), SolarTime]
     solar_time: Union[time, datetime]
     model_config = ConfigDict(
         description="""The solar time (ST) is a calculation of the passage of time based
@@ -249,7 +241,7 @@ class SolarTimeModel(BaseModel):
 # Solar surface
 
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt]
+    surface_tilt: Union[confloat(ge=-pi/2, le=pi/2), SurfaceTilt]
     model_config = ConfigDict(
         description="""Surface tilt (or slope) (β) is the angle between the inclined
         surface (slope) and the horizontal plane.""",
@@ -266,7 +258,7 @@ class SurfaceTiltModel(BaseModel):
 
 
 class SurfaceOrientationModel(BaseModel):
-    surface_orientation: Union[confloat(ge=0, le=2 * pi), SurfaceOrientation] = 180
+    surface_orientation: Union[confloat(ge=0, le=2*pi), SurfaceOrientation] = 180
     model_config = ConfigDict(
         description="""Surface orientation (also known as aspect or azimuth) is the projected angle measured clockwise from true north"""
     )
@@ -281,16 +273,10 @@ class SurfaceOrientationModel(BaseModel):
             raise ValueError("Unsupported surface_orientation type provided")
 
 
-# class HourAngleModel(BaseModel):
-#     hour_angle: Union[confloat(ge=0, le=1), HourAngle]
-#     model_config = ConfigDict(
-#         description="""Solar hour angle.""",
-#     )
-
 class SolarHourAngleModel(BaseModel):
     solar_hour_angle: Union[confloat(ge=-pi, le=pi), SolarHourAngle]
     model_config = ConfigDict(
-        description="""Solar hour angle.""",
+        description="""Solar hour angle""",
     )
 
     @field_validator("solar_hour_angle")
@@ -348,24 +334,6 @@ class RefractedSolarZenithModel(BaseModel):
             return RefractedSolarZenith(value=input, unit="radians")
         else:
             raise ValueError("Unsupported `refracted_solar_zenith` type provided")
-
-
-# class SolarTimeInput(
-#         ValidatedInputToDict,
-#         SolarPositionModel
-# ):
-#     pass
-
-
-# class SolarIncidenceInput(
-#     SolarTimeInput,
-#     SurfaceTiltModel,
-#     SurfaceOrientationModel,
-# ):
-#     random_time: bool = False
-#     hour_angle: float
-#     rounding_places: int = 5
-#     verbose: bool = False
 
 
 class ElevationModel(BaseModel):
