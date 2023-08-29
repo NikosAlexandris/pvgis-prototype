@@ -2,9 +2,8 @@ from devtools import debug
 from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.models.jenco.solar_incidence import calculate_solar_incidence_jenco
-from pvgisprototype.models.jenco.solar_incidence import calculate_effective_solar_incidence_angle
-from pvgisprototype.api.data_classes.models import Latitude
-from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes import Longitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.data_classes.models import SolarIncidence
@@ -83,25 +82,6 @@ def model_solar_incidence(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             verbose=verbose,
-        )
-        solar_incidence = convert_to_degrees_if_requested(
-            solar_incidence,
-            angle_output_units,
-        )
-
-    if solar_incidence_model.value == SolarIncidenceModels.effective:
-
-        solar_incidence = calculate_effective_solar_incidence_angle(
-            longitude=longitude,
-            latitude=latitude,
-            hour_angle=hour_angle,
-            surface_tilt=surface_tilt,
-            surface_orientation=surface_orientation,
-            solar_azimuth=solar_azimuth,
-            solar_altitude=solar_altitude,
-            shadow_indicator=shadow_indicator,
-            horizon_heights=horizon_heights,
-            horizon_interval=horizon_interval,
         )
         solar_incidence = convert_to_degrees_if_requested(
             solar_incidence,
