@@ -1,17 +1,23 @@
-from devtools import debug
-from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.models.jenco.solar_incidence import calculate_solar_incidence_jenco
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.data_classes.models import SolarIncidence
-from .models import SolarIncidenceModels
 from .models import SolarTimeModels
-from typing import List
+from .models import SolarIncidenceModels
 from pathlib import Path
+from typing import List
+from pvgisprototype.api.data_classes.models import SolarIncidence
+from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.cli.typer_parameters import SURFACE_TILT
+from pvgisprototype.cli.typer_parameters import SURFACE_ORIENTATION
+from pvgisprototype.cli.typer_parameters import REFRACTED_SOLAR_ZENITH_ANGLE
+from pvgisprototype.cli.typer_parameters import DAYS_IN_A_YEAR
+from pvgisprototype.cli.typer_parameters import PERIGEE_OFFSET
+from pvgisprototype.cli.typer_parameters import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.cli.typer_parameters import ANGLE_OUTPUT_UNITS
 
 
 def model_solar_incidence(
@@ -23,26 +29,25 @@ def model_solar_incidence(
     random_time: bool = False,
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.effective,
     hour_angle: float = None,
-    surface_tilt: float = 45,
-    surface_orientation: float = 180,
+    surface_tilt: float = SURFACE_TILT,
+    surface_orientation: float = SURFACE_ORIENTATION,
     shadow_indicator: Path = None,
     horizon_heights: List = None,
     horizon_interval: float = None,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,  # radians
-    days_in_a_year: float = 365.25,
-    perigee_offset: float = 0.048869,
-    eccentricity_correction_factor: float = 0.01672,
+    refracted_solar_zenith: float = REFRACTED_SOLAR_ZENITH_ANGLE,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    time_output_units: str = "minutes",
+    angle_units: str = "radians",
+    angle_output_units: str = ANGLE_OUTPUT_UNITS,
     verbose: bool = False,
 ) -> SolarIncidence:
     """ """
     if solar_incidence_model.value == SolarIncidenceModels.jenco:
-
         solar_time = model_solar_time(
             longitude=longitude,
             latitude=latitude,
@@ -98,24 +103,22 @@ def calculate_solar_incidence(
     timezone: ZoneInfo = None,
     random_time: bool = False,
     solar_incidence_models: List[SolarIncidenceModels] = [SolarIncidenceModels.jenco],
-    surface_tilt: float = 45,
-    surface_orientation: float = 180,
+    surface_tilt: float = SURFACE_TILT,
+    surface_orientation: float = SURFACE_ORIENTATION,
     # shadow_indicator: Path = None,
     horizon_heights: List[float] = None,
     horizon_interval: float = None,
-    days_in_a_year: float = 365.25,
-    perigee_offset: float = 0.048869,
-    eccentricity_correction_factor: float = 0.01672,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    time_output_units: str = "minutes",
+    angle_units: str = "radians",
+    angle_output_units: str = ANGLE_OUTPUT_UNITS,
     verbose: bool = False,
 ) -> List:
-    """
-    Calculates the solar Incidence angle for the selected models and returns the results in a table.
-    """
+    """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
     results = []
     for model in solar_incidence_models:
         if model != SolarIncidenceModels.all:  # ignore 'all' in the enumeration
@@ -141,9 +144,11 @@ def calculate_solar_incidence(
                 angle_output_units=angle_output_units,
                 verbose=verbose,
             )
-            results.append({
-                'Model': model.value,
-                'Incidence': solar_incidence.value,
-                'Units': solar_incidence.unit,  # Don't trust me -- Redesign Me!
-            })
+            results.append(
+                {
+                    "Model": model.value,
+                    "Incidence": solar_incidence.value,
+                    "Units": solar_incidence.unit,  # Don't trust me -- Redesign Me!
+                }
+            )
     return results
