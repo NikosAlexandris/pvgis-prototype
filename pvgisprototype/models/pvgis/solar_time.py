@@ -12,9 +12,9 @@ from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.image_offset_prototype import get_image_offset
 
-from pvgisprototype.api.data_classes import SolarTime
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes.models import SolarTime
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateSolarTimePVGISInputModel
 

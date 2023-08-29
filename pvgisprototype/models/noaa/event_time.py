@@ -5,9 +5,9 @@ from datetime import time
 from datetime import timedelta
 from pvgisprototype.api.decorators import validate_with_pydantic
 from .noaa_models import CalculateEventTimeNOAAInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import EventTime
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import EventTime
 from .equation_of_time import calculate_equation_of_time_noaa
 from .solar_declination import calculate_solar_declination_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_noaa

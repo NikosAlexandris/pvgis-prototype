@@ -14,11 +14,11 @@ from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import ctx_attach_requested_timezone
 
-from pvgisprototype.api.data_classes import RelativeLongitude
-from pvgisprototype.api.data_classes import SolarIncidence
-from pvgisprototype.api.data_classes import HorizonHeight
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes.models import RelativeLongitude
+from pvgisprototype.api.data_classes.models import SolarIncidence
+from pvgisprototype.api.data_classes.models import HorizonHeight
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateRelativeLongitudeInputModel

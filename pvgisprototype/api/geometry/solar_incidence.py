@@ -3,11 +3,11 @@ from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.models.jenco.solar_incidence import calculate_solar_incidence_jenco
 from pvgisprototype.models.jenco.solar_incidence import calculate_effective_solar_incidence_angle
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.data_classes import SolarIncidence
+from pvgisprototype.api.data_classes.models import SolarIncidence
 from .models import SolarIncidenceModels
 from .models import SolarTimeModels
 from typing import List

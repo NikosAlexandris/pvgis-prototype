@@ -5,8 +5,8 @@ from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
 from .noaa_models import CalculateTimeOffsetNOAAInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import TimeOffset
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import TimeOffset
 from .equation_of_time import calculate_equation_of_time_noaa
 
 

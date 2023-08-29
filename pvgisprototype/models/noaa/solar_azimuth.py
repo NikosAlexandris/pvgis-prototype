@@ -19,9 +19,9 @@ from pvgisprototype.models.noaa.solar_zenith import calculate_solar_zenith_time_
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarAzimuthNOAAInput
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarAzimuthNOAATimeSeriesInput
-from pvgisprototype.api.data_classes import SolarAzimuth
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes.models import SolarAzimuth
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput, expand_args=True)

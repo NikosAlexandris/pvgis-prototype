@@ -9,8 +9,8 @@ from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarHourAngleNOAAInput
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarHourAngleNOAATimeSeriesInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import SolarHourAngle
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import SolarHourAngle
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 import numpy as np
 

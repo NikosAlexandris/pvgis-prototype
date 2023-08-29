@@ -10,11 +10,11 @@ from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarAltitudeNOAAInput
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarAltitudeNOAATimeSeriesInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import SolarHourAngle
-from pvgisprototype.api.data_classes import SolarZenith
-from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import SolarHourAngle
+from pvgisprototype.api.data_classes.models import SolarZenith
+from pvgisprototype.api.data_classes.models import SolarAltitude
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from .solar_zenith import calculate_solar_zenith_noaa

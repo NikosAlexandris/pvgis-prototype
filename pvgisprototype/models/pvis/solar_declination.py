@@ -7,9 +7,9 @@ from math import asin
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateFractionalYearPVISInputModel
-from pvgisprototype.api.data_classes import FractionalYear
+from pvgisprototype.api.data_classes.models import FractionalYear
 from pvgisprototype.api.function_models import CalculateSolarDeclinationPVISInputModel
-from pvgisprototype.api.data_classes import SolarDeclination
+from pvgisprototype.api.data_classes.models import SolarDeclination
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_noaa
 

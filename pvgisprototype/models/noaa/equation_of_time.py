@@ -5,7 +5,7 @@ from .fractional_year import calculate_fractional_year_noaa
 from math import sin
 from math import cos
 
-from pvgisprototype.api.data_classes import EquationOfTime
+from pvgisprototype.api.data_classes.models import EquationOfTime
 
 
 # @cache_result

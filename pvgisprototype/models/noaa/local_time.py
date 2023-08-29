@@ -3,9 +3,9 @@ from datetime import timedelta
 from datetime import time
 from pvgisprototype.api.decorators import validate_with_pydantic
 from .noaa_models import CalculateLocalSolarTimeNOAAInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import SolarTime
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import SolarTime
 from .event_time import calculate_event_time_noaa
 
 

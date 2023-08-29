@@ -10,7 +10,7 @@ from pvgisprototype.models.pvis.solar_declination import calculate_solar_declina
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateSolarDeclinationPVISInputModel
-from pvgisprototype.api.data_classes import SolarDeclination
+from pvgisprototype.api.data_classes.models import SolarDeclination
 
 
 @validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)

@@ -5,8 +5,8 @@ from math import sin, cos, acos
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.data_classes import SolarIncidence
-from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes.models import SolarIncidence
+from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.function_models import CalculateSolarIncidenceInputModel
 
 

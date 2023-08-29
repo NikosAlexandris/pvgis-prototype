@@ -1,4 +1,4 @@
-from pvgisprototype.api.parameter_models import ValidatedInputToDict
+# from pvgisprototype.api.parameter_models import ValidatedInputToDict
 from pvgisprototype.api.parameter_models import BaseCoordinatesModel
 from pvgisprototype.api.parameter_models import BaseTimestampModel
 from pvgisprototype.api.parameter_models import BaseTimeModel
