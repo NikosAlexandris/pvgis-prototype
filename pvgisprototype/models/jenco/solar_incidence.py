@@ -164,10 +164,10 @@ def calculate_solar_incidence_jenco(
 
 # @validate_with_pydantic()
 def interpolate_horizon_height(
-        solar_azimuth: Annotated[float, typer.Argument(..., help="The azimuth angle of the sun.")],         # TODO: Replace with pydantic
-        horizon_heights: Annotated[List[float], typer.Argument(..., help="List of horizon height values.")],
-        horizon_interval: Annotated[float, typer.Argument(..., help="Interval between successive horizon data points.")]
-    ) -> HorizonHeight:
+    solar_azimuth: float,
+    horizon_heights: List[float],
+    horizon_interval: float,
+) -> HorizonHeight:
     """Interpolate the height of the horizon at the sun's azimuth angle.
 
     Parameters
@@ -190,6 +190,7 @@ def interpolate_horizon_height(
 
     # Handle wrap around
     position_after = 0 if position_after == len(horizon_heights) else position_after
+
     # Interpolate the horizon height (or weighted average)
     horizon_height = (
         (1 - (position_in_interval - position_before))
@@ -197,16 +198,17 @@ def interpolate_horizon_height(
         + (position_in_interval - position_before)
         * horizon_heights[position_after]
     )
+
     return HorizonHeight(horizon_height, 'meters')                          # FIXME: Is it meters?
 
 
 def is_surface_in_shade(
-        shadow_indicator: Annotated[Optional[int], typer.Argument(None, help="Shadow data indicating presence of shadow.")],
-        solar_altitude: Annotated[float, typer.Argument(..., help="The altitude of the sun.")],
-        solar_azimuth: Annotated[float, typer.Argument(..., help="The azimuth angle of the sun.")],
-        horizon_heights: Annotated[Optional[List[float]], typer.Argument(None, help="List of horizon height values.")],
-        horizon_interval: Annotated[Optional[float], typer.Argument(None, help="Interval between successive horizon data points.")]
-    ) -> bool:
+    solar_altitude: float,
+    solar_azimuth: float,
+    shadow_indicator: Path = None,
+    horizon_heights: Optional[List[float]] = None,
+    horizon_interval: Optional[float] = None,
+) -> bool:
     """Check whether the solar surface is in shade based on shadow and horizon data.
 
     Parameters
@@ -227,16 +229,12 @@ def is_surface_in_shade(
     bool
         True if the solar surface is in shade, otherwise False.
     """
-    # If shadow data is available and indicates a shadow, return True
     if shadow_indicator is not None and bool(shadow_indicator):
         return True
 
-    # If horizon height is available and indicates a shadow, return True
-    elif horizon_heights is not None:
+    if horizon_heights is not None:
         horizon_height = interpolate_horizon_height(solar_azimuth, horizon_heights, horizon_interval)
         if horizon_height > solar_altitude:
             return True
     
-    # all other cases, return False
     return False
-
