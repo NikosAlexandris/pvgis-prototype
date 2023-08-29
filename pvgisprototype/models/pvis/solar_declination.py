@@ -1,51 +1,13 @@
 from devtools import debug
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from math import pi
 from math import sin
 from math import asin
 
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateFractionalYearPVISInputModel
-from pvgisprototype.api.data_classes.models import FractionalYear
 from pvgisprototype.api.function_models import CalculateSolarDeclinationPVISInputModel
-from pvgisprototype.api.data_classes.models import SolarDeclination
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_noaa
-
-
-@validate_with_pydantic(CalculateFractionalYearPVISInputModel)
-def calculate_fractional_year_pvis(
-    timestamp: datetime,
-    days_in_a_year: float = 365.25,
-    angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
-) -> FractionalYear:
-    """Calculate fractional year in radians
-
-    Notes
-    -----
-    In PVGIS' C source code, this is called `day_angle`
-    """
-    year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1)
-    day_of_year = timestamp.timetuple().tm_yday
-    fractional_year = 2 * pi * day_of_year / days_in_a_year
-
-    # NOAA's corresponding equation
-    # fractional_year = (
-    #     2
-    #     * pi
-    #     / 365
-    #     * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
-    # )
-
-    if not 0 <= fractional_year < 2 * pi:
-        raise ValueError('Fractional year (in radians) must be in the range [0, 2*pi]')
-    fractional_year = FractionalYear(value=fractional_year, unit='radians')
-    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
-            
-    return fractional_year
+from pvgisprototype.api.data_classes import SolarDeclination
+from pvgisprototype.models.pvis.fractional_year import calculate_fractional_year_pvis
 
 
 @validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
@@ -105,6 +67,5 @@ def calculate_solar_declination_pvis(
                 )
             )
     solar_declination = SolarDeclination(value=solar_declination, unit='radians')
-    # declination = convert_to_degrees_if_requested(declination, angle_output_units)
 
     return solar_declination
