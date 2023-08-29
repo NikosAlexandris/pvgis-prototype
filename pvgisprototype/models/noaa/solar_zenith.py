@@ -239,22 +239,23 @@ def calculate_solar_zenith_time_series_noaa(
         angle_output_units: str = 'radians',
 ) -> Union[SolarZenith, np.ndarray]:
     """ """
-    solar_declinations = calculate_solar_declination_time_series_noaa(
+    solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
             angle_output_units='radians',
             )
-    solar_declinations = np.array([item.value for item in solar_declinations])
+    solar_declination_series = np.array([item.value for item in solar_declination_series])
 
     if isinstance(solar_hour_angle_series, SolarHourAngle):  # single SolarHourAngle
         solar_hour_angle_series = [solar_hour_angle_series]  # one-element list
+
     # convert to a NumPy array
     solar_hour_angle_series = np.array([item.value for item in solar_hour_angle_series])
 
     latitude_value = latitude.value
 
     cosine_solar_zenith = (
-        np.sin(latitude_value) * np.sin(solar_declinations)
-        + np.cos(latitude_value) * np.cos(solar_declinations) * np.cos(solar_hour_angle_series)
+        np.sin(latitude_value) * np.sin(solar_declination_series)
+        + np.cos(latitude_value) * np.cos(solar_declination_series) * np.cos(solar_hour_angle_series)
     )
     solar_zeniths = np.arccos(cosine_solar_zenith)
 
