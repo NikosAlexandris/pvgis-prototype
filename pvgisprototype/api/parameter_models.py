@@ -44,13 +44,6 @@ from pvgisprototype.api.data_classes import SolarPosition
 from pvgisprototype.api.data_classes import Elevation
 
 
-class ValidatedInputToDict(BaseModel):
-    def pydantic_model_to_dict(self):
-        d = {}
-        for k, v in self:
-            d[k] = v
-        return d
-
 # Where?
 
 class LongitudeModel(BaseModel):
