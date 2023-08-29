@@ -175,7 +175,7 @@ typer_argument_surface_tilt = typer.Argument(
     help=surface_tilt_typer_help,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = SOLAR_TILT,
+    # default_factory = SURFACE_TILT,
 )
 typer_option_surface_tilt = typer.Option(
     min=surface_tilt_minimum,
@@ -420,6 +420,7 @@ typer_option_angle_units = typer.Option(
     help="Angular units for internal solar geometry calculations. :warning: [bold red]Keep fingers away![/bold red]",
     rich_help_panel=rich_help_panel_output,
 )
+ANGLE_OUTPUT_UNITS = 'radians'
 typer_option_angle_output_units = typer.Option(
     '--angle-ouput-units',
     '-aou',
@@ -428,6 +429,7 @@ typer_option_angle_output_units = typer.Option(
     # help="Angular units for the calculated solar azimuth output (degrees or radians)"
     help="Angular units for solar geometry calculations (degrees or radians). :warning: [bold red]Under development[/red bold]",
     rich_help_panel=rich_help_panel_output,
+    # default_factory=ANGLE_OUTPUT_UNITS,
 )
 typer_option_statistics = typer.Option(
     help='Calculate and display summary statistics',
