@@ -5,11 +5,11 @@ from .fractional_year import calculate_fractional_year_noaa
 from math import sin
 from math import cos
 
-from pvgisprototype.api.data_classes import EquationOfTime
+from pvgisprototype.api.data_classes.models import EquationOfTime
 
 
 # @cache_result
-@validate_with_pydantic(CalculateEquationOfTimeNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateEquationOfTimeNOAAInput)
 def calculate_equation_of_time_noaa(
     timestamp: datetime,
     time_output_units: str = 'minutes',

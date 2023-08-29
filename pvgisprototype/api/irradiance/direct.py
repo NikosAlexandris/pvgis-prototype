@@ -149,7 +149,7 @@ class MethodsForInexactMatches(str, Enum):
 #     return value
 
 
-# @validate_with_pydantic(Elevation, expand_args=True)
+# @validate_with_pydantic(Elevation)
 def adjust_elevation(
     elevation: Annotated[float, typer_argument_elevation],
 ):

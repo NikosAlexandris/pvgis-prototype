@@ -10,18 +10,18 @@ from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarAltitudeNOAAInput
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarAltitudeNOAATimeSeriesInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import SolarHourAngle
-from pvgisprototype.api.data_classes import SolarZenith
-from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import SolarHourAngle
+from pvgisprototype.api.data_classes.models import SolarZenith
+from pvgisprototype.api.data_classes.models import SolarAltitude
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from .solar_zenith import calculate_solar_zenith_noaa
 from .solar_zenith import calculate_solar_zenith_time_series_noaa
 
 
-@validate_with_pydantic(CalculateSolarAltitudeNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
 def calculate_solar_altitude_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude,     # radians
@@ -57,7 +57,7 @@ def calculate_solar_altitude_noaa(
     return solar_altitude
 
 
-@validate_with_pydantic(CalculateSolarAltitudeNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAltitudeNOAATimeSeriesInput)
 def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,  # radians
     latitude: Latitude,  # radians

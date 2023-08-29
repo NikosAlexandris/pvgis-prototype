@@ -4,9 +4,9 @@ from typing import Annotated
 from typing import Optional
 from ...utilities.timestamp import convert_hours_to_seconds
 
-from pvgisprototype.api.data_classes import HourAngle
-from pvgisprototype.api.data_classes import HourAngleSunrise
-from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes.models import HourAngle
+from pvgisprototype.api.data_classes.models import HourAngleSunrise
+from pvgisprototype.api.data_classes.models import Latitude
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateHourAngleInputModel

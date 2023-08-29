@@ -7,7 +7,6 @@ from math import radians
 import numpy as np
 from typing import Any
 from dataclasses import replace
-from pvgisprototype.api.named_tuples import generate
 
 
 def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
@@ -46,7 +45,8 @@ def convert_float_to_degrees_if_requested(angle: float, output_units: str) -> fl
 def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
     """Convert angle from radians to degrees if requested"""
     if output_units == 'degrees' and not data_class.unit == 'degrees':
-        data_class = replace(data_class, value=degrees(data_class.value), unit='degrees')
+        data_class.value = degrees(data_class.value)
+        data_class.unit = 'degrees'
     return data_class
 
 

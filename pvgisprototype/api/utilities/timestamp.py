@@ -57,7 +57,6 @@ import zoneinfo
 from zoneinfo import ZoneInfo
 from rich import print
 
-from pvgisprototype.api.named_tuples import generate
 
 
 def parse_timestamp(timestamp_string):

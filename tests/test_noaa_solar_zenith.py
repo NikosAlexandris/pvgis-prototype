@@ -3,7 +3,7 @@ from datetime import datetime
 from pvgisprototype.models.noaa.solar_zenith import calculate_solar_zenith_noaa
 from pvgisprototype.models.noaa.solar_zenith import Latitude
 from pvgisprototype.models.noaa.solar_zenith import SolarHourAngle
-from pvgisprototype.api.data_classes import SolarZenith
+from pvgisprototype.api.data_classes.models import SolarZenith
 from pvgisprototype.models.noaa.solar_zenith import adjust_solar_zenith_for_atmospheric_refraction
 from pvgisprototype.models.noaa.solar_zenith import adjust_solar_zenith_for_atmospheric_refraction_time_series
 from pvgisprototype.models.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa

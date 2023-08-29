@@ -1,7 +1,7 @@
 import skyfield
 
 
-@validate_with_pydantic(CalculateSolarDeclinationSkyfieldInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarDeclinationSkyfieldInputModel)
 def calculate_solar_declination_skyfield(
     timestamp: datetime,
 ):

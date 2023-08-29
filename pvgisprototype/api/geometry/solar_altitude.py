@@ -7,9 +7,9 @@ from math import asin
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import ModelSolarAltitudeInputModel
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import SolarAltitude
 from .models import SolarPositionModels
 from .models import SolarTimeModels
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -25,7 +25,7 @@ from pvgisprototype.models.pvis.solar_altitude import calculate_solar_altitude_p
 # from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_position_pvgis
 
 
-@validate_with_pydantic(ModelSolarAltitudeInputModel, expand_args=True)
+@validate_with_pydantic(ModelSolarAltitudeInputModel)
 def model_solar_altitude(
     longitude: Longitude,
     latitude: Latitude,

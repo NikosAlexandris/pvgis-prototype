@@ -42,8 +42,8 @@ from .local_time import calculate_local_solar_time_noaa
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarPositionNOAAInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
 
 
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
@@ -51,7 +51,7 @@ degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
 calculation_cache = {}
 
 
-@validate_with_pydantic(CalculateSolarPositionNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarPositionNOAAInput)
 def calculate_noaa_solar_position(
     longitude: Longitude,       # radians 
     latitude: Latitude,         # radians

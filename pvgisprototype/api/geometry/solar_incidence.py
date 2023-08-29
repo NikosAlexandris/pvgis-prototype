@@ -6,7 +6,7 @@ from pvgisprototype.api.data_classes import Latitude
 from pvgisprototype.api.data_classes import Longitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.data_classes import SolarIncidence
+from pvgisprototype.api.data_classes.models import SolarIncidence
 from .models import SolarIncidenceModels
 from .models import SolarTimeModels
 from typing import List

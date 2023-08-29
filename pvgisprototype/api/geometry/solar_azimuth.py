@@ -4,9 +4,9 @@ from datetime import datetime
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import ModelSolarAzimuthInputModel
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import SolarAzimuth
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import SolarAzimuth
 from .models import SolarPositionModels
 from .models import SolarTimeModels
 from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
@@ -33,7 +33,7 @@ def convert_south_to_north_radians_convention(azimuth_south_radians):
     return (azimuth_south_radians + pi) % 2 * pi
 
 
-@validate_with_pydantic(ModelSolarAzimuthInputModel, expand_args=True)
+@validate_with_pydantic(ModelSolarAzimuthInputModel)
 def model_solar_azimuth(
     longitude: Longitude,
     latitude: Latitude,

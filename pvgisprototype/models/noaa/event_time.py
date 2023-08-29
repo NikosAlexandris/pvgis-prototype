@@ -5,9 +5,9 @@ from datetime import time
 from datetime import timedelta
 from pvgisprototype.api.decorators import validate_with_pydantic
 from .noaa_models import CalculateEventTimeNOAAInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import EventTime
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import EventTime
 from .equation_of_time import calculate_equation_of_time_noaa
 from .solar_declination import calculate_solar_declination_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
@@ -20,7 +20,7 @@ from ...api.utilities.timestamp import attach_requested_timezone
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 
 
-@validate_with_pydantic(CalculateEventTimeNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateEventTimeNOAAInput)
 def calculate_event_time_noaa(
     longitude: Longitude,   # radians
     latitude: Latitude, # radians

@@ -5,8 +5,8 @@ from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
 from .noaa_models import CalculateTimeOffsetNOAAInput
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import TimeOffset
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import TimeOffset
 from .equation_of_time import calculate_equation_of_time_noaa
 
 
@@ -14,7 +14,7 @@ from .equation_of_time import calculate_equation_of_time_noaa
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 
 
-@validate_with_pydantic(CalculateTimeOffsetNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateTimeOffsetNOAAInput)
 def calculate_time_offset_noaa(
         longitude: Longitude, 
         timestamp: datetime, 

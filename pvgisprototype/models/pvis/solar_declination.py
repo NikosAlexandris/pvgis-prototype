@@ -10,7 +10,7 @@ from pvgisprototype.api.data_classes import SolarDeclination
 from pvgisprototype.models.pvis.fractional_year import calculate_fractional_year_pvis
 
 
-@validate_with_pydantic(CalculateSolarDeclinationPVISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
 def calculate_solar_declination_pvis(
     timestamp: datetime,
     timezone: ZoneInfo,

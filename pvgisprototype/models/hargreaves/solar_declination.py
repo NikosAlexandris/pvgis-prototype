@@ -10,11 +10,11 @@ from math import radians
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateSolarDeclinationHargreavesInputModel
-from pvgisprototype.api.data_classes import SolarDeclination
+from pvgisprototype.api.data_classes.models import SolarDeclination
 # from pvgisprototype.api.named_tuples import generate
 
 
-@validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)
 def calculate_solar_declination_hargreaves(
         timestamp: datetime = partial(datetime.now, tz=timezone.utc),
         days_in_a_year: float = 365.25,

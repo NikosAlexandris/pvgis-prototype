@@ -17,11 +17,11 @@ from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 
-from pvgisprototype.api.data_classes import RelativeLongitude
-from pvgisprototype.api.data_classes import SolarIncidence
-from pvgisprototype.api.data_classes import HorizonHeight
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes.models import RelativeLongitude
+from pvgisprototype.api.data_classes.models import SolarIncidence
+from pvgisprototype.api.data_classes.models import HorizonHeight
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateRelativeLongitudeInputModel
@@ -33,7 +33,7 @@ import numpy as np
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 
-@validate_with_pydantic(CalculateRelativeLongitudeInputModel, expand_args=True)
+@validate_with_pydantic(CalculateRelativeLongitudeInputModel)
 def calculate_relative_longitude(
         latitude: Latitude,
         surface_tilt: float = 0,
@@ -78,7 +78,7 @@ def calculate_relative_longitude(
     return relative_longitude
 
 
-@validate_with_pydantic(CalculateSolarIncidenceJencoInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarIncidenceJencoInputModel)
 def calculate_solar_incidence_jenco(
         longitude: Longitude,
         latitude: Latitude,

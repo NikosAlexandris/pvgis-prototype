@@ -9,16 +9,8 @@ from typing import Union
 from zoneinfo import ZoneInfo
 from pydantic import validator
 
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
-
-
-class ValidatedInputToDict(BaseModel):
-    def pydantic_model_to_dict(self):
-        d = {}
-        for k, v in self:
-            d[k] = v
-        return d
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
 
 
 class LongitudeModel(BaseModel):

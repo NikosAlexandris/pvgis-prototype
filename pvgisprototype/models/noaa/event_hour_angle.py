@@ -6,12 +6,12 @@ from math import tan
 from math import acos
 from pvgisprototype.api.decorators import validate_with_pydantic
 from .noaa_models import CalculateEventHourAngleNOAAInput
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import EventTime
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import EventTime
 from .solar_declination import calculate_solar_declination_noaa
 
 
-@validate_with_pydantic(CalculateEventHourAngleNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateEventHourAngleNOAAInput)
 def calculate_event_hour_angle_noaa(
         latitude: Latitude, # radians
         timestamp: datetime,

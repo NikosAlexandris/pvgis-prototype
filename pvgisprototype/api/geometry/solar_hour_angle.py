@@ -7,12 +7,12 @@ from math import acos
 from math import tan
 from datetime import time
 
-from pvgisprototype.api.data_classes import HourAngle
-from pvgisprototype.api.data_classes import HourAngleSunrise
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import HourAngle
-from pvgisprototype.api.data_classes import HourAngleSunrise
-from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes.models import HourAngle
+from pvgisprototype.api.data_classes.models import HourAngleSunrise
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import HourAngle
+from pvgisprototype.api.data_classes.models import HourAngleSunrise
+from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.function_models import CalculateHourAngleInputModel
 from pvgisprototype.api.function_models import CalculateHourAngleSunriseInputModel
 from pvgisprototype.api.decorators import validate_with_pydantic
@@ -21,7 +21,7 @@ from ..utilities.timestamp import convert_hours_to_seconds
 from ..utilities.conversions import convert_to_degrees_if_requested
 
 
-@validate_with_pydantic(CalculateHourAngleInputModel, expand_args=True)
+@validate_with_pydantic(CalculateHourAngleInputModel)
 def calculate_hour_angle(
     solar_time: time,
     angle_output_units: str = "radians",
@@ -116,7 +116,7 @@ def calculate_hour_angle(
     return hour_angle
 
 
-@validate_with_pydantic(CalculateHourAngleSunriseInputModel, expand_args=True)
+@validate_with_pydantic(CalculateHourAngleSunriseInputModel)
 def calculate_hour_angle_sunrise(
     latitude: Latitude,
     surface_tilt: float = 0,

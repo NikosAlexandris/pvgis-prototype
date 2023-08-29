@@ -7,17 +7,17 @@ from math import asin
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateSolarAltitudePVISInputModel
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.data_classes.models import SolarAltitude
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
-@validate_with_pydantic(CalculateSolarAltitudePVISInputModel, expand_args=True)
+@validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
 def calculate_solar_altitude_pvis(
         longitude: Longitude,
         latitude: Latitude,

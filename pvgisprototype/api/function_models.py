@@ -1,5 +1,3 @@
-from .parameter_models import ValidatedInputToDict
-
 # Where?
 from .parameter_models import LatitudeModel
 from .parameter_models import BaseCoordinatesModel
@@ -10,7 +8,7 @@ from .parameter_models import BaseTimeModel
 
 # Atmospheric effects
 from .parameter_models import ApplyAtmosphericRefraction
-from .parameter_models import RefractedSolarZenithInput
+from .parameter_models import RefractedSolarZenithModel
 
 # Earth orbit
 from .parameter_models import DaysInAYearModel
@@ -28,7 +26,7 @@ from .parameter_models import ElevationModel
 
 # Solar geometry
 
-from .parameter_models import RefractedSolarAltitudeInput
+from .parameter_models import RefractedSolarAltitudeModel
 from .parameter_models import SolarDeclinationModel
 from .parameter_models import SolarPositionModel
 
@@ -47,7 +45,6 @@ from .parameter_models import BaseAngleOutputUnitsModel
 # Solar declination
 
 class CalculateFractionalYearPVISInputModel(
-    ValidatedInputToDict,
     BaseTimestampModel,
     BaseAngleInternalUnitsModel,
 ):
@@ -55,7 +52,6 @@ class CalculateFractionalYearPVISInputModel(
 
 
 class CalculateSolarDeclinationPVISInputModel(
-    ValidatedInputToDict,
     BaseTimeModel,
     EarthOrbitModel,
     BaseAngleOutputUnitsModel,
@@ -64,7 +60,6 @@ class CalculateSolarDeclinationPVISInputModel(
 
 
 class CalculateSolarDeclinationHargreavesInputModel(
-    ValidatedInputToDict,
     BaseTimestampModel,
     DaysInAYearModel,
     BaseAngleOutputUnitsModel,
@@ -75,7 +70,6 @@ class CalculateSolarDeclinationHargreavesInputModel(
 # Solar time
 
 class ModelSolarTimeInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     EarthOrbitModel,
@@ -88,7 +82,6 @@ class ModelSolarTimeInputModel(
 
 
 class CalculateSolarTimePVGISInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     EarthOrbitModel,
@@ -104,7 +97,6 @@ class CalculateSolarTimeEoTInputModel(
 
 
 class CalculateSolarTimeEphemInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
 ):
@@ -114,7 +106,6 @@ class CalculateSolarTimeEphemInputModel(
 # Hour angle
 
 class CalculateHourAngleInputModel(
-    ValidatedInputToDict,
     SolarTimeModel,  # Parameter
     BaseAngleOutputUnitsModel,
 ):
@@ -123,7 +114,6 @@ class CalculateHourAngleInputModel(
 
 # rename to : CalculateEventHourAngleInputModel
 class CalculateHourAngleSunriseInputModel(
-    ValidatedInputToDict,
     LatitudeModel,
     SurfaceTiltModel,
     SolarDeclinationModel,
@@ -135,11 +125,10 @@ class CalculateHourAngleSunriseInputModel(
 # Solar geometry
 
 class CalculateSolarAltitudePVISInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     SolarTimeModelModel,
@@ -151,11 +140,10 @@ class CalculateSolarAltitudePVISInputModel(
 
 
 class CalculateSolarAzimuthPVISInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     SolarTimeModelModel,
@@ -167,13 +155,12 @@ class CalculateSolarAzimuthPVISInputModel(
 
 
 class ModelSolarAltitudeInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     SolarPositionModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     BaseTimeOutputUnitsModel,
@@ -184,13 +171,12 @@ class ModelSolarAltitudeInputModel(
 
 
 class ModelSolarAzimuthInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     SolarPositionModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     BaseTimeOutputUnitsModel,
@@ -201,13 +187,12 @@ class ModelSolarAzimuthInputModel(
 
 
 class ModelSolarPositionInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     SolarPositionModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefraction,
-    RefractedSolarZenithInput,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     BaseTimeOutputUnitsModel,
@@ -220,7 +205,6 @@ class ModelSolarPositionInputModel(
 # Solar incidence angle
 
 class CalculateRelativeLongitudeInputModel(
-    ValidatedInputToDict,
     LatitudeModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
@@ -229,7 +213,6 @@ class CalculateRelativeLongitudeInputModel(
 
 
 class CalculateSolarIncidenceInputModel(
-    ValidatedInputToDict,
     LatitudeModel,
     SolarDeclinationModel,
     SurfaceTiltModel,
@@ -240,7 +223,6 @@ class CalculateSolarIncidenceInputModel(
 
 
 class CalculateSolarIncidenceJencoInputModel(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     RandomTimeModel,
@@ -257,9 +239,8 @@ class CalculateSolarIncidenceJencoInputModel(
 # Direct irradiance
 
 class CalculateOpticalAirMassInputModel(
-    ValidatedInputToDict,
     ElevationModel,
-    RefractedSolarAltitudeInput,
+    RefractedSolarAltitudeModel,
     BaseAngleUnitsModel
 ):
     pass

@@ -19,12 +19,12 @@ from pvgisprototype.models.noaa.solar_zenith import calculate_solar_zenith_time_
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarAzimuthNOAAInput
 from pvgisprototype.models.noaa.noaa_models import CalculateSolarAzimuthNOAATimeSeriesInput
-from pvgisprototype.api.data_classes import SolarAzimuth
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import Latitude
+from pvgisprototype.api.data_classes.models import SolarAzimuth
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import Latitude
 
 
-@validate_with_pydantic(CalculateSolarAzimuthNOAAInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
 def calculate_solar_azimuth_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude,     # radians
@@ -91,7 +91,7 @@ def calculate_solar_azimuth_noaa(
     return solar_azimuth
 
 
-@validate_with_pydantic(CalculateSolarAzimuthNOAATimeSeriesInput, expand_args=True)
+@validate_with_pydantic(CalculateSolarAzimuthNOAATimeSeriesInput)
 def calculate_solar_azimuth_time_series_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude,     # radians
