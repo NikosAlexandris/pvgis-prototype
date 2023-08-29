@@ -10,22 +10,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pvgisprototype.api.utilities.timestamp import random_datetimezone
 import random
+from .helpers import generate_timestamps_for_a_year
 
 
-def generate_timestamps_for_a_year(start_date=datetime(2023, 1, 1), frequency_minutes=60):
-    timestamps = [start_date + timedelta(minutes=i * frequency_minutes) for i in range(365 * 24 * 60 // frequency_minutes)]
-    return timestamps
+longitude=0.5
+latitude=0.5
+timezone=ZoneInfo('UTC')
+apply_atmospheric_refraction=True
+time_output_units='minutes'
+angle_output_units='radians'
 
 
-longitude = Longitude(value=0.1, unit='radians')
-latitude = Latitude(value=0.1, unit='radians')
 timestamps_for_a_year = generate_timestamps_for_a_year()
-timezone = ZoneInfo('UTC')
-apply_atmospheric_refraction = False
-time_output_units = 'minutes'
-angle_output_units = 'radians'
-
-
 test_cases = [
     (
         Longitude(value=0.5, unit='radians'),
