@@ -25,6 +25,34 @@ from .rich_help_panel_names import rich_help_panel_time_series
 from .rich_help_panel_names import rich_help_panel_efficiency
 from .rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.constants import LATITUDE_MINIMUM
+from pvgisprototype.api.constants import LATITUDE_MAXIMUM
+from pvgisprototype.api.constants import LONGITUDE_MINIMUM
+from pvgisprototype.api.constants import LONGITUDE_MAXIMUM
+from pvgisprototype.api.constants import ELEVATION_MINIMUM
+from pvgisprototype.api.constants import ELEVATION_MAXIMUM
+from pvgisprototype.api.constants import SOLAR_DECLINATION_MINIMUM
+from pvgisprototype.api.constants import SOLAR_DECLINATION_MAXIMUM
+from pvgisprototype.api.constants import SURFACE_TILT_MINIMUM
+from pvgisprototype.api.constants import SURFACE_TILT_MAXIMUM
+from pvgisprototype.api.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.api.constants import SURFACE_ORIENTATION_MINIMUM
+from pvgisprototype.api.constants import SURFACE_ORIENTATION_MAXIMUM
+from pvgisprototype.api.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.api.constants import SOLAR_CONSTANT_MINIMUM
+# from pvgisprototype.api.constants import SOLAR_CONSTANT
+from pvgisprototype.api.constants import DAYS_IN_A_YEAR
+from pvgisprototype.api.constants import PERIGEE_OFFSET
+from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.api.constants import LINKE_TURBIDITY_MINIMUM
+from pvgisprototype.api.constants import LINKE_TURBIDITY_MAXIMUM
+# from pvgisprototype.api.constants import LINKE_TURBIDITY_DEFAULT
+# from pvgisprototype.api.constants import OPTICAL_AIR_MASS_DEFAULT
+from pvgisprototype.api.constants import OPTICAL_AIR_MASS_TYPER_UNIT
+# from pvgisprototype.api.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.api.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+# from pvgisprototype.api.constants import MEAN_GROUND_ALBEDO_DEFAULT
+# from pvgisprototype.api.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 
 
 class OrderCommands(TyperGroup):
@@ -38,38 +66,32 @@ class OrderCommands(TyperGroup):
 # Where?
 
 longitude_typer_help=f'Longitude in decimal degrees ranging in [-180, 360]. [yellow]If ranging in [0, 360], consider the `--convert-longitude-360` option.[/yellow]'
-longitude_minimum=-180
-longitude_maximum=180  # in PVGIS : coloffset
 typer_argument_longitude = typer.Argument(
-    min=longitude_minimum,
-    max=longitude_maximum,
+    min=LONGITUDE_MINIMUM,
+    max=LONGITUDE_MAXIMUM,
     help=longitude_typer_help,
     callback=convert_to_radians,
 )
 typer_argument_longitude_in_degrees = typer.Argument(
-    min=longitude_minimum,
-    max=longitude_maximum,
+    min=LONGITUDE_MINIMUM,
+    max=LONGITUDE_MAXIMUM,
     help=longitude_typer_help,
 )
 latitude_typer_help='Latitude in decimal degrees ranging in [-90, 90]'
-latitude_minimum=-90
-latitude_maximum=90  # in PVGIS : rowoffset
 typer_argument_latitude = typer.Argument(
-    min=latitude_minimum,
-    max=latitude_maximum,
+    min=LATITUDE_MINIMUM,
+    max=LATITUDE_MAXIMUM,
     help=latitude_typer_help,
     callback=convert_to_radians,
 )
 typer_argument_latitude_in_degrees = typer.Argument(
-    min=latitude_minimum,
-    max=latitude_maximum,
+    min=LATITUDE_MINIMUM,
+    max=LATITUDE_MAXIMUM,
     help=latitude_typer_help,
 )
-elevation_minimum=0
-elevation_maximum=8848
 typer_argument_elevation = typer.Argument(
-    min=elevation_minimum,
-    max=elevation_maximum,
+    min=ELEVATION_MINIMUM,
+    max=ELEVATION_MAXIMUM,
     help='Elevation',
     # rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory=0,
@@ -105,12 +127,11 @@ typer_option_random_time = typer.Option(
     # '--random',
     help='Generate a random date, time and timezone to demonstrate calculation'
 )
-RANDOM_DAY_FLAG = False
 typer_option_random_day = typer.Option(
     # '--random-day',
     # '--random',
     help='Generate a random day to demonstrate calculation',
-    # default_factory=RANDOM_DAY_FLAG
+    # default_factory=RANDOM_DAY_FLAG_DEFAULT,
 )
 # day_of_year: Annotated[float, typer.Argument(
 #     min=1,
@@ -121,8 +142,8 @@ typer_option_random_day = typer.Option(
 # Solar geometry
 
 typer_argument_solar_declination = typer.Argument(
-    min=0,
-    max=90,
+    min=SOLAR_DECLINATION_MINIMUM,
+    max=SOLAR_DECLINATION_MAXIMUM,
     help='Solar declination angle',
 )
 typer_option_solar_declination_model = typer.Option(
@@ -137,22 +158,20 @@ typer_option_solar_declination_model = typer.Option(
 )
 
 solar_constant_typer_help='Top-of-Atmosphere mean solar electromagnetic radiation (W/m2) 1 au (astronomical unit) away from the Sun.'  #  (~1360.8 W/m2)
-solar_constant_minimum=1360
-SOLAR_CONSTANT = 1360.8
 typer_argument_solar_constant = typer.Argument(
-    min=solar_constant_minimum,
+    min=SOLAR_CONSTANT_MINIMUM,
     help=solar_constant_typer_help,
     rich_help_panel=rich_help_panel_earth_orbit,
     # default_factory = SOLAR_CONSTANT,
 )
 typer_option_solar_constant = typer.Option(
-    min=solar_constant_minimum,
+    min=SOLAR_CONSTANT_MINIMUM,
     help=solar_constant_typer_help,
     rich_help_panel=rich_help_panel_earth_orbit,
     # default_factory = SOLAR_CONSTANT,
 )
 
-SOLAR_INCIDENCE_ANGLE_MODEL=SolarIncidenceModels.jenco
+SOLAR_INCIDENCE_ANGLE_MODEL_DEFAULT=SolarIncidenceModels.jenco
 typer_option_solar_incidence_model = typer.Option(
     '--solar-incidence-model',
     show_default=True,
@@ -160,64 +179,60 @@ typer_option_solar_incidence_model = typer.Option(
     case_sensitive=False,
     help='Method to calculate the solar incidence angle',
     rich_help_panel=rich_help_panel_solar_position,
-    # default_factory=SOLAR_INCIDENCE_ANGLE_MODEL,
+    # default_factory=SOLAR_INCIDENCE_ANGLE_MODEL_DEFAULT,
 )
 
 # Solar surface
 
 surface_tilt_typer_help='Solar surface tilt angle'
-surface_tilt_minimum=0
-surface_tilt_maximum=90
-SURFACE_TILT=45  # degrees
 typer_argument_surface_tilt = typer.Argument(
-    min=surface_tilt_minimum,
-    max=surface_tilt_maximum,
+    min=SURFACE_TILT_MINIMUM,
+    max=SURFACE_TILT_MAXIMUM,
     help=surface_tilt_typer_help,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = SURFACE_TILT,
+    # default_factory = SURFACE_TILT_DEFAULT,
 )
 typer_option_surface_tilt = typer.Option(
-    min=surface_tilt_minimum,
-    max=surface_tilt_maximum,
+    min=SURFACE_TILT_MINIMUM,
+    max=SURFACE_TILT_MAXIMUM,
     help=surface_tilt_typer_help,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = SURFACE_TILT,
+    # default_factory = SURFACE_TILT_DEFAULT,
 )
 typer_option_random_surface_tilt = typer.Option(
-    # min=0, max=90,
+    # min=SURFACE_TILT_MINIMUM,
+    # max=SURFACE_TILT_MAXIMUM,
     help='Random solar surface tilt angle',
     # callback=random_surface_tilt,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = 45,
+    # default_factory = SURFACE_TILT_DEFAULT,
 )
 surface_orientation_typer_help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]'
-surface_orientation_minimum=0
-surface_orientation_maximum=360
-SURFACE_ORIENTATION=180  # Due south, counting from North
 typer_argument_surface_orientation = typer.Argument(
-    min=surface_orientation_minimum,
-    max=surface_orientation_maximum,
+    min=SURFACE_ORIENTATION_MINIMUM,
+    max=SURFACE_ORIENTATION_MAXIMUM,
     help=surface_orientation_typer_help,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = SURFACE_ORIENTATION
+    # default_factory = SURFACE_ORIENTATION_DEFAULT,
 )
 typer_option_surface_orientation = typer.Option(
-    min=0,
-    max=360,
+    min=SURFACE_ORIENTATION_MINIMUM,
+    max=SURFACE_ORIENTATION_MAXIMUM,
     help=surface_orientation_typer_help,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = SURFACE_ORIENTATION
+    # default_factory = SURFACE_ORIENTATION_DEFAULT,
 )
 typer_option_random_surface_orientation = typer.Option(
-    # min=0, max=360,
+    # min=SURFACE_ORIENTATION_MINIMUM,
+    # max=SURFACE_ORIENTATION_MAXIMUM,
     help='Random solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]',
     # callback=random_surface_orientation,
     rich_help_panel=rich_help_panel_geometry_surface,
-    # default_factory = 180,  # from North!
+    # default_factory = SURFACE_ORIENTATION_DEFAULT,
 )
 
 typer_argument_solar_time = typer.Argument(
@@ -279,19 +294,16 @@ typer_option_hour_offset = typer.Option(
 
 # Earth orbit
 
-DAYS_IN_A_YEAR = 365
 typer_option_days_in_a_year = typer.Option(
     help='Number of days in a year',
     rich_help_panel=rich_help_panel_earth_orbit,
     # default_factory=days_in_a_year_default,
 )
-PERIGEE_OFFSET = 0.048869
 typer_option_perigee_offset = typer.Option(
     help='Perigee offset',
     rich_help_panel=rich_help_panel_earth_orbit,
     # default_factory=PERIGEE_OFFSET,
 )
-ECCENTRICITY_CORRECTION_FACTOR = 0.03344
 typer_option_eccentricity_correction_factor = typer.Option(
     help='Eccentricity correction factor',
     rich_help_panel=rich_help_panel_earth_orbit,
@@ -302,47 +314,41 @@ typer_option_eccentricity_correction_factor = typer.Option(
 # Atmospheric properties
 
 linke_turbidity_factor_typer_help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
-linke_turbidity_minimum=0
-linke_turbidity_maximum=8
 typer_argument_linke_turbidity_factor = typer.Argument(
-    min=linke_turbidity_minimum,
-    max=linke_turbidity_maximum,
+    min=LINKE_TURBIDITY_MINIMUM,
+    max=LINKE_TURBIDITY_MAXIMUM,
     help=linke_turbidity_factor_typer_help,
     rich_help_panel=rich_help_panel_atmospheric_properties,
-    # default_factory=2,  # 2 to get going for now
+    # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
 typer_option_linke_turbidity_factor = typer.Option(
-    min=linke_turbidity_minimum,
-    max=linke_turbidity_maximum,
+    min=LINKE_TURBIDITY_MINIMUM,
+    max=LINKE_TURBIDITY_MAXIMUM,
     help=linke_turbidity_factor_typer_help,
     rich_help_panel=rich_help_panel_atmospheric_properties,
-    # default_factory=2,  # 2 to get going for now
+    # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
-optical_air_mass_typer_unit = 'unitless'
 typer_option_optical_air_mass = typer.Option(
-    help=f'Relative optical air mass [{optical_air_mass_typer_unit}]',
+    help=f'Relative optical air mass [{OPTICAL_AIR_MASS_TYPER_UNIT}]',
     rich_help_panel=rich_help_panel_atmospheric_properties,
-    # default_factory=2,
+    # default_factory=OPTICAL_AIR_MASS_DEFAULT,
 )
-
-ATMOSPHERIC_REFRACTION_FLAG = True
 typer_option_apply_atmospheric_refraction = typer.Option(
     '--apply-atmospheric-refraction',
     help='Apply atmospheric refraction functions',
     rich_help_panel=rich_help_panel_atmospheric_properties,
-    # default_factory=ATMOSPHERIC_REFRACTION_FLAG,
+    # default_factory=ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
 )
-REFRACTED_SOLAR_ZENITH_ANGLE=1.5853349194640094  # radians
 typer_option_refracted_solar_zenith = typer.Option(
     help=f'Default refracted solar zenith angle (in radians) for sun -rise and -set events',
     rich_help_panel=rich_help_panel_atmospheric_properties,
-    # default_factory=REFRACTED_SOLAR_ZENITH_ANGLE,
+    # default_factory=REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
 )
 typer_option_albedo = typer.Option(
     min=0,
     help='Mean ground albedo',
     rich_help_panel=rich_help_panel_advanced_options,
-    # default_factory = 2,
+    # default_factory = MEAN_GROUND_ALBEDO_DEFAULT,
 )
 
 # Solar irradiance
@@ -420,7 +426,6 @@ typer_option_angle_units = typer.Option(
     help="Angular units for internal solar geometry calculations. :warning: [bold red]Keep fingers away![/bold red]",
     rich_help_panel=rich_help_panel_output,
 )
-ANGLE_OUTPUT_UNITS = 'radians'
 typer_option_angle_output_units = typer.Option(
     '--angle-ouput-units',
     '-aou',
@@ -429,7 +434,7 @@ typer_option_angle_output_units = typer.Option(
     # help="Angular units for the calculated solar azimuth output (degrees or radians)"
     help="Angular units for solar geometry calculations (degrees or radians). :warning: [bold red]Under development[/red bold]",
     rich_help_panel=rich_help_panel_output,
-    # default_factory=ANGLE_OUTPUT_UNITS,
+    # default_factory=ANGLE_OUTPUT_UNITS_DEFAULT,
 )
 typer_option_statistics = typer.Option(
     help='Calculate and display summary statistics',

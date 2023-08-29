@@ -1,9 +1,37 @@
-"""
-Constants
-"""
-
 from math import pi
 import numpy as np
+
+LATITUDE_MINIMUM = -90
+LATITUDE_MAXIMUM = 90  # in PVGIS : rowoffset
+LONGITUDE_MINIMUM = -180
+LONGITUDE_MAXIMUM = 180  # in PVGIS : coloffset
+ELEVATION_MINIMUM = 0
+ELEVATION_MAXIMUM = 8848
+SOLAR_DECLINATION_MINIMUM = 0
+SOLAR_DECLINATION_MAXIMUM = 90
+SURFACE_TILT_MINIMUM = 0
+SURFACE_TILT_MAXIMUM = 90
+SURFACE_TILT_DEFAULT = 45  # degrees
+SURFACE_ORIENTATION_MINIMUM = 0
+SURFACE_ORIENTATION_MAXIMUM = 360
+SURFACE_ORIENTATION_DEFAULT = 180  # Due south, counting from North
+SOLAR_CONSTANT_MINIMUM = 1360
+SOLAR_CONSTANT = 1360.8
+RANDOM_DAY_FLAG_DEFAULT = False
+DAYS_IN_A_YEAR = 365
+PERIGEE_OFFSET = 0.048869
+ECCENTRICITY_CORRECTION_FACTOR = 0.03344
+LINKE_TURBIDITY_MINIMUM = 0
+LINKE_TURBIDITY_MAXIMUM = 8
+LINKE_TURBIDITY_DEFAULT = 2  # to get going for now
+OPTICAL_AIR_MASS_DEFAULT = 2
+OPTICAL_AIR_MASS_TYPER_UNIT = 'unitless'
+ATMOSPHERIC_REFRACTION_FLAG_DEFAULT = True
+REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT = 1.5853349194640094  # radians
+MEAN_GROUND_ALBEDO_DEFAULT = 2
+ANGLE_OUTPUT_UNITS_DEFAULT = 'radians'
+
+# from PVGIS
 
 AOI_CONSTANTS = [ -0.074, 0.155]
 EARTHRADIUS = 6371000.  # Earth radius in meters
@@ -23,10 +51,6 @@ pi_half = pi / 2  # Half of π
 pi2 = pi * 2  # 2π
 deg2rad = pi / 180  # Conversion factor from degrees to radians
 rad2deg = 180 / pi  # Conversion factor from radians to degrees
-
-# varCount_global = 0  # Global variable for varCount
-# bitCount_global = 0  # Global variable for bitCount
-# arrayNumInt = 0  # Global variable for arrayNumInt
 
 PERFORMANCE_RATIO = 0.68
 FIRSTYEAR = 2007
