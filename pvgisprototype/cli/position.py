@@ -632,36 +632,62 @@ def declination(
         )
 
 
-@app.command('surface-orientation', no_args_is_help=True, help=':compass: Calculate the solar surface orientation (azimuth)')
-def surface_orientation():
-    """Calculate the surface azimuth angle
+@app.command('hour-angle', no_args_is_help=True, help=':clock12: :globe_with_meridians: Calculate the hour angle (ω)')
+def hour_angle(
+    solar_time: Annotated[float, typer_argument_solar_time],
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+):
+    """Calculate the hour angle 'ω = (ST / 3600 - 12) * 15 * π / 180'
 
-    The surface azimuth or orientation (also known as Psi) is the angle between
-    the projection on a horizontal plane of the normal to a surface and the
-    local meridian, with north through east directions being positive.
+    The hour angle (ω) is the angle at any instant through which the earth has
+    to turn to bring the meridian of the observer directly in line with the
+    sun's rays measured in radian. In other words, it is a measure of time,
+    expressed in angular measurement, usually degrees, from solar noon. It
+    increases by 15° per hour, negative before solar noon and positive after
+    solar noon.
     """
 
     #
     # Update Me
     #
 
-    pass
+    hour_angle = calculate_hour_angle(
+            solar_time=solar_time,
+            angle_output_units=angle_output_units,
+            )
+    typer.echo(f'Hour angle: {hour_angle.value} {hour_angle.unit}')
 
 
-@app.command('surface-tilt', no_args_is_help=True, help='Calculate the solar surface tile (slope)')
-def surface_tilt():
-    """Calculate the surface tilt angle
+@app.command('sunrise', no_args_is_help=True, help=':sunrise: Calculate the hour angle (ω) at sun rise and set')
+def sunrise(
+    latitude: Annotated[float, typer_argument_latitude],
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 0,
+    solar_declination: Annotated[Optional[float], typer_argument_solar_declination] = 0,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+):
+    """Calculate the hour angle 'ω = (ST / 3600 - 12) * 15 * π / 180'
 
-    The surface tilt (or slope, also known as beta) is the angle between the
-    plane of the surface and the horizontal plane. A horizontal surface has a
-    slope of 0°, and a vertical surface has a slope of 90°.
+    The hour angle (ω) is the angle at any instant through which the earth has
+    to turn to bring the meridian of the observer directly in line with the
+    sun's rays measured in radian. In other words, it is a measure of time,
+    expressed in angular measurement, usually degrees, from solar noon. It
+    increases by 15° per hour, negative before solar noon and positive after
+    solar noon.
     """
 
     #
     # Update Me
     #
 
-    pass
+    hour_angle = calculate_hour_angle_sunrise(
+            latitude,
+            surface_tilt,
+            solar_declination,
+            angle_output_units=angle_output_units,
+            )
+
+    output_latitude = convert_to_degrees_if_requested(latitude, angle_output_units)
+    typer.echo(f'Hour angle at {output_latitude} at sun rise/set: {hour_angle.value} {hour_angle.unit}')
 
 
 @app.command('incidence', no_args_is_help=True, help='Calculate the solar incidence angle')
@@ -734,9 +760,13 @@ def incidence(
         solar_incidence_models=solar_incidence_model,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        # shadow_indicator=shadow_indicator,
+        # horizon_heights=horizon_heights,
+        # horizon_interval=horizon_interval,
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
+        random_time=random_time,
         # time_offset_global=time_offset_global,
         # hour_offset=hour_offset,
         time_output_units=time_output_units,
@@ -757,64 +787,6 @@ def incidence(
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
     )
-
-
-@app.command('hour-angle', no_args_is_help=True, help=':clock12: :globe_with_meridians: Calculate the hour angle (ω)')
-def hour_angle(
-    solar_time: Annotated[float, typer_argument_solar_time],
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-):
-    """Calculate the hour angle 'ω = (ST / 3600 - 12) * 15 * π / 180'
-
-    The hour angle (ω) is the angle at any instant through which the earth has
-    to turn to bring the meridian of the observer directly in line with the
-    sun's rays measured in radian. In other words, it is a measure of time,
-    expressed in angular measurement, usually degrees, from solar noon. It
-    increases by 15° per hour, negative before solar noon and positive after
-    solar noon.
-    """
-
-    #
-    # Update Me
-    #
-
-    hour_angle = calculate_hour_angle(
-            solar_time=solar_time,
-            angle_output_units=angle_output_units,
-            )
-    typer.echo(f'Hour angle: {hour_angle.value} {hour_angle.unit}')
-
-
-@app.command('sunrise', no_args_is_help=True, help=':sunrise: Calculate the hour angle (ω) at sun rise and set')
-def sunrise(
-    latitude: Annotated[float, typer_argument_latitude],
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 0,
-    solar_declination: Annotated[Optional[float], typer_argument_solar_declination] = 0,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-):
-    """Calculate the hour angle 'ω = (ST / 3600 - 12) * 15 * π / 180'
-
-    The hour angle (ω) is the angle at any instant through which the earth has
-    to turn to bring the meridian of the observer directly in line with the
-    sun's rays measured in radian. In other words, it is a measure of time,
-    expressed in angular measurement, usually degrees, from solar noon. It
-    increases by 15° per hour, negative before solar noon and positive after
-    solar noon.
-    """
-
-    #
-    # Update Me
-    #
-
-    hour_angle = calculate_hour_angle_sunrise(
-            latitude,
-            surface_tilt,
-            solar_declination,
-            angle_output_units=angle_output_units,
-            )
-
-    output_latitude = convert_to_degrees_if_requested(latitude, angle_output_units)
-    typer.echo(f'Hour angle at {output_latitude} at sun rise/set: {hour_angle.value} {hour_angle.unit}')
 
 
 if __name__ == "__main__":
