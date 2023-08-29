@@ -87,7 +87,6 @@ def calculate_solar_azimuth_pvis(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = calculate_hour_angle(
         solar_time=solar_time,
         angle_output_units=angle_output_units,
