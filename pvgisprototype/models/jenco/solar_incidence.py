@@ -1,18 +1,21 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
 import typer
 from typing import Annotated
 from typing import List
 from typing import Optional
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from math import sin, cos, acos
 from math import asin
 from math import atan
-from ...api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from ..noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
-from ...api.geometry.solar_declination import calculate_solar_declination_pvis
-from ...api.utilities.timestamp import ctx_convert_to_timezone
-from ...api.utilities.conversions import convert_to_radians
-from ...api.utilities.timestamp import ctx_attach_requested_timezone
+from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
+from ..noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_time_series_noaa
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 
 from pvgisprototype.api.data_classes import RelativeLongitude
 from pvgisprototype.api.data_classes import SolarIncidence
