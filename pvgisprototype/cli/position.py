@@ -345,7 +345,7 @@ def altitude(
         model = [
             model for model in SolarPositionModels if model != SolarPositionModels.all
         ]
-    solar_position = calculate_solar_altitude(
+    solar_altitude = calculate_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -367,7 +367,7 @@ def altitude(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position=solar_altitude,
+        table=solar_altitude,
         rounding_places=rounding_places,
         altitude=True,
         user_requested_timestamp=user_requested_timestamp, 
@@ -431,6 +431,7 @@ def zenith(
         model = [
             model for model in SolarPositionModels if model != SolarPositionModels.all
         ]
+    # Update Me --- Zenith Comes First, Altitude Bases On It ! ---------------
     solar_altitude = calculate_solar_altitude(
         longitude=longitude,
         latitude=latitude,
@@ -449,22 +450,23 @@ def zenith(
         angle_output_units=angle_output_units,
     )
     for model_result in solar_altitude:
-        solar_altitude = model_result.get('Altitude', None)
+        solar_zenith = model_result.get('Zenith', None)
         if solar_altitude is not None:
             if angle_output_units == 'degrees':
                 model_result['Zenith'] = 90 - solar_altitude
             else:
                 model_result['Zenith'] = radians(90) - solar_altitude
+    # Update Me --- Zenith Comes First, Altitude Bases On It ! ---------------
     print_solar_position_table(
-        longitude,
-        latitude,
-        timestamp,
-        timezone,
-        solar_altitude,
-        rounding_places,
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        table=solar_zenith,
+        rounding_places=rounding_places,
         zenith=True,
         user_requested_timestamp=user_requested_timestamp, 
-        user_requested_timezone=user_requested_timezone
+        user_requested_timezone=user_requested_timezone,
     )
 
 
@@ -547,7 +549,7 @@ def azimuth(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position=solar_azimuth,
+        table=solar_azimuth,
         rounding_places=rounding_places,
         azimuth=True,
         user_requested_timestamp=user_requested_timestamp, 
@@ -622,7 +624,7 @@ def declination(
         latitude=None,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position=solar_declination,
+        table=solar_declination,
         rounding_places=rounding_places,
         declination=True,
         user_requested_timestamp=user_requested_timestamp, 
@@ -749,7 +751,7 @@ def incidence(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position=solar_incidence,
+        table=solar_incidence,
         rounding_places=rounding_places,
         incidence=True,
         user_requested_timestamp=user_requested_timestamp, 
