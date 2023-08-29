@@ -26,14 +26,6 @@ from pvgisprototype.api.parameter_models import LatitudeModel
 from pvgisprototype.api.parameter_models import BaseCoordinatesModel
 
 
-class ValidatedInputToDict(BaseModel):
-    def pydantic_model_to_dict(self):
-        d = {}
-        for k, v in self:
-            d[k] = v
-        return d
-    
-
 class BaseTimeEventModel(BaseModel):
     event: str
 
@@ -100,7 +92,6 @@ class AngleInRadiansOutputUnitsModel(BaseModel):
 
 
 class CalculateFractionalYearNOAAInput(
-    ValidatedInputToDict,
     BaseTimestampModel,
     AngleInRadiansOutputUnitsModel,
 ):
@@ -108,7 +99,6 @@ class CalculateFractionalYearNOAAInput(
 
 
 class CalculateFractionalYearNOAATimeSeriesInput(  # merge above here-in!
-    ValidatedInputToDict,
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     AngleInRadiansOutputUnitsModel,
 ):
@@ -116,7 +106,6 @@ class CalculateFractionalYearNOAATimeSeriesInput(  # merge above here-in!
 
 
 class CalculateEquationOfTimeNOAAInput(
-    ValidatedInputToDict,
     BaseTimestampModel,
     BaseAngleUnitsModel,
     BaseTimeOutputUnitsModel,
@@ -125,7 +114,6 @@ class CalculateEquationOfTimeNOAAInput(
 
 
 class CalculateSolarDeclinationNOAAInput(
-    ValidatedInputToDict,
     BaseTimestampModel,
     BaseAngleOutputUnitsModel,
 ):
@@ -133,7 +121,6 @@ class CalculateSolarDeclinationNOAAInput(
 
 
 class CalculateSolarDeclinationNOAATimeSeriesInput(  # merge above here-in
-    ValidatedInputToDict,
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     BaseAngleOutputUnitsModel,
 ):
@@ -141,7 +128,6 @@ class CalculateSolarDeclinationNOAATimeSeriesInput(  # merge above here-in
 
 
 class CalculateTimeOffsetNOAAInput(
-    ValidatedInputToDict,
     LongitudeModel,
     BaseTimeModel,
     BaseTimeOutputUnitsModel,
@@ -151,7 +137,6 @@ class CalculateTimeOffsetNOAAInput(
 
 
 class CalculateTrueSolarTimeNOAAInput(
-    ValidatedInputToDict,
     LongitudeModel,
     BaseTimeModel,
     BaseTimeOutputUnitsModel,
@@ -160,7 +145,6 @@ class CalculateTrueSolarTimeNOAAInput(
 
 
 class CalculateTrueSolarTimeNOAATimeSeriesInput(
-    ValidatedInputToDict,
     LongitudeModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
@@ -169,7 +153,6 @@ class CalculateTrueSolarTimeNOAATimeSeriesInput(
 
 
 class CalculateSolarHourAngleNOAAInput(
-    ValidatedInputToDict,
     LongitudeModel,
     BaseTimeModel,
     BaseTimeOutputUnitsModel,
@@ -179,7 +162,6 @@ class CalculateSolarHourAngleNOAAInput(
 
 
 class CalculateSolarHourAngleNOAATimeSeriesInput(
-    ValidatedInputToDict,
     LongitudeModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
@@ -197,7 +179,6 @@ class SolarZenithSeriesModel(BaseModel):  # merge above here-in
 
 
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
-    ValidatedInputToDict,
     SolarZenithModel,
     BaseAngleOutputUnitsModel,
 ):
@@ -210,7 +191,6 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
 
 
 class AdjustSolarZenithForAtmosphericRefractionNOAATimeSeriesInput(
-    ValidatedInputToDict,
     SolarZenithSeriesModel,
     BaseAngleOutputUnitsModel,
 ):
@@ -227,7 +207,6 @@ class BaseApplyAtmosphericRefractionModel(BaseModel):
 
 
 class CalculateSolarZenithNOAAInput(
-    ValidatedInputToDict,
     LatitudeModel,
     BaseTimestampModel,
     SolarHourAngleModel,
@@ -238,7 +217,6 @@ class CalculateSolarZenithNOAAInput(
 
 
 class CalculateSolarZenithNOAATimeSeriesInput(
-    ValidatedInputToDict,
     LatitudeModel,
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     SolarHourAngleSeriesModel,
@@ -253,7 +231,6 @@ class SolarAltitudeModel_in_Radians(BaseModel):
 
 
 class CalculateSolarAltitudeNOAAInput(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseApplyAtmosphericRefractionModel,
@@ -265,7 +242,6 @@ class CalculateSolarAltitudeNOAAInput(
 
 
 class CalculateSolarAltitudeNOAATimeSeriesInput(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     BaseApplyAtmosphericRefractionModel,
@@ -277,7 +253,6 @@ class CalculateSolarAltitudeNOAATimeSeriesInput(
 
 
 class CalculateSolarAzimuthNOAAInput(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseTimeOutputUnitsModel,
@@ -288,7 +263,6 @@ class CalculateSolarAzimuthNOAAInput(
 
 
 class CalculateSolarAzimuthNOAATimeSeriesInput(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
@@ -301,7 +275,6 @@ class CalculateSolarAzimuthNOAATimeSeriesInput(
 
 
 class CalculateEventHourAngleNOAAInput(
-    ValidatedInputToDict,
     LatitudeModel,
     BaseTimestampModel,
     BaseAngleUnitsModel,
@@ -322,7 +295,6 @@ class CalculateEventHourAngleNOAAInput(
 
 
 class CalculateEventTimeNOAAInput(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseTimeEventModel,
@@ -335,7 +307,6 @@ class CalculateEventTimeNOAAInput(
 
 
 class CalculateLocalSolarTimeNOAAInput(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseTimeOutputUnitsModel,
@@ -346,7 +317,6 @@ class CalculateLocalSolarTimeNOAAInput(
 
 
 class CalculateSolarPositionNOAAInput(
-    ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseApplyAtmosphericRefractionModel,

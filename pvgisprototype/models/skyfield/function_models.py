@@ -5,7 +5,7 @@ from pvgisprototype.api.parameter_models import BaseTimeModel
 
 
 class CalculateSolarTimeSkyfieldInputModel(
-    ValidatedInputToDict,
+    # ValidatedInputToDict,
     BaseCoordinatesModel,
     BaseTimeModel,
 ):
@@ -13,7 +13,7 @@ class CalculateSolarTimeSkyfieldInputModel(
 
 
 class CalculateSolarDeclinationSkyfieldInputModel(
-    ValidatedInputToDict,
+    # ValidatedInputToDict,
     BaseTimestampModel,
         ):
     pass

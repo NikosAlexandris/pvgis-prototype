@@ -13,14 +13,6 @@ from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.data_classes.models import Longitude
 
 
-class ValidatedInputToDict(BaseModel):
-    def pydantic_model_to_dict(self):
-        d = {}
-        for k, v in self:
-            d[k] = v
-        return d
-
-
 class LongitudeModel(BaseModel):
     longitude: Union[confloat(ge=-pi, le=pi), Longitude]
     model_config = ConfigDict(arbitrary_types_allowed=True)
