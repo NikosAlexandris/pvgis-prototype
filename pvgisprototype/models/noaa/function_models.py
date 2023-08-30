@@ -1,94 +1,19 @@
-from typing import List
-from typing import Optional
-from typing import Union
-from typing import Sequence
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from math import pi
-from pydantic import field_validator
-from pydantic import BaseModel
-from pydantic import confloat
-import numpy as np
-
-# from pvgisprototype.api.data_classes.models import SolarZenith
-from pvgisprototype.api.parameter_models import SolarHourAngleModel
-from pvgisprototype.api.parameter_models import SolarHourAngleSeriesModel
-
-# When?
-from pvgisprototype.api.parameter_models import BaseTimestampModel
-from pvgisprototype.api.parameter_models import BaseTimestampSeriesModel
-from pvgisprototype.api.parameter_models import BaseTimeModel
-from pvgisprototype.api.parameter_models import BaseTimeSeriesModel
-
-# Where?
-from pvgisprototype.api.parameter_models import LongitudeModel
-from pvgisprototype.api.parameter_models import LatitudeModel
-from pvgisprototype.api.parameter_models import BaseCoordinatesModel
-
-
-class BaseTimeEventModel(BaseModel):
-    event: str
-
-    @field_validator('event')
-    @classmethod
-    def validate_event(cls, v):
-        valid_events = ['noon', 'sunrise', 'sunset']
-        if v not in valid_events:
-            raise ValueError(f"`event` must be one of {valid_events}")
-        return v
-
-
-class BaseTimeOutputUnitsModel(BaseModel):
-    time_output_units: Optional[str] = None
-
-    @field_validator('time_output_units')
-    @classmethod
-    def validate_time_output_units(cls, v):
-        valid_units = ['minutes', 'seconds', 'hours']
-        if v not in valid_units:
-            raise ValueError(f"time_output_units must be one of {valid_units}")
-        return v
-
-
-class BaseAngleUnitsModel(BaseModel):
-    angle_units: str
-
-    @field_validator('angle_units')
-    @classmethod
-    def validate_angle_units(cls, v):
-        valid_units = ['radians', 'degrees']
-        if v not in valid_units:
-            raise ValueError(f"angle_units must be one of {valid_units}")
-        return v
-
-
-class BaseAngleOutputUnitsModel(BaseModel):
-    angle_output_units: Optional[str] = "radians"
-
-    @field_validator('angle_output_units')
-    @classmethod
-    def validate_angle_output_units(cls, v):
-        valid_units = ['radians', 'degrees']
-        if v not in valid_units:
-            raise ValueError(f"angle_output_units must be one of {valid_units}")
-        return v
-
-
-class AngleInRadiansOutputUnitsModel(BaseModel):
-    """
-    The angle in radians output units argument is passed along with the
-    returned value. This is not a real test. Hopefully, and however, it helps
-    for clarity and understanding of what the function should return.
-    """
-    angle_output_units: str = "radians"
-
-    @field_validator('angle_output_units')
-    @classmethod
-    def validate_angle_output_units(cls, v):
-        valid_units = ['radians']
-        if v not in valid_units:
-            raise ValueError(f"angle_output_units must be one of {valid_units}")
-        return v
+from pvgisprototype.models.noaa.parameter_models import BaseTimestampModel
+from pvgisprototype.models.noaa.parameter_models import AngleInRadiansOutputUnitsModel
+from pvgisprototype.models.noaa.parameter_models import BaseTimestampSeriesModel
+from pvgisprototype.models.noaa.parameter_models import BaseAngleUnitsModel
+from pvgisprototype.models.noaa.parameter_models import BaseTimeOutputUnitsModel
+from pvgisprototype.models.noaa.parameter_models import BaseAngleOutputUnitsModel
+from pvgisprototype.models.noaa.parameter_models import LongitudeModel
+from pvgisprototype.models.noaa.parameter_models import BaseTimeModel
+from pvgisprototype.models.noaa.parameter_models import SolarZenithModel
+from pvgisprototype.models.noaa.parameter_models import SolarZenithSeriesModel
+from pvgisprototype.models.noaa.parameter_models import LatitudeModel
+from pvgisprototype.models.noaa.parameter_models import SolarHourAngleModel
+from pvgisprototype.models.noaa.parameter_models import BaseApplyAtmosphericRefractionModel
+from pvgisprototype.models.noaa.parameter_models import SolarHourAngleSeriesModel
+from pvgisprototype.models.noaa.parameter_models import BaseCoordinatesModel
+from pvgisprototype.models.noaa.parameter_models import BaseTimeEventModel
 
 
 class CalculateFractionalYearNOAAInput(
@@ -170,14 +95,6 @@ class CalculateSolarHourAngleNOAATimeSeriesInput(
     pass
 
 
-class SolarZenithModel(BaseModel):
-    solar_zenith: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
-
-
-class SolarZenithSeriesModel(BaseModel):  # merge above here-in
-    solar_zenith_series: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
-
-
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     SolarZenithModel,
     BaseAngleOutputUnitsModel,
@@ -202,10 +119,6 @@ class AdjustSolarZenithForAtmosphericRefractionNOAATimeSeriesInput(
         return v  # Return the original value or array
 
 
-class BaseApplyAtmosphericRefractionModel(BaseModel):
-    apply_atmospheric_refraction: bool
-
-
 class CalculateSolarZenithNOAAInput(
     LatitudeModel,
     BaseTimestampModel,
@@ -226,16 +139,11 @@ class CalculateSolarZenithNOAATimeSeriesInput(
     pass
 
 
-class SolarAltitudeModel_in_Radians(BaseModel):
-    solar_altitude: confloat(ge=-0.01745, le=pi/2)
-
-
 class CalculateSolarAltitudeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseApplyAtmosphericRefractionModel,
     BaseTimeOutputUnitsModel,
-    # BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
@@ -270,8 +178,6 @@ class CalculateSolarAzimuthNOAATimeSeriesInput(
     BaseAngleOutputUnitsModel,
 ):
     pass
-
-
 
 
 class CalculateEventHourAngleNOAAInput(
