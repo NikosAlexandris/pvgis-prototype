@@ -33,7 +33,7 @@ def calculate_fractional_year_noaa(
     if not 0 <= fractional_year < 2 * pi:
         raise ValueError(f'The calculated fractional year {fractional_year} is outside the expected range [0, 2*pi] radians')
 
-    fractional_year = FractionalYear(value=fractional_year, unit=angle_output_units)
+    fractional_year = FractionalYear(value=fractional_year, unit='radians')
 
     # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
     # if angle_output_units == 'degrees':
