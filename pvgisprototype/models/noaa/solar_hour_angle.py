@@ -20,8 +20,8 @@ def calculate_solar_hour_angle_noaa(
     longitude: Longitude,
     timestamp: datetime, 
     timezone: Optional[ZoneInfo] = None, 
-    time_output_units: Optional[str] = 'minutes',
-    angle_output_units: Optional[str] = 'radians',
+    time_output_units: str = 'minutes',
+    angle_output_units: str = 'radians',
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
 
@@ -78,7 +78,7 @@ def calculate_solar_hour_angle_noaa(
     solar_hour_angle = (true_solar_time_minutes - 720) * (pi / 720)
 
     if angle_output_units == 'radians' and not -pi <= solar_hour_angle <= pi:
-        raise ValueError(f'The hour angle in radians must range within [{-pi}, {pi}]')
+        raise ValueError(f'The calculated hour angle {solar_hour_angle} is out of the expected range [{-pi}, {pi}] radians')
 
     # elif angle_output_units == 'degrees' and not -180 <= solar_hour_angle <= 180:
     #     raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")

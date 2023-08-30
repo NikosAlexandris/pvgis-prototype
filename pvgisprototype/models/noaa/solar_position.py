@@ -67,16 +67,17 @@ def calculate_noaa_solar_position(
     """
     result = {}
     fractional_year = calculate_fractional_year_noaa(
-        timestamp=timestamp, angle_output_units=angle_output_units
+        timestamp=timestamp,
+        angle_output_units=angle_output_units,
     )
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
         time_output_units=time_output_units,
-        angle_units=angle_units,  # for calculate_fractional_year_noaa()
+        angle_units=angle_units,
     )
     solar_declination = calculate_solar_declination_noaa(
         timestamp=timestamp,
-        angle_units=angle_units,  # for calculate_fractional_year_noaa()
+        angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
     time_offset = calculate_time_offset_noaa(
@@ -97,7 +98,7 @@ def calculate_noaa_solar_position(
         timezone=timezone,
         time_output_units=time_output_units,
         angle_output_units=angle_output_units,
-    )
+    )  # for solar_zenith
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
         timestamp=timestamp,

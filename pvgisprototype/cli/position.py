@@ -167,7 +167,6 @@ def overview(
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
     
-    # Convert the input timestamp to UTC, for _all_ internal calculations
     utc_zoneinfo = ZoneInfo("UTC")
     if timestamp.tzinfo != utc_zoneinfo:
 
@@ -177,7 +176,7 @@ def overview(
 
         timestamp = timestamp.astimezone(utc_zoneinfo)
         timezone = utc_zoneinfo
-        typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
+        typer.echo(f'Input timestamp & zone ({user_requested_timestamp} & {user_requested_timezone}) converted to {timestamp} for all internal calculations!')
     
     # Why does the callback function `_parse_model` not work? 
     if SolarPositionModels.all in model:
@@ -255,7 +254,7 @@ def noaa(
 
         timestamp = timestamp.astimezone(utc_zoneinfo)
         timezone = utc_zoneinfo
-        typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
+        typer.echo(f'Input timestamp & zone ({user_requested_timestamp} & {user_requested_timezone}) converted to {timestamp} for all internal calculations!')
 
     solar_position_calculations = calculate_noaa_solar_position(
         longitude=longitude,
