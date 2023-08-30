@@ -1,3 +1,5 @@
+from pydantic import field_validator
+from typing import Optional
 from pvgisprototype.models.noaa.parameter_models import BaseTimestampModel
 from pvgisprototype.models.noaa.parameter_models import AngleInRadiansOutputUnitsModel
 from pvgisprototype.models.noaa.parameter_models import BaseTimestampSeriesModel
@@ -6,6 +8,7 @@ from pvgisprototype.models.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.models.noaa.parameter_models import BaseAngleOutputUnitsModel
 from pvgisprototype.models.noaa.parameter_models import LongitudeModel
 from pvgisprototype.models.noaa.parameter_models import BaseTimeModel
+from pvgisprototype.models.noaa.parameter_models import BaseTimeSeriesModel
 from pvgisprototype.models.noaa.parameter_models import SolarZenithModel
 from pvgisprototype.models.noaa.parameter_models import SolarZenithSeriesModel
 from pvgisprototype.models.noaa.parameter_models import LatitudeModel
@@ -14,6 +17,7 @@ from pvgisprototype.models.noaa.parameter_models import BaseApplyAtmosphericRefr
 from pvgisprototype.models.noaa.parameter_models import SolarHourAngleSeriesModel
 from pvgisprototype.models.noaa.parameter_models import BaseCoordinatesModel
 from pvgisprototype.models.noaa.parameter_models import BaseTimeEventModel
+from math import pi
 
 
 class CalculateFractionalYearNOAAInput(

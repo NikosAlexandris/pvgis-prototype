@@ -13,10 +13,10 @@ from math import isfinite
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.data_classes.models import AtmosphericRefraction
-from .noaa_models import CalculateSolarZenithNOAAInput
-from .noaa_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
-from .noaa_models import CalculateSolarZenithNOAATimeSeriesInput
-from .noaa_models import AdjustSolarZenithForAtmosphericRefractionNOAATimeSeriesInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarZenithNOAAInput
+from pvgisprototype.models.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarZenithNOAATimeSeriesInput
+from pvgisprototype.models.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionNOAATimeSeriesInput
 from pvgisprototype.api.data_classes.models import SolarZenith
 from pvgisprototype.api.data_classes.models import SolarAltitude
 from pvgisprototype.api.data_classes.models import Latitude

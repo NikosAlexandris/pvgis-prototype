@@ -41,7 +41,7 @@ from .event_time import calculate_event_time_noaa
 from .local_time import calculate_local_solar_time_noaa
 
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.models.noaa.noaa_models import CalculateSolarPositionNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarPositionNOAAInput
 from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.data_classes.models import Latitude
 

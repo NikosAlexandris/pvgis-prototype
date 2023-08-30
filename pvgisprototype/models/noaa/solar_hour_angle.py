@@ -7,8 +7,8 @@ from typing import Sequence
 from .solar_time import calculate_true_solar_time_noaa
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.models.noaa.noaa_models import CalculateSolarHourAngleNOAAInput
-from pvgisprototype.models.noaa.noaa_models import CalculateSolarHourAngleNOAATimeSeriesInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarHourAngleNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarHourAngleNOAATimeSeriesInput
 from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.data_classes.models import SolarHourAngle
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes

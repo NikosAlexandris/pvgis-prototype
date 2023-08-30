@@ -6,8 +6,8 @@ from typing import Optional
 from typing import Union
 from typing import Sequence
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.models.noaa.noaa_models import CalculateTrueSolarTimeNOAAInput
-from pvgisprototype.models.noaa.noaa_models import CalculateTrueSolarTimeNOAATimeSeriesInput
+from pvgisprototype.models.noaa.function_models import CalculateTrueSolarTimeNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateTrueSolarTimeNOAATimeSeriesInput
 from pvgisprototype.api.data_classes.models import Longitude
 from .time_offset import calculate_time_offset_noaa
 

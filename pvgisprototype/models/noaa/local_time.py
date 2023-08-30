@@ -2,7 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import time
 from pvgisprototype.api.decorators import validate_with_pydantic
-from .noaa_models import CalculateLocalSolarTimeNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateLocalSolarTimeNOAAInput
 from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.data_classes.models import SolarTime

@@ -5,7 +5,7 @@ from math import cos
 from math import tan
 from math import acos
 from pvgisprototype.api.decorators import validate_with_pydantic
-from .noaa_models import CalculateEventHourAngleNOAAInput
+from .function_models import CalculateEventHourAngleNOAAInput
 from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.data_classes.models import EventTime
 from .solar_declination import calculate_solar_declination_noaa

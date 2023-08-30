@@ -3,8 +3,8 @@ from typing import Optional
 from typing import Union
 from typing import Sequence
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.models.noaa.noaa_models import CalculateFractionalYearNOAAInput
-from pvgisprototype.models.noaa.noaa_models import CalculateFractionalYearNOAATimeSeriesInput
+from pvgisprototype.models.noaa.function_models import CalculateFractionalYearNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateFractionalYearNOAATimeSeriesInput
 from math import pi
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 

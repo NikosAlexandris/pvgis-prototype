@@ -4,7 +4,7 @@ from math import pi
 from datetime import time
 from datetime import timedelta
 from pvgisprototype.api.decorators import validate_with_pydantic
-from .noaa_models import CalculateEventTimeNOAAInput
+from .function_models import CalculateEventTimeNOAAInput
 from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.data_classes.models import EventTime

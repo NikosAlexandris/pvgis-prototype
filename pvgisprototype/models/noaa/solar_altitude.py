@@ -8,8 +8,8 @@ from math import pi
 from math import isfinite
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.models.noaa.noaa_models import CalculateSolarAltitudeNOAAInput
-from pvgisprototype.models.noaa.noaa_models import CalculateSolarAltitudeNOAATimeSeriesInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarAltitudeNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarAltitudeNOAATimeSeriesInput
 from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.data_classes.models import SolarHourAngle

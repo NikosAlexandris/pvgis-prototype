@@ -1,13 +1,13 @@
 from devtools import debug
-# from .noaa_models import LongitudeModel_in_Radians
+# from .function_models import LongitudeModel_in_Radians
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
-from .noaa_models import CalculateTimeOffsetNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateTimeOffsetNOAAInput
 from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.data_classes.models import TimeOffset
-from .equation_of_time import calculate_equation_of_time_noaa
+from pvgisprototype.models.noaa.equation_of_time import calculate_equation_of_time_noaa
 
 
 # equaivalen to : 4 * longitude (in degrees) ?
