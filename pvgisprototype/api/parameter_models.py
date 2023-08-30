@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import field_validator
 from pydantic import confloat
-from typing import Optional
 from typing import Union
+from typing import Optional
 from typing import Sequence
 from typing import List
 from zoneinfo import ZoneInfo
@@ -31,12 +31,13 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 
 # Where?
 
+
 class LongitudeModel(BaseModel):
     longitude: Union[confloat(ge=-pi, le=pi), Longitude]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("longitude")
-    def longitude_named_tuple(cls, input) -> Longitude:
+    def validate_longitude(cls, input) -> Longitude:
         if isinstance(input, Longitude):
             return input
         elif isinstance(input, float):
@@ -50,7 +51,7 @@ class LatitudeModel(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("latitude")
-    def latitude_named_tuple(cls, input) -> Latitude:
+    def validate_latitude(cls, input) -> Latitude:
         if isinstance(input, Latitude):
             return input
         elif isinstance(input, float):
@@ -67,6 +68,7 @@ class BaseCoordinatesModel(
 
 
 # When?
+
 
 class BaseTimestampModel(BaseModel):
     timestamp: datetime
@@ -129,6 +131,7 @@ class BaseTimeOutputUnitsModel(BaseModel):
 
 # Angular units
 
+
 class BaseAngleUnitsModel(BaseModel):
     angle_units: str
 
@@ -173,17 +176,16 @@ class BaseAngleOutputUnitsModel(BaseModel):
 
 # Solar geometry
 
+
 class SolarDeclinationModel(BaseModel):
-    solar_declination: Union[
-        confloat(ge=0, le=pi), SolarDeclination
-    ]
+    solar_declination: Union[confloat(ge=0, le=pi), SolarDeclination]
     model_config = ConfigDict(
         description="""Solar declination (δ) is the angle between the equator and a
         line drawn from the centre of the Earth to the centre of the sun.""",
     )
 
     @field_validator("solar_declination")
-    def solar_declination_named_tuple(cls, input) -> SolarDeclination:
+    def validate_solar_declination(cls, input) -> SolarDeclination:
         if isinstance(input, SolarDeclination):
             return input
         elif isinstance(input, float):
@@ -198,7 +200,7 @@ class SolarPositionModel(BaseModel):
 
 
 class DaysInAYearModel(BaseModel):
-    days_in_a_year: float = DAYS_IN_A_YEAR  # TODO: Validator 
+    days_in_a_year: float = DAYS_IN_A_YEAR  # TODO: Validator
 
 
 class EarthOrbitModel(DaysInAYearModel):
@@ -221,15 +223,16 @@ class SolarTimeModel(BaseModel):
 
 # Solar surface
 
+
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi/2, le=pi/2), SurfaceTilt]
+    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt]
     model_config = ConfigDict(
         description="""Surface tilt (or slope) (β) is the angle between the inclined
         surface (slope) and the horizontal plane.""",
     )
 
     @field_validator("surface_tilt")
-    def surface_tilt_named_tuple(cls, input) -> SurfaceTilt:
+    def validate_surface_tilt(cls, input) -> SurfaceTilt:
         if isinstance(input, SurfaceTilt):
             return input
         elif isinstance(input, float):
@@ -239,13 +242,13 @@ class SurfaceTiltModel(BaseModel):
 
 
 class SurfaceOrientationModel(BaseModel):
-    surface_orientation: Union[confloat(ge=0, le=2*pi), SurfaceOrientation] = 180
+    surface_orientation: Union[confloat(ge=0, le=2 * pi), SurfaceOrientation] = 180
     model_config = ConfigDict(
         description="""Surface orientation (also known as aspect or azimuth) is the projected angle measured clockwise from true north"""
     )
 
     @field_validator("surface_orientation")
-    def surface_orientation_named_tuple(cls, input) -> SurfaceOrientation:
+    def validate_surface_orientation(cls, input) -> SurfaceOrientation:
         if isinstance(input, SurfaceOrientation):
             return input
         elif isinstance(input, float):
@@ -261,7 +264,7 @@ class SolarHourAngleModel(BaseModel):
     )
 
     @field_validator("solar_hour_angle")
-    def solar_hour_angle_named_tuple(cls, input) -> SolarHourAngle:
+    def validate_solar_hour_angle(cls, input) -> SolarHourAngle:
         if isinstance(input, SolarHourAngle):
             return input
         elif isinstance(input, float):
@@ -278,10 +281,16 @@ class SolarHourAngleSeriesModel(BaseModel):
     )
 
     @field_validator("solar_hour_angle_series")
-    def solar_hour_angle_named_tuple(cls, input) -> Union[Sequence[SolarHourAngle], ndarray]:
-        if isinstance(input, list) and all(isinstance(item, SolarHourAngle) for item in input):
+    def validate_solar_hour_angle(
+        cls, input
+    ) -> Union[Sequence[SolarHourAngle], ndarray]:
+        if isinstance(input, list) and all(
+            isinstance(item, SolarHourAngle) for item in input
+        ):
             return input
-        elif isinstance(input, ndarray) and all(isinstance(item, SolarHourAngle) for item in input):
+        elif isinstance(input, ndarray) and all(
+            isinstance(item, SolarHourAngle) for item in input
+        ):
             return input
         else:
             raise ValueError("Unsupported solar_hour_angle_series type provided")
@@ -295,7 +304,7 @@ class RefractedSolarAltitudeModel(BaseModel):
     refracted_solar_altitude: Union[float, RefractedSolarAltitude]
 
     @field_validator("refracted_solar_altitude")
-    def refracted_solar_altitude_named_tuple(cls, input) -> RefractedSolarAltitude:
+    def validate_refracted_solar_altitude(cls, input) -> RefractedSolarAltitude:
         if isinstance(input, RefractedSolarAltitude):
             return input
         elif isinstance(input, float):
@@ -308,7 +317,7 @@ class RefractedSolarZenithModel(BaseModel):
     refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith]
 
     @field_validator("refracted_solar_zenith")
-    def refracted_solar_zenith_named_tuple(cls, input) -> RefractedSolarZenith:
+    def validate_refracted_solar_zenith(cls, input) -> RefractedSolarZenith:
         if isinstance(input, RefractedSolarZenith):
             return input
         elif isinstance(input, float):
@@ -320,16 +329,16 @@ class RefractedSolarZenithModel(BaseModel):
 class ElevationModel(BaseModel):
     elevation: Union[confloat(ge=0, le=8848), Elevation]
     model_config = ConfigDict(
-            arbitrary_types_allowed=True,
-            description="""Elevation""",
-        )
+        arbitrary_types_allowed=True,
+        description="""Elevation""",
+    )
 
-    @field_validator('elevation')
-    def elevation_named_tuple(cls, input) -> Elevation:
+    @field_validator("elevation")
+    def validate_elevation(cls, input) -> Elevation:
         if isinstance(input, Elevation):
             return input
         elif isinstance(input, float):
-            return Elevation(value=input, unit='meters')
+            return Elevation(value=input, unit="meters")
         else:
             raise ValueError("Unsupported type provided for `elevation`")
 
@@ -338,7 +347,12 @@ class ElevationModel(BaseModel):
         #     raise ValueError(f"elevation must be given in {valid_units}")
         # return v
 
+
 class IrradianceInputModel(BaseModel):
-    linke_turbidity_factor: confloat(ge=0, le=8)  # help='A measure of atmospheric turbidity',
+    linke_turbidity_factor: confloat(
+        ge=0, le=8
+    )  # help='A measure of atmospheric turbidity',
     optical_air_mass: float
-    extraterrestial_irradiance: confloat(ge=1360) = 1360.8 # description="The average solar radiation at the top of the atmosphere ~1360.8 W/m^2 (Kopp, 2011)")
+    extraterrestial_irradiance: confloat(
+        ge=1360
+    ) = 1360.8  # description="The average solar radiation at the top of the atmosphere ~1360.8 W/m^2 (Kopp, 2011)")
