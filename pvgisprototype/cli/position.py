@@ -17,7 +17,6 @@ from zoneinfo import ZoneInfo
 import math
 from math import radians
 import numpy as np
-# from rich.console import Console
 from rich.table import Table
 from rich import box
 from .typer_parameters import OrderCommands
@@ -90,7 +89,6 @@ from .print import print_solar_position_table
 from .print import print_noaa_solar_position_table
 
 
-# console = Console()
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=True,

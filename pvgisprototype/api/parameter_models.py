@@ -13,39 +13,20 @@ from math import pi
 from pydantic import validator
 import numpy as np
 from numpy import ndarray
-
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
-
-from pvgisprototype.api.data_classes.models import EccentricityCorrectionFactor
-from pvgisprototype.api.data_classes.models import PerigeeOffset
 from pvgisprototype.api.data_classes.models import RefractedSolarAltitude
 from pvgisprototype.api.data_classes.models import RefractedSolarZenith
 from pvgisprototype.api.data_classes.models import SurfaceTilt
 from pvgisprototype.api.data_classes.models import SurfaceOrientation
 from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.data_classes.models import Longitude
-from pvgisprototype.api.data_classes.models import HourAngleSunrise
-from pvgisprototype.api.data_classes.models import SolarTime
-from pvgisprototype.api.data_classes.models import TrueSolarTime
-from pvgisprototype.api.data_classes.models import EquationOfTime
-from pvgisprototype.api.data_classes.models import FractionalYear
-from pvgisprototype.api.data_classes.models import TimeOffset
-from pvgisprototype.api.data_classes.models import EventTime
-from pvgisprototype.api.data_classes.models import HourAngle
-from pvgisprototype.api.data_classes.models import SolarAltitude
-from pvgisprototype.api.data_classes.models import SolarAzimuth
-from pvgisprototype.api.data_classes.models import CompassSolarAzimuth
 from pvgisprototype.api.data_classes.models import SolarDeclination
-from pvgisprototype.api.data_classes.models import SolarIncidence
+from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.data_classes.models import SolarHourAngle
-from pvgisprototype.api.data_classes.models import SolarZenith
-from pvgisprototype.api.data_classes.models import SolarPosition
 from pvgisprototype.api.data_classes.models import Elevation
-
 from pvgisprototype.api.constants import DAYS_IN_A_YEAR
 from pvgisprototype.api.constants import PERIGEE_OFFSET
 from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.api.geometry.models import SolarTimeModels
 
 
 # Where?
