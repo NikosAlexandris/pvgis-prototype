@@ -33,24 +33,3 @@ class SolarTimeModels(str, Enum):
     noaa = 'NOAA'
     pvgis = 'PVGIS'
     skyfield = 'Skyfield'
-
-
-# def _parse_model(
-#         ctx: typer.Context,
-#         model: List[SolarPositionModels],
-#         param: typer.CallbackParam,
-#     ) -> List[SolarPositionModels]:
-
-#     print(f'ctx : {ctx}')
-#     print(f'param : {param}')
-#     print(f'model : {model}')
-#     print()
-#     if ctx.resilient_parsing:
-#         return
-#     if SolarPositionModels.all in model:
-#         # Return all models except for the 'all' itself!
-#         model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-#     print(f"Return model: {model}")
-#     return model
-
-
