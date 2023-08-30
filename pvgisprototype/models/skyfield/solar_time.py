@@ -20,9 +20,9 @@ from ...api.utilities.timestamp import ctx_convert_to_timezone
 
 from .decorators import validate_with_pydantic
 from pvgisprototype.models.skyfield.function_models import CalculateSolarTimeSkyfieldInputModel
-from pvgisprototype.api.data_classes.models import SolarTime
-from pvgisprototype.api.data_classes.models import Latitude
-from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.models import SolarTime
+from pvgisprototype.api.models import Latitude
+from pvgisprototype.api.models import Longitude
 
 
 @validate_with_pydantic(CalculateSolarTimeSkyfieldInputModel)

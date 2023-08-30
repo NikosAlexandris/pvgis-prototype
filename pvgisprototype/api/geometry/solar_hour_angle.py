@@ -7,12 +7,12 @@ from math import acos
 from math import tan
 from datetime import time
 
-from pvgisprototype.api.data_classes.models import HourAngle
-from pvgisprototype.api.data_classes.models import HourAngleSunrise
-from pvgisprototype.api.data_classes.models import Latitude
-from pvgisprototype.api.data_classes.models import HourAngle
-from pvgisprototype.api.data_classes.models import HourAngleSunrise
-from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.models import HourAngle
+from pvgisprototype.api.models import HourAngleSunrise
+from pvgisprototype.api.models import Latitude
+from pvgisprototype.api.models import HourAngle
+from pvgisprototype.api.models import HourAngleSunrise
+from pvgisprototype.api.models import Latitude
 from pvgisprototype.api.function_models import CalculateHourAngleInputModel
 from pvgisprototype.api.function_models import CalculateHourAngleSunriseInputModel
 from pvgisprototype.api.decorators import validate_with_pydantic

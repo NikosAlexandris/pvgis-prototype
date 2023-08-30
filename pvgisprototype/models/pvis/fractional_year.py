@@ -2,7 +2,7 @@ from datetime import date
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateFractionalYearPVISInputModel
 from datetime import datetime
-from pvgisprototype.api.data_classes.models import FractionalYear
+from pvgisprototype.api.models import FractionalYear
 from math import pi
 from math import isclose
 

@@ -12,7 +12,7 @@ from math import sin
 from math import cos
 import numpy as np
 
-from pvgisprototype.api.data_classes.models import SolarDeclination
+from pvgisprototype.api.models import SolarDeclination
 
 
 # @cache_result

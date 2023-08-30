@@ -8,9 +8,9 @@ import ephem
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.data_classes.models import SolarTime
-from pvgisprototype.api.data_classes.models import Latitude
-from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.models import SolarTime
+from pvgisprototype.api.models import Latitude
+from pvgisprototype.api.models import Longitude
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateSolarTimeEphemInputModel
 

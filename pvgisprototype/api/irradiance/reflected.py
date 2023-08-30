@@ -21,7 +21,7 @@ from math import sin
 from math import cos
 from .diffuse import diffuse_transmission_function
 from .diffuse import diffuse_solar_altitude_function
-from .constants import SOLAR_CONSTANT
+from pvgisprototype.api.constants import SOLAR_CONSTANT
 
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude

@@ -2,7 +2,7 @@ from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateSolarDeclinationPVISInputModel
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.data_classes.models import SolarDeclination
+from pvgisprototype.api.models import SolarDeclination
 from pvgisprototype.models.pvis.fractional_year import calculate_fractional_year_pvis
 from math import sin
 from math import asin

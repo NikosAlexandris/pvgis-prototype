@@ -48,7 +48,7 @@ from datetime import datetime
 from ..constants import AOI_CONSTANTS
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.data_classes.models import RefractedSolarAltitude
+from pvgisprototype.api.models import RefractedSolarAltitude
 from ..geometry.models import SolarDeclinationModels
 from ..geometry.models import SolarIncidenceModels
 from ..geometry.models import SolarTimeModels
@@ -76,7 +76,7 @@ from pydantic import validator
 from math import radians
 from math import degrees
 from pathlib import Path
-from .constants import SOLAR_CONSTANT
+from pvgisprototype.api.constants import SOLAR_CONSTANT
 
 # from pvgisprototype.api.series.utilities import select_coordinates
 from pvgisprototype.cli.series import select_time_series

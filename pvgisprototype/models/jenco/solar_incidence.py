@@ -17,11 +17,11 @@ from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 
-from pvgisprototype.api.data_classes.models import RelativeLongitude
-from pvgisprototype.api.data_classes.models import SolarIncidence
-from pvgisprototype.api.data_classes.models import HorizonHeight
-from pvgisprototype.api.data_classes.models import Longitude
-from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.models import RelativeLongitude
+from pvgisprototype.api.models import SolarIncidence
+from pvgisprototype.api.models import HorizonHeight
+from pvgisprototype.api.models import Longitude
+from pvgisprototype.api.models import Latitude
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import CalculateRelativeLongitudeInputModel

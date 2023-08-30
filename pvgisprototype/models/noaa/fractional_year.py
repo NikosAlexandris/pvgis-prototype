@@ -8,7 +8,7 @@ from pvgisprototype.models.noaa.function_models import CalculateFractionalYearNO
 from math import pi
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 
-from pvgisprototype.api.data_classes.models import FractionalYear
+from pvgisprototype.api.models import FractionalYear
 
 import numpy as np
 

@@ -5,9 +5,9 @@ from zoneinfo import ZoneInfo
 
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.api.function_models import ModelSolarTimeInputModel
-from pvgisprototype.api.data_classes.models import SolarTime
-from pvgisprototype.api.data_classes.models import Longitude
-from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.models import SolarTime
+from pvgisprototype.api.models import Longitude
+from pvgisprototype.api.models import Latitude
 from .models import SolarTimeModels
 from ..utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.models.milne1921.solar_time import calculate_solar_time_eot

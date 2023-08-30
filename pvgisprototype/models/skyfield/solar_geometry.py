@@ -21,13 +21,13 @@ from pvgisprototype.models.skyfield.function_models import CalculateSolarPositio
 from pvgisprototype.models.skyfield.function_models import CalculateSolarAltitudeAzimuthSkyfieldInputModel
 from pvgisprototype.models.skyfield.function_models import CalculateHourAngleSkyfieldInput
 
-from pvgisprototype.api.data_classes.models import SolarPosition
-from pvgisprototype.api.data_classes.models import SolarAltitude
-from pvgisprototype.api.data_classes.models import SolarAzimuth
-from pvgisprototype.api.data_classes.models import HourAngle
-from pvgisprototype.api.data_classes.models import SolarDeclination
-from pvgisprototype.api.data_classes.models import Latitude
-from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.models import SolarPosition
+from pvgisprototype.api.models import SolarAltitude
+from pvgisprototype.api.models import SolarAzimuth
+from pvgisprototype.api.models import HourAngle
+from pvgisprototype.api.models import SolarDeclination
+from pvgisprototype.api.models import Latitude
+from pvgisprototype.api.models import Longitude
 
 
 @validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel)
