@@ -4,8 +4,8 @@ from typing import Sequence
 from datetime import datetime
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.models.noaa.noaa_models import CalculateSolarDeclinationNOAAInput
-from pvgisprototype.models.noaa.noaa_models import CalculateSolarDeclinationNOAATimeSeriesInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarDeclinationNOAAInput
+from pvgisprototype.models.noaa.function_models import CalculateSolarDeclinationNOAATimeSeriesInput
 from .fractional_year import calculate_fractional_year_noaa 
 from pvgisprototype.models.noaa.fractional_year import calculate_fractional_year_time_series_noaa
 from math import sin
