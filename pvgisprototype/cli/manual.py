@@ -9,7 +9,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=':book:  Manual for solar radiation variables',
+    help=':book: Manual for solar radiation variables',
 )
 
 

@@ -6,6 +6,7 @@ from typing import Optional
 from typing import Tuple
 from enum import Enum
 
+from .typer_parameters import OrderCommands
 from .typer_parameters import typer_argument_longitude
 from .typer_parameters import typer_argument_longitude_in_degrees
 from .typer_parameters import typer_argument_latitude
@@ -53,10 +54,11 @@ from pvgisprototype.api.series.statistics import export_statistics_to_csv
 
 
 app = typer.Typer(
+    cls=OrderCommands,
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f'󰞱  Work with time series',
+    help=f':chart: Work with time series',
 )
 
 
