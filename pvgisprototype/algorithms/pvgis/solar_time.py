@@ -6,17 +6,17 @@ from datetime import timedelta
 from zoneinfo import ZoneInfo
 import numpy as np
 
-from ...api.constants import double_numpi
+from pvgisprototype.constants import double_numpi
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.image_offset_prototype import get_image_offset
 
-from pvgisprototype.api.models import SolarTime
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateSolarTimePVGISInputModel
+from pvgisprototype import SolarTime
+from pvgisprototype import Latitude
+from pvgisprototype import Longitude
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateSolarTimePVGISInputModel
 
 
 @validate_with_pydantic(CalculateSolarTimePVGISInputModel)

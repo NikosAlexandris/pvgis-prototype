@@ -1,8 +1,8 @@
 from datetime import date
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateFractionalYearPVISInputModel
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
 from datetime import datetime
-from pvgisprototype.api.models import FractionalYear
+from pvgisprototype import FractionalYear
 from math import pi
 from math import isclose
 

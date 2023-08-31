@@ -3,7 +3,7 @@ from typing import Union
 from typing import Sequence
 from datetime import datetime
 from ...api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarDeclinationNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarDeclinationNOAATimeSeriesInput
 from .fractional_year import calculate_fractional_year_noaa 
@@ -12,7 +12,7 @@ from math import sin
 from math import cos
 import numpy as np
 
-from pvgisprototype.api.models import SolarDeclination
+from pvgisprototype import SolarDeclination
 
 
 # @cache_result

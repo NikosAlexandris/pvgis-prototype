@@ -3,11 +3,11 @@ from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import ModelSolarTimeInputModel
-from pvgisprototype.api.models import SolarTime
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import Latitude
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import ModelSolarTimeInputModel
+from pvgisprototype import SolarTime
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
 from .models import SolarTimeModels
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot

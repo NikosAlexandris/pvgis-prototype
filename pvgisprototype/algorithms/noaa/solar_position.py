@@ -40,10 +40,10 @@ from .event_hour_angle import calculate_event_hour_angle_noaa
 from .event_time import calculate_event_time_noaa
 from .local_time import calculate_local_solar_time_noaa
 
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarPositionNOAAInput
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import Latitude
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
 
 
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians

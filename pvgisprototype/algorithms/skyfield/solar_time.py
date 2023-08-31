@@ -17,11 +17,11 @@ from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_to_degrees
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarTimeSkyfieldInputModel
-from pvgisprototype.api.models import SolarTime
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import Longitude
+from pvgisprototype import SolarTime
+from pvgisprototype import Latitude
+from pvgisprototype import Longitude
 
 
 @validate_with_pydantic(CalculateSolarTimeSkyfieldInputModel)

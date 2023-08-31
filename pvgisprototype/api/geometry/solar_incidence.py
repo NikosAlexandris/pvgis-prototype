@@ -1,23 +1,23 @@
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_jenco
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import Longitude
+from pvgisprototype import Latitude
+from pvgisprototype import Longitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from .models import SolarTimeModels
 from .models import SolarIncidenceModels
 from pathlib import Path
 from typing import List
-from pvgisprototype.api.models import SolarIncidence
+from pvgisprototype import SolarIncidence
 from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.api.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.api.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.api.constants import DAYS_IN_A_YEAR
-from pvgisprototype.api.constants import PERIGEE_OFFSET
-from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.api.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 
 
 def model_solar_incidence(

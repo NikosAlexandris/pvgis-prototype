@@ -2,11 +2,11 @@ from devtools import debug
 from typing import List
 from datetime import datetime
 from math import pi
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import ModelSolarAzimuthInputModel
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import SolarAzimuth
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import ModelSolarAzimuthInputModel
+from pvgisprototype import Latitude
+from pvgisprototype import Longitude
+from pvgisprototype import SolarAzimuth
 from .models import SolarPositionModels
 from .models import SolarTimeModels
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants

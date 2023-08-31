@@ -13,11 +13,11 @@ import numpy as np
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.models import SolarTime
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateSolarTimeEoTInputModel
+from pvgisprototype import SolarTime
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 
 
 

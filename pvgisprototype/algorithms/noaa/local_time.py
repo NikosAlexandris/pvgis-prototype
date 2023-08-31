@@ -1,11 +1,11 @@
 from datetime import datetime
 from datetime import timedelta
 from datetime import time
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateLocalSolarTimeNOAAInput
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import SolarTime
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
+from pvgisprototype import SolarTime
 from .event_time import calculate_event_time_noaa
 
 

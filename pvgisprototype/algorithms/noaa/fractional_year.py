@@ -2,13 +2,13 @@ from datetime import datetime
 from typing import Optional
 from typing import Union
 from typing import Sequence
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearNOAATimeSeriesInput
 from math import pi
 from ...api.utilities.conversions import convert_to_degrees_if_requested
 
-from pvgisprototype.api.models import FractionalYear
+from pvgisprototype import FractionalYear
 
 import numpy as np
 

@@ -6,11 +6,11 @@ from math import pi
 from math import sin
 from math import asin
 
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateFractionalYearPVISInputModel
-from pvgisprototype.api.models import FractionalYear
-from pvgisprototype.api.function_models import CalculateSolarDeclinationPVISInputModel
-from pvgisprototype.api.models import SolarDeclination
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
+from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
+from pvgisprototype import FractionalYear
+from pvgisprototype import SolarDeclination
 from .models import SolarDeclinationModels
 from ..utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis

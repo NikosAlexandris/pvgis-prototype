@@ -15,7 +15,7 @@ from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irrad
 # from pvgisprototype.api.irradiance.reflected import calculate_reflected_inclined_irradiance_pvgis
 
 from datetime import datetime
-from pvgisprototype.api.function_models import ModelSolarPositionInputModel
+from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
@@ -23,7 +23,7 @@ from ..utilities.conversions import convert_to_radians
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
-from pvgisprototype.api.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options

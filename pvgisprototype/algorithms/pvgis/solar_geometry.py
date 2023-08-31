@@ -13,11 +13,11 @@ from typing import Optional
 import datetime
 import numpy as np
 import typer
-from ...api.constants import EPS
-from ...api.constants import HOUR_ANGLE
-from ...api.constants import UNDEF
-from ...api.constants import double_numpi
-from ...api.constants import half_numpi
+from pvgisprototype.constants import EPS
+from pvgisprototype.constants import HOUR_ANGLE
+from pvgisprototype.constants import UNDEF
+from pvgisprototype.constants import double_numpi
+from pvgisprototype.constants import half_numpi
 from ...api.data_structures import SolarGeometryDayConstants
 from ...api.data_structures import SolarGeometryDayVariables
 from ...api.utilities.conversions import convert_to_degrees_if_requested

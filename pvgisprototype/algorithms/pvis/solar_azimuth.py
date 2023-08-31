@@ -8,12 +8,12 @@ from math import pi
 from math import sin
 from math import cos
 from math import acos
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateSolarAzimuthPVISInputModel
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import Latitude
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateSolarAzimuthPVISInputModel
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.models import SolarAzimuth
+from pvgisprototype import SolarAzimuth
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle

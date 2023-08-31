@@ -1,41 +1,66 @@
 # Where?
-from .parameter_models import LatitudeModel
-from .parameter_models import BaseCoordinatesModel
-from .parameter_models import ElevationModel
+from pvgisprototype.validation.parameters import LatitudeModel
+from pvgisprototype.validation.parameters import BaseCoordinatesModel
+from pvgisprototype.validation.parameters import ElevationModel
 
 # When?
-from .parameter_models import BaseTimestampModel
-from .parameter_models import BaseTimeModel
+from pvgisprototype.validation.parameters import BaseTimestampModel
+from pvgisprototype.validation.parameters import BaseTimeModel
 
 # Atmospheric effects
-from .parameter_models import ApplyAtmosphericRefraction
-from .parameter_models import RefractedSolarZenithModel
+from pvgisprototype.validation.parameters import ApplyAtmosphericRefraction
+from pvgisprototype.validation.parameters import RefractedSolarZenithModel
 
 # Earth orbit
-from .parameter_models import DaysInAYearModel
-from .parameter_models import EarthOrbitModel
+from pvgisprototype.validation.parameters import DaysInAYearModel
+from pvgisprototype.validation.parameters import EarthOrbitModel
 
 # Solar time
-from .parameter_models import SolarTimeModelModel
-from .parameter_models import SolarTimeModel
-from .parameter_models import TimeOffsetModel
-from .parameter_models import BaseTimeOutputUnitsModel
-from .parameter_models import RandomTimeModel
+from pvgisprototype.validation.parameters import SolarTimeModelModel
+from pvgisprototype.validation.parameters import SolarTimeModel
+from pvgisprototype.validation.parameters import TimeOffsetModel
+from pvgisprototype.validation.parameters import BaseTimeOutputUnitsModel
+from pvgisprototype.validation.parameters import RandomTimeModel
 
 # Solar geometry
-from .parameter_models import RefractedSolarAltitudeModel
-from .parameter_models import SolarDeclinationModel
-from .parameter_models import SolarPositionModel
+from pvgisprototype.validation.parameters import RefractedSolarAltitudeModel
+from pvgisprototype.validation.parameters import SolarDeclinationModel
+from pvgisprototype.validation.parameters import SolarPositionModel
 
 # Solar Surface
-from .parameter_models import SurfaceTiltModel
-from .parameter_models import SurfaceOrientationModel
+from pvgisprototype.validation.parameters import SurfaceTiltModel
+from pvgisprototype.validation.parameters import SurfaceOrientationModel
 
 # Output
-from .parameter_models import BaseAngleUnitsModel
-from .parameter_models import BaseAngleInternalUnitsModel
-from .parameter_models import BaseAngleOutputUnitsModel
+from pvgisprototype.validation.parameters import BaseAngleUnitsModel
+from pvgisprototype.validation.parameters import BaseAngleInternalUnitsModel
+from pvgisprototype.validation.parameters import BaseAngleOutputUnitsModel
 
+# Validator
+from typing import Type
+from pydantic import BaseModel
+from typing import Callable
+from functools import wraps
+
+
+def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if len(args) == 1 and isinstance(args[0], input_model):
+                # If the passed argument is already an instance of the expected model, skip validation
+                validated_input = args[0]
+            else:
+                input_data = {**kwargs, **dict(zip(func.__annotations__.keys(), args))}
+                validated_input = input_model(**input_data)
+            dictionary_input = {}
+            for k, v in validated_input:
+                dictionary_input[k] = v
+            return func(**dictionary_input)
+
+        return wrapper
+
+    return decorator
 
 class CalculateFractionalYearPVISInputModel(
     BaseTimestampModel,

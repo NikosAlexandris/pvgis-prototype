@@ -2,10 +2,10 @@ from devtools import debug
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import pi
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetNOAAInput
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import TimeOffset
+from pvgisprototype import Longitude
+from pvgisprototype import TimeOffset
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_noaa
 
 

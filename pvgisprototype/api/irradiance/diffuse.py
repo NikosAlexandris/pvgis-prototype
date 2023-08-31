@@ -62,7 +62,7 @@ from math import atan2
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from ..geometry.solar_time import model_solar_time
 from ..utilities.timestamp import timestamp_to_decimal_hours
-from pvgisprototype.api.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import SOLAR_CONSTANT
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_time_series

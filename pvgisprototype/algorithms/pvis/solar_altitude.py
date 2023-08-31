@@ -5,12 +5,12 @@ from math import cos
 from math import sin
 from math import asin
 
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateSolarAltitudePVISInputModel
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import Longitude
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
+from pvgisprototype import Latitude
+from pvgisprototype import Longitude
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.models import SolarAltitude
+from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle

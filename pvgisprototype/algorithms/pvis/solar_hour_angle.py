@@ -8,9 +8,9 @@ from pvgisprototype.api.data_classes.models import HourAngle
 from pvgisprototype.api.data_classes.models import HourAngleSunrise
 from pvgisprototype.api.data_classes.models import Latitude
 
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateHourAngleInputModel
-from pvgisprototype.api.function_models import HourAngleSunriseInput
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateHourAngleInputModel
+from pvgisprototype.validation.functions import HourAngleSunriseInput
 
 
 @validate_with_pydantic(CalculateHourAngleInputModel)

@@ -45,10 +45,10 @@ from math import exp
 from math import atan
 import numpy as np
 from datetime import datetime
-from ..constants import AOI_CONSTANTS
+from pvgisprototype.constants import AOI_CONSTANTS
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.models import RefractedSolarAltitude
+from pvgisprototype import RefractedSolarAltitude
 from ..geometry.models import SolarDeclinationModels
 from ..geometry.models import SolarIncidenceModels
 from ..geometry.models import SolarTimeModels
@@ -67,8 +67,8 @@ from ..utilities.timestamp import parse_timestamp
 from .loss import calculate_angular_loss_factor_for_direct_irradiance
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 
-from pvgisprototype.api.function_models import CalculateOpticalAirMassInputModel
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateOpticalAirMassInputModel
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -76,7 +76,7 @@ from pydantic import validator
 from math import radians
 from math import degrees
 from pathlib import Path
-from pvgisprototype.api.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import SOLAR_CONSTANT
 
 # from pvgisprototype.api.series.utilities import select_coordinates
 from pvgisprototype.cli.series import select_time_series

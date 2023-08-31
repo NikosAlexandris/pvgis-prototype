@@ -4,10 +4,10 @@ from typing import Optional
 from math import sin, cos, acos
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.models import SolarIncidence
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.function_models import CalculateSolarIncidenceInputModel
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype import SolarIncidence
+from pvgisprototype import Latitude
+from pvgisprototype.validation.functions import CalculateSolarIncidenceInputModel
 
 
 @validate_with_pydantic(CalculateSolarIncidenceInputModel)

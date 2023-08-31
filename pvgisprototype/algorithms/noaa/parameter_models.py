@@ -11,19 +11,19 @@ from pydantic import confloat
 import numpy as np
 
 # from pvgisprototype.api.data_classes.models import SolarZenith
-from pvgisprototype.api.parameter_models import SolarHourAngleModel
-from pvgisprototype.api.parameter_models import SolarHourAngleSeriesModel
+from pvgisprototype.validation.parameters import SolarHourAngleModel
+from pvgisprototype.validation.parameters import SolarHourAngleSeriesModel
 
 # When?
-from pvgisprototype.api.parameter_models import BaseTimestampModel
-from pvgisprototype.api.parameter_models import BaseTimestampSeriesModel
-from pvgisprototype.api.parameter_models import BaseTimeModel
-from pvgisprototype.api.parameter_models import BaseTimeSeriesModel
+from pvgisprototype.validation.parameters import BaseTimestampModel
+from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.parameters import BaseTimeModel
+from pvgisprototype.validation.parameters import BaseTimeSeriesModel
 
 # Where?
-from pvgisprototype.api.parameter_models import LongitudeModel
-from pvgisprototype.api.parameter_models import LatitudeModel
-from pvgisprototype.api.parameter_models import BaseCoordinatesModel
+from pvgisprototype.validation.parameters import LongitudeModel
+from pvgisprototype.validation.parameters import LatitudeModel
+from pvgisprototype.validation.parameters import BaseCoordinatesModel
 
 
 class BaseTimeEventModel(BaseModel):

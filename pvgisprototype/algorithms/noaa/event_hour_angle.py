@@ -4,10 +4,10 @@ from datetime import datetime
 from math import cos
 from math import tan
 from math import acos
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from .function_models import CalculateEventHourAngleNOAAInput
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import EventTime
+from pvgisprototype import Latitude
+from pvgisprototype import EventTime
 from .solar_declination import calculate_solar_declination_noaa
 
 

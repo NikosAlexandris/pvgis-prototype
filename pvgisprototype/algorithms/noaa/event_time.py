@@ -3,11 +3,11 @@ from datetime import datetime
 from math import pi
 from datetime import time
 from datetime import timedelta
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from .function_models import CalculateEventTimeNOAAInput
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import EventTime
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
+from pvgisprototype import EventTime
 from .equation_of_time import calculate_equation_of_time_noaa
 from .solar_declination import calculate_solar_declination_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_noaa

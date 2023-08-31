@@ -13,17 +13,17 @@ from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from typing import Tuple
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarPositionSkyfieldInputModel
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarAltitudeAzimuthSkyfieldInputModel
 from pvgisprototype.algorithms.skyfield.function_models import CalculateHourAngleSkyfieldInput
-from pvgisprototype.api.models import SolarPosition
-from pvgisprototype.api.models import SolarAltitude
-from pvgisprototype.api.models import SolarAzimuth
-from pvgisprototype.api.models import HourAngle
-from pvgisprototype.api.models import SolarDeclination
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import Longitude
+from pvgisprototype import SolarPosition
+from pvgisprototype import SolarAltitude
+from pvgisprototype import SolarAzimuth
+from pvgisprototype import HourAngle
+from pvgisprototype import SolarDeclination
+from pvgisprototype import Latitude
+from pvgisprototype import Longitude
 
 
 @validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel)

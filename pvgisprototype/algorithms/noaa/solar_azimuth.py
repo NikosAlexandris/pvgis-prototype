@@ -16,12 +16,12 @@ from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_noaa
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
 
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAzimuthNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAzimuthNOAATimeSeriesInput
-from pvgisprototype.api.models import SolarAzimuth
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import Latitude
+from pvgisprototype import SolarAzimuth
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput)

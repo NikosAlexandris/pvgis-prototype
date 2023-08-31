@@ -6,12 +6,12 @@ from math import sin
 from math import asin
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.api.function_models import ModelSolarAltitudeInputModel
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import Longitude
+from pvgisprototype.validation.functions import ModelSolarAltitudeInputModel
+from pvgisprototype import Latitude
+from pvgisprototype import Longitude
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.models import SolarAltitude
+from pvgisprototype import SolarAltitude
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 import suncalc

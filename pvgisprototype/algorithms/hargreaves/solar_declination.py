@@ -8,9 +8,9 @@ from math import sin
 from math import cos
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
-from pvgisprototype.api.decorators import validate_with_pydantic
-from pvgisprototype.api.function_models import CalculateSolarDeclinationHargreavesInputModel
-from pvgisprototype.api.models import SolarDeclination
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateSolarDeclinationHargreavesInputModel
+from pvgisprototype import SolarDeclination
 
 
 @validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)
