@@ -1,6 +1,7 @@
 # Where?
 from .parameter_models import LatitudeModel
 from .parameter_models import BaseCoordinatesModel
+from .parameter_models import ElevationModel
 
 # When?
 from .parameter_models import BaseTimestampModel
@@ -14,35 +15,27 @@ from .parameter_models import RefractedSolarZenithModel
 from .parameter_models import DaysInAYearModel
 from .parameter_models import EarthOrbitModel
 
-# Time
+# Solar time
 from .parameter_models import SolarTimeModelModel
 from .parameter_models import SolarTimeModel
 from .parameter_models import TimeOffsetModel
 from .parameter_models import BaseTimeOutputUnitsModel
 from .parameter_models import RandomTimeModel
 
-
-from .parameter_models import ElevationModel
-
 # Solar geometry
-
 from .parameter_models import RefractedSolarAltitudeModel
 from .parameter_models import SolarDeclinationModel
 from .parameter_models import SolarPositionModel
 
 # Solar Surface
-
 from .parameter_models import SurfaceTiltModel
 from .parameter_models import SurfaceOrientationModel
 
 # Output
-
 from .parameter_models import BaseAngleUnitsModel
 from .parameter_models import BaseAngleInternalUnitsModel
 from .parameter_models import BaseAngleOutputUnitsModel
 
-
-# Solar declination
 
 class CalculateFractionalYearPVISInputModel(
     BaseTimestampModel,
