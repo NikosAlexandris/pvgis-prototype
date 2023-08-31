@@ -13,20 +13,20 @@ from math import pi
 from pydantic import validator
 import numpy as np
 from numpy import ndarray
-from pvgisprototype.api.models import RefractedSolarAltitude
-from pvgisprototype.api.models import RefractedSolarZenith
-from pvgisprototype.api.models import SurfaceTilt
-from pvgisprototype.api.models import SurfaceOrientation
-from pvgisprototype.api.models import Latitude
-from pvgisprototype.api.models import Longitude
-from pvgisprototype.api.models import SolarDeclination
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.models import SolarHourAngle
-from pvgisprototype.api.models import Elevation
-from pvgisprototype.api.constants import DAYS_IN_A_YEAR
-from pvgisprototype.api.constants import PERIGEE_OFFSET
-from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.validation.models import RefractedSolarAltitude
+from pvgisprototype.validation.models import RefractedSolarZenith
+from pvgisprototype.validation.models import SurfaceTilt
+from pvgisprototype.validation.models import SurfaceOrientation
+from pvgisprototype.validation.models import Latitude
+from pvgisprototype.validation.models import Longitude
+from pvgisprototype.validation.models import SolarDeclination
+from pvgisprototype.validation.geometry.models import SolarPositionModels
+from pvgisprototype.validation.models import SolarHourAngle
+from pvgisprototype.validation.models import Elevation
+from pvgisprototype.validation.constants import DAYS_IN_A_YEAR
+from pvgisprototype.validation.constants import PERIGEE_OFFSET
+from pvgisprototype.validation.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.validation.geometry.models import SolarTimeModels
 
 
 # Where?

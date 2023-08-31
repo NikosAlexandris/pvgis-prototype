@@ -1,7 +1,7 @@
+from devtools import debug
 import yaml
 from pydantic import BaseModel
 from typing import Optional
-from pvgisprototype.api import models
 
 
 def model_hash(self):
@@ -11,9 +11,9 @@ def model_hash(self):
 def generate_dataclass_models(yaml_file: str):
 
     with open(yaml_file, 'r') as f:
-        parameters_info = yaml.safe_load(f)
+        parameters = yaml.safe_load(f)
 
-    for model_name, fields in parameters_info.items():
+    for model_name, fields in parameters.items():
         annotations = {}
         default_values = {}
         for field_name, field_data in fields.items():
@@ -27,10 +27,11 @@ def generate_dataclass_models(yaml_file: str):
             {
                 **annotations,
                 '__annotations__': annotations,
-                '__module__': "models",
+                '__module__': __name__,
                 '__qualname__': model_name,
                 '__hash__': model_hash,
                 **default_values,
             }
         )
-        setattr(models, model_name, model_class)
+        debug(locals())
+        # setattr(data_classes, model_name, model_class)
