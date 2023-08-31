@@ -24,6 +24,7 @@ class SolarPositionModels(str, Enum):
     # pvgis = 'PVGIS'
     suncalc = 'suncalc'
     skyfield = 'Skyfield'
+    pvlib = 'pvlib'
 
 
 class SolarTimeModels(str, Enum):
