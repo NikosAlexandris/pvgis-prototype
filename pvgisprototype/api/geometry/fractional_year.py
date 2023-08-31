@@ -1,5 +1,5 @@
-from pvgisprototype.models.noaa.fractional_year import calculate_fractional_year_noaa
-from pvgisprototype.models.pvis.fractional_year import calculate_fractional_year_pvis
+from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_noaa
+from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
 
 
 def model_fractional_year(
