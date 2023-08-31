@@ -14,14 +14,13 @@ from typing import Annotated
 from typing import Optional
 from rich import print
 
+from .typer_parameters import OrderCommands
 from .rich_help_panel_names import rich_help_panel_performance
 from . import energy
 from .rich_help_panel_names import rich_help_panel_series
-# from . import series
 from . import series
 from . import irradiance
 from . import meteorology
-# from .plot import uniplot
 from .rich_help_panel_names import rich_help_panel_geometry
 from . import time
 from . import position
@@ -33,14 +32,6 @@ from . import manual
 
 
 state = {"verbose": False}
-
-
-class OrderCommands(TyperGroup):
-  def list_commands(self, ctx: Context):
-    """Return list of commands in the order appear.
-    See: https://github.com/tiangolo/typer/issues/428#issuecomment-1238866548
-    """
-    return list(self.commands)    # get commands using self.commands
 
 
 app = typer.Typer(
@@ -88,12 +79,12 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series,
 )
-app.add_typer(
-    meteorology.app,
-    name="meteorology",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series,
-)
+# app.add_typer(
+#     meteorology.app,
+#     name="meteorology",
+#     no_args_is_help=True,
+#     rich_help_panel=rich_help_panel_series,
+# )
 app.add_typer(
     time.app,
     name="time",
