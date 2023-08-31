@@ -5,7 +5,7 @@ from math import cos
 from math import sin
 from math import asin
 from math import pi
-from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.api.function_models import ModelSolarAltitudeInputModel
 from pvgisprototype.api.models import Latitude
 from pvgisprototype.api.models import Longitude
