@@ -1,74 +1,4 @@
-EccentricityCorrectionFactor:
-  value:
-    type: float
-    initial: 0.03344
-  unit:
-    type: str
-    initial: radians
-
-PerigeeOffset:
-  value:
-    type: float
-    initial: 0.048869
-  unit:
-    type: str
-    initial: radians
-
-RefractedSolarAltitude:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: str
-    initial: radians
-
-RefractedSolarZenith:
-  value:
-    type: float
-    initial: 1.5853349194640094
-  unit:
-    type: str
-    initial: radians
-
-AtmosphericRefraction:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: Optional[str]
-    initial:
-
-SurfaceTilt:
-  value:
-    type: float
-    initial: 0.0
-  unit:
-    type: str
-    initial: 'radians'
-
-SurfaceOrientation:
-  value:
-    type: float
-    initial: 180.0
-  unit:
-    type: str
-    initial: 'degrees'
-
-Latitude:
-  value:
-    type: Optional[float]
-    initial: 
-  unit:
-    type: Optional[str]
-    initial:
-  symbol:
-    type: str
-    initial: Φ
-  desription:
-    type: str
-    initial: "The angle between a point on the Earth's surface and the equatorial plane.
-    It indicates a location's distance north or south of the equator, ranging from 0°
-    at the Equator to 90° North or South at the poles."
+# Where?
 
 Longitude:
   value:
@@ -86,13 +16,67 @@ Longitude:
     with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180°
     east or west."
 
-RelativeLongitude:
+Latitude:
+  value:
+    type: Optional[float]
+    initial: 
+  unit:
+    type: Optional[str]
+    initial:
+  symbol:
+    type: str
+    initial: Φ
+  desription:
+    type: str
+    initial: "The angle between a point on the Earth's surface and the equatorial plane.
+    It indicates a location's distance north or south of the equator, ranging from 0°
+    at the Equator to 90° North or South at the poles."
+
+Elevation:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: str
+    initial: meters
+  symbol:
+    type: str
+    initial: z
+  desription:
+    type: str
+    initial: "The height of a geographic point above a fixed reference point, commonly the mean sea level."
+
+# When?
+
+# Atmospheric properties
+
+AtmosphericRefraction:
   value:
     type: Optional[float]
     initial:
   unit:
     type: Optional[str]
     initial:
+
+# Earth orbit
+
+PerigeeOffset:
+  value:
+    type: float
+    initial: 0.048869
+  unit:
+    type: str
+    initial: radians
+
+EccentricityCorrectionFactor:
+  value:
+    type: float
+    initial: 0.03344
+  unit:
+    type: str
+    initial: radians
+
+# Solar time
 
 SolarTime:
   value:
@@ -118,39 +102,7 @@ EquationOfTime:
     type: Optional[str]
     initial:
 
-FractionalYear:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: Optional[str]
-    initial:
-
-TimeOffset:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: Optional[str]
-    initial:
-
-EventTime:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: Optional[str]
-    initial:
-
 HourAngle:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: Optional[str]
-    initial:
-
-HourAngleSunrise:
   value:
     type: Optional[float]
     initial:
@@ -166,6 +118,56 @@ SolarHourAngle:
     type: Optional[str]
     initial:
 
+EventTime:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: Optional[str]
+    initial:
+
+HourAngleSunrise:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: Optional[str]
+    initial:
+
+# Solar position
+
+FractionalYear:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: Optional[str]
+    initial:
+
+SolarDeclination:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: Optional[str]
+    initial:
+
+SolarZenith:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: Optional[str]
+    initial:
+
+RefractedSolarZenith:
+  value:
+    type: float
+    initial: 1.5853349194640094
+  unit:
+    type: str
+    initial: radians
+
 SolarAltitude:
   value:
     type: Optional[float]
@@ -173,6 +175,14 @@ SolarAltitude:
   unit:
     type: Optional[str]
     initial:
+
+RefractedSolarAltitude:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: str
+    initial: radians
 
 SolarAzimuth:
   value:
@@ -190,27 +200,13 @@ CompassSolarAzimuth:
     type: Optional[str]
     initial:
 
-SolarDeclination:
+SolarPosition:
   value:
     type: Optional[float]
     initial:
   unit:
     type: Optional[str]
     initial:
-
-Elevation:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: str
-    initial: meters
-  symbol:
-    type: str
-    initial: z
-  desription:
-    type: str
-    initial: "The height of a geographic point above a fixed reference point, commonly the mean sea level."
 
 SolarIncidence:
   value:
@@ -220,7 +216,9 @@ SolarIncidence:
     type: Optional[str]
     initial:
 
-SolarZenith:
+# How?
+
+RelativeLongitude:
   value:
     type: Optional[float]
     initial:
@@ -228,7 +226,7 @@ SolarZenith:
     type: Optional[str]
     initial:
 
-SolarPosition:
+TimeOffset:
   value:
     type: Optional[float]
     initial:
@@ -243,3 +241,21 @@ HorizonHeight:
   unit:
     type: Optional[str]
     initial:
+
+# Surface
+
+SurfaceTilt:
+  value:
+    type: float
+    initial: 0.0
+  unit:
+    type: str
+    initial: 'radians'
+
+SurfaceOrientation:
+  value:
+    type: float
+    initial: 180.0
+  unit:
+    type: str
+    initial: 'degrees'
