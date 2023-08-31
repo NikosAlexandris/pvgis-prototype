@@ -17,31 +17,15 @@ from numpy import ndarray
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
-from pvgisprototype.api.data_classes import EccentricityCorrectionFactor
-from pvgisprototype.api.data_classes import PerigeeOffset
-from pvgisprototype.api.data_classes import RefractedSolarAltitude
-from pvgisprototype.api.data_classes import RefractedSolarZenith
-from pvgisprototype.api.data_classes import SurfaceTilt
-from pvgisprototype.api.data_classes import SurfaceOrientation
-from pvgisprototype.api.data_classes import Latitude
-from pvgisprototype.api.data_classes import Longitude
-from pvgisprototype.api.data_classes import HourAngleSunrise
-from pvgisprototype.api.data_classes import SolarTime
-from pvgisprototype.api.data_classes import TrueSolarTime
-from pvgisprototype.api.data_classes import EquationOfTime
-from pvgisprototype.api.data_classes import FractionalYear
-from pvgisprototype.api.data_classes import TimeOffset
-from pvgisprototype.api.data_classes import EventTime
-from pvgisprototype.api.data_classes import HourAngle
-from pvgisprototype.api.data_classes import SolarAltitude
-from pvgisprototype.api.data_classes import SolarAzimuth
-from pvgisprototype.api.data_classes import CompassSolarAzimuth
-from pvgisprototype.api.data_classes import SolarDeclination
-from pvgisprototype.api.data_classes import SolarIncidence
-from pvgisprototype.api.data_classes import SolarHourAngle
-from pvgisprototype.api.data_classes import SolarZenith
-from pvgisprototype.api.data_classes import SolarPosition
-from pvgisprototype.api.data_classes import Elevation
+from pvgisprototype.api.data_classes.models import RefractedSolarAltitude
+from pvgisprototype.api.data_classes.models import RefractedSolarZenith
+from pvgisprototype.api.data_classes.models import SurfaceTilt
+from pvgisprototype.api.data_classes.models import SurfaceOrientation
+from pvgisprototype.api.data_classes.models import Latitude
+from pvgisprototype.api.data_classes.models import Longitude
+from pvgisprototype.api.data_classes.models import SolarDeclination
+from pvgisprototype.api.data_classes.models import SolarHourAngle
+from pvgisprototype.api.data_classes.models import Elevation
 
 
 # Where?
