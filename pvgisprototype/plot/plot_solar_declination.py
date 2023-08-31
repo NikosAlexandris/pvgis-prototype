@@ -17,9 +17,9 @@ from bokeh.plotting import save
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
-from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_noaa
-from pvgisprototype.models.hargreaves.solar_declination import calculate_solar_declination_hargreaves
-from pvgisprototype.models.pvgis.solar_declination import calculate_solar_declination_pvgis
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
+from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
+from pvgisprototype.algorithms.pvgis.solar_declination import calculate_solar_declination_pvgis
 
 
 def days_in_year(year):

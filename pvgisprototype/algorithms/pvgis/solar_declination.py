@@ -6,7 +6,7 @@ from datetime import datetime
 from datetime import timezone
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.models.pvis.solar_declination import calculate_solar_declination_pvis
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel

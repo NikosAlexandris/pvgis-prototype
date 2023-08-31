@@ -22,13 +22,13 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.api.utilities.timestamp import attach_timezone
 
-from pvgisprototype.models.noaa.solar_position import calculate_solar_altitude_noaa
-from pvgisprototype.models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
+from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
+from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 import suncalc
 import pysolar
-from pvgisprototype.models.pvis.solar_altitude import calculate_solar_altitude_pvis
-from pvgisprototype.models.pvlib.solar_altitude import calculate_solar_altitude_pvlib
-# from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_position_pvgis
+from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
+from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
+# from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
 
 
 @validate_with_pydantic(ModelSolarAltitudeInputModel)
@@ -155,6 +155,7 @@ def model_solar_altitude(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
+            timezone=timezone,
             angle_output_units=angle_output_units,
             )
         solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)

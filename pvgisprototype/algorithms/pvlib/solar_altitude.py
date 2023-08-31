@@ -12,7 +12,7 @@ from pvgisprototype import Latitude
 from pvgisprototype import SolarAltitude
 
 
-# @validate_with_pydantic(CalculateSolarAltitudePVLIBInputModel)
+@validate_with_pydantic(CalculateSolarAltitudePVLIBInputModel)
 def calculate_solar_altitude_pvlib(
         longitude: Longitude,   # degrees
         latitude: Latitude,     # degrees

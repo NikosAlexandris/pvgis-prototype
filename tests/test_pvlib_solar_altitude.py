@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
-from pvgisprototype.models.pvlib.solar_altitude import calculate_solar_altitude_pvlib
+from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
 from pvgisprototype.api.data_classes.models import Longitude
 from pvgisprototype.api.data_classes.models import Latitude
 from pvgisprototype.api.data_classes.models import SolarAltitude
