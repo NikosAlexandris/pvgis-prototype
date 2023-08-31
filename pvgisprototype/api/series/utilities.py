@@ -2,7 +2,8 @@ from devtools import debug
 import warnings
 import typer
 import netCDF4
-from colorama import Fore, Style
+from colorama import Fore
+from colorama import Style
 from .log import logger
 import xarray as xr
 
@@ -36,12 +37,31 @@ def open_data_array(
         ):
     """
     """
+    # try:
+    #     if in_memory:
+    #         dataarray = xr.load_dataarray(
+    #                 filename_or_obj=netcdf,
+    #                 mask_and_scale=mask_and_scale,
+    #                 )
+    #         return dataarray
+    # except Exception as exc:
+    #     typer.echo(f"Could not load the data in memory: {str(exc)}")
+    #     try:
+    #         dataarray = xr.open_dataarray(
+    #                 filename_or_obj=netcdf,
+    #                 mask_and_scale=mask_and_scale,
+    #                 )
+    #         return dataarray
+    #     except Exception as exc:
+    #         typer.echo(f"Could not open the data: {str(exc)}")
+    #         raise typer.Exit(code=33)
     if in_memory:
         print('In memory')
         return load_or_open_dataarray(xr.load_dataarray, netcdf, mask_and_scale)
     else:
         print('Open file')
         return load_or_open_dataarray(xr.open_dataarray, netcdf, mask_and_scale)
+
 
 
 def get_scale_and_offset(netcdf):
@@ -74,8 +94,10 @@ def select_coordinates(
         tolerance: float = 0.1,
         verbose: bool = False,
         ):
-    """
-    Select single pair of coordinates from a data array
+    """Select single pair of coordinates from a data array
+    
+    Will select center coordinates if none of (longitude, latitude) are
+    provided.
     """
     # ----------------------------------------------------------- Deduplicate me
     # Ugly hack for when dimensions 'longitude', 'latitude' are not spelled out!
