@@ -23,9 +23,9 @@ from pvgisprototype.api.models import SolarDeclination
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.models import SolarHourAngle
 from pvgisprototype.api.models import Elevation
-from pvgisprototype.api.constants import DAYS_IN_A_YEAR
-from pvgisprototype.api.constants import PERIGEE_OFFSET
-from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
 

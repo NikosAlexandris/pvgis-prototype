@@ -23,7 +23,7 @@ from ..utilities.conversions import convert_to_radians
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
-from pvgisprototype.api.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options

@@ -10,15 +10,15 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
-from pvgisprototype.api.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
-from pvgisprototype.api.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.api.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.cli.typer_parameters import typer_option_random_day
-from pvgisprototype.api.constants import RANDOM_DAY_FLAG_DEFAULT
+from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 
 
 app = typer.Typer(

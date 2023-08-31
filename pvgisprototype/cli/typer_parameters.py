@@ -25,34 +25,34 @@ from .rich_help_panel_names import rich_help_panel_time_series
 from .rich_help_panel_names import rich_help_panel_efficiency
 from .rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.api.constants import LATITUDE_MINIMUM
-from pvgisprototype.api.constants import LATITUDE_MAXIMUM
-from pvgisprototype.api.constants import LONGITUDE_MINIMUM
-from pvgisprototype.api.constants import LONGITUDE_MAXIMUM
-from pvgisprototype.api.constants import ELEVATION_MINIMUM
-from pvgisprototype.api.constants import ELEVATION_MAXIMUM
-from pvgisprototype.api.constants import SOLAR_DECLINATION_MINIMUM
-from pvgisprototype.api.constants import SOLAR_DECLINATION_MAXIMUM
-from pvgisprototype.api.constants import SURFACE_TILT_MINIMUM
-from pvgisprototype.api.constants import SURFACE_TILT_MAXIMUM
-from pvgisprototype.api.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.api.constants import SURFACE_ORIENTATION_MINIMUM
-from pvgisprototype.api.constants import SURFACE_ORIENTATION_MAXIMUM
-from pvgisprototype.api.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.api.constants import SOLAR_CONSTANT_MINIMUM
-# from pvgisprototype.api.constants import SOLAR_CONSTANT
-from pvgisprototype.api.constants import DAYS_IN_A_YEAR
-from pvgisprototype.api.constants import PERIGEE_OFFSET
-from pvgisprototype.api.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.api.constants import LINKE_TURBIDITY_MINIMUM
-from pvgisprototype.api.constants import LINKE_TURBIDITY_MAXIMUM
-# from pvgisprototype.api.constants import LINKE_TURBIDITY_DEFAULT
-# from pvgisprototype.api.constants import OPTICAL_AIR_MASS_DEFAULT
-from pvgisprototype.api.constants import OPTICAL_AIR_MASS_TYPER_UNIT
-# from pvgisprototype.api.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.api.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-# from pvgisprototype.api.constants import MEAN_GROUND_ALBEDO_DEFAULT
-# from pvgisprototype.api.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import LATITUDE_MINIMUM
+from pvgisprototype.constants import LATITUDE_MAXIMUM
+from pvgisprototype.constants import LONGITUDE_MINIMUM
+from pvgisprototype.constants import LONGITUDE_MAXIMUM
+from pvgisprototype.constants import ELEVATION_MINIMUM
+from pvgisprototype.constants import ELEVATION_MAXIMUM
+from pvgisprototype.constants import SOLAR_DECLINATION_MINIMUM
+from pvgisprototype.constants import SOLAR_DECLINATION_MAXIMUM
+from pvgisprototype.constants import SURFACE_TILT_MINIMUM
+from pvgisprototype.constants import SURFACE_TILT_MAXIMUM
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_MINIMUM
+from pvgisprototype.constants import SURFACE_ORIENTATION_MAXIMUM
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import SOLAR_CONSTANT_MINIMUM
+# from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import LINKE_TURBIDITY_MINIMUM
+from pvgisprototype.constants import LINKE_TURBIDITY_MAXIMUM
+# from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
+# from pvgisprototype.constants import OPTICAL_AIR_MASS_DEFAULT
+from pvgisprototype.constants import OPTICAL_AIR_MASS_TYPER_UNIT
+# from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+# from pvgisprototype.constants import MEAN_GROUND_ALBEDO_DEFAULT
+# from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 
 
 class OrderCommands(TyperGroup):
