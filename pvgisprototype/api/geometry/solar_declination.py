@@ -13,9 +13,9 @@ from pvgisprototype.api.function_models import CalculateSolarDeclinationPVISInpu
 from pvgisprototype.api.models import SolarDeclination
 from .models import SolarDeclinationModels
 from ..utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.models.pvis.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_noaa
-from pvgisprototype.models.hargreaves.solar_declination import calculate_solar_declination_hargreaves
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
+from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
 
 
 def model_solar_declination(

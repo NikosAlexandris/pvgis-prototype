@@ -61,7 +61,7 @@ from ..api.utilities.conversions import convert_float_to_degrees_if_requested
 from ..api.utilities.conversions import round_float_values
 from ..api.geometry.solar_declination import calculate_solar_declination
 from ..api.geometry.solar_incidence import calculate_solar_incidence
-from ..models.pyephem.solar_time import calculate_solar_time_ephem
+from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from ..api.geometry.solar_hour_angle import calculate_hour_angle
 from ..api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 from ..api.geometry.solar_altitude import calculate_solar_altitude
@@ -73,7 +73,7 @@ from ..api.geometry.models import SolarTimeModels
 # from ..api.geometry.solar_position import _parse_model
 from ..api.geometry.solar_position import calculate_solar_position
 from ..api.geometry.solar_position import model_solar_position
-from ..models.noaa.solar_position import calculate_noaa_solar_position
+from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
 from .rich_help_panel_names import rich_help_panel_advanced_options
 from .rich_help_panel_names import rich_help_panel_geometry_time
 from .rich_help_panel_names import rich_help_panel_geometry_position

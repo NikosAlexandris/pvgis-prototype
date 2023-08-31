@@ -29,20 +29,19 @@ from pvgisprototype.api.models import SolarAzimuth
 from .models import SolarTimeModels
 from .models import SolarPositionModels
 
-from pvgisprototype.models.noaa.solar_position import calculate_solar_declination_noaa
-from pvgisprototype.models.noaa.solar_position import calculate_solar_hour_angle_noaa
-from pvgisprototype.models.noaa.solar_zenith import calculate_solar_zenith_noaa
-from pvgisprototype.models.noaa.solar_position import calculate_solar_altitude_noaa
-from pvgisprototype.models.noaa.solar_position import calculate_solar_azimuth_noaa
-from pvgisprototype.models.pvis.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.models.pvis.solar_altitude import calculate_solar_altitude_pvis
-from pvgisprototype.models.pvis.solar_azimuth import calculate_solar_azimuth_pvis
-
-from ...models.skyfield.solar_geometry import calculate_solar_position_skyfield
-from ...models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
-# from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
-# from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
-from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
+from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_declination_noaa
+from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_hour_angle_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_noaa
+from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
+from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_azimuth_noaa
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
+from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
+from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
+from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_position_skyfield
+from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
+# from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
+# from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
+from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 
 
 def convert_south_to_north_degrees_convention(azimuth_south_degrees):

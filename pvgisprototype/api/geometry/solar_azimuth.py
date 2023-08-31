@@ -9,12 +9,12 @@ from pvgisprototype.api.models import Longitude
 from pvgisprototype.api.models import SolarAzimuth
 from .models import SolarPositionModels
 from .models import SolarTimeModels
-from ...models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
-from ...models.noaa.solar_position import calculate_solar_azimuth_noaa
-from ...models.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
+from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
+from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_azimuth_noaa
+from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 import suncalc
 import pysolar
-from pvgisprototype.models.pvis.solar_azimuth import calculate_solar_azimuth_pvis
+from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
 # from .solar_declination import calculate_solar_declination
 # from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
 # from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis

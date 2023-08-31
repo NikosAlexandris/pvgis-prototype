@@ -1,5 +1,5 @@
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
-from pvgisprototype.models.jenco.solar_incidence import calculate_solar_incidence_jenco
+from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_jenco
 from pvgisprototype.api.models import Latitude
 from pvgisprototype.api.models import Longitude
 from datetime import datetime

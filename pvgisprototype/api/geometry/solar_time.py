@@ -9,12 +9,12 @@ from pvgisprototype.api.models import SolarTime
 from pvgisprototype.api.models import Longitude
 from pvgisprototype.api.models import Latitude
 from .models import SolarTimeModels
-from ..utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.models.milne1921.solar_time import calculate_solar_time_eot
-from pvgisprototype.models.pyephem.solar_time import calculate_solar_time_ephem
-from pvgisprototype.models.pvgis.solar_time import calculate_solar_time_pvgis
-from pvgisprototype.models.noaa.solar_position import calculate_local_solar_time_noaa
-from pvgisprototype.models.skyfield.solar_time import calculate_solar_time_skyfield
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
+from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
+from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
+from pvgisprototype.algorithms.noaa.solar_position import calculate_local_solar_time_noaa
+from pvgisprototype.algorithms.skyfield.solar_time import calculate_solar_time_skyfield
 
 
 @validate_with_pydantic(ModelSolarTimeInputModel)

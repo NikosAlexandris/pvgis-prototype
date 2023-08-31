@@ -1,0 +1,109 @@
+import typer
+from datetime import time
+from typing import Annotated
+from typing import Optional
+from ...utilities.timestamp import convert_hours_to_seconds
+
+from pvgisprototype.api.data_classes.models import HourAngle
+from pvgisprototype.api.data_classes.models import HourAngleSunrise
+from pvgisprototype.api.data_classes.models import Latitude
+
+from pvgisprototype.api.decorators import validate_with_pydantic
+from pvgisprototype.api.function_models import CalculateHourAngleInputModel
+from pvgisprototype.api.function_models import HourAngleSunriseInput
+
+
+@validate_with_pydantic(CalculateHourAngleInputModel)
+def calculate_hour_angle(
+        solar_time: time,
+        angle_output_units: str = 'radians',
+    )-> HourAngle:
+    """Calculate the hour angle ω'
+
+    ω = (ST / 3600 - 12) * 15 * pi / 180
+
+    Parameters
+    ----------
+
+    hour_angle: float
+        The solar time (ST) is a calculation of the passage of time based on the
+        position of the Sun in the sky. It is expected to be decimal hours in a
+        24 hour format and measured internally in seconds. 
+
+    Returns
+    --------
+
+    hour_angle: float
+        Hour angle is the angle (ω) at any instant through which the earth has
+        to turn to bring the meridian of the observer directly in line with the
+        sun's rays measured in radian.
+    """
+    # `solar_time` here received in seconds!
+    # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
+    hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
+    hour_angle = HourAngle(input=hour_angle, unit='radians')
+    hour_angle = convert_to_degrees_if_requested(
+            hour_angle,
+            angle_output_units,
+            )
+    return hour_angle
+
+
+@validate_with_pydantic(CalculateHourAngleSunriseInputModel)
+def calculate_hour_angle_sunrise(  # rename to: calculate_event_hour_angle
+        latitude: Latitude,
+        surface_tilt: float = 0,
+        solar_declination: float = 0,
+        angle_output_units: str = 'radians',
+    ) -> HourAngleSunrise:
+    """Calculate the hour angle (ω) at sunrise and sunset
+
+    Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
+
+    The hour angle (ω) at sunrise and sunset measures the angular distance
+    between the sun at the local solar time and the sun at solar noon.
+
+    ω = acos(-tan(Φ-β)*tan(δ))
+
+    Parameters
+    ----------
+
+    latitude: float
+        Latitude (Φ) is the angle between the sun's rays and its projection on the
+        horizontal surface measured in radians
+
+    surface_tilt: float
+        Surface tilt (or slope) (β) is the angle between the inclined surface
+        (slope) and the horizontal plane.
+
+    solar_declination: float
+        Solar declination (δ) is the angle between the equator and a line drawn
+        from the centre of the Earth to the centre of the sun measured in
+        radians.
+
+    Returns
+    -------
+    hour_angle_sunrise: float
+        Hour angle (ω) is the angle at any instant through which the earth has
+        to turn to bring the meridian of the observer directly in line with the
+        sun's rays measured in radian.
+    """
+    hour_angle_sunrise_value = acos(
+            -tan(
+                latitude - surface_tilt
+                )
+            *tan(solar_declination)
+            )
+    hour_angle_sunrise = HourAngleSunrise(
+        value=hour_angle_sunrise_value,
+        unit='radians',
+    )
+    hour_angle_sunrise = convert_to_degrees_if_requested(
+            hour_angle_sunrise,
+            angle_output_units,
+            )
+    return hour_angle_sunrise
+
+
+if __name__ == "__main__":
+    typer.run(main)

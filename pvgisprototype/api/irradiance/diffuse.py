@@ -52,7 +52,7 @@ from .direct import calculate_direct_horizontal_irradiance
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
 from pvgisprototype.api.geometry.solar_azimuth import calculate_solar_azimuth
-from pvgisprototype.models.pvis.solar_incidence import calculate_solar_incidence
+from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from math import sin
