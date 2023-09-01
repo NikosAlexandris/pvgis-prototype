@@ -53,10 +53,18 @@ def calculate_equation_of_time_time_series_noaa(
         timestamps=timestamps,
         angle_output_units='radians'
     )
-    fractional_year_series = np.array([item.value if isinstance(item, FractionalYear) else item for item in fractional_year_series])
-    # if not isinstance(fractional_year_series, np.ndarray):
-    #     fractional_year_series = np.array([fractional_year_series.value])
-
+    if is_scalar_input:
+        fractional_year_series = np.array(
+            [fractional_year_series.value], dtype=np.float64
+        )
+    else:
+        fractional_year_series = np.array(
+            [
+                item.value if isinstance(item, FractionalYear) else item
+                for item in fractional_year_series
+            ],
+            dtype=np.float64,
+        )
     equation_of_time_series = 229.18 * (
         0.000075
         + 0.001868 * np.cos(fractional_year_series)
