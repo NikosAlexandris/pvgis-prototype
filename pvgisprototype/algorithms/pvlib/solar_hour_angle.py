@@ -19,7 +19,7 @@ def calculate_solar_hour_angle_pvlib(
     """
     longitude = convert_to_degrees_if_requested(longitude, 'degrees')
 
-    solar_hour_angle = pvlib.solarposition.hour_angle(timestamp, longitude.value, solar_time='apparent').values[0]
+    solar_hour_angle = pvlib.solarposition.hour_angle(timestamp, longitude.value, equation_of_time='apparent').values[0]
 
     if angle_output_units == 'radians' and not -pi <= solar_hour_angle <= pi:
         raise ValueError(f'The calculated hour angle {solar_hour_angle} is out of the expected range [{-pi}, {pi}] radians')
