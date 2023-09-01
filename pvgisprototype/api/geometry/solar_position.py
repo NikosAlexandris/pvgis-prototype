@@ -279,6 +279,15 @@ def model_solar_position(
             angle_output_units,
         )
 
+    # TODO: Implement pvlib solar position
+    # if model.value == SolarPositionModels.pvlib:
+    #     solar_altitude
+    #     solar_azimuth
+    #     solar_declination
+    #     solar_hour_angle
+    #     solar_zenith
+
+
     # if model.value  == SolarPositionModels.pvgis:
         
     #     solar_declination = calculate_solar_declination(timestamp)
