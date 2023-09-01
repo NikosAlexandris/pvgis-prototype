@@ -82,7 +82,12 @@ def plot_solar_declination(
         raise ValueError('Either `start_date` and `end_date` or only `year` should be provided')
 
     timestamps = generate_timestamps(start_date, end_date)
-    solar_declinations, solar_declinations_pvgis, solar_declinations_noaa, solar_declinations_hargreaves = calculate_declinations(timestamps, output_units)
+    (
+        solar_declinations,
+        solar_declinations_pvgis,
+        solar_declinations_noaa,
+        solar_declinations_hargreaves,
+    ) = calculate_declinations(timestamps, output_units)
 
     fig = plt.figure(figsize=(10,6))
     # plt.plot(timestamps, solar_declinations, linewidth=4, alpha=0.7, label='PVIS', linestyle='-', color='#66CCCC')
