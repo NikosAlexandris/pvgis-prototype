@@ -10,7 +10,7 @@ from math import radians
 
 from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
-from pvgisprototype.api.models import HourAngle
+from pvgisprototype import HourAngle
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
