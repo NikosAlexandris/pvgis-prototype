@@ -1,12 +1,17 @@
-from devtools import debug
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.api.decorators import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetNOAAInput
+from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTimeSeriesNOAAInput
 from pvgisprototype.api.models import Longitude
 from pvgisprototype.api.models import TimeOffset
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_noaa
+from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
+from typing import Union
+from typing import Sequence
+import numpy as np
+from pvgisprototype.api.models import EquationOfTime
 
 
 # equivalent to : 4 * longitude (in degrees) ?
@@ -19,7 +24,6 @@ def calculate_time_offset_noaa(
         timestamp: datetime, 
         timezone: ZoneInfo,
         time_output_units: str = 'minutes',  # redesign me!
-        angle_units: str = 'radians',
     ) -> TimeOffset:
     """Calculate the time offset (minutes) for NOAA's solar position calculations.
 
@@ -116,7 +120,6 @@ def calculate_time_offset_noaa(
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp,
         time_output_units,
-        angle_units,
         )  # minutes
     time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time.value
     # if not -720 + 70 <= time_offset <= 720 + 70:
@@ -124,3 +127,37 @@ def calculate_time_offset_noaa(
         raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
 
     return TimeOffset(value=time_offset, unit='minutes')
+
+
+@validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
+def calculate_time_offset_time_series_noaa(
+        longitude: Longitude, 
+        timestamps: Union[datetime, Sequence[datetime]],
+        timezone: ZoneInfo,
+        time_output_units: str = 'minutes',
+    ) -> Union[TimeOffset, np.ndarray]:
+    """ """
+    # 1
+    longitude_in_minutes = radians_to_time_minutes(longitude.value)  # time
+
+    # 2
+    timestamps = [timestamp.astimezone(timezone) for timestamp in timestamps]
+    timezone_offset_minutes_series = [timestamp.utcoffset().total_seconds() / 60 for timestamp in timestamps]
+    timezone_offset_minutes_series = np.atleast_1d(np.array(timezone_offset_minutes_series, dtype=float))
+
+    # 3
+    is_scalar_input = isinstance(timestamps, datetime) and isinstance(longitude_series, Longitude)
+    equation_of_time_series = calculate_equation_of_time_time_series_noaa(
+        timestamps,
+        time_output_units,
+    )
+    equation_of_time_series = np.array([item.value if isinstance(item, EquationOfTime) else item for item in equation_of_time_series])
+    time_offset_series = longitude_in_minutes - timezone_offset_minutes_series + equation_of_time_series
+
+    if not np.all((-790 <= time_offset_series) & (time_offset_series <= 790)):
+        raise ValueError("At leasr one calculated time offset is out of the expected range [-790, 790] minutes!")
+
+    if is_scalar_input:
+        return TimeOffset(value=time_offset_series[0], unit='minutes')
+    else:
+        return np.array([TimeOffset(value=value, unit='minutes') for value in time_offset_series], dtype=object)
