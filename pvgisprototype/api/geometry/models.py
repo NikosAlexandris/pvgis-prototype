@@ -14,6 +14,7 @@ class SolarDeclinationModels(str, Enum):
     pvis = 'pvis'
     hargreaves = 'Hargreaves'
     # pvgis = 'PVGIS'
+    pvlib = 'pvlib'
 
 
 class SolarPositionModels(str, Enum):

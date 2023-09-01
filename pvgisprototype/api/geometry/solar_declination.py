@@ -16,6 +16,7 @@ from ..utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
+from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_pvlib
 
 
 def model_solar_declination(
@@ -61,6 +62,17 @@ def model_solar_declination(
             days_in_a_year=days_in_a_year,
             angle_output_units=angle_output_units,
         ) # returns values in degrees by default
+
+    if model.value  == SolarDeclinationModels.pvlib:
+
+        solar_declination = calculate_solar_declination_pvlib(
+            timestamp=timestamp,
+            angle_output_units=angle_output_units,
+        )
+        solar_declination = convert_to_degrees_if_requested(
+            solar_declination,
+            angle_output_units,
+        )
 
     return solar_declination
 

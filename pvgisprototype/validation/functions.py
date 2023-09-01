@@ -170,6 +170,12 @@ class CalculateSolarAzimuthPVLIBInputModel(
 ):
     pass
 
+class CalculateSolarDeclinationPVLIBInput(
+    BaseTimestampModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
 
 class CalculateSolarAzimuthPVISInputModel(
     BaseCoordinatesModel,
