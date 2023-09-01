@@ -9,7 +9,7 @@ from math import isfinite
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitudeNOAAInput
-from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitudeNOAATimeSeriesInput
+from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitudeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import SolarHourAngle
@@ -57,7 +57,7 @@ def calculate_solar_altitude_noaa(
     return solar_altitude
 
 
-@validate_with_pydantic(CalculateSolarAltitudeNOAATimeSeriesInput)
+@validate_with_pydantic(CalculateSolarAltitudeTimeSeriesNOAAInput)
 def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,  # radians
     latitude: Latitude,  # radians

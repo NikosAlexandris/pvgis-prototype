@@ -1,7 +1,7 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeNOAAInput
-from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeNOAATimeSeriesInput
+from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
 from datetime import datetime
 from typing import Optional
@@ -88,7 +88,7 @@ def calculate_true_solar_time_noaa(
     return true_solar_time
 
 
-@validate_with_pydantic(CalculateTrueSolarTimeNOAATimeSeriesInput)
+@validate_with_pydantic(CalculateTrueSolarTimeTimeSeriesNOAAInput)
 def calculate_true_solar_time_time_series_noaa(
         longitude: Longitude,   # radians
         timestamps: Union[datetime, Sequence[datetime]], 
