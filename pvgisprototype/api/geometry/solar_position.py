@@ -39,6 +39,11 @@ from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitu
 from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_position_skyfield
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
+from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
+from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimuth_pvlib
+from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_pvlib
+from pvgisprototype.algorithms.pvlib.solar_hour_angle import calculate_solar_hour_angle_pvlib
+from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_pvlib
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
@@ -280,13 +285,55 @@ def model_solar_position(
         )
 
     # TODO: Implement pvlib solar position
-    # if model.value == SolarPositionModels.pvlib:
-    #     solar_altitude
-    #     solar_azimuth
-    #     solar_declination
-    #     solar_hour_angle
-    #     solar_zenith
+    if model.value == SolarPositionModels.pvlib:
+        solar_altitude = calculate_solar_altitude_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            angle_output_units=angle_output_units,
+            )
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
+        solar_azimuth = calculate_solar_azimuth_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            angle_output_units=angle_output_units,
+        )
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+
+        solar_declination = calculate_solar_declination_pvlib(
+            timestamp=timestamp,
+            angle_output_units=angle_output_units,
+        )
+        solar_declination = convert_to_degrees_if_requested(
+            solar_declination,
+            angle_output_units,
+        )
+        
+        # solar_hour_angle = calculate_solar_hour_angle_pvlib(
+        #     longitude=longitude,
+        #     timestamp=timestamp,
+        #     angle_output_units=angle_output_units,
+        # )
+        # solar_hour_angle = convert_to_degrees_if_requested(
+        #     solar_hour_angle,
+        #     angle_output_units,
+        # )
+
+        solar_zenith = calculate_solar_zenith_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            angle_output_units=angle_output_units,
+        )
+        solar_zenith = convert_to_degrees_if_requested(
+            solar_zenith,
+            angle_output_units,
+        )
 
     # if model.value  == SolarPositionModels.pvgis:
         
