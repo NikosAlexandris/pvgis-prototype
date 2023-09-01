@@ -33,7 +33,7 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 def calculate_extraterrestrial_normal_irradiance(
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timestamp: Annotated[datetime, typer_argument_timestamp],
     # timezone: Annotated[Optional[str], typer_option_timezone],
     # Make `day_of_year` optional ?
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,

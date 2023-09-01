@@ -1,7 +1,7 @@
 from math import pi
 import numpy as np
 
-PARAMETERS_YAML_FILE = 'parameters.yaml'
+PARAMETERS_YAML_FILE = 'parameters.yaml'  # definitions
 
 LATITUDE_MINIMUM = -90
 LATITUDE_MAXIMUM = 90  # in PVGIS : rowoffset
@@ -39,7 +39,9 @@ OPTICAL_AIR_MASS_TYPER_UNIT = 'unitless'
 ATMOSPHERIC_REFRACTION_FLAG_DEFAULT = True
 
 REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT = 1.5853349194640094  # radians
+
 MEAN_GROUND_ALBEDO_DEFAULT = 2
+
 ANGLE_OUTPUT_UNITS_DEFAULT = 'radians'
 
 # from PVGIS

@@ -10,21 +10,6 @@ from pydantic import BaseModel
 from pydantic import confloat
 import numpy as np
 
-# from pvgisprototype import SolarZenith
-from pvgisprototype.validation.parameters import SolarHourAngleModel
-from pvgisprototype.validation.parameters import SolarHourAngleSeriesModel
-
-# When?
-from pvgisprototype.validation.parameters import BaseTimestampModel
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
-from pvgisprototype.validation.parameters import BaseTimeModel
-from pvgisprototype.validation.parameters import BaseTimeSeriesModel
-
-# Where?
-from pvgisprototype.validation.parameters import LongitudeModel
-from pvgisprototype.validation.parameters import LatitudeModel
-from pvgisprototype.validation.parameters import BaseCoordinatesModel
-
 
 class BaseTimeEventModel(BaseModel):
     event: str

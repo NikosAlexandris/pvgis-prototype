@@ -23,10 +23,10 @@ from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
 from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.api.geometry.models import SolarTimeModels
 
 
 
@@ -79,6 +79,12 @@ class BaseTimestampModel(BaseModel):
 class BaseTimestampSeriesModel(BaseModel):
     timestamps: Union[datetime, Sequence[datetime]]
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @field_validator('timestamps')
+    def check_empty_list(cls, value):
+        if isinstance(value, list) and not value:
+            raise ValueError('Empty list of timestamps provided')
+        return value
 
 
 class BaseTimeModel(BaseTimestampModel):
