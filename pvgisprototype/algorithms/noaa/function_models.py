@@ -1,22 +1,31 @@
 from pydantic import field_validator
 from typing import Optional
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimestampModel
+
+# When?
+from pvgisprototype.api.parameter_models import BaseTimestampModel
+from pvgisprototype.api.parameter_models import BaseTimestampSeriesModel
+from pvgisprototype.api.parameter_models import BaseTimeModel
+from pvgisprototype.api.parameter_models import BaseTimeSeriesModel
+from pvgisprototype.api.parameter_models import SolarHourAngleModel
+from pvgisprototype.api.parameter_models import SolarHourAngleSeriesModel
+from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeEventModel
+
+# Where?
+from pvgisprototype.api.parameter_models import LongitudeModel
+from pvgisprototype.api.parameter_models import LatitudeModel
+from pvgisprototype.api.parameter_models import BaseCoordinatesModel
+
+# Units?
+
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimestampSeriesModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import LongitudeModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeSeriesModel
+
+# What?
+from pvgisprototype.algorithms.noaa.parameter_models import BaseApplyAtmosphericRefractionModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
-from pvgisprototype.algorithms.noaa.parameter_models import LatitudeModel
-from pvgisprototype.algorithms.noaa.parameter_models import SolarHourAngleModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseApplyAtmosphericRefractionModel
-from pvgisprototype.algorithms.noaa.parameter_models import SolarHourAngleSeriesModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseCoordinatesModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeEventModel
 from math import pi
 
 
