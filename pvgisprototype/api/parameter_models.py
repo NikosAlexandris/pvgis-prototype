@@ -79,6 +79,12 @@ class BaseTimestampSeriesModel(BaseModel):
     timestamps: Union[datetime, Sequence[datetime]]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    @field_validator('timestamps')
+    def check_empty_list(cls, value):
+        if isinstance(value, list) and not value:
+            raise ValueError('Empty list of timestamps provided')
+        return value
+
 
 class BaseTimeModel(BaseTimestampModel):
     timezone: Optional[ZoneInfo] = None
