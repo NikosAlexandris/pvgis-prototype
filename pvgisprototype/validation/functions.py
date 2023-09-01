@@ -1,5 +1,6 @@
 # Where?
 from pvgisprototype.validation.parameters import LatitudeModel
+from pvgisprototype.validation.parameters import LongitudeModel
 from pvgisprototype.validation.parameters import BaseCoordinatesModel
 from pvgisprototype.validation.parameters import ElevationModel
 
@@ -135,6 +136,14 @@ class CalculateHourAngleSunriseInputModel(
     LatitudeModel,
     SurfaceTiltModel,
     SolarDeclinationModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+class SolarHourAnglePVLIBInput(
+    LongitudeModel,
+    BaseTimestampModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
