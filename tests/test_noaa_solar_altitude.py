@@ -2,10 +2,10 @@ import pytest
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
-from pvgisprototype.models.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
-from pvgisprototype.api.data_classes.models import Longitude
-from pvgisprototype.api.data_classes.models import Latitude
-from pvgisprototype.api.data_classes.models import SolarAltitude
+from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
+from pvgisprototype.api.models import Longitude
+from pvgisprototype.api.models import Latitude
+from pvgisprototype.api.models import SolarAltitude
 import numpy as np
 import matplotlib.pyplot as plt
 from pvgisprototype.api.utilities.timestamp import random_datetimezone

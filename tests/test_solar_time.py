@@ -9,11 +9,12 @@ from math import radians
 
 from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
+from pvgisprototype.api.models import HourAngle
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 
-from pvgisprototype.models.pyephem.solar_time import calculate_solar_time_ephem
-from pvgisprototype.models.milne1921.solar_time import calculate_solar_time_eot
-from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_time_pvgis
+from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
+from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
 from pvgisprototype.api.utilities.conversions import convert_to_radians

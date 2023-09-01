@@ -2,8 +2,10 @@ import pytest
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
-from pvgisprototype.models.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
-from pvgisprototype.api.data_classes.models import Longitude, Latitude, SolarAzimuth
+from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
+from pvgisprototype.api.models import Longitude
+from pvgisprototype.api.models import Latitude
+from pvgisprototype.api.models import SolarAzimuth
 import numpy as np
 import matplotlib.pyplot as plt
 

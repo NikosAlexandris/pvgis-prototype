@@ -3,9 +3,9 @@ import pytest
 from datetime import datetime
 from datetime import timedelta
 from math import pi, isclose
-from pvgisprototype.models.noaa.fractional_year import calculate_fractional_year_noaa
-from pvgisprototype.models.noaa.fractional_year import calculate_fractional_year_time_series_noaa
-from pvgisprototype.models.noaa.fractional_year import FractionalYear
+from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_noaa
+from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa
+from pvgisprototype.algorithms.noaa.fractional_year import FractionalYear
 import pydantic
 import numpy as np
 

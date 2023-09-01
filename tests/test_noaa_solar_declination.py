@@ -1,8 +1,8 @@
 import pytest
 from datetime import datetime
-from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_noaa
-from pvgisprototype.models.noaa.solar_declination import calculate_solar_declination_time_series_noaa
-from pvgisprototype.models.noaa.solar_declination import SolarDeclination
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import SolarDeclination
 import pydantic
 import numpy as np
 

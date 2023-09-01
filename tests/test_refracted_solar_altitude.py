@@ -1,6 +1,6 @@
 import pytest
 from pvgisprototype.api.irradiance.direct import calculate_refracted_solar_altitude_time_series
-from pvgisprototype.api.data_classes import SolarAltitude
+from pvgisprototype.api.models import SolarAltitude
 import numpy as np
 
 

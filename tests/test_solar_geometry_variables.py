@@ -4,9 +4,9 @@ import numpy as np
 import random
 from pvgisprototype.api.data_structures import SolarGeometryDayConstants
 from pvgisprototype.api.data_structures import SolarGeometryDayVariables
-from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_time_pvgis
-from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
-from pvgisprototype.models.pvgis.solar_geometry import calculate_solar_geometry_pvgis_variables
+from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
+from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
+from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_variables
 from pvgisprototype.plot.plot_solar_geometry_pvgis import plot_solar_geometry_pvgis_variables
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 

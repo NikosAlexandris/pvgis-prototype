@@ -1,9 +1,8 @@
 import pytest
 import matplotlib.pyplot as plt
-from pvgisprototype.api.irradiance.extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
-from pvgisprototype.api.irradiance.constants import EXTRATERRESTRIAL_IRRADIANCE_MIN
-from pvgisprototype.api.irradiance.constants import EXTRATERRESTRIAL_IRRADIANCE_MAX
-from pvgisprototype.plot.plot_extraterrestrial_irradiance import plot_extraterrestrial_irradiance
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance
+from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MIN
+from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MAX
 import numpy as np
 import random
 
