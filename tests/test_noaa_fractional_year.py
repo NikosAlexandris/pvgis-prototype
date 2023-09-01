@@ -8,11 +8,13 @@ from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_
 from pvgisprototype.algorithms.noaa.fractional_year import FractionalYear
 import pydantic
 import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 test_cases = [
-    (datetime(year=2023, month=7, day=25, hour=12), 3.55),  # specific date
-    (datetime(year=2023, month=1, day=1, hour=0), 0),  # boundary case of 0
+    (datetime(year=2023, month=7, day=25, hour=12), 3.55),   # specific date
+    (datetime(year=2023, month=1, day=1, hour=0), 0),        # boundary case of 0
     (datetime(year=2023, month=12, day=31, hour=23), 2*pi),  # boundary case of 2*pi
 ]
 tolerances = [1, 0.1]
@@ -47,12 +49,14 @@ def test_calculate_fractional_year_noaa_invalid_input():
 
 
 @pytest.mark.parametrize("timestamp, expected_fractional_year", test_cases)
-@pytest.mark.parametrize('tolerance', tolerances)
-def test_calculate_fractional_year_time_series_noaa_single_timestamp(timestamp, expected_fractional_year, tolerance):
+@pytest.mark.parametrize("tolerance", tolerances)
+def test_calculate_fractional_year_time_series_noaa_single_timestamp(
+    timestamp, expected_fractional_year, tolerance
+):
     calculated = calculate_fractional_year_time_series_noaa(timestamp)
-    assert isinstance(calculated[0], FractionalYear)
-    assert pytest.approx(expected_fractional_year, abs=tolerance) == calculated[0].value
-    assert 'radians' == calculated[0].unit
+    assert isinstance(calculated, FractionalYear)
+    assert pytest.approx(expected_fractional_year, abs=tolerance) == calculated.value
+    assert "radians" == calculated.unit
 
 
 @pytest.fixture
@@ -85,13 +89,35 @@ def test_calculate_fractional_year_time_series_noaa(
 ):
     calculated = calculate_fractional_year_time_series_noaa(timestamps)
     assert isinstance(calculated, np.ndarray)
-    assert all(isinstance(item, FractionalYear) for item in calculated)
+    assert all(isinstance(calculation, FractionalYear) for calculation in calculated)
     assert np.allclose([item.value for item in calculated], expected_fractional_years, atol=tolerance)
     assert all(item.unit == 'radians' for item in calculated)
 
 
-import matplotlib.pyplot as plt
-import numpy as np
+@pytest.mark.parametrize('tolerance', tolerances)
+def test_leap_year(
+    timestamps,
+    expected_fractional_years,
+    tolerance,
+):
+    # 2024 is a leap year
+    calculated = calculate_fractional_year_time_series_noaa(timestamps)
+    assert isinstance(calculated, np.ndarray)
+    assert all(isinstance(calculation, FractionalYear) for calculation in calculated)
+
+
+def test_calculate_fractional_year_time_series_noaa_invalid_datetime():
+    with pytest.raises(ValueError):
+        calculate_fractional_year_time_series_noaa([]) # Empty list
+
+
+@pytest.mark.parametrize('tolerance', tolerances)
+def test_calculate_fractional_year_time_series_noaa_range(
+    timestamps,
+    tolerance,
+):
+    calculated = calculate_fractional_year_time_series_noaa(timestamps)
+    assert all(0 <= calculation.value < 2 * np.pi for calculation in calculated)
 
 
 def plot_fractional_year_noaa(timestamps, expected, calculated):
@@ -107,7 +133,7 @@ def plot_fractional_year_noaa(timestamps, expected, calculated):
 
 
 @pytest.mark.mpl_image_compare
-def test_plot_fractional_year_noaa(timestamps, expected_fractional_years):
+def test_plot_fractional_year_time_series_noaa(timestamps, expected_fractional_years):
 # def test_plot_fractional_year_noaa():
     calculated_fractional_years = calculate_fractional_year_time_series_noaa(timestamps)
     assert plot_fractional_year_noaa(
@@ -118,7 +144,7 @@ def test_plot_fractional_year_noaa(timestamps, expected_fractional_years):
 
 
 @pytest.mark.mpl_image_compare
-def test_plot_fractional_year_noaa(timestamps_for_a_year, expected_fractional_years_for_a_year):
+def test_plot_fractional_year_time_series_noaa(timestamps_for_a_year, expected_fractional_years_for_a_year):
 # def test_plot_fractional_year_noaa():
     calculated_fractional_years_for_a_year = calculate_fractional_year_time_series_noaa(timestamps_for_a_year)
     assert plot_fractional_year_noaa(
