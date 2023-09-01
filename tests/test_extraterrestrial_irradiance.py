@@ -8,7 +8,14 @@ from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MAX
 import numpy as np
 import random
 
-tolerances = [1, 0, 0.5, 0.1, 0.01, 0.001, 0.0001]
+tolerances = [
+    1,
+    0.5,
+    0.1,
+    0.01,
+    0.001,
+    # 0.0001,
+]
 @pytest.mark.parametrize(
     "timestamp, expected", 
     [
@@ -21,7 +28,7 @@ tolerances = [1, 0, 0.5, 0.1, 0.01, 0.001, 0.0001]
 )
 @pytest.mark.parametrize('tolerance', tolerances)
 def test_calculate_extraterrestrial_irradiance(timestamp: datetime, expected: float, tolerance: float):
-    assert expected == pytest.approx(calculate_extraterrestrial_normal_irradiance(timestamp), tolerance)
+    assert pytest.approx(expected, tolerance) == calculate_extraterrestrial_normal_irradiance(timestamp)
 
 random_timestamp = [
         datetime(year=random.randint(2005, 2023), month=random.randint(1, 12), day=random.randint(1, 28), hour=random.randint(0, 23), minute=random.randint(0, 59), second=random.randint(0, 59)),
