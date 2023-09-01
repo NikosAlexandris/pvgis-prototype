@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from pvgisprototype.api.models import SolarHourAngle
 from .solar_time import calculate_true_solar_time_noaa
 from math import pi
-from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleNOAATimeSeriesInput
+from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleTimeSeriesNOAAInput
 from typing import Union
 from typing import Sequence
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
@@ -91,7 +91,7 @@ def calculate_solar_hour_angle_noaa(
     return solar_hour_angle
 
 
-@validate_with_pydantic(CalculateSolarHourAngleNOAATimeSeriesInput)
+@validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
     timestamps: Sequence[datetime], 
