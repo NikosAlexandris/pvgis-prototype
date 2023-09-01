@@ -165,6 +165,12 @@ class CalculateSolarAltitudePVLIBInputModel(
     pass
 
 
+class CalculateSolarAzimuthPVLIBInputModel(
+    CalculateSolarAltitudePVLIBInputModel
+):
+    pass
+
+
 class CalculateSolarAzimuthPVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,

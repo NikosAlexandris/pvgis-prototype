@@ -15,6 +15,7 @@ from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_al
 import suncalc
 import pysolar
 from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
+from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimuth_pvlib
 # from .solar_declination import calculate_solar_declination
 # from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
 # from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
@@ -154,6 +155,17 @@ def model_solar_azimuth(
             solar_time_model=solar_time_model,
             time_output_units=time_output_units,
             angle_units=angle_units,
+            angle_output_units=angle_output_units,
+        )
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+
+    if model.value  == SolarPositionModels.pvlib:
+
+        solar_azimuth = calculate_solar_azimuth_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
             angle_output_units=angle_output_units,
         )
         solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
