@@ -186,6 +186,12 @@ class CalculateSolarDeclinationPVLIBInput(
     pass
 
 
+class CalculateSolarZenithPVLIBInputModel(
+    CalculateSolarAltitudePVLIBInputModel
+):
+    pass
+
+
 class CalculateSolarAzimuthPVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
