@@ -1,40 +1,38 @@
 import pytest
+from datetime import datetime
 import matplotlib.pyplot as plt
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance
 from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MIN
 from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MAX
+# from pvgisprototype.plot.plot_extraterrestrial_irradiance import plot_extraterrestrial_irradiance
 import numpy as np
 import random
 
-
+tolerances = [1, 0, 0.5, 0.1, 0.01, 0.001, 0.0001]
 @pytest.mark.parametrize(
-    "day_of_year, expected", 
+    "timestamp, expected", 
     [
-        (3, 1412.366252486348),   # Perihelion: solar constant should be maximum
-        (80, 1361.44578929),  # Vernal equinox
-        (183, 1321.44578929),  # Aphelion: solar constant should be minimum
-        (266, 1361.44578929),  # Autumnal equinox
-        (355, 1400.25687453),  # Close to winter solstice
+        (datetime(year=2023, month=1, day=3, hour=12, minute=0, second=0), 1412.366252486348),  # Perihelion
+        (datetime(year=2023, month=3, day=21, hour=12, minute=0, second=0), 1361.44578929),  # Vernal equinox
+        (datetime(year=2023, month=7, day=2, hour=12, minute=0, second=0), 1321.44578929),  # Aphelion
+        (datetime(year=2023, month=9, day=23, hour=12, minute=0, second=0), 1361.44578929),  # Autumnal equinox
+        (datetime(year=2023, month=12, day=21, hour=12, minute=0, second=0), 1400.25687453),  # Close to winter solstice
     ]
 )
-def test_calculate_extraterrestrial_irradiance(day_of_year: int, expected: float):
-    assert expected == pytest.approx(calculate_extraterrestrial_irradiance(day_of_year), 0.0001)
+@pytest.mark.parametrize('tolerance', tolerances)
+def test_calculate_extraterrestrial_irradiance(timestamp: datetime, expected: float, tolerance: float):
+    assert expected == pytest.approx(calculate_extraterrestrial_normal_irradiance(timestamp), tolerance)
 
-
-@pytest.mark.parametrize(
-    "day_of_year", 
-    [
-        # (random.randint(1, 366), 1360.8931954516274)  # Random day of the year
-        (random.randint(1, 366)),
-        (random.randint(1, 366)),
-        (random.randint(1, 366)),
-        (random.randint(1, 366)),
-        (random.randint(1, 366)),
+random_timestamp = [
+        datetime(year=random.randint(2005, 2023), month=random.randint(1, 12), day=random.randint(1, 28), hour=random.randint(0, 23), minute=random.randint(0, 59), second=random.randint(0, 59)),
+        datetime(year=random.randint(2005, 2023), month=random.randint(1, 12), day=random.randint(1, 28), hour=random.randint(0, 23), minute=random.randint(0, 59), second=random.randint(0, 59)),
+        datetime(year=random.randint(2005, 2023), month=random.randint(1, 12), day=random.randint(1, 28), hour=random.randint(0, 23), minute=random.randint(0, 59), second=random.randint(0, 59)),
+        datetime(year=random.randint(2005, 2023), month=random.randint(1, 12), day=random.randint(1, 28), hour=random.randint(0, 23), minute=random.randint(0, 59), second=random.randint(0, 59)),
+        datetime(year=random.randint(2005, 2023), month=random.randint(1, 12), day=random.randint(1, 28), hour=random.randint(0, 23), minute=random.randint(0, 59), second=random.randint(0, 59)),
     ]
-)
-def test_calculate_extraterrestrial_irradiance_for_random_day(day_of_year: int):
-    calculated = calculate_extraterrestrial_irradiance(day_of_year)
-    # assert expected == pytest.approx(calculated, abs=0.5)
+@pytest.mark.parametrize('timestamp', random_timestamp) 
+def test_calculate_extraterrestrial_irradiance_for_random_day(timestamp: datetime):
+    calculated = calculate_extraterrestrial_normal_irradiance(timestamp)
     assert EXTRATERRESTRIAL_IRRADIANCE_MIN <= calculated <= EXTRATERRESTRIAL_IRRADIANCE_MAX
 
 
