@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from pydantic import confloat
 import numpy as np
 
-# from pvgisprototype.api.data_classes.models import SolarZenith
+# from pvgisprototype import SolarZenith
 from pvgisprototype.validation.parameters import SolarHourAngleModel
 from pvgisprototype.validation.parameters import SolarHourAngleSeriesModel
 
