@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from pvgisprototype.api.data_structures import SolarGeometryDayConstants
+from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_variables

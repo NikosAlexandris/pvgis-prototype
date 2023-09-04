@@ -6,13 +6,14 @@ from typer.core import TyperGroup
 
 from .rich_help_panel_names import rich_help_panel_series_irradiance
 from .rich_help_panel_names import rich_help_panel_toolbox
-from ..api.irradiance.extraterrestrial import app as extraterrestrial_irradiance
-from ..api.irradiance.shortwave import app as global_irradiance
-from ..api.irradiance.direct import app as direct_irradiance
-from ..api.irradiance.diffuse import app as diffuse_irradiance
-from ..api.irradiance.reflected import app as reflected_irradiance
-from ..api.irradiance.loss import app as angular_loss_factor
-from ..api.irradiance.effective import app as effective_irradiance
+from pvgisprototype.api.irradiance.extraterrestrial import app as extraterrestrial_irradiance
+from pvgisprototype.api.irradiance.shortwave import app as global_irradiance
+from pvgisprototype.api.irradiance.direct import app as direct_irradiance
+from pvgisprototype.api.irradiance.direct_time_series import app as direct_irradiance_series
+from pvgisprototype.api.irradiance.diffuse import app as diffuse_irradiance
+from pvgisprototype.api.irradiance.reflected import app as reflected_irradiance
+from pvgisprototype.api.irradiance.loss import app as angular_loss_factor
+from pvgisprototype.api.irradiance.effective import app as effective_irradiance
 from .typer_parameters import OrderCommands
 
 
@@ -43,6 +44,13 @@ app.add_typer(
     direct_irradiance,
     name="direct",
     help="Estimate the direct irradiance incident on a horizontal or inclined surface",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
+app.add_typer(
+    direct_irradiance_series,
+    name="direct-series",
+    help="Estimate the direct irradiance incident on a horizontal or inclined surface over a period of time",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series_irradiance,
 )

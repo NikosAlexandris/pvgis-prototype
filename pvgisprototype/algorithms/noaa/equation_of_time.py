@@ -45,7 +45,7 @@ def calculate_equation_of_time_noaa(
 def calculate_equation_of_time_time_series_noaa(
     timestamps: Union[datetime, Sequence[datetime]],
     time_output_units: str = 'minutes',
-) -> Union[EquationOfTime, np.ndarray]:
+):#-> Union[EquationOfTime, np.ndarray]:
     """Calculate the equation of time in minutes for a time series"""
     is_scalar_input = isinstance(timestamps, datetime)
     # timestamps = np.atleast_1d(np.array(timestamps, dtype=datetime))

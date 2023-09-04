@@ -97,7 +97,7 @@ def calculate_solar_incidence_jenco(
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-        verbose: bool = False,
+        verbose: int = 0,
     ) -> SolarIncidence:
     """Calculate the solar incidence based on sun's position and surface geometry.
 
