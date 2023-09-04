@@ -8,9 +8,9 @@ from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearTimeSeriesNOAAInput
-from math import pi
-from ...api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype import FractionalYear
+from math import pi
 import numpy as np
 
 
