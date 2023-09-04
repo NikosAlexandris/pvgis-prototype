@@ -12,8 +12,28 @@ FRACTIONAL_YEAR_MAXIMUM = 2 * pi
 
 
 def days_in_year(year):
+    """ Calculate the number of days in a given year, accounting for leap years.
+
+    Parameters
+    ----------
+    year : int
+        The year for which to calculate the number of days.
+
+    Returns
+    -------
+    int
+        The number of days in the given year.
+
+    Examples
+    --------
+    >>> days_in_year(2020)
+    366
+
+    >>> days_in_year(2021)
+    365
+    """
     start_date = date(year, 1, 1)
-    end_date = date(year+1, 1, 1)
+    end_date = date(year + 1, 1, 1)
     delta = end_date - start_date
     return delta.days
 
