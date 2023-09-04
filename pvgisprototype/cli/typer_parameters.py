@@ -63,6 +63,23 @@ class OrderCommands(TyperGroup):
     return list(self.commands)
 
 
+# Generic
+
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"PVGIS prototype version: {version('pvgis-prototype')}")
+        raise typer.Exit(code=0)
+
+
+typer_option_version = typer.Option(
+    "--version",
+    help="Show the version of the application and exit",
+    callback=_version_callback,
+    is_eager=True,
+    # default_factory=None,
+)
+
+
 # Where?
 
 longitude_typer_help=f'Longitude in decimal degrees ranging in [-180, 360]. [yellow]If ranging in [0, 360], consider the `--convert-longitude-360` option.[/yellow]'
@@ -385,15 +402,15 @@ typer_option_efficiency = typer.Option(
     # default_factory=None,
 )
 
-
 # Output options
 
 typer_option_verbose = typer.Option(
-    # '--verbose',
-    # '-v',
+    '--verbose',
+    '-v',
+    # count=True,
     help='Show details while executing commands',
     rich_help_panel=rich_help_panel_output,
-    # default_factory=False,
+    # default_factory=0,
 )
 
 typer_option_rounding_places = typer.Option(
