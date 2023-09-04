@@ -3,7 +3,9 @@ from typer.core import TyperGroup
 from click import Context
 from typing import Annotated
 from typing import Optional
+from typing import List
 # from typing import Path
+from datetime import datetime
 from pathlib import Path
 from ..api.utilities.conversions import convert_to_radians
 from ..api.utilities.timestamp import now_utc_datetimezone
@@ -53,6 +55,7 @@ from pvgisprototype.constants import OPTICAL_AIR_MASS_TYPER_UNIT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 # from pvgisprototype.constants import MEAN_GROUND_ALBEDO_DEFAULT
 # from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 
 
 class OrderCommands(TyperGroup):
@@ -120,6 +123,20 @@ typer_argument_timestamp = typer.Argument(
     help='Timestamp',
     callback=ctx_attach_requested_timezone,
     default_factory=now_utc_datetimezone,
+)
+
+
+def parse_timestamp_series(value: str) -> List[float]:
+    datetime_strings = value.split(',')
+    datetime_series = [datetime.fromisoformat(string) for string in datetime_strings]
+    # return BaseTimestampSeriesModel(timestamps=datetime_series)
+    return datetime_series
+
+
+typer_argument_timestamps = typer.Argument(
+    help='Timestamps',
+    parser=parse_timestamp_series,
+#     default_factory=now_utc_datetimezone_series,
 )
 typer_option_start_time = typer.Option(
     help='Start timestamp of the period',
@@ -345,8 +362,37 @@ typer_option_linke_turbidity_factor = typer.Option(
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
+
+
+def parse_linke_turbidity_factor_series(value: str) -> BaseTimestampSeriesModel:
+    linke_turbidity_factor_strings = value.split(',')
+    linke_turbidity_factor_series = [linke_turbidity_factor.fromisoformat(string) for string in linke_turbidity_factor_strings]
+    return linke_turbidity_factor_series
+
+
+linke_turbidity_factor_series_typer_help='Ratio series of total to Rayleigh optical depth measuring atmospheric turbidity'
+typer_option_linke_turbidity_factor_series = typer.Option(
+    # min=LINKE_TURBIDITY_MINIMUM,
+    # max=LINKE_TURBIDITY_MAXIMUM,
+    help=linke_turbidity_factor_typer_help,
+    parser=parse_linke_turbidity_factor_series,
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+    # default_factory=LINKE_TURBIDITY_DEFAULT,
+)
 typer_option_optical_air_mass = typer.Option(
     help=f'Relative optical air mass [{OPTICAL_AIR_MASS_TYPER_UNIT}]',
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+    # default_factory=OPTICAL_AIR_MASS_DEFAULT,
+)
+
+
+def parse_optical_air_mass_series(value: str) -> List[float]:
+    float_strings = value.split(',')
+    return [float(string) for string in float_strings]
+
+
+typer_option_optical_air_mass_series = typer.Option(
+    help=f'Relative optical air mass series [{OPTICAL_AIR_MASS_TYPER_UNIT}]',
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=OPTICAL_AIR_MASS_DEFAULT,
 )
