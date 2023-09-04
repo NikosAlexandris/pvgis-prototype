@@ -20,7 +20,7 @@ def calculate_local_solar_time_noaa(
         time_output_units: str = 'hours',
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
-        verbose: str = False,
+        verbose: int = 0,
     ) -> SolarTime:
     """
     Returns

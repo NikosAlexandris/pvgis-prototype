@@ -89,7 +89,7 @@ def select_time_series(
     # csv: Annotated[Path, typer_option_csv] = 'series_in',
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
-    verbose: Annotated[Optional[bool], typer_option_verbose] = False,
+    verbose: Annotated[int, typer_option_verbose] = False,
 ):
     """
     Plot location series
