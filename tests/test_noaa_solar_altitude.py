@@ -21,7 +21,9 @@ time_output_units='minutes'
 angle_output_units='radians'
 
 
-timestamps_for_a_year = generate_timestamps_for_a_year()
+# Set a seed to ensure agreement of plots between tests!
+random.seed(43) # Comment to really pick a random year
+random_year = random.randint(2005, 2023)
 timestamps_for_a_year = generate_timestamps_for_a_year(year=random_year)
 test_cases = [
     (
