@@ -48,7 +48,7 @@ def calculate_solar_declination_noaa(
 def calculate_solar_declination_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
         angle_output_units: str = "radians"
-) -> Union[SolarDeclination, np.ndarray]:
+):# -> Union[SolarDeclination, np.ndarray]:
 
     # timestamps = np.atleast_1d(timestamps)  # timestamps as array
     fractional_years = calculate_fractional_year_time_series_noaa(

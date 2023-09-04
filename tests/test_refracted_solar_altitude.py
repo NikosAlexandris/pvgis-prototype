@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.irradiance.direct import calculate_refracted_solar_altitude_time_series
+from pvgisprototype.api.irradiance.direct_time_series import calculate_refracted_solar_altitude_time_series
 from pvgisprototype import SolarAltitude
 import numpy as np
 

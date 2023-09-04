@@ -378,8 +378,8 @@ def model_solar_position(
             solar_declination if solar_declination is not None else None,
             solar_hour_angle if solar_hour_angle is not None else None,
             solar_zenith if solar_zenith is not None else None,
-            solar_altitude,
-            solar_azimuth
+            solar_altitude if solar_altitude is not None else None,
+            solar_azimuth if solar_azimuth is not None else None,
     )
     return position
 

@@ -123,7 +123,7 @@ def solar_time(
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose]= 0,
 ):
     """Calculate the solar time.
 
