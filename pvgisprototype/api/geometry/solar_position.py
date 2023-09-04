@@ -299,8 +299,8 @@ def model_solar_position(
             angle_output_units,
         )
 
-    # TODO: Implement pvlib solar position
     if model.value == SolarPositionModels.pvlib:
+
         solar_altitude = calculate_solar_altitude_pvlib(
             longitude=longitude,
             latitude=latitude,
