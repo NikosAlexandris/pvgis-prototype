@@ -4,6 +4,7 @@ from datetime import date
 from typing import Optional
 from typing import Union
 from typing import Sequence
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearTimeSeriesNOAAInput
@@ -13,8 +14,7 @@ from pvgisprototype import FractionalYear
 import numpy as np
 
 
-def days_in_year(year: int) -> int:
-    return (date(year, 12, 31) - date(year, 1, 1)).days + 1
+
 
 
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
@@ -26,7 +26,7 @@ def calculate_fractional_year_noaa(
     fractional_year = (
         2
         * pi
-        / days_in_year(timestamp.year)
+        / get_days_in_year(timestamp.year)
         * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
     )
 
@@ -55,7 +55,7 @@ def calculate_fractional_year_time_series_noaa(
     """ """
     is_scalar_input = isinstance(timestamps, datetime)
     timestamps = np.atleast_1d(np.array(timestamps, dtype=datetime))
-    days_in_year_series = np.array([days_in_year(ts.year) for ts in timestamps])
+    days_in_year_series = np.array([get_days_in_year(ts.year) for ts in timestamps])
     days_of_year_series = np.array([ts.timetuple().tm_yday for ts in timestamps])
     hours = np.array([ts.hour for ts in timestamps])
     fractional_year_series = 2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24)

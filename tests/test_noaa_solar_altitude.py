@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pvgisprototype.api.utilities.timestamp import random_datetimezone
 import random
-from .helpers import generate_timestamps_for_a_year
+from pvgisprototype.api.utilities.timestamp import generate_timestamps_for_a_year
 
 
 longitude=0.5
@@ -22,6 +22,7 @@ angle_output_units='radians'
 
 
 timestamps_for_a_year = generate_timestamps_for_a_year()
+timestamps_for_a_year = generate_timestamps_for_a_year(year=random_year)
 test_cases = [
     (
         Longitude(value=0.5, unit='radians'),
