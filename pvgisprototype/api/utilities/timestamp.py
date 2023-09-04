@@ -58,7 +58,6 @@ from zoneinfo import ZoneInfo
 from rich import print
 
 
-
 def parse_timestamp(timestamp_string):
     if timestamp_string:
         formats = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%Y-%m', '%Y']
@@ -198,9 +197,7 @@ def random_day_of_year(days_in_a_year) -> int:
     """
     Generate a random datetime and timezone object
     """
-    day = random.randint(1, days_in_a_year)
-
-    return days_in_a_year
+    return random.randint(1, days_in_a_year)
 
 
 def random_datetimezone() -> tuple:
