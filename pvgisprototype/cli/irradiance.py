@@ -48,6 +48,13 @@ app.add_typer(
     rich_help_panel=rich_help_panel_series_irradiance,
 )
 app.add_typer(
+    direct_irradiance_series,
+    name="direct-series",
+    help="Estimate the direct irradiance incident on a horizontal or inclined surface over a period of time",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
+app.add_typer(
     diffuse_irradiance,
     name="diffuse",
     help="Estimate the diffuse irradiance",
