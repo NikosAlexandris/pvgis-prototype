@@ -55,7 +55,7 @@ class CalculateEquationOfTimeNOAAInput(
 
 
 class CalculateEquationOfTimeTimeSeriesNOAAInput(
-    BaseTimestampSeriesModel,
+    BaseTimestampSeriesModel,  # != BaseTimestampModel
     BaseTimeOutputUnitsModel,
 ):
     pass
