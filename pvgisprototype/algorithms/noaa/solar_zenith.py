@@ -17,6 +17,7 @@ from pvgisprototype.algorithms.noaa.function_models import CalculateSolarZenithN
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarZenithTimeSeriesNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput
+from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
 from pvgisprototype import SolarZenith
 from pvgisprototype import SolarAltitude
 from pvgisprototype import Latitude
@@ -256,26 +257,26 @@ def calculate_solar_zenith_time_series_noaa(
         np.sin(latitude_value) * np.sin(solar_declination_series)
         + np.cos(latitude_value) * np.cos(solar_declination_series) * np.cos(solar_hour_angle_series)
     )
-    solar_zeniths = np.arccos(cosine_solar_zenith)
+    solar_zenith_series = np.arccos(cosine_solar_zenith)
 
     if apply_atmospheric_refraction:
-        solar_zeniths = adjust_solar_zenith_for_atmospheric_refraction_time_series(
-            solar_zeniths, angle_output_units="radians"
+        solar_zenith_series = adjust_solar_zenith_for_atmospheric_refraction_time_series(
+            solar_zenith_series, angle_output_units="radians"
         )
 
-    if not np.all(np.isfinite(solar_zeniths)) or not np.all((0 <= solar_zeniths) & (solar_zeniths <= np.pi + 0.0146)):
+    if not np.all(np.isfinite(solar_zenith_series)) or not np.all((0 <= solar_zenith_series) & (solar_zenith_series <= np.pi + 0.0146)):
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {np.pi + 0.0146}] radians')
 
-    solar_zeniths = [
-        SolarZenith(value=value, unit='radians') for value in solar_zeniths
+    solar_zenith_series = [
+        SolarZenith(value=value, unit='radians') for value in solar_zenith_series
     ]
     if angle_output_units == "degrees":
-        solar_zeniths = [
+        solar_zenith_series = [
             convert_to_degrees_if_requested(zenith, angle_output_units)
-            for zenith in solar_zeniths
+            for zenith in solar_zenith_series
         ]
 
     if np.isscalar(timestamps):
-        return solar_zeniths[0]
+        return solar_zenith_series[0]
     else:
-        return np.array(solar_zeniths, dtype=object)
+        return np.array(solar_zenith_series, dtype=object)
