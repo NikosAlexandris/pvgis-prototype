@@ -299,25 +299,7 @@ def model_solar_position(
             angle_output_units,
         )
 
-    # TODO: Implement pvlib solar position
     if model.value == SolarPositionModels.pvlib:
-        solar_altitude = calculate_solar_altitude_pvlib(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            angle_output_units=angle_output_units,
-            )
-        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
-
-        solar_azimuth = calculate_solar_azimuth_pvlib(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            angle_output_units=angle_output_units,
-        )
-        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
 
         solar_declination = calculate_solar_declination_pvlib(
             timestamp=timestamp,
@@ -349,6 +331,24 @@ def model_solar_position(
             solar_zenith,
             angle_output_units,
         )
+
+        solar_altitude = calculate_solar_altitude_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            angle_output_units=angle_output_units,
+            )
+        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
+
+        solar_azimuth = calculate_solar_azimuth_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            angle_output_units=angle_output_units,
+        )
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
 
     # if model.value  == SolarPositionModels.pvgis:
         
@@ -433,7 +433,7 @@ def calculate_solar_position(
                 'Hour Angle' if solar_hour_angle is not None else None: solar_hour_angle.value if solar_hour_angle is not None else None,
                 'Zenith' if solar_zenith is not None else None: solar_zenith.value if solar_zenith is not None else None,
                 'Altitude' if solar_altitude is not None else None: solar_altitude.value if solar_altitude is not None else None,
-                'Altitude' if solar_azimuth is not None else None: solar_azimuth.value if solar_azimuth is not None else None,
+                'Azimuth' if solar_azimuth is not None else None: solar_azimuth.value if solar_azimuth is not None else None,
                 'Units': angle_output_units
             })
 
