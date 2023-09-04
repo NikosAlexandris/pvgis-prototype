@@ -93,15 +93,15 @@ def calculate_solar_azimuth_noaa(
 
 @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesNOAAInput)
 def calculate_solar_azimuth_time_series_noaa(
-        longitude: Longitude,   # radians
-        latitude: Latitude,     # radians
-        timestamps: Union[float, Sequence[float]],
-        timezone: str,
-        apply_atmospheric_refraction: bool = True,
-        time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
-        angle_output_units: str = 'radians',
-    )-> np.ndarray:
+    longitude: Longitude,   # radians
+    latitude: Latitude,     # radians
+    timestamps: Union[float, Sequence[float]],
+    timezone: str,
+    apply_atmospheric_refraction: bool = True,
+    time_output_units: str = 'minutes',
+    angle_units: str = 'radians',
+    angle_output_units: str = 'radians',
+):# -> np.ndarray:
     """Calculate the solar azimuth (θ) in radians for a time series"""
 
     solar_declination_series = calculate_solar_declination_time_series_noaa(

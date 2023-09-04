@@ -4,10 +4,8 @@ from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_o
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
 from pvgisprototype.algorithms.noaa.equation_of_time import EquationOfTime
 import numpy as np
-from .cases_equation_of_time import cases_for_equation_of_time
-
-
-tolerances = [1, 0.5, 0.1, 0.001]
+from .cases.equation_of_time import cases_for_equation_of_time
+from .cases.equation_of_time import tolerances
 
 
 @pytest.mark.parametrize("timestamp, time_output_units, expected", cases_for_equation_of_time)

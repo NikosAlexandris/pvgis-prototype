@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from datetime import datetime
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
-from .helpers import generate_timestamps_for_a_year
+from pvgisprototype.api.utilities.timestamp import generate_timestamps_for_a_year
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 
