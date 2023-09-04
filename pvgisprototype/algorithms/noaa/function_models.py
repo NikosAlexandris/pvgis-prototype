@@ -55,7 +55,7 @@ class CalculateEquationOfTimeNOAAInput(
 
 
 class CalculateEquationOfTimeTimeSeriesNOAAInput(
-    BaseTimestampSeriesModel,
+    BaseTimestampSeriesModel,  # != BaseTimestampModel
     BaseTimeOutputUnitsModel,
 ):
     pass
@@ -250,7 +250,7 @@ class CalculateLocalSolarTimeNOAAInput(
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
-    verbose: Optional[bool] = False
+    verbose: int = 0
 
 
 class CalculateSolarPositionNOAAInput(

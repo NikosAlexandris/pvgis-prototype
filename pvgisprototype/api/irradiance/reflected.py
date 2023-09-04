@@ -95,7 +95,7 @@ def calculate_ground_reflected_inclined_irradiance(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose]= False,
 ):
     """Calculate the clear-sky diffuse ground reflected irradiance on an inclined surface (Ri).
 

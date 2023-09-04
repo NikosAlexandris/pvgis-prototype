@@ -44,7 +44,7 @@ def model_solar_incidence(
     time_output_units: str = "minutes",
     angle_units: str = "radians",
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
-    verbose: bool = False,
+    verbose: int = 0,
 ) -> SolarIncidence:
     """ """
     if solar_incidence_model.value == SolarIncidenceModels.jenco:
@@ -116,7 +116,7 @@ def calculate_solar_incidence(
     time_output_units: str = "minutes",
     angle_units: str = "radians",
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
-    verbose: bool = False,
+    verbose: int = 0,
 ) -> List:
     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
     results = []

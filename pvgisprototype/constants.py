@@ -1,7 +1,42 @@
 from math import pi
 import numpy as np
 
+
 PARAMETERS_YAML_FILE = 'parameters.yaml'  # definitions
+"""
+Name of the YAML file that contains various parameter configurations
+for PVIS functions.
+
+This YAML file defines the type, initial values, units, and descriptions for
+each parameter. The file is organized into sections, each corresponding to a
+different 'group' like: 'Where?', 'When?', 'Atmospheric properties', 'Earth
+orbit', etc.
+
+Each parameter is described with the following keys:
+
+    - value: Contains 'type' and 'initial' values.
+    - unit: Contains 'type' and 'initial' values.
+    - symbol: Symbol used for the parameter.
+    - description: Textual description of what the parameter represents.
+
+See Also
+--------
+- Python's PyYAML library for YAML file parsing:
+  https://pypi.org/project/PyYAML/
+
+Examples
+--------
+- Longitude:
+    value:
+        type: Optional[float]
+        initial:
+    unit:
+        type: Optional[str]
+        initial:
+    symbol: Λ
+    description: "The angle between a point on the Earth's surface and the meridian plane,
+                  ranging from 0° at the Prime Meridian to 180° east or west."
+"""
 
 LATITUDE_MINIMUM = -90
 LATITUDE_MAXIMUM = 90  # in PVGIS : rowoffset
@@ -27,6 +62,7 @@ EXTRATERRESTRIAL_IRRADIANCE_MIN = 1315  # 1315.2963089821737 for days_in_a_year 
 EXTRATERRESTRIAL_IRRADIANCE_MAX = 1407  # 1406.3049813983132 for days_in_a_year = 365.25
 
 RANDOM_DAY_FLAG_DEFAULT = False
+RANDOM_DAY_SERIES_FLAG_DEFAULT = False
 DAYS_IN_A_YEAR = 365
 PERIGEE_OFFSET = 0.048869
 ECCENTRICITY_CORRECTION_FACTOR = 0.03344

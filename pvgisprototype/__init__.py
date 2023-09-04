@@ -1,4 +1,3 @@
-from devtools import debug
 import yaml
 from pydantic import BaseModel
 from typing import Optional
@@ -8,7 +7,6 @@ from pydantic import BaseModel
 from typing import Optional
 from devtools import debug
 from pathlib import Path
-# from pvgisprototype.validation.data_classes import generate_dataclass_models
 from pvgisprototype.constants import PARAMETERS_YAML_FILE
 
 
@@ -41,9 +39,7 @@ def generate_dataclass_models(yaml_file: str):
                 **default_values,
             }
         )
-        # debug(locals())
         globals()[model_name] = model_class
-        # setattr(data_classes, model_name, model_class)
 
 package_root = Path(__file__).resolve().parent
 parameters_yaml_file_path = package_root / 'validation' / PARAMETERS_YAML_FILE
