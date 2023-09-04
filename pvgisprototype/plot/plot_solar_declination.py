@@ -19,7 +19,6 @@ from pvgisprototype.api.geometry.solar_declination import calculate_solar_declin
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
 from pvgisprototype.algorithms.pvgis.solar_declination import calculate_solar_declination_pvgis
-from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_pvlib
 
 
 def generate_timestamps(start_date: datetime, end_date: datetime):
@@ -59,20 +58,7 @@ def calculate_declinations(
     # restructure for plotting
     solar_declinations_hargreaves = [item.value for item in solar_declinations_hargreaves]
 
-    solar_declinations_pvlib = np.vectorize(calculate_solar_declination_pvlib)(
-        timestamp=timestamps,
-        angle_output_units=output_units, # in degrees
-    )
-    # restructure for plotting
-    solar_declinations_pvlib = [item.value for item in solar_declinations_pvlib]
-
-    return (
-        solar_declinations,
-        solar_declinations_pvgis,
-        solar_declinations_noaa,
-        solar_declinations_hargreaves,
-        solar_declinations_pvlib,
-    )
+    return solar_declinations, solar_declinations_pvgis, solar_declinations_noaa, solar_declinations_hargreaves
     
 
 def plot_solar_declination(
@@ -94,7 +80,6 @@ def plot_solar_declination(
         solar_declinations_pvgis,
         solar_declinations_noaa,
         solar_declinations_hargreaves,
-        solar_declinations_pvlib,
     ) = calculate_declinations(timestamps, output_units)
 
     fig = plt.figure(figsize=(10,6))
@@ -135,15 +120,6 @@ def plot_solar_declination(
         label="Hargreaves",
         linestyle=":",
         color="#9966CC",
-    )
-    plt.plot(
-        timestamps,
-        solar_declinations_pvlib,
-        linewidth=2.0,
-        alpha=1.0,
-        label="pvlib",
-        linestyle="-",
-        color="#FFA500",
     )
 
     plt.xlabel('Day of the Year')
