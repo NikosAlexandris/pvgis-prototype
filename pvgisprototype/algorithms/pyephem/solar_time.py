@@ -21,7 +21,7 @@ def calculate_solar_time_ephem(
     latitude: Latitude,
     timestamp: datetime,
     timezone: str = None,
-    verbose: bool = False,
+    verbose: int = 0,
   ):
   """Calculate the solar time using PyEphem
 

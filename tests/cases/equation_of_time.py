@@ -18,6 +18,7 @@ Test cases for the Equation of Time
 
     14.25
 """
+tolerances = [1, 0.5, 0.1, 0.001]
 cases_for_equation_of_time = [
     (datetime(year=2023, month=7, day=25, hour=12), "minutes", 14.25),
     (datetime(year=2023, month=12, day=21, hour=12), "minutes", -3.44),

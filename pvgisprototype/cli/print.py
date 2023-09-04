@@ -127,7 +127,7 @@ def print_noaa_solar_position_table(
     user_requested_timestamp: datetime = None, 
     user_requested_timezone: str = None,
     angle_output_units: str = 'radians',
-    verbose: bool = False,  # New verbose argument
+    verbose: int = 0,
 ):
     console = Console()
 

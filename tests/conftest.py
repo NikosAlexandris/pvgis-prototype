@@ -83,3 +83,11 @@ def create_minimal_netcdf(path_to_data: pathlib.Path, time=24, lon=2, lat=2):
     dataset.close()
 
     return filename
+
+
+@pytest.fixture
+def timestamps_for_a_year():
+    start_date = datetime(year=2023, month=1, day=1, hour=0)
+    return [start_date + timedelta(hours=i) for i in range(365 * 24)]
+
+
