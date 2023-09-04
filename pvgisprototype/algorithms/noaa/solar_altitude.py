@@ -66,7 +66,7 @@ def calculate_solar_altitude_time_series_noaa(
     apply_atmospheric_refraction: bool = True,
     time_output_units: str = "minutes",
     angle_output_units: str = "radians",
-) -> np.ndarray:
+):
     """Calculate the solar zenith angle (φ) in radians for a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude,

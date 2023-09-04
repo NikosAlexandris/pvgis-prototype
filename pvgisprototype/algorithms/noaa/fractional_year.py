@@ -51,7 +51,7 @@ def calculate_fractional_year_noaa(
 def calculate_fractional_year_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
         angle_output_units: str = "radians"
-    ) -> Union[FractionalYear, np.ndarray]:
+    ):
     """ """
     is_scalar_input = isinstance(timestamps, datetime)
     timestamps = np.atleast_1d(np.array(timestamps, dtype=datetime))
