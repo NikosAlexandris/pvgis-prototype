@@ -250,7 +250,7 @@ class CalculateLocalSolarTimeNOAAInput(
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
-    verbose: Optional[bool] = False
+    verbose: int = 0
 
 
 class CalculateSolarPositionNOAAInput(

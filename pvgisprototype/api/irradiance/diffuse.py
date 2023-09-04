@@ -161,7 +161,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose]= False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
     time series.
@@ -444,7 +444,7 @@ def calculate_diffuse_inclined_irradiance(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose]= False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface
 

@@ -92,7 +92,7 @@ def select_coordinates(
         time: str = None,
         method: str ='nearest',
         tolerance: float = 0.1,
-        verbose: bool = False,
+        verbose: int = 0,
         ):
     """Select single pair of coordinates from a data array
     
