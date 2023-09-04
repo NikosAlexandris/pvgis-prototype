@@ -158,9 +158,9 @@ def adjust_solar_zenith_for_atmospheric_refraction(
 
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction_time_series(
-        solar_zenith_series: np.ndarray,  # radians
+        solar_zenith_series: SolarZenithSeriesModel,#: np.ndarray,  # radians
         angle_output_units: str = 'radians',
-    ) -> np.ndarray:
+    ):
     """Adjust solar zenith for atmospheric refraction for a time series of solar zenith angles"""
     atmospheric_refraction_functions = {
         'high_solar_altitude': np.vectorize(atmospheric_refraction_for_high_solar_altitude),
@@ -236,7 +236,7 @@ def calculate_solar_zenith_time_series_noaa(
         solar_hour_angle_series: Union[SolarHourAngle, Sequence[SolarHourAngle]],
         apply_atmospheric_refraction: bool = False,
         angle_output_units: str = 'radians',
-) -> Union[SolarZenith, np.ndarray]:
+):
     """ """
     solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
