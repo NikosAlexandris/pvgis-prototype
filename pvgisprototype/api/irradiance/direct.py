@@ -84,10 +84,10 @@ from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
-from pvgisprototype.cli.typer_parameters import typer_argument_refracted_solar_altitude
-from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_argument_refracted_solar_altitude
+from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_argument_linke_turbidity_factor
@@ -141,6 +141,7 @@ class MethodsForInexactMatches(str, Enum):
     pad = 'pad' # ffill: propagate last valid index value forward
     backfill = 'backfill' # bfill: propagate next valid index value backward
     nearest = 'nearest' # use nearest valid index value
+
 
 # Forbid using --solar-time-model all wherever it does not make sense?
 # def validate_solar_time_model(value: SolarTimeModels) -> SolarTimeModels:
@@ -220,46 +221,6 @@ def calculate_refracted_solar_altitude(
     return refracted_solar_altitude
 
 
-def calculate_refracted_solar_altitude_time_series(
-    solar_altitude_series: np.ndarray,
-    angle_input_units: str = 'degrees',
-    angle_output_units: str = 'radians',
-):
-    """Adjust the solar altitude angle for atmospheric refraction for a time series of solar altitudes.
-    
-    This function is vectorized to handle arrays of solar altitudes.
-    """
-    if angle_input_units != "degrees":
-        raise ValueError("Only degrees are supported for angle_input_units.")
-
-    solar_altitude_values = np.array(
-        [solar_altitude.value for solar_altitude in solar_altitude_series]
-    )
-    atmospheric_refraction = (
-        0.061359
-        * (
-            0.1594
-            + 1.123 * solar_altitude_values
-            + 0.065656 * np.power(solar_altitude_values, 2)
-        )
-        / (
-            1
-            + 28.9344 * solar_altitude_values
-            + 277.3971 * np.power(solar_altitude_values, 2)
-        )
-    )
-    refracted_solar_altitude_values = solar_altitude_values + atmospheric_refraction
-    refracted_solar_altitude_series = [
-        RefractedSolarAltitude(value=value, unit="radians") for value in refracted_solar_altitude_values
-    ]
-    refracted_solar_altitude_series = [
-        convert_to_degrees_if_requested(altitude, angle_output_units)
-        for altitude in refracted_solar_altitude_series
-    ]
-
-    return refracted_solar_altitude_series
-
-
 @validate_with_pydantic(CalculateOpticalAirMassInputModel)
 def calculate_optical_air_mass(
     elevation: Annotated[float, typer_argument_elevation],
@@ -324,21 +285,6 @@ def calculate_optical_air_mass(
 
     # debug(locals())
     return optical_air_mass
-
-
-def calculate_optical_air_mass_time_series(
-    elevations: np.ndarray,
-    refracted_solar_altitude_series: np.ndarray,
-    angle_units: str = 'radians',
-) -> np.ndarray:
-    """Vectorized function to approximate the relative optical air mass for a time series."""
-    optical_air_masse_series = adjust_elevation(elevations) / (
-        np.sin(refracted_solar_altitude_series)
-        + 0.50572
-        * np.power((refracted_solar_altitude_series + 6.07995), -1.6364)
-    )
-    
-    return optical_air_masse_series
 
 
 def rayleigh_optical_thickness(
