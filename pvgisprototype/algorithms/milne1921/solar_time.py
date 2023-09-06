@@ -1,3 +1,4 @@
+from devtools import debug
 import typer
 from typing import Annotated
 from typing import Optional
@@ -111,29 +112,36 @@ def calculate_apparent_solar_time_milne1921(
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # Handle Me during input validation? -------------------------------------
 
-    year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
-    hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
-    day_of_year = timestamp.timetuple().tm_yday
 
     # Equation of Time, Milne 1921 -------------------------------------------
+
     # The difference of local time from UTC equals the time zone, in hours
     local_time_minus_utc = timestamp.utcoffset().total_seconds() / 3600
-    local_standard_meridian_time = 15 * local_time_minus_utc
+    local_standard_time_meridian = 15 * local_time_minus_utc
 
+    # `b` for the equation of time -------------------------------------------
+    day_of_year = timestamp.timetuple().tm_yday
     b = radians( 360 / 365 * (day_of_year - 81))  # from degrees to radians
-    equation_of_time = 9.87 * sin(2*b) - 7.53 * cos(b) - 1.5 * sin(b)
+
+    # however, in : 
+    # Solar Energy Engineering (Second Edition),
+    # Chapter 2 - Environmental Characteristics,
+    # Soteris A. Kalogirou, Academic Press, 2014,
+    # ISBN 9780123972705, https://doi.org/10.1016/B978-0-12-397270-5.00002-9.
+    # Pages 51-123,
+    # b = (day_of_year - 81) * 360 / 364  (in degrees)
+    # -----------------------------------------------------------------------
+
+    equation_of_time = 9.87 * sin(2 * b) - 7.53 * cos(b) - 1.5 * sin(b)
 
     # ------------------------------------------------------------------------
-    longitude = degrees(longitude)  # this equation of time requires degrees!
-    # ------------------------------------------------------------------------
-    time_correction_factor = 4 * (longitude - local_standard_meridian_time) + equation_of_time
+    # the following equation requires longitude in degrees!
+    time_correction_factor = (
+        4 * (degrees(longitude.value) - local_standard_time_meridian) + equation_of_time
+    )
     time_correction_factor_hours = time_correction_factor / 60
-    solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
-    solar_time_decimal_hours = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600
-    hour_angle = 15 * (solar_time_decimal_hours - 12)
+    apparent_solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     # ------------------------------------------------------------------------
     
     debug(locals())
-    # return SolarTime(solar_time, 'decimal hours')
-    return solar_time
+    return apparent_solar_time
