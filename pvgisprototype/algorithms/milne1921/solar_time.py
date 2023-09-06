@@ -33,16 +33,21 @@ def calculate_apparent_solar_time_milne1921(
         time_offset_global: float = 0,
         hour_offset: float = 0,
 ):
-    """Calculate the solar time.
+    """Calculate the apparent solar time based on the equation of time by Milne 1921
+
+    Notes
+    -----
 
     - Local Time (LT)
 
     - Local Standard Time Meridian (LSTM)
     
-        - 15° = 360°/24 hours.
+        - 1 hour in time equals to 15° degrees of earth's rotation
+          (from: 360°/24 hours)
+
         - Examples:
-            - Sydney Australia is UTC +10 so the LSTM is 150 °E.
-            - Phoenix, USA is UTC -7 so the LSTM is 105 °W
+            - Sydney Australia is UTC +10 so the LSTM is 10 * 15° = 150 °E.
+            - Phoenix, USA is UTC -7 so the LSTM is -7 * 15° = -105°E or 105 °W
 
     - The equation of time (EoT) (in minutes) is an empirical equation that
       corrects for the eccentricity of the Earth's orbit and the Earth's axial
@@ -57,10 +62,14 @@ def calculate_apparent_solar_time_milne1921(
         - Time correction (TC) factor = 4 * (longitude - LSTM) + EoT
 
     - Solar time (or local solar time) = LT + TC / 60
+        * The solar (or local) solar time here equals to :
+        - the apparent solar time (AST)
+        - or corrected local solar time
+        - or true solar time or (TST)
+        as termed in other models/equations.
+
     - Hour angle = 15 * (LST - 12)
 
-    Notes
-    -----
     _Milne
 
     @article{Milne1921,
@@ -73,6 +82,25 @@ def calculate_apparent_solar_time_milne1921(
         author = {R. M. Milne},
         title = {593. Note on the Equation of Time},
         journal = {The Mathematical Gazette}
+    }
+
+    See also:
+
+    @incollection{KALOGIROU201451,
+    title = {Chapter 2 - Environmental Characteristics},
+    editor = {Soteris A. Kalogirou},
+    booktitle = {Solar Energy Engineering (Second Edition)},
+    publisher = {Academic Press},
+    edition = {Second Edition},
+    address = {Boston},
+    pages = {51-123},
+    year = {2014},
+    isbn = {978-0-12-397270-5},
+    doi = {https://doi.org/10.1016/B978-0-12-397270-5.00002-9},
+    url = {https://www.sciencedirect.com/science/article/pii/B9780123972705000029},
+    author = {Soteris A. Kalogirou},
+    keywords = {Atmospheric attenuation, Extraterrestrial radiation, Radiation exchange between surfaces, Shadow determination, Solar angles, Solar radiation measuring instruments, Solar radiation, Terrestrial irradiation, Total radiation on tilted surfaces, Typical meteorological year},
+    abstract = {Chapter 2 gives an analysis of the environmental characteristics of solar radiation and in particular the reckoning of time and solar angles. In the latter the basic solar geometry equations are given including declination, hour angle, altitude angle, azimuth angle as well as the incidence angle for stationary and moving surfaces, sun path diagrams, and shadow determination including the way to calculate shading effects. This is followed by a description of the basic principles of solar radiation heat transfer including transparent plates, radiation exchange between surfaces, extraterrestrial solar radiation, atmospheric attenuation, terrestrial irradiation, and total radiation on tilted surfaces. It concludes with a review of the solar radiation measuring instruments and the way to construct typical meteorological year files.}
     }
     """
     # # Handle Me during input validation? -------------------------------------
