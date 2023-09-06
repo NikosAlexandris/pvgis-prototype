@@ -30,8 +30,8 @@ class SolarPositionModels(str, Enum):
 
 class SolarTimeModels(str, Enum):
     all = 'all'
-    eot = 'EoT'
     ephem = 'ephem'
+    milne = 'Milne (1921)'
     noaa = 'NOAA'
     pvgis = 'PVGIS'
     skyfield = 'Skyfield'
