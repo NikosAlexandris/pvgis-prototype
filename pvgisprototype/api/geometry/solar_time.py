@@ -47,19 +47,19 @@ def model_solar_time(
     """
     # if local and timestamp is not None and timezone is not None:
     #     timestamp = timezone.localize(timestamp)
-                longitude,
-                latitude,
-                timestamp,
-                timezone,
-                days_in_a_year,
-                perigee_offset,
-                eccentricity_correction_factor,
-                time_offset_global,
-                hour_offset,
-                )
     if solar_time_model.value == SolarTimeModels.milne:
 
         solar_time = calculate_apparent_solar_time_milne1921(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset,
+        )
 
     if solar_time_model.value == SolarTimeModels.ephem:
 
