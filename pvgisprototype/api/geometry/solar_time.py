@@ -10,7 +10,7 @@ from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from .models import SolarTimeModels
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
 from pvgisprototype.algorithms.noaa.solar_position import calculate_local_solar_time_noaa
@@ -47,9 +47,6 @@ def model_solar_time(
     """
     # if local and timestamp is not None and timezone is not None:
     #     timestamp = timezone.localize(timestamp)
-    if solar_time_model.value == SolarTimeModels.eot:
-
-        solar_time = calculate_solar_time_eot(
                 longitude,
                 latitude,
                 timestamp,
@@ -60,6 +57,9 @@ def model_solar_time(
                 time_offset_global,
                 hour_offset,
                 )
+    if solar_time_model.value == SolarTimeModels.milne:
+
+        solar_time = calculate_apparent_solar_time_milne1921(
 
     if solar_time_model.value == SolarTimeModels.ephem:
 

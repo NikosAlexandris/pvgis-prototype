@@ -22,7 +22,7 @@ from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 
 
 @validate_with_pydantic(CalculateSolarTimeEoTInputModel)
-def calculate_solar_time_eot(
+def calculate_apparent_solar_time_milne1921(
         longitude: Longitude,
         latitude: Latitude,
         timestamp: datetime,
