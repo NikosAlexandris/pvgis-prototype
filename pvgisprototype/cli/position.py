@@ -71,8 +71,8 @@ from ..api.geometry.models import SolarIncidenceModels
 from ..api.geometry.models import SolarPositionModels
 from ..api.geometry.models import SolarTimeModels
 # from ..api.geometry.solar_position import _parse_model
-from ..api.geometry.solar_position import calculate_solar_position
-from ..api.geometry.solar_position import model_solar_position
+from ..api.geometry.solar_position import calculate_solar_geometry_overview
+from ..api.geometry.solar_position import model_solar_geometry_overview
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
 from .rich_help_panel_names import rich_help_panel_advanced_options
 from .rich_help_panel_names import rich_help_panel_geometry_time
@@ -182,7 +182,7 @@ def overview(
     if SolarPositionModels.all in model:
         model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
 
-    solar_position = calculate_solar_position(
+    solar_position = calculate_solar_geometry_overview(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
