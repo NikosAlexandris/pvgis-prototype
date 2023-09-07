@@ -58,7 +58,7 @@ def convert_south_to_north_radians_convention(azimuth_south_radians):
 
 
 @validate_with_pydantic(ModelSolarPositionInputModel)
-def model_solar_position(
+def model_solar_geometry_overview(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
@@ -384,7 +384,7 @@ def model_solar_position(
     return position
 
 
-def calculate_solar_position(
+def calculate_solar_geometry_overview(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
@@ -408,7 +408,7 @@ def calculate_solar_position(
     results = []
     for model in models:
         if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
-            solar_declination, solar_hour_angle, solar_zenith, solar_altitude, solar_azimuth = model_solar_position(
+            solar_declination, solar_hour_angle, solar_zenith, solar_altitude, solar_azimuth = model_solar_geometry_overview(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
