@@ -10,8 +10,8 @@ logging.basicConfig(
 )
 from typing import List
 from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.solar_position import model_solar_position
-from pvgisprototype.api.geometry.solar_position import calculate_solar_position
+from pvgisprototype.api.geometry.solar_position import model_solar_geometry_overview
+from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_position_skyfield
 from pvgisprototype.api.data_structures import SolarGeometryDayConstants
@@ -43,7 +43,7 @@ def plot_daily_solar_altitude(
             solar_altitude, _, _ = model(solar_geometry_day_constants, year, hour_of_year)
             altitudes.append(solar_altitude)
         else:
-            solar_altitude, _ , units = model_solar_position(longitude, latitude, timestamp, model)
+            solar_altitude, _ , units = model_solar_geometry_overview(longitude, latitude, timestamp, model)
             altitudes.append(solar_altitude)
 
     fig, ax = plt.subplots()
@@ -75,7 +75,7 @@ def plot_daily_solar_azimuth(
     azimuths = []
     timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
     for timestamp in timestamps:
-        altitude, azimuth, units = model_solar_position(longitude, latitude, timestamp, model)
+        altitude, azimuth, units = model_solar_geometry_overview(longitude, latitude, timestamp, model)
         azimuths.append(azimuth)
 
     fig, ax = plt.subplots()
@@ -107,7 +107,7 @@ def plot_daily_solar_position(
     azimuths = []
     timestamps = [timestamp.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
     for timestamp in timestamps:
-        altitude, azimuth, units = model_solar_position(longitude, latitude, timestamp, model)
+        altitude, azimuth, units = model_solar_geometry_overview(longitude, latitude, timestamp, model)
         logging.debug(f"{model}: Altitude={altitude}, Azimuth={azimuth}")
         altitudes.append(altitude)
         azimuths.append(azimuth)
@@ -163,7 +163,7 @@ def plot_daily_solar_position_models(
         altitudes = []
         azimuths = []
         for timestamp in timestamps:
-            altitude, azimuth, units = model_solar_position(
+            altitude, azimuth, units = model_solar_geometry_overview(
                 longitude, latitude, timestamp, timezone, model
             )
             altitudes.append(altitude)
@@ -195,7 +195,7 @@ def plot_daily_solar_position_scatter(
     azimuths = []
     timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
     for timestamp in timestamps:
-        altitude, azimuth, units = model_solar_position(longitude, latitude, timestamp, model)
+        altitude, azimuth, units = model_solar_geometry_overview(longitude, latitude, timestamp, model)
         altitudes.append(altitude)
         azimuths.append(azimuth)
 
@@ -229,7 +229,7 @@ def plot_yearly_solar_position(
 
     while start_date <= end_date:
         timestamp = datetime.combine(start_date, time(12, 0))
-        altitude, azimuth = model_solar_position(longitude, latitude, timestamp, model)
+        altitude, azimuth = model_solar_geometry_overview(longitude, latitude, timestamp, model)
         timestamps.append(start_date)
         altitudes.append(altitude)
         azimuths.append(azimuth)
@@ -271,7 +271,7 @@ def plot_analemma(longitude, latitude, year, model):
     while start_date <= end_date:
         for h in range(24):
             timestamp = datetime.combine(start_date, time(h, 0))
-            altitude, azimuth = model_solar_position(longitude, latitude, timestamp, model)
+            altitude, azimuth = model_solar_geometry_overview(longitude, latitude, timestamp, model)
             if altitude > 0:  # consider only daytime
                 timestamps.append(timestamp)
                 azimuths.append(azimuth)
