@@ -15,6 +15,8 @@ from typing import Optional
 from rich import print
 
 from .typer_parameters import OrderCommands
+from .typer_parameters import typer_option_verbose
+from .typer_parameters import typer_option_version
 from .rich_help_panel_names import rich_help_panel_performance
 from . import energy
 from .rich_help_panel_names import rich_help_panel_series
@@ -117,22 +119,11 @@ app.add_typer(
 )
 
 
-def _version_callback(value: bool) -> None:
-    if value:
-        typer.echo(f"pvgis prototype version: {version('pvgis-prototype')}")
-        raise typer.Exit(code=0)
-
-
 @app.callback(no_args_is_help=True)
 def main(
-        verbose: Annotated[Optional[bool], typer.Option(
-            help="Show details while executing commands")] = False,
-        version: Annotated[Optional[bool], typer.Option(
-                "--version",
-                help="Show the application's version and exit",
-                callback=_version_callback,
-                is_eager=True)] = None,
-        ) -> None:
+    verbose: Annotated[int, typer_option_verbose] = 0,
+    version: Annotated[Optional[bool], typer_option_version] = None,
+) -> None:
     """
     callback() : PVIS prototype
     """

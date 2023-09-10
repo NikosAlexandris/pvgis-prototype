@@ -214,7 +214,7 @@ def calculate_effective_irradiance(
     system_efficiency: Optional[float] = 0.86,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[bool, typer_option_verbose] = False,
+    verbose: Annotated[int, typer_option_verbose] = False,
     ):
     """Calculate hourly radiation values for a specific moment in time.
     

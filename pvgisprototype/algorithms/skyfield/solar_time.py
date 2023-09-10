@@ -30,7 +30,7 @@ def calculate_solar_time_skyfield(
         latitude: Latitude,
         timestamp: datetime,
         timezone: str = None,
-        verbose: bool = False,
+        verbose: int = 0,
     ):
 
     # Handle Me during input validation? -------------------------------------
