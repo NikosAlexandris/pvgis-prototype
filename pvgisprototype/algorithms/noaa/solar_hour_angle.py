@@ -13,6 +13,7 @@ from typing import Union
 from typing import Sequence
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 import numpy as np
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
@@ -20,8 +21,8 @@ def calculate_solar_hour_angle_noaa(
     longitude: Longitude,
     timestamp: datetime, 
     timezone: Optional[ZoneInfo] = None, 
-    time_output_units: str = 'minutes',
-    angle_output_units: str = 'radians',
+    time_output_units: Optional[str] = 'minutes',
+    angle_output_units: Optional[str] = 'radians',
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
 
@@ -90,6 +91,7 @@ def calculate_solar_hour_angle_noaa(
         value=solar_hour_angle,
         unit='radians',
     )
+    solar_hour_angle = convert_to_degrees_if_requested(solar_hour_angle, angle_output_units)
 
     return solar_hour_angle
 
