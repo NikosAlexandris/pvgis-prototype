@@ -9,6 +9,7 @@ from math import degrees
 from math import sin
 from math import cos
 import numpy as np
+from zoneinfo import ZoneInfo
 
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
@@ -24,14 +25,14 @@ from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 @validate_with_pydantic(CalculateSolarTimeEoTInputModel)
 def calculate_solar_time_eot(
         longitude: Longitude,
-        latitude: Latitude,
+        # latitude: Latitude,
         timestamp: datetime,
-        timezone: str = None,
-        days_in_a_year: float = 365.25,
-        perigee_offset: float = 0.048869,
-        eccentricity_correction_factor: float = 0.03344,
-        time_offset_global: float = 0,
-        hour_offset: float = 0,
+        timezone: ZoneInfo,
+        # days_in_a_year: float = 365.25,
+        # perigee_offset: float = 0.048869,
+        # eccentricity_correction_factor: float = 0.03344,
+        # time_offset_global: float = 0,
+        # hour_offset: float = 0,
 ):
     """Calculate the solar time.
 
@@ -83,9 +84,9 @@ def calculate_solar_time_eot(
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # Handle Me during input validation? -------------------------------------
 
-    year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
-    hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+    # year = timestamp.year
+    # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
+    # hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
     day_of_year = timestamp.timetuple().tm_yday
 
     # Equation of Time, Milne 1921 -------------------------------------------
@@ -97,15 +98,22 @@ def calculate_solar_time_eot(
     equation_of_time = 9.87 * sin(2*b) - 7.53 * cos(b) - 1.5 * sin(b)
 
     # ------------------------------------------------------------------------
-    longitude = degrees(longitude)  # this equation of time requires degrees!
+    longitude = degrees(longitude.value)  # this equation of time requires degrees!
     # ------------------------------------------------------------------------
     time_correction_factor = 4 * (longitude - local_standard_meridian_time) + equation_of_time
     time_correction_factor_hours = time_correction_factor / 60
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
-    solar_time_decimal_hours = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600
-    hour_angle = 15 * (solar_time_decimal_hours - 12)
+    # solar_time_decimal_hours = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600
+    # hour_angle = 15 * (solar_time_decimal_hours - 12)
     # ------------------------------------------------------------------------
     
-    debug(locals())
-    # return SolarTime(solar_time, 'decimal hours')
+    solar_time = datetime(
+            year=solar_time.year,
+            month=solar_time.month,
+            day=solar_time.day,
+            hour=int(solar_time.hour),
+            minute=int(solar_time.minute),
+            second=int(solar_time.second),
+            tzinfo=solar_time.tzinfo,
+            )
     return solar_time
