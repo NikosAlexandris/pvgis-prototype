@@ -103,7 +103,7 @@ def calculate_solar_hour_angle_time_series_noaa(
     timezone: Optional[str] = None, 
     time_output_units: Optional[str] = 'minutes',
     angle_output_units: Optional[str] = 'radians',
-) -> Union[SolarHourAngle, np.ndarray]:
+):
     """Calculate the solar hour angle in radians for a time series."""
     solar_hour_angle_series = []
     
