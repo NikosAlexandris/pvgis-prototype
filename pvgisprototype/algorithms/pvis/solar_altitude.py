@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 from math import cos
 from math import sin
 from math import asin
+from typing import Optional
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
@@ -33,9 +34,9 @@ def calculate_solar_altitude_pvis(
         time_offset_global: int,
         hour_offset: int,
         solar_time_model: SolarTimeModels,
-        time_output_units: str,
-        angle_units: str,
-        angle_output_units: str,
+        time_output_units: Optional[str] = 'minutes',
+        angle_units: Optional[str] = 'radians',
+        angle_output_units: Optional[str] = 'radians',
     ) -> SolarAltitude:
     """Compute various solar geometry variables.
     Parameters
@@ -76,8 +77,8 @@ def calculate_solar_altitude_pvis(
     C31 = cos(latitude.value) * cos(solar_declination.value)
     C33 = sin(latitude.value) * sin(solar_declination.value)
     solar_time = model_solar_time(
-        longitude=longitude.value,
-        latitude=latitude.value,
+        longitude=longitude,
+        latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
         solar_time_model=solar_time_model,  # returns datetime.time object
