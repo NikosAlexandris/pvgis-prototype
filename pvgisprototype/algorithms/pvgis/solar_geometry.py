@@ -170,7 +170,7 @@ def calculate_solar_geometry_pvgis_variables(
         sunset_time,
     ) = solar_geometry_day_constants.dict().values()
 
-    solar_time, _units = calculate_solar_time_pvgis(
+    solar_time = calculate_solar_time_pvgis(
             year,
             hour_of_year,
             days_in_a_year,
@@ -310,7 +310,7 @@ def calculate_solar_position_pvgis(
         sunset_time,
     ) = solar_geometry_day_constants.dict().values()
 
-    solar_time, _units = calculate_solar_time_pvgis(
+    solar_time = calculate_solar_time_pvgis(
             longitude,
             latitude,
             timestamp,

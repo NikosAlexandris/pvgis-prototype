@@ -71,7 +71,10 @@ def calculate_solar_hour_angle_noaa(
     each minute equals to 0.25 radians.
     """
     true_solar_time = calculate_true_solar_time_noaa(
-        longitude, timestamp, timezone, time_output_units
+        longitude=longitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        time_output_units='minutes',                    # NOTE gounaol: Should not be None
     )  # in minutes
 
     true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
@@ -104,7 +107,10 @@ def calculate_solar_hour_angle_time_series_noaa(
     
     for timestamp in timestamps:
         true_solar_time = calculate_true_solar_time_noaa(
-            longitude, timestamp, timezone, time_output_units
+            longitude=longitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            time_output_units=time_output_units,
         )  # in minutes
 
         true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
