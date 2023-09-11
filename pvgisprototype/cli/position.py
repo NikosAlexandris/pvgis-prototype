@@ -447,12 +447,13 @@ def zenith(
         angle_output_units=angle_output_units,
     )
     for model_result in solar_altitude:
-        solar_zenith = model_result.get('Zenith', None)
-        if solar_altitude is not None:
+        solar_altitude_value = model_result.get('Altitude', None)
+        if solar_altitude_value is not None:
             if angle_output_units == 'degrees':
-                model_result['Zenith'] = 90 - solar_altitude
+                model_result['Zenith'] = 90 - solar_altitude_value
             else:
-                model_result['Zenith'] = radians(90) - solar_altitude
+                model_result['Zenith'] = radians(90) - solar_altitude_value
+    solar_zenith = solar_altitude
     # Update Me --- Zenith Comes First, Altitude Bases On It ! ---------------
     print_solar_position_table(
         longitude=longitude,
