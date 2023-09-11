@@ -110,7 +110,8 @@ class CalculateSolarTimePVGISInputModel(
  
 
 class CalculateSolarTimeEoTInputModel(
-    ModelSolarTimeInputModel
+    LongitudeModel,
+    BaseTimeModel,
 ):
     pass
 
