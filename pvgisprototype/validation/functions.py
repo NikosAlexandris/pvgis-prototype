@@ -120,7 +120,7 @@ class CalculateSolarTimeEphemInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
 ):
-    verbose: int
+    verbose: int = 0
 
 
 # Hour angle
