@@ -25,15 +25,9 @@ from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 @validate_with_pydantic(CalculateSolarTimeEoTInputModel)
 def calculate_solar_time_eot(
         longitude: Longitude,
-        # latitude: Latitude,
         timestamp: datetime,
         timezone: ZoneInfo,
-        # days_in_a_year: float = 365.25,
-        # perigee_offset: float = 0.048869,
-        # eccentricity_correction_factor: float = 0.03344,
-        # time_offset_global: float = 0,
-        # hour_offset: float = 0,
-):
+) -> datetime:
     """Calculate the solar time.
 
     - Local Time (LT)

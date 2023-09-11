@@ -51,14 +51,8 @@ def model_solar_time(
 
         solar_time = calculate_solar_time_eot(
                 longitude,
-                latitude,
                 timestamp,
                 timezone,
-                days_in_a_year,
-                perigee_offset,
-                eccentricity_correction_factor,
-                time_offset_global,
-                hour_offset,
                 )
 
     if solar_time_model.value == SolarTimeModels.ephem:
