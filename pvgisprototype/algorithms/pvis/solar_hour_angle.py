@@ -1,20 +1,22 @@
 import typer
+import numpy as np
 from datetime import time
 from typing import Annotated
 from typing import Optional
-from ...utilities.timestamp import convert_hours_to_seconds
+# from ...utilities.timestamp import convert_hours_to_seconds
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 from pvgisprototype import HourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateHourAngleInputModel
-from pvgisprototype.validation.functions import HourAngleSunriseInput
+from pvgisprototype.validation.functions import SolarHourAnglePvisInput
+from pvgisprototype.validation.functions import SolarHourAngleSunrisePvisInput
 
 
-@validate_with_pydantic(CalculateHourAngleInputModel)
-def calculate_hour_angle(
+@validate_with_pydantic(SolarHourAnglePvisInput)
+def calculate_hour_angle_pvis(
         solar_time: time,
         angle_output_units: str = 'radians',
     )-> HourAngle:
@@ -40,7 +42,7 @@ def calculate_hour_angle(
     """
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
-    hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
+    hour_angle = (solar_time / 3600 - 12) * 15 * np.pi / 180
     hour_angle = HourAngle(input=hour_angle, unit='radians')
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
@@ -49,7 +51,7 @@ def calculate_hour_angle(
     return hour_angle
 
 
-@validate_with_pydantic(CalculateHourAngleSunriseInputModel)
+@validate_with_pydantic(SolarHourAngleSunrisePvisInput)
 def calculate_hour_angle_sunrise(  # rename to: calculate_event_hour_angle
         latitude: Latitude,
         surface_tilt: float = 0,
