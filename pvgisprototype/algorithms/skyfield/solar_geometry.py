@@ -16,7 +16,7 @@ from typing import Tuple
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarPositionSkyfieldInputModel
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarAltitudeAzimuthSkyfieldInputModel
-from pvgisprototype.algorithms.skyfield.function_models import CalculateHourAngleSkyfieldInput
+from pvgisprototype.validation.functions import SolarHourAngleSkyfieldInput
 from pvgisprototype import SolarPosition
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
@@ -145,7 +145,7 @@ def calculate_solar_altitude_azimuth_skyfield(
     return solar_altitude, solar_azimuth   # distance_to_sun
 
 
-@validate_with_pydantic(CalculateHourAngleSkyfieldInput)
+@validate_with_pydantic(SolarHourAngleSkyfieldInput)
 def calculate_hour_angle_skyfield(
         longitude: Longitude,
         latitude: Latitude,
@@ -188,7 +188,13 @@ def calculate_hour_angle_skyfield(
         hour_angle = hour_angle.radians
         solar_declination = solar_declination.radians
 
-    hour_angle = HourAngle(value=hour_angle, unit=angle_output_units)
-    solar_declination = SolarDeclination(value=solar_declination, unit=angle_output_units)
+    hour_angle = HourAngle(
+        value=hour_angle.radians,
+        unit='radians'
+    )
+    solar_declination = SolarDeclination(
+        value=solar_declination.degrees,
+        unit='degrees'
+    )
 
     return hour_angle, solar_declination
