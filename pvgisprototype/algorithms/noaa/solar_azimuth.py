@@ -52,7 +52,7 @@ def calculate_solar_azimuth_noaa(
         timestamp=timestamp,
         timezone=timezone,
         time_output_units=time_output_units,
-        angle_output_units=angle_output_units,
+        angle_output_units='radians',
     )
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
