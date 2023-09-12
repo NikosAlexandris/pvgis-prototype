@@ -91,7 +91,10 @@ def calculate_solar_hour_angle_noaa(
         value=solar_hour_angle,
         unit='radians',
     )
-    solar_hour_angle = convert_to_degrees_if_requested(solar_hour_angle, angle_output_units)
+    solar_hour_angle = convert_to_degrees_if_requested(
+        solar_hour_angle,
+        angle_output_units
+    )
 
     return solar_hour_angle
 

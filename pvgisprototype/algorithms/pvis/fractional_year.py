@@ -1,6 +1,7 @@
 from datetime import date
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from datetime import datetime
 from pvgisprototype import FractionalYear
 from math import pi
@@ -60,7 +61,7 @@ def calculate_fractional_year_pvis(
         )
     """
     year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1)
+    # start_of_year = datetime(year=year, month=1, day=1)
     day_of_year = timestamp.timetuple().tm_yday
     fractional_year = 2 * pi * day_of_year / days_in_year(year)
 
@@ -69,6 +70,6 @@ def calculate_fractional_year_pvis(
         raise ValueError(f'Calculated fractional year {fractional_year} is out of the expected range [{FRACTIONAL_YEAR_MINIMUM}, {FRACTIONAL_YEAR_MAXIMUM}] radians')
 
     fractional_year = FractionalYear(value=fractional_year, unit='radians')
-    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
+    fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
             
     return fractional_year

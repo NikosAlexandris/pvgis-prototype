@@ -4,6 +4,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarDeclination
 from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from math import sin
 from math import asin
 
@@ -67,5 +68,6 @@ def calculate_solar_declination_pvis(
         )
     )
     solar_declination = SolarDeclination(value=solar_declination, unit="radians")
+    solar_declination = convert_to_degrees_if_requested(solar_declination, angle_output_units)
 
     return solar_declination
