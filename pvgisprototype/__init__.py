@@ -2,16 +2,31 @@ import yaml
 from pydantic import BaseModel
 from typing import Optional
 from devtools import debug
-import yaml
-from pydantic import BaseModel
-from typing import Optional
-from devtools import debug
 from pathlib import Path
 from pvgisprototype.constants import PARAMETERS_YAML_FILE
+import numpy as np
 
 
 def model_hash(self):
     return hash(tuple(sorted(self.dict().items())))
+
+
+@property
+def to_degrees_attr(self):
+    """Instance property to convert radians to degrees"""
+    if self.unit == 'degrees':
+        return self.value
+    else:  # radians
+        return np.degrees(self.value)
+
+
+@property
+def to_radians_attr(self):
+    """Instance property to convert degrees to radians"""
+    if self.unit == 'radians':
+        return self.value
+    else:  # degrees
+        return np.radians(self.value)
 
 
 def generate_dataclass_models(yaml_file: str):
@@ -36,6 +51,8 @@ def generate_dataclass_models(yaml_file: str):
                 '__module__': __name__,
                 '__qualname__': model_name,
                 '__hash__': model_hash,
+                'degrees': to_degrees_attr,
+                'radians': to_radians_attr,
                 **default_values,
             }
         )

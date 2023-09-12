@@ -180,11 +180,16 @@ def model_solar_geometry_overview(
                 timezone=timezone,
                 angle_output_units=angle_output_units,
                 )
+        # ------------------------------------ TODO: calculate_solar_zenith_skyfield
         solar_zenith = SolarZenith(
-            value = 90 - solar_altitude.to_degrees().value,
+            value = 90 - solar_altitude.degrees,
             unit = 'degrees'
         )
-
+        solar_zenith = convert_to_radians_if_requested(
+            solar_zenith,
+            angle_output_units,
+        )
+        # --------------------------------------------------------------------
         solar_hour_angle, solar_declination = calculate_hour_angle_skyfield(
             longitude=longitude,
             latitude=latitude,
@@ -233,14 +238,16 @@ def model_solar_geometry_overview(
             solar_azimuth, angle_output_units
         )
         solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+        # ------------------------------------ TODO: calculate_solar_zenith_suncalc
         solar_zenith = SolarZenith(
-            value = 90 - solar_altitude.to_degrees().value,
+            value = 90 - solar_altitude.degrees,
             unit = 'degrees'
         )
-
-        solar_altitude = convert_to_radians_if_requested(
-            solar_altitude, angle_output_units
+        solar_zenith = convert_to_radians_if_requested(
+            solar_zenith,
+            angle_output_units,
         )
+        # --------------------------------------------------------------------
 
     if model.value == SolarPositionModels.pysolar:
 
@@ -256,14 +263,16 @@ def model_solar_geometry_overview(
         # required by output function
         solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
 
+        # ------------------------------------ TODO: calculate_solar_zenith_pysolar
         solar_zenith = SolarZenith(
-            value = 90 - solar_altitude.to_degrees().value,
+            value = 90 - solar_altitude.degrees,
             unit = 'degrees'
         )
-
-        solar_altitude = convert_to_radians_if_requested(
-            solar_altitude, angle_output_units
+        solar_zenith = convert_to_radians_if_requested(
+            solar_zenith,
+            angle_output_units,
         )
+        # --------------------------------------------------------------------
 
         solar_azimuth = pysolar.solar.get_azimuth(
             latitude_deg=latitude_in_degrees,  # this comes first
@@ -318,15 +327,16 @@ def model_solar_geometry_overview(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             )
+        # ------------------------------------ TODO: calculate_solar_zenith_pvis
         solar_zenith = SolarZenith(
-            value = 90 - solar_altitude.to_degrees().value,
+            value = 90 - solar_altitude.degrees,
             unit = 'degrees'
         )
-
-        solar_altitude = convert_to_radians_if_requested(
-            solar_altitude, angle_output_units
+        solar_zenith = convert_to_radians_if_requested(
+            solar_zenith,
+            angle_output_units,
         )
-
+        # --------------------------------------------------------------------
         solar_azimuth = calculate_solar_azimuth_pvis(
             longitude=longitude,
             latitude=latitude,
