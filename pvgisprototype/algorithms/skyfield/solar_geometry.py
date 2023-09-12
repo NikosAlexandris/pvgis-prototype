@@ -18,7 +18,6 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarPositionSkyfieldInputModel
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarAltitudeAzimuthSkyfieldInputModel
 from pvgisprototype.validation.functions import SolarHourAngleSkyfieldInput
-from pvgisprototype import SolarPosition
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import HourAngle
@@ -33,8 +32,7 @@ def calculate_solar_position_skyfield(
         latitude: Latitude,
         timestamp: datetime,
         timezone: str = None,
-        angle_output_units: str = 'radians',
-    ) -> SolarPosition:
+    ):
     """Calculate sun position above the local horizon using Skyfield.
 
     Returns
@@ -114,7 +112,6 @@ def calculate_solar_altitude_azimuth_skyfield(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        angle_output_units=angle_output_units,
     )
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
 
@@ -140,7 +137,7 @@ def calculate_solar_altitude_azimuth_skyfield(
 
 
 @validate_with_pydantic(SolarHourAngleSkyfieldInput)
-def calculate_hour_angle_skyfield(
+def calculate_hour_angle_skyfield(      # NOTE gounaol: Declination is also calculated by skyfield.solar_declination.calculate_solar_declination_skyfield
         longitude: Longitude,
         latitude: Latitude,
         timestamp: datetime,
@@ -162,11 +159,10 @@ def calculate_hour_angle_skyfield(
         sun's rays measured in radian.
     """
     solar_position = calculate_solar_position_skyfield(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            angle_output_units,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
             )
     hour_angle, solar_declination, distance_to_sun = solar_position.hadec()
 

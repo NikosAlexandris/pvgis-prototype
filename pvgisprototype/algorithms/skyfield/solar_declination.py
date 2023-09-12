@@ -10,7 +10,7 @@ from pvgisprototype import SolarDeclination
 # NOTE gounaol: Skyfield solar declination is also computed by skyfield.solar_geometry.calculate_hour_angle_skyfield()
 
 @validate_with_pydantic(CalculateSolarDeclinationSkyfieldInput)
-def calculate_solar_declination_skyfield(
+def calculate_solar_declination_skyfield(      # NOTE gounaol: Declination is also calculated by skyfield.solar_geometry.calculate_hour_angle_skyfield
     timestamp: datetime,
     angle_output_units: Optional[str] = 'radians'
 ) -> SolarDeclination:
