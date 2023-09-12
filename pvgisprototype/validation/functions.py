@@ -63,6 +63,7 @@ def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
 
     return decorator
 
+
 class CalculateFractionalYearPVISInputModel(
     BaseTimestampModel,
     BaseAngleInternalUnitsModel,
@@ -131,6 +132,12 @@ class CalculateHourAngleInputModel(
 ):
     pass
 
+class SolarHourAnglePvisInput(
+    SolarTimeModel,  # Parameter
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
 
 # rename to : CalculateEventHourAngleInputModel
 class CalculateHourAngleSunriseInputModel(
@@ -138,6 +145,12 @@ class CalculateHourAngleSunriseInputModel(
     SurfaceTiltModel,
     SolarDeclinationModel,
     BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+class SolarHourAngleSunrisePvisInput(
+    CalculateHourAngleSunriseInputModel
 ):
     pass
 
