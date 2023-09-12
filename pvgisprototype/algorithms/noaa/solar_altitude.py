@@ -38,7 +38,7 @@ def calculate_solar_altitude_noaa(
         timestamp,
         timezone,
         time_output_units,
-        angle_output_units,
+        'radians',
     )
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
