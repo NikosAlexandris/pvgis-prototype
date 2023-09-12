@@ -186,6 +186,14 @@ class SolarHourAnglePVLIBInput(
     pass
 
 
+class SolarHourAngleSkyfieldInput(
+    BaseCoordinatesModel,
+    BaseTimestampModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
 # Solar geometry
 
 class CalculateSolarAltitudePVISInputModel(
@@ -223,6 +231,11 @@ class CalculateSolarDeclinationPVLIBInput(
 ):
     pass
 
+class CalculateSolarDeclinationSkyfieldInput(
+    BaseTimestampModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
 
 class CalculateSolarZenithPVLIBInputModel(
     CalculateSolarAltitudePVLIBInputModel
