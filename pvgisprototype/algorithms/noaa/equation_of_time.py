@@ -30,10 +30,10 @@ def calculate_equation_of_time_noaa(
     )
     equation_of_time = 229.18 * (
         0.000075
-        + 0.001868 * cos(fractional_year.value)
-        - 0.032077 * sin(fractional_year.value)
-        - 0.014615 * cos(2 * fractional_year.value)
-        - 0.040849 * sin(2 * fractional_year.value)
+        + 0.001868 * cos(fractional_year.radians)
+        - 0.032077 * sin(fractional_year.radians)
+        - 0.014615 * cos(2 * fractional_year.radians)
+        - 0.040849 * sin(2 * fractional_year.radians)
     )
     if not EQUATIONOFTIME_MINIMUM <= equation_of_time <= EQUATIONOFTIME_MAXIMUM:
         raise ValueError("The calculated equation of time is out of the expected range [{EQUATIONOFTIME_MINIMUM}, {EQUATIONOFTIME_MAXIMUM}] {EQUATIONOFTIME_UNITS}")

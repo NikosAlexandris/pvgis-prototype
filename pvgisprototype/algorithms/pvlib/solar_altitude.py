@@ -4,7 +4,6 @@ from zoneinfo import ZoneInfo
 from math import isfinite
 import pvlib
 from ...api.utilities.conversions import convert_to_radians_if_requested
-from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVLIBInputModel
 from pvgisprototype import Longitude
@@ -22,10 +21,8 @@ def calculate_solar_altitude_pvlib(
     )-> SolarAltitude:
     """Calculate the solar zenith angle (φ) in radians
     """
-    longitude = convert_to_degrees_if_requested(longitude, 'degrees')
-    latitude = convert_to_degrees_if_requested(latitude, 'degrees')
 
-    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.value, longitude.value)
+    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_altitude = solar_position['apparent_elevation'].values[0]
 
     if not isfinite(solar_altitude) or not -90 <= solar_altitude <= 90:
