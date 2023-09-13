@@ -31,7 +31,7 @@ def calculate_solar_time_skyfield(
         timestamp: datetime,
         timezone: str = None,
         verbose: int = 0,
-    ):
+    )->datetime:
 
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -49,12 +49,12 @@ def calculate_solar_time_skyfield(
 
     planets = load('de421.bsp')
     sun = planets['Sun']
-    if longitude.value > 0:
-        location = wgs84.latlon(latitude.value * N, longitude.value * E)
-    if longitude.value < 0:
-        location = wgs84.latlon(latitude.value * N, longitude.value * W)  # Correct ?
+    if longitude.degrees > 0:
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees * E)
+    if longitude.degrees < 0:
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees * W)  # Correct ?
     else:
-        location = wgs84.latlon(latitude.value * N, longitude.value)  # Correct ?
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees)  # Correct ?
 
     f = almanac.meridian_transits(planets, sun, location)
 

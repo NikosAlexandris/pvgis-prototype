@@ -84,16 +84,17 @@ def calculate_solar_position_skyfield(
     planets = skyfield.api.load('de421.bsp')
     sun = planets['Sun']
     earth = planets['Earth']
-    N = skyfield.api.N
-    W = skyfield.api.W
-    E = skyfield.api.E
+    # N = skyfield.api.N
+    # W = skyfield.api.W
+    # E = skyfield.api.E
 
-    if longitude.value < 0:
-        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value * W)  # W or E ?
-    if longitude.value > 0:
-        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value * E)  # W or E ?
-    else:
-        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value)  # ?
+    # if longitude.value < 0:
+    #     location = skyfield.api.wgs84.latlon(latitude.radians * N, longitude.radians * W)  # W or E ?
+    # elif longitude.value > 0:
+    #     location = skyfield.api.wgs84.latlon(latitude.radians * N, longitude.radians * E)  # W or E ?
+    # else:
+    #     location = skyfield.api.wgs84.latlon(latitude.radians * N, longitude.radians)  # ?
+    location = skyfield.api.wgs84.latlon(latitude.degrees, longitude.degrees)
 
     # sun position seen from observer location
     timescale = skyfield.api.load.timescale()

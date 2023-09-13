@@ -62,26 +62,29 @@ def calculate_solar_azimuth_noaa(
         angle_output_units='radians',
     )
                      # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-    # cos(180 - θ) = - ----------------------------------------------------------
+    # cos(180 - θ) = ------------------------------------------------------------
                      #            cos(latitude) * sin(solar_zenith)
 
 
                      # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-        # - cos(θ) = - ------------------------------------------------------------
+        # - cos(θ) = --------------------------------------------------------------
                      #            cos(latitude) * sin(solar_zenith)
 
 
-                   # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-          # cos(θ) = ----------------------------------------------------------
-                   #             cos(latitude) * sin(solar_zenith)
+                          # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # cos(θ) = -  --------------------------------------------------------------
+                            #      cos(latitude) * sin(solar_zenith)
 
+                          # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # θ = arccos( -  -------------------------------------------------------------- )
+                            #      cos(latitude) * sin(solar_zenith)
 
     # numerator = sin(solar_declination.value) - sin(latitude.value) * cos(solar_zenith.value)
-    numerator = sin(latitude.value) * cos(solar_zenith.value) - sin(solar_declination.value)
-    denominator = cos(latitude.value) * sin(solar_zenith.value)
+    numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
+    denominator = cos(latitude.radians) * sin(solar_zenith.radians)
     # try else raise ... ?
     cosine_solar_azimuth = numerator / denominator
-    solar_azimuth = acos(cosine_solar_azimuth)
+    solar_azimuth = acos(-cosine_solar_azimuth)
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
         raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')

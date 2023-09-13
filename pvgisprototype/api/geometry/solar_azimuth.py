@@ -31,7 +31,7 @@ def convert_south_to_north_degrees_convention(azimuth_south_degrees):
 
 
 def convert_south_to_north_radians_convention(azimuth_south_radians):
-    return (azimuth_south_radians + pi) % 2 * pi
+    return (azimuth_south_radians + pi) % (2 * pi)
 
 
 @validate_with_pydantic(ModelSolarAzimuthInputModel)
