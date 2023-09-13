@@ -18,7 +18,6 @@ def calculate_true_solar_time_noaa(
         timestamp: datetime, 
         timezone: Optional[ZoneInfo],
         time_output_units: str = 'minutes',
-        angle_output_units: str = 'radians',
     ) -> datetime:
     """Calculate the true solar time.
 
@@ -59,8 +58,7 @@ def calculate_true_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        time_output_units=time_output_units,
-        angle_output_units=angle_output_units,
+        time_output_units='minutes',
         )  # in minutes
     true_solar_time = (
         timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.value

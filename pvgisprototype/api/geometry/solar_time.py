@@ -9,7 +9,6 @@ from pvgisprototype import SolarTime
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from .models import SolarTimeModels
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
@@ -90,8 +89,6 @@ def model_solar_time(
     if solar_time_model.value == SolarTimeModels.skyfield:
 
         # --------------------------------------------------- expects degrees!
-        longitude = convert_to_degrees_if_requested(longitude, 'degrees')
-        latitude = convert_to_degrees_if_requested(latitude, 'degrees')
         solar_time = calculate_solar_time_skyfield(
             longitude,
             latitude,

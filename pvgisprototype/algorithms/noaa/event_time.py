@@ -89,7 +89,7 @@ def calculate_event_time_noaa(
     #         # time_output_units,
     #         angle_output_units=angle_output_units,
     #         )  # radians
-    longitude_minutes = radians_to_time_minutes(longitude.value)
+    longitude_minutes = radians_to_time_minutes(longitude.radians)
     event_hour_angle = calculate_event_hour_angle_noaa(
             latitude=latitude,
             timestamp=timestamp,
@@ -97,7 +97,7 @@ def calculate_event_time_noaa(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             )
-    event_hour_angle_minutes = radians_to_time_minutes(event_hour_angle.value)
+    event_hour_angle_minutes = radians_to_time_minutes(event_hour_angle.radians)
     equation_of_time = calculate_equation_of_time_noaa(
             timestamp=timestamp,
             time_output_units=time_output_units,

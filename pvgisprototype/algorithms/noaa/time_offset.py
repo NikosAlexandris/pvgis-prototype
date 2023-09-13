@@ -111,15 +111,15 @@ def calculate_time_offset_noaa(
       speed and axial tilt. It varies throughout the year, but is typically
       within the range of about -20 minutes to +20 minutes.
     """
-    longitude_in_minutes = radians_to_time_minutes(longitude.value)  # time
+    longitude_in_minutes = radians_to_time_minutes(longitude.radians)  # time
 
     # This will be 0 for UTC, obviously! Review-Me! --------------------------
 
     timestamp = timestamp.astimezone(timezone)
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
-        timestamp,
-        time_output_units,
+        timestamp=timestamp,
+        time_output_units='minutes',
         )  # minutes
     time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time.value
     # if not -720 + 70 <= time_offset <= 720 + 70:

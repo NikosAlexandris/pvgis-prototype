@@ -159,9 +159,9 @@ def calculate_hour_angle_sunrise(
         -tan(latitude.value - surface_tilt.value) * tan(solar_declination.value)
     )
     hour_angle_sunrise = HourAngleSunrise(value=hour_angle_sunrise, unit="radians")
-    # hour_angle_sunrise = convert_to_degrees_if_requested(
-    #     hour_angle_sunrise,
-    #     angle_output_units,
-    # )
+    hour_angle_sunrise = convert_to_degrees_if_requested(
+        hour_angle_sunrise,
+        angle_output_units,
+    )
 
     return hour_angle_sunrise

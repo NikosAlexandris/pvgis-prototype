@@ -2,8 +2,6 @@ import typer
 from typing import Annotated
 from typing import Optional
 from math import sin, cos, acos
-from ...api.utilities.conversions import convert_to_radians
-from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype import SolarIncidence
 from pvgisprototype import Latitude

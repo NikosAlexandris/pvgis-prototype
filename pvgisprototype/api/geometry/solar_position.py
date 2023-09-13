@@ -126,12 +126,12 @@ def model_solar_geometry_overview(
             timestamp=timestamp,
             timezone=timezone,
             time_output_units=time_output_units,
-            angle_output_units='radians',
+            angle_output_units=angle_output_units,
         )
         solar_zenith = calculate_solar_zenith_noaa(
             latitude=latitude,
             timestamp=timestamp,
-            solar_hour_angle=solar_hour_angle.value,
+            solar_hour_angle=solar_hour_angle,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             angle_output_units=angle_output_units,
         )
