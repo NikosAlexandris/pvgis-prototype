@@ -10,6 +10,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
@@ -27,7 +28,7 @@ def calculate_solar_altitude_pvis(
         timestamp: datetime,
         timezone: ZoneInfo,
         apply_atmospheric_refraction: bool,
-        refracted_solar_zenith: float,
+        refracted_solar_zenith: RefractedSolarZenith,
         days_in_a_year: float,
         perigee_offset: float,
         eccentricity_correction_factor: float,
@@ -82,7 +83,7 @@ def calculate_solar_altitude_pvis(
         timestamp=timestamp,
         timezone=timezone,
         solar_time_model=solar_time_model,  # returns datetime.time object
-        refracted_solar_zenith=refracted_solar_zenith.value,
+        refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
