@@ -55,12 +55,12 @@ def calculate_equation_of_time_time_series_noaa(
     )
     if is_scalar_input:
         fractional_year_series = np.array(
-            [fractional_year_series.value], dtype=np.float64
+            [fractional_year_series.radians], dtype=np.float64
         )
     else:
         fractional_year_series = np.array(
             [
-                item.value if isinstance(item, FractionalYear) else item
+                item.radians if isinstance(item, FractionalYear) else item
                 for item in fractional_year_series
             ],
             dtype=np.float64,

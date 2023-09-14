@@ -65,11 +65,11 @@ def calculate_solar_azimuth_pvis(
         timestamp=timestamp,
         angle_output_units=angle_output_units,
     )
-    C11 = sin(latitude.value) * cos(solar_declination.value)
-    C13 = -cos(latitude.value) * sin(solar_declination.value)
-    C22 = cos(solar_declination.value)
-    C31 = cos(latitude.value) * cos(solar_declination.value)
-    C33 = sin(latitude.value) * sin(solar_declination.value)
+    C11 = sin(latitude.radians) * cos(solar_declination.radians)
+    C13 = -cos(latitude.radians) * sin(solar_declination.radians)
+    C22 = cos(solar_declination.radians)
+    C31 = cos(latitude.radians) * cos(solar_declination.radians)
+    C33 = sin(latitude.radians) * sin(solar_declination.radians)
     solar_time = model_solar_time(
         longitude=longitude,
         latitude=latitude,
@@ -91,9 +91,9 @@ def calculate_solar_azimuth_pvis(
         solar_time=solar_time,
         angle_output_units=angle_output_units,
     )
-    cosine_solar_azimuth = (C11 * cos(hour_angle.value + C13)) / pow(
-        pow((C22 * sin(hour_angle.value)), 2)
-        + pow((C11 * cos(hour_angle.value) + C13), 2),
+    cosine_solar_azimuth = (C11 * cos(hour_angle.radians + C13)) / pow(
+        pow((C22 * sin(hour_angle.radians)), 2)
+        + pow((C11 * cos(hour_angle.radians) + C13), 2),
         0.5,
     )
     solar_azimuth = acos(cosine_solar_azimuth)

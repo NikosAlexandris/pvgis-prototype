@@ -54,16 +54,16 @@ def calculate_relative_longitude(
     #         )
 
     tangent_relative_longitude_numerator = -(
-        sin(surface_tilt.value)
-        * sin(surface_orientation.value)
+        sin(surface_tilt.radians)
+        * sin(surface_orientation.radians)
     )
 
     tangent_relative_longitude_denominator = (
-            sin(latitude.value)
-        * sin(surface_tilt.value)
-        * cos(surface_orientation.value)
-        + cos(latitude.value)
-        * cos(surface_tilt.value)
+            sin(latitude.radians)
+        * sin(surface_tilt.radians)
+        * cos(surface_orientation.radians)
+        + cos(latitude.radians)
+        * cos(surface_tilt.radians)
     )
     
     tangent_relative_longitude = (
@@ -168,11 +168,11 @@ def calculate_solar_incidence_jenco(
 
     else:
         sine_relative_inclined_latitude = - (
-            cos(latitude.value)
-            * sin(surface_tilt.value)
-            * cos(surface_orientation.value)
-            + sin(latitude.value)
-            * cos(surface_tilt.value)
+            cos(latitude.radians)
+            * sin(surface_tilt.radians)
+            * cos(surface_orientation.radians)
+            + sin(latitude.radians)
+            * cos(surface_tilt.radians)
         )
         relative_inclined_latitude = asin(sine_relative_inclined_latitude)
         solar_declination = calculate_solar_declination_pvis(
@@ -183,8 +183,8 @@ def calculate_solar_incidence_jenco(
             perigee_offset,
             angle_output_units,
             )
-        c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.value)
-        c_inclined_33 = sine_relative_inclined_latitude * sin(solar_declination.value)
+        c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.radians)
+        c_inclined_33 = sine_relative_inclined_latitude * sin(solar_declination.radians)
         solar_hour_angle = calculate_solar_hour_angle_noaa(
             longitude,
             timestamp,
@@ -198,7 +198,7 @@ def calculate_solar_incidence_jenco(
             surface_orientation
         )
         sine_solar_incidence = (
-            c_inclined_31 * cos(solar_hour_angle.value - relative_longitude.value) + c_inclined_33
+            c_inclined_31 * cos(solar_hour_angle.radians - relative_longitude.radians) + c_inclined_33
         )
         solar_incidence = SolarIncidence(
             value=asin(sine_solar_incidence),
@@ -225,10 +225,10 @@ def calculate_solar_incidence_time_series_jenco(
         timestamps=timestamps,
         angle_output_units=angle_output_units,
     )
-    solar_declination_series = np.array([item.value for item in solar_declination_series])
+    solar_declination_series = np.array([item.radians for item in solar_declination_series])
     sine_relative_inclined_latitude = -(
-        cos(latitude.value) * sin(surface_tilt) * cos(surface_orientation)
-        + sin(latitude.value) * cos(surface_tilt)
+        cos(latitude.radians) * sin(surface_tilt) * cos(surface_orientation)
+        + sin(latitude.radians) * cos(surface_tilt)
     )
     relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
     c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
@@ -244,12 +244,12 @@ def calculate_solar_incidence_time_series_jenco(
         time_output_units=time_output_units,
         angle_output_units=angle_output_units,
     )
-    solar_hour_angle_series = np.array([item.value for item in solar_hour_angle_series])
+    solar_hour_angle_series = np.array([item.radians for item in solar_hour_angle_series])
     relative_longitude = calculate_relative_longitude(
         latitude, surface_tilt, surface_orientation
     )
     sine_solar_incidence_series = (
-        c_inclined_31_series * np.cos(solar_hour_angle_series - relative_longitude.value)
+        c_inclined_31_series * np.cos(solar_hour_angle_series - relative_longitude.radians)
         + c_inclined_33_series
     )
     solar_incidence_angle_series = np.arcsin(sine_solar_incidence_series)

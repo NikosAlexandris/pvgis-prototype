@@ -138,7 +138,7 @@ def calculate_time_offset_time_series_noaa(
 ):# -> Union[TimeOffset, np.ndarray]:
     """ """
     # 1
-    longitude_in_minutes = radians_to_time_minutes(longitude.value)  # time
+    longitude_in_minutes = radians_to_time_minutes(longitude.radians)  # time
 
     # 2
     timestamps = [timestamp.astimezone(timezone) for timestamp in timestamps]

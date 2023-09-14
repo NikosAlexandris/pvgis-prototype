@@ -148,7 +148,7 @@ def calculate_ground_reflected_inclined_irradiance(
         )
 
     # on a horizontal surface : G0h = G0 sin(h0)
-    extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(solar_altitude.value)
+    extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(solar_altitude.radians)
 
     # Dhc [W.m-2]
     diffuse_horizontal_component = (

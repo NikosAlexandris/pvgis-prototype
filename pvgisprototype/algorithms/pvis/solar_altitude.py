@@ -74,8 +74,8 @@ def calculate_solar_altitude_pvis(
         perigee_offset=perigee_offset,
         angle_output_units=angle_output_units,
     )
-    C31 = cos(latitude.value) * cos(solar_declination.value)
-    C33 = sin(latitude.value) * sin(solar_declination.value)
+    C31 = cos(latitude.radians) * cos(solar_declination.radians)
+    C33 = sin(latitude.radians) * sin(solar_declination.radians)
     solar_time = model_solar_time(
         longitude=longitude,
         latitude=latitude,
@@ -97,7 +97,7 @@ def calculate_solar_altitude_pvis(
             solar_time=solar_time,
             angle_output_units='radians',
     )
-    sine_solar_altitude = C31 * cos(hour_angle.value) + C33
+    sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
     solar_altitude = asin(sine_solar_altitude)
     solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
     solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
