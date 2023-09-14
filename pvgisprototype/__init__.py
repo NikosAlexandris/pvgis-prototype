@@ -11,18 +11,34 @@ def model_hash(self):
     return hash(tuple(sorted(self.dict().items())))
 
 
+
 @property
-def to_degrees_attr(self):
+def degrees_property(self):
     """Instance property to convert radians to degrees"""
-    if self.unit == 'degrees':
-        return self.value
-    else:  # radians
-        return np.degrees(self.value)
+    if self.value is not None:
+        if self.unit == 'degrees':
+            return self.value
+        elif self.unit == 'radians':
+            return np.degrees(self.value)
+        else:
+            return None
+    else:
+        return None
 
 
 @property
-def to_radians_attr(self):
+def radians_property(self):
     """Instance property to convert degrees to radians"""
+    if self.value is not None:
+        if self.unit == 'radians':
+            return self.value
+        elif self.unit == 'degrees':
+            return np.radians(self.value)
+        else:
+            return None
+    else:
+        return None
+
     if self.unit == 'radians':
         return self.value
     else:  # degrees
@@ -51,8 +67,8 @@ def generate_dataclass_models(yaml_file: str):
                 '__module__': __name__,
                 '__qualname__': model_name,
                 '__hash__': model_hash,
-                'degrees': to_degrees_attr,
-                'radians': to_radians_attr,
+                'degrees': degrees_property,
+                'radians': radians_property,
                 **default_values,
             }
         )
