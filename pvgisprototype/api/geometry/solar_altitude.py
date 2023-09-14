@@ -95,8 +95,8 @@ def model_solar_altitude(
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
-            lng=longitude.value,
-            lat=latitude.value,
+            lng=longitude.degrees,
+            lat=latitude.degrees,
         ).values()  # zero points to south
         solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
         solar_altitude = convert_to_degrees_if_requested(
@@ -106,12 +106,10 @@ def model_solar_altitude(
     if model.value == SolarPositionModels.pysolar:
 
         timestamp = attach_timezone(timestamp, timezone)
-        longitude_in_degrees = convert_float_to_degrees_if_requested(longitude.value, 'degrees')
-        latitude_in_degrees = convert_float_to_degrees_if_requested(latitude.value, 'degrees')
 
         solar_altitude = pysolar.solar.get_altitude(
-            latitude_deg=latitude_in_degrees,  # this comes first
-            longitude_deg=longitude_in_degrees,
+            latitude_deg=latitude.degrees,  # this comes first
+            longitude_deg=longitude.degrees,
             when=timestamp,
         )  # returns degrees by default
         # required by output function

@@ -156,7 +156,7 @@ def calculate_hour_angle_sunrise(
         observer directly in line with the sun's rays measured in radian.
     """
     hour_angle_sunrise = acos(
-        -tan(latitude.value - surface_tilt.value) * tan(solar_declination.value)
+        -tan(latitude.radians - surface_tilt.radians) * tan(solar_declination.radians)
     )
     hour_angle_sunrise = HourAngleSunrise(value=hour_angle_sunrise, unit="radians")
     hour_angle_sunrise = convert_to_degrees_if_requested(

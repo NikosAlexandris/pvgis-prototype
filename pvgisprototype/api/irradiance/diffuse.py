@@ -526,7 +526,7 @@ def calculate_diffuse_inclined_irradiance(
 
         # on a horizontal surface : G0h = G0 sin(h0)
         extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(
-            solar_altitude.value
+            solar_altitude.radians
         )
 
         # proportion between direct (beam) and extraterrestrial irradiance : Kb
@@ -583,7 +583,7 @@ def calculate_diffuse_inclined_irradiance(
             hour_angle,
             angle_output_units=angle_output_units,
         )
-        if sin(solar_incidence_angle.value) < 0 and solar_altitude.value >=0:
+        if sin(solar_incidence_angle.radians) < 0 and solar_altitude.radians >=0:
 
             # F(γN)
             diffuse_sky_irradiance = calculate_diffuse_sky_irradiance(
@@ -596,10 +596,10 @@ def calculate_diffuse_inclined_irradiance(
 
         else:  # sunlit surface and non-overcast sky
 
-            if solar_altitude.value >= 0.1:  # radians or 5.7 degrees
+            if solar_altitude.radians >= 0.1:  # radians or 5.7 degrees
                 diffuse_inclined_irradiance = diffuse_horizontal_component * (
                     diffuse_sky_irradiance * (1 - kb)
-                    + kb * sin(solar_incidence_angle.value) / sin(solar_altitude.value)
+                    + kb * sin(solar_incidence_angle.radians) / sin(solar_altitude.radians)
                 )
 
             else:  # if solar_altitude.value < 0.1:
@@ -634,7 +634,7 @@ def calculate_diffuse_inclined_irradiance(
                     + kb
                     * sin(surface_tilt)
                     * cos(azimuth_difference)
-                    / (0.1 - 0.008 * solar_altitude.value)
+                    / (0.1 - 0.008 * solar_altitude.radians)
                 )
         # finally, we need to set
         diffuse_irradiance = diffuse_inclined_irradiance

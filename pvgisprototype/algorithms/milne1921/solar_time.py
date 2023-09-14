@@ -92,9 +92,9 @@ def calculate_solar_time_eot(
     equation_of_time = 9.87 * sin(2*b) - 7.53 * cos(b) - 1.5 * sin(b)
 
     # ------------------------------------------------------------------------
-    longitude = degrees(longitude.value)  # this equation of time requires degrees!
+    # longitude = degrees(longitude.value)  # this equation of time requires degrees!
     # ------------------------------------------------------------------------
-    time_correction_factor = 4 * (longitude - local_standard_meridian_time) + equation_of_time
+    time_correction_factor = 4 * (longitude.degrees - local_standard_meridian_time) + equation_of_time
     time_correction_factor_hours = time_correction_factor / 60
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     # solar_time_decimal_hours = solar_time.hour + solar_time.minute / 60 + solar_time.second / 3600

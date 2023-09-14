@@ -28,12 +28,12 @@ def calculate_solar_declination_noaa(
                 )
         declination = (
         0.006918
-        - 0.399912 * cos(fractional_year.value)
-        + 0.070257 * sin(fractional_year.value)
-        - 0.006758 * cos(2 * fractional_year.value)
-        + 0.000907 * sin(2 * fractional_year.value)
-        - 0.002697 * cos(3 * fractional_year.value)
-        + 0.00148 * sin(3 * fractional_year.value)
+        - 0.399912 * cos(fractional_year.radians)
+        + 0.070257 * sin(fractional_year.radians)
+        - 0.006758 * cos(2 * fractional_year.radians)
+        + 0.000907 * sin(2 * fractional_year.radians)
+        - 0.002697 * cos(3 * fractional_year.radians)
+        + 0.00148 * sin(3 * fractional_year.radians)
         )
 
         declination = SolarDeclination(value=declination, unit='radians')
@@ -55,7 +55,7 @@ def calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
         angle_output_units="radians",
     )
-    fractional_years = np.array([item.value for item in fractional_years])
+    fractional_years = np.array([item.radians for item in fractional_years])
     declinations = (
         0.006918
         - 0.399912 * np.cos(fractional_years)

@@ -79,7 +79,7 @@ def calculate_solar_azimuth_noaa(
           # θ = arccos( -  -------------------------------------------------------------- )
                             #      cos(latitude) * sin(solar_zenith)
 
-    # numerator = sin(solar_declination.value) - sin(latitude.value) * cos(solar_zenith.value)
+    # numerator = sin(solar_declination.radians) - sin(latitude.radians) * cos(solar_zenith.radians)
     numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
     denominator = cos(latitude.radians) * sin(solar_zenith.radians)
     # try else raise ... ?
@@ -129,8 +129,8 @@ def calculate_solar_azimuth_time_series_noaa(
 
     solar_azimuth_series = []
     for solar_declination, solar_zenith in zip(solar_declination_series, solar_zenith_series):
-        numerator = sin(latitude.value) * cos(solar_zenith.value) - sin(solar_declination.value)
-        denominator = cos(latitude.value) * sin(solar_zenith.value)
+        numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
+        denominator = cos(latitude.radians) * sin(solar_zenith.radians)
         cosine_solar_azimuth = numerator / denominator
         solar_azimuth = acos(cosine_solar_azimuth)
 
