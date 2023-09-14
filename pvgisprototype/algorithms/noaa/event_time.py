@@ -110,9 +110,9 @@ def calculate_event_time_noaa(
     #   from a range of 0 to 2 * pi (a full circle)
     #   to a range of 0 to 1440 (a full day in minutes)
     event_calculations = {
-        'sunrise': 720 - (longitude_minutes + event_hour_angle_minutes) - equation_of_time.value,
-        'noon': 720 - longitude_minutes - equation_of_time.value,
-        'sunset': 720 - (longitude_minutes - event_hour_angle_minutes) - equation_of_time.value
+        'sunrise': 720 - (longitude_minutes + event_hour_angle_minutes) - equation_of_time.minutes,
+        'noon': 720 - longitude_minutes - equation_of_time.minutes,
+        'sunset': 720 - (longitude_minutes - event_hour_angle_minutes) - equation_of_time.minutes
     }
     event_time = event_calculations.get(event.lower())
     event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(minutes=event_time)

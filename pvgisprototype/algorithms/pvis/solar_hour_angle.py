@@ -1,9 +1,10 @@
 import typer
 import numpy as np
-from datetime import time
+from datetime import datetime
 from typing import Annotated
 from typing import Optional
 # from ...utilities.timestamp import convert_hours_to_seconds
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 from pvgisprototype import HourAngle
@@ -17,7 +18,7 @@ from pvgisprototype.validation.functions import SolarHourAngleSunrisePvisInput
 
 @validate_with_pydantic(SolarHourAnglePvisInput)
 def calculate_hour_angle_pvis(
-        solar_time: time,
+        solar_time: datetime,
         angle_output_units: str = 'radians',
     )-> HourAngle:
     """Calculate the hour angle ω'
@@ -27,7 +28,7 @@ def calculate_hour_angle_pvis(
     Parameters
     ----------
 
-    hour_angle: float
+    solar_time: float
         The solar time (ST) is a calculation of the passage of time based on the
         position of the Sun in the sky. It is expected to be decimal hours in a
         24 hour format and measured internally in seconds. 
@@ -42,7 +43,13 @@ def calculate_hour_angle_pvis(
     """
     # `solar_time` here received in seconds!
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
-    hour_angle = (solar_time / 3600 - 12) * 15 * np.pi / 180
+
+    # datetime to hours
+    solar_time_decimale_hours = timestamp_to_decimal_hours(solar_time)              # FIXME
+    hour_angle = (solar_time_decimale_hours - 12) * 15 * (np.pi / 180)
+    hour_angle = (hour_angle - 12) * 15 * (np.pi / 180)
+
+    # hour_angle = (hour_angle / 3600 - 12) * 15 * np.pi / 180
     hour_angle = HourAngle(input=hour_angle, unit='radians')
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
