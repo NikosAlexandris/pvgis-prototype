@@ -19,8 +19,8 @@ from pvgisprototype.validation.functions import CalculateSolarTimePVGISInputMode
 
 @validate_with_pydantic(CalculateSolarTimePVGISInputModel)
 def calculate_solar_time_pvgis(
-        longitude: Latitude,
-        latitude: Longitude,
+        longitude: Longitude,
+        latitude: Latitude,
         timestamp: datetime,
         timezone: ZoneInfo = None,
         days_in_a_year: float = 365.25,
@@ -75,13 +75,13 @@ def calculate_solar_time_pvgis(
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     
     solar_time = datetime(
-            year=solar_time.year,
-            month=solar_time.month,
-            day=solar_time.day,
+            year=timestamp.year,
+            month=timestamp.month,
+            day=timestamp.day,
             hour=int(solar_time.hour),
             minute=int(solar_time.minute),
             second=int(solar_time.second),
-            tzinfo=solar_time.tzinfo,
+            tzinfo=timestamp.tzinfo,
     )
 
     return solar_time
