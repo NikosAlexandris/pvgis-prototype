@@ -88,19 +88,19 @@ SolarTime:
 
 TrueSolarTime:
   value:
-    type: Optional[float]
+    type: Optional[datetime]
     initial:
   unit:
-    type: Optional[str]
-    initial:
+    type: str
+    initial: datetime
 
 EquationOfTime:
   value:
-    type: Optional[float]
+    type: Optional[timedelta]
     initial:
   unit:
-    type: Optional[str]
-    initial:
+    type: str
+    initial: timedelta
 
 HourAngle:
   value:
@@ -228,11 +228,11 @@ RelativeLongitude:
 
 TimeOffset:
   value:
-    type: Optional[float]
+    type: Optional[timedelta]
     initial:
   unit:
-    type: Optional[str]
-    initial:
+    type: str
+    initial: timedelta
 
 HorizonHeight:
   value:
