@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarTimeInputModel
-from pvgisprototype import SolarTime
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from .models import SolarTimeModels
@@ -21,10 +21,10 @@ def model_solar_time(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: ZoneInfo = None,
+    timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,  # radians
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,  # radians
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.03344,
@@ -49,40 +49,40 @@ def model_solar_time(
     if solar_time_model.value == SolarTimeModels.eot:
 
         solar_time = calculate_solar_time_eot(
-                longitude,
-                timestamp,
-                timezone,
+                longitude=longitude,
+                timestamp=timestamp,
+                timezone=timezone,
                 )
 
     if solar_time_model.value == SolarTimeModels.ephem:
 
         solar_time = calculate_solar_time_ephem(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
             )
 
     if solar_time_model.value == SolarTimeModels.pvgis:
 
         solar_time = calculate_solar_time_pvgis(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
             )
 
     if solar_time_model.value == SolarTimeModels.noaa:
 
         solar_time = calculate_local_solar_time_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            refracted_solar_zenith,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_output_units,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_output_units=angle_output_units,
             # verbose,
             )
 
@@ -90,10 +90,10 @@ def model_solar_time(
 
         # --------------------------------------------------- expects degrees!
         solar_time = calculate_solar_time_skyfield(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
             )
         # expects degrees ! --------------------------------------------------
 
@@ -104,10 +104,10 @@ def calculate_solar_time(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str = None,
+    timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,  # radians
     models: List[SolarTimeModels] = [SolarTimeModels.skyfield],
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,  # radians
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.03344,

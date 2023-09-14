@@ -2,6 +2,7 @@ from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_jenco
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from pvgisprototype import RefractedSolarZenith
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from .models import SolarTimeModels
@@ -24,7 +25,8 @@ def model_solar_incidence(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: ZoneInfo = None,
+    timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     random_time: bool = False,
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.effective,
@@ -35,7 +37,6 @@ def model_solar_incidence(
     horizon_heights: List = None,
     horizon_interval: float = None,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,

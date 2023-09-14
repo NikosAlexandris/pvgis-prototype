@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.solar_altitude import calculate_solar_altitude
@@ -14,10 +15,10 @@ def calculate_solar_zenith(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,
     models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,

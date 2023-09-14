@@ -26,6 +26,7 @@ from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
 
@@ -321,7 +322,7 @@ class RefractedSolarAltitudeModel(BaseModel):
 
 
 class RefractedSolarZenithModel(BaseModel):
-    refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith]
+    refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 
     @field_validator("refracted_solar_zenith")
     def validate_refracted_solar_zenith(cls, input) -> RefractedSolarZenith:
@@ -331,6 +332,7 @@ class RefractedSolarZenithModel(BaseModel):
             return RefractedSolarZenith(value=input, unit="radians")
         else:
             raise ValueError("Unsupported `refracted_solar_zenith` type provided")
+
 
 
 class ElevationModel(BaseModel):
