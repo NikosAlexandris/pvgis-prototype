@@ -2,6 +2,7 @@ import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 import numpy as np
@@ -28,7 +29,7 @@ def calculate_solar_time_pvgis(
         eccentricity_correction_factor: float = 0.165,  # from the C code
         time_offset_global: float = 0,
         hour_offset: float = 0,
-    ):
+    )->SolarTime:
     """Calculate the solar time.
 
     1. Map the day of the year onto the circumference of a circle, essentially
@@ -74,14 +75,14 @@ def calculate_solar_time_pvgis(
     time_correction_factor_hours = hour_of_day + time_offset + hour_offset
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     
-    solar_time = datetime(
-            year=timestamp.year,
-            month=timestamp.month,
-            day=timestamp.day,
+    solar_time = time(
+            # year=timestamp.year,
+            # month=timestamp.month,
+            # day=timestamp.day,
             hour=int(solar_time.hour),
             minute=int(solar_time.minute),
             second=int(solar_time.second),
             tzinfo=timestamp.tzinfo,
     )
 
-    return solar_time
+    return SolarTime(value=solar_time, unit='timestamp')

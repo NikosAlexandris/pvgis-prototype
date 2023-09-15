@@ -1,6 +1,7 @@
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 from math import pi
 import ephem
@@ -22,7 +23,7 @@ def calculate_solar_time_ephem(
     timestamp: datetime,
     timezone: str = None,
     verbose: int = 0,
-  ):
+  )->SolarTime:
   """Calculate the solar time using PyEphem
 
   The position of the Sun in the sky changes slightly day to day due to the
@@ -134,10 +135,10 @@ def calculate_solar_time_ephem(
   solar_time_decimal_hours = solar_time_hours * 24 / pi / 2  # convert to decimal hours
   solar_time_datetime = timestamp + timedelta(hours=solar_time_hours)
 
-  solar_time = datetime(
-          year=solar_time_datetime.year,
-          month=solar_time_datetime.month,
-          day=solar_time_datetime.day,
+  solar_time = time(
+          # year=solar_time_datetime.year,
+          # month=solar_time_datetime.month,
+          # day=solar_time_datetime.day,
           hour=int(solar_time_datetime.hour),
           minute=int(solar_time_datetime.minute),
           second=int(solar_time_datetime.second),
@@ -152,4 +153,4 @@ def calculate_solar_time_ephem(
   #     # typer.echo(f'Mean solar time: {solar_time}')
 
   # debug(locals())
-  return solar_time
+  return SolarTime(value=solar_time, unit='timestamp')

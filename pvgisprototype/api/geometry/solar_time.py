@@ -8,6 +8,7 @@ from pvgisprototype.validation.functions import ModelSolarTimeInputModel
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import SolarTime
 from .models import SolarTimeModels
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
@@ -33,7 +34,7 @@ def model_solar_time(
     time_output_units: str = "minutes",
     angle_units: str = "radians",
     angle_output_units: str = "radians",
-):
+)->SolarTime:
     """Calculates the solar time and returns the calculated value and the units.
 
     Parameters

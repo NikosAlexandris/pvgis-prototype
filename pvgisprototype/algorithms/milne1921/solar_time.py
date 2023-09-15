@@ -2,6 +2,7 @@ import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 
 from math import radians
@@ -14,9 +15,8 @@ from zoneinfo import ZoneInfo
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype import SolarTime
 from pvgisprototype import Longitude
-from pvgisprototype import Latitude
+from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 
@@ -27,7 +27,7 @@ def calculate_solar_time_eot(
         longitude: Longitude,
         timestamp: datetime,
         timezone: ZoneInfo,
-) -> datetime:
+) -> SolarTime:
     """Calculate the solar time.
 
     - Local Time (LT)
@@ -101,13 +101,14 @@ def calculate_solar_time_eot(
     # hour_angle = 15 * (solar_time_decimal_hours - 12)
     # ------------------------------------------------------------------------
     
-    solar_time = datetime(
-            year=solar_time.year,
-            month=solar_time.month,
-            day=solar_time.day,
+    solar_time = time(
+            # year=solar_time.year,
+            # month=solar_time.month,
+            # day=solar_time.day,
             hour=int(solar_time.hour),
             minute=int(solar_time.minute),
             second=int(solar_time.second),
             tzinfo=solar_time.tzinfo,
             )
-    return solar_time
+    
+    return SolarTime(value=solar_time, unit='timestamp')
