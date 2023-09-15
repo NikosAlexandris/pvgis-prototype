@@ -141,7 +141,7 @@ class BaseTimeOutputUnitsModel(BaseModel):
 
 
 class BaseAngleUnitsModel(BaseModel):
-    angle_units: str
+    angle_units: str = 'radians'
 
     @field_validator("angle_units")
     @classmethod

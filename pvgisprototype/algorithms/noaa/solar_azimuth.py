@@ -86,13 +86,15 @@ def calculate_solar_azimuth_noaa(
     cosine_solar_azimuth = numerator / denominator
     solar_azimuth = acos(cosine_solar_azimuth)
 
-    if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
-        raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
-
     solar_azimuth = SolarAzimuth(
             value=solar_azimuth,
             unit='radians',
             )
+
+    if not isfinite(solar_azimuth.radians) or not 0 <= solar_azimuth.radians <= 2*pi:
+        raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
+
+
     solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
 
     return solar_azimuth

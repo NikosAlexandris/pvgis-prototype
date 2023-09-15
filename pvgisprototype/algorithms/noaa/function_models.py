@@ -18,7 +18,7 @@ from pvgisprototype.validation.parameters import BaseCoordinatesModel
 # Units?
 
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleUnitsModel
+from pvgisprototype.validation.parameters import BaseAngleUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
 
