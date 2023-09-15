@@ -196,8 +196,8 @@ def calculate_solar_altitude(
             )
             results.append({
                 'Model': model.value,
-                'Altitude': solar_altitude.value,
-                'Units': solar_altitude.unit,  # Don't trust me -- Redesign Me!
+                'Altitude': getattr(solar_altitude, angle_output_units),
+                'Units': angle_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results

@@ -90,8 +90,8 @@ def calculate_solar_declination(
             )
             results.append({
                 'Model': model.value,
-                'Declination': solar_declination.value,
-                'Units': solar_declination.unit,  # Don't trust me -- Redesign Me!
+                'Declination': getattr(solar_declination, angle_output_units),
+                'Units': angle_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results
