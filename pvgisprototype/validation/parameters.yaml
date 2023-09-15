@@ -118,13 +118,21 @@ SolarHourAngle:
     type: Optional[str]
     initial:
 
-EventTime:
+EventHourAngle:
   value:
     type: Optional[float]
     initial:
   unit:
     type: Optional[str]
     initial:
+
+EventTime:
+  value:
+    type: Optional[datetime]
+    initial:
+  unit:
+    type: str
+    initial: datetime
 
 HourAngleSunrise:
   value:
