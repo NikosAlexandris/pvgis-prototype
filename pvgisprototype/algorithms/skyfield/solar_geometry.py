@@ -20,7 +20,7 @@ from pvgisprototype.validation.functions import CalculateSolarAltitudeAzimuthSky
 from pvgisprototype.validation.functions import SolarHourAngleSkyfieldInput
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
-from pvgisprototype import HourAngle
+from pvgisprototype import SolarHourAngle
 from pvgisprototype import SolarDeclination
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
@@ -139,7 +139,7 @@ def calculate_hour_angle_skyfield(      # NOTE gounaol: Declination is also calc
         timestamp: datetime,
         timezone: str = None,
         angle_output_units: str = 'radians',
-    ) -> Tuple[HourAngle, SolarDeclination]:
+    ) -> Tuple[SolarHourAngle, SolarDeclination]:
     """Calculate the hour angle ω'
 
     Parameters
@@ -178,7 +178,7 @@ def calculate_hour_angle_skyfield(      # NOTE gounaol: Declination is also calc
         hour_angle = hour_angle._degrees
         solar_declination = solar_declination.degrees
 
-    hour_angle = HourAngle(
+    hour_angle = SolarHourAngle(
         value=hour_angle,
         unit=angle_output_units
     )
