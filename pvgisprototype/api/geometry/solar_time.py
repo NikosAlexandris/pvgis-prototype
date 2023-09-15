@@ -149,8 +149,8 @@ def calculate_solar_time(
             )
             results.append({
                 'Model': model,
-                'Solar time': solar_time,
-                # 'Units': solar_time,  # Don't trust me -- Redesign Me!
+                'Solar time': getattr(solar_time, angle_output_units),
+                'Units': angle_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results
