@@ -316,7 +316,7 @@ class SolarHourAngleSeriesModel(BaseModel):
             raise ValueError("Unsupported solar_hour_angle_series type provided")
 
 
-class ApplyAtmosphericRefraction(BaseModel):
+class ApplyAtmosphericRefractionModel(BaseModel):
     apply_atmospheric_refraction: bool
 
 

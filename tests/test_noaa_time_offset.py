@@ -37,7 +37,7 @@ def test_calculate_time_offset_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        time_output_units=time_output_units,
+        # time_output_units=time_output_units,
     )
     expected_unit == time_output_units
     assert pytest.approx(expected, tolerance) == time_offset.value

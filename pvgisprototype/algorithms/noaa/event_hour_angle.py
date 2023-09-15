@@ -19,7 +19,7 @@ def calculate_event_hour_angle_noaa(
         timestamp: datetime,
         refracted_solar_zenith: RefractedSolarZenith,
         angle_units: str = 'radians',
-        angle_output_units: str = 'radians',
+        # angle_output_units: str = 'radians',
     ) -> EventTime:
     """
     Calculates the event hour angle using the NOAA method.
@@ -64,9 +64,9 @@ def calculate_event_hour_angle_noaa(
     will convert the calculated event hour angle from radians to degrees.
     """
     solar_declination = calculate_solar_declination_noaa(
-            timestamp,
-            angle_units,
-            'radians',
+            timestamp=timestamp,
+            angle_units=angle_units,
+            # angle_output_units='radians',
             )  # radians
     cosine_event_hour_angle = cos(refracted_solar_zenith.radians) / (
         cos(latitude.radians) * cos(solar_declination.radians)
@@ -75,9 +75,9 @@ def calculate_event_hour_angle_noaa(
 
     event_hour_angle = EventTime(value=event_hour_angle, unit='radians')
 
-    event_hour_angle = convert_to_degrees_if_requested(
-            event_hour_angle,
-            angle_output_units,
-            )
+    # event_hour_angle = convert_to_degrees_if_requested(
+    #         event_hour_angle,
+    #         angle_output_units,
+    #         )
 
     return event_hour_angle

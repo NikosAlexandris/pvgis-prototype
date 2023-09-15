@@ -3,7 +3,7 @@ from datetime import timedelta
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetNOAAInput
+from pvgisprototype.validation.functions import CalculateTimeOffsetNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import TimeOffset
 from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTimeSeriesNOAAInput
@@ -24,7 +24,7 @@ def calculate_time_offset_noaa(
         longitude: Longitude, 
         timestamp: datetime, 
         timezone: ZoneInfo,
-        time_output_units: str = 'minutes',  # redesign me!
+        # time_output_units: str = 'minutes',  # redesign me!
     ) -> TimeOffset:
     """Calculate the time offset (minutes) for NOAA's solar position calculations.
 
@@ -120,14 +120,14 @@ def calculate_time_offset_noaa(
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
-        time_output_units='minutes',
+        # time_output_units='minutes',
         )  # minutes
-    time_offset_minutes = longitude_in_minutes - timezone_offset_minutes + equation_of_time.minutes
+    time_offset_minutes = longitude_in_minutes - timezone_offset_minutes + equation_of_time.as_minutes
     time_offset_timedelta = timedelta(minutes=time_offset_minutes)
     time_offset = TimeOffset(value=time_offset_timedelta, unit='timedelta')
 
     # if not -720 + 70 <= time_offset <= 720 + 70:
-    if not -790 <= time_offset.minutes <= 790:
+    if not -790 <= time_offset.as_minutes <= 790:
         raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
 
     return time_offset
