@@ -420,11 +420,11 @@ def calculate_solar_geometry_overview(
             )
             results.append({
                 'Model': model.value,
-                'Declination' if solar_declination is not None else None: solar_declination.value if solar_declination is not None else None,
-                'Hour Angle' if solar_hour_angle is not None else None: solar_hour_angle.value if solar_hour_angle is not None else None,
-                'Zenith' if solar_zenith is not None else None: solar_zenith.value if solar_zenith is not None else None,
-                'Altitude' if solar_altitude is not None else None: solar_altitude.value if solar_altitude is not None else None,
-                'Azimuth' if solar_azimuth is not None else None: solar_azimuth.value if solar_azimuth is not None else None,
+                'Declination' if solar_declination is not None else None: getattr(solar_declination, angle_output_units) if solar_declination is not None else None,
+                'Hour Angle' if solar_hour_angle is not None else None: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle is not None else None,
+                'Zenith' if solar_zenith is not None else None: getattr(solar_zenith, angle_output_units) if solar_zenith is not None else None,
+                'Altitude' if solar_altitude is not None else None: getattr(solar_altitude, angle_output_units) if solar_altitude is not None else None,
+                'Azimuth' if solar_azimuth is not None else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth is not None else None,
                 'Units': angle_output_units
             })
 
