@@ -102,7 +102,7 @@ EquationOfTime:
     type: str
     initial: timedelta
 
-HourAngle:
+SolarHourAngle:
   value:
     type: Optional[float]
     initial:
@@ -110,7 +110,7 @@ HourAngle:
     type: Optional[str]
     initial:
 
-SolarHourAngle:
+EventHourAngle:
   value:
     type: Optional[float]
     initial:
@@ -120,11 +120,11 @@ SolarHourAngle:
 
 EventTime:
   value:
-    type: Optional[float]
+    type: Optional[datetime]
     initial:
   unit:
-    type: Optional[str]
-    initial:
+    type: str
+    initial: datetime
 
 HourAngleSunrise:
   value:
