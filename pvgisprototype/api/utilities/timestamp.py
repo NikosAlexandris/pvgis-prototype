@@ -288,8 +288,8 @@ def convert_hours_to_datetime_time(value: float) -> time:
     return time(hours, minutes, seconds)
 
 
-def timestamp_to_decimal_hours(t):
-    return t.hour + t.minute / 60 + t.second / 3600 + t.microsecond / 3600000000
+# def timestamp_to_decimal_hours(t):  # NOTE: Integrated in dateclasses
+#     return t.hour + t.minute / 60 + t.second / 3600 + t.microsecond / 3600000000
 
 
 def timestamp_to_minutes(timestamp: datetime) -> float:

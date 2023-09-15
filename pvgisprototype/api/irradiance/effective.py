@@ -40,7 +40,7 @@ from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
 from ..geometry.solar_time import model_solar_time
-from ..utilities.timestamp import timestamp_to_decimal_hours
+# from ..utilities.timestamp import timestamp_to_decimal_hours
 from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -374,8 +374,8 @@ def calculate_effective_irradiance(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+    # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.datetime)
+    hour_angle = np.radians(15) * (solar_time.as_hours - 12)
     solar_incidence_angle = model_solar_incidence(
         longitude=longitude,
         latitude=latitude,
