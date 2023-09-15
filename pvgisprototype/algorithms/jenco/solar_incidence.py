@@ -22,6 +22,7 @@ from pvgisprototype import SolarIncidence
 from pvgisprototype import HorizonHeight
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import SolarHourAngle
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel
@@ -83,9 +84,9 @@ def calculate_solar_incidence_jenco(
         longitude: Longitude,
         latitude: Latitude,
         timestamp: datetime,
-        timezone: ZoneInfo = None,
+        timezone: ZoneInfo,
+        hour_angle: SolarHourAngle,
         random_time: bool = False,
-        hour_angle: float = None,
         surface_tilt: float = None,
         surface_orientation: float = None,
         shadow_indicator: Path = None,
@@ -157,11 +158,11 @@ def calculate_solar_incidence_jenco(
     # solar_azimuth = calculate_solar_azimuth()
     solar_azimuth = None
     in_shade = is_surface_in_shade(
-            solar_altitude,
-            solar_azimuth,
-            shadow_indicator,
-            horizon_heights,
-            horizon_interval,
+            solar_altitude=solar_altitude,
+            solar_azimuth=solar_azimuth,
+            shadow_indicator=shadow_indicator,
+            horizon_heights=horizon_heights,
+            horizon_interval=horizon_interval,
     )
     if in_shade:
         return NO_SOLAR_INCIDENCE
@@ -176,26 +177,26 @@ def calculate_solar_incidence_jenco(
         )
         relative_inclined_latitude = asin(sine_relative_inclined_latitude)
         solar_declination = calculate_solar_declination_pvis(
-            timestamp,
-            timezone,
-            days_in_a_year,
-            eccentricity_correction_factor,
-            perigee_offset,
-            angle_output_units,
+            timestamp=timestamp,
+            timezone=timezone,
+            days_in_a_year=days_in_a_year,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            perigee_offset=perigee_offset,
+            # angle_output_units=angle_output_units,
             )
         c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.radians)
         c_inclined_33 = sine_relative_inclined_latitude * sin(solar_declination.radians)
         solar_hour_angle = calculate_solar_hour_angle_noaa(
-            longitude,
-            timestamp,
-            timezone,
-            time_output_units,
-            angle_output_units,
+            longitude=longitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            time_output_units=time_output_units,
+            angle_output_units=angle_output_units,
         )
         relative_longitude = calculate_relative_longitude(
-            latitude,
-            surface_tilt,
-            surface_orientation
+            latitude=latitude,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation
         )
         sine_solar_incidence = (
             c_inclined_31 * cos(solar_hour_angle.radians - relative_longitude.radians) + c_inclined_33

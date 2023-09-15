@@ -48,10 +48,12 @@ def calculate_solar_altitude_noaa(
         angle_output_units='radians',
     )
     solar_altitude = pi/2 - solar_zenith.radians
-    if not isfinite(solar_altitude) or not -pi/2 <= solar_altitude <= pi/2:
-        raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
 
     solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+
+    if not isfinite(solar_altitude.radians) or not -pi/2 <= solar_altitude.radians <= pi/2:
+        raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
+
     solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
     return solar_altitude

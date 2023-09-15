@@ -81,16 +81,17 @@ def calculate_solar_hour_angle_noaa(
     # true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
     solar_hour_angle = (true_solar_time.minutes - 720) * (pi / 720)
 
-    if angle_output_units == 'radians' and not -pi <= solar_hour_angle <= pi:
+    solar_hour_angle = SolarHourAngle(
+        value=solar_hour_angle,
+        unit='radians',
+    )
+
+    if not -pi <= solar_hour_angle.radians <= pi:
         raise ValueError(f'The calculated hour angle {solar_hour_angle} is out of the expected range [{-pi}, {pi}] radians')
 
     # elif angle_output_units == 'degrees' and not -180 <= solar_hour_angle <= 180:
     #     raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")
 
-    solar_hour_angle = SolarHourAngle(
-        value=solar_hour_angle,
-        unit='radians',
-    )
     solar_hour_angle = convert_to_degrees_if_requested(
         solar_hour_angle,
         angle_output_units
