@@ -237,8 +237,8 @@ def calculate_solar_azimuth(
             )
             results.append({
                 'Model': model.value,
-                'Azimuth': solar_azimuth.value,
-                'Units': solar_azimuth.unit,  # Don't trust me -- Redesign Me!
+                'Azimuth': getattr(solar_azimuth, angle_output_units),
+                'Units': angle_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results
