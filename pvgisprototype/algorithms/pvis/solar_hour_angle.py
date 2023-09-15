@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Annotated
 from typing import Optional
 # from ...utilities.timestamp import convert_hours_to_seconds
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
+# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 from pvgisprototype import HourAngle
@@ -45,8 +45,8 @@ def calculate_hour_angle_pvis(
     # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
 
     # datetime to hours
-    solar_time_decimale_hours = timestamp_to_decimal_hours(solar_time)              # FIXME
-    hour_angle = (solar_time_decimale_hours - 12) * 15 * (np.pi / 180)
+    # solar_time_decimale_hours = timestamp_to_decimal_hours(solar_time.datetime)
+    hour_angle = (solar_time.as_hours - 12) * 15 * (np.pi / 180)
     hour_angle = (hour_angle - 12) * 15 * (np.pi / 180)
 
     # hour_angle = (hour_angle / 3600 - 12) * 15 * np.pi / 180

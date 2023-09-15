@@ -61,7 +61,7 @@ from ..utilities.conversions import convert_to_radians_if_requested
 from ..utilities.conversions import convert_dictionary_to_table
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
-from ..utilities.timestamp import timestamp_to_decimal_hours
+# from ..utilities.timestamp import timestamp_to_decimal_hours
 from ..utilities.timestamp import ctx_attach_requested_timezone
 from ..utilities.timestamp import parse_timestamp
 from .loss import calculate_angular_loss_factor_for_direct_irradiance
@@ -622,8 +622,8 @@ def calculate_direct_inclined_irradiance_pvgis(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
     )
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+    # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.datetime)
+    hour_angle = np.radians(15) * (solar_time.as_hours - 12)
 
     # calculate C3x geometry parameters for inclined surface
     relative_latitude = math.asin(sine_relative_latitude)
