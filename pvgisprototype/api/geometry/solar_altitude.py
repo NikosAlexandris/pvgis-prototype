@@ -49,7 +49,7 @@ def model_solar_altitude(
     eccentricity_correction_factor: float,
     time_output_units: str,
     angle_units: str,
-    angle_output_units: str,
+    # angle_output_units: str,
 ) -> SolarAltitude:
     """
     The solar altitude angle measures from the horizon up towards the zenith
@@ -80,7 +80,7 @@ def model_solar_altitude(
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             time_output_units=time_output_units,
-            angle_output_units=angle_output_units,
+            # angle_output_units=angle_output_units,
         )
 
     if model.value == SolarPositionModels.skyfield:
@@ -89,7 +89,7 @@ def model_solar_altitude(
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
-                angle_output_units=angle_output_units,
+                # angle_output_units=angle_output_units,
                 )
 
     if model.value == SolarPositionModels.suncalc:
@@ -100,9 +100,9 @@ def model_solar_altitude(
             lat=latitude.degrees,
         ).values()  # zero points to south
         solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
-        solar_altitude = convert_to_degrees_if_requested(
-            solar_altitude, angle_output_units
-        )
+        # solar_altitude = convert_to_degrees_if_requested(
+        #     solar_altitude, angle_output_units
+        # )
 
     if model.value == SolarPositionModels.pysolar:
 
@@ -115,9 +115,9 @@ def model_solar_altitude(
         )  # returns degrees by default
         # required by output function
         solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
-        solar_altitude = convert_to_radians_if_requested(
-            solar_altitude, angle_output_units
-        )
+        # solar_altitude = convert_to_radians_if_requested(
+        #     solar_altitude, angle_output_units
+        # )
 
     if model.value  == SolarPositionModels.pvis:
 
@@ -136,7 +136,7 @@ def model_solar_altitude(
             solar_time_model=solar_time_model,
             time_output_units=time_output_units,
             angle_units=angle_units,
-            angle_output_units=angle_output_units,
+            # angle_output_units=angle_output_units,
             )
 
     if model.value  == SolarPositionModels.pvlib:
@@ -146,7 +146,7 @@ def model_solar_altitude(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            angle_output_units=angle_output_units,
+            # angle_output_units=angle_output_units,
             )
 
     return solar_altitude
@@ -157,7 +157,7 @@ def calculate_solar_altitude(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    refracted_solar_zenith: RefractedSolarZenith,
+    refracted_solar_zenith: RefractedSolarZenith = 1.5853349194640094,
     models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
@@ -192,7 +192,7 @@ def calculate_solar_altitude(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 time_output_units=time_output_units,
                 angle_units=angle_units,
-                angle_output_units=angle_output_units,
+                # angle_output_units=angle_output_units,
             )
             results.append({
                 'Model': model.value,

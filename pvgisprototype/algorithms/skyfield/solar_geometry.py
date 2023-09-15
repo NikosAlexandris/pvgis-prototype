@@ -15,7 +15,7 @@ from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from typing import Tuple
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarPositionSkyfieldInputModel
-from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarAltitudeAzimuthSkyfieldInputModel
+from pvgisprototype.validation.functions import CalculateSolarAltitudeAzimuthSkyfieldInputModel
 from pvgisprototype.validation.functions import SolarHourAngleSkyfieldInput
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth

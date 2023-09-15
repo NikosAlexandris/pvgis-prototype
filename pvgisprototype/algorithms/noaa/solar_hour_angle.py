@@ -1,6 +1,6 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleNOAAInput
+from pvgisprototype.validation.functions import CalculateSolarHourAngleNOAAInput
 from pvgisprototype import Longitude
 from datetime import datetime
 from typing import Optional
@@ -22,7 +22,7 @@ def calculate_solar_hour_angle_noaa(
     timestamp: datetime, 
     timezone: Optional[ZoneInfo] = None, 
     time_output_units: Optional[str] = 'minutes',
-    angle_output_units: Optional[str] = 'radians',
+    # angle_output_units: Optional[str] = 'radians',
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
 
@@ -75,11 +75,11 @@ def calculate_solar_hour_angle_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        time_output_units='minutes',                    # NOTE gounaol: Should not be None
+        # time_output_units='minutes',                    # NOTE gounaol: Should not be None
     )  # in minutes
 
     # true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
-    solar_hour_angle = (true_solar_time.minutes - 720) * (pi / 720)
+    solar_hour_angle = (true_solar_time.as_minutes - 720) * (pi / 720)
 
     solar_hour_angle = SolarHourAngle(
         value=solar_hour_angle,
@@ -92,12 +92,18 @@ def calculate_solar_hour_angle_noaa(
     # elif angle_output_units == 'degrees' and not -180 <= solar_hour_angle <= 180:
     #     raise ValueError("The hour angle in degrees must be within the range [-180, 180] degrees")
 
-    solar_hour_angle = convert_to_degrees_if_requested(
-        solar_hour_angle,
-        angle_output_units
-    )
+    # solar_hour_angle = convert_to_degrees_if_requested(
+    #     solar_hour_angle,
+    #     angle_output_units
+    # )
 
     return solar_hour_angle
+
+
+
+
+
+
 
 
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
@@ -116,7 +122,7 @@ def calculate_solar_hour_angle_time_series_noaa(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
-            time_output_units=time_output_units,
+            # time_output_units=time_output_units,
         )  # in minutes
 
         true_solar_time_minutes = timestamp_to_minutes(true_solar_time)

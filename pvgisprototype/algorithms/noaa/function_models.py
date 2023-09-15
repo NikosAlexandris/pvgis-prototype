@@ -48,26 +48,12 @@ class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     pass
 
 
-class CalculateEquationOfTimeNOAAInput(
-    BaseTimestampModel,
-    BaseTimeOutputUnitsModel,
-):
-    pass
-
-
 class CalculateEquationOfTimeTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     BaseTimeOutputUnitsModel,
 ):
     pass
 
-
-class CalculateTimeOffsetNOAAInput(
-    LongitudeModel,
-    BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-):
-    pass
 
 
 class CalculateTimeOffsetTimeSeriesNOAAInput(
@@ -78,13 +64,6 @@ class CalculateTimeOffsetTimeSeriesNOAAInput(
     pass
 
 
-class CalculateTrueSolarTimeNOAAInput(
-    LongitudeModel,
-    BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-):
-    pass
-
 
 class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     LongitudeModel,
@@ -94,13 +73,7 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     pass
 
 
-class CalculateSolarHourAngleNOAAInput(
-    LongitudeModel,
-    BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
+
 
 
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
@@ -113,11 +86,7 @@ class CalculateSolarHourAngleTimeSeriesNOAAInput(
 
 
 
-class CalculateSolarDeclinationNOAAInput(
-    BaseTimestampModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
+
 
 
 class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
@@ -129,7 +98,7 @@ class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
 
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     SolarZenithModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     @field_validator('solar_zenith')
     @classmethod
@@ -151,14 +120,6 @@ class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
         return v  # Return the original value or array
 
 
-class CalculateSolarZenithNOAAInput(
-    LatitudeModel,
-    BaseTimestampModel,
-    SolarHourAngleModel,
-    BaseApplyAtmosphericRefractionModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
 
 
 class CalculateSolarZenithTimeSeriesNOAAInput(
@@ -171,14 +132,7 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     pass
 
 
-class CalculateSolarAltitudeNOAAInput(
-    BaseCoordinatesModel,
-    BaseTimeModel,
-    BaseApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
+
 
 
 class CalculateSolarAltitudeTimeSeriesNOAAInput(
@@ -217,7 +171,7 @@ class CalculateEventHourAngleNOAAInput(
     BaseTimestampModel,
     RefractedSolarZenithModel,
     BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
 
     @field_validator('refracted_solar_zenith')
@@ -240,7 +194,7 @@ class CalculateEventTimeNOAAInput(
     BaseApplyAtmosphericRefractionModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -251,7 +205,7 @@ class CalculateLocalSolarTimeNOAAInput(
     RefractedSolarZenithModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     verbose: int = 0
 
