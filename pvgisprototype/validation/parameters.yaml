@@ -102,14 +102,6 @@ EquationOfTime:
     type: str
     initial: timedelta
 
-HourAngle:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: Optional[str]
-    initial:
-
 SolarHourAngle:
   value:
     type: Optional[float]

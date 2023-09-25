@@ -6,10 +6,9 @@ from math import radians
 from math import acos
 from math import tan
 from datetime import time
-from pvgisprototype import HourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
-from pvgisprototype import HourAngle
+from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype import SolarTime
@@ -25,7 +24,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 def calculate_hour_angle(
     solar_time: SolarTime,
     angle_output_units: str = "radians",
-):
+) -> SolarHourAngle:
     """Calculate the hour angle ω'
 
     ω = (ST / 3600 - 12) * 15 * pi / 180
@@ -109,7 +108,7 @@ def calculate_hour_angle(
     """
     # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.timestamp)
     hour_angle = radians(15) * (solar_time.as_hours - 12)
-    hour_angle = HourAngle(value=hour_angle, unit='radians')
+    hour_angle = SolarHourAngle(value=hour_angle, unit='radians')
     hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
 
     # debug(locals())
