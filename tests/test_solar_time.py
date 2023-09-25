@@ -10,7 +10,7 @@ from math import radians
 
 from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
-from pvgisprototype import HourAngle
+from pvgisprototype import SolarHourAngle
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
@@ -308,7 +308,7 @@ def test_calculate_hour_angle(solar_time, angle_output_units, expected, toleranc
     # expected is a `time` object
     solar_time = time(hour=solar_time, minute=0, second=0) 
     calculated = calculate_hour_angle(solar_time, angle_output_units)
-    assert isinstance(calculated, HourAngle)
+    assert isinstance(calculated, SolarHourAngle)
     assert pytest.approx(expected, tolerance) == calculated.value
     assert angle_output_units == calculated.unit
 
