@@ -51,8 +51,8 @@ def model_solar_azimuth(
     days_in_a_year: float,
     perigee_offset: float,
     eccentricity_correction_factor: float,
-    time_output_units: str,
-    angle_units: str,
+    # time_output_units: str,
+    # angle_units: str,
     # angle_output_units: str,
 ) -> SolarAzimuth:
     """
@@ -85,8 +85,8 @@ def model_solar_azimuth(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
             # angle_output_units=angle_output_units,
         )
     
@@ -145,8 +145,8 @@ def model_solar_azimuth(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_time_model=solar_time_model,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
             # angle_output_units=angle_output_units,
         )
 
@@ -200,8 +200,8 @@ def calculate_solar_azimuth(
     eccentricity_correction_factor: float = 0.01672,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
+    # time_output_units: str = 'minutes',
+    # angle_units: str = 'radians',
     angle_output_units: str = 'radians',
 ) -> List:
     """
@@ -224,8 +224,8 @@ def calculate_solar_azimuth(
                 days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
-                time_output_units=time_output_units,
-                angle_units=angle_units,
+                # time_output_units=time_output_units,
+                # angle_units=angle_units,
                 # angle_output_units=angle_output_units,
             )
             results.append({

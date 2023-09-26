@@ -23,7 +23,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 @validate_with_pydantic(CalculateHourAngleInputModel)
 def calculate_hour_angle(
     solar_time: SolarTime,
-    angle_output_units: str = "radians",
+    # angle_output_units: str = "radians",
 ) -> SolarHourAngle:
     """Calculate the hour angle ω'
 
@@ -109,7 +109,7 @@ def calculate_hour_angle(
     # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.timestamp)
     hour_angle = radians(15) * (solar_time.as_hours - 12)
     hour_angle = SolarHourAngle(value=hour_angle, unit='radians')
-    hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
+    # hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
 
     # debug(locals())
     return hour_angle
@@ -120,7 +120,7 @@ def calculate_hour_angle_sunrise(
     latitude: Latitude,
     surface_tilt: float = 0,
     solar_declination: float = 0,
-    angle_output_units: str = "radians",
+    # angle_output_units: str = "radians",
 ) -> HourAngleSunrise:
     """Calculate the hour angle (ω) at sunrise and sunset
 
@@ -159,9 +159,9 @@ def calculate_hour_angle_sunrise(
         -tan(latitude.radians - surface_tilt.radians) * tan(solar_declination.radians)
     )
     hour_angle_sunrise = HourAngleSunrise(value=hour_angle_sunrise, unit="radians")
-    hour_angle_sunrise = convert_to_degrees_if_requested(
-        hour_angle_sunrise,
-        angle_output_units,
-    )
+    # hour_angle_sunrise = convert_to_degrees_if_requested(
+    #     hour_angle_sunrise,
+    #     angle_output_units,
+    # )
 
     return hour_angle_sunrise

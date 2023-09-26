@@ -8,7 +8,7 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from typing import Annotated
 from typing import Optional
 from typing import List
-from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
+# from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
