@@ -83,6 +83,7 @@ from .rich_help_panel_names import rich_help_panel_solar_time
 from .rich_help_panel_names import rich_help_panel_earth_orbit
 from .rich_help_panel_names import rich_help_panel_atmospheric_properties
 from .rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.constants import ZENITH_NAME, ALTITUDE_NAME
 
 from .print import print_table
 from .print import print_solar_position_table
@@ -447,12 +448,12 @@ def zenith(
         angle_output_units=angle_output_units,
     )
     for model_result in solar_altitude:
-        solar_altitude_value = model_result.get('Altitude', None)
+        solar_altitude_value = model_result.get(ALTITUDE_NAME, None)
         if solar_altitude_value is not None:
             if angle_output_units == 'degrees':
-                model_result['Zenith'] = 90 - solar_altitude_value
+                model_result[ZENITH_NAME] = 90 - solar_altitude_value
             else:
-                model_result['Zenith'] = radians(90) - solar_altitude_value
+                model_result[ZENITH_NAME] = radians(90) - solar_altitude_value
     solar_zenith = solar_altitude
     # Update Me --- Zenith Comes First, Altitude Bases On It ! ---------------
     print_solar_position_table(

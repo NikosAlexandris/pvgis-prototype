@@ -1,5 +1,6 @@
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_noaa
 from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
+from pvgisprototype.constants import ALGORITHM_NAME, ALTITUDE_NAME, UNITS_NAME
 
 
 def model_fractional_year(
@@ -33,9 +34,9 @@ def calculate_fractional_year(
                 angle_output_units=angle_output_units,
             )
             results.append({
-                'Model': model.value,
-                'Altitude': fractional_year.value,
-                'Units': fractional_year.unit,  # Don't trust me -- Redesign Me!
+                ALGORITHM_NAME: model.value,
+                ALTITUDE_NAME: getattr(fractional_year, angle_output_units),
+                UNITS_NAME: fractional_year.unit,  # Don't trust me -- Redesign Me!
             })
 
     return results

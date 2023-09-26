@@ -7,17 +7,28 @@ from rich.table import Table
 from rich.panel import Panel
 from rich import box
 from typing import List
-
-
-DECLINATION_COLUMN_NAME = 'Declination'
-HOUR_ANGLE_COLUMN_NAME = 'Hour Angle'
-ZENITH_COLUMN_NAME = 'Zenith'
-ALTITUDE_COLUMN_NAME = 'Altitude'
-AZIMUTH_COLUMN_NAME = 'Azimuth'
-INCIDENCE_COLUMN_NAME = 'Incidence'
-UNITS_COLUMN_NAME = 'Units'
-UNITLESSS_COLUMN_NAME = 'Unitless'
-NOT_AVAILABLE_COLUMN_NAME = 'NA'
+from pvgisprototype.constants import (
+    ALGORITHM_COLUMN_NAME,
+    ALGORITHM_NAME,
+    ALTITUDE_COLUMN_NAME,
+    ALTITUDE_NAME,
+    AZIMUTH_COLUMN_NAME,
+    AZIMUTH_NAME,
+    DECLINATION_COLUMN_NAME,
+    DECLINATION_NAME,
+    HOUR_ANGLE_COLUMN_NAME,
+    HOUR_ANGLE_NAME,
+    INCIDENCE_COLUMN_NAME,
+    INCIDENCE_NAME,
+    SOLAR_TIME_MODEL_NAME,
+    SOLAR_TIME_MODEL_COLUMN_NAME,
+    UNITS_COLUMN_NAME,
+    UNITS_NAME,
+    ZENITH_COLUMN_NAME,
+    ZENITH_NAME,
+    NOT_AVAILABLE_COLUMN_NAME,
+    UNITLESSS_COLUMN_NAME,
+)
 
 
 def print_table(headers: List[str], data: List[List[str]]):
@@ -59,11 +70,12 @@ def print_solar_position_table(
     columns = ["Longitude", "Latitude", "Time", "Zone"]
     if user_requested_timestamp and user_requested_timezone:
         columns.extend(["Local Time", "Local Zone"])
-    columns.append("Model")
+    columns.append(SOLAR_TIME_MODEL_COLUMN_NAME)
     if declination is not None:
         columns.append(DECLINATION_COLUMN_NAME)
     if hour_angle is not None:
         columns.append(HOUR_ANGLE_COLUMN_NAME)
+    columns.append(ALGORITHM_COLUMN_NAME)
     if zenith is not None:
         columns.append(ZENITH_COLUMN_NAME)
     if altitude is not None:
@@ -73,19 +85,21 @@ def print_solar_position_table(
     if incidence is not None:
         columns.append(INCIDENCE_COLUMN_NAME)
     columns.append(UNITS_COLUMN_NAME)
+    
 
     # Create the table
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
     for model_result in rounded_table:
-        model_name = model_result.get('Model', '')
-        declination_value = model_result.get(DECLINATION_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination is not None else None
-        hour_angle_value = model_result.get(HOUR_ANGLE_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle is not None else None
-        zenith_value = model_result.get(ZENITH_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith is not None else None
-        altitude_value = model_result.get(ALTITUDE_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude is not None else None
-        azimuth_value = model_result.get(AZIMUTH_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth is not None else None
-        incidence_value = model_result.get(INCIDENCE_COLUMN_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence is not None else None
-        units = model_result.get(UNITS_COLUMN_NAME, UNITLESSS_COLUMN_NAME)
+        algorithm_name = model_result.get(ALGORITHM_NAME, '')
+        declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination is not None else None
+        hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle is not None else None
+        zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith is not None else None
+        altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude is not None else None
+        azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth is not None else None
+        incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence is not None else None
+        units = model_result.get(UNITS_NAME, UNITLESSS_COLUMN_NAME)
+        solar_time_model = model_result.get(SOLAR_TIME_MODEL_NAME, '')
 
         row = [str(longitude), str(latitude), str(timestamp), str(timezone)]
 
@@ -98,11 +112,12 @@ def print_solar_position_table(
         if user_requested_timestamp and user_requested_timezone:
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
-        row.append(model_name)
+        row.append(solar_time_model)
         if declination_value is not None:
             row.append(str(declination_value))
         if hour_angle_value is not None:
             row.append(str(hour_angle_value))
+        row.append(algorithm_name)
         if zenith_value is not None:
             row.append(str(zenith_value))
         if altitude_value is not None:
@@ -150,8 +165,8 @@ def print_noaa_solar_position_table(
         # solar_position_calculations['true_solar_time']
         # solar_position_calculations['solar_hour_angle']
         # solar_position_calculations['solar_zenith']
-        "Altitude",
-        "Azimuth",
+        ALTITUDE_COLUMN_NAME,
+        AZIMUTH_COLUMN_NAME,
         "Sunrise",
         'Noon',
         'Local solar time',
