@@ -31,9 +31,9 @@ def calculate_solar_azimuth_noaa(
         timestamp: datetime,
         timezone: str,
         apply_atmospheric_refraction: bool = True,
-        time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
-        angle_output_units: str = 'radians',
+        # time_output_units: str = 'minutes',
+        # angle_units: str = 'radians',
+        # angle_output_units: str = 'radians',
     )-> SolarAzimuth:
     """Calculate the solar azimith (θ) in radians
 
@@ -44,22 +44,22 @@ def calculate_solar_azimuth_noaa(
     """
     solar_declination = calculate_solar_declination_noaa(
         timestamp,
-        angle_units,
-        'radians',
+        # angle_units,
+        # 'radians',
     )
     solar_hour_angle = calculate_solar_hour_angle_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        time_output_units=time_output_units,
-        angle_output_units='radians',
+        # time_output_units=time_output_units,
+        # angle_output_units='radians',
     )
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
         timestamp=timestamp,
         solar_hour_angle=solar_hour_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        angle_output_units='radians',
+        # angle_output_units='radians',
     )
                          # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
     # cos(180 - θ) = -  -----------------------------------------------------------
@@ -95,7 +95,7 @@ def calculate_solar_azimuth_noaa(
         raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
 
 
-    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+    # solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
 
     return solar_azimuth
 

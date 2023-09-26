@@ -1,7 +1,7 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import SolarHourAnglePVLIBInput
-from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype import Longitude
 from datetime import datetime
 from pvgisprototype import SolarHourAngle
@@ -14,7 +14,7 @@ import pandas as pd
 def calculate_solar_hour_angle_pvlib(
     longitude: Longitude,
     timestamp: datetime, 
-    angle_output_units: str = 'radians',
+    # angle_output_units: str = 'radians',
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
     """
@@ -36,6 +36,6 @@ def calculate_solar_hour_angle_pvlib(
     if not -180 <= solar_hour_angle.degrees <= 180:
         raise ValueError(f'The calculated hour angle {solar_hour_angle} is out of the expected range [{-180}, {180}] degrees')
 
-    solar_hour_angle = convert_to_radians_if_requested(solar_hour_angle, angle_output_units)
+    # solar_hour_angle = convert_to_radians_if_requested(solar_hour_angle, angle_output_units)
 
     return solar_hour_angle

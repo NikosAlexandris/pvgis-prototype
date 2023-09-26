@@ -39,7 +39,7 @@ def calculate_relative_longitude(
         latitude: Latitude,
         surface_tilt: float = 0,
         surface_orientation: float = 0,
-        angle_output_units: str = 'radians',
+        # angle_output_units: str = 'radians',
     ) -> RelativeLongitude:
     """
     """
@@ -74,7 +74,7 @@ def calculate_relative_longitude(
 
     relative_longitude = RelativeLongitude(
         value=atan(tangent_relative_longitude),
-        unit=angle_output_units,
+        unit='radians'     # angle_output_units,
     )
     return relative_longitude
 
@@ -85,7 +85,7 @@ def calculate_solar_incidence_jenco(
         latitude: Latitude,
         timestamp: datetime,
         timezone: ZoneInfo,
-        hour_angle: SolarHourAngle,
+        # hour_angle: SolarHourAngle,
         random_time: bool = False,
         surface_tilt: float = None,
         surface_orientation: float = None,
@@ -95,9 +95,9 @@ def calculate_solar_incidence_jenco(
         days_in_a_year: float = 365.25,
         eccentricity_correction_factor: float = 0.03344,
         perigee_offset: float = 0.048869,
-        time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
-        angle_output_units: str = 'radians',
+        # time_output_units: str = 'minutes',
+        # angle_units: str = 'radians',
+        # angle_output_units: str = 'radians',
         verbose: int = 0,
     ) -> SolarIncidence:
     """Calculate the solar incidence based on sun's position and surface geometry.
@@ -190,8 +190,8 @@ def calculate_solar_incidence_jenco(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
-            time_output_units=time_output_units,
-            angle_output_units=angle_output_units,
+            # time_output_units=time_output_units,
+            # angle_output_units=angle_output_units,
         )
         relative_longitude = calculate_relative_longitude(
             latitude=latitude,
@@ -203,7 +203,7 @@ def calculate_solar_incidence_jenco(
         )
         solar_incidence = SolarIncidence(
             value=asin(sine_solar_incidence),
-            unit=angle_output_units
+            unit='radians'
         )
 
     # return max(NO_SOLAR_INCIDENCE, solar_incidence)

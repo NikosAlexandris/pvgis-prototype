@@ -19,8 +19,8 @@ def calculate_local_solar_time_noaa(
         timezone: ZoneInfo,
         refracted_solar_zenith: RefractedSolarZenith,  # radians
         apply_atmospheric_refraction: bool = False,
-        time_output_units: str = 'hours',
-        angle_units: str = 'radians',
+        # time_output_units: str = 'hours',
+        # angle_units: str = 'radians',
         # angle_output_units: str = 'radians',
         verbose: int = 0,
     ) -> SolarTime:
@@ -45,8 +45,8 @@ def calculate_local_solar_time_noaa(
             event='noon',
             refracted_solar_zenith=refracted_solar_zenith,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
             # angle_output_units=angle_output_units,
             )
 

@@ -36,7 +36,7 @@ import numpy as np
 
 class CalculateFractionalYearNOAAInput(
     BaseTimestampModel,
-    AngleInRadiansOutputUnitsModel,
+    # AngleInRadiansOutputUnitsModel,
 ):
     pass
 
@@ -149,9 +149,9 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
 class CalculateSolarAzimuthNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -170,7 +170,7 @@ class CalculateEventHourAngleNOAAInput(
     LatitudeModel,
     BaseTimestampModel,
     RefractedSolarZenithModel,
-    BaseAngleUnitsModel,
+    # BaseAngleUnitsModel,
     # BaseAngleOutputUnitsModel,
 ):
 
@@ -192,8 +192,8 @@ class CalculateEventTimeNOAAInput(
     RefractedSolarZenithModel,
     BaseTimeEventModel,
     BaseApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
     # BaseAngleOutputUnitsModel,
 ):
     pass
@@ -203,8 +203,8 @@ class CalculateLocalSolarTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
     RefractedSolarZenithModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
     # BaseAngleOutputUnitsModel,
 ):
     verbose: int = 0
@@ -215,9 +215,9 @@ class CalculateSolarPositionNOAAInput(
     BaseTimeModel,
     RefractedSolarZenithModel,
     BaseApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
 
     @field_validator('refracted_solar_zenith')

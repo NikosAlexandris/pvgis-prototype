@@ -31,8 +31,8 @@ def model_solar_time(
     eccentricity_correction_factor: float = 0.03344,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    time_output_units: str = "minutes",
-    angle_units: str = "radians",
+    # time_output_units: str = "minutes",
+    # angle_units: str = "radians",
     # angle_output_units: str = "radians",
 )->SolarTime:
     """Calculates the solar time and returns the calculated value and the units.
@@ -82,7 +82,7 @@ def model_solar_time(
             timezone=timezone,
             refracted_solar_zenith=refracted_solar_zenith,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            time_output_units=time_output_units,
+            # time_output_units=time_output_units,
             # angle_output_units=angle_output_units,
             # verbose,
             )
@@ -114,8 +114,8 @@ def calculate_solar_time(
     eccentricity_correction_factor: float = 0.03344,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    time_output_units: str = "minutes",
-    angle_units: str = "radians",
+    # time_output_units: str = "minutes",
+    # angle_units: str = "radians",
     angle_output_units: str = "radians",
 ) -> List:
     """Calculates the solar time using all models and returns the results in a table.
@@ -144,7 +144,7 @@ def calculate_solar_time(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                time_output_units=time_output_units,
+                # time_output_units=time_output_units,
                 # angle_output_units=angle_output_units,
             )
             results.append({
