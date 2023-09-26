@@ -26,6 +26,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import attach_timezone
+from pvgisprototype.constants import ALGORITHM_NAME, AZIMUTH_NAME, UNITS_NAME
 
 
 def convert_south_to_north_degrees_convention(azimuth_south_degrees):
@@ -229,9 +230,9 @@ def calculate_solar_azimuth(
                 # angle_output_units=angle_output_units,
             )
             results.append({
-                'Model': model.value,
-                'Azimuth': getattr(solar_azimuth, angle_output_units),
-                'Units': angle_output_units,  # Don't trust me -- Redesign Me!
+                ALGORITHM_NAME: model.value,
+                AZIMUTH_NAME: getattr(solar_azimuth, angle_output_units),
+                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results

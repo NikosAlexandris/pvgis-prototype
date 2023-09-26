@@ -5,6 +5,7 @@ from pvgisprototype.api.geometry.solar_declination import calculate_solar_declin
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_five_years
+from pvgisprototype.constants import DECLINATION_NAME, UNITS_NAME
 import numpy as np
 import random
 import datetime
@@ -57,8 +58,8 @@ def test_calculate_solar_declination(
     )
     model_result = calculated[0]
     model_name = model_result.get("Model", "")
-    calculated_value = model_result.get("Declination", "NA")
-    calculated_unit = model_result.get("Units", "")
+    calculated_value = model_result.get(DECLINATION_NAME, "NA")
+    calculated_unit = model_result.get(UNITS_NAME, "")
     assert pytest.approx(expected_value, tolerance) == calculated_value
     assert expected_unit == calculated_unit
 

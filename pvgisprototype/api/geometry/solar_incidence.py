@@ -19,6 +19,9 @@ from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import ALGORITHM_NAME
+from pvgisprototype.constants import INCIDENCE_NAME
+from pvgisprototype.constants import UNITS_NAME
 
 
 def model_solar_incidence(
@@ -147,9 +150,9 @@ def calculate_solar_incidence(
             )
             results.append(
                 {
-                    "Model": model.value,
-                    "Incidence": solar_incidence.value,
-                    "Units": solar_incidence.unit,  # Don't trust me -- Redesign Me!
+                    ALGORITHM_NAME: model.value,
+                    INCIDENCE_NAME: getattr(solar_incidence, angle_output_units),
+                    UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
                 }
             )
     return results
