@@ -497,21 +497,21 @@ def calculate_direct_inclined_irradiance_pvgis(
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
-    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvis,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
+    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvlib,
     solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the direct irradiance incident on a tilted surface [W*m-2] 
@@ -568,41 +568,55 @@ def calculate_direct_inclined_irradiance_pvgis(
 
     # calculate solar declination + C3x geometry parameters
     solar_declination = model_solar_declination(
-            timestamp=timestamp,
-            timezone=timezone,
-            model=solar_declination_model,
-            days_in_a_year=days_in_a_year,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            perigee_offset=perigee_offset,
-            angle_output_units=angle_output_units,
-            )
-    solar_time = model_solar_time(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            model=solar_time_model,
-            refracted_solar_zenith=refracted_solar_zenith,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
+        timestamp=timestamp,
+        timezone=timezone,
+        model=solar_declination_model,
+        days_in_a_year=days_in_a_year,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        perigee_offset=perigee_offset,
+        angle_output_units=angle_output_units,
     )
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+    solar_time = model_solar_time(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        model=solar_time_model,
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+    )
+    hour_angle = calculate_hour_angle(
+        solar_time=solar_time,
+        angle_output_units=angle_output_units,
+    )
 
     # calculate C3x geometry parameters for inclined surface
     relative_latitude = math.asin(sine_relative_latitude)
     C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination.value)
     C33_inclined = math.sin(relative_latitude) * math.sin(solar_declination.value)
 
+    # Left-over comment from ? -----------------------------------------------
+    # cos(hour_angle - relative_longitude) = C33_inclined / C31_inclined
+    # ------------------------------------------------------------------------
+
+    relative_longitude = calculate_relative_longitude(
+        latitude,
+        surface_tilt,
+        surface_orientation,
+        angle_output_units=angle_output_units,
+    )
     # calculate solar incidence angle
-    sine_solar_incidence_angle = C31_inclined * math.cos (hour_angle - relative_longitude) + C33_inclined
+    sine_solar_incidence_angle = (
+        C31_inclined * math.cos(hour_angle.value - relative_longitude.value) + C33_inclined
+    )
 
     #
     # ----------------------------------------------------- make it a function
