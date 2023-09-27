@@ -10,6 +10,7 @@ from pvgisprototype.validation.parameters import ElevationModel
 # When?
 from pvgisprototype.validation.parameters import BaseTimestampModel
 from pvgisprototype.validation.parameters import BaseTimeModel
+from pvgisprototype.validation.parameters import BaseTimeSeriesModel
 
 # Atmospheric effects
 from pvgisprototype.validation.parameters import ApplyAtmosphericRefraction
@@ -99,6 +100,7 @@ class ModelSolarTimeInputModel(
     TimeOffsetModel,
     HourOffsetModel,
     VerbosityModel,
+    BaseTimeSeriesModel,
     TimeOffsetModel,
     HourOffsetModel,
     SolarTimeModelModel,
@@ -239,6 +241,7 @@ class ModelSolarAltitudeInputModel(
     pass
 
 
+    BaseTimeSeriesModel,
     TimeOffsetModel,
     HourOffsetModel,
 class ModelSolarAzimuthInputModel(
@@ -310,6 +313,7 @@ class CalculateSolarIncidenceJencoInputModel(
     VerbosityModel,
 ):
     hour_angle: float
+    BaseTimeSeriesModel,
     VerbosityModel,
 
 
