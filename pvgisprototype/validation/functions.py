@@ -23,6 +23,7 @@ from pvgisprototype.validation.parameters import EarthOrbitModel
 from pvgisprototype.validation.parameters import SolarTimeModelModel
 from pvgisprototype.validation.parameters import SolarTimeModel
 from pvgisprototype.validation.parameters import TimeOffsetModel
+from pvgisprototype.validation.parameters import HourOffsetModel
 from pvgisprototype.validation.parameters import BaseTimeOutputUnitsModel
 from pvgisprototype.validation.parameters import RandomTimeModel
 
@@ -96,7 +97,9 @@ class ModelSolarTimeInputModel(
     BaseTimeModel,
     EarthOrbitModel,
     TimeOffsetModel,
+    HourOffsetModel,
     VerbosityModel,
+    HourOffsetModel,
     SolarTimeModelModel,
     BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -166,6 +169,7 @@ class CalculateSolarAltitudePVISInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
+    HourOffsetModel,
     SolarTimeModelModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
@@ -207,6 +211,7 @@ class CalculateSolarAzimuthPVISInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
+    HourOffsetModel,
     SolarTimeModelModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
@@ -224,6 +229,7 @@ class ModelSolarAltitudeInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
+    HourOffsetModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -231,6 +237,7 @@ class ModelSolarAltitudeInputModel(
     pass
 
 
+    HourOffsetModel,
 class ModelSolarAzimuthInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
@@ -240,6 +247,7 @@ class ModelSolarAzimuthInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
+    HourOffsetModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -257,6 +265,7 @@ class ModelSolarPositionInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
+    HourOffsetModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
