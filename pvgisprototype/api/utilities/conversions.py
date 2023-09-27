@@ -43,15 +43,14 @@ def convert_float_to_degrees_if_requested(angle: float, output_units: str) -> fl
 
 def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
     """Convert angle from radians to degrees if requested"""
+    from copy import deepcopy
+    copy_of_data_class = deepcopy(data_class)
     if output_units == 'degrees' and not data_class.unit == 'degrees':
-        data_class.value = degrees(data_class.value)
-        data_class.unit = 'degrees'
-    return data_class
+        copy_of_data_class.value = degrees(data_class.value)
+        copy_of_data_class.unit = 'degrees'
+    return copy_of_data_class
 
 
-# def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
-#     """Convert angle from degrees to radians if requested."""
-#     return np.radians(angle) if output_units == 'radians' else angle
 def convert_series_to_degrees_if_requested(
     data_class_series: List[Any],
     angle_output_units: str,
