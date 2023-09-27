@@ -176,39 +176,57 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
         verbose: int = 0,
     ):
     """Adjust solar zenith for atmospheric refraction for a time series of solar zenith angles"""
+    is_scalar = False
+    if isinstance(solar_zenith_series, SolarZenith):
+        is_scalar=True
+        solar_zenith_series = [solar_zenith_series.value]
+    else:
+        solar_zenith_series = [zenith.value for zenith in solar_zenith_series]
+
     atmospheric_refraction_functions = {
         'high_solar_altitude': np.vectorize(atmospheric_refraction_for_high_solar_altitude),
         'near_horizon': np.vectorize(atmospheric_refraction_for_near_horizon),
         'below_horizon': np.vectorize(atmospheric_refraction_for_below_horizon)
     }
 
-    solar_altitudes = np.radians(90) - solar_zenith_series  # in radians
-    adjusted_solar_zeniths = np.copy(solar_zenith_series)
+    solar_zenith_series_array = np.array(solar_zenith_series)
+    solar_altitude_series_array = np.radians(90) - np.array(solar_zenith_series_array)  # in radians
+    adjusted_solar_zenith_series_array = np.copy(solar_zenith_series_array)
 
-    mask_high = solar_altitudes > np.radians(5)
-    mask_near = (solar_altitudes > np.radians(-0.575)) & ~mask_high
-    mask_below = solar_altitudes <= np.radians(-0.575)
+    # mask for different altitude levels
+    mask_high = solar_altitude_series_array > np.radians(5)
+    mask_near = (solar_altitude_series_array > np.radians(-0.575)) & ~mask_high
+    mask_below = solar_altitude_series_array <= np.radians(-0.575)
 
+    # Vectorized functions
     function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).value)
     function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).value)
     function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).value)
 
+    # Adjust
     if mask_high.any():
-        adjusted_solar_zeniths[mask_high] -= function_high(solar_altitudes[mask_high])
+        adjusted_solar_zenith_series_array[mask_high] -= function_high(solar_altitude_series_array[mask_high])
     if mask_near.any():
-        adjusted_solar_zeniths[mask_near] -= function_near(solar_altitudes[mask_near])
+        adjusted_solar_zenith_series_array[mask_near] -= function_near(solar_altitude_series_array[mask_near])
     if mask_below.any():
-        adjusted_solar_zeniths[mask_below] -= function_below(solar_altitudes[mask_below])
+        adjusted_solar_zenith_series_array[mask_below] -= function_below(solar_altitude_series_array[mask_below])
 
-    if not np.all(np.isfinite(adjusted_solar_zeniths)) or not np.all((0 <= adjusted_solar_zeniths) & (adjusted_solar_zeniths <= np.pi + 0.0146)):
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {np.pi + 0.0146}] radians')
 
+    # Validate
+    if not np.all(np.isfinite(adjusted_solar_zenith_series_array)) or not np.all((0 <= adjusted_solar_zenith_series_array) & (adjusted_solar_zenith_series_array <= np.pi + 0.0146)):
+        raise ValueError(f'The `adjusted_solar_zenith` should be a finite number ranging in [0, {np.pi + 0.0146}] radians')
+
+    if not is_scalar:
+        adjusted_solar_zenith_series = [SolarZenith(value=value, unit='radians') for value in adjusted_solar_zenith_series_array]
+    else:
+        adjusted_solar_zenith_series = SolarZenith(value=adjusted_solar_zenith_series_array[0], unit='radians')
+    
     if angle_output_units == 'degrees':
-        adjusted_solar_zeniths = np.degrees(adjusted_solar_zeniths)
+        adjusted_solar_zenith_series = convert_series_to_degrees_if_requested(adjusted_solar_zenith_series, angle_output_units)
 
     if verbose == 3:
         debug(locals())
-    return adjusted_solar_zeniths
+    return adjusted_solar_zenith_series
 
 
 @validate_with_pydantic(CalculateSolarZenithNOAAInput)
