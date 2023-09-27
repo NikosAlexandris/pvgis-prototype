@@ -52,6 +52,7 @@ from .typer_parameters import typer_option_angle_units
 from .typer_parameters import typer_option_angle_output_units
 from .typer_parameters import typer_option_rounding_places
 from .typer_parameters import typer_option_verbose
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 
 
 app = typer.Typer(
@@ -77,23 +78,23 @@ console = Console()
 #             )
 #     typer.echo(f'Solar time: {hour_angle} ({timezone})')
 
-
-@app.command('fractional-year', no_args_is_help=True, help='⦩ Calculate the fractional year')
-def fractional_year():
+@app.command('fractional-year', no_args_is_help=True, help=f'⦩ Calculate the fractional year {NOT_IMPLEMENTED_CLI}')
+def fractional_year(
+):
     """
     """
     pass
 
 
-@app.command('eot', no_args_is_help=True, help='⦩ Calculate the equation of time')
+@app.command('eot', no_args_is_help=True, help=f'⦩ Calculate the equation of time {NOT_IMPLEMENTED_CLI}')
 def equation_of_time(
-        ):
+):
     """
     """
     pass
 
 
-@app.command('offset', no_args_is_help=True, help='⦩ Calculate the time offset')
+@app.command('offset', no_args_is_help=True, help=f'⦩ Calculate the time offset {NOT_IMPLEMENTED_CLI}')
 def offset(
         ):
     """
@@ -184,15 +185,15 @@ def solar_time(
     console.print(solar_time_table)
 
 
-@app.command('local', no_args_is_help=True, help='⦩ Calculate the local time')
+@app.command('local', no_args_is_help=True, help=f'⦩ Calculate the local time {NOT_IMPLEMENTED_CLI}')
 def local(
-        ):
+):
     """
     """
     pass
 
 
-@app.command('correction', no_args_is_help=True, help='⦩ Calculate the time correction')
+@app.command('correction', no_args_is_help=True, help=f'⦩ Calculate the time correction {NOT_IMPLEMENTED_CLI}')
 def correction(
         ):
     """
