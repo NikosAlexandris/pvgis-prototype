@@ -31,10 +31,11 @@ def load_or_open_dataarray(function, filename_or_obj, mask_and_scale):
 
 
 def open_data_array(
-        netcdf: str,
-        mask_and_scale=False,
-        in_memory: bool = False,
-        ):
+    netcdf: str,
+    mask_and_scale: bool = False,
+    in_memory: bool = False,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
     """
     """
     # try:
@@ -56,12 +57,13 @@ def open_data_array(
     #         typer.echo(f"Could not open the data: {str(exc)}")
     #         raise typer.Exit(code=33)
     if in_memory:
-        print('In memory')
+        if verbose > 0:
+            print('In memory')
         return load_or_open_dataarray(xr.load_dataarray, netcdf, mask_and_scale)
     else:
-        print('Open file')
+        if verbose > 0:
+            print('Open file')
         return load_or_open_dataarray(xr.open_dataarray, netcdf, mask_and_scale)
-
 
 
 def get_scale_and_offset(netcdf):
