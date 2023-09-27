@@ -31,8 +31,15 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 
 MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
 
-# Where?
 
+# Generic input/output
+
+
+class VerbosityModel(BaseModel):
+    verbose: int = 0
+
+
+# Where?
 
 class LongitudeModel(BaseModel):
     longitude: Union[confloat(ge=-pi, le=pi), Longitude]
@@ -70,7 +77,6 @@ class BaseCoordinatesModel(
 
 
 # When?
-
 
 class BaseTimestampModel(BaseModel):
     timestamp: datetime
@@ -118,11 +124,18 @@ class BaseTimeSeriesModel(BaseTimestampSeriesModel):
 
 class TimeOffsetModel(BaseModel):
     time_offset_global: float = 0
+
+
+class HourOffsetModel(BaseModel):
     hour_offset: float = 0
 
 
 class RandomTimeModel(BaseModel):
     random_time: bool
+
+
+class RandomTimeSeriesModel(BaseModel):
+    random_time_series: bool
 
 
 class BaseTimeOutputUnitsModel(BaseModel):
@@ -138,7 +151,6 @@ class BaseTimeOutputUnitsModel(BaseModel):
 
 
 # Angular units
-
 
 class BaseAngleUnitsModel(BaseModel):
     angle_units: str
@@ -183,7 +195,6 @@ class BaseAngleOutputUnitsModel(BaseModel):
 
 
 # Solar geometry
-
 
 class SolarDeclinationModel(BaseModel):
     solar_declination: Union[confloat(ge=0, le=pi), SolarDeclination]
@@ -230,7 +241,6 @@ class SolarTimeModel(BaseModel):
 
 
 # Solar surface
-
 
 class SurfaceTiltModel(BaseModel):
     surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt]
@@ -321,7 +331,19 @@ class RefractedSolarAltitudeModel(BaseModel):
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_altitude`")
 
 
+class RefractedSolarAltitudeSeriesModel(BaseModel):
+    refracted_solar_altitude_series: Union[RefractedSolarAltitude, Sequence[RefractedSolarAltitude]]
+
+    # @field_validator("refracted_solar_altitude")
+    # def validate_refracted_solar_altitude(cls, input) -> RefractedSolarAltitude:
+    #     if isinstance(input, RefractedSolarAltitude):
+    #         return input
+    #     elif isinstance(input, float):
+    #         return RefractedSolarAltitude(value=input, unit="radians")
+    #     else:
     #         raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_altitude`")
+
+
 class RefractedSolarZenithModel(BaseModel):
     refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith]
 
