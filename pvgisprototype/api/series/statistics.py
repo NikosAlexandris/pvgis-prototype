@@ -15,21 +15,20 @@ def calculate_series_statistics(data_array):
         'End': data_array.time.values[-1],
         'Count': data_array.count().values,
         'Min': data_array.min().values,
+        '25th Percentile': np.percentile(data_array, 25),
         'Mean': data_array.mean().values,
         'Median': data_array.median().values,
         'Mode': mode(data_array.values.flatten())[0],
         'Max': data_array.max().values,
+        'Sum': data_array.sum().values,
         'Variance': data_array.var().values,
         'Standard deviation': data_array.std().values,
-        'Sum': data_array.sum().values,
-        'Index of Max': data_array.argmax().values,
-        # 'Max value longitude': data_array.argmax('lon').values,
-        # 'Max value latitude': data_array.argmax('lat').values,
+        'Time of Min': data_array.idxmin('time').values,
+        'Index of Min': data_array.argmin().values,
         'Time of Max': data_array.idxmax('time').values,
-        'Idex of Min': data_array.argmin().values,
-        'Time of Min': data_array.idxmin().values,
-        # sum = location_time_series.where(location_time_series > 0).sum()
-        # '25th Percentile': np.percentile(data_array, 25),
+        'Index of Max': data_array.argmax().values,
+        # 'Longitude of Max': data_array.argmax('lon').values,
+        # 'Latitude of Max': data_array.argmax('lat').values,
     }
     return statistics
 
@@ -69,14 +68,10 @@ def print_series_statistics(statistics, title='Time series'):
 
     # Index of items
     index_metadata = [
-        'Index of Max', 
-        # 'Max value longitude': data_array.argmax('lon').values,
-        # 'Max value latitude': data_array.argmax('lat').values,
-        'Time of Max',
-        'Idex of Min',
         'Time of Min',
-        # sum = location_time_series.where(location_time_series > 0).sum()
-        # '25th Percentile': np.percentile(data_array, 25),
+        'Index of Min',
+        'Time of Max',
+        'Index of Max', 
         ]
 
     # Add statistics
