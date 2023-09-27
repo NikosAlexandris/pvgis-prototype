@@ -1,24 +1,45 @@
-import typer
-from typing import Annotated
-from typing import Optional
-from math import sin, cos, acos
-from ...api.utilities.conversions import convert_to_radians
-from ...api.utilities.conversions import convert_to_degrees_if_requested
+from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateSolarIncidencePVISInputModel
 from pvgisprototype import SolarIncidence
+from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.validation.functions import CalculateSolarIncidenceInputModel
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
+from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
+from math import sin
+from math import cos
+from math import acos
 
 
-@validate_with_pydantic(CalculateSolarIncidenceInputModel)
-def calculate_solar_incidence(
-        latitude: Latitude,
-        solar_declination: float = 0,
-        surface_tilt: float = 0,
-        surface_orientation: float = 180,
-        hour_angle: float = None,
-        angle_output_units: str = 'radians',
-    ) -> SolarIncidence:
+@validate_with_pydantic(CalculateSolarIncidencePVISInputModel)
+def calculate_solar_incidence_pvis(
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: ZoneInfo,
+    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    # solar_declination: float = 0,
+    surface_tilt: float = 0,
+    surface_orientation: float = 180,
+    # hour_angle: float = None,
+    apply_atmospheric_refraction: bool = True,
+    refracted_solar_zenith: float = 1.5853349194640094,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: str = 'minutes',
+    angle_units: str = 'radians',
+    angle_output_units: str = 'radians',
+) -> SolarIncidence:
     """Calculate the angle of incidence (θ) between the direction of the sun
     ray and the line normal to the surface measured in radian.
 
@@ -63,11 +84,39 @@ def calculate_solar_incidence(
 
     Returns
     -------
-
     solar_incidence: float
         The angle of incidence (θ) is the angle between the direction of the
         sun ray and the line normal to the surface measured in radian.
     """
+    solar_declination = calculate_solar_declination_pvis(
+        timestamp=timestamp,
+        timezone=timezone,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        angle_output_units=angle_output_units,
+    )
+    solar_time = model_solar_time(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        solar_time_model=solar_time_model,  # returns datetime.time object
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+    )
+    hour_angle = calculate_solar_hour_angle_pvis(
+        solar_time=solar_time,
+        angle_output_units=angle_output_units,
+    )
     solar_incidence = acos(
         sin(latitude.value)
         * (
@@ -75,13 +124,13 @@ def calculate_solar_incidence(
             * cos(surface_tilt.value)
             + cos(solar_declination.value)
             * cos(surface_orientation.value)
-            * cos(hour_angle)
+            * cos(hour_angle.value)
             * sin(surface_tilt.value)
         )
         + cos(latitude.value)
         * (
             cos(solar_declination.value)
-            * cos(hour_angle)
+            * cos(hour_angle.value)
             * cos(surface_tilt.value)
             - sin(solar_declination.value)
             * cos(surface_orientation.value)
@@ -89,7 +138,8 @@ def calculate_solar_incidence(
         )
         + cos(solar_declination.value)
         * sin(surface_orientation.value)
-        * sin(hour_angle)
+        * sin(hour_angle.value)
         * sin(surface_tilt.value)
     )
+
     return SolarIncidence(value=solar_incidence, unit=angle_output_units)
