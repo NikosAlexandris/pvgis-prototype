@@ -1,3 +1,4 @@
+from devtools import debug
 import logging
 import typer
 from typing import Annotated
@@ -86,23 +87,16 @@ def calculate_solar_position_skyfield(
     planets = skyfield.api.load('de421.bsp')
     sun = planets['Sun']
     earth = planets['Earth']
-    N = skyfield.api.N
-    W = skyfield.api.W
-    E = skyfield.api.E
-
-    if longitude.value < 0:
-        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value * W)  # W or E ?
-    if longitude.value > 0:
-        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value * E)  # W or E ?
-    else:
-        location = skyfield.api.wgs84.latlon(latitude.value * N, longitude.value)  # ?
+    # N = skyfield.api.N
+    # W = skyfield.api.W
+    # E = skyfield.api.E
+    location = skyfield.api.wgs84.latlon(latitude.value, longitude.value)
 
     # sun position seen from observer location
     timescale = skyfield.api.load.timescale()
     requested_timestamp = timescale.from_datetime(timestamp)
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
 
-    # solar_position = SolarPosition(value=solar_position, unit=angle_output_units)
     return solar_position
 
 
