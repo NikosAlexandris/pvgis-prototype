@@ -696,14 +696,14 @@ def calculate_direct_inclined_irradiance_pvgis(
                 linke_turbidity_factor=linke_turbidity_factor,
                 )
     else:  # read from a time series dataset
-        time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
         longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
         latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
         direct_horizontal_irradiance = select_time_series(
             time_series=direct_horizontal_component,
             longitude=longitude_for_selection,
             latitude=latitude_for_selection,
-            time=time,
+            timestamps=[timestamp],  # preserve input, feed it as needed!
             mask_and_scale=mask_and_scale,
             inexact_matches_method=inexact_matches_method,
             tolerance=tolerance,
