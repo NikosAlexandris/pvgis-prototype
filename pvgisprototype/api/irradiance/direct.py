@@ -30,6 +30,7 @@ from enum import Enum
 from rich import print
 from rich.console import Console
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
@@ -49,24 +50,30 @@ from pvgisprototype.constants import AOI_CONSTANTS
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
 from pvgisprototype import RefractedSolarAltitude
-from ..geometry.models import SolarDeclinationModels
-from ..geometry.models import SolarIncidenceModels
-from ..geometry.models import SolarTimeModels
-from ..geometry.solar_time import model_solar_time
-from ..utilities.conversions import convert_to_radians
-from ..utilities.conversions import convert_float_to_degrees_if_requested
-from ..utilities.conversions import convert_to_degrees_if_requested
-from ..utilities.conversions import convert_float_to_radians_if_requested
-from ..utilities.conversions import convert_to_radians_if_requested
-from ..utilities.conversions import convert_dictionary_to_table
-from ..utilities.timestamp import now_utc_datetimezone
-from ..utilities.timestamp import ctx_convert_to_timezone
-from ..utilities.timestamp import timestamp_to_decimal_hours
-from ..utilities.timestamp import ctx_attach_requested_timezone
-from ..utilities.timestamp import parse_timestamp
+from pvgisprototype import OpticalAirMass
+from pvgisprototype import RayleighThickness
+from pvgisprototype.api.geometry.models import SolarDeclinationModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
+from pvgisprototype.algorithms.jenco.solar_incidence import calculate_relative_longitude
+from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_float_to_radians_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+from pvgisprototype.api.utilities.conversions import convert_dictionary_to_table
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
+from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
+from pvgisprototype.api.utilities.timestamp import parse_timestamp
 from .loss import calculate_angular_loss_factor_for_direct_irradiance
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 
+from pvgisprototype.validation.functions import AdjustElevationInputModel
 from pvgisprototype.validation.functions import CalculateOpticalAirMassInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 
@@ -76,8 +83,17 @@ from pydantic import validator
 from math import radians
 from math import degrees
 from pathlib import Path
+from pvgisprototype.constants import OPTICAL_AIR_MASS_DEFAULT
+from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
+from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
-
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype import Elevation
 # from pvgisprototype.api.series.utilities import select_coordinates
 from pvgisprototype.cli.series import select_time_series
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -101,6 +117,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_c
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
@@ -118,6 +135,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
+from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 
 
 app = typer.Typer(
@@ -128,19 +147,6 @@ app = typer.Typer(
     help=f"Estimate the direct solar radiation",
 )
 console = Console()
-
-
-class DirectIrradianceComponents(str, Enum):
-    normal = 'normal'
-    on_horizontal_surface = 'horizontal'
-    on_inclined_surface = 'inclined'
-
-
-class MethodsForInexactMatches(str, Enum):
-    none = None # only exact matches
-    pad = 'pad' # ffill: propagate last valid index value forward
-    backfill = 'backfill' # bfill: propagate next valid index value backward
-    nearest = 'nearest' # use nearest valid index value
 
 
 # Forbid using --solar-time-model all wherever it does not make sense?
@@ -279,7 +285,6 @@ def calculate_refracted_solar_altitude(
 def calculate_optical_air_mass(
     elevation: Annotated[float, typer_argument_elevation],
     refracted_solar_altitude: Annotated[float, typer_argument_refracted_solar_altitude],
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
 ) -> float:
     """Approximate the relative optical air mass.
 
@@ -789,7 +794,7 @@ def calculate_direct_irradiance(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
     solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
