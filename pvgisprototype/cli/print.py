@@ -9,6 +9,7 @@ from rich import box
 from typing import List
 
 
+SURFACE_TILT_COLUMN_NAME = 'Tilt'
 DECLINATION_COLUMN_NAME = 'Declination'
 HOUR_ANGLE_COLUMN_NAME = 'Hour Angle'
 ZENITH_COLUMN_NAME = 'Zenith'
