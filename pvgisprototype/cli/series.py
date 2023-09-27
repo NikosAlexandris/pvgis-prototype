@@ -90,20 +90,23 @@ def warn_for_negative_longitude(
 @app.command(
     'select',
     no_args_is_help=True,
-    help='  Select time series over a location',             
+    help='  Select time series over a location',
 )
 def select_time_series(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    time: Annotated[Optional[str], typer_argument_time] = None,
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    # csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = 'series_in',
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -127,26 +130,66 @@ def select_time_series(
     logger.info(f'Scale factor : {scale_factor}, Offset : {add_offset}')
 
     if (longitude and latitude):
-        logger.info(f'Coordinates : {longitude}, {latitude}')
+        coordinates = f'Coordinates : {longitude}, {latitude}'
+        logger.info(coordinates)
 
-    data_array = open_data_array(
-            time_series,
-            mask_and_scale,
-            in_memory,
-            )
-    data_array = select_coordinates(
-        data_array=data_array,
+    location_time_series = select_location_time_series(
+        time_series,
         longitude=longitude,
         latitude=latitude,
-        time=time,
-        method=inexact_matches_method,
+        inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
         verbose=verbose,
     )
+    # ------------------------------------------------------------------------
+    if start_time or end_time:
+        timestamp = None  # we don't need a timestamp anymore!
 
-    if data_array.size == 1:
-        single_value = float(data_array.values)
-        warning = Fore.YELLOW + f'{exclamation_mark} The selection matches a single value : {single_value}' + Style.RESET_ALL
+        if start_time and not end_time:  # set `end_time` to end of series
+            end_time = location_time_series.time.values[-1]
+            # end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        elif end_time and not start_time:  # set `start_time` to beginning of series
+            start_time = location_time_series.time.values[0]
+            # start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        else:  # Convert `start_time` & `end_time` to the correct string format
+            # if isinstance(start_time, datetime):
+            start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
+            # if isinstance(end_time, datetime):
+            end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
+    
+        location_time_series = (
+            location_time_series.sel(time=slice(start_time, end_time))
+        )
+
+    if timestamps and not start_time and not end_time:
+        # convert timestamp to ISO format string without fractional seconds
+        # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        time_array = np.array([t.strftime('%Y-%m-%d %H:%M:%S') for t in timestamps])
+        if not nearest_neighbor_lookup:
+            inexact_matches_method = None
+        try:
+            location_time_series = (
+                location_time_series.sel(time=time_array, method=inexact_matches_method)
+            )
+        except KeyError:
+            print("No data found for one or more of the given timestamps.")
+
+    if location_time_series.size == 1:
+        single_value = float(location_time_series.values)
+        print(f'Indexes : {location_time_series.indexes}')
+        warning = (
+            Fore.YELLOW
+            + f"{exclamation_mark} The selected timestamp "
+            + Fore.GREEN
+            + f"{location_time_series[location_time_series.indexes].time.values}"
+            + Fore.YELLOW
+            + f" matches the single value "
+            + Fore.GREEN
+            + f'{single_value}'
+            + Style.RESET_ALL
+        )
         logger.warning(warning)
         if verbose > 0:
             typer.echo(Fore.YELLOW + warning)
@@ -154,21 +197,16 @@ def select_time_series(
             debug(locals())
         return single_value
 
-    # # if statistics_to_csv:
-    # #     series_statistics = calculate_series_statistics(data_array)
-    # #     export_statistics_to_csv(series_statistics)
-
-    # if csv:
-    #     data_array.to_pandas().to_csv(csv)
-
     # ---------------------------------------------------------- Remove Me ---
-    typer.echo(data_array.values)
+    typer.echo(location_time_series.values)
     # ---------------------------------------------------------- Remove Me ---
 
-    # echo statistics after series which might be Long!
+    # statistics after echoing series which might be Long!
     if statistics:
-        series_statistics = calculate_series_statistics(data_array)
-        print_series_statistics(series_statistics)
+        data_statistics = calculate_series_statistics(location_time_series)
+        print_series_statistics(data_statistics)
+        if csv:
+            export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
         # return print_series_statistics(series_statistics)
 
     # if output_filename:
@@ -176,10 +214,10 @@ def select_time_series(
     #     extension = output_filename.suffix.lower()
 
     #     if extension.lower() == '.nc':
-    #         data_array.to_time_series(output_filename)
+    #         location_time_series.to_time_series(output_filename)
 
     #     elif extension.lower() == '.csv':
-    #         data_array.to_pandas().to_csv(output_filename)
+    #         location_time_series.to_pandas().to_csv(output_filename)
 
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
@@ -189,7 +227,6 @@ def select_time_series(
     if verbose == 3:
         debug(locals())
     return location_time_series
-    return data_array
 
 
 @app.command(
