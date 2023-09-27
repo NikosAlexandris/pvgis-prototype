@@ -107,6 +107,7 @@ def calculate_hour_angle(
             = 13:54 or 1:54 pm
 
     Additional notes:
+
     Nomenclature from [1]_
 
     α [°] solar altitude angle
@@ -153,13 +154,6 @@ def calculate_hour_angle_sunrise(
 ) -> HourAngleSunrise:
     """Calculate the hour angle (ω) at sunrise and sunset
 
-    Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
-
-    The hour angle (ω) at sunrise and sunset measures the angular distance
-    between the sun at the local solar time and the sun at solar noon.
-
-    ω = acos(-tan(Φ-β)*tan(δ))
-
     Parameters
     ----------
 
@@ -183,6 +177,15 @@ def calculate_hour_angle_sunrise(
         Tuple containg (hour_angle, units). Hour angle (ω) is the angle at any
         instant through which the earth has to turn to bring the meridian of the
         observer directly in line with the sun's rays measured in radian.
+
+    Notes
+    -----
+    Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
+
+    The hour angle (ω) at sunrise and sunset measures the angular distance
+    between the sun at the local solar time and the sun at solar noon.
+
+    ω = acos(-tan(Φ-β)*tan(δ))
     """
     hour_angle_sunrise = acos(
         -tan(latitude.value - surface_tilt.value) * tan(solar_declination.value)
