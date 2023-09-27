@@ -1,20 +1,24 @@
+from devtools import debug
 import typer
 from datetime import time
 from typing import Annotated
 from typing import Optional
-from ...utilities.timestamp import convert_hours_to_seconds
+from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 from pvgisprototype import HourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateHourAngleInputModel
-from pvgisprototype.validation.functions import HourAngleSunriseInput
+from pvgisprototype.validation.functions import CalculateSolarHourAnglePVISInputModel
+from pvgisprototype.validation.functions import CalculateHourAngleSunriseInputModel
+from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
+from math import pi
 
 
-@validate_with_pydantic(CalculateHourAngleInputModel)
-def calculate_hour_angle(
+@validate_with_pydantic(CalculateSolarHourAnglePVISInputModel)
+def calculate_solar_hour_angle_pvis(
         solar_time: time,
         angle_output_units: str = 'radians',
     )-> HourAngle:
@@ -25,7 +29,7 @@ def calculate_hour_angle(
     Parameters
     ----------
 
-    hour_angle: float
+    solar_time: float
         The solar time (ST) is a calculation of the passage of time based on the
         position of the Sun in the sky. It is expected to be decimal hours in a
         24 hour format and measured internally in seconds. 
@@ -34,18 +38,26 @@ def calculate_hour_angle(
     --------
 
     hour_angle: float
-        Hour angle is the angle (ω) at any instant through which the earth has
-        to turn to bring the meridian of the observer directly in line with the
-        sun's rays measured in radian.
+        The solar hour angle (ω) is the angle at any instant through which the
+        earth has to turn to bring the meridian of the observer directly in
+        line with the sun's rays measured in radian.
+
+    Notes
+    -----
+    If not mistaken, in PVGIS' C source code, the conversion function is:
+
+        hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
+
+        where the solar time was given in seconds.
     """
-    # `solar_time` here received in seconds!
-    # hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
-    hour_angle = (solar_time / 3600 - 12) * 15 * pi / 180
-    hour_angle = HourAngle(input=hour_angle, unit='radians')
+    true_solar_time_minutes = timestamp_to_minutes(solar_time)
+    hour_angle = (true_solar_time_minutes / 60 - 12) * 15 * pi / 180
+    hour_angle = HourAngle(value=hour_angle, unit='radians')
     hour_angle = convert_to_degrees_if_requested(
             hour_angle,
             angle_output_units,
             )
+
     return hour_angle
 
 
