@@ -4,7 +4,9 @@ from rich.progress import track
 from rich import box
 from math import degrees
 from math import radians
+from math import pi
 import numpy as np
+from typing import List
 from typing import Any
 
 
@@ -94,6 +96,11 @@ def convert_series_to_degrees_if_requested(
 def convert_float_to_radians_if_requested(angle: float, output_units: str) -> float:
     """Convert angle from radians to radians if requested"""
     return radians(angle) if output_units == 'radians' else angle
+
+
+# def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
+#     """Convert angle from degrees to radians if requested."""
+#     return np.radians(angle) if output_units == 'radians' else angle
 
 
 def convert_to_radians_if_requested(data_input: Any, output_units: str) -> Any:
@@ -200,3 +207,11 @@ def round_float_values(obj, decimal_places=3):
 #         return obj
 #     else:
 #         return obj
+
+
+def convert_south_to_north_degrees_convention(azimuth_south_degrees):
+    return (azimuth_south_degrees + 180) % 360
+
+
+def convert_south_to_north_radians_convention(azimuth_south_radians):
+    return (azimuth_south_radians + pi) % (2 * pi)
