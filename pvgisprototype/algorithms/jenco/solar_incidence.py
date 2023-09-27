@@ -26,6 +26,7 @@ from pvgisprototype import Latitude
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel
 from pvgisprototype.validation.functions import CalculateSolarIncidenceJencoInputModel
+from pvgisprototype.validation.functions import CalculateSolarIncidenceTimeSeriesJencoInputModel
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -233,18 +234,22 @@ def calculate_solar_incidence_jenco(
     return solar_incidence
 
 
+@validate_with_pydantic(CalculateSolarIncidenceTimeSeriesJencoInputModel)
 def calculate_solar_incidence_time_series_jenco(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: np.array,
     timezone: Optional[ZoneInfo] = None,
+    random_time_series: bool = False,
     surface_tilt: float = 45,
     surface_orientation: float = 180,
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = 'minutes',
+    angle_units: str = 'radians',
     angle_output_units: str = 'radians',
+    verbose: int = 0,
 ) -> np.array:
     solar_incidence_angle_series = np.empty_like(timestamps, dtype=float)
 
@@ -254,8 +259,8 @@ def calculate_solar_incidence_time_series_jenco(
     )
     solar_declination_series = np.array([item.value for item in solar_declination_series])
     sine_relative_inclined_latitude = -(
-        cos(latitude.value) * sin(surface_tilt) * cos(surface_orientation)
-        + sin(latitude.value) * cos(surface_tilt)
+        cos(latitude.value) * sin(surface_tilt.value) * cos(surface_orientation.value)
+        + sin(latitude.value) * cos(surface_tilt.value)
     )
     relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
     c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
