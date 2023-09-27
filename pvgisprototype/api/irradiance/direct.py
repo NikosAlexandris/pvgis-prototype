@@ -179,9 +179,13 @@ def correct_linke_turbidity_factor(
     return -0.8662 * linke_turbidity_factor
 
 
+@app.command(
+    'refracted-solar-altitude',
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_geometry,
+)
 def calculate_refracted_solar_altitude(
     solar_altitude: Annotated[float, typer_argument_solar_altitude],
-    angle_input_units: Annotated[str, typer_option_angle_units] = 'degrees',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -200,9 +204,20 @@ def calculate_refracted_solar_altitude(
      0      0     0                                         
 
     This function implements the algorithm described by Hofierka :cite:`p:hofierka2002`.
+
+    Notes
+    -----
+
+    In PVGIS C source code the relevant code fragment is :
+
+	elevationCorr = exp(-sunVarGeom->z_orig / 8434.5);
+	temp1 = 0.1594 + locSolarAltitude * (1.123 + 0.065656 * locSolarAltitude);
+	temp2 = 1. + locSolarAltitude * (28.9344 + 277.3971 * locSolarAltitude);
+	drefract = 0.061359 * temp1 / temp2;    /* in radians */
+	h0refract = locSolarAltitude + drefract;
     """
-    if angle_input_units != "degrees":
-        raise ValueError(f"Only `degrees` are supported for `angle_input_units`.")
+    if solar_altitude.unit != "degrees":
+        raise ValueError(f"The atmospheric refraction equation expects the solar altitude angle in `degrees`!")
 
     atmospheric_refraction = (
         0.061359
@@ -211,11 +226,19 @@ def calculate_refracted_solar_altitude(
             + 1.123 * solar_altitude.value
             + 0.065656 * pow(solar_altitude.value, 2)
         )
-        / (1 + 28.9344 * solar_altitude.value + 277.3971 * pow(solar_altitude.value, 2))
+        / (
+            1
+            + 28.9344 * solar_altitude.value
+            + 277.3971 * pow(solar_altitude.value, 2)
+        )
     )
-    refracted_solar_altitude = solar_altitude.value + atmospheric_refraction
-    refracted_solar_altitude = convert_float_to_radians_if_requested(
-        refracted_solar_altitude, angle_output_units
+    refracted_solar_altitude = RefractedSolarAltitude(
+        value=solar_altitude.value + atmospheric_refraction,
+        unit=solar_altitude.unit,
+    )
+    refracted_solar_altitude = convert_to_radians_if_requested(
+        refracted_solar_altitude,
+        angle_output_units,
     )
 
     if verbose == 3:
