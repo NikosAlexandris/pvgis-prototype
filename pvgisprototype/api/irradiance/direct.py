@@ -444,11 +444,12 @@ def calculate_direct_normal_irradiance(
             * rayleigh_optical_thickness.value
         )
     )
+    if verbose > 1:
+        print(f'Direct normal irradiance = Extraterrestial normal irradiance * exp( Corrected Linke turbidity factor * Optical air mass * Rayleigh Optical Thickness )')
+    if verbose > 0:
+        print(f'Direct normal irradiance: {direct_normal_irradiance}')  # B0c
     if verbose == 3:
         debug(locals())
-    typer.echo(f'Direct normal irradiance = Extraterrestial normal irradiance * exp( Corrected Linke turbidity factor * Optical air mass * Rayleigh Optical Thickness )')
-    typer.echo(f'Direct normal irradiance: {direct_normal_irradiance}')  # B0c
-
     return direct_normal_irradiance  # B0c
 
 
@@ -538,7 +539,8 @@ def calculate_direct_horizontal_irradiance(
 
     # table_with_inputs = convert_dictionary_to_table(locals())
     # console.print(table_with_inputs)
-    typer.echo(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')  # B0c
+    if verbose > 0:
+        print(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')  # B0c
     if verbose == 3:
         debug(locals())
     return direct_horizontal_irradiance
@@ -719,7 +721,7 @@ def calculate_direct_inclined_irradiance_pvgis(
             debug(locals())
     except ZeroDivisionError:
         logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
-        typer.echo("Is the solar altitude angle zero?")
+        print("Is the solar altitude angle zero?")
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
@@ -738,7 +740,7 @@ def calculate_direct_inclined_irradiance_pvgis(
                     angle_of_incidence_constant = 0.155,
                     )
             direct_inclined_irradiance = modified_direct_horizontal_irradiance * angular_loss_factor
-            typer.echo(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {PVGIS})')  # B0c
+            print(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {PVGIS})')  # B0c
 
             return direct_inclined_irradiance
 
@@ -751,8 +753,8 @@ def calculate_direct_inclined_irradiance_pvgis(
             logging.error(f"Which Error? {e}")
             raise ValueError
 
-    typer.echo(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} (based on {solar_incidence_model})')  # B0c
-
+    if verbose > 0:
+        print(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} (based on {solar_incidence_model})')  # B0c
     if verbose == 3:
         debug(locals())
     return modified_direct_horizontal_irradiance
@@ -836,11 +838,11 @@ def calculate_direct_irradiance(
     # day_of_year = timestamp.timetuple().tm_yday
     # day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
     # if surface_tilt == 0:
-    #     typer.echo(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')
+    #     print(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')
     #     direct_horizontal_irradiance = calculate_direct_horizontal_irradiance()
     #     return direct_horizontal_irradiance  # Bhc
 
     # if surface_tilt != 0:
     #     direct_inclined_irradiance = calculate_direct_inclined_irradiance()
-    #     typer.echo(f'Direct inclined irradiance : {direct_inclined_irradiance}')
+    #     print(f'Direct inclined irradiance : {direct_inclined_irradiance}')
     #     return direct_inclined_irradiance  # Bic

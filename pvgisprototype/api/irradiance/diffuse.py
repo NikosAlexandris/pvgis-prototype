@@ -254,13 +254,13 @@ def calculate_diffuse_horizontal_component_from_sarah(
         )
         logging.warning(warning)
         if verbose > 0:
-            typer.echo(Fore.YELLOW + warning)
+            print(Fore.YELLOW + warning)
         if verbose == 3:
             debug(locals())
         return single_value
 
     # ---------------------------------------------------------- Remove Me ---
-    typer.echo(diffuse_horizontal_irradiance.values)
+    print(diffuse_horizontal_irradiance.values)
     # ---------------------------------------------------------- Remove Me ---
 
     # statistics after echoing series which might be Long!
@@ -271,7 +271,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
             export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
 
     if verbose > 0:
-        typer.echo(f'Series : {location_time_series.values}')
+        print(f'Series : {location_time_series.values}')
     if verbose == 3:
         debug(locals())
     return diffuse_horizontal_irradiance
@@ -679,9 +679,8 @@ def calculate_diffuse_inclined_irradiance(
     #     if csv:
     #         export_statistics_to_csv(data_statistics, 'diffuse_horizontal_component')
 
-    # ---------------------------------------------------------- Remove Me ---
-    typer.echo(diffuse_irradiance)
-    # ---------------------------------------------------------- Remove Me ---
+    if verbose > 0:
+        print(f'Diffuse irradiance : {diffuse_irradiance}')
     if verbose == 3:
         debug(locals())
 
