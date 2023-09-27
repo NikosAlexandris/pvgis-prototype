@@ -52,6 +52,7 @@ from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.series.statistics import export_statistics_to_csv
 
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 app = typer.Typer(
@@ -230,8 +231,8 @@ def select_time_series(
 
 
 @app.command(
-        no_args_is_help=True,
-        help='󰾂  Group-by of time series over a location',
+    no_args_is_help=True,
+    help=f'󰾂  Group-by of time series over a location {NOT_IMPLEMENTED_CLI}',
  )
 def resample(
     indexer: str = None,  # The offset string or object representing target conversion.
