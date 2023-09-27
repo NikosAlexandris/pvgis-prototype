@@ -10,6 +10,7 @@ from .time_offset import calculate_time_offset_noaa
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
@@ -113,8 +114,9 @@ def calculate_true_solar_time_time_series_noaa(
         timezone: Optional[ZoneInfo],
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
+        verbose: int = VERBOSE_LEVEL_DEFAULT,
     ) -> Sequence[datetime]:
-    true_solar_times = []
+    true_solar_time_series = []
     for timestamp in timestamps:
         time_offset = calculate_time_offset_noaa(
             longitude=longitude,
@@ -146,6 +148,6 @@ def calculate_true_solar_time_time_series_noaa(
                 second=int(seconds),
                 tzinfo=timestamp.tzinfo,
         )
-        true_solar_times.append(true_solar_time)
+        true_solar_time_series.append(true_solar_time)
 
-    return true_solar_times
+    return true_solar_time_series
