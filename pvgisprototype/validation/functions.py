@@ -30,6 +30,7 @@ from pvgisprototype.validation.parameters import RandomTimeModel
 
 # Solar geometry
 from pvgisprototype.validation.parameters import RefractedSolarAltitudeModel
+from pvgisprototype.validation.parameters import RefractedSolarAltitudeSeriesModel
 from pvgisprototype.validation.parameters import SolarDeclinationModel
 from pvgisprototype.validation.parameters import SolarPositionModel
 
@@ -333,3 +334,4 @@ class CalculateOpticalAirMassInputModel(
     #     if not v == valid_units:
     #         raise ValueError(f"angle_units must be {valid_units}")
     #     return v
+    RefractedSolarAltitudeSeriesModel,
