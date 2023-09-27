@@ -99,6 +99,7 @@ class ModelSolarTimeInputModel(
     TimeOffsetModel,
     HourOffsetModel,
     VerbosityModel,
+    TimeOffsetModel,
     HourOffsetModel,
     SolarTimeModelModel,
     BaseTimeOutputUnitsModel,
@@ -120,6 +121,7 @@ class CalculateSolarTimePVGISInputModel(
 
 class CalculateSolarTimeEoTInputModel(
     ModelSolarTimeInputModel
+    TimeOffsetModel,
     VerbosityModel,
 ):
     pass
@@ -237,6 +239,7 @@ class ModelSolarAltitudeInputModel(
     pass
 
 
+    TimeOffsetModel,
     HourOffsetModel,
 class ModelSolarAzimuthInputModel(
     BaseCoordinatesModel,
