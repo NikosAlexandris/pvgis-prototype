@@ -52,7 +52,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_temperature_time_series
 from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_time_series
 from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
@@ -184,7 +184,7 @@ def calculate_effective_irradiance(
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    direct_horizontal_irradiance: Annotated[Optional[Path], typer_argument_direct_horizontal_irradiance] = None,
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     temperature: Annotated[float, typer_argument_temperature_time_series] = 25,
     wind_speed: Annotated[float, typer_argument_wind_speed_time_series] = 0,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
