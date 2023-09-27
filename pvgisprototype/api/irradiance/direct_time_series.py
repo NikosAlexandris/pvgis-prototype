@@ -93,39 +93,63 @@ def calculate_refracted_solar_altitude_time_series(
     solar_altitude_series,#: np.ndarray,
     angle_input_units: str = 'degrees',
     angle_output_units: str = 'radians',
+    verbose: int = 0,
 ):
-    """Adjust the solar altitude angle for atmospheric refraction for a time series of solar altitudes.
+    """Adjust the solar altitude angle for atmospheric refraction for a time series.
     
+    Note
+    ----
     This function is vectorized to handle arrays of solar altitudes.
     """
     if angle_input_units != "degrees":
         raise ValueError("Only degrees are supported for angle_input_units.")
 
-    solar_altitude_values = np.array(
-        [solar_altitude.value for solar_altitude in solar_altitude_series]
-    )
+    is_scalar = False
+    if isinstance(solar_altitude_series, SolarAltitude):
+        is_scalar = True
+        solar_altitude_series = [solar_altitude_series.value]
+    else:
+        solar_altitude_series = [altitude.value for altitude in solar_altitude_series]
+
+    # Unpack SolarAltitude objects to NumPy Arrays ----------------------- vvv
+    solar_altitude_series_array = np.array(solar_altitude_series)
+    # ------------------------------------------------------------------------
+
     atmospheric_refraction = (
         0.061359
         * (
             0.1594
-            + 1.123 * solar_altitude_values
-            + 0.065656 * np.power(solar_altitude_values, 2)
+            + 1.123 * solar_altitude_series_array
+            + 0.065656 * np.power(solar_altitude_series_array, 2)
         )
         / (
             1
-            + 28.9344 * solar_altitude_values
-            + 277.3971 * np.power(solar_altitude_values, 2)
+            + 28.9344 * solar_altitude_series_array
+            + 277.3971 * np.power(solar_altitude_series_array, 2)
         )
     )
-    refracted_solar_altitude_values = solar_altitude_values + atmospheric_refraction
-    refracted_solar_altitude_series = [
-        RefractedSolarAltitude(value=value, unit="radians") for value in refracted_solar_altitude_values
-    ]
-    refracted_solar_altitude_series = [
-        convert_to_degrees_if_requested(altitude, angle_output_units)
-        for altitude in refracted_solar_altitude_series
-    ]
+    refracted_solar_altitude_series_array = (
+        solar_altitude_series_array + atmospheric_refraction
+    )
 
+    # Pack results back to SolarAltitude objects -----------------------------
+    if not is_scalar:
+        refracted_solar_altitude_series = [
+            RefractedSolarAltitude(value=value, unit="degrees")
+            for value in refracted_solar_altitude_series_array
+        ]
+    else:
+        refracted_solar_altitude_series = RefractedSolarAltitude(
+            value=refracted_solar_altitude_series_array[0], unit="degrees"
+        )
+    # -------------------------------------------------------------------- ^^^
+    
+    refracted_solar_altitude_series = convert_series_to_radians_if_requested(
+        refracted_solar_altitude_series, angle_output_units
+    )
+
+    if verbose == 3:
+        debug(locals())
     return refracted_solar_altitude_series
 
 
