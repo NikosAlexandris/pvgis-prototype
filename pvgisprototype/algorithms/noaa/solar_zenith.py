@@ -9,6 +9,7 @@ from math import acos
 from math import radians
 from math import degrees
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from math import isfinite
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -281,11 +282,15 @@ def calculate_solar_zenith_time_series_noaa(
         verbose: int = 0,
 ):
     """ """
+    # Handle single datetime or SolarHourAngle inputs
     solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
             angle_output_units='radians',
             )
     solar_declination_series = np.array([item.value for item in solar_declination_series])
+
+    if isinstance(timestamps, datetime):
+        timestamps = [timestamps]
 
     if isinstance(solar_hour_angle_series, SolarHourAngle):  # single SolarHourAngle
         solar_hour_angle_series = [solar_hour_angle_series]  # one-element list
@@ -294,29 +299,28 @@ def calculate_solar_zenith_time_series_noaa(
     solar_hour_angle_series = np.array([item.value for item in solar_hour_angle_series])
 
     latitude_value = latitude.value
-
     cosine_solar_zenith = (
         np.sin(latitude_value) * np.sin(solar_declination_series)
         + np.cos(latitude_value) * np.cos(solar_declination_series) * np.cos(solar_hour_angle_series)
     )
     solar_zenith_series = np.arccos(cosine_solar_zenith)
 
+    solar_zenith_series = [SolarZenith(value=value, unit='radians') for value in solar_zenith_series]
     if apply_atmospheric_refraction:
         solar_zenith_series = adjust_solar_zenith_for_atmospheric_refraction_time_series(
             solar_zenith_series, angle_output_units="radians"
         )
 
-    if not np.all(np.isfinite(solar_zenith_series)) or not np.all((0 <= solar_zenith_series) & (solar_zenith_series <= np.pi + 0.0146)):
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {np.pi + 0.0146}] radians')
+    # Convert SolarZenith objects to a NumPy array of float values
+    solar_zenith_values = np.array([zenith.value for zenith in solar_zenith_series])
 
-    solar_zenith_series = [
-        SolarZenith(value=value, unit='radians') for value in solar_zenith_series
-    ]
-    if angle_output_units == "degrees":
-        solar_zenith_series = [
-            convert_to_degrees_if_requested(zenith, angle_output_units)
-            for zenith in solar_zenith_series
-        ]
+    # Validate
+    if not np.all(np.isfinite(solar_zenith_values)) or not np.all((0 <= solar_zenith_values) & (solar_zenith_values <= np.pi + 0.0146)):
+        raise ValueError(f'Solar zenith values should be finite numbers and range in [0, {np.pi + 0.0146}] radians')
+
+    # Why !?
+    solar_zenith_series = [SolarZenith(value=value, unit='radians') for value in solar_zenith_values]
+    solar_zenith_series = convert_series_to_degrees_if_requested(solar_zenith_series, angle_output_units)
     
     if verbose == 3:
         debug(locals())
