@@ -171,12 +171,33 @@ def adjust_elevation(
 range_in_minus_plus_pi = lambda radians: (radians + pi) % (2 * pi) - pi
 
 
+@app.command(
+    'correct-linke-turbidity',
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+)
 def correct_linke_turbidity_factor(
     linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
 ):
-    """Calculate the air mass 2 Linke atmospheric turbidity factor"""
-    # debug(locals())
-    return -0.8662 * linke_turbidity_factor
+    """Calculate the air mass 2 Linke atmospheric turbidity factor
+
+    Notes
+    -----
+    The term -0.8662 * TLK is the air mass 2 Linke atmospheric turbidity factor
+    [dimensionless] corrected by Kasten [1]_.
+
+    In PVGIS C source code the relevant code fragment is :
+
+	elevationCorr = exp(-sunVarGeom->z_orig / 8434.5);
+	temp1 = 0.1594 + locSolarAltitude * (1.123 + 0.065656 * locSolarAltitude);
+	temp2 = 1. + locSolarAltitude * (28.9344 + 277.3971 * locSolarAltitude);
+	drefract = 0.061359 * temp1 / temp2;    /* in radians */
+	h0refract = locSolarAltitude + drefract;
+	opticalAirMass = elevationCorr / (sin(h0refract) + 0.50572 * pow(h0refract * rad2deg + 6.07995, -1.6364));
+	airMass2Linke = 0.8662 * sunRadVar->linke;
+    """
+    corrected_linke_turbidity_factor = -0.8662 * linke_turbidity_factor
+    return corrected_linke_turbidity_factor
 
 
 @app.command(
