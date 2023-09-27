@@ -453,8 +453,8 @@ def calculate_diffuse_inclined_irradiance(
 
     In order or appearance:
 
-    - extraterrestial_normal_irradiance : G0
-    - extraterrestial_horizontal_irradiance : G0h = G0 sin(h0)
+    - extraterrestrial_normal_irradiance : G0
+    - extraterrestrial_horizontal_irradiance : G0h = G0 sin(h0)
     - kb : Proportion between direct (beam) and extraterrestrial irradiance : Kb
     - diffuse_horizontal_component : Dhc [W.m-2]
     - diffuse_transmission_function() :
@@ -502,8 +502,8 @@ def calculate_diffuse_inclined_irradiance(
 
         # G0
         # day_of_year = timestamp.timetuple().tm_yday
-        # extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(day_of_year)
-        extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(timestamp)
+        # extraterrestrial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(day_of_year)
+        extraterrestrial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(timestamp)
 
         # extraterrestrial on a horizontal surface requires the solar altitude
         solar_altitude = model_solar_altitude(
@@ -525,16 +525,16 @@ def calculate_diffuse_inclined_irradiance(
         )
 
         # on a horizontal surface : G0h = G0 sin(h0)
-        extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(
+        extraterrestrial_horizontal_irradiance = extraterrestrial_normal_irradiance * sin(
             solar_altitude.value
         )
 
         # proportion between direct (beam) and extraterrestrial irradiance : Kb
-        kb = direct_horizontal_component / extraterrestial_horizontal_irradiance
+        kb = direct_horizontal_component / extraterrestrial_horizontal_irradiance
 
         # Dhc [W.m-2]
         diffuse_horizontal_component = (
-            extraterrestial_normal_irradiance
+            extraterrestrial_normal_irradiance
             * diffuse_transmission_function(solar_altitude.value)
             * diffuse_solar_altitude_function(solar_altitude.value, linke_turbidity_factor)
         )
