@@ -113,6 +113,50 @@ def print_solar_position_table(
             row.append(str(incidence_value))
         row.append(str(units))
         table.add_row(*row)
+def print_hour_angle_table(
+    latitude,
+    rounding_places,
+    surface_tilt=None,
+    declination=None,
+    hour_angle=None,
+    units=None,
+):
+    """ """
+    console = Console()
+
+    latitude = round_float_values(latitude, rounding_places)
+    # rounded_table = round_float_values(table, rounding_places)
+    surface_tilt = round_float_values(surface_tilt, rounding_places)
+    declination = round_float_values(declination, rounding_places)
+    hour_angle = round_float_values(hour_angle, rounding_places)
+
+    columns = ["Latitude", "Event"]
+    if surface_tilt is not None:
+        columns.append(SURFACE_TILT_COLUMN_NAME)
+    if declination is not None:
+        columns.append(DECLINATION_COLUMN_NAME)
+    if hour_angle is not None:
+        columns.append(HOUR_ANGLE_COLUMN_NAME)
+    columns.append(UNITS_COLUMN_NAME)
+
+    # table = Table(*columns, box=box.SIMPLE_HEAD)
+    table = Table(
+        *columns,
+        box=box.SIMPLE_HEAD,
+        show_header=True,
+        header_style="bold magenta",
+    )
+
+    row = [str(latitude), 'Event']
+    if surface_tilt is not None:
+        row.append(str(surface_tilt))
+    if declination is not None:
+        row.append(str(declination))
+    if hour_angle is not None:
+        row.append(str(hour_angle))
+    row.append(str(units))
+    # table.add_row(*row, style=style)
+    table.add_row(*row)
 
     console.print(table)
 
