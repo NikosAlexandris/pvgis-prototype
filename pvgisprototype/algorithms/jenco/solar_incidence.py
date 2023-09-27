@@ -1,5 +1,7 @@
 import typer
 from typing import Annotated
+from typing import Union
+from typing import Sequence
 from typing import List
 from typing import Optional
 from pathlib import Path
@@ -9,9 +11,9 @@ from math import sin, cos, acos
 from math import asin
 from math import atan
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from ..noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
-from ..noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.conversions import convert_to_radians
@@ -82,7 +84,6 @@ def calculate_relative_longitude(
         sin(surface_tilt.value)
         * sin(surface_orientation.value)
     )
-
     tangent_relative_longitude_denominator = (
             sin(latitude.value)
         * sin(surface_tilt.value)
@@ -90,14 +91,13 @@ def calculate_relative_longitude(
         + cos(latitude.value)
         * cos(surface_tilt.value)
     )
-    
     tangent_relative_longitude = (
         tangent_relative_longitude_numerator /
         tangent_relative_longitude_denominator
     )
-
+    relative_longitude = atan(tangent_relative_longitude)
     relative_longitude = RelativeLongitude(
-        value=atan(tangent_relative_longitude),
+        value=relative_longitude,
         unit=angle_output_units,
     )
     return relative_longitude
@@ -110,7 +110,7 @@ def calculate_solar_incidence_jenco(
         timestamp: datetime,
         timezone: ZoneInfo = None,
         random_time: bool = False,
-        hour_angle: float = None,
+        # hour_angle: float = None,
         surface_tilt: float = None,
         surface_orientation: float = None,
         shadow_indicator: Path = None,
