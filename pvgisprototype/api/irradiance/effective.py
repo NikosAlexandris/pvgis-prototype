@@ -19,9 +19,9 @@ from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from ..utilities.conversions import convert_to_radians
-from ..utilities.timestamp import now_utc_datetimezone
-from ..utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
@@ -99,7 +99,7 @@ AOIConstants.append(0.155)
 
 app = typer.Typer(
     cls=OrderCommands,
-    add_completion=False,
+    add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
     help=f"Estimate the direct solar radiation",
@@ -169,12 +169,12 @@ def calculate_efficiency(
 
 # @numba.jit(nopython=True)
 @app.callback(
-        'effective',
-       invoke_without_command=True,
-       no_args_is_help=True,
-       # context_settings={"ignore_unknown_options": True},
-       help=f'Calculate the clear-sky ground reflected irradiance',
-       )
+    'effective',
+    invoke_without_command=True,
+    no_args_is_help=True,
+    # context_settings={"ignore_unknown_options": True},
+    help="Estimate the effective irradiance for a specific hour",
+)
 def calculate_effective_irradiance(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -216,14 +216,12 @@ def calculate_effective_irradiance(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     verbose: Annotated[int, typer_option_verbose] = False,
     ):
-    """Calculate hourly radiation values for a specific moment in time.
-    
-    Calculate hourly radiation values for a specific moment in time considering
-    :
-    - solar geometry
-    - the sun-to-surface geometry
-    - temperature
-    - wind speed
+    """Calculate the effective hourly irradiance for a location and moment in
+    time.
+
+    The calculation applies efficiency coefficients to the direct (beam),
+    diffuse, and reflected radiation considering : solar geometry,
+    sun-to-surface geometry, temperature and wind speed.
 
     Parameters
     ----------
@@ -250,9 +248,7 @@ def calculate_effective_irradiance(
 
     Returns
     -------
-    None
-    """
-    """
+
     Notes
     -----
 
@@ -375,7 +371,7 @@ def calculate_effective_irradiance(
         angle_output_units=angle_output_units,
     )
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+    # hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
     solar_incidence_angle = model_solar_incidence(
         longitude=longitude,
         latitude=latitude,
@@ -383,7 +379,7 @@ def calculate_effective_irradiance(
         timezone=timezone,
         solar_time_model=solar_time_model,
         solar_incidence_model=solar_incidence_model,
-        hour_angle=hour_angle,
+        # hour_angle=hour_angle,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         # shadow_indicator=shadow_indicator,
@@ -501,5 +497,7 @@ def calculate_effective_irradiance(
     efficiency_coefficient = max(efficiency_coefficient, 0.0)  # limit to zero
     
     result = efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
-    debug(locals())
+    typer.echo(f'Effective hourly irradiance: {result}')
+    if verbose == 3:
+        debug(locals())
     return result
