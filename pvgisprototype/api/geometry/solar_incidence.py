@@ -25,10 +25,10 @@ def model_solar_incidence(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     random_time: bool = False,
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.effective,
-    hour_angle: float = None,
+    # hour_angle: float = None,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     shadow_indicator: Path = None,
@@ -65,19 +65,19 @@ def model_solar_incidence(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
         )
-        if not hour_angle:
-            hour_angle = calculate_hour_angle(
-                solar_time=solar_time,
-                angle_output_units=angle_output_units,
-            )
-            hour_angle = hour_angle.value
+        # if not hour_angle:
+        #     hour_angle = calculate_hour_angle(
+        #         solar_time=solar_time,
+        #         angle_output_units=angle_output_units,
+        #     )
+        #     hour_angle = hour_angle.value
         solar_incidence = calculate_solar_incidence_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
             random_time=random_time,
-            hour_angle=hour_angle,
+            # hour_angle=hour_angle,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
             days_in_a_year=days_in_a_year,
