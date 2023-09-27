@@ -124,6 +124,41 @@ def print_solar_position_table(
     console.print(table)
 
 
+def print_hour_angle_table_2(
+    solar_time,
+    rounding_places,
+    hour_angle=None,
+    units=None,
+):
+    """ """
+    console = Console()
+
+    solar_time = round_float_values(solar_time, rounding_places)
+    hour_angle = round_float_values(hour_angle, rounding_places)
+
+    columns = ["Solar time"]
+    if hour_angle is not None:
+        columns.append(HOUR_ANGLE_COLUMN_NAME)
+    columns.append(UNITS_COLUMN_NAME)
+
+    # table = Table(*columns, box=box.SIMPLE_HEAD)
+    table = Table(
+        *columns,
+        box=box.SIMPLE_HEAD,
+        show_header=True,
+        header_style="bold magenta",
+    )
+
+    row = [str(solar_time)]
+    if hour_angle is not None:
+        row.append(str(hour_angle))
+    row.append(str(units))
+    # table.add_row(*row, style=style)
+    table.add_row(*row)
+
+    console.print(table)
+
+
 def print_hour_angle_table(
     latitude,
     rounding_places,
