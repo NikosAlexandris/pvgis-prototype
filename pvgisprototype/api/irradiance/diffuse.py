@@ -13,7 +13,7 @@ logging.basicConfig(
     ]
 )
 import typer
-from typer import Argument, Option
+from typer import Option
 from typing import Annotated
 from typing import Optional
 from typing import Union
@@ -51,10 +51,13 @@ from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 from .direct import calculate_direct_horizontal_irradiance
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.geometry.solar_azimuth import calculate_solar_azimuth
-from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence
+from pvgisprototype.api.geometry.solar_azimuth import model_solar_azimuth
+from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
+from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.utilities import select_location_time_series
 from math import sin
 from math import cos
 from math import pi
@@ -77,6 +80,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
@@ -120,33 +124,9 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f"Calculate the diffuse from global and direct irradiance time series",
+    help=f"Calculate the diffuse irradiance incident on a solar surface",
 )
 console = Console()
-
-
-class MethodsForInexactMatches(str, Enum):
-    none = None # only exact matches
-    pad = 'pad' # ffill: propagate last valid index value forward
-    backfill = 'backfill' # bfill: propagate next valid index value backward
-    nearest = 'nearest' # use nearest valid index value
-
-
-def select_location_time_series(
-    time_series_filename: Annotated[Path, typer_argument_time_series],
-    # longitude: Annotated[Longitude, typer_argument_longitude_in_degrees],
-    # latitude: Annotated[Latitude, typer_argument_latitude_in_degrees],
-    longitude: Annotated[float, typer_argument_longitude_in_degrees],
-    latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
-):
-    data_array = xr.open_dataarray(time_series_filename)
-    location_time_series = data_array.sel(
-            lon=longitude,
-            lat=latitude,
-            method=inexact_matches_method)
-    # location_time_series.load()  # load into memory for fast processing
-    return location_time_series
 
 
 @app.command(
@@ -163,6 +143,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
@@ -205,27 +186,19 @@ def calculate_diffuse_horizontal_component_from_sarah(
     )
     direct_irradiance_location_time_series.load()
 
-    if timestamp:
-        # convert timestamp to ISO format string without fractional seconds
-        time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        global_irradiance_location_time_series = (
-            global_irradiance_location_time_series.sel(time=time)
-        )
-        direct_irradiance_location_time_series = (
-            direct_irradiance_location_time_series.sel(time=time)
-        )
+    # ------------------------------------------------------------------------
     if start_time or end_time:
-        # If only start_time is provided, end_time defaults to the end of the series
-        if start_time and not end_time:
-            end_time = direct_location_time_series.time.values[-1]
+        timestamp = None  # we don't need a timestamp anymore!
+
+        if start_time and not end_time:  # set `end_time` to end of series
+            end_time = direct_irradiance_location_time_series.time.values[-1]
             # end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
-        # If only end_time is provided, start_time defaults to the beginning of the series
-        elif end_time and not start_time:
-            start_time = direct_location_time_series.time.values[0]
+
+        elif end_time and not start_time:  # set `start_time` to beginning of series
+            start_time = direct_irradiance_location_time_series.time.values[0]
             # start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-        # If both start_time and end_time are provided, use them as they are
-        # Convert start_time and end_time to the correct string format if they're datetime objects
-        else:
+
+        else:  # Convert `start_time` & `end_time` to the correct string format
             # if isinstance(start_time, datetime):
             start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
             # if isinstance(end_time, datetime):
@@ -237,6 +210,19 @@ def calculate_diffuse_horizontal_component_from_sarah(
         direct_irradiance_location_time_series = (
             direct_irradiance_location_time_series.sel(time=slice(start_time, end_time))
         )
+
+    if timestamp and not start_time and not end_time:
+        # convert timestamp to ISO format string without fractional seconds
+        time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        if not nearest_neighbor_lookup:
+            inexact_matches_method = None
+        global_irradiance_location_time_series = (
+            global_irradiance_location_time_series.sel(time=time, method=inexact_matches_method)
+        )
+        direct_irradiance_location_time_series = (
+            direct_irradiance_location_time_series.sel(time=time, method=inexact_matches_method)
+        )
+    # ------------------------------------------------------------------------
 
     diffuse_horizontal_irradiance = (
         global_irradiance_location_time_series - direct_irradiance_location_time_series
@@ -253,35 +239,52 @@ def calculate_diffuse_horizontal_component_from_sarah(
 
     if diffuse_horizontal_irradiance.size == 1:
         single_value = float(diffuse_horizontal_irradiance.values)
-        warning = Fore.YELLOW + f'{exclamation_mark} The selection matches the single value : {single_value}' + Style.RESET_ALL
+        warning = (
+            Fore.YELLOW
+            + f"{exclamation_mark} The selected timestamp "
+            + Fore.GREEN
+            + f"{diffuse_horizontal_irradiance[diffuse_horizontal_irradiance.indexes].time.values}"
+            + Fore.YELLOW
+            + f" matches the single value "
+            + Fore.GREEN
+            + f'{single_value}'
+            + Style.RESET_ALL
+        )
         logging.warning(warning)
-        if verbose:
+        if verbose > 0:
             typer.echo(Fore.YELLOW + warning)
+        if verbose == 3:
+            debug(locals())
         return single_value
 
     # ---------------------------------------------------------- Remove Me ---
     typer.echo(diffuse_horizontal_irradiance.values)
     # ---------------------------------------------------------- Remove Me ---
 
+    # statistics after echoing series which might be Long!
     if statistics:
         data_statistics = calculate_series_statistics(diffuse_horizontal_irradiance)
         print_series_statistics(data_statistics, title='Diffuse horizontal irradiance from SARAH')
         if csv:
             export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
 
+    if verbose > 0:
+        typer.echo(f'Series : {location_time_series.values}')
+    if verbose == 3:
+        debug(locals())
     return diffuse_horizontal_irradiance
 
 
 @app.command(
-        'n-term',
-        no_args_is_help=True,
-        help=f'N Calculate the N term for the diffuse sky irradiance function',
-        rich_help_panel=rich_help_panel_toolbox,
-        )
+    'n-term',
+    no_args_is_help=True,
+    help=f'N Calculate the N term for the diffuse sky irradiance function',
+    rich_help_panel=rich_help_panel_toolbox,
+)
 def calculate_term_n(
-        kb,
-        ):
+    kb: float,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
     """Define the N term
 
     Parameters
@@ -294,13 +297,15 @@ def calculate_term_n(
     N: float
         The N term
     """
+    if verbose == 3:
+        debug(locals())
     return 0.00263 - 0.712 * kb - 0.6883 * kb ** 2
     
 
 @app.command(
         'sky-irradiance',
         no_args_is_help=True,
-        help=f'⇊ Calculate the diffuse clear-sky irradiance',
+        help=f'⇊ Calculate the diffuse sky irradiance',
         rich_help_panel=rich_help_panel_series_irradiance,
         )
 def calculate_diffuse_sky_irradiance(
@@ -350,14 +355,19 @@ def calculate_diffuse_sky_irradiance(
         )
 def diffuse_transmission_function(
     linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
-        ):
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
     """ Diffuse transmission function
     """
-    return (
+    diffuse_transmission = (
         -0.015843
         + 0.030543 * linke_turbidity_factor
         + 0.3797 * linke_turbidity_factor**2
     )
+
+    if verbose == 3:
+        debug(locals())
+    return diffuse_transmission
 
 
 @app.command(
@@ -368,9 +378,9 @@ def diffuse_transmission_function(
         )
 def diffuse_solar_altitude_coefficients(
     linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
-        ):
-    """
-    """
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    """ """
     # calculate common terms only once
     linke_turbidity_factor_squared = linke_turbidity_factor**2
     diffuse_transmission = diffuse_transmission_function(linke_turbidity_factor)
@@ -394,34 +404,33 @@ def diffuse_solar_altitude_coefficients(
         + 0.0085079 * linke_turbidity_factor_squared
     )
 
+    if verbose == 3:
+        debug(locals())
     return a1, a2, a3
 
 
 @app.command(
-        'diffuse-solar-altitude',
-        no_args_is_help=True,
-        help=f'☀∡ Calculate the diffuse solar altitude angle',
-        rich_help_panel=rich_help_panel_toolbox,
-        )
+    'diffuse-solar-altitude',
+    no_args_is_help=True,
+    help=f'☀∡ Calculate the diffuse solar altitude angle',
+    rich_help_panel=rich_help_panel_toolbox,
+)
 def diffuse_solar_altitude_function(
     solar_altitude: Annotated[float, typer_argument_solar_altitude],
     linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
-        ):
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
     """Diffuse solar altitude function Fd"""
     a1, a2, a3 = diffuse_solar_altitude_coefficients(linke_turbidity_factor)
     return a1 + a2 * sin(solar_altitude) + a3 * sin(solar_altitude) ** 2
 
 
-# @app.callback(
-#         invoke_without_command=True,
-#         no_args_is_help=True,
-#         context_settings={"ignore_unknown_options": True})
 @app.command(
-        'inclined',
-        no_args_is_help=True,
-        help=f'☀∡ Calculate the diffuse irradiance incident on a tilted surface',
-        rich_help_panel=rich_help_panel_series_irradiance,
-        )
+    'inclined',
+    no_args_is_help=True,
+    help=f'☀∡ Calculate the diffuse irradiance incident on a tilted surface',
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
 def calculate_diffuse_inclined_irradiance(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -433,8 +442,7 @@ def calculate_diffuse_inclined_irradiance(
     linke_turbidity_factor: Annotated[float, typer_option_linke_turbidity_factor] = 2,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
-    direct_horizontal_irradiance: Annotated[Optional[Path], typer.Option(
-        help='Read horizontal irradiance time series data from a file',)] = None,
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer_argument_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvis,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
@@ -581,13 +589,15 @@ def calculate_diffuse_inclined_irradiance(
         )
         solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
         hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
-        solar_incidence_angle = calculate_solar_incidence(
-            latitude,
-            solar_declination,
-            surface_tilt,
-            surface_orientation,
-            hour_angle,
+        solar_incidence_angle = calculate_solar_incidence_pvis(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+            hour_angle=hour_angle,
             angle_output_units=angle_output_units,
+            verbose=verbose,
         )
         if sin(solar_incidence_angle.value) < 0 and solar_altitude.value >=0:
 
@@ -668,7 +678,7 @@ def calculate_diffuse_inclined_irradiance(
     # ---------------------------------------------------------- Remove Me ---
     typer.echo(diffuse_irradiance)
     # ---------------------------------------------------------- Remove Me ---
-    if verbose:
-        print(locals())
+    if verbose == 3:
+        debug(locals())
 
     return diffuse_irradiance
