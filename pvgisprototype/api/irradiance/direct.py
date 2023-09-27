@@ -287,7 +287,7 @@ def calculate_optical_air_mass(
     return optical_air_mass
 
 
-def rayleigh_optical_thickness(
+def calculate_rayleigh_optical_thickness(
     optical_air_mass: Annotated[float, typer_option_optical_air_mass] = 2,
 ):
     """
@@ -301,18 +301,20 @@ def rayleigh_optical_thickness(
 
     .. [1] Hofierka, 2002
     """
-    if optical_air_mass <= 20:
+    if optical_air_mass.value <= 20:
         rayleigh_optical_thickness = 1 / (
-        6.6296 + 1.7513 * optical_air_mass
-        - 0.1202 * math.pow(optical_air_mass, 2)
-        + 0.0065 * math.pow(optical_air_mass, 3)
-        - 0.00013* math.pow(optical_air_mass, 4)
+        6.6296 + 1.7513 * optical_air_mass.value
+        - 0.1202 * math.pow(optical_air_mass.value, 2)
+        + 0.0065 * math.pow(optical_air_mass.value, 3)
+        - 0.00013* math.pow(optical_air_mass.value, 4)
         )
 
-    if optical_air_mass > 20:
-        rayleigh_optical_thickness = 1 / (10.4 + 0.718 * optical_air_mass)
-
-    # debug(locals())
+    if optical_air_mass.value > 20:
+        rayleigh_optical_thickness = 1 / (10.4 + 0.718 * optical_air_mass.value)
+    rayleigh_optical_thickness = RayleighThickness(
+        value=rayleigh_optical_thickness,
+        unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
+    )
     return rayleigh_optical_thickness
 
 
@@ -320,11 +322,11 @@ def rayleigh_optical_thickness(
 def calculate_direct_normal_irradiance(
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
-    optical_air_mass: Annotated[float, typer_option_optical_air_mass] = 2,
+    optical_air_mass: Annotated[float, typer_option_optical_air_mass] = OPTICAL_AIR_MASS_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365,  # 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the direct normal irradiance attenuated by the cloudless atmosphere
