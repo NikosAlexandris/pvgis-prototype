@@ -9,11 +9,11 @@ from typing import Any
 
 
 def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
-    """Convert angle to radians."""
+    """Convert floating point angular measurement from degrees to radians."""
     if ctx.resilient_parsing:
         return
     if type(angle) != float:
-        raise typer.BadParameter("Latitude should be a float!")
+        raise typer.BadParameter("Input should be a float!")
 
     return np.radians(angle)
 
@@ -23,7 +23,7 @@ def convert_to_degrees(ctx: typer.Context, param: typer.CallbackParam, angle: fl
     if ctx.resilient_parsing:
         return
     if type(angle) != float:
-        raise typer.BadParameter("Latitude should be a float!")
+        raise typer.BadParameter("The input value {angle} for an angular measurement is not of the expected type float!")
 
     return np.degrees(angle)
 
