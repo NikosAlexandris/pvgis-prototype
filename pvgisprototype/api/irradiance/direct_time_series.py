@@ -50,18 +50,43 @@ app = typer.Typer(
 
 
 def correct_linke_turbidity_factor_time_series(
-    linke_turbidity_factor_series,#: np.ndarray
-):
-    """Vectorized function to calculate the air mass 2 Linke atmospheric turbidity factor for a time series.
-    
-    Parameters:
-    - linke_turbidity_factor_series (np.ndarray): The Linke turbidity factors as a numpy array.
-    
-    Returns:
-    - np.ndarray: The corrected Linke turbidity factors as a numpy array.
+    linke_turbidity_factor_series: Union[
+        List[LinkeTurbidityFactor], LinkeTurbidityFactor
+    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    verbose: int = 0,
+) -> Union[List[LinkeTurbidityFactor], LinkeTurbidityFactor]:
     """
-    
-    return -0.8662 * linke_turbidity_factor_series
+    Vectorized function to calculate the air mass 2 Linke atmospheric turbidity factor for a time series.
+
+    Parameters:
+    - linke_turbidity_factor_series (List[LinkeTurbidityFactor] or LinkeTurbidityFactor): 
+      The Linke turbidity factors as a list of LinkeTurbidityFactor objects or a single object.
+
+    Returns:
+    - List[LinkeTurbidityFactor] or LinkeTurbidityFactor: 
+      The corrected Linke turbidity factors as a list of LinkeTurbidityFactor objects or a single object.
+    """
+    is_scalar = False
+    if isinstance(linke_turbidity_factor_series, LinkeTurbidityFactor):
+        is_scalar = True
+        linke_turbidity_factor_series = [linke_turbidity_factor_series.value]
+    else:
+        linke_turbidity_factor_series = [factor.value for factor in linke_turbidity_factor_series]
+
+    # Convert to NumPy array
+    linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
+
+    # Perform calculations
+    corrected_linke_turbidity_factors_array = -0.8662 * linke_turbidity_factor_series_array
+
+    if verbose == 3:
+        debug(locals())
+
+    # Convert back to custom data class objects
+    if is_scalar:
+        return LinkeTurbidityFactor(value=corrected_linke_turbidity_factors_array[0], unit=LINKE_TURBIDITY_FACTOR_UNIT)
+    else:
+        return [LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_FACTOR_UNIT) for value in corrected_linke_turbidity_factors_array]
 
 
 def calculate_refracted_solar_altitude_time_series(
