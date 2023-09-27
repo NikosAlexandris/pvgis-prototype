@@ -393,21 +393,21 @@ def calculate_direct_horizontal_irradiance(
     elevation: Annotated[float, typer_argument_elevation],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365,  # 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[int, typer_option_verbose]= False,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the direct irradiatiance incident on a horizontal surface
@@ -429,19 +429,20 @@ def calculate_direct_horizontal_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
+        model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        solar_time_model=solar_time_model,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
-        )
-    # expects solar altitude in degrees! -------------------------------------
+    )
+    # The refraction equation expects the solar altitude angle in degrees! ---
     expected_solar_altitude_units = 'degrees'
     solar_altitude_in_degrees = convert_to_degrees_if_requested(
             solar_altitude,
@@ -450,20 +451,16 @@ def calculate_direct_horizontal_irradiance(
     # refracted_solar_altitude, refracted_solar_altitude_units = calculate_refracted_solar_altitude(
     refracted_solar_altitude = calculate_refracted_solar_altitude(
             solar_altitude=solar_altitude_in_degrees,
-            angle_input_units=expected_solar_altitude_units,
             angle_output_units='radians',  # Here in radians!
-            )
+            ) 
     optical_air_mass = calculate_optical_air_mass(
             elevation=elevation,
             refracted_solar_altitude=refracted_solar_altitude,
-            angle_units=expected_solar_altitude_units,  # and Here!
             )
     # --------------------------------------expects solar altitude in degrees!
     direct_normal_irradiance = calculate_direct_normal_irradiance(
             optical_air_mass=optical_air_mass,
             linke_turbidity_factor=linke_turbidity_factor,
-            # day_of_year=day_of_year,  # day_of_year = timestamp.timetuple().tm_yday
-            # day_of_year=timestamp.timetuple().tm_yday,
             timestamp=timestamp,
             solar_constant=solar_constant,
             days_in_a_year=days_in_a_year,
