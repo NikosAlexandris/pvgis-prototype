@@ -19,6 +19,7 @@ from typing import Optional
 from typing import Union
 from enum import Enum
 from datetime import datetime
+from rich import print
 from rich.console import Console
 from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
@@ -82,6 +83,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
@@ -100,18 +102,17 @@ from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
 from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
+from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
+from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
-
-from pvgisprototype.constants import DAYS_IN_A_YEAR
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
@@ -442,7 +443,7 @@ def calculate_diffuse_inclined_irradiance(
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = 180,
     linke_turbidity_factor: Annotated[float, typer_option_linke_turbidity_factor] = 2,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_argument_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.pvlib,
