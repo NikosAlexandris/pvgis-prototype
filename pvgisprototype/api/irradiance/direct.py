@@ -373,11 +373,16 @@ def calculate_direct_normal_irradiance(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
     )
-    direct_normal_irradiance = extraterrestial_normal_irradiance * exp(
-            correct_linke_turbidity_factor(linke_turbidity_factor)
-            * optical_air_mass
-            * rayleigh_optical_thickness(optical_air_mass)
-            )
+    corrected_linke_turbidity_factor = correct_linke_turbidity_factor(linke_turbidity_factor)
+    rayleigh_optical_thickness = calculate_rayleigh_optical_thickness(optical_air_mass)
+    direct_normal_irradiance = (
+        extraterrestial_normal_irradiance
+        * exp(
+            corrected_linke_turbidity_factor
+            * optical_air_mass.value
+            * rayleigh_optical_thickness.value
+        )
+    )
     if verbose == 3:
         debug(locals())
     typer.echo(f'Direct normal irradiance = Extraterrestial normal irradiance * exp( Corrected Linke turbidity factor * Optical air mass * Rayleigh Optical Thickness )')
