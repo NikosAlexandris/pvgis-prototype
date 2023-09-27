@@ -1,3 +1,6 @@
+# Generic input/output
+from pvgisprototype.validation.parameters import VerbosityModel
+
 # Where?
 from pvgisprototype.validation.parameters import LatitudeModel
 from pvgisprototype.validation.parameters import LongitudeModel
@@ -93,9 +96,11 @@ class ModelSolarTimeInputModel(
     BaseTimeModel,
     EarthOrbitModel,
     TimeOffsetModel,
+    VerbosityModel,
     SolarTimeModelModel,
     BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -105,12 +110,14 @@ class CalculateSolarTimePVGISInputModel(
     BaseTimeModel,
     EarthOrbitModel,
     TimeOffsetModel,
+    VerbosityModel,
 ):
     pass
  
 
 class CalculateSolarTimeEoTInputModel(
     ModelSolarTimeInputModel
+    VerbosityModel,
 ):
     pass
 
@@ -118,6 +125,7 @@ class CalculateSolarTimeEoTInputModel(
 class CalculateSolarTimeEphemInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
+    VerbosityModel,
 ):
     verbose: int
 
@@ -235,6 +243,7 @@ class ModelSolarAzimuthInputModel(
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -251,6 +260,7 @@ class ModelSolarPositionInputModel(
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -285,8 +295,10 @@ class CalculateSolarIncidenceJencoInputModel(
     BaseTimeOutputUnitsModel,
     BaseAngleInternalUnitsModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     hour_angle: float
+    VerbosityModel,
 
 
 # Direct irradiance
