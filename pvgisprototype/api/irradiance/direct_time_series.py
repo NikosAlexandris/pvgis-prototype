@@ -143,16 +143,22 @@ def rayleigh_optical_thickness_time_series(
 @app.command('normal-series', no_args_is_help=True)
 def calculate_direct_normal_irradiance_time_series(
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series],#: np.ndarray,
-    optical_air_mass_series: Annotated[List[float], typer_option_optical_air_mass_series],#: np.ndarray,
-    solar_constant: float = SOLAR_CONSTANT,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,#: np.ndarray,
+    optical_air_mass_series: Annotated[List[float], typer_option_optical_air_mass_series] = None,#: np.ndarray,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """ """
-    print(timestamps)
+   # Unpack custom objects to NumPy arrays
+    linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
+    optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
+
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
@@ -164,21 +170,34 @@ def calculate_direct_normal_irradiance_time_series(
         )
     )
     corrected_linke_turbidity_factors = correct_linke_turbidity_factor_time_series(
-        linke_turbidity_factor_series
+        linke_turbidity_factor_series,
+        verbose=verbose,
     )
     rayleigh_thickness_series = rayleigh_optical_thickness_time_series(
-        optical_air_mass_series
+        optical_air_mass_series,
+        verbose=verbose,
     )
+    # Unpack the custom objects into NumPy arrays
+    corrected_linke_turbidity_factor_series_array = np.array([x.value for x in corrected_linke_turbidity_factors])
+    optical_air_mass_series_array = np.array([x.value for x in optical_air_mass_series])
+    rayleigh_thickness_series_array = np.array([x.value for x in rayleigh_thickness_series])
+
+    # Calculate
     direct_normal_irradiance_series = (
         extraterrestrial_normal_irradiance_series
         * np.exp(
-            corrected_linke_turbidity_factors
-            * optical_air_mass_series
-            * rayleigh_thickness_series
+            corrected_linke_turbidity_factor_series_array
+            * optical_air_mass_series_array
+            * rayleigh_thickness_series_array
         )
     )
-    typer.echo(f'Direct normal irradiance series: {direct_normal_irradiance_series}')  # B0c
 
+    if verbose == 1:
+        pass
+
+    if verbose == 3:
+        debug(locals())
+    typer.echo(f'Direct normal irradiance series: {direct_normal_irradiance_series}')  # B0c
     return direct_normal_irradiance_series
 
 
