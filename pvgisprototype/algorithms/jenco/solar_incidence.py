@@ -26,6 +26,9 @@ from pvgisprototype import Latitude
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel
 from pvgisprototype.validation.functions import CalculateSolarIncidenceJencoInputModel
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 
 import numpy as np
 
@@ -91,9 +94,9 @@ def calculate_solar_incidence_jenco(
         shadow_indicator: Path = None,
         horizon_heights: Optional[List[float]] = None,
         horizon_interval: Optional[float] = None,
-        days_in_a_year: float = 365.25,
-        eccentricity_correction_factor: float = 0.03344,
-        perigee_offset: float = 0.048869,
+        days_in_a_year: float = DAYS_IN_A_YEAR,
+        perigee_offset: float = PERIGEE_OFFSET,
+        eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
         time_output_units: str = 'minutes',
         angle_units: str = 'radians',
         angle_output_units: str = 'radians',
@@ -176,12 +179,12 @@ def calculate_solar_incidence_jenco(
         )
         relative_inclined_latitude = asin(sine_relative_inclined_latitude)
         solar_declination = calculate_solar_declination_pvis(
-            timestamp,
-            timezone,
-            days_in_a_year,
-            eccentricity_correction_factor,
-            perigee_offset,
-            angle_output_units,
+            timestamp=timestamp,
+            timezone=timezone,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            angle_output_units=angle_output_units,
             )
         c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.value)
         c_inclined_33 = sine_relative_inclined_latitude * sin(solar_declination.value)
@@ -216,6 +219,9 @@ def calculate_solar_incidence_time_series_jenco(
     timezone: Optional[ZoneInfo] = None,
     surface_tilt: float = 45,
     surface_orientation: float = 180,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = 'minutes',
     angle_output_units: str = 'radians',
 ) -> np.array:
