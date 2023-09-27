@@ -16,7 +16,6 @@ from pathlib import Path
 from .direct import calculate_direct_horizontal_irradiance
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence
 from math import sin
 from math import cos
 from .diffuse import diffuse_transmission_function
