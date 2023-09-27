@@ -1,24 +1,56 @@
+from devtools import debug
+from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
+from datetime import datetime
+from math import sin
+from math import asin
+from math import cos
+from math import atan
 import numpy as np
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.api.irradiance.direct import adjust_elevation
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from typing import Annotated
 from typing import Optional
+from typing import Union
+from typing import Sequence
 from typing import List
+from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
+from pvgisprototype.api.geometry.solar_declination_time_series import model_solar_declination_time_series
+from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
+from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_component
+from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
+from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
+from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
+from pvgisprototype.cli.typer_parameters import typer_option_tolerance
+from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer_parameters import typer_option_optical_air_mass_series
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
+from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
@@ -31,13 +63,43 @@ from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
+from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+from pvgisprototype.constants import LINKE_TURBIDITY_FACTOR_UNIT
+from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
+from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_series_to_radians_if_requested
 
 from zoneinfo import ZoneInfo
+from pvgisprototype import SolarAltitude
+from pvgisprototype import RefractedSolarAltitude
+from pvgisprototype import OpticalAirMass
+from pvgisprototype import RayleighThickness
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.geometry.models import SolarDeclinationModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.cli.series import select_time_series
+# from pvgisprototype.api.series.utilities import select_location_time_series
+from pathlib import Path
+
+from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 app = typer.Typer(
