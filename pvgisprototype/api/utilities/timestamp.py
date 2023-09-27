@@ -49,6 +49,7 @@ from datetime import time
 from typing import Annotated
 from typing import Optional
 from typing import Union
+from typing import Sequence
 import calendar
 import random
 # import time
@@ -56,6 +57,7 @@ import typer
 import zoneinfo
 from zoneinfo import ZoneInfo
 from rich import print
+import numpy as np
 
 
 def parse_timestamp(timestamp_string):
@@ -290,6 +292,21 @@ def convert_hours_to_datetime_time(value: float) -> time:
 
 def timestamp_to_decimal_hours(t):
     return t.hour + t.minute / 60 + t.second / 3600 + t.microsecond / 3600000000
+
+
+def timestamp_to_decimal_hours_time_series(
+    timestamps: Union[datetime, Sequence[datetime]]
+) -> np.ndarray:
+    if isinstance(timestamps, datetime):
+        timestamps = [timestamps]
+
+    timestamps_array = np.array(timestamps)
+    hours = (timestamps_array.astype('datetime64[h]') - timestamps_array.astype('datetime64[D]')).astype('timedelta64[h]').astype(float)
+    minutes = (timestamps_array.astype('datetime64[m]') - timestamps_array.astype('datetime64[h]')).astype('timedelta64[m]').astype(float) / 60
+    seconds = (timestamps_array.astype('datetime64[s]') - timestamps_array.astype('datetime64[m]')).astype('timedelta64[s]').astype(float) / 3600
+    microseconds = (timestamps_array.astype('datetime64[us]') - timestamps_array.astype('datetime64[s]')).astype('timedelta64[us]').astype(float) / 3600000000
+
+    return hours + minutes + seconds + microseconds
 
 
 def timestamp_to_minutes(timestamp: datetime) -> float:
