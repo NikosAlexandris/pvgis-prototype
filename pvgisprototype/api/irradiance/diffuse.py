@@ -66,7 +66,6 @@ from pvgisprototype.api.geometry.solar_declination import model_solar_declinatio
 from ..geometry.solar_time import model_solar_time
 from ..utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
-
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_time_series
 from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
@@ -94,6 +93,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
@@ -113,6 +113,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+
 
 AOIConstants = []
 AOIConstants.append(-0.074)
@@ -444,6 +445,7 @@ def calculate_diffuse_inclined_irradiance(
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_argument_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.pvlib,
     solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvis,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
@@ -525,6 +527,7 @@ def calculate_diffuse_inclined_irradiance(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
+            model=solar_position_model,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
@@ -620,7 +623,7 @@ def calculate_diffuse_inclined_irradiance(
 
             else:  # if solar_altitude.value < 0.1:
                 # requires the solar azimuth
-                solar_azimuth = calculate_solar_azimuth(
+                solar_azimuth = model_solar_azimuth(
                     longitude=longitude,
                     latitude=latitude,
                     timestamp=timestamp,
