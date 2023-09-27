@@ -104,39 +104,86 @@ def calculate_refracted_solar_altitude_time_series(
     return refracted_solar_altitude_series
 
 
+@validate_with_pydantic(CalculateOpticalAirMassTimeSeriesInputModel)
 def calculate_optical_air_mass_time_series(
-    elevation,#: np.ndarray,
-    refracted_solar_altitude_series,#: np.ndarray,
-    angle_units: str = 'radians',
+    elevation: Annotated[float, typer_argument_elevation],
+    refracted_solar_altitude_series: Union[RefractedSolarAltitude, Sequence[RefractedSolarAltitude]],
+    verbose: Annotated[int, typer_option_verbose] = 0,
 ):
     """Vectorized function to approximate the relative optical air mass for a time series."""
-    optical_air_masse_series = adjust_elevation(elevation) / (
-        np.sin(refracted_solar_altitude_series)
+    is_scalar = False
+    if isinstance(refracted_solar_altitude_series, RefractedSolarAltitude):
+        is_scalar = True
+        refracted_solar_altitude_series = [refracted_solar_altitude_series.value]
+    else:
+        refracted_solar_altitude_series = [altitude.value for altitude in refracted_solar_altitude_series]
+    
+    # Unpack RefractedSolarAltitude objects to a NumPy array
+    refracted_solar_altitude_series_array = np.array(refracted_solar_altitude_series)
+    adjusted_elevation = adjust_elevation(elevation.value)
+    optical_air_mass_series = adjusted_elevation.value / (
+        np.sin(refracted_solar_altitude_series_array)
         + 0.50572
-        * np.power((refracted_solar_altitude_series + 6.07995), -1.6364)
+        * np.power((refracted_solar_altitude_series_array + 6.07995), -1.6364)
     )
     
+    # Repack results back into custom objects
+    if not is_scalar:
+        optical_air_mass_series = [OpticalAirMass(value=value, unit=OPTICAL_AIR_MASS_UNIT) for value in optical_air_mass_series]
+    else:
+        optical_air_mass_series = OpticalAirMass(value=optical_air_mass_series[0], unit=OPTICAL_AIR_MASS_UNIT)
+
+    if verbose == 3:
+        debug(locals())
     return optical_air_mass_series
 
 
 def rayleigh_optical_thickness_time_series(
-    optical_air_mass_series,#: np.ndarray,
+    optical_air_mass_series,  #: np.ndarray,
+    verbose: int = 0,
 ):
-    """ """
-    rayleigh_thickness_series = np.zeros_like(optical_air_mass_series)
-    smaller_than_20 = optical_air_mass_series <= 20
-    larger_than_20 = optical_air_mass_series > 20
-    rayleigh_thickness_series[smaller_than_20] = 1 / (
+    """Vectorized function to calculate Rayleigh optical thickness for a time series."""
+    
+    # Check if input is scalar or array-like
+    is_scalar = False
+    if isinstance(optical_air_mass_series, OpticalAirMass):
+        is_scalar = True
+        optical_air_mass_series = [optical_air_mass_series.value]
+    else:
+        optical_air_mass_series = [air_mass.value for air_mass in optical_air_mass_series]
+    
+    # Unpack OpticalAirMass objects to a NumPy array
+    optical_air_mass_series_array = np.array(optical_air_mass_series)
+    
+    # Perform calculations
+    rayleigh_thickness_series_array = np.zeros_like(optical_air_mass_series_array)
+    smaller_than_20 = optical_air_mass_series_array <= 20
+    larger_than_20 = optical_air_mass_series_array > 20
+    rayleigh_thickness_series_array[smaller_than_20] = 1 / (
         6.6296
-        + 1.7513 * optical_air_mass_series[smaller_than_20]
-        - 0.1202 * np.power(optical_air_mass_series[smaller_than_20], 2)
-        + 0.0065 * np.power(optical_air_mass_series[smaller_than_20], 3)
-        - 0.00013 * np.power(optical_air_mass_series[smaller_than_20], 4)
+        + 1.7513 * optical_air_mass_series_array[smaller_than_20]
+        - 0.1202 * np.power(optical_air_mass_series_array[smaller_than_20], 2)
+        + 0.0065 * np.power(optical_air_mass_series_array[smaller_than_20], 3)
+        - 0.00013 * np.power(optical_air_mass_series_array[smaller_than_20], 4)
     )
-    rayleigh_thickness_series[larger_than_20] = 1 / (
-        10.4 + 0.718 * optical_air_mass_series[mask2]
+    rayleigh_thickness_series_array[larger_than_20] = 1 / (
+        10.4 + 0.718 * optical_air_mass_series_array[larger_than_20]
     )
+    
+    # Repack results back into custom objects
+    if not is_scalar:
+        rayleigh_thickness_series = [
+            RayleighThickness(value=value, unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT)
+            for value in rayleigh_thickness_series_array
+        ]
+    else:
+        rayleigh_thickness_series = RayleighThickness(
+            value=rayleigh_thickness_series_array[0],
+            unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
+        )
 
+    if verbose == 3:
+        debug(locals())
     return rayleigh_thickness_series
 
 
