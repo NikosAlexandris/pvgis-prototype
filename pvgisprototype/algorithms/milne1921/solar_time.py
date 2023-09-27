@@ -1,5 +1,6 @@
 from devtools import debug
 import typer
+from rich import print
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
@@ -21,7 +22,6 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 
 
-
 @validate_with_pydantic(CalculateSolarTimeEoTInputModel)
 def calculate_apparent_solar_time_milne1921(
         longitude: Longitude,
@@ -33,6 +33,7 @@ def calculate_apparent_solar_time_milne1921(
         eccentricity_correction_factor: float = 0.03344,
         time_offset_global: float = 0,
         hour_offset: float = 0,
+        verbose: int = 0,
 ):
     """Calculate the apparent solar time based on the equation of time by Milne 1921
 
@@ -142,6 +143,12 @@ def calculate_apparent_solar_time_milne1921(
     time_correction_factor_hours = time_correction_factor / 60
     apparent_solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
     # ------------------------------------------------------------------------
+    if verbose:
+        print('Day of year : {day_of_year}')
+        print('Equation of time : {equation_of_time}')
+        print('Time correction factor : {time_correction_factor}')
+
+    if verbose == 3:
+        debug(locals())
     
-    debug(locals())
     return apparent_solar_time
