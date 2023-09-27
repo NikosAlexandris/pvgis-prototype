@@ -34,11 +34,11 @@ def calculate_solar_altitude_noaa(
     """Calculate the solar zenith angle (φ) in radians
     """
     solar_hour_angle = calculate_solar_hour_angle_noaa(
-        longitude,
-        timestamp,
-        timezone,
-        time_output_units,
-        angle_output_units,
+        longitude=longitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        time_output_units=time_output_units,
+        angle_output_units='radians',
     )
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
@@ -47,12 +47,12 @@ def calculate_solar_altitude_noaa(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         angle_output_units='radians',
     )
-    solar_altitude = pi/2 - solar_zenith.value
-    if not isfinite(solar_altitude) or not -pi/2 <= solar_altitude <= pi/2:
+    solar_altitude = pi / 2 - solar_zenith.value
+    if not isfinite(solar_altitude) or not -pi / 2 <= solar_altitude <= pi / 2:
         raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
 
     solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
-    solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
+    # solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
     return solar_altitude
 
@@ -66,6 +66,7 @@ def calculate_solar_altitude_time_series_noaa(
     apply_atmospheric_refraction: bool = True,
     time_output_units: str = "minutes",
     angle_output_units: str = "radians",
+    verbose: int = 0,
 ):
     """Calculate the solar zenith angle (φ) in radians for a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
@@ -100,4 +101,6 @@ def calculate_solar_altitude_time_series_noaa(
         for altitude in solar_altitude_series
     ]
 
+    if verbose == 3:
+        debug(locals())
     return np.array(solar_altitude_series, dtype=object)
