@@ -223,6 +223,11 @@ def calculate_refracted_solar_altitude(
     return refracted_solar_altitude
 
 
+@app.command(
+    'optical-air-mass',
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+)
 @validate_with_pydantic(CalculateOpticalAirMassInputModel)
 def calculate_optical_air_mass(
     elevation: Annotated[float, typer_argument_elevation],
@@ -241,9 +246,6 @@ def calculate_optical_air_mass(
 
     refracted_solar_altitude: float
         Refracted solar altitude angle in degrees
-
-    angle_units: str, default='degrees'
-        The expected units for the refracted solar altitude is 'degrees'.
 
     Returns
     -------
@@ -278,11 +280,16 @@ def calculate_optical_air_mass(
 
     .. [2] Hofierka, 2002
     """
-    optical_air_mass = adjust_elevation(elevation) / (
-            sin(refracted_solar_altitude.value)
-            + 0.50572
-            * math.pow((refracted_solar_altitude.value + 6.07995), -1.6364)
-            )
+    adjusted_elevation = adjust_elevation(elevation.value)
+    optical_air_mass = adjusted_elevation.value / (
+        sin(refracted_solar_altitude.value)
+        + 0.50572
+        * math.pow((refracted_solar_altitude.value + 6.07995), -1.6364)
+    )
+    optical_air_mass = OpticalAirMass(
+        value=optical_air_mass,
+        unit=OPTICAL_AIR_MASS_UNIT,
+    )
 
     return optical_air_mass
 
