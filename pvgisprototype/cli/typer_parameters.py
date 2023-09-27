@@ -424,9 +424,9 @@ typer_argument_direct_horizontal_irradiance = typer.Argument(
     rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory=None,
 )
-typer_option_direct_horizontal_component = typer.Option(
+typer_option_direct_horizontal_irradiance = typer.Option(
     # help='Path to direct horizontal irradiance time series (Surface Incoming Direct radiation (SID), `fdir`)',
-    help='Read horizontal irradiance time series from a file',
+    help='Direct (or beam) horizontal irradiance (Surface Incoming Direct radiation (SID), `fdir`',
     rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory = Path(),
 )

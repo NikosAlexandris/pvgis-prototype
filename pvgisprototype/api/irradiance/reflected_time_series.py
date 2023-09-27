@@ -39,7 +39,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_option_albedo
-from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_component
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
@@ -107,7 +107,7 @@ def calculate_ground_reflected_inclined_irradiance(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_component] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.noaa,

@@ -113,7 +113,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_r
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_option_albedo
-from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_component
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
@@ -553,7 +553,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     elevation: Annotated[float, typer_argument_elevation],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_component] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
@@ -779,7 +779,7 @@ def calculate_direct_irradiance(
         show_choices=True,
         case_sensitive=False,
         help="Direct irradiance component to calculate")] = 'inclined',
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_component] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     # direct_horizontal_radiation: Annotated[float, typer.Argument(
     #     help='Direct normal radiation in W/m²',
     #     min=-9000, max=1000)],  # `sh` which comes from `s0`

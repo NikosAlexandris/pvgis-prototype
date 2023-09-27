@@ -35,7 +35,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_option_albedo
-from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_component
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
@@ -82,7 +82,7 @@ def calculate_ground_reflected_inclined_irradiance(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_component] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
@@ -157,7 +157,6 @@ def calculate_ground_reflected_inclined_irradiance(
         * diffuse_solar_altitude_function(solar_altitude.value, linke_turbidity_factor)
     )
     global_horizontal_irradiance = direct_horizontal_component + diffuse_horizontal_component
-
     ground_view_fraction = (1 - cos(surface_tilt)) / 2
 
     # clear-sky ground reflected irradiance

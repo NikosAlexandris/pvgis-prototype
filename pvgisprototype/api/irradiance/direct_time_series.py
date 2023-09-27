@@ -33,7 +33,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_component
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
 from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
@@ -465,7 +465,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_component] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,

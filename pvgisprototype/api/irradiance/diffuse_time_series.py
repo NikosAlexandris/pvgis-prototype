@@ -43,7 +43,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
-from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_component
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude_series
@@ -331,7 +331,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_component] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
     solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.noaa,
