@@ -50,13 +50,13 @@ def print_solar_position_table(
     user_requested_timestamp=None,
     user_requested_timezone=None,
 ):
+    """ """
     console = Console()
 
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
 
-    # Define the list of column names
     columns = ["Longitude", "Latitude", "Time", "Zone"]
     if user_requested_timestamp and user_requested_timezone:
         columns.extend(["Local Time", "Local Zone"])
@@ -75,7 +75,6 @@ def print_solar_position_table(
         columns.append(INCIDENCE_COLUMN_NAME)
     columns.append(UNITS_COLUMN_NAME)
 
-    # Create the table
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
     for model_result in rounded_table:
@@ -99,7 +98,13 @@ def print_solar_position_table(
         if user_requested_timestamp and user_requested_timezone:
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
+
+        is_pvis = model_name.lower() == 'pvis'
+        style = "red" if is_pvis else None
+        # is_pvlib = model_name.lower() == 'pvlib'
+        # style = "green" if is_pvlib else None
         row.append(model_name)
+
         if declination_value is not None:
             row.append(str(declination_value))
         if hour_angle_value is not None:
@@ -112,8 +117,13 @@ def print_solar_position_table(
             row.append(str(azimuth_value))
         if incidence_value is not None:
             row.append(str(incidence_value))
+
         row.append(str(units))
-        table.add_row(*row)
+        table.add_row(*row, style=style)
+
+    console.print(table)
+
+
 def print_hour_angle_table(
     latitude,
     rounding_places,
