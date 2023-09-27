@@ -75,7 +75,8 @@ def model_solar_geometry_overview(
     time_output_units: str,
     angle_units: str,
     angle_output_units: str,
-) -> Tuple[SolarAltitude, SolarAzimuth]:
+    verbose: int = 0,
+):
     """
     The solar altitude angle measures from the horizon up towards the zenith
     (positive, and down towards the nadir (negative)). The altitude is zero all
@@ -381,6 +382,8 @@ def model_solar_geometry_overview(
             solar_altitude if solar_altitude is not None else None,
             solar_azimuth if solar_azimuth is not None else None,
     )
+    if verbose == 3:
+        debug(locals())
     return position
 
 
@@ -401,6 +404,7 @@ def calculate_solar_geometry_overview(
     time_output_units: str = 'minutes',
     angle_units: str = 'radians',
     angle_output_units: str = 'radians',
+    verbose: int = 0,
 ) -> List:
     """
     Calculates the solar position using all models and returns the results in a table.
@@ -425,6 +429,7 @@ def calculate_solar_geometry_overview(
                 time_output_units=time_output_units,
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
+                verbose=verbose,
             )
             results.append({
                 'Model': model.value,
