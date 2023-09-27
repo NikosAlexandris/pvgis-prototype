@@ -181,7 +181,6 @@ def calculate_direct_normal_irradiance_time_series(
 
     return direct_normal_irradiance_series
 
-import numpy.typing as npt
 
 @app.command('horizontal-series', no_args_is_help=True)
 def calculate_direct_horizontal_irradiance_time_series(
@@ -189,60 +188,70 @@ def calculate_direct_horizontal_irradiance_time_series(
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,#Annotated[Optional[ZoneInfo], typer_option_timezone] = None,
-    linke_turbidity_factor_series = None,#: Annotated[Optional[np.ndarray], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
+    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365,  # 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[int, typer_option_verbose]= False,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> np.ndarray:
     """ """
-    solar_altitude_series = model_solar_altitude_series(
+    if verbose == 3:
+        debug(locals())
+
+    solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
+        model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        solar_time_model=solar_time_model,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
-        )
+        verbose=verbose,
+    )
     
-    # expects solar altitude in degrees! -------------------------------------
-    expected_solar_altitude_units = 'degrees'
+    # expects solar altitude in degrees! ----------------------------------vvv
+    expected_solar_altitude_units = "degrees"
     solar_altitude_series_in_degrees = convert_series_to_degrees_if_requested(
-            solar_altitude_series,
-            expected_solar_altitude_units=expected_solar_altitude_units,  # Here!
-            )
+        solar_altitude_series,
+        angle_output_units=expected_solar_altitude_units,  # Here!
+    )
+
     # refracted_solar_altitude, refracted_solar_altitude_units = calculate_refracted_solar_altitude(
     refracted_solar_altitude_series = calculate_refracted_solar_altitude_time_series(
-            solar_altitude_series=solar_altitude_series_in_degrees,
-            angle_input_units=expected_solar_altitude_units,
-            angle_output_units='radians',  # Here in radians!
-            )
+        solar_altitude_series=solar_altitude_series_in_degrees,
+        angle_input_units=expected_solar_altitude_units,
+        angle_output_units="radians",  # Here in radians!
+    )
     optical_air_mass_series = calculate_optical_air_mass_time_series(
-            elevation=elevation,
-            refracted_solar_altitude_series=refracted_solar_altitude_series,
-            angle_units='degrees',  # and Here!
-            )
-    # --------------------------------------expects solar altitude in degrees!
+        elevation=elevation,
+        refracted_solar_altitude_series=refracted_solar_altitude_series,
+        verbose=verbose,
+    )
+    # ^^^ --------------------------------- expects solar altitude in degrees!
+
     direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
         timestamps=timestamps,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
@@ -251,11 +260,19 @@ def calculate_direct_horizontal_irradiance_time_series(
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        verbose=verbose,
     )
-    direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series)
+    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
+    direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
 
-    # table_with_inputs = convert_dictionary_to_table(locals())
-    # console.print(table_with_inputs)
-    typer.echo(f'Direct horizontal irradiance series: {direct_horizontal_irradiance_series}')  # B0c
+    if verbose == 1:
+        pass
 
+    if verbose == 3:
+        debug(locals())
+
+    timestamps = np.array(timestamps)
+    results = np.column_stack((timestamps, direct_horizontal_irradiance_series))
+    # typer.echo(f'Direct horizontal irradiance series: {direct_horizontal_irradiance_series}')  # B0c
+    typer.echo(f'Direct horizontal irradiance series:\n{results}')
     return direct_horizontal_irradiance_series
