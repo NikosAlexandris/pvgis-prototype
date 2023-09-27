@@ -183,6 +183,7 @@ def calculate_refracted_solar_altitude(
     solar_altitude: Annotated[float, typer_argument_solar_altitude],
     angle_input_units: Annotated[str, typer_option_angle_units] = 'degrees',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Adjust the solar altitude angle for atmospheric refraction
 
@@ -217,7 +218,8 @@ def calculate_refracted_solar_altitude(
         refracted_solar_altitude, angle_output_units
     )
 
-    # debug(locals())
+    if verbose == 3:
+        debug(locals())
     return refracted_solar_altitude
 
 
@@ -276,14 +278,12 @@ def calculate_optical_air_mass(
 
     .. [2] Hofierka, 2002
     """
-    # debug(locals())
     optical_air_mass = adjust_elevation(elevation) / (
             sin(refracted_solar_altitude.value)
             + 0.50572
             * math.pow((refracted_solar_altitude.value + 6.07995), -1.6364)
             )
 
-    # debug(locals())
     return optical_air_mass
 
 
@@ -325,6 +325,7 @@ def calculate_direct_normal_irradiance(
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365,  # 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the direct normal irradiance attenuated by the cloudless atmosphere
 
@@ -377,6 +378,9 @@ def calculate_direct_normal_irradiance(
             * optical_air_mass
             * rayleigh_optical_thickness(optical_air_mass)
             )
+    if verbose == 3:
+        debug(locals())
+    typer.echo(f'Direct normal irradiance = Extraterrestial normal irradiance * exp( Corrected Linke turbidity factor * Optical air mass * Rayleigh Optical Thickness )')
     typer.echo(f'Direct normal irradiance: {direct_normal_irradiance}')  # B0c
 
     return direct_normal_irradiance  # B0c
@@ -404,6 +408,7 @@ def calculate_direct_horizontal_irradiance(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     verbose: Annotated[int, typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the direct irradiatiance incident on a horizontal surface
 
@@ -464,12 +469,15 @@ def calculate_direct_horizontal_irradiance(
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
+            verbose=verbose,
             )
     direct_horizontal_irradiance = direct_normal_irradiance * sin(solar_altitude.value)
 
     # table_with_inputs = convert_dictionary_to_table(locals())
     # console.print(table_with_inputs)
     typer.echo(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')  # B0c
+    if verbose == 3:
+        debug(locals())
     return direct_horizontal_irradiance
 
 
@@ -504,6 +512,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the direct irradiance incident on a tilted surface [W*m-2] 
 
@@ -517,45 +526,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     #     B   = ────────────────     in  ⎜───⎟
     #      ic       sin ⎛h ⎞             ⎜ -2⎟           
     #                   ⎝ 0⎠             ⎝m  ⎠           
-    year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1,
-                             tzinfo=timestamp.tzinfo)
-    day_of_year = timestamp.timetuple().tm_yday
-    hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
 
-    # day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
-
-    # Hofierka, 2002 ------------------------------------------------------
-    # tangent_relative_longitude = - sin(surface_tilt)
-    #                              * sin(surface_orientation) /
-    #                                sin(latitude) 
-    #                              * sin(surface_tilt) 
-    #                              * cos(surface_orientation) 
-    #                              + cos(latitude) 
-    #                              * cos(surface_tilt)
-    tangent_relative_longitude = -sin(surface_tilt) * sin(
-        surface_orientation
-    ) / sin(latitude) * sin(surface_tilt) * cos(
-        surface_orientation
-    ) + cos(
-        latitude
-    ) * cos(
-        surface_tilt
-    )
-    # C source code -------------------------------------------------------
-    # There is an error of one negative sign in either of the expressions!
-    # That is so because : cos(pi/2 + x) = -sin(x)
-    # tangent_relative_longitude = - cos(half_pi - surface_tilt)  # cos(pi/2 - x) = sin(x)
-    #                              * cos(half_pi + surface_orientation) /  # cos(pi/2 + x) = -sin(x)
-    #                                sin(latitude) 
-    #                              * cos(half_pi - surface_tilt) 
-    #                              * sin(half_pi + surface_orientation)  # sin(pi/2 + x) = cos(x)
-    #                              + cos(latitude) 
-    #                              * sin(half_pi - surface_tilt)  # sin(pi/2 - x) = cos(x)
-    # --------------------------------------------------------------------
-
-    relative_longitude = atan(tangent_relative_longitude)
-    # cos(hour_angle - relative_longitude) = C33_inclined / C31_inclined
 
     # Hofierka, 2002
     # sine_relative_latitude = -cos(latitude) 
@@ -650,14 +621,14 @@ def calculate_direct_inclined_irradiance_pvgis(
         longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
         latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
         direct_horizontal_irradiance = select_time_series(
-                time_series=direct_horizontal_component,
-                longitude=longitude_for_selection,
-                latitude=latitude_for_selection,
-                time=time,
-                mask_and_scale=mask_and_scale,
-                inexact_matches_method=inexact_matches_method,
-                tolerance=tolerance,
-                verbose=verbose,
+            time_series=direct_horizontal_component,
+            longitude=longitude_for_selection,
+            latitude=latitude_for_selection,
+            time=time,
+            mask_and_scale=mask_and_scale,
+            inexact_matches_method=inexact_matches_method,
+            tolerance=tolerance,
+            verbose=verbose,
         )
         print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance}')
 
@@ -667,6 +638,8 @@ def calculate_direct_inclined_irradiance_pvgis(
             * sine_solar_incidence_angle
             / sine_solar_altitude
         )
+        if verbose == 3:
+            debug(locals())
     except ZeroDivisionError:
         logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
         typer.echo("Is the solar altitude angle zero?")
@@ -703,7 +676,8 @@ def calculate_direct_inclined_irradiance_pvgis(
 
     typer.echo(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} (based on {solar_incidence_model})')  # B0c
 
-    debug(locals())
+    if verbose == 3:
+        debug(locals())
     return modified_direct_horizontal_irradiance
 
 
@@ -754,7 +728,7 @@ def calculate_direct_irradiance(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose] = 0,
     ):
     """Calculate the direct irradiatiance incident on a solar surface.
 
