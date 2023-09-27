@@ -102,7 +102,7 @@ state = {"verbose": False}
 @app.callback()
 def main(
     ctx: typer.Context,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[Optional[int], typer_option_verbose] = 0,
     debug: Annotated[Optional[bool], typer.Option(
         "--debug",
         help="Enable debug mode")] = False,
@@ -113,7 +113,7 @@ def main(
     # print(f"Executing command: {ctx.invoked_subcommand}")
     if verbose:
         print("Will output verbosely")
-        state["verbose"] = True
+        # state["verbose"] = True
 
     app.debug_mode = debug
 
@@ -143,7 +143,7 @@ def overview(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[Optional[int], typer_option_verbose] = 0,
     ):
     """
     """
@@ -199,6 +199,7 @@ def overview(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -236,7 +237,7 @@ def noaa(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[Optional[int], typer_option_verbose] = 0,
 ):
     """
     """
@@ -307,7 +308,7 @@ def altitude(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[Optional[int], typer_option_verbose] = 0,
 ) -> float:
     """Calculate the solar altitude angle above the horizon.
 
@@ -358,6 +359,7 @@ def altitude(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     print_solar_position_table(
         longitude=longitude,
@@ -391,7 +393,7 @@ def zenith(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[Optional[int], typer_option_verbose] = 0,
 ) -> float:
     """Calculate the solar zenith angle
 
@@ -445,6 +447,7 @@ def zenith(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     for model_result in solar_altitude:
         solar_zenith = model_result.get('Zenith', None)
@@ -486,7 +489,7 @@ def azimuth(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[Optional[int], typer_option_verbose] = 0,
 ) -> float:
     """Calculate the solar azimuth angle
 
@@ -540,6 +543,7 @@ def azimuth(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     print_solar_position_table(
         longitude=longitude,
@@ -633,6 +637,8 @@ def declination(
 def hour_angle(
     solar_time: Annotated[float, typer_argument_solar_time],
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
 ):
     """Calculate the hour angle 'ω = (ST / 3600 - 12) * 15 * π / 180'
 
@@ -653,6 +659,7 @@ def hour_angle(
             angle_output_units=angle_output_units,
             )
     typer.echo(f'Hour angle: {hour_angle.value} {hour_angle.unit}')
+        rounding_places=rounding_places,
 
 
 @app.command('sunrise', no_args_is_help=True, help=':sunrise: Calculate the hour angle (ω) at sun rise and set')
@@ -661,6 +668,8 @@ def sunrise(
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 0,
     solar_declination: Annotated[Optional[float], typer_argument_solar_declination] = 0,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
 ):
     """Calculate the hour angle 'ω = (ST / 3600 - 12) * 15 * π / 180'
 
