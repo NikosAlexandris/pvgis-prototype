@@ -8,6 +8,7 @@ import math
 import numpy as np
 import typer
 from enum import Enum
+from rich import print
 
 
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_pvgis
@@ -497,7 +498,10 @@ def calculate_effective_irradiance(
     efficiency_coefficient = max(efficiency_coefficient, 0.0)  # limit to zero
     
     result = efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
-    typer.echo(f'Effective hourly irradiance: {result}')
+    if verbose > 0:
+        print(f'Direct, Diffuse, Reflected: {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance}')
+        print(f'Efficiency coefficient : {efficiency_coefficient}')
+        print(f'Effective hourly irradiance values (Direct, Diffuse, Reflected): {result}')
     if verbose == 3:
         debug(locals())
     return result

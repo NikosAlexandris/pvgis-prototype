@@ -7,6 +7,7 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from ..utilities.conversions import convert_to_radians
 from datetime import datetime
 from ..utilities.timestamp import now_utc_datetimezone
+from rich import print
 from ..utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
@@ -171,6 +172,6 @@ def calculate_ground_reflected_inclined_irradiance(
         )
         ground_reflected_irradiance *= ground_reflected_irradiance_loss_factor
 
-    typer.echo(ground_reflected_irradiance)
-
+    if verbose > 0:
+        print(f'Ground reflected irradiance : {ground_reflected_irradiance}')
     return ground_reflected_irradiance
