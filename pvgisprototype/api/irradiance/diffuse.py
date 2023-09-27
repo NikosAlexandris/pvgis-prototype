@@ -104,6 +104,11 @@ from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 AOIConstants = []
 AOIConstants.append(-0.074)
@@ -161,7 +166,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
-    verbose: Annotated[int, typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
     time series.
@@ -276,6 +281,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
 def calculate_term_n(
         kb,
         ):
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     """Define the N term
 
     Parameters
@@ -435,16 +441,16 @@ def calculate_diffuse_inclined_irradiance(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
-    verbose: Annotated[int, typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the diffuse irradiance incident on a solar surface
 
