@@ -22,7 +22,7 @@ from .typer_parameters import typer_option_statistics
 from .typer_parameters import typer_option_output_filename
 from .typer_parameters import typer_option_variable_name_as_suffix
 from .typer_parameters import typer_option_tufte_style
-from .typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
@@ -52,6 +52,7 @@ from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.series.statistics import export_statistics_to_csv
 
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -105,7 +106,7 @@ def select_time_series(
     # csv: Annotated[Path, typer_option_csv] = 'series_in',
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
-    verbose: Annotated[int, typer_option_verbose] = False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """
     Plot location series
@@ -147,8 +148,10 @@ def select_time_series(
         single_value = float(data_array.values)
         warning = Fore.YELLOW + f'{exclamation_mark} The selection matches a single value : {single_value}' + Style.RESET_ALL
         logger.warning(warning)
-        if verbose:
+        if verbose > 0:
             typer.echo(Fore.YELLOW + warning)
+        if verbose == 3:
+            debug(locals())
         return single_value
 
     # # if statistics_to_csv:
@@ -181,6 +184,11 @@ def select_time_series(
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
 
+    if verbose > 0:
+        typer.echo(f'Series : {location_time_series.values}')
+    if verbose == 3:
+        debug(locals())
+    return location_time_series
     return data_array
 
 
@@ -264,7 +272,7 @@ def uniplot(
     lines: bool = True,
     title: str = 'Uniplot',
     unit: str = 'Units',  #" °C")
-    verbose: Annotated[Optional[bool], typer_option_verbose] = False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot time series in the terminal"""
     from uniplot import plot
