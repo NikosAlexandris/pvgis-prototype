@@ -15,6 +15,7 @@ from ..utilities.conversions import convert_to_degrees_if_requested
 from ..utilities.conversions import convert_float_to_radians_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
 from ..utilities.conversions import convert_to_radians
+from ..utilities.conversions import convert_south_to_north_radians_convention
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
@@ -47,14 +48,6 @@ from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
-
-
-def convert_south_to_north_degrees_convention(azimuth_south_degrees):
-    return (azimuth_south_degrees + 180) % 360
-
-
-def convert_south_to_north_radians_convention(azimuth_south_radians):
-    return (azimuth_south_radians + pi) % 2 * pi
 
 
 @validate_with_pydantic(ModelSolarPositionInputModel)
