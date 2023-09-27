@@ -150,7 +150,7 @@ class MethodsForInexactMatches(str, Enum):
 #     return value
 
 
-# @validate_with_pydantic(Elevation)
+@validate_with_pydantic(AdjustElevationInputModel)
 def adjust_elevation(
     elevation: Annotated[float, typer_argument_elevation],
 ):
@@ -161,14 +161,17 @@ def adjust_elevation(
     Notes
     -----
 
+    In PVGIS C source code:
+
+	elevationCorr = exp(-sunVarGeom->z_orig / 8434.5);
+
+    References
+    ----------
+
     .. [1] Hofierka, 2002
     """
-    # debug(locals())
-    return exp(-elevation.value / 8434.5)
-
-
-# ensure value ranges in [-pi, pi]
-range_in_minus_plus_pi = lambda radians: (radians + pi) % (2 * pi) - pi
+    adjusted_elevation = exp(-elevation.value / 8434.5)
+    return Elevation(value=adjusted_elevation, unit="meters")
 
 
 @app.command(
