@@ -1,3 +1,5 @@
+from devtools import debug
+import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
@@ -97,6 +99,8 @@ def calculate_solar_time_ephem(
           logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
   # Handle Me during input validation? -------------------------------------
 
+  longitude = longitude.value
+  latitude = latitude.value
   observer = ephem.Observer()
   observer.date = timestamp
   observer.lon = longitude
@@ -139,8 +143,6 @@ def calculate_solar_time_ephem(
       typer.echo(f'Sun right ascension: {sun.ra}')
       typer.echo(f'Hour angle: {hour_angle}')
       typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
-      # typer.echo(f'Mean solar time: {solar_time}')
+      typer.echo(f'Mean solar time: {mean_solar_time}')
 
-  # debug(locals())
-  # return SolarTime(value=solar_time_datetime, unit='datetime?')
   return solar_time_datetime
