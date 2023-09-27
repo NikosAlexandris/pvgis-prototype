@@ -27,6 +27,42 @@ def calculate_local_solar_time_noaa(
     -------
 
     (solar_time, units): float, str
+
+    Notes
+    -----
+
+    The local standard time (LST) 
+
+
+    The general equation for AST is :
+
+        AST = LST + ET +/-4 * (SL - LL) - DS
+
+        where :
+
+        - AST Apparent Solar Time
+        - LST Local Standard Time
+        - ET Equation of Time
+        - SL Standard Longitude
+        - LL Local Longitude
+        - DS Daylight Saving *
+            * Working with UTC, DS is removed from the equation.
+
+    Thus, the LST is given by :
+
+        LST = AST - ET -/+4 * (SL - LL)
+
+    For noon, AST = 12 thus :
+
+        LST = 12 - ET -/+4 * (SL - LL)
+
+    In solar energy calculations, the apparent solar time (AST) based on the
+    apparent angular motion of the sun across the sky expresses the time of
+    day. The time when the sun crosses the meridian of the observer is the
+    local solar noon. It usually does not coincide with the 12:00 o’clock time
+    of a locality. To convert the local standard time (LST) to AST, two
+    corrections are applied; the equation of time (ET) and longitude
+    correction. These are analyzed next.
     """
     # # Handle Me during input validation? -------------------------------------
     # if timezone != timestamp.tzinfo:
@@ -36,17 +72,17 @@ def calculate_local_solar_time_noaa(
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # ------------------------------------------------------------------------
     solar_noon_timestamp = calculate_event_time_noaa(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            'noon',
-            refracted_solar_zenith,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
-            )
+        longitude,
+        latitude,
+        timestamp,
+        timezone,
+        'noon',
+        refracted_solar_zenith,
+        apply_atmospheric_refraction,
+        time_output_units,
+        angle_units,
+        angle_output_units,
+    )
 
     if timestamp < solar_noon_timestamp:
         previous_solar_noon_timestamp = solar_noon_timestamp - timedelta(days=1)
