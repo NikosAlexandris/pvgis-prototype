@@ -69,6 +69,22 @@ class MethodsForInexactMatches(str, Enum):
     nearest = 'nearest' # use nearest valid index value
 
 
+def warn_for_negative_longitude(
+    longitude: Longitude = None,
+):
+    """Warn for negative longitude value
+
+    Maybe the input dataset ranges in [0, 360] degrees ?
+    """
+    if longitude < 0:
+        warning = Fore.YELLOW + f'{exclamation_mark} '
+        warning += f'The longitude ' + Style.RESET_ALL
+        warning += f'{longitude} ' + Fore.RED + f'is negative. ' + Style.RESET_ALL
+        warning += Fore.YELLOW + f'If the input dataset\'s longitude values range in [0, 360], consider using `--convert-longitude-360`!' + Style.RESET_ALL
+        # logger.warning(warning)
+        typer.echo(Fore.YELLOW + warning)
+
+
 # @app.callback('series', invoke_without_command=True)
 @app.command(
     'select',
@@ -96,14 +112,7 @@ def select_time_series(
     """
     if convert_longitude_360:
         longitude = longitude % 360
-
-    if longitude < 0:
-        warning = Fore.YELLOW + f'{exclamation_mark} '
-        warning += f'The longitude ' + Style.RESET_ALL
-        warning += f'{longitude} ' + Fore.RED + f'is negative. ' + Style.RESET_ALL
-        warning += Fore.YELLOW + f'If the input dataset\'s longitude values range in [0, 360], consider using `--convert-longitude-360`!' + Style.RESET_ALL
-        # logger.warning(warning)
-        typer.echo(Fore.YELLOW + warning)
+    warn_for_negative_longitude(longitude)
 
     logger.handlers = []  # Remove any existing handlers
     file_handler = logging.FileHandler(f'{output_filename}_{time_series.name}.log')
