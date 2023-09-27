@@ -265,7 +265,7 @@ def plot(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-    time: Annotated[Optional[str], typer_argument_time] = None,
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
@@ -302,7 +302,7 @@ def uniplot(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-    time: Annotated[Optional[str], typer_argument_time] = None,
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
@@ -315,16 +315,16 @@ def uniplot(
     """Plot time series in the terminal"""
     from uniplot import plot
     data_array = select_time_series(
-            time_series=time_series,
-            longitude=longitude,
-            latitude=latitude,
-            time=time,
-            convert_longitude_360=convert_longitude_360,
-            statistics=False,
-            output_filename=None,
-            variable_name_as_suffix=variable_name_as_suffix,
-            verbose=verbose,
-            )
+        time_series=time_series,
+        longitude=longitude,
+        latitude=latitude,
+        time=time,
+        convert_longitude_360=convert_longitude_360,
+        statistics=False,
+        output_filename=None,
+        variable_name_as_suffix=variable_name_as_suffix,
+        verbose=verbose,
+    )
     supertitle = f'{data_array.long_name}'
     y_label = data_array.units
     plot(
