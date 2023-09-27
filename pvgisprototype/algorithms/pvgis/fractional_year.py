@@ -15,7 +15,7 @@ FRACTIONAL_YEAR_MAXIMUM = 2 * pi
 
 
 # @validate_with_pydantic(CalculateFractionalYearPVGISInputModel, expand_args=True)
-def calculate_fractional_year_pvis(
+def calculate_fractional_year_pvgis(
     timestamp: datetime,
     angle_units: str = 'radians',
     angle_output_units: str = 'radians',
