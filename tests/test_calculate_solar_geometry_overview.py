@@ -1,7 +1,8 @@
 import pytest
+import sys
 from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
 from pvgisprototype.api.geometry.models import SolarPositionModels
-from .helpers import load_test_cases
+from .helpers import read_test_cases_file, test_cases_from_data
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.constants import (
     ALGORITHM_NAME,
@@ -14,11 +15,18 @@ from pvgisprototype.constants import (
 )
 
 
-test_cases = load_test_cases(
+test_cases_data = read_test_cases_file(
     '/mnt/c/Users/olygo/Documents/projects/JRC/PVGIS/modernize/test_cases/Test_cases_extracted_from_NOAA_Solar_Calculator_copy.xlsx'
 )
+test_cases = test_cases_from_data(
+    test_cases_data,
+    declination=DECLINATION_NAME,
+    altitude=ALTITUDE_NAME,
+    azimuth=AZIMUTH_NAME,
+)
 
-tolerances = [1, 0.5, 0.1]
+
+tolerances = [0.1]      # 1, 0.5, 
 
 models = [[
     SolarPositionModels.noaa,
