@@ -19,7 +19,7 @@
 - variable: Declination
   variable_name: declination_angle
   symbol: δ
-  description: The declination angle of the sun is the angle between the equator and a line drawn from the centre of the Earth to the centre of the sun.
+  description: The solar declination is the angle between the rays of the sun and the equator of the earth. It is used to calculate the solar elevation and azimuth angles.
   units: Radian
   tags:
     - solar
