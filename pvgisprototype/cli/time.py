@@ -37,7 +37,7 @@ from .typer_parameters import typer_argument_solar_declination
 from .typer_parameters import typer_argument_surface_tilt
 from .typer_parameters import typer_argument_surface_orientation
 from .typer_parameters import typer_argument_hour_angle
-from .typer_parameters import typer_argument_solar_time
+from .typer_parameters import typer_argument_true_solar_time
 from .typer_parameters import typer_option_solar_position_model
 from .typer_parameters import typer_option_solar_time_model
 from .typer_parameters import typer_option_global_time_offset
@@ -65,19 +65,6 @@ app = typer.Typer(
 console = Console()
 
 
-# @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
-# def hour_angle(
-#         solar_time: Annotated[float, typer.Argument(
-#             callback=convert_to_radians, min=-180, max=180)],
-#         ):
-#     """Calculate the hour angle based on the formula:
-#     ω = (ST / 3600 - 12) * 15 * 0.0175
-#     """
-#     hour_angle = calculate_hour_angle(
-#             solar_time,
-#             )
-#     typer.echo(f'Solar time: {hour_angle} ({timezone})')
-
 @app.command('fractional-year', no_args_is_help=True, help=f'⦩ Calculate the fractional year {NOT_IMPLEMENTED_CLI}')
 def fractional_year(
 ):
@@ -96,17 +83,16 @@ def equation_of_time(
 
 @app.command('offset', no_args_is_help=True, help=f'⦩ Calculate the time offset {NOT_IMPLEMENTED_CLI}')
 def offset(
-        ):
+):
     """
     """
     pass
 
 
-# @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
 @app.command(
     'solar',
     no_args_is_help=True,
-    help='⦩ Calculate the solar time'
+    help='⦩ Calculate the apparent solar time'
 )
 def solar_time(
     longitude: Annotated[float, typer_argument_longitude],
@@ -169,6 +155,7 @@ def solar_time(
         hour_offset=hour_offset,
         time_output_units=time_output_units,
         angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     solar_time_table = Table('Model', 'Solar time', #'Units',
                                  box=box.SIMPLE_HEAD)
