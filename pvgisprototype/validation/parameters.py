@@ -29,6 +29,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
 
+MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
 
 # Where?
 
@@ -44,7 +45,7 @@ class LongitudeModel(BaseModel):
         elif isinstance(input, float):
             return Longitude(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported `longitude` type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `longitude`")
 
 
 class LatitudeModel(BaseModel):
@@ -58,7 +59,7 @@ class LatitudeModel(BaseModel):
         elif isinstance(input, float):
             return Latitude(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported `latitude` type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `latitude`")
 
 
 class BaseCoordinatesModel(
@@ -198,7 +199,7 @@ class SolarDeclinationModel(BaseModel):
         elif isinstance(input, float):
             return SolarDeclination(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported solar_declination type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_declination`")
 
 
 class SolarPositionModel(BaseModel):
@@ -245,7 +246,7 @@ class SurfaceTiltModel(BaseModel):
         elif isinstance(input, float):
             return SurfaceTilt(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported surface_tilt type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_tilt`")
 
 
 class SurfaceOrientationModel(BaseModel):
@@ -261,7 +262,7 @@ class SurfaceOrientationModel(BaseModel):
         elif isinstance(input, float):
             return SurfaceOrientation(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported surface_orientation type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_orientation`")
 
 
 class SolarHourAngleModel(BaseModel):
@@ -277,7 +278,7 @@ class SolarHourAngleModel(BaseModel):
         elif isinstance(input, float):
             return SolarHourAngle(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported solar_hour_angle type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_hour_angle`")
 
 
 class SolarHourAngleSeriesModel(BaseModel):
@@ -300,7 +301,7 @@ class SolarHourAngleSeriesModel(BaseModel):
         ):
             return input
         else:
-            raise ValueError("Unsupported solar_hour_angle_series type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_hour_angle_series`")
 
 
 class ApplyAtmosphericRefraction(BaseModel):
@@ -317,9 +318,10 @@ class RefractedSolarAltitudeModel(BaseModel):
         elif isinstance(input, float):
             return RefractedSolarAltitude(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported `refracted_solar_altitude` type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_altitude`")
 
 
+    #         raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_altitude`")
 class RefractedSolarZenithModel(BaseModel):
     refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith]
 
@@ -330,7 +332,7 @@ class RefractedSolarZenithModel(BaseModel):
         elif isinstance(input, float):
             return RefractedSolarZenith(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported `refracted_solar_zenith` type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_zenith`")
 
 
 class ElevationModel(BaseModel):
@@ -347,7 +349,7 @@ class ElevationModel(BaseModel):
         elif isinstance(input, float):
             return Elevation(value=input, unit="meters")
         else:
-            raise ValueError("Unsupported type provided for `elevation`")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `elevation`")
 
         # valid_units = "meters"
         # if not unit == valid_units:
