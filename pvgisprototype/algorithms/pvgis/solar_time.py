@@ -28,7 +28,7 @@ def calculate_solar_time_pvgis(
     timezone: ZoneInfo = None,
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,  # from the C code : = 0.165
     time_offset_global: float = 0,
     verbose: int = 0,
 ):
