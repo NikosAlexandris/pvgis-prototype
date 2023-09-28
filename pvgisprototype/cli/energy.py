@@ -9,122 +9,113 @@ energy
 import typer
 from typing_extensions import Annotated
 from typing import Optional
+from typing import List
 import pathlib
 import os
 from .example_pv_estimation_output import csv_to_list_of_dictionaries
 from rich import print
-from .messages import NOT_IMPLEMENTED
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
+from pvgisprototype.cli.typer_parameters import typer_argument_pv_technology
+from pvgisprototype.cli.typer_parameters import typer_argument_mounting_type
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_optimise_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_optimise_surface_geometry
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import OPTIMISE_SURFACE_TILT_FLAG_DEFAULT
+from pvgisprototype.constants import OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT
 
 
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f':sun::high_voltage: Estimate the energy production of a PV system',
+    help=f':sun::high_voltage: Estimate the energy production of a PV system {NOT_IMPLEMENTED}',
 )
 
 
-@app.command('grid', no_args_is_help=True, help=f":electric_plug: Estimate the energy production of a PV system connected to the electricity grid")
+@app.command(
+    'grid',
+    no_args_is_help=True,
+    help=f":electric_plug: Estimate the energy production of a PV system connected to the electricity grid {NOT_IMPLEMENTED}",
+)
 def estimate_grid_connected_pv(
-        longitude: Annotated[float, typer.Argument(
-            rich_help_panel='Required',
-            help='Longitude in decimal degrees, west is negative',
-            min=-180, max=180)],  #lon
-        latitude: Annotated[float, typer.Argument(
-            rich_help_panel='Required',
-            help='Latitude in decimal degrees, south is negative',
-            min=-90, max=90)],  # lat
-        peak_power: Annotated[float, typer.Argument(
-            rich_help_panel='Required',
-            help='The installed peak PV power in kWp',
-            min=0, max=100000000)],  # peakpower
-        loss: Annotated[float, typer.Argument(
-            rich_help_panel='Preset',
-            help='System losses in %',
-            min=0, max=100)] = 14,  # loss
-        solar_radiation_database: Annotated[Optional[str], typer.Argument(
-            rich_help_panel='Preset',
-            help='Solar radiation database with hourly time resolution')
-                                            ] = 'PVGIS-SARAH2',  # raddatabase
-        consider_shadows: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Preset',
-            help='Calculate effect of horizon shadowing'),
-                                    ] = True,  # usehorizon
-        horizon_heights: Annotated[Optional[float], typer.Argument(
-            rich_help_panel='Preset',
-            help='Define horizon heights (comma-seprarated values or .csv file) at equal angular distance around the horizon given in clockwise direction starting at North, going to East, South, West, and back to North (first point is due north, last is west of north). Example: 10, 20, 30, 20, 5, 0, 10, 20, 5, 0, 10, 20, 30, 20, 5, 0, 10, 20, 5, 0'
-            )] = None,  # userhorizon
-        pv_techonology: Annotated[Optional[str], typer.Argument(
-            rich_help_panel='Preset',
-            help='Technology of the PV module: crystalline silicon cells, thin film modules made from CIS or CIGS, thin film modules made from Cadmium Telluride (CdTe), other/unknown',
-            )] = None,  # pvtechchoice
-        mounting_type: Annotated[Optional[str], typer.Argument(
-            rich_help_panel='Preset',
-            help='Type of mounting')] = 'free',  # mountingplace
-        # fixed: Annotated[Optional[bool], typer.Argument()] = True,  # fixed
-        inclination: Annotated[float, typer.Argument(
-            rich_help_panel='Preset',
-            help='Inclination angle (slope) from horizontal plane of the fixed PV system',
-            min=0, max=90)] = 0,  # angle
-        orientation: Annotated[float, typer.Argument(
-            rich_help_panel='Preset',
-            help='Orientation (azimuth) of the fixed PV system: 0=south, 90=west, -90=east',
-            min=0, max=180)] = 0,  # aspect
-        optimise_inclination: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Optional',
-            help='Optimise inclination for a fixed PV system',
-            )] = False,  # optimalinclination
-        optimise_angles: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Optional',
-            help='Optimise inclination and orientation for a fixed PV system',
-            )] = False,  # optimalangles
-        single_axis_system: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Optional',
-            help='Consider a single axis PV system -- Remove Me and improve single_axis_inclination!',
-            )] = False,  # inclined_axis
-        single_axis_inclination: Annotated[float, typer.Argument(
-            rich_help_panel='Optional',
-            help='Inclination for a single axis PV system',
-            min=0, max=90)] = 0,  # inclinedaxisangle
-        optimise_single_axis_inclination: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Optional',
-            help='Optimise inclination for a single axis PV system',
-            )] = False,  # inclined_optimum
-        vertical_axis_system: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Optional',
-            help='Consider a single vertical axis PV system -- Remove Me and improve vertical_axis_inclination!',
-            )] = False,  # vertical_axis
-        vertical_axis_inclination: Annotated[float, typer.Argument(
-            rich_help_panel='Optional',
-            help='Inclination for a single axis PV system',
-            min=0, max=90)] = 0,  # Verticalaxisangle
-        optimise_vertical_axis_inclination: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Optional',
-            help='Optimise inclination for a single vertical axis PV system',
-            )] = False,  # vertical_optimum
-        two_axis_system: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Optional',
-            help='Consider a two-axis tracking PV system -- Review Me!',
-            )] = False,  # twoaxis
-        electricity_price: Annotated[Optional[bool], typer.Argument(
-            rich_help_panel='Optional',
-            help='Calculate the PV electricity price (kwh/year) for the system cost in the user requested currency -- Review Me!',
-            )] = False,  # pvprice
-        cost: Annotated[float, typer.Argument(
-            rich_help_panel='Optional',
-            help='Total cost of installing the PV system [custom currency]',
-            min=0, max=100000000)] = 0,  # systemcost
-        interest: Annotated[float, typer.Argument(
-            rich_help_panel='Optional',
-            help='Interest in %/year',
-            min=0, max=100)] = None,  # interest
-        lifetime: Annotated[int, typer.Argument(
-            rich_help_panel='Optional',
-            help='Expected lifetime of the PV system in years',
-            min=0, max=100)] = 25,  # lifetime
-        output_format: Annotated[Optional[str], typer.Argument(
-            help='Output format')] = 'csv',  # outputformat
-    ):
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    peak_power: Annotated[float, typer.Argument(
+        rich_help_panel='Required',
+        help='The installed peak PV power in kWp',
+        min=0, max=100000000)],  # peakpower
+    loss: Annotated[float, typer.Argument(
+        rich_help_panel='Preset',
+        help='System losses in %',
+        min=0, max=100)] = 14,  # loss
+    solar_radiation_database: Annotated[Optional[str], typer.Argument(
+        rich_help_panel='Preset',
+        help='Solar radiation database with hourly time resolution')
+                                        ] = 'PVGIS-SARAH2',  # raddatabase
+    consider_shadows: Annotated[Optional[bool], typer.Argument(
+        rich_help_panel='Preset',
+        help='Calculate effect of horizon shadowing'),
+                                ] = True,  # usehorizon
+    horizon_heights: Annotated[List[float], typer_argument_horizon_heights] = None,
+    pv_techonology: Annotated[Optional[str], typer_argument_pv_technology] = None,  # pvtechchoice
+    mounting_type: Annotated[Optional[str], typer_argument_mounting_type] = 'free',
+    surface_tilt: Annotated[float, typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Annotated[float, typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    optimise_surface_tilt: Annotated[Optional[bool], typer_option_optimise_surface_tilt] = OPTIMISE_SURFACE_TILT_FLAG_DEFAULT,
+    optimise_surface_geometry: Annotated[Optional[bool], typer_option_optimise_surface_geometry] = OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT,
+    single_axis_system: Annotated[Optional[bool], typer.Argument(
+        rich_help_panel='Optional',
+        help='Consider a single axis PV system -- Remove Me and improve single_axis_inclination!',
+        )] = False,  # inclined_axis
+    single_axis_inclination: Annotated[float, typer.Argument(
+        rich_help_panel='Optional',
+        help='Inclination for a single axis PV system',
+        min=0, max=90)] = 0,  # inclinedaxisangle
+    optimise_single_axis_inclination: Annotated[Optional[bool], typer.Argument(
+        rich_help_panel='Optional',
+        help='Optimise inclination for a single axis PV system',
+        )] = False,  # inclined_optimum
+    vertical_axis_system: Annotated[Optional[bool], typer.Argument(
+        rich_help_panel='Optional',
+        help='Consider a single vertical axis PV system -- Remove Me and improve vertical_axis_inclination!',
+        )] = False,  # vertical_axis
+    vertical_axis_inclination: Annotated[float, typer.Argument(
+        rich_help_panel='Optional',
+        help='Inclination for a single axis PV system',
+        min=0, max=90)] = 0,  # Verticalaxisangle
+    optimise_vertical_axis_inclination: Annotated[Optional[bool], typer.Argument(
+        rich_help_panel='Optional',
+        help='Optimise inclination for a single vertical axis PV system',
+        )] = False,  # vertical_optimum
+    two_axis_system: Annotated[Optional[bool], typer.Argument(
+        rich_help_panel='Optional',
+        help='Consider a two-axis tracking PV system -- Review Me!',
+        )] = False,  # twoaxis
+    electricity_price: Annotated[Optional[bool], typer.Argument(
+        rich_help_panel='Optional',
+        help='Calculate the PV electricity price (kwh/year) for the system cost in the user requested currency -- Review Me!',
+        )] = False,  # pvprice
+    cost: Annotated[float, typer.Argument(
+        rich_help_panel='Optional',
+        help='Total cost of installing the PV system [custom currency]',
+        min=0, max=100000000)] = 0,  # systemcost
+    interest: Annotated[float, typer.Argument(
+        rich_help_panel='Optional',
+        help='Interest in %/year',
+        min=0, max=100)] = None,  # interest
+    lifetime: Annotated[int, typer.Argument(
+        rich_help_panel='Optional',
+        help='Expected lifetime of the PV system in years',
+        min=0, max=100)] = 25,  # lifetime
+    output_format: Annotated[Optional[str], typer.Argument(
+        help='Output format')] = 'csv',  # outputformat
+):
     r"""Estimate the energy production of a PV system connected to the electricity grid
 
     Performance of grid-connected PV systems.  This tool makes it possible to
@@ -608,7 +599,11 @@ def estimate_grid_connected_pv(
 
 
 # @app.command('tracking', no_args_is_help=True, help=":satellite_antenna: Estimate PV power output for a system not connected to the grid")
-@app.command('tracking', help=":satellite_antenna: Estimate PV power output for a system not connected to the grid")
+@app.command(
+    'tracking',
+    no_args_is_help=True,
+    help=f":satellite_antenna: Estimate PV power output for a system not connected to the grid {NOT_IMPLEMENTED}",
+)
 def estimate_tracking_pv():
     """Estimate the energy production of a tracking PV system connected to the electricity grid
 
@@ -645,8 +640,11 @@ def estimate_tracking_pv():
     print(f"{NOT_IMPLEMENTED}")
 
 
-# @app.command('offgrid', no_args_is_help=True, help=':battery:  Estimate PV power output for a system not connected to the grid')
-@app.command('offgrid', help=':battery:  Estimate PV power output for a system not connected to the grid')
+@app.command(
+    'offgrid',
+    no_args_is_help=True,
+    help=f':battery:  Estimate PV power output for a system not connected to the grid {NOT_IMPLEMENTED}',
+)
 def estimate_offgrid_pv():
     """Estimate the energy production of a PV system that is not connected to
     the electricity grid but instead relies on battery storage
