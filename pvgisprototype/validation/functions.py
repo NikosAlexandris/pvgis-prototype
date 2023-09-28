@@ -34,6 +34,7 @@ from pvgisprototype.validation.parameters import RefractedSolarAltitudeModel
 from pvgisprototype.validation.parameters import RefractedSolarAltitudeSeriesModel
 from pvgisprototype.validation.parameters import SolarDeclinationModel
 from pvgisprototype.validation.parameters import SolarPositionModel
+from pvgisprototype.validation.parameters import SolarHourAngleModel
 
 # Solar Surface
 from pvgisprototype.validation.parameters import SurfaceTiltModel
@@ -375,6 +376,7 @@ class CalculateSolarIncidencePVISInputModel(
 class CalculateSolarIncidenceJencoInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
+    SolarHourAngleModel,
     RandomTimeModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
