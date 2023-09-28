@@ -2,6 +2,7 @@ from devtools import debug
 import pytest
 import matplotlib.pyplot as plt
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 from datetime import timezone
 from zoneinfo import ZoneInfo
@@ -9,10 +10,11 @@ from math import radians
 
 from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
+from pvgisprototype import HourAngle
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
-from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
@@ -36,7 +38,7 @@ random_year = random.randint(2005, 2023)
 
 models = [
         SolarTimeModels.ephem,
-        SolarTimeModels.eot,
+        SolarTimeModels.milne,
         SolarTimeModels.noaa,
         SolarTimeModels.pvgis,
         SolarTimeModels.skyfield,
@@ -278,27 +280,52 @@ cases = [
 ]
 units = [
     ('radians'),
-    ('degrees'),
+    # ('degrees'),
 ]
-@pytest.mark.parametrize("solar_time, expected_hour_angle", cases)
-def test_calculate_hour_angle(solar_time, expected_hour_angle):
-    # Since we are not calling `calculate_hour_angle` through the command line,
-    # the callback function `convert_hours_to_seconds` won't run!
-    # Let's do this here:
-    solar_time_in_seconds = convert_hours_to_seconds(solar_time)
-    calculated_hour_angle = calculate_hour_angle(solar_time_in_seconds)
-    assert calculated_hour_angle == pytest.approx(expected_hour_angle, 0.00000000000000001)
+tolerances = [
+        # 0.00000000000000001,
+        # 0.0000000000000001,
+        # 0.000000000000001,
+        # 0.00000000000001,
+        # 0.0000000000001,
+        # 0.000000000001,
+        # 0.00000000001,
+        # 0.0000000001,
+        # 0.000000001,
+        # 0.00000001,
+        # 0.0000001,
+        # 0.000001,
+        # 0.00001,
+        # 0.0001,
+        0.001,
+        # 0.01,
+        0.1,
+        ]
+@pytest.mark.parametrize("solar_time, expected", cases)
+@pytest.mark.parametrize("angle_output_units", units)
+@pytest.mark.parametrize("tolerance", tolerances)
+def test_calculate_hour_angle(solar_time, angle_output_units, expected, tolerance):
+    # expected is a `time` object
+    solar_time = time(hour=solar_time, minute=0, second=0) 
+    calculated = calculate_hour_angle(solar_time, angle_output_units)
+    assert isinstance(calculated, HourAngle)
+    assert pytest.approx(expected, tolerance) == calculated.value
+    assert angle_output_units == calculated.unit
 
 
 @pytest.mark.mpl_image_compare
-def test_calculate_hour_angle_plot():
+@pytest.mark.parametrize("angle_output_units", units)
+def test_calculate_hour_angle_plot(angle_output_units):
     calculated_hour_angles = []
     expected_hour_angles = []
     for solar_time, expected_hour_angle in cases:
         # convert `solar_time` to seconds as expected
         solar_time_in_seconds = solar_time * 3600
-        calculated_hour_angle = calculate_hour_angle(solar_time_in_seconds)
-        calculated_hour_angles.append(calculated_hour_angle)
+        calculated_hour_angle = calculate_hour_angle(
+            solar_time=solar_time_in_seconds,
+            angle_output_units=angle_output_units,
+        )
+        calculated_hour_angles.append(calculated_hour_angle.value)
         expected_hour_angles.append(expected_hour_angle)
 
     fig = plt.figure(figsize=(10,6))

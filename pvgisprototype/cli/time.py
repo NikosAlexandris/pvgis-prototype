@@ -37,7 +37,7 @@ from .typer_parameters import typer_argument_solar_declination
 from .typer_parameters import typer_argument_surface_tilt
 from .typer_parameters import typer_argument_surface_orientation
 from .typer_parameters import typer_argument_hour_angle
-from .typer_parameters import typer_argument_solar_time
+from .typer_parameters import typer_argument_true_solar_time
 from .typer_parameters import typer_option_solar_position_model
 from .typer_parameters import typer_option_solar_time_model
 from .typer_parameters import typer_option_global_time_offset
@@ -52,6 +52,7 @@ from .typer_parameters import typer_option_angle_units
 from .typer_parameters import typer_option_angle_output_units
 from .typer_parameters import typer_option_rounding_places
 from .typer_parameters import typer_option_verbose
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 
 
 app = typer.Typer(
@@ -64,48 +65,34 @@ app = typer.Typer(
 console = Console()
 
 
-# @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
-# def hour_angle(
-#         solar_time: Annotated[float, typer.Argument(
-#             callback=convert_to_radians, min=-180, max=180)],
-#         ):
-#     """Calculate the hour angle based on the formula:
-#     ω = (ST / 3600 - 12) * 15 * 0.0175
-#     """
-#     hour_angle = calculate_hour_angle(
-#             solar_time,
-#             )
-#     typer.echo(f'Solar time: {hour_angle} ({timezone})')
-
-
-@app.command('fractional-year', no_args_is_help=True, help='⦩ Calculate the fractional year')
-def fractional_year():
+@app.command('fractional-year', no_args_is_help=True, help=f'⦩ Calculate the fractional year {NOT_IMPLEMENTED_CLI}')
+def fractional_year(
+):
     """
     """
     pass
 
 
-@app.command('eot', no_args_is_help=True, help='⦩ Calculate the equation of time')
+@app.command('eot', no_args_is_help=True, help=f'⦩ Calculate the equation of time {NOT_IMPLEMENTED_CLI}')
 def equation_of_time(
-        ):
+):
     """
     """
     pass
 
 
-@app.command('offset', no_args_is_help=True, help='⦩ Calculate the time offset')
+@app.command('offset', no_args_is_help=True, help=f'⦩ Calculate the time offset {NOT_IMPLEMENTED_CLI}')
 def offset(
-        ):
+):
     """
     """
     pass
 
 
-# @app.callback(invoke_without_command=True, no_args_is_help=True, context_settings={"ignore_unknown_options": True})
 @app.command(
     'solar',
     no_args_is_help=True,
-    help='⦩ Calculate the solar time'
+    help='⦩ Calculate the apparent solar time'
 )
 def solar_time(
     longitude: Annotated[float, typer_argument_longitude],
@@ -123,7 +110,7 @@ def solar_time(
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
+    verbose: Annotated[int, typer_option_verbose]= 0,
 ):
     """Calculate the solar time.
 
@@ -168,6 +155,7 @@ def solar_time(
         hour_offset=hour_offset,
         time_output_units=time_output_units,
         angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     solar_time_table = Table('Model', 'Solar time', #'Units',
                                  box=box.SIMPLE_HEAD)
@@ -184,15 +172,15 @@ def solar_time(
     console.print(solar_time_table)
 
 
-@app.command('local', no_args_is_help=True, help='⦩ Calculate the local time')
+@app.command('local', no_args_is_help=True, help=f'⦩ Calculate the local time {NOT_IMPLEMENTED_CLI}')
 def local(
-        ):
+):
     """
     """
     pass
 
 
-@app.command('correction', no_args_is_help=True, help='⦩ Calculate the time correction')
+@app.command('correction', no_args_is_help=True, help=f'⦩ Calculate the time correction {NOT_IMPLEMENTED_CLI}')
 def correction(
         ):
     """

@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from pvgisprototype import SolarHourAngle
 from .solar_time import calculate_true_solar_time_noaa
 from math import pi
-from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleNOAATimeSeriesInput
+from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleTimeSeriesNOAAInput
 from typing import Union
 from typing import Sequence
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
@@ -22,6 +22,7 @@ def calculate_solar_hour_angle_noaa(
     timezone: Optional[ZoneInfo] = None, 
     time_output_units: str = 'minutes',
     angle_output_units: str = 'radians',
+    verbose: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
 
@@ -77,6 +78,12 @@ def calculate_solar_hour_angle_noaa(
     true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
     solar_hour_angle = (true_solar_time_minutes - 720) * (pi / 720)
 
+    # Important ! ------------------------------------------------------------
+    # If (hourangle < -180) Then hourangle = hourangle + 360
+    if solar_hour_angle < -pi:
+        solar_hour_angle += 2 * pi
+    # ------------------------------------------------------------------------
+
     if angle_output_units == 'radians' and not -pi <= solar_hour_angle <= pi:
         raise ValueError(f'The calculated hour angle {solar_hour_angle} is out of the expected range [{-pi}, {pi}] radians')
 
@@ -85,20 +92,23 @@ def calculate_solar_hour_angle_noaa(
 
     solar_hour_angle = SolarHourAngle(
         value=solar_hour_angle,
-        unit='radians',
+        unit=angle_output_units,
     )
 
+    if verbose == 3:
+        debug(locals())
     return solar_hour_angle
 
 
-@validate_with_pydantic(CalculateSolarHourAngleNOAATimeSeriesInput)
+@validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
     timestamps: Sequence[datetime], 
     timezone: Optional[str] = None, 
     time_output_units: Optional[str] = 'minutes',
     angle_output_units: Optional[str] = 'radians',
-) -> Union[SolarHourAngle, np.ndarray]:
+    verbose: int = 0,
+):
     """Calculate the solar hour angle in radians for a time series."""
     solar_hour_angle_series = []
     
@@ -120,4 +130,6 @@ def calculate_solar_hour_angle_time_series_noaa(
 
         solar_hour_angle_series.append(solar_hour_angle_obj)
 
+    if verbose == 3:
+        debug(locals())
     return np.array(solar_hour_angle_series, dtype=object)

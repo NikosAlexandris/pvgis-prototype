@@ -15,17 +15,10 @@ from bokeh.plotting import figure
 from bokeh.plotting import output_file
 from bokeh.plotting import save
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
-
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
 from pvgisprototype.algorithms.pvgis.solar_declination import calculate_solar_declination_pvgis
-
-
-def days_in_year(year):
-    start_date = datetime(year, 1, 1)  # First day of the year
-    end_date = datetime(year + 1, 1, 1)  # First day of the next year
-    return (end_date - start_date).days
 
 
 def generate_timestamps(start_date: datetime, end_date: datetime):
@@ -82,7 +75,12 @@ def plot_solar_declination(
         raise ValueError('Either `start_date` and `end_date` or only `year` should be provided')
 
     timestamps = generate_timestamps(start_date, end_date)
-    solar_declinations, solar_declinations_pvgis, solar_declinations_noaa, solar_declinations_hargreaves = calculate_declinations(timestamps, output_units)
+    (
+        solar_declinations,
+        solar_declinations_pvgis,
+        solar_declinations_noaa,
+        solar_declinations_hargreaves,
+    ) = calculate_declinations(timestamps, output_units)
 
     fig = plt.figure(figsize=(10,6))
     # plt.plot(timestamps, solar_declinations, linewidth=4, alpha=0.7, label='PVIS', linestyle='-', color='#66CCCC')

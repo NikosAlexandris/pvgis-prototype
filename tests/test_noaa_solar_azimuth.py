@@ -3,7 +3,9 @@ from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
-from pvgisprototype import Longitude, Latitude, SolarAzimuth
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
+from pvgisprototype import SolarAzimuth
 import numpy as np
 import matplotlib.pyplot as plt
 

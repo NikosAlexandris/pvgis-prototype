@@ -1,44 +1,33 @@
 import pytest
+from datetime import datetime
 import matplotlib.pyplot as plt
-from pvgisprototype.api.irradiance.extraterrestrial_irradiance import calculate_extraterrestrial_irradiance
-from pvgisprototype.api.irradiance.constants import EXTRATERRESTRIAL_IRRADIANCE_MIN
-from pvgisprototype.api.irradiance.constants import EXTRATERRESTRIAL_IRRADIANCE_MAX
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance
+from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MIN
+from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MAX
 from pvgisprototype.plot.plot_extraterrestrial_irradiance import plot_extraterrestrial_irradiance
 import numpy as np
+from .cases.extraterrestrial_irradiance import tolerances
+from .cases.extraterrestrial_irradiance import cases_for_extraterrestrial_irradiance
+from .cases.extraterrestrial_irradiance import random_timestamp
 import random
 
 
-@pytest.mark.parametrize(
-    "day_of_year, expected", 
-    [
-        (3, 1412.366252486348),   # Perihelion: solar constant should be maximum
-        (80, 1361.44578929),  # Vernal equinox
-        (183, 1321.44578929),  # Aphelion: solar constant should be minimum
-        (266, 1361.44578929),  # Autumnal equinox
-        (355, 1400.25687453),  # Close to winter solstice
-    ]
-)
-def test_calculate_extraterrestrial_irradiance(day_of_year: int, expected: float):
-    assert expected == pytest.approx(calculate_extraterrestrial_irradiance(day_of_year), 0.0001)
+@pytest.mark.parametrize("timestamp, expected", cases_for_extraterrestrial_irradiance)
+@pytest.mark.parametrize('tolerance', tolerances)
+def test_calculate_extraterrestrial_irradiance(timestamp: datetime, expected: float, tolerance: float):
+    assert pytest.approx(expected, tolerance) == calculate_extraterrestrial_normal_irradiance(timestamp)
 
 
-@pytest.mark.parametrize(
-    "day_of_year", 
-    [
-        # (random.randint(1, 366), 1360.8931954516274)  # Random day of the year
-        (random.randint(1, 366)),
-        (random.randint(1, 366)),
-        (random.randint(1, 366)),
-        (random.randint(1, 366)),
-        (random.randint(1, 366)),
-    ]
-)
-def test_calculate_extraterrestrial_irradiance_for_random_day(day_of_year: int):
-    calculated = calculate_extraterrestrial_irradiance(day_of_year)
-    # assert expected == pytest.approx(calculated, abs=0.5)
+@pytest.mark.parametrize('timestamp', random_timestamp) 
+def test_calculate_extraterrestrial_irradiance_for_random_day(timestamp: datetime):
+    calculated = calculate_extraterrestrial_normal_irradiance(timestamp)
     assert EXTRATERRESTRIAL_IRRADIANCE_MIN <= calculated <= EXTRATERRESTRIAL_IRRADIANCE_MAX
 
 
-# @pytest.mark.mpl_image_compare  # instructs use of a baseline image
-# def test_extraterrestrial_irradiance_plot():
-#     return plot_extraterrestrial_irradiance()
+# Set a seed to ensure agreement of plots between tests!
+random.seed(43) # Comment to really pick a random year
+random_year = random.randint(2005, 2023)
+print(f'Random year : {random_year}')
+@pytest.mark.mpl_image_compare  # use a baseline image
+def test_extraterrestrial_irradiance_plot(year=random_year):
+    return plot_extraterrestrial_irradiance(year)
