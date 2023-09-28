@@ -16,7 +16,7 @@ from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_dec
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
 from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_pvlib
-from pvgisprototype.constants import ALGORITHM_NAME, DECLINATION_NAME, UNITS_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME, DECLINATION_NAME, UNITS_NAME
 
 
 def model_solar_declination(
@@ -90,7 +90,7 @@ def calculate_solar_declination(
                 # angle_output_units=angle_output_units,
             )
             results.append({
-                ALGORITHM_NAME: model.value,
+                POSITION_ALGORITHM_NAME: model.value,
                 DECLINATION_NAME: getattr(solar_declination, angle_output_units),
                 UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })

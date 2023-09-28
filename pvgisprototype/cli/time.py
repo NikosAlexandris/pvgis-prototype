@@ -52,7 +52,7 @@ from .typer_parameters import typer_option_angle_units
 from .typer_parameters import typer_option_angle_output_units
 from .typer_parameters import typer_option_rounding_places
 from .typer_parameters import typer_option_verbose
-from pvgisprototype.constants import ALGORITHM_NAME, ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME, POSITION_ALGORITHM_COLUMN_NAME
 
 
 app = typer.Typer(
@@ -170,11 +170,11 @@ def solar_time(
         time_output_units=time_output_units,
         angle_output_units=angle_output_units,
     ) 
-    solar_time_table = Table(ALGORITHM_COLUMN_NAME, 'Solar time', #UNITS_NAME,
+    solar_time_table = Table(POSITION_ALGORITHM_COLUMN_NAME, 'Solar time', #UNITS_NAME,
                                  box=box.SIMPLE_HEAD)
     for model_result in solar_time:
         # typer.echo(f'Solar time: {solar_time} {units} ({timezone})')
-        model_name = model_result.get(ALGORITHM_NAME, '')
+        model_name = model_result.get(POSITION_ALGORITHM_NAME, '')
         solar_time = model_result.get('Solar time', '')
         # units = model_result.get(UNITS_NAME, '')
         solar_time_table.add_row(
