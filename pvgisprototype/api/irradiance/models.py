@@ -12,3 +12,9 @@ class MethodsForInexactMatches(str, Enum):
     pad = 'pad' # ffill: propagate last valid index value forward
     backfill = 'backfill' # bfill: propagate next valid index value backward
     nearest = 'nearest' # use nearest valid index value
+
+
+class PVModuleEfficiencyAlgorithms(str, Enum):
+    none = None
+    linear = 'Linear'
+    fainman = 'Fainman'

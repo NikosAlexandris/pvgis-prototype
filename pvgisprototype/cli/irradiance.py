@@ -5,6 +5,7 @@ from click import Context
 from typer.core import TyperGroup
 
 from .rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
 from .rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.api.irradiance.extraterrestrial import app as extraterrestrial_irradiance
 from pvgisprototype.api.irradiance.shortwave import app as global_irradiance
@@ -16,6 +17,7 @@ from pvgisprototype.api.irradiance.reflected import app as reflected_irradiance
 from pvgisprototype.api.irradiance.reflected_time_series import app as reflected_irradiance_series
 from pvgisprototype.api.irradiance.loss import app as angular_loss_factor
 from pvgisprototype.api.irradiance.effective import app as effective_irradiance
+from pvgisprototype.api.irradiance.efficiency import app as pv_efficiency
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
@@ -36,6 +38,15 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series_irradiance,
 )
+app.add_typer(
+    pv_efficiency,
+    name="pv-efficiency",
+    no_args_is_help=True,
+    # rich_help_panel=rich_help_panel_efficiency,
+    rich_help_panel=rich_help_panel_toolbox,
+)
+
+
 app.add_typer(
     global_irradiance,
     name="global",
