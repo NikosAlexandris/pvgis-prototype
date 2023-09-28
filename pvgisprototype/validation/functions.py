@@ -160,6 +160,12 @@ class CalculateHourAngleInputModel(
 ):
     pass
 
+class SolarHourAnglePvisInput(
+    SolarTimeModel,  # Parameter
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
 
 class CalculateSolarHourAnglePVISInputModel(
     SolarTimeModel,  # Parameter
@@ -174,6 +180,12 @@ class CalculateHourAngleSunriseInputModel(
     SurfaceTiltModel,
     SolarDeclinationModel,
     BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+class SolarHourAngleSunrisePvisInput(
+    CalculateHourAngleSunriseInputModel
 ):
     pass
 

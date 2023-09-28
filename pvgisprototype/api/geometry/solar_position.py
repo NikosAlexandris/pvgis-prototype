@@ -26,6 +26,7 @@ from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
+from pvgisprototype import SolarZenith
 
 from .models import SolarTimeModels
 from .models import SolarPositionModels
@@ -123,7 +124,7 @@ def model_solar_geometry_overview(
             timestamp=timestamp,
             timezone=timezone,
             time_output_units=time_output_units,
-            angle_output_units=angle_output_units,
+            angle_output_units='radians',
         )
         solar_zenith = calculate_solar_zenith_noaa(
             latitude=latitude,
@@ -182,6 +183,17 @@ def model_solar_geometry_overview(
             angle_output_units,
         )
 
+        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+
+        # solar_declination = calculate_solar_declination_skyfield(     # NOTE gounaol: Duplicated 
+        #     timestamp=timestamp,
+        #     angle_output_units=angle_output_units,
+        # )
+        solar_declination = convert_to_degrees_if_requested(
+            solar_declination,
+            angle_output_units,
+        )
+
     if model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
@@ -197,7 +209,12 @@ def model_solar_geometry_overview(
             solar_azimuth, angle_output_units
         )
         solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
-        solar_altitude = convert_to_degrees_if_requested(
+        solar_zenith = SolarZenith(
+            value = 90 - solar_altitude.to_degrees().value,
+            unit = 'degrees'
+        )
+
+        solar_altitude = convert_to_radians_if_requested(
             solar_altitude, angle_output_units
         )
 
@@ -214,6 +231,12 @@ def model_solar_geometry_overview(
         )  # returns degrees by default
         # required by output function
         solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
+
+        solar_zenith = SolarZenith(
+            value = 90 - solar_altitude.to_degrees().value,
+            unit = 'degrees'
+        )
+
         solar_altitude = convert_to_radians_if_requested(
             solar_altitude, angle_output_units
         )
@@ -244,6 +267,16 @@ def model_solar_geometry_overview(
             angle_output_units,
         )
 
+        # solar_hour_angle = calculate_hour_angle_pvis(
+        #     solar_time=timestamp,                           # FIXME gounaol: Is this correct?
+        #     angle_output_units=angle_output_units,
+        # )
+
+        # solar_hour_angle = convert_to_degrees_if_requested(
+        #     solar_hour_angle,
+        #     angle_output_units,
+        # )
+
         solar_altitude = calculate_solar_altitude_pvis(
             longitude=longitude,
             latitude=latitude,
@@ -260,7 +293,6 @@ def model_solar_geometry_overview(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-        )
         solar_altitude = convert_to_degrees_if_requested(
             solar_altitude, angle_output_units
         )
@@ -297,15 +329,15 @@ def model_solar_geometry_overview(
             angle_output_units,
         )
         
-        # solar_hour_angle = calculate_solar_hour_angle_pvlib(
-        #     longitude=longitude,
-        #     timestamp=timestamp,
-        #     angle_output_units=angle_output_units,
-        # )
-        # solar_hour_angle = convert_to_degrees_if_requested(
-        #     solar_hour_angle,
-        #     angle_output_units,
-        # )
+        solar_hour_angle = calculate_solar_hour_angle_pvlib(
+            longitude=longitude,
+            timestamp=timestamp,
+            angle_output_units=angle_output_units,
+        )
+        solar_hour_angle = convert_to_degrees_if_requested(
+            solar_hour_angle,
+            angle_output_units,
+        )
 
         solar_zenith = calculate_solar_zenith_pvlib(
             longitude=longitude,
