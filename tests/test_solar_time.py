@@ -14,7 +14,7 @@ from pvgisprototype import HourAngle
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
-from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
@@ -38,7 +38,7 @@ random_year = random.randint(2005, 2023)
 
 models = [
         SolarTimeModels.ephem,
-        SolarTimeModels.eot,
+        SolarTimeModels.milne,
         SolarTimeModels.noaa,
         SolarTimeModels.pvgis,
         SolarTimeModels.skyfield,
