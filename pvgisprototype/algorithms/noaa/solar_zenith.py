@@ -242,6 +242,7 @@ def calculate_solar_zenith_noaa(
     """Calculate the solar zenith angle (φ) in radians """
     if verbose == 3:
         debug(locals())
+
     solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
             angle_output_units='radians',

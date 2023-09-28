@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 from math import cos
 from math import sin
 from math import asin
+from typing import Optional
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
@@ -19,25 +20,25 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 
 @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
 def calculate_solar_altitude_pvis(
-        longitude: Longitude,
-        latitude: Latitude,
-        # longitude: Longitude_in_Radians,
-        # latitude: Latitude_in_Radians,
-        timestamp: datetime,
-        timezone: ZoneInfo,
-        apply_atmospheric_refraction: bool,
-        refracted_solar_zenith: float,
-        days_in_a_year: float,
-        perigee_offset: float,
-        eccentricity_correction_factor: float,
-        time_offset_global: int,
-        hour_offset: int,
-        solar_time_model: SolarTimeModels,
-        time_output_units: str,
-        angle_units: str,
-        angle_output_units: str,
-        verbose: int = 0,
-    ) -> SolarAltitude:
+    longitude: Longitude,
+    latitude: Latitude,
+    # longitude: Longitude_in_Radians,
+    # latitude: Latitude_in_Radians,
+    timestamp: datetime,
+    timezone: ZoneInfo,
+    apply_atmospheric_refraction: bool,
+    refracted_solar_zenith: float,
+    days_in_a_year: float,
+    perigee_offset: float,
+    eccentricity_correction_factor: float,
+    time_offset_global: int,
+    hour_offset: int,
+    solar_time_model: SolarTimeModels,
+    time_output_units: str,
+    angle_units: str,
+    angle_output_units: str,
+    verbose: int = 0,
+) -> SolarAltitude:
     """Compute various solar geometry variables.
     Parameters
     ----------
@@ -77,8 +78,8 @@ def calculate_solar_altitude_pvis(
     C31 = cos(latitude.value) * cos(solar_declination.value)
     C33 = sin(latitude.value) * sin(solar_declination.value)
     solar_time = model_solar_time(
-        longitude=longitude.value,
-        latitude=latitude.value,
+        longitude=longitude,
+        latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
         solar_time_model=solar_time_model,  # returns datetime.time object
