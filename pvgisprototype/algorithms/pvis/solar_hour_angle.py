@@ -1,9 +1,9 @@
 from devtools import debug
 import typer
+import numpy as np
 from datetime import time
 from typing import Annotated
 from typing import Optional
-from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 from pvgisprototype import HourAngle
@@ -61,7 +61,7 @@ def calculate_solar_hour_angle_pvis(
     return hour_angle
 
 
-@validate_with_pydantic(CalculateHourAngleSunriseInputModel)
+@validate_with_pydantic(SolarHourAngleSunrisePvisInput)
 def calculate_hour_angle_sunrise(  # rename to: calculate_event_hour_angle
         latitude: Latitude,
         surface_tilt: float = 0,
