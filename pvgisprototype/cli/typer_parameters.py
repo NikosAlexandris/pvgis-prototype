@@ -120,6 +120,17 @@ typer_argument_elevation = typer.Argument(
     # rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory=0,
 )
+typer_argument_horizon_heights = typer.Option(
+    help='List of horizon heights (comma-separated values or .csv file) at equal angular distance around the horizon given in clockwise direction starting at North, going to East, South, West, and back to North (first point is due north, last is west of north). Example: 10, 20, 30, 20, 5, 0, 10, 20, 5, 0, 10, 20, 30, 20, 5, 0, 10, 20, 5, 0'
+    # default_factory = None,
+)
+typer_argument_pv_technology = typer.Argument(
+    help='Technology of the PV module: crystalline silicon cells, thin film modules made from CIS or CIGS, thin film modules made from Cadmium Telluride (CdTe), other/unknown',
+)
+typer_argument_mounting_type = typer.Argument(
+    help='Type of mounting',  # in PVGIS : mountingplace
+    # default_factory = 'free',  # see PVGIS for more!
+)
 typer_argument_area = typer.Argument(
     help='The area of the modules in m<sup>2</sup>',
     min=0.001,  # min of mini-solar-panel?
@@ -277,7 +288,7 @@ typer_option_solar_incidence_model = typer.Option(
 
 # Solar surface
 
-surface_tilt_typer_help='Solar surface tilt angle'
+surface_tilt_typer_help='Solar surface tilt angle from the horizontal plane'  # in PVGIS : slope
 typer_argument_surface_tilt = typer.Argument(
     help=surface_tilt_typer_help,
     min=SURFACE_TILT_MINIMUM,
@@ -302,7 +313,16 @@ typer_option_random_surface_tilt = typer.Option(
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = SURFACE_TILT_DEFAULT,
 )
-surface_orientation_typer_help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]'
+typer_option_optimise_surface_tilt = typer.Option(
+    help='Optimise inclination for a fixed PV system',  # in PVGIS : optimalinclination
+    # default_factory = OPTIMISE_SURFACE_TILT_FLAG_DEFAULT,
+)
+typer_option_optimise_surface_geometry = typer.Option(
+    help='Optimise inclination and orientation for a fixed PV system',  # in PVGIS : optimalangles
+    # default_factory = OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT,
+)
+surface_orientation_typer_help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]'  # also known as : azimuth, in PVGIS : aspect
+# Note, in PVGIS : '0=south, 90=west, -90=east' ? ----------------------------
 typer_argument_surface_orientation = typer.Argument(
     help=surface_orientation_typer_help,
     min=SURFACE_ORIENTATION_MINIMUM,
@@ -554,13 +574,20 @@ typer_argument_conversion_efficiency = typer.Argument(
     max=100,
     default_factory = None,
 )
+typer_option_system_efficiency = typer.Option(
+    '--system-efficiency-factor',
+    help='System efficiency factor',
+    rich_help_panel=rich_help_panel_efficiency,
+    # rich_help_panel=rich_help_panel_series_irradiance,
+    # default_factory=SYSTEM_EFFICIENCY_DEFAULT,
+)
 typer_option_efficiency = typer.Option(
     '--efficiency-factor',
     '-e',
     help='Efficiency factor',
     rich_help_panel=rich_help_panel_efficiency,
     # rich_help_panel=rich_help_panel_series_irradiance,
-    # default_factory=None,
+    # default_factory=EFFICIENCY_DEFAULT,
 )
 
 # Output options
