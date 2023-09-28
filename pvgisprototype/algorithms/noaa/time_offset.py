@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timedelta
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -121,12 +122,15 @@ def calculate_time_offset_noaa(
         timestamp=timestamp,
         time_output_units='minutes',
         )  # minutes
-    time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time.value
+    time_offset_minutes = longitude_in_minutes - timezone_offset_minutes + equation_of_time.minutes
+    time_offset_timedelta = timedelta(minutes=time_offset_minutes)
+    time_offset = TimeOffset(value=time_offset_timedelta, unit='timedelta')
+
     # if not -720 + 70 <= time_offset <= 720 + 70:
-    if not -790 <= time_offset <= 790:
+    if not -790 <= time_offset.minutes <= 790:
         raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
 
-    return TimeOffset(value=time_offset, unit='minutes')
+    return time_offset
 
 
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)

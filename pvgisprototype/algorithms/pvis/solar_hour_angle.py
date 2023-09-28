@@ -1,7 +1,7 @@
 from devtools import debug
 import typer
 import numpy as np
-from datetime import time
+from datetime import datetime
 from typing import Annotated
 from typing import Optional
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
@@ -54,9 +54,9 @@ def calculate_solar_hour_angle_pvis(
     hour_angle = (true_solar_time_minutes / 60 - 12) * 15 * pi / 180
     hour_angle = HourAngle(value=hour_angle, unit='radians')
     hour_angle = convert_to_degrees_if_requested(
-            hour_angle,
-            angle_output_units,
-            )
+        hour_angle,
+        angle_output_units,
+    )
 
     return hour_angle
 
