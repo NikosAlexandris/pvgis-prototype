@@ -98,10 +98,20 @@ HOUR_OFFSET_DEFAULT = 0
 
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
-TEMPERATURE_DEFAULT = 25
+TEMPERATURE_DEFAULT = 25  # Cell temperature under standard test conditions, degrees Celsius.
 WIND_SPEED_DEFAULT = 0
 ALBEDO_DEFAULT = 0.2
 
+EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT = [
+    94.804,
+    3.151,
+    -0.8768,
+    -0.32148,
+    0.003795,
+    -0.001056,
+    -0.0005247,
+    0.035,
+]
 SYSTEM_EFFICIENCY_DEFAULT = 0.86
 EFFICIENCY_DEFAULT = 0.86
 
