@@ -23,6 +23,3 @@ class CalculateSolarPositionSkyfieldInputModel(CalculateSolarTimeSkyfieldInputMo
 class CalculateSolarAltitudeAzimuthSkyfieldInputModel(CalculateSolarPositionSkyfieldInputModel):
     pass
 
-
-class CalculateHourAngleSkyfieldInput(CalculateSolarPositionSkyfieldInputModel):
-    angle_output_units: float
