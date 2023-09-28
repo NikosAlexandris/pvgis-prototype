@@ -78,7 +78,7 @@ class AngleInRadiansOutputUnitsModel(BaseModel):
 
 
 class SolarZenithModel(BaseModel):
-    solar_zenith: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
+    solar_zenith: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)], SolarZenith]
 
 
 class SolarZenithSeriesModel(BaseModel):  # merge above here-in
