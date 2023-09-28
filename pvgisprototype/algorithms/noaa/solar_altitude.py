@@ -48,7 +48,7 @@ def calculate_solar_altitude_noaa(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         angle_output_units='radians',
     )
-    solar_altitude = pi / 2 - solar_zenith.value
+    solar_altitude = pi/2 - solar_zenith.radians
     if not isfinite(solar_altitude) or not -pi / 2 <= solar_altitude <= pi / 2:
         raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
 
@@ -85,7 +85,7 @@ def calculate_solar_altitude_time_series_noaa(
         angle_output_units="radians",
     )
     solar_altitude_series = np.pi / 2 - np.array(
-        [zenith.value for zenith in solar_zenith_series]
+        [zenith.radians for zenith in solar_zenith_series]
     )
     if not np.all(np.isfinite(solar_altitude_series)) or not np.all(
         (-np.pi / 2 <= solar_altitude_series) & (solar_altitude_series <= np.pi / 2)

@@ -137,12 +137,14 @@ def calculate_apparent_solar_time_milne1921(
     # ------------------------------------------------------------------------
     # the following equation requires longitude in degrees!
     time_correction_factor = (
-        4 * (degrees(longitude.value) - local_standard_time_meridian) + equation_of_time
+        4 * (longitude.degrees - local_standard_meridian_time) + equation_of_time
     )
+    # ------------------------------------------------------------------------
+
     time_correction_factor_hours = time_correction_factor / 60
     apparent_solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
-    # ------------------------------------------------------------------------
-    if verbose:
+
+    if verbose > 0:
         print('Day of year : {day_of_year}')
         print('Equation of time : {equation_of_time}')
         print('Time correction factor : {time_correction_factor}')

@@ -137,7 +137,7 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     @field_validator('solar_zenith')
     @classmethod
     def solar_zenith_range(cls, v):
-        if not (0 <= v <= pi):
+        if not (0 <= v.radians <= pi):
             raise ValueError('solar_zenith must range within [0, π]')
         return v
 

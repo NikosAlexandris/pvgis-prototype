@@ -64,10 +64,10 @@ def calculate_solar_declination_pvis(
     solar_declination = asin(
         0.3978
         * sin(
-            fractional_year.value
+            fractional_year.radians
             - 1.4
             + eccentricity_correction_factor
-            * sin(fractional_year.value - perigee_offset)
+            * sin(fractional_year.radians - perigee_offset)
         )
     )
     solar_declination = SolarDeclination(value=solar_declination, unit="radians")
