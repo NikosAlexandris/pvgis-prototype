@@ -176,7 +176,6 @@ def calculate_solar_geometry_pvgis_variables(
             days_in_a_year,
             perigee_offset,
             eccentricity_correction_factor,
-            hour_offset
     )
     # approximate sun position in the sky (`solar_time`), convert to angle
         # solar noon : 0 degrees, solar midnight : 180 degrees
@@ -318,7 +317,6 @@ def calculate_solar_position_pvgis(
             days_in_a_year,
             perigee_offset,
             eccentricity_correction_factor,
-            hour_offset
     )
 
     # approximate sun position in the sky (`solar_time`), convert to angle
