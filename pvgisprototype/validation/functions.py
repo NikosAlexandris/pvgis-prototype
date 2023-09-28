@@ -149,7 +149,6 @@ class CalculateSolarTimeEphemInputModel(
     BaseTimeModel,
     VerbosityModel,
 ):
-    # verbose: int
     pass
 
 
