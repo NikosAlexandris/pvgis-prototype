@@ -35,5 +35,3 @@ def calculate_solar_altitude_pvlib(
     solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
 
     return solar_altitude
-
-

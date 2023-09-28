@@ -184,6 +184,30 @@ RefractedSolarAltitude:
     type: str
     initial: radians
 
+LinkeTurbidityFactor:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: str
+    initial: unitless
+
+OpticalAirMass:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: str
+    initial: unitless
+
+RayleighThickness:
+  value:
+    type: Optional[float]
+    initial:
+  unit:
+    type: str
+    initial: unitless
+
 SolarAzimuth:
   value:
     type: Optional[float]
@@ -247,10 +271,10 @@ HorizonHeight:
 SurfaceTilt:
   value:
     type: float
-    initial: 0.0
+    initial: 45
   unit:
     type: str
-    initial: 'radians'
+    initial: 'degrees'
 
 SurfaceOrientation:
   value:

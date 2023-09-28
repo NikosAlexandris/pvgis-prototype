@@ -4,7 +4,7 @@ from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.irradiance.direct import calculate_refracted_solar_altitude
 from pvgisprototype.api.irradiance.direct import calculate_optical_air_mass
-from pvgisprototype.api.irradiance.direct import rayleigh_optical_thickness
+from pvgisprototype.api.irradiance.direct import calculate_rayleigh_optical_thickness
 from pvgisprototype.api.irradiance.direct import calculate_direct_normal_irradiance
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_pvgis

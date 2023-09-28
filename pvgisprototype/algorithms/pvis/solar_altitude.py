@@ -36,6 +36,7 @@ def calculate_solar_altitude_pvis(
         time_output_units: str,
         angle_units: str,
         angle_output_units: str,
+        verbose: int = 0,
     ) -> SolarAltitude:
     """Compute various solar geometry variables.
     Parameters
@@ -105,4 +106,6 @@ def calculate_solar_altitude_pvis(
     #         output_units,
     #         )
 
+    if verbose == 3:
+        debug(locals())
     return solar_altitude

@@ -14,8 +14,8 @@ from pvgisprototype.api.geometry.solar_position import model_solar_geometry_over
 from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_position_skyfield
-from pvgisprototype.api.data_structures import SolarGeometryDayConstants
-from pvgisprototype.api.data_structures import SolarGeometryDayVariables
+from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
+from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
 import matplotlib.pyplot as plt
 from datetime import datetime
 from datetime import timedelta

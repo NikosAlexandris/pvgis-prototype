@@ -14,7 +14,7 @@ from pvgisprototype import HourAngle
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
-from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
@@ -38,7 +38,7 @@ random_year = random.randint(2005, 2023)
 
 models = [
         SolarTimeModels.ephem,
-        SolarTimeModels.eot,
+        SolarTimeModels.milne,
         SolarTimeModels.noaa,
         SolarTimeModels.pvgis,
         SolarTimeModels.skyfield,
@@ -314,14 +314,18 @@ def test_calculate_hour_angle(solar_time, angle_output_units, expected, toleranc
 
 
 @pytest.mark.mpl_image_compare
-def test_calculate_hour_angle_plot():
+@pytest.mark.parametrize("angle_output_units", units)
+def test_calculate_hour_angle_plot(angle_output_units):
     calculated_hour_angles = []
     expected_hour_angles = []
     for solar_time, expected_hour_angle in cases:
         # convert `solar_time` to seconds as expected
         solar_time_in_seconds = solar_time * 3600
-        calculated_hour_angle = calculate_hour_angle(solar_time_in_seconds)
-        calculated_hour_angles.append(calculated_hour_angle)
+        calculated_hour_angle = calculate_hour_angle(
+            solar_time=solar_time_in_seconds,
+            angle_output_units=angle_output_units,
+        )
+        calculated_hour_angles.append(calculated_hour_angle.value)
         expected_hour_angles.append(expected_hour_angle)
 
     fig = plt.figure(figsize=(10,6))

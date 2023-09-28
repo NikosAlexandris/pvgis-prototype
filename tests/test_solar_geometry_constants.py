@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.data_structures import SolarGeometryDayConstants
+from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from pvgisprototype.plot.plot_solar_geometry_pvgis import plot_sunrise_sunset
 import datetime

@@ -49,6 +49,7 @@ from datetime import time
 from typing import Annotated
 from typing import Optional
 from typing import Union
+from typing import Sequence
 import calendar
 import random
 # import time
@@ -56,7 +57,7 @@ import typer
 import zoneinfo
 from zoneinfo import ZoneInfo
 from rich import print
-
+import numpy as np
 
 
 def parse_timestamp(timestamp_string):
@@ -178,13 +179,27 @@ def ctx_attach_requested_timezone(
 #     return timezone_aware_timestamp
 
 
+def get_days_in_year(year):
+    start_date = datetime(year, 1, 1)  # First day of the year
+    end_date = datetime(year + 1, 1, 1)  # First day of the next year
+    return (end_date - start_date).days
+
+
+def generate_timestamps_for_a_year(year, frequency_minutes=60):
+    start_date = datetime(year, 1, 1)
+    days_in_year = get_days_in_year(year)
+    end_date = start_date + timedelta(days=days_in_year)
+    total_minutes = int((end_date - start_date).total_seconds() // 60)
+    intervals = total_minutes // frequency_minutes
+    
+    return [start_date + timedelta(minutes=(idx * frequency_minutes)) for idx in range(intervals)]
+
+
 def random_day_of_year(days_in_a_year) -> int:
     """
     Generate a random datetime and timezone object
     """
-    day = random.randint(1, days_in_a_year)
-
-    return days_in_a_year
+    return random.randint(1, days_in_a_year)
 
 
 def random_datetimezone() -> tuple:
@@ -277,6 +292,21 @@ def convert_hours_to_datetime_time(value: float) -> time:
 
 def timestamp_to_decimal_hours(t):
     return t.hour + t.minute / 60 + t.second / 3600 + t.microsecond / 3600000000
+
+
+def timestamp_to_decimal_hours_time_series(
+    timestamps: Union[datetime, Sequence[datetime]]
+) -> np.ndarray:
+    if isinstance(timestamps, datetime):
+        timestamps = [timestamps]
+
+    timestamps_array = np.array(timestamps)
+    hours = (timestamps_array.astype('datetime64[h]') - timestamps_array.astype('datetime64[D]')).astype('timedelta64[h]').astype(float)
+    minutes = (timestamps_array.astype('datetime64[m]') - timestamps_array.astype('datetime64[h]')).astype('timedelta64[m]').astype(float) / 60
+    seconds = (timestamps_array.astype('datetime64[s]') - timestamps_array.astype('datetime64[m]')).astype('timedelta64[s]').astype(float) / 3600
+    microseconds = (timestamps_array.astype('datetime64[us]') - timestamps_array.astype('datetime64[s]')).astype('timedelta64[us]').astype(float) / 3600000000
+
+    return hours + minutes + seconds + microseconds
 
 
 def timestamp_to_minutes(timestamp: datetime) -> float:

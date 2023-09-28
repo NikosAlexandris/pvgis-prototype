@@ -1,6 +1,9 @@
 from pydantic import field_validator
 from typing import Optional
 
+# Generic input/output
+from pvgisprototype.validation.parameters import VerbosityModel
+
 # When?
 from pvgisprototype.validation.parameters import BaseTimestampModel
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
@@ -55,7 +58,7 @@ class CalculateEquationOfTimeNOAAInput(
 
 
 class CalculateEquationOfTimeTimeSeriesNOAAInput(
-    BaseTimestampSeriesModel,
+    BaseTimestampSeriesModel,  # != BaseTimestampModel
     BaseTimeOutputUnitsModel,
 ):
     pass
@@ -129,6 +132,7 @@ class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     SolarZenithModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     @field_validator('solar_zenith')
     @classmethod
@@ -141,13 +145,20 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
 class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
     SolarZenithSeriesModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
+    # @field_validator('solar_zenith_series')
+    # def solar_zenith_range(cls, v):
+    #     v_array = np.atleast_1d(v)  # Ensure v is treated as an array
+    #     if not np.all((0 <= v_array) & (v_array <= np.pi)):  # Adjust the condition to work with an array
+    #         raise ValueError('solar_zenith must range within [0, π]')
+    #     return v  # Return the original value or array
     @field_validator('solar_zenith_series')
     def solar_zenith_range(cls, v):
-        v_array = np.atleast_1d(v)  # Ensure v is treated as an array
-        if not np.all((0 <= v_array) & (v_array <= np.pi)):  # Adjust the condition to work with an array
-            raise ValueError('solar_zenith must range within [0, π]')
-        return v  # Return the original value or array
+        v_values = np.array([zenith.value for zenith in np.atleast_1d(v)])  # Extract numerical values
+        if not np.all((0 <= v_values) & (v_values <= np.pi)):  # Adjust the condition to work with an array
+            raise ValueError("The solar zenith angle must be between 0 and pi radians.")
+        return v
 
 
 class CalculateSolarZenithNOAAInput(
@@ -156,6 +167,7 @@ class CalculateSolarZenithNOAAInput(
     SolarHourAngleModel,
     BaseApplyAtmosphericRefractionModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -166,6 +178,7 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     SolarHourAngleSeriesModel,
     BaseApplyAtmosphericRefractionModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -187,6 +200,7 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
     BaseTimeOutputUnitsModel,
     # BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -195,8 +209,9 @@ class CalculateSolarAzimuthNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -205,7 +220,7 @@ class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
@@ -250,7 +265,7 @@ class CalculateLocalSolarTimeNOAAInput(
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
-    verbose: Optional[bool] = False
+    verbose: int = 0
 
 
 class CalculateSolarPositionNOAAInput(

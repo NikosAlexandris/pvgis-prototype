@@ -1,0 +1,56 @@
+
+from devtools import debug
+from typing import Union
+from typing import Sequence
+from typing import List
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from math import pi
+from math import sin
+from math import asin
+
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
+from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
+from pvgisprototype import FractionalYear
+from pvgisprototype import SolarDeclination
+from .models import SolarDeclinationModels
+from ..utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+
+
+def model_solar_declination_time_series(
+    timestamps: Union[datetime, Sequence[datetime]],
+    timezone: ZoneInfo = None,
+    model: SolarDeclinationModels = SolarDeclinationModels.pvis,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: str = 'radians',
+    verbose: int = 0,
+) -> Sequence[SolarDeclination]:
+    """ """
+    if model.value == SolarDeclinationModels.noaa:
+
+        solar_declination_series = calculate_solar_declination_time_series_noaa(
+            timestamps=timestamps,
+            angle_output_units=angle_output_units
+        )
+        solar_declination_series = convert_to_degrees_if_requested(
+            solar_declination_series,
+            angle_output_units,
+        )
+
+    if model.value  == SolarDeclinationModels.pvis:
+        pass
+
+    if model.value  == SolarDeclinationModels.hargreaves:
+        pass
+
+    if model.value  == SolarDeclinationModels.pvlib:
+        pass
+
+    return solar_declination_series

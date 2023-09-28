@@ -131,11 +131,11 @@ def calculate_time_offset_noaa(
 
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
 def calculate_time_offset_time_series_noaa(
-        longitude: Longitude, 
-        timestamps: Union[datetime, Sequence[datetime]],
-        timezone: ZoneInfo,
-        time_output_units: str = 'minutes',
-    ) -> Union[TimeOffset, np.ndarray]:
+    longitude: Longitude, 
+    timestamps: Union[datetime, Sequence[datetime]],
+    timezone: ZoneInfo,
+    time_output_units: str = 'minutes',
+):# -> Union[TimeOffset, np.ndarray]:
     """ """
     # 1
     longitude_in_minutes = radians_to_time_minutes(longitude.value)  # time

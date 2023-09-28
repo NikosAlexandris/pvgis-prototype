@@ -4,16 +4,18 @@ from rich.progress import track
 from rich import box
 from math import degrees
 from math import radians
+from math import pi
 import numpy as np
+from typing import List
 from typing import Any
 
 
 def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
-    """Convert angle to radians."""
+    """Convert floating point angular measurement from degrees to radians."""
     if ctx.resilient_parsing:
         return
     if type(angle) != float:
-        raise typer.BadParameter("Latitude should be a float!")
+        raise typer.BadParameter("Input should be a float!")
 
     return np.radians(angle)
 
@@ -23,7 +25,7 @@ def convert_to_degrees(ctx: typer.Context, param: typer.CallbackParam, angle: fl
     if ctx.resilient_parsing:
         return
     if type(angle) != float:
-        raise typer.BadParameter("Latitude should be a float!")
+        raise typer.BadParameter("The input value {angle} for an angular measurement is not of the expected type float!")
 
     return np.degrees(angle)
 
@@ -43,20 +45,62 @@ def convert_float_to_degrees_if_requested(angle: float, output_units: str) -> fl
 
 def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
     """Convert angle from radians to degrees if requested"""
+    from copy import deepcopy
+    copy_of_data_class = deepcopy(data_class)
     if output_units == 'degrees' and not data_class.unit == 'degrees':
-        data_class.value = degrees(data_class.value)
-        data_class.unit = 'degrees'
-    return data_class
+        copy_of_data_class.value = degrees(data_class.value)
+        copy_of_data_class.unit = 'degrees'
+    return copy_of_data_class
 
 
-# def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
-#     """Convert angle from degrees to radians if requested."""
-#     return np.radians(angle) if output_units == 'radians' else angle
+def convert_series_to_degrees_if_requested(
+    data_class_series: List[Any],
+    angle_output_units: str,
+) -> List[Any]:
+    """
+    Vectorized conversion of a series of angle data from radians to degrees if requested.
+
+    Parameters
+    ----------
+    data_class_series : List[Any]
+        A list of data classes containing the angle value and unit.
+    angle_output_units : str
+        The desired output unit ('degrees' or 'radians').
+
+    Returns
+    -------
+    List[Any]
+        A list of converted data classes.
+    """
+    from copy import deepcopy
+    copy_of_data_class_series = deepcopy(data_class_series)
+
+    if angle_output_units == "degrees":
+        values_to_convert = np.array(
+            [
+                data_class.value
+                for data_class in copy_of_data_class_series
+                if data_class.unit != "degrees"
+            ]
+        )
+        converted_values = np.degrees(values_to_convert)
+
+        for i, data_class in enumerate(copy_of_data_class_series):
+            if data_class.unit != "degrees":
+                data_class.value = converted_values[i]
+                data_class.unit = "degrees"
+
+    return copy_of_data_class_series
 
 
 def convert_float_to_radians_if_requested(angle: float, output_units: str) -> float:
     """Convert angle from radians to radians if requested"""
     return radians(angle) if output_units == 'radians' else angle
+
+
+# def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
+#     """Convert angle from degrees to radians if requested."""
+#     return np.radians(angle) if output_units == 'radians' else angle
 
 
 def convert_to_radians_if_requested(data_input: Any, output_units: str) -> Any:
@@ -76,6 +120,47 @@ def convert_to_radians_if_requested(data_input: Any, output_units: str) -> Any:
             data_input.unit = 'radians'
             
     return data_input
+
+
+def convert_series_to_radians_if_requested(
+    data_class_series: List[Any],
+    angle_output_units: str,
+) -> List[Any]:
+    """
+    Vectorized conversion of a series of angle data from radians to radians if requested.
+
+    Parameters
+    ----------
+    data_class_series : List[Any]
+        A list of data classes containing the angle value and unit.
+    angle_output_units : str
+        The desired output unit ('radians' or 'radians').
+
+    Returns
+    -------
+    List[Any]
+        A list of converted data classes.
+    """
+
+    from copy import deepcopy
+
+    copy_of_data_class_series = deepcopy(data_class_series)
+    if angle_output_units == "radians":
+        values_to_convert = np.array(
+            [
+                data_class.value
+                for data_class in copy_of_data_class_series
+                if data_class.unit != "radians"
+            ]
+        )
+        converted_values = np.radians(values_to_convert)
+
+        for i, data_class in enumerate(copy_of_data_class_series):
+            if data_class.unit != "radians":
+                data_class.value = converted_values[i]
+                data_class.unit = "radians"
+
+    return copy_of_data_class_series
 
 
 def convert_dictionary_to_table(dictionary):
@@ -122,3 +207,11 @@ def round_float_values(obj, decimal_places=3):
 #         return obj
 #     else:
 #         return obj
+
+
+def convert_south_to_north_degrees_convention(azimuth_south_degrees):
+    return (azimuth_south_degrees + 180) % 360
+
+
+def convert_south_to_north_radians_convention(azimuth_south_radians):
+    return (azimuth_south_radians + pi) % (2 * pi)

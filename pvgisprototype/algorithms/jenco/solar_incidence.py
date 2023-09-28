@@ -1,5 +1,7 @@
 import typer
 from typing import Annotated
+from typing import Union
+from typing import Sequence
 from typing import List
 from typing import Optional
 from pathlib import Path
@@ -9,9 +11,9 @@ from math import sin, cos, acos
 from math import asin
 from math import atan
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from ..noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
-from ..noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.conversions import convert_to_radians
@@ -26,38 +28,67 @@ from pvgisprototype import Latitude
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel
 from pvgisprototype.validation.functions import CalculateSolarIncidenceJencoInputModel
-
+from pvgisprototype.validation.functions import CalculateSolarIncidenceTimeSeriesJencoInputModel
+from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import NO_SOLAR_INCIDENCE
+from pvgisprototype.constants import RADIANS
 import numpy as np
-
-
-NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 
 @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
 def calculate_relative_longitude(
-        latitude: Latitude,
-        surface_tilt: float = 0,
-        surface_orientation: float = 0,
-        angle_output_units: str = 'radians',
-    ) -> RelativeLongitude:
+    latitude: Latitude,
+    surface_tilt: float = SURFACE_TILT_DEFAULT,
+    surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+) -> RelativeLongitude:
     """
-    """
-    # tangent_relative_longitude = -(
-    #             sin(surface_tilt)
-    #             * sin(surface_orientation)
-    #         ) / (
-    #             sin(latitude)
-    #             * sin(surface_tilt)
-    #             * cos(surface_orientation)
-    #             + cos(latitude)
-    #             * cos(surface_tilt)
-    #         )
+    Notes
+    -----
+    Hofierka, 2002 uses equations presented by Jenco :
+    tangent_relative_longitude =
+                                - sin(surface_tilt)
+                                * sin(surface_orientation) /
+                                  sin(latitude) 
+                                * sin(surface_tilt) 
+                                * cos(surface_orientation) 
+                                + cos(latitude) 
+                                * cos(surface_tilt)
 
+    In PVGIS' C source code :
+
+    There is an error of one negative sign in either of the expressions! That
+    is so because : cos(pi/2 + x) = -sin(x).
+
+    tangent_relative_longitude =
+
+            - cos(half_pi - surface_tilt)           # cos(pi/2 - x) = sin(x)
+    
+            * cos(half_pi + surface_orientation) /  # cos(pi/2 + x) = -sin(x)
+            
+            sin(latitude) 
+            
+            * cos(half_pi - surface_tilt) 
+            
+            * sin(half_pi + surface_orientation)    # sin(pi/2 + x) = cos(x)
+            
+            + cos(latitude) 
+            
+            * sin(half_pi - surface_tilt)           # sin(pi/2 - x) = cos(x)
+    """
     tangent_relative_longitude_numerator = -(
         sin(surface_tilt.value)
         * sin(surface_orientation.value)
     )
-
     tangent_relative_longitude_denominator = (
             sin(latitude.value)
         * sin(surface_tilt.value)
@@ -65,14 +96,13 @@ def calculate_relative_longitude(
         + cos(latitude.value)
         * cos(surface_tilt.value)
     )
-    
     tangent_relative_longitude = (
         tangent_relative_longitude_numerator /
         tangent_relative_longitude_denominator
     )
-
+    relative_longitude = atan(tangent_relative_longitude)
     relative_longitude = RelativeLongitude(
-        value=atan(tangent_relative_longitude),
+        value=relative_longitude,
         unit=angle_output_units,
     )
     return relative_longitude
@@ -80,25 +110,25 @@ def calculate_relative_longitude(
 
 @validate_with_pydantic(CalculateSolarIncidenceJencoInputModel)
 def calculate_solar_incidence_jenco(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: ZoneInfo = None,
-        random_time: bool = False,
-        hour_angle: float = None,
-        surface_tilt: float = None,
-        surface_orientation: float = None,
-        shadow_indicator: Path = None,
-        horizon_heights: Optional[List[float]] = None,
-        horizon_interval: Optional[float] = None,
-        days_in_a_year: float = 365.25,
-        eccentricity_correction_factor: float = 0.03344,
-        perigee_offset: float = 0.048869,
-        time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
-        angle_output_units: str = 'radians',
-        verbose: bool = False,
-    ) -> SolarIncidence:
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: ZoneInfo = None,
+    random_time: bool = False,
+    # hour_angle: float = None,
+    surface_tilt: float = None,
+    surface_orientation: float = None,
+    shadow_indicator: Path = None,
+    horizon_heights: Optional[List[float]] = None,
+    horizon_interval: Optional[float] = None,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
+    angle_units: str = 'radians',
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+) -> SolarIncidence:
     """Calculate the solar incidence based on sun's position and surface geometry.
 
     Parameters
@@ -176,12 +206,12 @@ def calculate_solar_incidence_jenco(
         )
         relative_inclined_latitude = asin(sine_relative_inclined_latitude)
         solar_declination = calculate_solar_declination_pvis(
-            timestamp,
-            timezone,
-            days_in_a_year,
-            eccentricity_correction_factor,
-            perigee_offset,
-            angle_output_units,
+            timestamp=timestamp,
+            timezone=timezone,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            angle_output_units=angle_output_units,
             )
         c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.value)
         c_inclined_33 = sine_relative_inclined_latitude * sin(solar_declination.value)
@@ -202,22 +232,29 @@ def calculate_solar_incidence_jenco(
         )
         solar_incidence = SolarIncidence(
             value=asin(sine_solar_incidence),
-            unit=angle_output_units
+            unit=RADIANS,
         )
 
     # return max(NO_SOLAR_INCIDENCE, solar_incidence)
     return solar_incidence
 
 
+@validate_with_pydantic(CalculateSolarIncidenceTimeSeriesJencoInputModel)
 def calculate_solar_incidence_time_series_jenco(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: np.array,
     timezone: Optional[ZoneInfo] = None,
-    surface_tilt: float = 45,
-    surface_orientation: float = 180,
-    time_output_units: str = 'minutes',
-    angle_output_units: str = 'radians',
+    random_time_series: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    surface_tilt: float = SURFACE_TILT_DEFAULT,
+    surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
+    angle_units: str = 'radians',
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> np.array:
     solar_incidence_angle_series = np.empty_like(timestamps, dtype=float)
 
@@ -227,8 +264,8 @@ def calculate_solar_incidence_time_series_jenco(
     )
     solar_declination_series = np.array([item.value for item in solar_declination_series])
     sine_relative_inclined_latitude = -(
-        cos(latitude.value) * sin(surface_tilt) * cos(surface_orientation)
-        + sin(latitude.value) * cos(surface_tilt)
+        cos(latitude.value) * sin(surface_tilt.value) * cos(surface_orientation.value)
+        + sin(latitude.value) * cos(surface_tilt.value)
     )
     relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
     c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
@@ -294,7 +331,7 @@ def interpolate_horizon_height(
         * horizon_heights[position_after]
     )
 
-    return HorizonHeight(horizon_height, 'meters')                          # FIXME: Is it meters?
+    return HorizonHeight(horizon_height, HORIZON_HEIGHT_UNIT)
 
 
 def is_surface_in_shade(
