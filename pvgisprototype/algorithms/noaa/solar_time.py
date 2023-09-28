@@ -92,7 +92,6 @@ def calculate_true_solar_time_noaa(
     if time_output_units == 'minutes':
         # if not 0 <= true_solar_time <= 1440:
         # if not 0 <= true_solar_time <= 1580:
-        # if not -790 <= true_solar_time <= 790:
         true_solar_time_minutes = (
             true_solar_time.hour * 60
             + true_solar_time.minute
@@ -129,7 +128,6 @@ def calculate_true_solar_time_time_series_noaa(
         if time_output_units == 'minutes':
             # if not 0 <= true_solar_time <= 1440:
             # if not 0 <= true_solar_time <= 1580:
-            # if not -790 <= true_solar_time <= 790:
             if not -1580 <= true_solar_time <= 1580:
                 raise ValueError(f'The calculated true solar time `{true_solar_time}` is out of the expected range [-1580, 1580] minutes!')
 

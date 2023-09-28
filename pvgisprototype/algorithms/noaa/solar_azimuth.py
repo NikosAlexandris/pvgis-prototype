@@ -82,6 +82,9 @@ def calculate_solar_azimuth_noaa(
           # cos(θ) = ----------------------------------------------------------
                    #             cos(latitude) * sin(solar_zenith)
 
+                          # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # θ = arccos( -  -------------------------------------------------------------- )
+                            #      cos(latitude) * sin(solar_zenith)
 
     # or else, from the first equation, after multiplying by -1 :
 
@@ -106,17 +109,14 @@ def calculate_solar_azimuth_noaa(
     # which is the same as reported in 
 
 
-    # numerator = sin(solar_declination.value) - sin(latitude.value) * cos(solar_zenith.value)
-    numerator = sin(latitude.value) * cos(solar_zenith.value) - sin(solar_declination.value)
-    denominator = cos(latitude.value) * sin(solar_zenith.value)
+    numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
+    denominator = cos(latitude.radians) * sin(solar_zenith.radians)
     # try else raise ... ?
     cosine_solar_azimuth = -1 * numerator / denominator
     solar_azimuth = acos(cosine_solar_azimuth)
 
     if solar_hour_angle.value > 0:
         solar_azimuth = 2 * pi - solar_azimuth
-
-    debug(locals())
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
         raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
