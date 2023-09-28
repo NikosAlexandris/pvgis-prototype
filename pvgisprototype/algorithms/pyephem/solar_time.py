@@ -103,8 +103,8 @@ def calculate_solar_time_ephem(
   latitude = latitude.value
   observer = ephem.Observer()
   observer.date = timestamp
-  observer.lon = longitude.value
-  observer.lat = latitude.value
+  observer.lon = longitude.degrees
+  observer.lat = latitude.degrees
   sidereal_time = observer.sidereal_time()
 
   sun = ephem.Sun()  # a Sun object

@@ -125,7 +125,6 @@ def calculate_solar_azimuth_noaa(
             value=solar_azimuth,
             unit='radians',
             )
-    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
 
     if verbose == 3:
         debug(locals())

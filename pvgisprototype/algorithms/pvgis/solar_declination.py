@@ -42,12 +42,11 @@ def calculate_solar_declination_pvgis(
     """
     day_of_year = timestamp.timetuple().tm_yday
     solar_declination = calculate_solar_declination_pvis(
-        timestamp,
-        timezone,
-        days_in_a_year,
-        eccentricity_correction_factor,
-        perigee_offset,
-        angle_output_units,
+        timestamp=timestamp,
+        timezone=timezone,
+        days_in_a_year=days_in_a_year,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        perigee_offset=perigee_offset,
         )
     
     solar_declination = SolarDeclination(
