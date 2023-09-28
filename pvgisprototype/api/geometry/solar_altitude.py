@@ -83,10 +83,6 @@ def model_solar_altitude(
             angle_output_units=angle_output_units,
             verbose=verbose,
         )
-        solar_altitude = convert_to_degrees_if_requested(
-            solar_altitude,
-            angle_output_units,
-        )
 
     if model.value == SolarPositionModels.skyfield:
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
@@ -96,10 +92,6 @@ def model_solar_altitude(
             timezone=timezone,
             angle_output_units=angle_output_units,
             verbose=verbose,
-        )
-        solar_altitude = convert_to_degrees_if_requested(
-            solar_altitude,
-            angle_output_units,
         )
 
     if model.value == SolarPositionModels.suncalc:
@@ -151,7 +143,6 @@ def model_solar_altitude(
             angle_output_units=angle_output_units,
             verbose=verbose,
             )
-        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
     if model.value  == SolarPositionModels.pvlib:
 
@@ -163,7 +154,6 @@ def model_solar_altitude(
             angle_output_units=angle_output_units,
             verbose=verbose,
         )
-        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
     return solar_altitude
 

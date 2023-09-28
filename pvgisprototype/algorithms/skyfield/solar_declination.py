@@ -3,7 +3,7 @@ import skyfield
 from pvgisprototype.validation.functions import validate_with_pydantic
 from datetime import datetime
 from pvgisprototype.validation.functions import CalculateSolarDeclinationSkyfieldInput
-from ...api.utilities.conversions import convert_to_degrees_if_requested
+from ...api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype import SolarDeclination
 
 
@@ -43,10 +43,8 @@ def calculate_solar_declination_skyfield(      # NOTE gounaol: Declination is al
         value = solar_declination.degrees,
         unit = 'degrees'
     )
-
-    solar_declination = convert_to_degrees_if_requested(
-            solar_declination,
-            angle_output_units,
-            )
-
+    solar_declination = convert_to_radians_if_requested(
+        solar_declination,
+        angle_output_units,
+    )
     return solar_declination

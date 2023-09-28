@@ -251,9 +251,9 @@ def calculate_solar_zenith_noaa(
             timestamp=timestamp,
             angle_output_units='radians',
             )
-    cosine_solar_zenith = sin(latitude.value) * sin(solar_declination.value) + cos(
-        latitude.value
-    ) * cos(solar_declination.value) * cos(solar_hour_angle.value)
+    cosine_solar_zenith = sin(latitude.radians) * sin(solar_declination.radians) + cos(
+        latitude.radians
+    ) * cos(solar_declination.radians) * cos(solar_hour_angle.radians)
     solar_zenith = acos(cosine_solar_zenith)
     solar_zenith = SolarZenith(
         value=solar_zenith,
@@ -268,10 +268,6 @@ def calculate_solar_zenith_noaa(
             angle_output_units="radians",  # always in radians!
         )
     
-    # # --------------------------------------------- NOTE gounaol: solar zenith angles above 90° may not always be useful
-    # if solar_zenith.value > pi/2:
-    #     solar_zenith.value = solar_zenith.value - pi/2
-    # # ----------------------------------------------------------------------------------------------
     # if not isfinite(solar_zenith.value) or not 0 <= solar_zenith.value <= pi/2 + 0.0146:
     if not isfinite(solar_zenith.value) or not 0 <= solar_zenith.value <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')

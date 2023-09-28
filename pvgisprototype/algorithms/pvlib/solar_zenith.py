@@ -10,7 +10,6 @@ from math import cos
 from math import acos
 from math import pi
 from math import isfinite
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -30,10 +29,8 @@ def calculate_solar_zenith_pvlib(
     )-> SolarZenith:
     """Calculate the solar azimith (θ) in radians
     """
-    longitude = convert_to_degrees_if_requested(longitude, 'degrees')
-    latitude = convert_to_degrees_if_requested(latitude, 'degrees')
 
-    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.value, longitude.value)
+    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_zenith = solar_position['zenith'].values[0]
 
     if not isfinite(solar_zenith) or not 0 <= solar_zenith <= 180.836518:
