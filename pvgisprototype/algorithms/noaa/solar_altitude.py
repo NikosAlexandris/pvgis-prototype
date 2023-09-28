@@ -15,6 +15,7 @@ from pvgisprototype import Latitude
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import SolarZenith
 from pvgisprototype import SolarAltitude
+from pvgisprototype.constants import RADIANS
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from .solar_zenith import calculate_solar_zenith_noaa
@@ -51,7 +52,7 @@ def calculate_solar_altitude_noaa(
     if not isfinite(solar_altitude) or not -pi / 2 <= solar_altitude <= pi / 2:
         raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-pi/2}, {pi/2}] radians')
 
-    solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+    solar_altitude = SolarAltitude(value=solar_altitude, unit=RADIANS)
     # solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
     return solar_altitude
