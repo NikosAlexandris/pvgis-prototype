@@ -23,15 +23,23 @@ from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
 from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.api.geometry.models import SolarTimeModels
 
+
+MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
+
+
+# Generic input/output
+
+
+class VerbosityModel(BaseModel):
+    verbose: int = 0
 
 
 # Where?
-
 
 class LongitudeModel(BaseModel):
     longitude: Union[confloat(ge=-pi, le=pi), Longitude]
@@ -44,7 +52,7 @@ class LongitudeModel(BaseModel):
         elif isinstance(input, float):
             return Longitude(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported `longitude` type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `longitude`")
 
 
 class LatitudeModel(BaseModel):
@@ -58,7 +66,7 @@ class LatitudeModel(BaseModel):
         elif isinstance(input, float):
             return Latitude(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported `latitude` type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `latitude`")
 
 
 class BaseCoordinatesModel(
@@ -70,7 +78,6 @@ class BaseCoordinatesModel(
 
 # When?
 
-
 class BaseTimestampModel(BaseModel):
     timestamp: datetime
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -79,6 +86,12 @@ class BaseTimestampModel(BaseModel):
 class BaseTimestampSeriesModel(BaseModel):
     timestamps: Union[datetime, Sequence[datetime]]
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @field_validator('timestamps')
+    def check_empty_list(cls, value):
+        if isinstance(value, list) and not value:
+            raise ValueError('Empty list of timestamps provided')
+        return value
 
 
 class BaseTimeModel(BaseTimestampModel):
@@ -111,11 +124,18 @@ class BaseTimeSeriesModel(BaseTimestampSeriesModel):
 
 class TimeOffsetModel(BaseModel):
     time_offset_global: float = 0
+
+
+class HourOffsetModel(BaseModel):
     hour_offset: float = 0
 
 
 class RandomTimeModel(BaseModel):
     random_time: bool
+
+
+class RandomTimeSeriesModel(BaseModel):
+    random_time_series: bool
 
 
 class BaseTimeOutputUnitsModel(BaseModel):
@@ -131,7 +151,6 @@ class BaseTimeOutputUnitsModel(BaseModel):
 
 
 # Angular units
-
 
 class BaseAngleUnitsModel(BaseModel):
     angle_units: str
@@ -177,7 +196,6 @@ class BaseAngleOutputUnitsModel(BaseModel):
 
 # Solar geometry
 
-
 class SolarDeclinationModel(BaseModel):
     solar_declination: Union[confloat(ge=0, le=pi), SolarDeclination]
     model_config = ConfigDict(
@@ -192,7 +210,7 @@ class SolarDeclinationModel(BaseModel):
         elif isinstance(input, float):
             return SolarDeclination(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported solar_declination type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_declination`")
 
 
 class SolarPositionModel(BaseModel):
@@ -224,7 +242,6 @@ class SolarTimeModel(BaseModel):
 
 # Solar surface
 
-
 class SurfaceTiltModel(BaseModel):
     surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt]
     model_config = ConfigDict(
@@ -239,7 +256,7 @@ class SurfaceTiltModel(BaseModel):
         elif isinstance(input, float):
             return SurfaceTilt(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported surface_tilt type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_tilt`")
 
 
 class SurfaceOrientationModel(BaseModel):
@@ -255,7 +272,7 @@ class SurfaceOrientationModel(BaseModel):
         elif isinstance(input, float):
             return SurfaceOrientation(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported surface_orientation type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_orientation`")
 
 
 class SolarHourAngleModel(BaseModel):
@@ -271,7 +288,7 @@ class SolarHourAngleModel(BaseModel):
         elif isinstance(input, float):
             return SolarHourAngle(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported solar_hour_angle type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_hour_angle`")
 
 
 class SolarHourAngleSeriesModel(BaseModel):
@@ -294,7 +311,7 @@ class SolarHourAngleSeriesModel(BaseModel):
         ):
             return input
         else:
-            raise ValueError("Unsupported solar_hour_angle_series type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_hour_angle_series`")
 
 
 class ApplyAtmosphericRefraction(BaseModel):
@@ -311,7 +328,20 @@ class RefractedSolarAltitudeModel(BaseModel):
         elif isinstance(input, float):
             return RefractedSolarAltitude(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported `refracted_solar_altitude` type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_altitude`")
+
+
+class RefractedSolarAltitudeSeriesModel(BaseModel):
+    refracted_solar_altitude_series: Union[RefractedSolarAltitude, Sequence[RefractedSolarAltitude]]
+
+    # @field_validator("refracted_solar_altitude")
+    # def validate_refracted_solar_altitude(cls, input) -> RefractedSolarAltitude:
+    #     if isinstance(input, RefractedSolarAltitude):
+    #         return input
+    #     elif isinstance(input, float):
+    #         return RefractedSolarAltitude(value=input, unit="radians")
+    #     else:
+    #         raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_altitude`")
 
 
 class RefractedSolarZenithModel(BaseModel):
@@ -324,7 +354,7 @@ class RefractedSolarZenithModel(BaseModel):
         elif isinstance(input, float):
             return RefractedSolarZenith(value=input, unit="radians")
         else:
-            raise ValueError("Unsupported `refracted_solar_zenith` type provided")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_zenith`")
 
 
 class ElevationModel(BaseModel):
@@ -341,7 +371,7 @@ class ElevationModel(BaseModel):
         elif isinstance(input, float):
             return Elevation(value=input, unit="meters")
         else:
-            raise ValueError("Unsupported type provided for `elevation`")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `elevation`")
 
         # valid_units = "meters"
         # if not unit == valid_units:

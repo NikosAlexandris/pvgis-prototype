@@ -9,21 +9,7 @@ from pydantic import field_validator
 from pydantic import BaseModel
 from pydantic import confloat
 import numpy as np
-
-# from pvgisprototype import SolarZenith
-from pvgisprototype.validation.parameters import SolarHourAngleModel
-from pvgisprototype.validation.parameters import SolarHourAngleSeriesModel
-
-# When?
-from pvgisprototype.validation.parameters import BaseTimestampModel
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
-from pvgisprototype.validation.parameters import BaseTimeModel
-from pvgisprototype.validation.parameters import BaseTimeSeriesModel
-
-# Where?
-from pvgisprototype.validation.parameters import LongitudeModel
-from pvgisprototype.validation.parameters import LatitudeModel
-from pvgisprototype.validation.parameters import BaseCoordinatesModel
+from pvgisprototype import SolarZenith
 
 
 class BaseTimeEventModel(BaseModel):
@@ -96,7 +82,8 @@ class SolarZenithModel(BaseModel):
 
 
 class SolarZenithSeriesModel(BaseModel):  # merge above here-in
-    solar_zenith_series: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
+    # solar_zenith_series: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
+    solar_zenith_series: Union[SolarZenith, Sequence[SolarZenith]]
 
 
 class BaseApplyAtmosphericRefractionModel(BaseModel):

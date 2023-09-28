@@ -18,15 +18,15 @@ from pvgisprototype.constants import HOUR_ANGLE
 from pvgisprototype.constants import UNDEF
 from pvgisprototype.constants import double_numpi
 from pvgisprototype.constants import half_numpi
-from ...api.data_structures import SolarGeometryDayConstants
-from ...api.data_structures import SolarGeometryDayVariables
-from ...api.utilities.conversions import convert_to_degrees_if_requested
-from ...api.utilities.conversions import convert_to_radians
-from ...api.utilities.timestamp import attach_timezone
-from ...api.utilities.timestamp import convert_to_timezone
-from ...api.utilities.timestamp import ctx_convert_to_timezone
-from ...api.utilities.timestamp import get_day_from_hour_of_year
-from ...api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
+from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.timestamp import attach_timezone
+from pvgisprototype.api.utilities.timestamp import convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import get_day_from_hour_of_year
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from .solar_time import calculate_solar_time_pvgis
 
 

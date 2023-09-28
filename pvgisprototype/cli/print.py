@@ -9,6 +9,7 @@ from rich import box
 from typing import List
 
 
+SURFACE_TILT_COLUMN_NAME = 'Tilt'
 DECLINATION_COLUMN_NAME = 'Declination'
 HOUR_ANGLE_COLUMN_NAME = 'Hour Angle'
 ZENITH_COLUMN_NAME = 'Zenith'
@@ -49,13 +50,13 @@ def print_solar_position_table(
     user_requested_timestamp=None,
     user_requested_timezone=None,
 ):
+    """ """
     console = Console()
 
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
 
-    # Define the list of column names
     columns = ["Longitude", "Latitude", "Time", "Zone"]
     if user_requested_timestamp and user_requested_timezone:
         columns.extend(["Local Time", "Local Zone"])
@@ -74,7 +75,6 @@ def print_solar_position_table(
         columns.append(INCIDENCE_COLUMN_NAME)
     columns.append(UNITS_COLUMN_NAME)
 
-    # Create the table
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
     for model_result in rounded_table:
@@ -98,7 +98,13 @@ def print_solar_position_table(
         if user_requested_timestamp and user_requested_timezone:
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
+
+        is_pvis = model_name.lower() == 'pvis'
+        style = "red" if is_pvis else None
+        # is_pvlib = model_name.lower() == 'pvlib'
+        # style = "green" if is_pvlib else None
         row.append(model_name)
+
         if declination_value is not None:
             row.append(str(declination_value))
         if hour_angle_value is not None:
@@ -111,8 +117,92 @@ def print_solar_position_table(
             row.append(str(azimuth_value))
         if incidence_value is not None:
             row.append(str(incidence_value))
+
         row.append(str(units))
-        table.add_row(*row)
+        table.add_row(*row, style=style)
+
+    console.print(table)
+
+
+def print_hour_angle_table_2(
+    solar_time,
+    rounding_places,
+    hour_angle=None,
+    units=None,
+):
+    """ """
+    console = Console()
+
+    solar_time = round_float_values(solar_time, rounding_places)
+    hour_angle = round_float_values(hour_angle, rounding_places)
+
+    columns = ["Solar time"]
+    if hour_angle is not None:
+        columns.append(HOUR_ANGLE_COLUMN_NAME)
+    columns.append(UNITS_COLUMN_NAME)
+
+    # table = Table(*columns, box=box.SIMPLE_HEAD)
+    table = Table(
+        *columns,
+        box=box.SIMPLE_HEAD,
+        show_header=True,
+        header_style="bold magenta",
+    )
+
+    row = [str(solar_time)]
+    if hour_angle is not None:
+        row.append(str(hour_angle))
+    row.append(str(units))
+    # table.add_row(*row, style=style)
+    table.add_row(*row)
+
+    console.print(table)
+
+
+def print_hour_angle_table(
+    latitude,
+    rounding_places,
+    surface_tilt=None,
+    declination=None,
+    hour_angle=None,
+    units=None,
+):
+    """ """
+    console = Console()
+
+    latitude = round_float_values(latitude, rounding_places)
+    # rounded_table = round_float_values(table, rounding_places)
+    surface_tilt = round_float_values(surface_tilt, rounding_places)
+    declination = round_float_values(declination, rounding_places)
+    hour_angle = round_float_values(hour_angle, rounding_places)
+
+    columns = ["Latitude", "Event"]
+    if surface_tilt is not None:
+        columns.append(SURFACE_TILT_COLUMN_NAME)
+    if declination is not None:
+        columns.append(DECLINATION_COLUMN_NAME)
+    if hour_angle is not None:
+        columns.append(HOUR_ANGLE_COLUMN_NAME)
+    columns.append(UNITS_COLUMN_NAME)
+
+    # table = Table(*columns, box=box.SIMPLE_HEAD)
+    table = Table(
+        *columns,
+        box=box.SIMPLE_HEAD,
+        show_header=True,
+        header_style="bold magenta",
+    )
+
+    row = [str(latitude), 'Event']
+    if surface_tilt is not None:
+        row.append(str(surface_tilt))
+    if declination is not None:
+        row.append(str(declination))
+    if hour_angle is not None:
+        row.append(str(hour_angle))
+    row.append(str(units))
+    # table.add_row(*row, style=style)
+    table.add_row(*row)
 
     console.print(table)
 

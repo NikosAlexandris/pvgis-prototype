@@ -6,25 +6,25 @@ from math import radians
 from math import acos
 from math import tan
 from datetime import time
-
 from pvgisprototype import HourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype import HourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
+from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.validation.functions import CalculateHourAngleInputModel
 from pvgisprototype.validation.functions import CalculateHourAngleSunriseInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
-from ..utilities.timestamp import timestamp_to_decimal_hours
-from ..utilities.timestamp import convert_hours_to_seconds
-from ..utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
+from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateHourAngleInputModel)
 def calculate_hour_angle(
     solar_time: time,
-    angle_output_units: str = "radians",
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
 ):
     """Calculate the hour angle ω'
 
@@ -64,15 +64,22 @@ def calculate_hour_angle(
     where the plus sign applies to afternoon hours and the minus sign to
     morning hours.
 
-    The hour angle can also be obtained from the AST; that is, the corrected
-    local solar time:
+    The hour angle can also be obtained from the apparent solar time (AST);
+    that is, the corrected local solar time:
 
         h = (AST - 12) * 15
 
     At local solar noon, AST = 12 and h = 0°. Therefore, from Eq <<(2.3)<<, the
-    LST (the time shown by our clocks at local solar noon) is:
+    local solar time (LST, the time shown by our clocks at local solar noon)
+    is:
 
         LST = 12 - ET ∓ 4 * (SL - LL)
+
+        where:
+
+            ET is the Equation of Time
+            SL Standard Longitude
+            LL Local Longitude
 
     Example 1
 
@@ -96,7 +103,33 @@ def calculate_hour_angle(
     The apparent solar time on March 10 at 2:30 pm for the city of Athens,
     Greece (23°40′E longitude) is 
 
-        AST = 14:30−4(30−23.66)−0:11=14:30−0:25−0:11=13:54,or1:54pm
+        AST = 14:30 - 4 * (30 - 23.66) - 0:11
+            = 14:30 - 0:25 - 0:11 
+            = 13:54 or 1:54 pm
+
+    Additional notes:
+    
+
+    Nomenclature from [1]_
+
+    α [°] solar altitude angle
+    β [°] tilt angle
+    δ [°] solar declination
+    θ [°] solar incidence angle
+    Φ [°] solar zenith angle
+    h [°] hour angle
+    L [°] local latitude
+    N [-] day of the year
+    z [°] solar azimuth angle
+    ZS [°] surface azimuth angle
+    AST Apparent Solar Time
+    LST Local Standard Time
+    ET Equation of Time
+    SL Standard Longitude
+    LL Local Longitude
+    DS Daylight Saving 
+
+    .. [1] Determination of Optimal Position of Solar Trough Collector. Available from: https://www.researchgate.net/publication/317826540_Determination_of_Optimal_Position_of_Solar_Trough_Collector [accessed Sep 06 2023].
 
     In PVGIS :
         hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
@@ -108,11 +141,8 @@ def calculate_hour_angle(
     In this function:
     """
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = radians(15) * (solar_time_decimal_hours - 12)
+    hour_angle = (solar_time_decimal_hours - 12) * radians(15)
     hour_angle = HourAngle(value=hour_angle, unit='radians')
-    # hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
-
-    # debug(locals())
     return hour_angle
 
 
@@ -124,13 +154,6 @@ def calculate_hour_angle_sunrise(
     angle_output_units: str = "radians",
 ) -> HourAngleSunrise:
     """Calculate the hour angle (ω) at sunrise and sunset
-
-    Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
-
-    The hour angle (ω) at sunrise and sunset measures the angular distance
-    between the sun at the local solar time and the sun at solar noon.
-
-    ω = acos(-tan(Φ-β)*tan(δ))
 
     Parameters
     ----------
@@ -155,6 +178,15 @@ def calculate_hour_angle_sunrise(
         Tuple containg (hour_angle, units). Hour angle (ω) is the angle at any
         instant through which the earth has to turn to bring the meridian of the
         observer directly in line with the sun's rays measured in radian.
+
+    Notes
+    -----
+    Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
+
+    The hour angle (ω) at sunrise and sunset measures the angular distance
+    between the sun at the local solar time and the sun at solar noon.
+
+    ω = acos(-tan(Φ-β)*tan(δ))
     """
     hour_angle_sunrise = acos(
         -tan(latitude.value - surface_tilt.value) * tan(solar_declination.value)

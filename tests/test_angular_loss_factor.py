@@ -1,4 +1,7 @@
+# UPDATE-ME ------------------------------------------------------------------
+
 import pytest
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor
 
 
 @pytest.mark.parametrize(

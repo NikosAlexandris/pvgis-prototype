@@ -1,9 +1,9 @@
 import pytest
-from pvgisprototype.api.geometry.solar_position import calculate_solar_position
+from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
-from pvgisprototype.api.data_structures import SolarGeometryDayConstants
-from pvgisprototype.api.data_structures import SolarGeometryDayVariables
+from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
+from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
 from pvgisprototype.plot.plot_solar_position import plot_daily_solar_position
 from pvgisprototype.plot.plot_solar_position import plot_daily_solar_position_models
 from pvgisprototype.plot.plot_solar_position import plot_daily_solar_position_scatter
@@ -80,7 +80,7 @@ def test_calculate_solar_position(model):
         # assert sun_azimuth == expected_sun_azimuth
 
     else:
-        solar_position = calculate_solar_position(
+        solar_position = calculate_solar_geometry_overview(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,

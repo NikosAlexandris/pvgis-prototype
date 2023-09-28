@@ -9,6 +9,12 @@ import xarray as xr
 
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from typing import Annotated
+from typing import Tuple
+from enum import Enum
+from pathlib import Path
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.api.series.models import MethodsForInexactMatches
 
 
 # Hardcodings
@@ -16,6 +22,7 @@ from pvgisprototype import Longitude
 exclamation_mark = u'\N{exclamation mark}'
 check_mark = u'\N{check mark}'
 x_mark = u'\N{Ballot Script X}'
+
 
 def load_or_open_dataarray(function, filename_or_obj, mask_and_scale):
     try:
@@ -31,10 +38,11 @@ def load_or_open_dataarray(function, filename_or_obj, mask_and_scale):
 
 
 def open_data_array(
-        netcdf: str,
-        mask_and_scale=False,
-        in_memory: bool = False,
-        ):
+    netcdf: str,
+    mask_and_scale: bool = False,
+    in_memory: bool = False,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
     """
     """
     # try:
@@ -56,12 +64,13 @@ def open_data_array(
     #         typer.echo(f"Could not open the data: {str(exc)}")
     #         raise typer.Exit(code=33)
     if in_memory:
-        print('In memory')
+        if verbose > 0:
+            print('In memory')
         return load_or_open_dataarray(xr.load_dataarray, netcdf, mask_and_scale)
     else:
-        print('Open file')
+        if verbose > 0:
+            print('Open file')
         return load_or_open_dataarray(xr.open_dataarray, netcdf, mask_and_scale)
-
 
 
 def get_scale_and_offset(netcdf):
@@ -85,15 +94,12 @@ def get_scale_and_offset(netcdf):
     return (scale_factor, add_offset)
 
 
-def select_coordinates(
-        data_array,
-        longitude: Longitude = None,
-        latitude: Latitude = None,
-        time: str = None,
-        method: str ='nearest',
-        tolerance: float = 0.1,
-        verbose: bool = False,
-        ):
+def set_location_indexers(
+    data_array,
+    longitude: Longitude = None,
+    latitude: Latitude = None,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
     """Select single pair of coordinates from a data array
     
     Will select center coordinates if none of (longitude, latitude) are
@@ -131,6 +137,35 @@ def select_coordinates(
         indexers[y] = latitude
         text_coordinates = Fore.GREEN + f'{check_mark} Coordinates : {longitude}, {latitude}.' + Style.RESET_ALL
 
+    logger.info(text_coordinates)
+    if verbose > 0:
+        typer.echo(text_coordinates)
+    if verbose == 3:
+        debug(locals())
+    return indexers
+
+
+def select_coordinates(
+    data_array,
+    longitude: Longitude,
+    latitude: Latitude,
+    time: str = None,
+    method: str ='nearest',
+    tolerance: float = 0.1,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
+    """Select single pair of coordinates from a data array
+    
+    Will select center coordinates if none of (longitude, latitude) are
+    provided.
+    """
+    indexers = set_location_indexers(
+        data_array=data_array,
+        longitude=longitude,
+        latitude=latitude,
+        verbose=verbose,
+    )
+
     try:
         if not time:
             data_array = data_array.sel(
@@ -151,6 +186,41 @@ def select_coordinates(
         typer.echo(f"Something went wrong in selecting the data: {str(exc)}")
         raise SystemExit(33)
 
-    logger.info(text_coordinates)
-    typer.echo(text_coordinates)
     return data_array
+
+
+def select_location_time_series(
+    time_series_filename: Path = None,
+    longitude: Longitude = None,
+    latitude: Latitude = None,
+    inexact_matches_method: MethodsForInexactMatches  = MethodsForInexactMatches.nearest,
+    tolerance: float = 0.1,
+    mask_and_scale: bool = False,
+    in_memory: bool = False,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
+    """Select a location from a time series dataset format supported by
+    xarray"""
+    data_array = open_data_array(
+        time_series_filename,
+        mask_and_scale,
+        in_memory,
+    )
+    indexers = set_location_indexers(
+        data_array=data_array,
+        longitude=longitude,
+        latitude=latitude,
+        verbose=verbose,
+    )
+    try:
+        location_time_series = data_array.sel(
+                **indexers,
+                method=inexact_matches_method)
+        # location_time_series.load()  # load into memory for fast processing
+    except Exception as exc:
+        typer.echo(f"Something went wrong in selecting the data: {str(exc)}")
+        raise SystemExit(33)
+
+    if verbose == 3:
+        debug(locals())
+    return location_time_series

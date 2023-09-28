@@ -8,6 +8,7 @@ import math
 import numpy as np
 import typer
 from enum import Enum
+from rich import print
 
 
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_pvgis
@@ -19,9 +20,9 @@ from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from ..utilities.conversions import convert_to_radians
-from ..utilities.timestamp import now_utc_datetimezone
-from ..utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
@@ -51,36 +52,62 @@ from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+# from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_temperature_time_series
+from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_time_series
+from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
+from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
+from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
+from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
+from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
+from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_albedo
+from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
+from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
+from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
+from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
+from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
+from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
+from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
+from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
+from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
+from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_efficiency
+from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 model_constants=[]
 model_constants.append(94.804)
@@ -99,7 +126,7 @@ AOIConstants.append(0.155)
 
 app = typer.Typer(
     cls=OrderCommands,
-    add_completion=False,
+    add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
     help=f"Estimate the direct solar radiation",
@@ -169,12 +196,12 @@ def calculate_efficiency(
 
 # @numba.jit(nopython=True)
 @app.callback(
-        'effective',
-       invoke_without_command=True,
-       no_args_is_help=True,
-       # context_settings={"ignore_unknown_options": True},
-       help=f'Calculate the clear-sky ground reflected irradiance',
-       )
+    'effective',
+    invoke_without_command=True,
+    no_args_is_help=True,
+    # context_settings={"ignore_unknown_options": True},
+    help="Estimate the effective irradiance for a specific hour",
+)
 def calculate_effective_irradiance(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -183,47 +210,45 @@ def calculate_effective_irradiance(
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    direct_horizontal_irradiance: Annotated[Optional[Path], typer_argument_direct_horizontal_irradiance] = None,
-    temperature: Annotated[float, typer_argument_temperature_time_series] = 25,
-    wind_speed: Annotated[float, typer_argument_wind_speed_time_series] = 0,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    temperature: Annotated[float, typer_argument_temperature_time_series] = TEMPERATURE_DEFAULT,
+    wind_speed: Annotated[float, typer_argument_wind_speed_time_series] = WIND_SPEED_DEFAULT,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
-    in_memory: Annotated[bool, typer_option_in_memory] = False,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
-    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
-    linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = 2,
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
-    albedo: Annotated[Optional[float], typer_option_albedo] = 2,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = LINKE_TURBIDITY_DEFAULT,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
-    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvis,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.skyfield,
+    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvlib,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
     solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
+    hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
-    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
-    system_efficiency: Optional[float] = 0.86,
-    efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[bool, typer_option_verbose] = False,
-    ):
-    """Calculate hourly radiation values for a specific moment in time.
-    
-    Calculate hourly radiation values for a specific moment in time considering
-    :
-    - solar geometry
-    - the sun-to-surface geometry
-    - temperature
-    - wind speed
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
+    horizon_heights: Annotated[List[float], typer_argument_horizon_heights] = None,
+    system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    """Calculate the effective hourly irradiance for a location and moment in
+    time.
+
+    The calculation applies efficiency coefficients to the direct (beam),
+    diffuse, and reflected radiation considering : solar geometry,
+    sun-to-surface geometry, temperature and wind speed.
 
     Parameters
     ----------
@@ -250,9 +275,7 @@ def calculate_effective_irradiance(
 
     Returns
     -------
-    None
-    """
-    """
+
     Notes
     -----
 
@@ -375,7 +398,7 @@ def calculate_effective_irradiance(
         angle_output_units=angle_output_units,
     )
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+    # hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
     solar_incidence_angle = model_solar_incidence(
         longitude=longitude,
         latitude=latitude,
@@ -383,7 +406,7 @@ def calculate_effective_irradiance(
         timezone=timezone,
         solar_time_model=solar_time_model,
         solar_incidence_model=solar_incidence_model,
-        hour_angle=hour_angle,
+        # hour_angle=hour_angle,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         # shadow_indicator=shadow_indicator,
@@ -501,5 +524,10 @@ def calculate_effective_irradiance(
     efficiency_coefficient = max(efficiency_coefficient, 0.0)  # limit to zero
     
     result = efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
-    debug(locals())
+    if verbose > 0:
+        print(f'Direct, Diffuse, Reflected: {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance}')
+        print(f'Efficiency coefficient : {efficiency_coefficient}')
+        print(f'Effective hourly irradiance values (Direct, Diffuse, Reflected): {result}')
+    if verbose == 3:
+        debug(locals())
     return result

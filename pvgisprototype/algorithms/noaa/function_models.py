@@ -1,24 +1,40 @@
 from pydantic import field_validator
 from typing import Optional
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimestampModel
+
+# Generic input/output
+from pvgisprototype.validation.parameters import VerbosityModel
+
+# When?
+from pvgisprototype.validation.parameters import BaseTimestampModel
+from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.parameters import BaseTimeModel
+from pvgisprototype.validation.parameters import BaseTimeSeriesModel
+from pvgisprototype.validation.parameters import SolarHourAngleModel
+from pvgisprototype.validation.parameters import SolarHourAngleSeriesModel
+from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeEventModel
+
+# Where?
+from pvgisprototype.validation.parameters import LongitudeModel
+from pvgisprototype.validation.parameters import LatitudeModel
+from pvgisprototype.validation.parameters import BaseCoordinatesModel
+
+# Units?
+
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimestampSeriesModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import LongitudeModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeSeriesModel
+
+# What?
+from pvgisprototype.algorithms.noaa.parameter_models import BaseApplyAtmosphericRefractionModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
-from pvgisprototype.algorithms.noaa.parameter_models import LatitudeModel
-from pvgisprototype.algorithms.noaa.parameter_models import SolarHourAngleModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseApplyAtmosphericRefractionModel
-from pvgisprototype.algorithms.noaa.parameter_models import SolarHourAngleSeriesModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseCoordinatesModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeEventModel
 from math import pi
+import numpy as np
 
+# In order of dependency:
+# Fractional year  < Equation of time  < Time offset  < True solar time  < Solar hour angle 
+# Solar declination  < Solar zenith  < Solar altitude  < Solar azimuth
 
 class CalculateFractionalYearNOAAInput(
     BaseTimestampModel,
@@ -27,7 +43,7 @@ class CalculateFractionalYearNOAAInput(
     pass
 
 
-class CalculateFractionalYearNOAATimeSeriesInput(  # merge above here-in!
+class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     AngleInRadiansOutputUnitsModel,
 ):
@@ -36,22 +52,14 @@ class CalculateFractionalYearNOAATimeSeriesInput(  # merge above here-in!
 
 class CalculateEquationOfTimeNOAAInput(
     BaseTimestampModel,
-    BaseAngleUnitsModel,
     BaseTimeOutputUnitsModel,
 ):
     pass
 
 
-class CalculateSolarDeclinationNOAAInput(
-    BaseTimestampModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
-
-
-class CalculateSolarDeclinationNOAATimeSeriesInput(  # merge above here-in
+class CalculateEquationOfTimeTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
-    BaseAngleOutputUnitsModel,
+    BaseTimeOutputUnitsModel,
 ):
     pass
 
@@ -60,7 +68,14 @@ class CalculateTimeOffsetNOAAInput(
     LongitudeModel,
     BaseTimeModel,
     BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+):
+    pass
+
+
+class CalculateTimeOffsetTimeSeriesNOAAInput(
+    LongitudeModel,
+    BaseTimeSeriesModel,
+    BaseTimeOutputUnitsModel,
 ):
     pass
 
@@ -73,7 +88,7 @@ class CalculateTrueSolarTimeNOAAInput(
     pass
 
 
-class CalculateTrueSolarTimeNOAATimeSeriesInput(
+class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
@@ -90,7 +105,7 @@ class CalculateSolarHourAngleNOAAInput(
     pass
 
 
-class CalculateSolarHourAngleNOAATimeSeriesInput(
+class CalculateSolarHourAngleTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
@@ -99,9 +114,25 @@ class CalculateSolarHourAngleNOAATimeSeriesInput(
     pass
 
 
+
+class CalculateSolarDeclinationNOAAInput(
+    BaseTimestampModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
+class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
+    BaseTimestampSeriesModel,  # != BaseTimestampModel
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     SolarZenithModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     @field_validator('solar_zenith')
     @classmethod
@@ -111,16 +142,23 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
         return v
 
 
-class AdjustSolarZenithForAtmosphericRefractionNOAATimeSeriesInput(
+class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
     SolarZenithSeriesModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
+    # @field_validator('solar_zenith_series')
+    # def solar_zenith_range(cls, v):
+    #     v_array = np.atleast_1d(v)  # Ensure v is treated as an array
+    #     if not np.all((0 <= v_array) & (v_array <= np.pi)):  # Adjust the condition to work with an array
+    #         raise ValueError('solar_zenith must range within [0, π]')
+    #     return v  # Return the original value or array
     @field_validator('solar_zenith_series')
     def solar_zenith_range(cls, v):
-        v_array = np.atleast_1d(v)  # Ensure v is treated as an array
-        if not np.all((0 <= v_array) & (v_array <= np.pi)):  # Adjust the condition to work with an array
-            raise ValueError('solar_zenith must range within [0, π]')
-        return v  # Return the original value or array
+        v_values = np.array([zenith.value for zenith in np.atleast_1d(v)])  # Extract numerical values
+        if not np.all((0 <= v_values) & (v_values <= np.pi)):  # Adjust the condition to work with an array
+            raise ValueError("The solar zenith angle must be between 0 and pi radians.")
+        return v
 
 
 class CalculateSolarZenithNOAAInput(
@@ -129,16 +167,18 @@ class CalculateSolarZenithNOAAInput(
     SolarHourAngleModel,
     BaseApplyAtmosphericRefractionModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
 
-class CalculateSolarZenithNOAATimeSeriesInput(
+class CalculateSolarZenithTimeSeriesNOAAInput(
     LatitudeModel,
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     SolarHourAngleSeriesModel,
     BaseApplyAtmosphericRefractionModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -153,13 +193,14 @@ class CalculateSolarAltitudeNOAAInput(
     pass
 
 
-class CalculateSolarAltitudeNOAATimeSeriesInput(
+class CalculateSolarAltitudeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     BaseApplyAtmosphericRefractionModel,
     BaseTimeOutputUnitsModel,
     # BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -168,17 +209,18 @@ class CalculateSolarAzimuthNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
 
-class CalculateSolarAzimuthNOAATimeSeriesInput(
+class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
@@ -223,7 +265,7 @@ class CalculateLocalSolarTimeNOAAInput(
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
-    verbose: Optional[bool] = False
+    verbose: int = 0
 
 
 class CalculateSolarPositionNOAAInput(

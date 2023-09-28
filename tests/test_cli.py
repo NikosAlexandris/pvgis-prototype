@@ -7,9 +7,9 @@ from pvgisprototype.cli.series import app as series_app
 from pvgisprototype.cli.utilities import app as utility_app
 # from pvgisprototype.solar_geometry_pvgis_constants import app as solar_geometry_pvgis_constants_app
 # from pvgisprototype.solar_geometry_pvgis_variables import app as solar_geometry_pvgis_variables_app
-from pvgisprototype.api.geometry.solar_position import app as solar_position_app
-from pvgisprototype.api.irradiance.extraterrestrial_irradiance import app as extraterrestrial_irradiance_app
-from pvgisprototype.api.irradiance.direct_irradiance import app as direct_irradiance_app
+from pvgisprototype.cli.position import app as solar_position_app
+from pvgisprototype.api.irradiance.extraterrestrial import app as extraterrestrial_app
+from pvgisprototype.api.irradiance.direct import app as direct_app
 
 from .conftest import EU_GEOMETRIC_CENTER_POST_BREXIT
 from .test_expected_output import EU_CENTER_LOCATION_VALUES

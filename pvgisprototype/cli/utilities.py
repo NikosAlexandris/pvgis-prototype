@@ -2,22 +2,34 @@ import typer
 from typing_extensions import Annotated
 from typing import Optional
 from rich import print
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
+from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_area
+from pvgisprototype.cli.typer_parameters import typer_argument_conversion_efficiency
+
 
 
 app = typer.Typer(
-    add_completion=False,
+    cls=OrderCommands,
+    add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
     help=f":toolbox:  Diagnostic functions",
 )
 
 
-@app.command()
+@app.command(
+    'get-horizon',
+    no_args_is_help=True,
+    help=f'⦩⦬ Calculate the horizon angle height around a single point based on a digital elevation model {NOT_IMPLEMENTED_CLI}',
+ )
 def get_horizon(
-        longitude: Annotated[Optional[float], typer.Argument(min=-180, max=180)],
-        latitude: Annotated[Optional[float], typer.Argument(min=-90, max=90)],
-        ):
-    """Computes the entire horizon angle height (in radians) around a single point from a digital elevation model
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+):
+    """Calculate the entire horizon angle height (in radians) around a single point from a digital elevation model
 
     Notes:
         - Based on the original C program `horizon_out`
@@ -35,11 +47,15 @@ def get_horizon(
     pass
 
 
-@app.command()
+@app.command(
+    'get-elevation',
+    no_args_is_help=True,
+    help=f'Retrieve the location elevation from digital elevation data {NOT_IMPLEMENTED_CLI}',
+ )
 def get_elevation(
-        longitude: Annotated[float, typer.Argument(..., min=-180, max=180)],
-        latitude: Annotated[float, typer.Argument(..., min=-90, max=90)],
-        ):
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+):
     """
     Retrieve the location elevation from digital elevation data
 
@@ -56,11 +72,15 @@ def get_elevation(
     pass
 
 
-@app.command()
+@app.command(
+    'list-databases',
+    no_args_is_help=True,
+    help=f'List solar irradiance databases {NOT_IMPLEMENTED_CLI}',
+)
 def list_databases(
-        longitude: Annotated[float, typer.Argument(min=-180, max=180)] = None,
-        latitude: Annotated[float, typer.Argument(min=-90, max=90)] = None,
-        ):
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+):
     """
     List available databases for a location
 
@@ -88,21 +108,21 @@ def list_databases(
             raise typer.Exit(code=33)
 
 
-@app.callback(invoke_without_command=True)
+@app.command(
+    'peak-power',
+    no_args_is_help=True,
+    help=f'Calculate the peak power in kW based on area and conversion efficiency {NOT_IMPLEMENTED_CLI}',
+)
 def  calculate_peak_power(
-        area: Annotated[float, typer.Argument(
-            help='The area of the modules in m<sup>2</sup>',
-            min=0.001)] = None,  # min of mini-solar-panel?
-        conversion_efficiency: Annotated[float, typer.Argument(
-            help='Conversion efficianet in %',
-            min=0, max=100)] = None,
-        ):
-        """Calculate the peak power in kW based on area and conversion efficiency
+    area: Annotated[float, typer_argument_area],
+    conversion_efficiency: Annotated[float, typer_argument_conversion_efficiency],
+):
+    """Calculate the peak power in kW based on area and conversion efficiency
 
-        .. math:: Power = 1/m^{2} * area * efficiency / 100
+    .. math:: Power = 1/m^{2} * area * efficiency / 100
 
-        Returns:
-            Power in kWp
-        """
-        power = 1 / m2 * area * conversion_efficiency / 100
-        return power
+    Returns:
+        Power in kWp
+    """
+    power = 1 / m2 * area * conversion_efficiency / 100
+    return power
