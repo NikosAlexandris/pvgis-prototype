@@ -11,6 +11,7 @@ from math import degrees
 from math import sin
 from math import cos
 import numpy as np
+from zoneinfo import ZoneInfo
 
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
@@ -24,16 +25,15 @@ from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 
 @validate_with_pydantic(CalculateSolarTimeEoTInputModel)
 def calculate_apparent_solar_time_milne1921(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-        days_in_a_year: float = 365.25,
-        perigee_offset: float = 0.048869,
-        eccentricity_correction_factor: float = 0.03344,
-        time_offset_global: float = 0,
-        hour_offset: float = 0,
-        verbose: int = 0,
+    longitude: Longitude,
+    timestamp: datetime,
+    timezone: ZoneInfo = None,
+    days_in_a_year: float = 365.25,
+    perigee_offset: float = 0.048869,
+    eccentricity_correction_factor: float = 0.03344,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    verbose: int = 0,
 ):
     """Calculate the apparent solar time based on the equation of time by Milne 1921
 
@@ -113,6 +113,13 @@ def calculate_apparent_solar_time_milne1921(
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # Handle Me during input validation? -------------------------------------
 
+<<<<<<< HEAD
+=======
+    # year = timestamp.year
+    # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
+    # hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
+    day_of_year = timestamp.timetuple().tm_yday
+>>>>>>> c4247e4 (Update functions to return datetime)
 
     # Equation of Time, Milne 1921 -------------------------------------------
 
