@@ -102,10 +102,6 @@ def calculate_solar_altitude_pvis(
     solar_altitude = asin(sine_solar_altitude)
     solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
     solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
-    # solar_altitude = convert_to_degrees_if_requested(
-    #         solar_altitude,
-    #         output_units,
-    #         )
 
     if verbose == 3:
         debug(locals())
