@@ -12,6 +12,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAzimuthPVISInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAzimuth
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
@@ -34,7 +35,7 @@ def calculate_solar_azimuth_pvis(
     timestamp: datetime,
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: float,
+    refracted_solar_zenith: RefractedSolarZenith,
     days_in_a_year: float,
     perigee_offset: float,
     eccentricity_correction_factor: float,

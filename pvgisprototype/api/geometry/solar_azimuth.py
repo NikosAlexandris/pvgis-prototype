@@ -4,10 +4,12 @@ from typing import Optional
 from typing import List
 from datetime import datetime
 from math import pi
+from zoneinfo import ZoneInfo
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAzimuthInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import SolarAzimuth
 from .models import SolarPositionModels
 from .models import SolarTimeModels
@@ -40,10 +42,10 @@ def model_solar_azimuth(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str,
+    timezone: ZoneInfo,
     model: SolarPositionModels = SolarPositionModels.pvlib,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     time_offset_global: float = 0,
     hour_offset: float = 0,
@@ -139,7 +141,7 @@ def model_solar_azimuth(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith.value,
+            refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
@@ -193,11 +195,11 @@ def calculate_solar_azimuth(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str = None,
+    timezone: ZoneInfo,
     models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,

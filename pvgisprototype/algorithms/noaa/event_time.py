@@ -6,6 +6,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from .function_models import CalculateEventTimeNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import EventTime
 from .equation_of_time import calculate_equation_of_time_noaa
 from .solar_declination import calculate_solar_declination_noaa
@@ -26,7 +27,7 @@ def calculate_event_time_noaa(
     timestamp: datetime,
     timezone: str,
     event: str,
-    refracted_solar_zenith: float = 1.5853349194640094,  # radians
+    refracted_solar_zenith: RefractedSolarZenith,  # radians
     apply_atmospheric_refraction: bool = False,
     time_output_units: str = 'minutes',
     angle_units: str = 'radians',

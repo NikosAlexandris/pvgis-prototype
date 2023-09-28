@@ -9,6 +9,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
@@ -36,10 +37,10 @@ def model_solar_altitude(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str,
+    timezone: ZoneInfo,
     model: SolarPositionModels,
     apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: float,
+    refracted_solar_zenith: RefractedSolarZenith,
     solar_time_model: SolarTimeModels,
     time_offset_global: float,
     hour_offset: float,
@@ -129,7 +130,7 @@ def model_solar_altitude(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith.value,
+            refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
@@ -161,12 +162,12 @@ def calculate_solar_altitude(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,
     models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,

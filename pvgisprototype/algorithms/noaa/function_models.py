@@ -29,6 +29,7 @@ from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnits
 from pvgisprototype.algorithms.noaa.parameter_models import BaseApplyAtmosphericRefractionModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
+from pvgisprototype.validation.parameters import RefractedSolarZenithModel
 from math import pi
 import numpy as np
 
@@ -229,17 +230,17 @@ class CalculateSolarAzimuthTimeSeriesNOAAInput(
 class CalculateEventHourAngleNOAAInput(
     LatitudeModel,
     BaseTimestampModel,
+    RefractedSolarZenithModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
-    refracted_solar_zenith: float
 
     @field_validator('refracted_solar_zenith')
     @classmethod
     def validate_refracted_solar_zenith(cls, v):
         target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
         error_margin = 0.01
-        if not (target_zenith - error_margin) <= v <= (target_zenith + error_margin):
+        if not (target_zenith - error_margin) <= v.radians <= (target_zenith + error_margin):
             raise ValueError(
                 f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
@@ -249,6 +250,7 @@ class CalculateEventHourAngleNOAAInput(
 class CalculateEventTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
     BaseTimeEventModel,
     BaseApplyAtmosphericRefractionModel,
     BaseTimeOutputUnitsModel,
@@ -261,6 +263,7 @@ class CalculateEventTimeNOAAInput(
 class CalculateLocalSolarTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -271,12 +274,12 @@ class CalculateLocalSolarTimeNOAAInput(
 class CalculateSolarPositionNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
     BaseApplyAtmosphericRefractionModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
-    refracted_solar_zenith: float
 
     @field_validator('refracted_solar_zenith')
     @classmethod

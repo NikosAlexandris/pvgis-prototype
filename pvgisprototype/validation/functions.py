@@ -99,6 +99,7 @@ class CalculateSolarDeclinationHargreavesInputModel(
 class ModelSolarTimeInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     HourOffsetModel,

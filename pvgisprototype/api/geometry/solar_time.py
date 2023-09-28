@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarTimeInputModel
-from pvgisprototype import SolarTime
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from .models import SolarTimeModels
@@ -26,10 +26,10 @@ def model_solar_time(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: ZoneInfo = None,
+    timezone: ZoneInfo,
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -90,30 +90,17 @@ def model_solar_time(
 
     if solar_time_model.value == SolarTimeModels.noaa:
 
-        solar_time = calculate_true_solar_time_noaa(
+        solar_time = calculate_local_solar_time_noaa(
             longitude=longitude,
-            # latitude=latitude,
+            latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            # refracted_solar_zenith=refracted_solar_zenith,
-            # apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
             time_output_units=time_output_units,
-            angle_units=angle_units,
-            # angle_output_units=angle_output_units,
-            verbose=verbose,
+            angle_output_units=angle_output_units,
+            verbose,
         )
-        # solar_time = calculate_local_solar_time_noaa(
-        #     longitude=longitude,
-        #     latitude=latitude,
-        #     timestamp=timestamp,
-        #     timezone=timezone,
-        #     refracted_solar_zenith=refracted_solar_zenith,
-        #     apply_atmospheric_refraction=apply_atmospheric_refraction,
-        #     time_output_units=time_output_units,
-        #     angle_units=angle_units,
-        #     angle_output_units=angle_output_units,
-        #     # verbose,
-        # )
 
     if solar_time_model.value == SolarTimeModels.skyfield:
 
@@ -134,10 +121,10 @@ def calculate_solar_time(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str = None,
+    timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,  # radians
     models: List[SolarTimeModels] = [SolarTimeModels.skyfield],
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,  # radians
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.03344,
