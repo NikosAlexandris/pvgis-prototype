@@ -29,23 +29,28 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel
 from pvgisprototype.validation.functions import CalculateSolarIncidenceJencoInputModel
 from pvgisprototype.validation.functions import CalculateSolarIncidenceTimeSeriesJencoInputModel
+from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-
+from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import NO_SOLAR_INCIDENCE
+from pvgisprototype.constants import RADIANS
 import numpy as np
-
-
-NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 
 @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
 def calculate_relative_longitude(
-        latitude: Latitude,
-        surface_tilt: float = 0,
-        surface_orientation: float = 0,
-        angle_output_units: str = 'radians',
-    ) -> RelativeLongitude:
+    latitude: Latitude,
+    surface_tilt: float = SURFACE_TILT_DEFAULT,
+    surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+) -> RelativeLongitude:
     """
     Notes
     -----
@@ -105,25 +110,25 @@ def calculate_relative_longitude(
 
 @validate_with_pydantic(CalculateSolarIncidenceJencoInputModel)
 def calculate_solar_incidence_jenco(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: ZoneInfo = None,
-        random_time: bool = False,
-        # hour_angle: float = None,
-        surface_tilt: float = None,
-        surface_orientation: float = None,
-        shadow_indicator: Path = None,
-        horizon_heights: Optional[List[float]] = None,
-        horizon_interval: Optional[float] = None,
-        days_in_a_year: float = DAYS_IN_A_YEAR,
-        perigee_offset: float = PERIGEE_OFFSET,
-        eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-        time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
-        angle_output_units: str = 'radians',
-        verbose: int = 0,
-    ) -> SolarIncidence:
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: ZoneInfo = None,
+    random_time: bool = False,
+    # hour_angle: float = None,
+    surface_tilt: float = None,
+    surface_orientation: float = None,
+    shadow_indicator: Path = None,
+    horizon_heights: Optional[List[float]] = None,
+    horizon_interval: Optional[float] = None,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
+    angle_units: str = 'radians',
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+) -> SolarIncidence:
     """Calculate the solar incidence based on sun's position and surface geometry.
 
     Parameters
@@ -227,7 +232,7 @@ def calculate_solar_incidence_jenco(
         )
         solar_incidence = SolarIncidence(
             value=asin(sine_solar_incidence),
-            unit=angle_output_units
+            unit=RADIANS,
         )
 
     # return max(NO_SOLAR_INCIDENCE, solar_incidence)
@@ -240,16 +245,16 @@ def calculate_solar_incidence_time_series_jenco(
     latitude: Latitude,
     timestamps: np.array,
     timezone: Optional[ZoneInfo] = None,
-    random_time_series: bool = False,
-    surface_tilt: float = 45,
-    surface_orientation: float = 180,
+    random_time_series: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    surface_tilt: float = SURFACE_TILT_DEFAULT,
+    surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = 'minutes',
+    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
     angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
-    verbose: int = 0,
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> np.array:
     solar_incidence_angle_series = np.empty_like(timestamps, dtype=float)
 
@@ -326,7 +331,7 @@ def interpolate_horizon_height(
         * horizon_heights[position_after]
     )
 
-    return HorizonHeight(horizon_height, 'meters')                          # FIXME: Is it meters?
+    return HorizonHeight(horizon_height, HORIZON_HEIGHT_UNIT)
 
 
 def is_surface_in_shade(
