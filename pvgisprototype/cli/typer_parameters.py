@@ -185,6 +185,45 @@ typer_option_random_day = typer.Option(
 #     max=366,
 #     help='Day of year')] = None,
 
+# Time series
+
+typer_argument_time_series = typer.Argument(
+    show_default=False,
+    help='Input time series data file (any format supported by Xarray)',
+    rich_help_panel=rich_help_panel_time_series,
+        )
+typer_option_mask_and_scale = typer.Option(
+    help="Mask and scale the series",
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=False,
+)
+# Rename to nearest_neighbor_method ?
+typer_option_nearest_neighbor_lookup = typer.Option(
+    '--nearest_neighbor_lookup',
+    help='Enable nearest neighbor (inexact) lookups by use of the methods `pad`, `backfill` or `nearest`',
+    show_default=True,
+    show_choices=True,
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=False,
+)
+typer_option_inexact_matches_method = typer.Option(
+    '--method-for-inexact-matches',
+    '-m',
+    help='Method for nearest neighbor (inexact) lookups',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=MethodsForInexactMatches.nearest,
+)
+typer_option_tolerance = typer.Option(
+    # help=f'Maximum distance between original and new labels for inexact matches. See nearest-neighbor-lookups Xarray documentation',
+    # help=f'Maximum distance between original and new labels for inexact matches. See [nearest-neighbor-lookups](https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups) @ Xarray documentation',
+    help=f'Maximum distance between original & new labels for inexact matches. See https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups',
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=0.1,
+)
+
 
 # Solar geometry
 
@@ -319,7 +358,15 @@ typer_argument_solar_altitude = typer.Argument(
     help='Solar altitude',
     rich_help_panel=rich_help_panel_solar_position,
 )
+typer_argument_solar_altitude_series = typer.Argument(
+    help='Solar altitude series',
+    rich_help_panel=rich_help_panel_solar_position,
+)
 typer_argument_refracted_solar_altitude = typer.Argument(
+    help='Refracted solar altitude',
+    rich_help_panel=rich_help_panel_solar_position,
+)
+typer_argument_refracted_solar_altitude_series = typer.Argument(
     help='Refracted solar altitude',
     rich_help_panel=rich_help_panel_solar_position,
 )
@@ -392,6 +439,18 @@ def parse_linke_turbidity_factor_series(value: str):
     return linke_turbidity_factor_series
 
 
+def linke_turbidity_callback(value: str, ctx: Context):
+    if value:
+        parsed_values = parse_linke_turbidity_factor_series(value)
+        return [LinkeTurbidityFactor(value=v, unit=LINKE_TURBIDITY_FACTOR_UNIT) for v in parsed_values]
+
+    timestamps = ctx.params.get('timestamps')
+    if timestamps:
+        return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_FACTOR_UNIT) for _ in timestamps]
+    else:
+        return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_FACTOR_UNIT)]
+
+
 linke_turbidity_factor_series_typer_help='Ratio series of total to Rayleigh optical depth measuring atmospheric turbidity'
 typer_option_linke_turbidity_factor_series = typer.Option(
     help=linke_turbidity_factor_typer_help,
@@ -402,6 +461,12 @@ typer_option_linke_turbidity_factor_series = typer.Option(
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
+
+
+def optical_air_mass_callback(value: str, ctx: Context):
+    """Callback to handle the optical air mass series input or provide a default series."""
+    if value:
+        return OpticalAirMass(value=value, unit=OPTICAL_AIR_MASS_UNIT)
 
 
 typer_option_optical_air_mass = typer.Option(
@@ -419,6 +484,16 @@ def parse_optical_air_mass_series(value: str) -> List[float]:
     return optical_air_mass_series
 
 
+def optical_air_mass_series_callback(value: str, ctx: Context):
+    """Callback to handle the optical air mass series input or provide a default series."""
+    if value:
+        return parse_optical_air_mass_series(value)
+
+    timestamps = ctx.params.get('timestamps')
+    if timestamps:
+        return [OpticalAirMass(value=OPTICAL_AIR_MASS_DEFAULT, unit=OPTICAL_AIR_MASS_UNIT) for _ in timestamps]
+    else:
+        return [OpticalAirMass(value=OPTICAL_AIR_MASS_DEFAULT, unit=OPTICAL_AIR_MASS_UNIT)]
 
 
 typer_option_optical_air_mass_series = typer.Option(
@@ -465,10 +540,19 @@ the_term_n_unit='unitless'
 typer_argument_term_n = typer.Argument(
     help=f'The term N for the calculation of the sky dome fraction viewed by a tilted surface [{the_term_n_unit}]'
 )
+typer_argument_term_n_series = typer.Argument(
+    help=f'The term N for the calculation of the sky dome fraction viewed by a tilted surface for a period of time [{the_term_n_unit}]'
+)
 typer_option_apply_angular_loss_factor = typer.Option(
     help='Apply angular loss function',
     rich_help_panel=rich_help_panel_advanced_options,
     # default_factory = True,
+)
+typer_argument_conversion_efficiency = typer.Argument(
+    help='Conversion efficiency in %',
+    min=0,
+    max=100,
+    default_factory = None,
 )
 typer_option_efficiency = typer.Option(
     '--efficiency-factor',
