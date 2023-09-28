@@ -413,7 +413,7 @@ def calculate_effective_irradiance(
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 angle_output_units=angle_output_units,
-                verbose=verbose,
+                verbose=0,
             )
 
         # In any case
@@ -439,6 +439,7 @@ def calculate_effective_irradiance(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            verbose=0,
         )
         reflected_irradiance = calculate_ground_reflected_inclined_irradiance(
             longitude=longitude,
@@ -463,6 +464,7 @@ def calculate_effective_irradiance(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            verbose=0,
         )
 
     else:  # the sun is below the horizon
