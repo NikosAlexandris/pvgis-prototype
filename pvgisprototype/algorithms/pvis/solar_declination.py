@@ -6,15 +6,18 @@ from pvgisprototype import SolarDeclination
 from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
 from math import sin
 from math import asin
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 
 
 @validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
 def calculate_solar_declination_pvis(
     timestamp: datetime,
     timezone: ZoneInfo,
-    days_in_a_year: float = 365.25,
-    eccentricity_correction_factor: float = 0.03344,
-    perigee_offset: float = 0.048869,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = "radians",
 ) -> SolarDeclination:
     """Approximate the sun's declination for a given day of the year.

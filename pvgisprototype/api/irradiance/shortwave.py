@@ -22,13 +22,24 @@ from enum import Enum
 from datetime import datetime
 from rich.console import Console
 from pandas import Timestamp
-from ..utilities.conversions import convert_to_radians
-from ..utilities.timestamp import now_utc_datetimezone
-from ..utilities.timestamp import ctx_convert_to_timezone
-from ..series.statistics import calculate_series_statistics
-from ..series.statistics import print_series_statistics
-from ..series.statistics import export_statistics_to_csv
+from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_pvgis
+from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.series.statistics import calculate_series_statistics
+from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pathlib import Path
+
+from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_elevation
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
+from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 
 import xarray as xr
 import numpy as np
@@ -36,6 +47,8 @@ import numpy as np
 from scipy.stats import mode
 from rich.table import Table
 import csv
+
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 
 
 class MethodsForInexactMatches(str, Enum):
@@ -50,49 +63,26 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f"Estimate the global irradiance time series",
 )
 
 
-def select_location_time_series(data_path, longitude, latitude, inexact_matches_method='nearest'):
-    data_array = xr.open_dataarray(data_path)
-    location_time_series = data_array.sel(
-            lon=longitude,
-            lat=latitude,
-            method=inexact_matches_method)
-    location_time_series.load()  # load into memory for fast processing
-    return location_time_series
-
-
 @app.callback(
-        invoke_without_command=True,
-        no_args_is_help=True,
-        context_settings={"ignore_unknown_options": True})
+    invoke_without_command=True,
+    no_args_is_help=True,
+    context_settings={"ignore_unknown_options": True},
+    help=f"Estimate the global (shortwave) irradiance time series {NOT_IMPLEMENTED_CLI}",
+)
 def estimate_global_irradiance(
-        shortwave: Annotated[Path, typer.Argument(
-            help='Global irradiance (Surface Incoming Shortwave Irradiance, `ssrd`')], 
-        longitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-180, max=180)],  # in PVGIS : coloffset
-        latitude: Annotated[float, typer.Argument(
-            callback=convert_to_radians,
-            min=-90, max=90)],  # in PVGIS : rowoffset
-        timestamp: Annotated[Optional[datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        start_time: datetime = Argument(None, help='Start date of the period'),
-        end_time: datetime = Argument(None, help='End date of the period'),
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Timezone',
-            callback=ctx_convert_to_timezone)] = None,
-        inexact_matches_method: Annotated[MethodsForInexactMatches, typer.Option(
-            '-m',
-            '--method-for-inexact-matches',
-            show_default=True,
-            show_choices=True,
-            case_sensitive=False,
-            help="Model to calculate solar position")] = MethodsForInexactMatches.nearest,
-    ):
+    shortwave: Annotated[Path, typer_argument_shortwave_irradiance],
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+):
     """Calculate the global irradiance incident on a solar surface.
 
     Parameters
@@ -170,7 +160,6 @@ def estimate_global_irradiance(
         * diffuse_transmission_function(solar_altitude.value)
         * diffuse_solar_altitude_function(solar_altitude.value, linke_turbidity_factor)
     )
-
     reflected_irradiance = calculate_ground_reflected_inclined_irradiance(
         longitude=longitude,
         latitude=latitude,

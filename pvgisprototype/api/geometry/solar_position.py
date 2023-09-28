@@ -15,6 +15,7 @@ from ..utilities.conversions import convert_to_degrees_if_requested
 from ..utilities.conversions import convert_float_to_radians_if_requested
 from ..utilities.conversions import convert_to_radians_if_requested
 from ..utilities.conversions import convert_to_radians
+from ..utilities.conversions import convert_south_to_north_radians_convention
 from ..utilities.timestamp import now_utc_datetimezone
 from ..utilities.timestamp import ctx_convert_to_timezone
 from ..utilities.timestamp import attach_timezone
@@ -49,14 +50,6 @@ from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 
 
-def convert_south_to_north_degrees_convention(azimuth_south_degrees):
-    return (azimuth_south_degrees + 180) % 360
-
-
-def convert_south_to_north_radians_convention(azimuth_south_radians):
-    return (azimuth_south_radians + pi) % 2 * pi
-
-
 @validate_with_pydantic(ModelSolarPositionInputModel)
 def model_solar_geometry_overview(
     longitude: Longitude,
@@ -75,7 +68,8 @@ def model_solar_geometry_overview(
     time_output_units: str,
     angle_units: str,
     angle_output_units: str,
-) -> Tuple[SolarAltitude, SolarAzimuth]:
+    verbose: int = 0,
+):
     """
     The solar altitude angle measures from the horizon up towards the zenith
     (positive, and down towards the nadir (negative)). The altitude is zero all
@@ -160,7 +154,7 @@ def model_solar_geometry_overview(
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             time_output_units=time_output_units,
-            angle_units=angle_units,
+            # angle_units=angle_units,
             angle_output_units=angle_output_units,
         )
         solar_azimuth = convert_to_degrees_if_requested(
@@ -171,20 +165,20 @@ def model_solar_geometry_overview(
     if model.value == SolarPositionModels.skyfield:
 
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
-                longitude=longitude,
-                latitude=latitude,
-                timestamp=timestamp,
-                timezone=timezone,
-                angle_output_units=angle_output_units,
-                )
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            angle_output_units=angle_output_units,
+        )
         solar_altitude = convert_to_degrees_if_requested(
             solar_altitude,
             angle_output_units,
-            )
+        )
         solar_azimuth = convert_to_degrees_if_requested(
             solar_azimuth,
             angle_output_units,
-            )
+        )
 
     if model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
@@ -264,8 +258,10 @@ def model_solar_geometry_overview(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-            )
-        solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
+        )
+        solar_altitude = convert_to_degrees_if_requested(
+            solar_altitude, angle_output_units
+        )
 
         solar_azimuth = calculate_solar_azimuth_pvis(
             longitude=longitude,
@@ -284,19 +280,8 @@ def model_solar_geometry_overview(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
         )
-        solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
-
-        solar_declination = calculate_solar_declination_pvis(
-            timestamp=timestamp,
-            timezone=timezone,
-            days_in_a_year=days_in_a_year,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            perigee_offset=perigee_offset,
-            angle_output_units=angle_output_units,
-        )
-        solar_declination = convert_to_degrees_if_requested(
-            solar_declination,
-            angle_output_units,
+        solar_azimuth = convert_to_degrees_if_requested(
+            solar_azimuth, angle_output_units
         )
 
     if model.value == SolarPositionModels.pvlib:
@@ -378,9 +363,11 @@ def model_solar_geometry_overview(
             solar_declination if solar_declination is not None else None,
             solar_hour_angle if solar_hour_angle is not None else None,
             solar_zenith if solar_zenith is not None else None,
-            solar_altitude,
-            solar_azimuth
+            solar_altitude if solar_altitude is not None else None,
+            solar_azimuth if solar_azimuth is not None else None,
     )
+    if verbose == 3:
+        debug(locals())
     return position
 
 
@@ -401,6 +388,7 @@ def calculate_solar_geometry_overview(
     time_output_units: str = 'minutes',
     angle_units: str = 'radians',
     angle_output_units: str = 'radians',
+    verbose: int = 0,
 ) -> List:
     """
     Calculates the solar position using all models and returns the results in a table.
@@ -425,6 +413,7 @@ def calculate_solar_geometry_overview(
                 time_output_units=time_output_units,
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
+                verbose=verbose,
             )
             results.append({
                 'Model': model.value,

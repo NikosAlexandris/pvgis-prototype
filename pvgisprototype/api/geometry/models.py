@@ -3,35 +3,35 @@ from enum import Enum
 
 class SolarIncidenceModels(str, Enum):
     all = 'all'
-    jenco = 'Jenco'
-    effective = 'effective'
     # pvis = 'pvis'
+    effective = 'effective'
+    jenco = 'Jenco'
 
 
 class SolarDeclinationModels(str, Enum):
     all = 'all'
+    # pvgis = 'PVGIS'
+    hargreaves = 'Hargreaves'
     noaa = 'NOAA'
     pvis = 'pvis'
-    hargreaves = 'Hargreaves'
-    # pvgis = 'PVGIS'
     pvlib = 'pvlib'
 
 
 class SolarPositionModels(str, Enum):
     all = 'all'
     noaa = 'NOAA'
-    pysolar = 'pysolar'
-    pvis = 'pvis'
     # pvgis = 'PVGIS'
-    suncalc = 'suncalc'
-    skyfield = 'Skyfield'
+    pvis = 'pvis'
     pvlib = 'pvlib'
+    pysolar = 'pysolar'
+    skyfield = 'Skyfield'
+    suncalc = 'suncalc'
 
 
 class SolarTimeModels(str, Enum):
     all = 'all'
-    eot = 'EoT'
     ephem = 'ephem'
+    milne = 'Milne (1921)'
     noaa = 'NOAA'
     pvgis = 'PVGIS'
     skyfield = 'Skyfield'

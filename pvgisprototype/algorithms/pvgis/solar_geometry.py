@@ -18,8 +18,8 @@ from pvgisprototype.constants import HOUR_ANGLE
 from pvgisprototype.constants import UNDEF
 from pvgisprototype.constants import double_numpi
 from pvgisprototype.constants import half_numpi
-from pvgisprototype.api.data_structures import SolarGeometryDayConstants
-from pvgisprototype.api.data_structures import SolarGeometryDayVariables
+from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
+from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import attach_timezone

@@ -13,12 +13,15 @@ from typing_extensions import Annotated
 import math
 from math import exp
 from math import pi
+from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 
 
 app = typer.Typer(
+    cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
-    help=f"Angular loss factor",
+    help=f"Angular loss factor {NOT_IMPLEMENTED_CLI}",
 )
 
 
@@ -27,7 +30,7 @@ AOIConstants.append(-0.074)
 AOIConstants.append(0.155)
 
 
-@app.callback(invoke_without_command=True)
+# @app.callback(invoke_without_command=True)
 def calculate_angular_loss_factor_for_direct_irradiance(
         sine_solar_incidence_angle: Annotated[float, typer.Argument(
             help='Solar altitude in degrees °',
@@ -94,6 +97,27 @@ def calculate_angular_loss_factor_for_direct_irradiance(
         logging.error(f"Zero Division Error: {e}")
         typer.echo("Error: Division by zero in calculating the angular loss factor.")
         return 1
+
+
+# Not complete ---------------------------------------------------------------
+def calculate_angular_loss_factor_for_direct_irradiance_time_series(
+        sine_solar_incidence_angle_series: Annotated[float, typer.Argument(
+            help='Solar altitude in degrees °',
+            min=0, max=90)],
+        angle_of_incidence_constant: float = 0.155,
+    ):
+    try:
+        angular_loss_series = 1 - np.exp( - sine_solar_incidence_angle_series / angle_of_incidence_constant )
+        normalisation_term =  1 / ( 1 - exp( -1 / angle_of_incidence_constant))
+        angular_loss_factor_series = angular_loss_factor_series / normalisation_term
+        typer.echo(f'Angular loss factor series : {angular_loss_factor_series}')
+        return angular_loss_factor_series
+
+    except ZeroDivisionError as e:
+        logging.error(f"Zero Division Error: {e}")
+        typer.echo("Error: Division by zero in calculating the angular loss factor.")
+        return 1
+# Not complete ---------------------------------------------------------------
 
 
 def calculate_angular_loss_factor_for_nondirect_irradiance(

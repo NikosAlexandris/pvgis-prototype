@@ -1,3 +1,4 @@
+from devtools import debug
 import typer
 from typing_extensions import Annotated
 from typing import Optional
@@ -5,8 +6,9 @@ from datetime import datetime
 from math import pi
 from math import cos
 import numpy as np
-from ...api.utilities.timestamp import random_day_of_year
+from pvgisprototype.api.utilities.timestamp import random_day_of_year
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
@@ -19,28 +21,35 @@ from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correc
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.cli.typer_parameters import typer_option_random_day
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
 app = typer.Typer(
+    cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
-    help=f"Calculate the extraterrestial_irradiance for a day in the year",
+    rich_markup_mode="rich",
+    help=f"Calculate the extraterrestial normal irradiance for a day in the year",
 )
 
 
 @app.callback(
+    'extraterrestial',
     invoke_without_command=True,
     no_args_is_help=True,
+    help=f"Calculate the extraterrestial normal irradiance for a day in the year",
 )
 def calculate_extraterrestrial_normal_irradiance(
     timestamp: Annotated[datetime, typer_argument_timestamp],
-    # timezone: Annotated[Optional[str], typer_option_timezone],
     # Make `day_of_year` optional ?
+    # timezone: Annotated[Optional[str], typer_option_timezone] = None,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    random_day: Annotated[bool, typer_option_random_day] = RANDOM_DAY_FLAG_DEFAULT
+    random_day: Annotated[bool, typer_option_random_day] = RANDOM_DAY_FLAG_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> float:
     """Calculate the extraterrestial irradiance for the given day of the year.
 
@@ -67,12 +76,12 @@ def calculate_extraterrestrial_normal_irradiance(
     perigee_offset: float
         0.048869 (in angular units). The earth's closest position to the sun is
         January 2 at 8:18pm or day number 2.8408. In angular units :
-        2*pi * 2.8408 / 365.25 = 0.048869.
+        2 * pi * 2.8408 / 365.25 = 0.048869.
 
     eccentricity_correction_factor: float
         For Earth this is currently about 0.01672, and so the distance to the
         sun varies by +/- 0.01672 from the mean distance (1AU). Thus, the
-        amplitude of the function over the year is: 2*eccentricity = 0.03344.
+        amplitude of the function over the year is: 2 * eccentricity = 0.03344.
 
     Returns
     -------
@@ -116,8 +125,13 @@ def calculate_extraterrestrial_normal_irradiance(
     # ------------------------------------------------------------------------
     day_of_year = timestamp.timetuple().tm_yday
     position_of_earth = 2 * pi * day_of_year / days_in_a_year
-    distance_correction_factor = 1 + eccentricity_correction_factor * cos(position_of_earth - perigee_offset)
+    distance_correction_factor = 1 + eccentricity_correction_factor * cos(
+        position_of_earth - perigee_offset
+    )
     extraterrestial_normal_irradiance = solar_constant * distance_correction_factor
 
-    # typer.echo(f'Extraterrestrial irradiance: {extraterrestial_irradiance}')
+    if verbose > 0:
+        typer.echo(f"Extraterrestrial irradiance: {extraterrestial_normal_irradiance}")
+    if verbose == 3:
+        debug(locals())
     return extraterrestial_normal_irradiance
