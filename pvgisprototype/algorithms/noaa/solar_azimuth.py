@@ -83,8 +83,9 @@ def calculate_solar_azimuth_noaa(
                    #             cos(latitude) * sin(solar_zenith)
 
                           # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-          # θ = arccos( -  -------------------------------------------------------------- )
+          # θ = arccos(  -------------------------------------------------------------- )
                             #      cos(latitude) * sin(solar_zenith)
+
 
     # or else, from the first equation, after multiplying by -1 :
 
