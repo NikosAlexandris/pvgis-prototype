@@ -164,6 +164,10 @@ def adjust_solar_zenith_for_atmospheric_refraction(
         value=adjusted_solar_zenith,
         unit='radians',
     )
+    solar_zenith = convert_to_degrees_if_requested(
+        solar_zenith,
+        angle_output_units
+    )
 
     if verbose == 3:
         debug(locals())
@@ -263,10 +267,19 @@ def calculate_solar_zenith_noaa(
             solar_zenith.value,
             angle_output_units="radians",  # always in radians!
         )
+    
+    # # --------------------------------------------- NOTE gounaol: solar zenith angles above 90° may not always be useful
+    # if solar_zenith.value > pi/2:
+    #     solar_zenith.value = solar_zenith.value - pi/2
+    # # ----------------------------------------------------------------------------------------------
     # if not isfinite(solar_zenith.value) or not 0 <= solar_zenith.value <= pi/2 + 0.0146:
     if not isfinite(solar_zenith.value) or not 0 <= solar_zenith.value <= pi + 0.0146:
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
-    solar_zenith = convert_to_degrees_if_requested(solar_zenith, angle_output_units)
+        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')
+    
+    solar_zenith = convert_to_degrees_if_requested(
+        solar_zenith,
+        angle_output_units
+    )
 
     if verbose == 3:
         debug(locals())
