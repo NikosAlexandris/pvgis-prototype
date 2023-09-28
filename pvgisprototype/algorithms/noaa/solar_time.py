@@ -87,7 +87,7 @@ def calculate_true_solar_time_noaa(
         timestamp=timestamp,
         timezone=timezone,
         time_output_units=time_output_units,
-        angle_units=angle_units,
+        angle_output_units=angle_output_units,
         )  # in minutes
 
     time_offset_timedelta = timedelta(minutes=time_offset.value)
