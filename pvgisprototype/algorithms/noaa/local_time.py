@@ -1,10 +1,11 @@
 from datetime import datetime
 from datetime import timedelta
-from datetime import time
+from zoneinfo import ZoneInfo
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateLocalSolarTimeNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import SolarTime
 from .event_time import calculate_event_time_noaa
 
@@ -14,8 +15,8 @@ def calculate_local_solar_time_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude, # radians
         timestamp: datetime,
-        timezone: str,
-        refracted_solar_zenith: float = 1.5853349194640094,  # radians
+        timezone: ZoneInfo,
+        refracted_solar_zenith: RefractedSolarZenith,  # radians
         apply_atmospheric_refraction: bool = False,
         time_output_units: str = 'hours',
         angle_units: str = 'radians',

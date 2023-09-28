@@ -27,6 +27,7 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import SolarZenith
+from pvgisprototype import RefractedSolarZenith
 
 from .models import SolarTimeModels
 from .models import SolarPositionModels
@@ -61,7 +62,7 @@ def model_solar_geometry_overview(
     timezone: ZoneInfo,
     model: SolarPositionModels,
     apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: float,
+    refracted_solar_zenith: RefractedSolarZenith,
     solar_time_model: SolarTimeModels,
     time_offset_global: float,
     hour_offset: float,
@@ -267,7 +268,7 @@ def model_solar_geometry_overview(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith.value,
+            refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
@@ -294,7 +295,7 @@ def model_solar_geometry_overview(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith.value,
+            refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
@@ -376,11 +377,11 @@ def calculate_solar_geometry_overview(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: ZoneInfo = None,
+    timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,
     models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,
