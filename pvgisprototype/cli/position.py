@@ -96,6 +96,13 @@ from .print import print_solar_position_table
 from .print import print_noaa_solar_position_table
 
 
+def calculate_zenith(angle_output_units, solar_altitude_angle):
+    if angle_output_units == 'degrees':
+        return 90 - solar_altitude_angle
+    else:
+        return radians(90) - radians(solar_altitude_angle)
+
+
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=True,
@@ -467,12 +474,6 @@ def zenith(
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
-
-    def calculate_zenith(angle_output_units, solar_altitude_angle):
-        if angle_output_units == 'degrees':
-            return 90 - solar_altitude_angle
-        else:
-            return radians(90) - radians(solar_altitude_angle)
 
     solar_zenith = solar_altitude
     for model_result in solar_zenith:
