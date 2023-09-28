@@ -122,19 +122,19 @@ def calculate_solar_altitude_azimuth_skyfield(
         value=solar_altitude.radians,
         unit='radians',
     )
-    solar_altitude = convert_to_degrees_if_requested(
-        solar_altitude,
-        angle_output_units,
-        )
-
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth.radians,
         unit='radians',
     )
+
+    solar_altitude = convert_to_degrees_if_requested(
+        solar_altitude,
+        angle_output_units,
+    )
     solar_azimuth = convert_to_degrees_if_requested(
         solar_azimuth,
         angle_output_units,
-        )
+    )
 
     return solar_altitude, solar_azimuth   # distance_to_sun
 
@@ -182,13 +182,17 @@ def calculate_hour_angle_skyfield(
         hour_angle = hour_angle.radians
         solar_declination = solar_declination.radians
 
+    if angle_output_units == 'degrees':
+        hour_angle = hour_angle._degrees
+        solar_declination = solar_declination.degrees
+
     hour_angle = HourAngle(
-        value=hour_angle.radians,
-        unit='radians'
+        value=hour_angle,
+        unit=angle_output_units
     )
     solar_declination = SolarDeclination(
-        value=solar_declination.degrees,
-        unit='degrees'
+        value=solar_declination,
+        unit=angle_output_units
     )
 
     return hour_angle, solar_declination
