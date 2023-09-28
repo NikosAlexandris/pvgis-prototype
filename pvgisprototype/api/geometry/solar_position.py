@@ -49,16 +49,17 @@ from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_de
 from pvgisprototype.algorithms.pvlib.solar_hour_angle import calculate_solar_hour_angle_pvlib
 from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_pvlib
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
-# from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from pvgisprototype.constants import (
-    ALGORITHM_NAME,
+    POSITION_ALGORITHM_NAME,
     ALTITUDE_NAME,
     AZIMUTH_NAME,
     DECLINATION_NAME,
     HOUR_ANGLE_NAME,
     ZENITH_NAME,
     UNITS_NAME,
+    TIME_ALGORITHM_NAME,
 )
 
 
@@ -434,14 +435,14 @@ def calculate_solar_geometry_overview(
                 # angle_output_units=angle_output_units,
             )
             results.append({
-                ALGORITHM_NAME: model.value,
+                POSITION_ALGORITHM_NAME: model.value,
                 DECLINATION_NAME if solar_declination is not None else None: getattr(solar_declination, angle_output_units) if solar_declination is not None else None,
                 HOUR_ANGLE_NAME if solar_hour_angle is not None else None: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle is not None else None,
                 ZENITH_NAME if solar_zenith is not None else None: getattr(solar_zenith, angle_output_units) if solar_zenith is not None else None,
                 ALTITUDE_NAME if solar_altitude is not None else None: getattr(solar_altitude, angle_output_units) if solar_altitude is not None else None,
                 AZIMUTH_NAME if solar_azimuth is not None else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth is not None else None,
                 UNITS_NAME: angle_output_units,
-                'Solar Time Model': solar_time_model,
+                TIME_ALGORITHM_NAME: solar_time_model,
             })
 
     return results

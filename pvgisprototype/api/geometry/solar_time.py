@@ -15,7 +15,7 @@ from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ep
 from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
 from pvgisprototype.algorithms.noaa.solar_position import calculate_local_solar_time_noaa
 from pvgisprototype.algorithms.skyfield.solar_time import calculate_solar_time_skyfield
-from pvgisprototype.constants import ALGORITHM_NAME, UNITS_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME, UNITS_NAME
 
 
 @validate_with_pydantic(ModelSolarTimeInputModel)
@@ -149,7 +149,7 @@ def calculate_solar_time(
                 # angle_output_units=angle_output_units,
             )
             results.append({
-                ALGORITHM_NAME: model,
+                POSITION_ALGORITHM_NAME: model,
                 'Solar time': getattr(solar_time, angle_output_units),
                 UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })

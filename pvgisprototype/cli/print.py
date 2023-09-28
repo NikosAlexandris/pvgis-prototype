@@ -8,8 +8,8 @@ from rich.panel import Panel
 from rich import box
 from typing import List
 from pvgisprototype.constants import (
-    ALGORITHM_COLUMN_NAME,
-    ALGORITHM_NAME,
+    POSITION_ALGORITHM_COLUMN_NAME,
+    POSITION_ALGORITHM_NAME,
     ALTITUDE_COLUMN_NAME,
     ALTITUDE_NAME,
     AZIMUTH_COLUMN_NAME,
@@ -20,8 +20,8 @@ from pvgisprototype.constants import (
     HOUR_ANGLE_NAME,
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
-    SOLAR_TIME_MODEL_NAME,
-    SOLAR_TIME_MODEL_COLUMN_NAME,
+    TIME_ALGORITHM_NAME,
+    TIME_ALGORITHM_COLUMN_NAME,
     UNITS_COLUMN_NAME,
     UNITS_NAME,
     ZENITH_COLUMN_NAME,
@@ -70,12 +70,12 @@ def print_solar_position_table(
     columns = ["Longitude", "Latitude", "Time", "Zone"]
     if user_requested_timestamp and user_requested_timezone:
         columns.extend(["Local Time", "Local Zone"])
-    columns.append(SOLAR_TIME_MODEL_COLUMN_NAME)
+    columns.append(TIME_ALGORITHM_COLUMN_NAME)
     if declination is not None:
         columns.append(DECLINATION_COLUMN_NAME)
     if hour_angle is not None:
         columns.append(HOUR_ANGLE_COLUMN_NAME)
-    columns.append(ALGORITHM_COLUMN_NAME)
+    columns.append(POSITION_ALGORITHM_COLUMN_NAME)
     if zenith is not None:
         columns.append(ZENITH_COLUMN_NAME)
     if altitude is not None:
@@ -91,7 +91,7 @@ def print_solar_position_table(
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
     for model_result in rounded_table:
-        algorithm_name = model_result.get(ALGORITHM_NAME, '')
+        algorithm_name = model_result.get(POSITION_ALGORITHM_NAME, '')
         declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination is not None else None
         hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle is not None else None
         zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith is not None else None
@@ -99,7 +99,7 @@ def print_solar_position_table(
         azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth is not None else None
         incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence is not None else None
         units = model_result.get(UNITS_NAME, UNITLESSS_COLUMN_NAME)
-        solar_time_model = model_result.get(SOLAR_TIME_MODEL_NAME, '')
+        solar_time_model = model_result.get(TIME_ALGORITHM_NAME, '')
 
         row = [str(longitude), str(latitude), str(timestamp), str(timezone)]
 
