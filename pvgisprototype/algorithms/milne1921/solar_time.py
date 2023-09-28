@@ -34,7 +34,7 @@ def calculate_apparent_solar_time_milne1921(
     time_offset_global: float = 0,
     hour_offset: float = 0,
     verbose: int = 0,
-):
+) -> datetime:
     """Calculate the apparent solar time based on the equation of time by Milne 1921
 
     Notes
@@ -112,14 +112,6 @@ def calculate_apparent_solar_time_milne1921(
     #     except Exception as e:
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # Handle Me during input validation? -------------------------------------
-
-<<<<<<< HEAD
-=======
-    # year = timestamp.year
-    # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
-    # hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
-    day_of_year = timestamp.timetuple().tm_yday
->>>>>>> c4247e4 (Update functions to return datetime)
 
     # Equation of Time, Milne 1921 -------------------------------------------
 
