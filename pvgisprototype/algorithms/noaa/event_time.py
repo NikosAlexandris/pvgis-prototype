@@ -6,6 +6,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from .function_models import CalculateEventTimeNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import EventTime
 from .equation_of_time import calculate_equation_of_time_noaa
 from .solar_declination import calculate_solar_declination_noaa
@@ -15,9 +16,6 @@ from .event_hour_angle import calculate_event_hour_angle_noaa
 from ...api.utilities.timestamp import attach_requested_timezone
 
 
-# TODO: Maybe create a function that accepts a named_tuple and checks existing units
-radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
-
 
 @validate_with_pydantic(CalculateEventTimeNOAAInput)
 def calculate_event_time_noaa(
@@ -26,11 +24,11 @@ def calculate_event_time_noaa(
     timestamp: datetime,
     timezone: str,
     event: str,
-    refracted_solar_zenith: float = 1.5853349194640094,  # radians
+    refracted_solar_zenith: RefractedSolarZenith,  # radians
     apply_atmospheric_refraction: bool = False,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    # time_output_units: str = 'minutes',
+    # angle_units: str = 'radians',
+    # angle_output_units: str = 'radians',
 )-> EventTime:
     """Calculate the sunrise or sunset
 
@@ -88,19 +86,17 @@ def calculate_event_time_noaa(
     #         # time_output_units,
     #         angle_output_units=angle_output_units,
     #         )  # radians
-    longitude_minutes = radians_to_time_minutes(longitude.value)
     event_hour_angle = calculate_event_hour_angle_noaa(
             latitude=latitude,
             timestamp=timestamp,
             refracted_solar_zenith=refracted_solar_zenith,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
+            # angle_units=angle_units,
+            # angle_output_units=angle_output_units,
             )
-    event_hour_angle_minutes = radians_to_time_minutes(event_hour_angle.value)
     equation_of_time = calculate_equation_of_time_noaa(
             timestamp=timestamp,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
             )  # minutes
     # 2 * pi radians equals a circle, 360 degrees or 24 hours
     # 60 minutes * 24 hours = 1440 minutes (in 24 hours or a day)
@@ -109,12 +105,12 @@ def calculate_event_time_noaa(
     #   from a range of 0 to 2 * pi (a full circle)
     #   to a range of 0 to 1440 (a full day in minutes)
     event_calculations = {
-        'sunrise': 720 - (longitude_minutes + event_hour_angle_minutes) - equation_of_time.value,
-        'noon': 720 - longitude_minutes - equation_of_time.value,
-        'sunset': 720 - (longitude_minutes - event_hour_angle_minutes) - equation_of_time.value
+        'sunrise': 720 - (longitude.as_minutes + event_hour_angle.as_minutes) - equation_of_time.as_minutes,
+        'noon': 720 - longitude.as_minutes - equation_of_time.as_minutes,
+        'sunset': 720 - (longitude.as_minutes - event_hour_angle.as_minutes) - equation_of_time.as_minutes
     }
     event_time = event_calculations.get(event.lower())
     event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(minutes=event_time)
     event_datetime_utc = attach_requested_timezone(event_datetime)  # assign UTC
 
-    return event_datetime_utc
+    return EventTime(value=event_datetime_utc, unit='datetime')

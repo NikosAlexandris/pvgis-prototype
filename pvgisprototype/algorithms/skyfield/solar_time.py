@@ -2,6 +2,7 @@ import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
+from datetime import time
 from datetime import time as datetime_time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
@@ -31,7 +32,7 @@ def calculate_solar_time_skyfield(
         timestamp: datetime,
         timezone: str = None,
         verbose: int = 0,
-    ):
+    )->SolarTime:
 
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -49,12 +50,12 @@ def calculate_solar_time_skyfield(
 
     planets = load('de421.bsp')
     sun = planets['Sun']
-    if longitude.value > 0:
-        location = wgs84.latlon(latitude.value * N, longitude.value * E)
-    if longitude.value < 0:
-        location = wgs84.latlon(latitude.value * N, longitude.value * W)  # Correct ?
+    if longitude.degrees > 0:
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees * E)
+    if longitude.degrees < 0:
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees * W)  # Correct ?
     else:
-        location = wgs84.latlon(latitude.value * N, longitude.value)  # Correct ?
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees)  # Correct ?
 
     f = almanac.meridian_transits(planets, sun, location)
 
@@ -76,7 +77,16 @@ def calculate_solar_time_skyfield(
     hours = int(hours_since_solar_noon)
     minutes = int((hours_since_solar_noon - hours) * 60)
     seconds = int(((hours_since_solar_noon - hours) * 60 - minutes) * 60)
-    local_solar_time = datetime_time(hours, minutes, seconds)
+    # local_solar_time = datetime_time(hours, minutes, seconds)
+    local_solar_time = time(
+            # year=timestamp.year,
+            # month=timestamp.month,
+            # day=timestamp.day,
+            hour=int(hours),
+            minute=int(minutes),
+            second=int(seconds),
+            tzinfo=timestamp.tzinfo,
+    )
     # local_solar_time = previous_solar_noon.utc_datetime() + timedelta(hours=hours_since_solar_noon)
 
     if verbose:
@@ -88,4 +98,4 @@ def calculate_solar_time_skyfield(
         next_solar_noon_string = next_solar_noon.astimezone(timezone).strftime('%Y-%m-%d %H:%M:%S')
         typer.echo(f'Next solar noon: {next_solar_noon_string}')
 
-    return local_solar_time
+    return SolarTime(value=local_solar_time, unit='timestamp')

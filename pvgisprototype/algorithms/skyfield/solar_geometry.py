@@ -16,12 +16,11 @@ from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from typing import Tuple
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarPositionSkyfieldInputModel
-from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarAltitudeAzimuthSkyfieldInputModel
-from pvgisprototype.algorithms.skyfield.function_models import CalculateHourAngleSkyfieldInput
-from pvgisprototype import SolarPosition
+from pvgisprototype.validation.functions import CalculateSolarAltitudeAzimuthSkyfieldInputModel
+from pvgisprototype.validation.functions import SolarHourAngleSkyfieldInput
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
-from pvgisprototype import HourAngle
+from pvgisprototype import SolarHourAngle
 from pvgisprototype import SolarDeclination
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
@@ -33,8 +32,7 @@ def calculate_solar_position_skyfield(
         latitude: Latitude,
         timestamp: datetime,
         timezone: str = None,
-        angle_output_units: str = 'radians',
-    ) -> SolarPosition:
+    ):
     """Calculate sun position above the local horizon using Skyfield.
 
     Returns
@@ -90,7 +88,8 @@ def calculate_solar_position_skyfield(
     # N = skyfield.api.N
     # W = skyfield.api.W
     # E = skyfield.api.E
-    location = skyfield.api.wgs84.latlon(latitude.value, longitude.value)
+
+    location = skyfield.api.wgs84.latlon(latitude.degrees, longitude.degrees)
 
     # sun position seen from observer location
     timescale = skyfield.api.load.timescale()
@@ -114,7 +113,6 @@ def calculate_solar_altitude_azimuth_skyfield(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        angle_output_units=angle_output_units,
     )
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
 
@@ -122,31 +120,31 @@ def calculate_solar_altitude_azimuth_skyfield(
         value=solar_altitude.radians,
         unit='radians',
     )
-    solar_altitude = convert_to_degrees_if_requested(
-        solar_altitude,
-        angle_output_units,
-        )
-
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth.radians,
         unit='radians',
     )
+
+    solar_altitude = convert_to_degrees_if_requested(
+        solar_altitude,
+        angle_output_units,
+    )
     solar_azimuth = convert_to_degrees_if_requested(
         solar_azimuth,
         angle_output_units,
-        )
+    )
 
     return solar_altitude, solar_azimuth   # distance_to_sun
 
 
-@validate_with_pydantic(CalculateHourAngleSkyfieldInput)
-def calculate_hour_angle_skyfield(
+@validate_with_pydantic(SolarHourAngleSkyfieldInput)
+def calculate_hour_angle_skyfield(      # NOTE gounaol: Declination is also calculated by skyfield.solar_declination.calculate_solar_declination_skyfield
         longitude: Longitude,
         latitude: Latitude,
         timestamp: datetime,
         timezone: str = None,
         angle_output_units: str = 'radians',
-    ) -> Tuple[HourAngle, SolarDeclination]:
+    ) -> Tuple[SolarHourAngle, SolarDeclination]:
     """Calculate the hour angle ω'
 
     Parameters
@@ -162,11 +160,10 @@ def calculate_hour_angle_skyfield(
         sun's rays measured in radian.
     """
     solar_position = calculate_solar_position_skyfield(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            angle_output_units,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
             )
     hour_angle, solar_declination, distance_to_sun = solar_position.hadec()
 
@@ -182,7 +179,17 @@ def calculate_hour_angle_skyfield(
         hour_angle = hour_angle.radians
         solar_declination = solar_declination.radians
 
-    hour_angle = HourAngle(value=hour_angle, unit=angle_output_units)
-    solar_declination = SolarDeclination(value=solar_declination, unit=angle_output_units)
+    if angle_output_units == 'degrees':
+        hour_angle = hour_angle._degrees
+        solar_declination = solar_declination.degrees
+
+    hour_angle = SolarHourAngle(
+        value=hour_angle,
+        unit=angle_output_units
+    )
+    solar_declination = SolarDeclination(
+        value=solar_declination,
+        unit=angle_output_units
+    )
 
     return hour_angle, solar_declination

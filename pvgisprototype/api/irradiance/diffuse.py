@@ -65,7 +65,7 @@ from math import pi
 from math import atan2
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from ..geometry.solar_time import model_solar_time
-from ..utilities.timestamp import timestamp_to_decimal_hours
+# from ..utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_time_series
@@ -544,7 +544,7 @@ def calculate_diffuse_inclined_irradiance(
 
         # on a horizontal surface : G0h = G0 sin(h0)
         extraterrestrial_horizontal_irradiance = extraterrestrial_normal_irradiance * sin(
-            solar_altitude.value
+            solar_altitude.radians
         )
 
         # proportion between direct (beam) and extraterrestrial irradiance : Kb
@@ -591,8 +591,8 @@ def calculate_diffuse_inclined_irradiance(
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
         )
-        solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-        hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+        # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.datetime)
+        hour_angle = np.radians(15) * (solar_time.as_hours - 12)
         solar_incidence_angle = calculate_solar_incidence_pvis(
             longitude=longitude,
             latitude=latitude,
@@ -603,7 +603,7 @@ def calculate_diffuse_inclined_irradiance(
             angle_output_units=angle_output_units,
             verbose=verbose,
         )
-        if sin(solar_incidence_angle.value) < 0 and solar_altitude.value >=0:
+        if sin(solar_incidence_angle.radians) < 0 and solar_altitude.radians >=0:
 
             # F(γN)
             diffuse_sky_irradiance = calculate_diffuse_sky_irradiance(
@@ -616,10 +616,10 @@ def calculate_diffuse_inclined_irradiance(
 
         else:  # sunlit surface and non-overcast sky
 
-            if solar_altitude.value >= 0.1:  # radians or 5.7 degrees
+            if solar_altitude.radians >= 0.1:  # radians or 5.7 degrees
                 diffuse_inclined_irradiance = diffuse_horizontal_component * (
                     diffuse_sky_irradiance * (1 - kb)
-                    + kb * sin(solar_incidence_angle.value) / sin(solar_altitude.value)
+                    + kb * sin(solar_incidence_angle.radians) / sin(solar_altitude.radians)
                 )
 
             else:  # if solar_altitude.value < 0.1:
@@ -654,7 +654,7 @@ def calculate_diffuse_inclined_irradiance(
                     + kb
                     * sin(surface_tilt)
                     * cos(azimuth_difference)
-                    / (0.1 - 0.008 * solar_altitude.value)
+                    / (0.1 - 0.008 * solar_altitude.radians)
                 )
         # finally, we need to set
         diffuse_irradiance = diffuse_inclined_irradiance

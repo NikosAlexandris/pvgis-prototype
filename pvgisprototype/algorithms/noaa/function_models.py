@@ -21,7 +21,7 @@ from pvgisprototype.validation.parameters import BaseCoordinatesModel
 # Units?
 
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleUnitsModel
+from pvgisprototype.validation.parameters import BaseAngleUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
 
@@ -29,6 +29,7 @@ from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnits
 from pvgisprototype.algorithms.noaa.parameter_models import BaseApplyAtmosphericRefractionModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
+from pvgisprototype.validation.parameters import RefractedSolarZenithModel
 from math import pi
 import numpy as np
 
@@ -38,7 +39,7 @@ import numpy as np
 
 class CalculateFractionalYearNOAAInput(
     BaseTimestampModel,
-    AngleInRadiansOutputUnitsModel,
+    # AngleInRadiansOutputUnitsModel,
 ):
     pass
 
@@ -50,26 +51,12 @@ class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     pass
 
 
-class CalculateEquationOfTimeNOAAInput(
-    BaseTimestampModel,
-    BaseTimeOutputUnitsModel,
-):
-    pass
-
-
 class CalculateEquationOfTimeTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     BaseTimeOutputUnitsModel,
 ):
     pass
 
-
-class CalculateTimeOffsetNOAAInput(
-    LongitudeModel,
-    BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-):
-    pass
 
 
 class CalculateTimeOffsetTimeSeriesNOAAInput(
@@ -80,13 +67,6 @@ class CalculateTimeOffsetTimeSeriesNOAAInput(
     pass
 
 
-class CalculateTrueSolarTimeNOAAInput(
-    LongitudeModel,
-    BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-):
-    pass
-
 
 class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     LongitudeModel,
@@ -96,13 +76,7 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     pass
 
 
-class CalculateSolarHourAngleNOAAInput(
-    LongitudeModel,
-    BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
+
 
 
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
@@ -115,11 +89,7 @@ class CalculateSolarHourAngleTimeSeriesNOAAInput(
 
 
 
-class CalculateSolarDeclinationNOAAInput(
-    BaseTimestampModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
+
 
 
 class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
@@ -131,13 +101,13 @@ class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
 
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     SolarZenithModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     @field_validator('solar_zenith')
     @classmethod
     def solar_zenith_range(cls, v):
-        if not (0 <= v <= pi):
+        if not (0 <= v.radians <= pi):
             raise ValueError('solar_zenith must range within [0, π]')
         return v
 
@@ -161,7 +131,7 @@ class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
         return v
 
 
-class CalculateSolarZenithNOAAInput(
+class CalculateSolarZenithNOAAInput(                # FIXME: Move this to function models, keep VerbosityModel
     LatitudeModel,
     BaseTimestampModel,
     SolarHourAngleModel,
@@ -183,14 +153,7 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     pass
 
 
-class CalculateSolarAltitudeNOAAInput(
-    BaseCoordinatesModel,
-    BaseTimeModel,
-    BaseApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
+
 
 
 class CalculateSolarAltitudeTimeSeriesNOAAInput(
@@ -208,9 +171,9 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
 class CalculateSolarAzimuthNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-    # BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass
@@ -229,17 +192,17 @@ class CalculateSolarAzimuthTimeSeriesNOAAInput(
 class CalculateEventHourAngleNOAAInput(
     LatitudeModel,
     BaseTimestampModel,
-    BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    RefractedSolarZenithModel,
+    # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
-    refracted_solar_zenith: float
 
     @field_validator('refracted_solar_zenith')
     @classmethod
     def validate_refracted_solar_zenith(cls, v):
         target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
         error_margin = 0.01
-        if not (target_zenith - error_margin) <= v <= (target_zenith + error_margin):
+        if not (target_zenith - error_margin) <= v.radians <= (target_zenith + error_margin):
             raise ValueError(
                 f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
@@ -249,11 +212,12 @@ class CalculateEventHourAngleNOAAInput(
 class CalculateEventTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
     BaseTimeEventModel,
     BaseApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -261,9 +225,10 @@ class CalculateEventTimeNOAAInput(
 class CalculateLocalSolarTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    RefractedSolarZenithModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     verbose: int = 0
 
@@ -271,12 +236,12 @@ class CalculateLocalSolarTimeNOAAInput(
 class CalculateSolarPositionNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
     BaseApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
-    refracted_solar_zenith: float
 
     @field_validator('refracted_solar_zenith')
     @classmethod

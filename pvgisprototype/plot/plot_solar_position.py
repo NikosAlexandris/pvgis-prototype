@@ -22,6 +22,7 @@ from datetime import timedelta
 from datetime import timezone
 from datetime import time
 import numpy as np
+from pvgisprototype.constants import ALTITUDE_NAME, AZIMUTH_NAME
 
 
 def plot_daily_solar_altitude(
@@ -120,8 +121,8 @@ def plot_daily_solar_position(
 
     # color = 'tab:red'
     ax1.set_xlabel('Hour of the day')
-    # ax1.set_ylabel('Altitude', color=color)
-    ax1.set_ylabel('Altitude')
+    # ax1.set_ylabel(ALTITUDE_NAME, color=color)
+    ax1.set_ylabel(ALTITUDE_NAME)
     # ax1.plot(timestamps, altitudes, color=color)
     ax1.plot(timestamps, altitudes)
     # ax1.tick_params(axis='y', labelcolor=color)
@@ -134,8 +135,8 @@ def plot_daily_solar_position(
     ax2.spines['right'].set_visible(False)
 
     # color = 'tab:blue'
-    # ax2.set_ylabel('Azimuth', color=color)
-    ax2.set_ylabel('Azimuth')
+    # ax2.set_ylabel(AZIMUTH_NAME, color=color)
+    ax2.set_ylabel(AZIMUTH_NAME)
     # ax2.plot(range(24), azimuths, color=color)
     # ax2.plot(timestamps, azimuths, color=color)
     ax2.plot(timestamps, azimuths)
@@ -171,11 +172,11 @@ def plot_daily_solar_position_models(
 
         ax1 = axs[i]
         ax1.set_xlabel('Hour of the day')
-        ax1.set_ylabel('Altitude')
+        ax1.set_ylabel(ALTITUDE_NAME)
         ax1.plot(timestamps, altitudes)
 
         ax2 = ax1.twinx()
-        ax2.set_ylabel('Azimuth')
+        ax2.set_ylabel(AZIMUTH_NAME)
         ax2.plot(timestamps, azimuths)
 
         ax1.title.set_text(f'{title} - Model: {model.value}')
@@ -206,8 +207,8 @@ def plot_daily_solar_position_scatter(
     ax.spines['right'].set_visible(False)
     
     plt.scatter(azimuths, altitudes, label='Solar Geometry Plot')
-    plt.xlabel('Azimuth')
-    plt.ylabel('Altitude')
+    plt.xlabel(AZIMUTH_NAME)
+    plt.ylabel(ALTITUDE_NAME)
 
     # fig.tight_layout()
     plt.title(title)
@@ -243,7 +244,7 @@ def plot_yearly_solar_position(
 
     color = 'tab:red'
     ax1.set_xlabel('Day of the year')
-    ax1.set_ylabel('Altitude', color=color)
+    ax1.set_ylabel(ALTITUDE_NAME, color=color)
     ax1.plot(timestamps, altitudes, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
 
@@ -251,7 +252,7 @@ def plot_yearly_solar_position(
     ax2.spines['top'].set_visible(False)
     ax2.spines['right'].set_visible(False)
     color = 'tab:blue'
-    ax2.set_ylabel('Azimuth', color=color)
+    ax2.set_ylabel(AZIMUTH_NAME, color=color)
     ax2.plot(timestamps, azimuths, color=color)
     ax2.tick_params(axis='y', labelcolor=color)
 

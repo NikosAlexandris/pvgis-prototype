@@ -4,6 +4,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarDeclination
 from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from math import sin
 from math import asin
 from pvgisprototype.constants import DAYS_IN_A_YEAR
@@ -18,7 +19,7 @@ def calculate_solar_declination_pvis(
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = "radians",
+    # angle_output_units: str = "radians",
 ) -> SolarDeclination:
     """Approximate the sun's declination for a given day of the year.
 
@@ -57,18 +58,19 @@ def calculate_solar_declination_pvis(
     """
     fractional_year = calculate_fractional_year_pvis(
         timestamp=timestamp,
-        days_in_a_year=days_in_a_year,
-        angle_output_units="radians",
+        # days_in_a_year=days_in_a_year,
+        # angle_output_units="radians",
     )
     solar_declination = asin(
         0.3978
         * sin(
-            fractional_year.value
+            fractional_year.radians
             - 1.4
             + eccentricity_correction_factor
-            * sin(fractional_year.value - perigee_offset)
+            * sin(fractional_year.radians - perigee_offset)
         )
     )
     solar_declination = SolarDeclination(value=solar_declination, unit="radians")
+    # solar_declination = convert_to_degrees_if_requested(solar_declination, angle_output_units)
 
     return solar_declination

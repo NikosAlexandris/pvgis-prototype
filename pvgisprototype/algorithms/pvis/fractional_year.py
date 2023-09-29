@@ -1,6 +1,7 @@
 from datetime import date
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from datetime import datetime
 from pvgisprototype import FractionalYear
 from math import pi
@@ -41,8 +42,8 @@ def days_in_year(year):
 @validate_with_pydantic(CalculateFractionalYearPVISInputModel)
 def calculate_fractional_year_pvis(
     timestamp: datetime,
-    angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    # angle_units: str = 'radians',
+    # angle_output_units: str = 'radians',
 ) -> FractionalYear:
     """Calculate fractional year in radians
 
@@ -60,7 +61,7 @@ def calculate_fractional_year_pvis(
         )
     """
     year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1)
+    # start_of_year = datetime(year=year, month=1, day=1)
     day_of_year = timestamp.timetuple().tm_yday
     fractional_year = 2 * pi * day_of_year / days_in_year(year)
 
