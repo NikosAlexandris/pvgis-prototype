@@ -18,7 +18,7 @@ from math import cos
 from math import acos
 
 
-@validate_with_pydantic(CalculateSolarIncidencePVISInputModel)
+@validate_with_pydantic(CalculateSolarIncidencePVISInputModel)      # NOTE gounaol: Renamed from CalculateSolarIncidenceInputModel
 def calculate_solar_incidence_pvis(
     longitude: Longitude,
     latitude: Latitude,
@@ -36,8 +36,8 @@ def calculate_solar_incidence_pvis(
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
+    # time_output_units: str = 'minutes',
+    # angle_units: str = 'radians',
     angle_output_units: str = 'radians',
 ) -> SolarIncidence:
     """Calculate the angle of incidence (θ) between the direction of the sun
@@ -109,37 +109,36 @@ def calculate_solar_incidence_pvis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
     )
     hour_angle = calculate_solar_hour_angle_pvis(
         solar_time=solar_time,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     solar_incidence = acos(
-        sin(latitude.value)
+        sin(latitude.radians)
         * (
-            sin(solar_declination.value)
-            * cos(surface_tilt.value)
-            + cos(solar_declination.value)
-            * cos(surface_orientation.value)
-            * cos(hour_angle.value)
-            * sin(surface_tilt.value)
+            sin(solar_declination.radians)
+            * cos(surface_tilt.radians)
+            + cos(solar_declination.radians)
+            * cos(surface_orientation.radians)
+            * cos(hour_angle.radians)
+            * sin(surface_tilt.radians)
         )
-        + cos(latitude.value)
+        + cos(latitude.radians)
         * (
-            cos(solar_declination.value)
-            * cos(hour_angle.value)
-            * cos(surface_tilt.value)
-            - sin(solar_declination.value)
-            * cos(surface_orientation.value)
-            * sin(surface_tilt.value)
+            cos(solar_declination.radians)
+            * cos(hour_angle.radians)
+            * cos(surface_tilt.radians)
+            - sin(solar_declination.radians)
+            * cos(surface_orientation.radians)
+            * sin(surface_tilt.radians)
         )
-        + cos(solar_declination.value)
-        * sin(surface_orientation.value)
-        * sin(hour_angle.value)
-        * sin(surface_tilt.value)
+        + cos(solar_declination.radians)
+        * sin(surface_orientation.radians)
+        * sin(hour_angle.radians)
+        * sin(surface_tilt.radians)
     )
-
-    return SolarIncidence(value=solar_incidence, unit=angle_output_units)
+    return SolarIncidence(value=solar_incidence, unit='radians')

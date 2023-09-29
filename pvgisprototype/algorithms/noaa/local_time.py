@@ -1,10 +1,12 @@
 from datetime import datetime
-from datetime import timedelta
 from datetime import time
+from datetime import timedelta
+from zoneinfo import ZoneInfo
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateLocalSolarTimeNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import SolarTime
 from .event_time import calculate_event_time_noaa
 
@@ -14,12 +16,12 @@ def calculate_local_solar_time_noaa(
         longitude: Longitude,   # radians
         latitude: Latitude, # radians
         timestamp: datetime,
-        timezone: str,
-        refracted_solar_zenith: float = 1.5853349194640094,  # radians
+        timezone: ZoneInfo,
+        refracted_solar_zenith: RefractedSolarZenith,  # radians
         apply_atmospheric_refraction: bool = False,
-        time_output_units: str = 'hours',
-        angle_units: str = 'radians',
-        angle_output_units: str = 'radians',
+        # time_output_units: str = 'hours',
+        # angle_units: str = 'radians',
+        # angle_output_units: str = 'radians',
         verbose: int = 0,
     ) -> SolarTime:
     """
@@ -72,24 +74,24 @@ def calculate_local_solar_time_noaa(
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # ------------------------------------------------------------------------
     solar_noon_timestamp = calculate_event_time_noaa(
-        longitude,
-        latitude,
-        timestamp,
-        timezone,
-        'noon',
-        refracted_solar_zenith,
-        apply_atmospheric_refraction,
-        time_output_units,
-        angle_units,
-        angle_output_units,
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        event='noon',
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
     )
 
-    if timestamp < solar_noon_timestamp:
-        previous_solar_noon_timestamp = solar_noon_timestamp - timedelta(days=1)
+    if timestamp < solar_noon_timestamp.datetime:
+        previous_solar_noon_timestamp = solar_noon_timestamp.datetime - timedelta(days=1)
         local_solar_time_delta = timestamp - previous_solar_noon_timestamp
 
     else:
-        local_solar_time_delta = timestamp - solar_noon_timestamp
+        local_solar_time_delta = timestamp - solar_noon_timestamp.datetime
 
     total_seconds = int(local_solar_time_delta.total_seconds())
     # hours, remainder = divmod(total_seconds, 3600)
@@ -101,4 +103,14 @@ def calculate_local_solar_time_noaa(
 
     local_solar_time = timestamp + timedelta(seconds=total_seconds)
 
-    return local_solar_time
+    local_solar_time = time(
+            # year=local_solar_time.year,
+            # month=local_solar_time.month,
+            # day=local_solar_time.day,
+            hour=int(local_solar_time.hour),
+            minute=int(local_solar_time.minute),
+            second=int(local_solar_time.second),
+            tzinfo=local_solar_time.tzinfo,
+            )
+
+    return SolarTime(value=local_solar_time, unit='timestamp')

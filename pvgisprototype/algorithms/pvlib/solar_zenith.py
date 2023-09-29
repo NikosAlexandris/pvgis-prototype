@@ -1,17 +1,10 @@
 from devtools import debug
-from typing import Union
 from zoneinfo import ZoneInfo
-from typing import Sequence
-import numpy as np
 import pvlib
 from datetime import datetime
-from math import sin
-from math import cos
-from math import acos
 from math import pi
 from math import isfinite
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarZenithPVLIBInputModel
@@ -26,14 +19,12 @@ def calculate_solar_zenith_pvlib(
         latitude: Latitude,     # degrees
         timestamp: datetime,
         timezone: ZoneInfo,
-        angle_output_units: str = 'radians',
+        # angle_output_units: str = 'radians',
     )-> SolarZenith:
     """Calculate the solar azimith (θ) in radians
     """
-    longitude = convert_to_degrees_if_requested(longitude, 'degrees')
-    latitude = convert_to_degrees_if_requested(latitude, 'degrees')
 
-    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.value, longitude.value)
+    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_zenith = solar_position['zenith'].values[0]
 
     if not isfinite(solar_zenith) or not 0 <= solar_zenith <= 180.836518:
@@ -43,6 +34,6 @@ def calculate_solar_zenith_pvlib(
             value=solar_zenith,
             unit='degrees',
             )
-    solar_zenith = convert_to_radians_if_requested(solar_zenith, angle_output_units)
+    # solar_zenith = convert_to_radians_if_requested(solar_zenith, angle_output_units)
 
     return solar_zenith

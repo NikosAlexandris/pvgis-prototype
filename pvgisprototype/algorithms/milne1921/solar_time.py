@@ -4,6 +4,7 @@ from rich import print
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 
 from math import radians
@@ -11,13 +12,13 @@ from math import degrees
 from math import sin
 from math import cos
 import numpy as np
+from zoneinfo import ZoneInfo
 
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype import SolarTime
 from pvgisprototype import Longitude
-from pvgisprototype import Latitude
+from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 
@@ -25,16 +26,15 @@ from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 @validate_with_pydantic(CalculateSolarTimeEoTInputModel)
 def calculate_apparent_solar_time_milne1921(
         longitude: Longitude,
-        latitude: Latitude,
         timestamp: datetime,
-        timezone: str = None,
-        days_in_a_year: float = 365.25,
-        perigee_offset: float = 0.048869,
-        eccentricity_correction_factor: float = 0.03344,
-        time_offset_global: float = 0,
-        hour_offset: float = 0,
+        timezone: ZoneInfo = None,
+        # days_in_a_year: float = 365.25,
+        # perigee_offset: float = 0.048869,
+        # eccentricity_correction_factor: float = 0.03344,          # FIXME: Are these usefull ?
+        # time_offset_global: float = 0,
+        # hour_offset: float = 0,
         verbose: int = 0,
-):
+) -> SolarTime:
     """Calculate the apparent solar time based on the equation of time by Milne 1921
 
     Notes
@@ -138,7 +138,7 @@ def calculate_apparent_solar_time_milne1921(
     # ------------------------------------------------------------------------
     # the following equation requires longitude in degrees!
     time_correction_factor = (
-        4 * (degrees(longitude.value) - local_standard_time_meridian) + equation_of_time
+        4 * (longitude.degrees - local_standard_time_meridian) + equation_of_time
     )
     time_correction_factor_hours = time_correction_factor / 60
     apparent_solar_time = timestamp + timedelta(hours=time_correction_factor_hours)

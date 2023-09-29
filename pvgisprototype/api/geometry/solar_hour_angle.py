@@ -6,26 +6,26 @@ from math import radians
 from math import acos
 from math import tan
 from datetime import time
-from pvgisprototype import HourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
-from pvgisprototype import HourAngle
+from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import CalculateHourAngleInputModel
 from pvgisprototype.validation.functions import CalculateHourAngleSunriseInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
+# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateHourAngleInputModel)
 def calculate_hour_angle(
-    solar_time: time,
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
-):
+    solar_time: SolarTime,
+    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+) -> SolarHourAngle:
     """Calculate the hour angle ω'
 
     ω = (ST / 3600 - 12) * 15 * pi / 180
@@ -140,9 +140,12 @@ def calculate_hour_angle(
 
     In this function:
     """
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = (solar_time_decimal_hours - 12) * radians(15)
-    hour_angle = HourAngle(value=hour_angle, unit='radians')
+    # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.timestamp)
+    hour_angle = radians(15) * (solar_time.as_hours - 12)
+    hour_angle = SolarHourAngle(value=hour_angle, unit='radians')
+    # hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
+
+    # debug(locals())
     return hour_angle
 
 
@@ -151,7 +154,7 @@ def calculate_hour_angle_sunrise(
     latitude: Latitude,
     surface_tilt: float = 0,
     solar_declination: float = 0,
-    angle_output_units: str = "radians",
+    # angle_output_units: str = "radians",
 ) -> HourAngleSunrise:
     """Calculate the hour angle (ω) at sunrise and sunset
 
@@ -189,7 +192,7 @@ def calculate_hour_angle_sunrise(
     ω = acos(-tan(Φ-β)*tan(δ))
     """
     hour_angle_sunrise = acos(
-        -tan(latitude.value - surface_tilt.value) * tan(solar_declination.value)
+        -tan(latitude.radians - surface_tilt.radians) * tan(solar_declination.radians)
     )
     hour_angle_sunrise = HourAngleSunrise(value=hour_angle_sunrise, unit="radians")
     # hour_angle_sunrise = convert_to_degrees_if_requested(

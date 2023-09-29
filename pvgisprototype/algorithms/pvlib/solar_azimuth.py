@@ -10,8 +10,7 @@ from math import cos
 from math import acos
 from math import pi
 from math import isfinite
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAzimuthPVLIBInputModel
@@ -26,14 +25,12 @@ def calculate_solar_azimuth_pvlib(
         latitude: Latitude,     # degrees
         timestamp: datetime,
         timezone: ZoneInfo,
-        angle_output_units: str = 'radians',
+        # angle_output_units: str = 'radians',
     )-> SolarAzimuth:
     """Calculate the solar azimith (θ) in radians
     """
-    longitude = convert_to_degrees_if_requested(longitude, 'degrees')
-    latitude = convert_to_degrees_if_requested(latitude, 'degrees')
 
-    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.value, longitude.value)
+    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_azimuth = solar_position['azimuth'].values[0]
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 360:
@@ -43,6 +40,6 @@ def calculate_solar_azimuth_pvlib(
             value=solar_azimuth,
             unit='degrees',
             )
-    solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
+    # solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
     return solar_azimuth

@@ -3,6 +3,7 @@ import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 from math import pi
 import ephem
@@ -24,7 +25,7 @@ def calculate_solar_time_ephem(
     timestamp: datetime,
     timezone: str = None,
     verbose: int = 0,
-  ):
+  )->SolarTime:
   """Calculate the solar time using PyEphem
 
   The position of the Sun in the sky changes slightly day to day due to the
@@ -103,8 +104,8 @@ def calculate_solar_time_ephem(
   latitude = latitude.value
   observer = ephem.Observer()
   observer.date = timestamp
-  observer.lon = longitude
-  observer.lat = latitude
+  observer.lon = longitude.degrees
+  observer.lat = latitude.degrees
   sidereal_time = observer.sidereal_time()
 
   sun = ephem.Sun()  # a Sun object
@@ -138,11 +139,22 @@ def calculate_solar_time_ephem(
   solar_time_decimal_hours = solar_time_hours * 24 / pi / 2  # convert to decimal hours
   solar_time_datetime = timestamp + timedelta(hours=solar_time_hours)
 
-  if verbose:
-      typer.echo(f'Local sidereal time: {sidereal_time}')
-      typer.echo(f'Sun right ascension: {sun.ra}')
-      typer.echo(f'Hour angle: {hour_angle}')
-      typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
-      typer.echo(f'Mean solar time: {mean_solar_time}')
+  solar_time = time(
+          # year=solar_time_datetime.year,
+          # month=solar_time_datetime.month,
+          # day=solar_time_datetime.day,
+          hour=int(solar_time_datetime.hour),
+          minute=int(solar_time_datetime.minute),
+          second=int(solar_time_datetime.second),
+          tzinfo=solar_time_datetime.tzinfo,
+          )
 
-  return solar_time_datetime
+  # if verbose:
+  #     typer.echo(f'Local sidereal time: {sidereal_time}')
+  #     typer.echo(f'Sun right ascension: {sun.ra}')
+  #     typer.echo(f'Hour angle: {hour_angle}')
+  #     typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
+  #     # typer.echo(f'Mean solar time: {solar_time}')
+
+  # debug(locals())
+  return SolarTime(value=solar_time, unit='timestamp')

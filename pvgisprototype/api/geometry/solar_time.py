@@ -5,17 +5,18 @@ from zoneinfo import ZoneInfo
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarTimeInputModel
-from pvgisprototype import SolarTime
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import SolarTime
 from .models import SolarTimeModels
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
 from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_noaa
 # from pvgisprototype.algorithms.noaa.solar_position import calculate_local_solar_time_noaa
 from pvgisprototype.algorithms.skyfield.solar_time import calculate_solar_time_skyfield
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME, UNITS_NAME
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -27,20 +28,20 @@ def model_solar_time(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: ZoneInfo = None,
+    timezone: ZoneInfo,
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    time_output_units: str = "minutes",
-    angle_units: str = "radians",
-    angle_output_units: str = "radians",
+    # time_output_units: str = "minutes",
+    # angle_units: str = "radians",
+    # angle_output_units: str = "radians",
     verbose: int = 0,
-):
+)->SolarTime:
     """Calculates the solar time and returns the calculated value and the units.
 
     Parameters
@@ -57,15 +58,15 @@ def model_solar_time(
 
         solar_time = calculate_apparent_solar_time_milne1921(
             longitude=longitude,
-            latitude=latitude,
+            # latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
-            verbose=verbose,
+            # days_in_a_year=days_in_a_year,
+            # perigee_offset=perigee_offset,
+            # eccentricity_correction_factor=eccentricity_correction_factor,
+            # time_offset_global=time_offset_global,
+            # hour_offset=hour_offset,                          # FIXME: Are these usefull?
+            # verbose=verbose,
         )
 
     if solar_time_model.value == SolarTimeModels.ephem:
@@ -85,8 +86,8 @@ def model_solar_time(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            time_offset_global=time_offset_global,
-            verbose=verbose,
+            # time_offset_global=time_offset_global,                          # FIXME: Are these usefull?
+            # verbose=verbose,
         )
 
     if solar_time_model.value == SolarTimeModels.noaa:
@@ -98,8 +99,8 @@ def model_solar_time(
             timezone=timezone,
             # refracted_solar_zenith=refracted_solar_zenith,
             # apply_atmospheric_refraction=apply_atmospheric_refraction,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
             # angle_output_units=angle_output_units,
             verbose=verbose,
         )
@@ -118,14 +119,12 @@ def model_solar_time(
 
     if solar_time_model.value == SolarTimeModels.skyfield:
 
-        longitude = convert_to_degrees_if_requested(longitude, 'degrees')
-        latitude = convert_to_degrees_if_requested(latitude, 'degrees')
         # vvv vvv vvv --------------------------------------- expects degrees!
         solar_time = calculate_solar_time_skyfield(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
+            longitude=longitude=longitude,
+            latitude=latitude=latitude,
+            timestamp=timestamp=timestamp,
+            timezone=timezone=timezone,
             verbose=verbose,
         )
         # ^^^ ^^^ ^^^ --------------------------------------- expects degrees!
@@ -137,17 +136,17 @@ def calculate_solar_time(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str = None,
+    timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,  # radians
     models: List[SolarTimeModels] = [SolarTimeModels.skyfield],
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,  # radians
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.03344,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    time_output_units: str = "minutes",
-    angle_units: str = "radians",
+    # time_output_units: str = "minutes",
+    # angle_units: str = "radians",
     angle_output_units: str = "radians",
     verbose: int = 0,
 ) -> List:
@@ -176,14 +175,14 @@ def calculate_solar_time(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                time_output_units=time_output_units,
-                angle_output_units=angle_output_units,
+                # time_output_units=time_output_units,
+                # angle_output_units=angle_output_units,
                 verbose=verbose,
             )
             results.append({
-                'Model': model,
-                'Solar time': solar_time,
-                # 'Units': solar_time,  # Don't trust me -- Redesign Me!
+                POSITION_ALGORITHM_NAME: model,
+                'Solar time': getattr(solar_time, angle_output_units),
+                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results

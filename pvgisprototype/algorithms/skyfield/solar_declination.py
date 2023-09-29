@@ -1,10 +1,19 @@
+from typing import Optional
 import skyfield
+from pvgisprototype.validation.functions import validate_with_pydantic
+from datetime import datetime
+from pvgisprototype.validation.functions import CalculateSolarDeclinationSkyfieldInput
+# from ...api.utilities.conversions import convert_to_radians_if_requested
+from pvgisprototype import SolarDeclination
 
 
-@validate_with_pydantic(CalculateSolarDeclinationSkyfieldInputModel)
-def calculate_solar_declination_skyfield(
+# NOTE gounaol: Skyfield solar declination is also computed by skyfield.solar_geometry.calculate_hour_angle_skyfield()
+
+@validate_with_pydantic(CalculateSolarDeclinationSkyfieldInput)
+def calculate_solar_declination_skyfield(      # NOTE gounaol: Declination is also calculated by skyfield.solar_geometry.calculate_hour_angle_skyfield
     timestamp: datetime,
-):
+    # angle_output_units: Optional[str] = 'radians'
+) -> SolarDeclination:
     """Calculate the solar declination using Skyfield
 
     Notes
@@ -30,4 +39,12 @@ def calculate_solar_declination_skyfield(
     solar_position = (earth).at(requested_timestamp).observe(sun).apparent()
     right_angle, solar_declination, distance_to_sun = solar_position.radec(epoch='date')
 
+    solar_declination = SolarDeclination(
+        value = solar_declination.degrees,
+        unit = 'degrees'
+    )
+    # solar_declination = convert_to_radians_if_requested(
+    #     solar_declination,
+    #     angle_output_units,
+    # )
     return solar_declination

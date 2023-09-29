@@ -22,10 +22,12 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
+from pvgisprototype import SolarTime
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
 
@@ -153,7 +155,7 @@ class BaseTimeOutputUnitsModel(BaseModel):
 # Angular units
 
 class BaseAngleUnitsModel(BaseModel):
-    angle_units: str
+    angle_units: str = 'radians'
 
     @field_validator("angle_units")
     @classmethod
@@ -232,12 +234,23 @@ class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
 
 
 class SolarTimeModel(BaseModel):
-    solar_time: Union[time, datetime]
+    solar_time: Union[time, SolarTime]
     model_config = ConfigDict(
         description="""The solar time (ST) is a calculation of the passage of time based
         on the position of the Sun in the sky. It is expected to be decimal hours in a
         24 hour format and measured internally in seconds.""",
     )
+
+    @field_validator("solar_time")
+    def validate_solar_time(cls, input) -> SolarTime:
+        if isinstance(input, SolarTime):
+            return input
+        elif isinstance(input, time):
+            return SolarTime(value=input, unit="timestamp")
+        else:
+            raise ValueError("Unsupported `solar_time` type provided")
+
+    
 
 
 # Solar surface
@@ -314,7 +327,7 @@ class SolarHourAngleSeriesModel(BaseModel):
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_hour_angle_series`")
 
 
-class ApplyAtmosphericRefraction(BaseModel):
+class ApplyAtmosphericRefractionModel(BaseModel):
     apply_atmospheric_refraction: bool
 
 
@@ -345,7 +358,7 @@ class RefractedSolarAltitudeSeriesModel(BaseModel):
 
 
 class RefractedSolarZenithModel(BaseModel):
-    refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith]
+    refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 
     @field_validator("refracted_solar_zenith")
     def validate_refracted_solar_zenith(cls, input) -> RefractedSolarZenith:
@@ -355,6 +368,7 @@ class RefractedSolarZenithModel(BaseModel):
             return RefractedSolarZenith(value=input, unit="radians")
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_zenith`")
+
 
 
 class ElevationModel(BaseModel):
