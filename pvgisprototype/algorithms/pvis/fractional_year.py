@@ -42,8 +42,8 @@ def days_in_year(year):
 @validate_with_pydantic(CalculateFractionalYearPVISInputModel)
 def calculate_fractional_year_pvis(
     timestamp: datetime,
-    angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    # angle_units: str = 'radians',
+    # angle_output_units: str = 'radians',
 ) -> FractionalYear:
     """Calculate fractional year in radians
 
@@ -70,6 +70,6 @@ def calculate_fractional_year_pvis(
         raise ValueError(f'Calculated fractional year {fractional_year} is out of the expected range [{FRACTIONAL_YEAR_MINIMUM}, {FRACTIONAL_YEAR_MAXIMUM}] radians')
 
     fractional_year = FractionalYear(value=fractional_year, unit='radians')
-    fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
+    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
             
     return fractional_year

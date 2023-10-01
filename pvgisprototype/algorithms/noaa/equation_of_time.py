@@ -27,7 +27,7 @@ def calculate_equation_of_time_noaa(
     """Calculate the equation of time in minutes"""
     fractional_year = calculate_fractional_year_noaa(
         timestamp=timestamp,
-        angle_output_units='radians'  # hardcoded intentionally
+        # angle_output_units='radians'  # hardcoded intentionally
     )
     equation_of_time_minutes = 229.18 * (
         0.000075

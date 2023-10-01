@@ -69,8 +69,8 @@ def model_solar_geometry_overview(
     days_in_a_year: float,
     perigee_offset: float,
     eccentricity_correction_factor: float,
-    time_output_units: str,
-    angle_units: str,
+    # time_output_units: str,
+    # angle_units: str,
     # angle_output_units: str,
     verbose: int = 0,
 ) -> Tuple[SolarAltitude, SolarAzimuth]:
@@ -120,7 +120,7 @@ def model_solar_geometry_overview(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
-            time_output_units=time_output_units,
+            # time_output_units=time_output_units,
             # angle_output_units=angle_output_units,
         )
         solar_zenith = calculate_solar_zenith_noaa(
@@ -136,7 +136,7 @@ def model_solar_geometry_overview(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            time_output_units=time_output_units,
+            # time_output_units=time_output_units,
             # angle_output_units=angle_output_units,
         )
         solar_azimuth = calculate_solar_azimuth_noaa(
@@ -145,7 +145,7 @@ def model_solar_geometry_overview(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            time_output_units=time_output_units,
+            # time_output_units=time_output_units,
             # angle_units=angle_units,
             # angle_output_units=angle_output_units,
         )
@@ -258,11 +258,15 @@ def model_solar_geometry_overview(
             perigee_offset=perigee_offset,
             # angle_output_units=angle_output_units,
         )
+        solar_time_eot = calculate_solar_time_eot(
+            longitude=longitude,
+            timestamp=timestamp,
+            timezone=timezone,
         )
-        # solar_hour_angle = calculate_hour_angle_pvis(
-        #     solar_time=timestamp,                           # FIXME gounaol: Is this correct?
-        #     angle_output_units=angle_output_units,
-        # )
+        solar_hour_angle = calculate_hour_angle_pvis(
+            solar_time=solar_time_eot,                           # FIXME gounaol: Is this correct?
+            # angle_output_units=angle_output_units,
+        )
         solar_altitude = calculate_solar_altitude_pvis(
             longitude=longitude,
             latitude=latitude,
@@ -276,8 +280,8 @@ def model_solar_geometry_overview(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_time_model=solar_time_model,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
             # angle_output_units=angle_output_units,
             )
         # ------------------------------------ TODO: calculate_solar_zenith_pvis
@@ -303,8 +307,8 @@ def model_solar_geometry_overview(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_time_model=solar_time_model,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
             # angle_output_units=angle_output_units,
         )
 
@@ -388,8 +392,8 @@ def calculate_solar_geometry_overview(
     eccentricity_correction_factor: float = 0.01672,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
+    # time_output_units: str = 'minutes',
+    # angle_units: str = 'radians',
     angle_output_units: str = 'radians',
     verbose: int = 0,
 ) -> List:
@@ -413,8 +417,8 @@ def calculate_solar_geometry_overview(
                 days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
-                time_output_units=time_output_units,
-                angle_units=angle_units,
+                # time_output_units=time_output_units,
+                # angle_units=angle_units,
                 # angle_output_units=angle_output_units,
                 verbose=verbose,
             )

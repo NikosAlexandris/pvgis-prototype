@@ -49,9 +49,9 @@ def model_solar_incidence(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: float = HOUR_OFFSET_DEFAULT,
-    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: str = "radians",
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    # time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
+    # angle_units: str = "radians",
+    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
     """ """
@@ -69,9 +69,9 @@ def model_solar_incidence(
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
+            # angle_output_units=angle_output_units,
         )
         # if not hour_angle:
         #     hour_angle = calculate_hour_angle(
@@ -91,15 +91,15 @@ def model_solar_incidence(
             days_in_a_year=days_in_a_year,
             eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
+            # angle_output_units=angle_output_units,
             verbose=verbose,
         )
-        solar_incidence = convert_to_degrees_if_requested(
-            solar_incidence,
-            angle_output_units,
-        )
+        # solar_incidence = convert_to_degrees_if_requested(
+        #     solar_incidence,
+        #     angle_output_units,
+        # )
 
     return solar_incidence
 
@@ -121,9 +121,9 @@ def calculate_solar_incidence(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: float = HOUR_OFFSET_DEFAULT,
-    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: str = "radians",
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    # time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
+    # angle_units: str = "radians",
+    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
@@ -147,9 +147,9 @@ def calculate_solar_incidence(
                 days_in_a_year=days_in_a_year,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 perigee_offset=perigee_offset,
-                time_output_units=time_output_units,
-                angle_units=angle_units,
-                angle_output_units=angle_output_units,
+                # time_output_units=time_output_units,
+                # angle_units=angle_units,
+                # angle_output_units=angle_output_units,
                 verbose=verbose,
             )
             results.append(

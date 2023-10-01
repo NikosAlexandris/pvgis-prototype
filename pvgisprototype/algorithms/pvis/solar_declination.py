@@ -4,7 +4,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarDeclination
 from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from math import sin
 from math import asin
 from pvgisprototype.constants import DAYS_IN_A_YEAR
@@ -58,8 +58,8 @@ def calculate_solar_declination_pvis(
     """
     fractional_year = calculate_fractional_year_pvis(
         timestamp=timestamp,
-        days_in_a_year=days_in_a_year,
-        angle_output_units="radians",
+        # days_in_a_year=days_in_a_year,
+        # angle_output_units="radians",
     )
     solar_declination = asin(
         0.3978

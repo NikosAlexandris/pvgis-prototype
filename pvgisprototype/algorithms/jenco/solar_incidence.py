@@ -50,7 +50,7 @@ def calculate_relative_longitude(
     latitude: Latitude,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
 ) -> RelativeLongitude:
     """
     Notes
@@ -104,7 +104,7 @@ def calculate_relative_longitude(
     relative_longitude = atan(tangent_relative_longitude)
     relative_longitude = RelativeLongitude(
         value=relative_longitude,
-        unit=angle_output_units,
+        unit='radians'     # angle_output_units,
     )
     return relative_longitude
 
@@ -125,9 +125,9 @@ def calculate_solar_incidence_jenco(
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: str = 'radians',
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    # time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
+    # angle_units: str = 'radians',
+    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
     """Calculate the solar incidence based on sun's position and surface geometry.
@@ -219,8 +219,8 @@ def calculate_solar_incidence_jenco(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
-            time_output_units=time_output_units,
-            angle_output_units=angle_output_units,
+            # time_output_units=time_output_units,
+            # angle_output_units=angle_output_units,
         )
         relative_longitude = calculate_relative_longitude(
             latitude=latitude,
