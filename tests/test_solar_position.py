@@ -13,6 +13,15 @@ from pvgisprototype.plot.plot_solar_position import plot_yearly_solar_position
 from pvgisprototype.plot.plot_solar_position import plot_analemma
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+from pvgisprototype.constants import (
+    ALGORITHM_NAME,
+    ALTITUDE_NAME,
+    DECLINATION_NAME,
+    ZENITH_NAME,
+    AZIMUTH_NAME,
+    INCIDENCE_NAME,
+    UNITS_NAME,
+)
 
 
 models = [
@@ -89,23 +98,23 @@ def test_calculate_solar_position(model):
         )
         print(f' Result : {solar_position}')
         for model_result in solar_position:
-            model_name = model_result.get('Model', None)
-            declination = model_result.get('Declination', None)
+            model_name = model_result.get(ALGORITHM_NAME, None)
+            declination = model_result.get(DECLINATION_NAME, None)
             if declination is not None:
                 assert isinstance(declination, float)
-            altitude = model_result.get('Altitude', None)
+            altitude = model_result.get(ALTITUDE_NAME, None)
             if altitude is not None:
                 assert isinstance(altitude, float)
-            azimuth = model_result.get('Azimuth', None)
+            azimuth = model_result.get(AZIMUTH_NAME, None)
             if azimuth is not None:
                 assert isinstance(azimuth, float)
-            zenith = model_result.get('Zenith', None)
+            zenith = model_result.get(ZENITH_NAME, None)
             if zenith is not None:
                 assert isinstance(zenith, float)
-            incidence = model_result.get('Incidence', None)
+            incidence = model_result.get(INCIDENCE_NAME, None)
             if incidence is not None:
                 assert isinstance(incidence, float)
-            units = model_result.get('Units', None)
+            units = model_result.get(UNITS_NAME, None)
             if units is not None:
                 assert isinstance(units, str)
 

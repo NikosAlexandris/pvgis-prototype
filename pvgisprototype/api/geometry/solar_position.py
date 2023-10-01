@@ -52,6 +52,15 @@ from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
+from pvgisprototype.constants import (
+    ALGORITHM_NAME,
+    ALTITUDE_NAME,
+    AZIMUTH_NAME,
+    DECLINATION_NAME,
+    HOUR_ANGLE_NAME,
+    ZENITH_NAME,
+    UNITS_NAME,
+)
 
 
 @validate_with_pydantic(ModelSolarPositionInputModel)
@@ -423,13 +432,14 @@ def calculate_solar_geometry_overview(
                 verbose=verbose,
             )
             results.append({
-                'Model': model.value,
-                'Declination' if solar_declination is not None else None: getattr(solar_declination, angle_output_units) if solar_declination is not None else None,
-                'Hour Angle' if solar_hour_angle is not None else None: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle is not None else None,
-                'Zenith' if solar_zenith is not None else None: getattr(solar_zenith, angle_output_units) if solar_zenith is not None else None,
-                'Altitude' if solar_altitude is not None else None: getattr(solar_altitude, angle_output_units) if solar_altitude is not None else None,
-                'Azimuth' if solar_azimuth is not None else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth is not None else None,
-                'Units': angle_output_units
+                ALGORITHM_NAME: model.value,
+                DECLINATION_NAME if solar_declination is not None else None: getattr(solar_declination, angle_output_units) if solar_declination is not None else None,
+                HOUR_ANGLE_NAME if solar_hour_angle is not None else None: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle is not None else None,
+                ZENITH_NAME if solar_zenith is not None else None: getattr(solar_zenith, angle_output_units) if solar_zenith is not None else None,
+                ALTITUDE_NAME if solar_altitude is not None else None: getattr(solar_altitude, angle_output_units) if solar_altitude is not None else None,
+                AZIMUTH_NAME if solar_azimuth is not None else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth is not None else None,
+                UNITS_NAME: angle_output_units,
+                'Solar Time Model': solar_time_model,
             })
 
     return results

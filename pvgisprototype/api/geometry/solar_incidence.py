@@ -26,6 +26,9 @@ from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import ALGORITHM_NAME
+from pvgisprototype.constants import INCIDENCE_NAME
+from pvgisprototype.constants import UNITS_NAME
 
 
 def model_solar_incidence(
@@ -154,9 +157,9 @@ def calculate_solar_incidence(
             )
             results.append(
                 {
-                    "Model": model.value,
-                    "Incidence": solar_incidence.value,
-                    "Units": solar_incidence.unit,  # Don't trust me -- Redesign Me!
+                    ALGORITHM_NAME: model.value,
+                    INCIDENCE_NAME: getattr(solar_incidence, angle_output_units),
+                    UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
                 }
             )
     return results

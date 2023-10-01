@@ -3,6 +3,15 @@ from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from .helpers import load_test_cases
 from pvgisprototype import RefractedSolarZenith
+from pvgisprototype.constants import (
+    ALGORITHM_NAME,
+    ALTITUDE_NAME,
+    AZIMUTH_NAME,
+    DECLINATION_NAME,
+    HOUR_ANGLE_NAME,
+    ZENITH_NAME,
+    UNITS_NAME,
+)
 
 
 test_cases = load_test_cases(
@@ -56,28 +65,28 @@ def test_calculate_solar_geometry_overview(
 
     for idx in range(len(models)):
         assert isinstance(calculated[idx], dict)
-        assert isinstance(calculated[idx]['Model'], str)
-        assert 'Declination' not in calculated[idx] or isinstance(calculated[idx]['Declination'], float)
-        assert 'Hour Angle' not in calculated[idx] or isinstance(calculated[idx]['Hour Angle'], float)
-        assert isinstance(calculated[idx]['Zenith'], float)
-        assert isinstance(calculated[idx]['Altitude'], float)
-        assert isinstance(calculated[idx]['Azimuth'], float)
-        assert isinstance(calculated[idx]['Units'], str)
+        assert isinstance(calculated[idx][ALGORITHM_NAME], str)
+        assert DECLINATION_NAME not in calculated[idx] or isinstance(calculated[idx][DECLINATION_NAME], float)
+        assert HOUR_ANGLE_NAME not in calculated[idx] or isinstance(calculated[idx][HOUR_ANGLE_NAME], float)
+        assert isinstance(calculated[idx][ZENITH_NAME], float)
+        assert isinstance(calculated[idx][ALTITUDE_NAME], float)
+        assert isinstance(calculated[idx][AZIMUTH_NAME], float)
+        assert isinstance(calculated[idx][UNITS_NAME], str)
 
         # Assert output
-        assert 'Declination' not in calculated[idx] or calculated[idx]['Declination'] == pytest.approx(
+        assert DECLINATION_NAME not in calculated[idx] or calculated[idx][DECLINATION_NAME] == pytest.approx(
             getattr(expected_declination, angle_output_units),
             tolerance,
             )
-        assert calculated[idx]['Altitude'] == pytest.approx(
+        assert calculated[idx][ALTITUDE_NAME] == pytest.approx(
             getattr(expected_altitude, angle_output_units),
             tolerance,
             )
         
-        if calculated[idx]['Model'] == 'NOAA':          # FIXME: Remove this when noaa-azimuth is fixed
+        if calculated[idx][ALGORITHM_NAME] == 'NOAA':          # FIXME: Remove this when noaa-azimuth is fixed
             continue
 
-        assert calculated[idx]['Azimuth'] == pytest.approx(
+        assert calculated[idx][AZIMUTH_NAME] == pytest.approx(
             getattr(expected_azimuth, angle_output_units),
             tolerance,
             )
