@@ -59,6 +59,7 @@ from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype import Longitude
+from pvgisprototype.constants import UNITS_NAME
 
 
 app = typer.Typer(
@@ -315,7 +316,7 @@ def uniplot(
     tufte_style: Annotated[bool, typer_option_tufte_style] = False,
     lines: bool = True,
     title: str = 'Uniplot',
-    unit: str = 'Units',  #" °C")
+    unit: str = UNITS_NAME,  #" °C")
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot time series in the terminal"""

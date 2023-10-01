@@ -29,6 +29,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_radians_if_reque
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_south_to_north_radians_convention
 from pvgisprototype.api.utilities.timestamp import attach_timezone
+from pvgisprototype.constants import ALGORITHM_NAME, AZIMUTH_NAME, UNITS_NAME
 
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
@@ -236,9 +237,9 @@ def calculate_solar_azimuth(
                 verbose=verbose,
             )
             results.append({
-                'Model': model.value,
-                'Azimuth': getattr(solar_azimuth, angle_output_units),
-                'Units': angle_output_units,  # Don't trust me -- Redesign Me!
+                ALGORITHM_NAME: model.value,
+                AZIMUTH_NAME: getattr(solar_azimuth, angle_output_units),
+                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results

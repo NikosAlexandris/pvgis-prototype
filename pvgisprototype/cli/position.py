@@ -90,6 +90,17 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from .rich_help_panel_names import rich_help_panel_advanced_options
+from .rich_help_panel_names import rich_help_panel_geometry_time
+from .rich_help_panel_names import rich_help_panel_geometry_position
+from .rich_help_panel_names import rich_help_panel_geometry_refraction
+from .rich_help_panel_names import rich_help_panel_geometry_surface
+from .rich_help_panel_names import rich_help_panel_solar_time
+from .rich_help_panel_names import rich_help_panel_earth_orbit
+from .rich_help_panel_names import rich_help_panel_atmospheric_properties
+from .rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.constants import ZENITH_NAME, ALTITUDE_NAME
+>>>>>>> 7e6280c (Add `solar time algorithm` in overview table)
 
 from .print import print_table
 from .print import print_solar_position_table
@@ -474,13 +485,14 @@ def zenith(
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
-
     solar_zenith = solar_altitude
     for model_result in solar_zenith:
-        if 'Zenith' not in model_result:
-            solar_altitude_angle = model_result.get('Altitude', None)
+        if ZENITH_NAME not in model_result:
+            solar_altitude_angle = model_result.get(ALTITUDE_NAME, None)
             if solar_altitude_angle is not None:
-                model_result['Zenith'] = calculate_zenith(angle_output_units, solar_altitude_angle)
+                model_result[ZENITH_NAME] = calculate_zenith(angle_output_units, solar_altitude_angle)
+
+
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -701,9 +713,8 @@ def hour_angle(
     #
 
     hour_angle = calculate_hour_angle(
-<<<<<<< HEAD
         solar_time=solar_time,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
     from pvgisprototype.cli.print import print_hour_angle_table_2
@@ -713,12 +724,7 @@ def hour_angle(
         hour_angle=hour_angle.value,
         units=hour_angle.unit,
     )
-=======
-            solar_time=solar_time,
-            # angle_output_units=angle_output_units,
-            )
     typer.echo(f'Hour angle: {getattr(hour_angle, angle_output_units)} {angle_output_units}')
->>>>>>> e43b0f7 (In `solar geometry overview` comment out everything related to:)
 
 
 @app.command('sunrise', no_args_is_help=True, help=':sunrise: Calculate the hour angle (ω) at sun rise and set')

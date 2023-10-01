@@ -20,6 +20,8 @@ from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import ALGORITHM_NAME
+from pvgisprototype.constants import UNITS_NAME
 
 
 @validate_with_pydantic(ModelSolarTimeInputModel)
@@ -166,9 +168,9 @@ def calculate_solar_time(
                 verbose=verbose,
             )
             results.append({
-                'Model': model,
+                ALGORITHM_NAME: model,
                 'Solar time': getattr(solar_time, angle_output_units),
-                'Units': angle_output_units,  # Don't trust me -- Redesign Me!
+                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results
