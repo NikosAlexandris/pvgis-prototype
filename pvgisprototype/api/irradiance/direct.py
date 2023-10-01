@@ -611,15 +611,15 @@ def calculate_direct_inclined_irradiance_pvgis(
                              * sin(half_pi + surface_orientation)
                              + sin(latitude)
                              * sin(half_pi - surface_tilt)
-    """
-    # Notes
-    # -----
-    #           B   ⋅ sin ⎛δ   ⎞                    
-    #            hc       ⎝ exp⎠         ⎛ W ⎞
-    #     B   = ────────────────     in  ⎜───⎟
-    #      ic       sin ⎛h ⎞             ⎜ -2⎟           
-    #                   ⎝ 0⎠             ⎝m  ⎠           
+    Additional Notes
+    ----------------
 
+              B   ⋅ sin ⎛δ   ⎞                    
+               hc       ⎝ exp⎠         ⎛ W ⎞
+        B   = ────────────────     in  ⎜───⎟
+         ic       sin ⎛h ⎞             ⎜ -2⎟           
+                      ⎝ 0⎠             ⎝m  ⎠           
+    """
     solar_altitude = model_solar_altitude(
         longitude=longitude,
         latitude=latitude,

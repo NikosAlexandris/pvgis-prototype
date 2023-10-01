@@ -50,9 +50,10 @@ def calculate_solar_hour_angle_pvis(
 
         where the solar time was given in seconds.
     """
-    true_solar_time_minutes = timestamp_to_minutes(solar_time)
-    hour_angle = (true_solar_time_minutes / 60 - 12) * 15 * pi / 180
-    hour_angle = HourAngle(value=hour_angle, unit='radians')
+    # true_solar_time_minutes = timestamp_to_minutes(solar_time)
+    # hour_angle = (true_solar_time_minutes / 60 - 12) * 15 * pi / 180
+    hour_angle = (solar_time.as_hours - 12) * 15 * (np.pi / 180)
+    hour_angle = HourAngle(input=hour_angle, unit='radians')
     hour_angle = convert_to_degrees_if_requested(
         hour_angle,
         angle_output_units,
