@@ -13,17 +13,17 @@ from pvgisprototype import HourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import CalculateHourAngleInputModel
 from pvgisprototype.validation.functions import CalculateHourAngleSunriseInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
-# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateHourAngleInputModel)
 def calculate_hour_angle(
-    solar_time: time,
+    solar_time: SolarTime,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
 ):
     """Calculate the hour angle ω'

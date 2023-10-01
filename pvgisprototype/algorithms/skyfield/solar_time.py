@@ -2,6 +2,7 @@ import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
+from datetime import time
 from datetime import time as datetime_time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
@@ -31,7 +32,7 @@ def calculate_solar_time_skyfield(
         timestamp: datetime,
         timezone: str = None,
         verbose: int = 0,
-    )->datetime:
+    )->SolarTime:
 
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -77,10 +78,10 @@ def calculate_solar_time_skyfield(
     minutes = int((hours_since_solar_noon - hours) * 60)
     seconds = int(((hours_since_solar_noon - hours) * 60 - minutes) * 60)
     # local_solar_time = datetime_time(hours, minutes, seconds)
-    local_solar_time = datetime(
-            year=timestamp.year,
-            month=timestamp.month,
-            day=timestamp.day,
+    local_solar_time = time(
+            # year=timestamp.year,
+            # month=timestamp.month,
+            # day=timestamp.day,
             hour=int(hours),
             minute=int(minutes),
             second=int(seconds),
@@ -97,4 +98,4 @@ def calculate_solar_time_skyfield(
         next_solar_noon_string = next_solar_noon.astimezone(timezone).strftime('%Y-%m-%d %H:%M:%S')
         typer.echo(f'Next solar noon: {next_solar_noon_string}')
 
-    return local_solar_time
+    return SolarTime(value=local_solar_time, unit='timestamp')

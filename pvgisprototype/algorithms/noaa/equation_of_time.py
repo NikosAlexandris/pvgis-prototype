@@ -1,5 +1,5 @@
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeNOAAInput
+from pvgisprototype.validation.functions import CalculateEquationOfTimeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
 from datetime import datetime
 from datetime import timedelta
@@ -22,7 +22,7 @@ EQUATIONOFTIME_UNITS = 'minutes'
 @validate_with_pydantic(CalculateEquationOfTimeNOAAInput)
 def calculate_equation_of_time_noaa(
     timestamp: datetime,
-    time_output_units: str = 'minutes',
+    # time_output_units: str = 'minutes',
 ) -> EquationOfTime:
     """Calculate the equation of time in minutes"""
     fractional_year = calculate_fractional_year_noaa(
@@ -40,7 +40,7 @@ def calculate_equation_of_time_noaa(
 
     equation_of_time = EquationOfTime(value=equation_of_time_timedelta, unit='timedelta')
 
-    if not EQUATIONOFTIME_MINIMUM <= equation_of_time.minutes <= EQUATIONOFTIME_MAXIMUM:
+    if not EQUATIONOFTIME_MINIMUM <= equation_of_time.as_minutes <= EQUATIONOFTIME_MAXIMUM:
         raise ValueError("The calculated equation of time is out of the expected range [{EQUATIONOFTIME_MINIMUM}, {EQUATIONOFTIME_MAXIMUM}] {EQUATIONOFTIME_UNITS}")
 
     return equation_of_time

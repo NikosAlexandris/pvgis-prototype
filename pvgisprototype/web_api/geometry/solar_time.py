@@ -39,21 +39,21 @@ async def get_calculate_solar_time(
     
     # debug(locals())
     solar_time  = calculate_solar_time(
-            longitude,
-            latitude,
-            timestamp,
-            timezone,
-            model,
-            refracted_solar_zenith,
-            apply_atmospheric_refraction,
-            time_output_units,
-            angle_units,
-            angle_output_units,
-            days_in_a_year,
-            perigee_offset,
-            eccentricity_correction_factor,
-            time_offset_global,
-            hour_offset,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=model,
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            time_output_units=time_output_units,
+            angle_units=angle_units,
+            angle_output_units=angle_output_units,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset,
             )
     # debug(locals())
     return {"Local solar time": solar_time}
