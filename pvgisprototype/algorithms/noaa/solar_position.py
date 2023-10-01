@@ -73,7 +73,7 @@ def calculate_noaa_solar_position(
     )
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
-        time_output_units=time_output_units,
+        # time_output_units=time_output_units,
         angle_units=angle_units,
     )
     solar_declination = calculate_solar_declination_noaa(
@@ -84,14 +84,14 @@ def calculate_noaa_solar_position(
     time_offset = calculate_time_offset_noaa(
         longitude=longitude,
         timestamp=timestamp,
-        time_output_units=time_output_units,  # for calculate_equation_of_time_noaa()
+        # time_output_units=time_output_units,  # for calculate_equation_of_time_noaa()
         angle_units=angle_units,  # for calculate_equation_of_time_noaa()
     )
     true_solar_time = calculate_true_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        time_output_units=time_output_units,
+        # time_output_units=time_output_units,
     )  # in minutes
     solar_hour_angle = calculate_solar_hour_angle_noaa(
         longitude=longitude,

@@ -4,6 +4,7 @@ from rich import print
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 
 from math import radians
@@ -16,9 +17,8 @@ from zoneinfo import ZoneInfo
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype import SolarTime
 from pvgisprototype import Longitude
-from pvgisprototype import Latitude
+from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 

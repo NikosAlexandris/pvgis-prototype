@@ -13,7 +13,7 @@ from .cases.equation_of_time import tolerances
 def test_calculate_equation_of_time_noaa(
     timestamp, time_output_units, expected, tolerance
 ):
-    calculated = calculate_equation_of_time_noaa(timestamp, time_output_units)
+    calculated = calculate_equation_of_time_noaa(timestamp)
     assert pytest.approx(expected, abs=tolerance) == calculated.value
     assert time_output_units == calculated.unit
 

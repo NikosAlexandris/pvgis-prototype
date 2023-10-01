@@ -54,7 +54,7 @@ def model_solar_azimuth(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = 'minutes',
     angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    # angle_output_units: str = 'radians',
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarAzimuth:
     """
@@ -89,7 +89,7 @@ def model_solar_azimuth(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             time_output_units=time_output_units,
             # angle_units=angle_units,
-            angle_output_units=angle_output_units,
+            # angle_output_units=angle_output_units,
             verbose=verbose,
         )
     
@@ -100,7 +100,7 @@ def model_solar_azimuth(
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
-                angle_output_units=angle_output_units,
+                # angle_output_units=angle_output_units,
                 )
 
     if model.value == SolarPositionModels.suncalc:
@@ -114,9 +114,9 @@ def model_solar_azimuth(
             solar_azimuth_south_radians_convention
         )
         solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="radians")
-        solar_azimuth = convert_to_degrees_if_requested(
-            solar_azimuth, angle_output_units
-        )
+        # solar_azimuth = convert_to_degrees_if_requested(
+        #     solar_azimuth, angle_output_units
+        # )
 
     if model.value == SolarPositionModels.pysolar:
 
@@ -129,9 +129,9 @@ def model_solar_azimuth(
         )  # returns degrees by default
         # required by output function
         solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="degrees")
-        solar_azimuth = convert_to_radians_if_requested(
-            solar_azimuth, angle_output_units
-        )
+        # solar_azimuth = convert_to_radians_if_requested(
+        #     solar_azimuth, angle_output_units
+        # )
 
     if model.value  == SolarPositionModels.pvis:
 
@@ -150,7 +150,7 @@ def model_solar_azimuth(
             solar_time_model=solar_time_model,
             time_output_units=time_output_units,
             angle_units=angle_units,
-            angle_output_units=angle_output_units,
+            # angle_output_units=angle_output_units,
         )
 
     if model.value  == SolarPositionModels.pvlib:
@@ -160,7 +160,7 @@ def model_solar_azimuth(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            angle_output_units=angle_output_units,
+            # angle_output_units=angle_output_units,
         )
 
     # if model.value  == SolarPositionModels.pvgis:
@@ -232,7 +232,7 @@ def calculate_solar_azimuth(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 time_output_units=time_output_units,
                 angle_units=angle_units,
-                angle_output_units=angle_output_units,
+                # angle_output_units=angle_output_units,
                 verbose=verbose,
             )
             results.append({

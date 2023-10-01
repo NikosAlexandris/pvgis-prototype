@@ -1,6 +1,6 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeNOAAInput
+from pvgisprototype.validation.functions import CalculateTrueSolarTimeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import TrueSolarTime
@@ -20,7 +20,7 @@ def calculate_true_solar_time_noaa(
     longitude: Longitude,   # radians
     timestamp: datetime, 
     timezone: Optional[ZoneInfo],
-    time_output_units: str = 'minutes',
+    # time_output_units: str = 'minutes',
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> datetime:
     """Calculate the true solar time.
@@ -86,10 +86,11 @@ def calculate_true_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        time_output_units='minutes',
+        # time_output_units='minutes',
         )  # in minutes
     time_offset_timedelta = timedelta(minutes=time_offset.value)
     true_solar_time = timestamp + time_offset_timedelta
+
     if time_output_units == 'minutes':
         # if not 0 <= true_solar_time <= 1440:
         # if not 0 <= true_solar_time <= 1580:
@@ -119,11 +120,11 @@ def calculate_true_solar_time_time_series_noaa(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
-            time_output_units=time_output_units,
+            # time_output_units=time_output_units,
             angle_units=angle_units,
         )  # in minutes
         true_solar_time = (
-            timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.minutes
+            timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.as_minutes
         )
 
         if time_output_units == 'minutes':

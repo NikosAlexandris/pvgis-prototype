@@ -44,7 +44,7 @@ def calculate_solar_azimuth_pvis(
     solar_time_model: SolarTimeModels,
     time_output_units: str,
     angle_units: str,
-    angle_output_units: str,
+    # angle_output_units: str,
 ) -> SolarAzimuth:
     """Compute various solar geometry variables.
 
@@ -64,7 +64,7 @@ def calculate_solar_azimuth_pvis(
     """
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     C11 = sin(latitude.radians) * cos(solar_declination.radians)
     C13 = -cos(latitude.radians) * sin(solar_declination.radians)
@@ -86,11 +86,11 @@ def calculate_solar_azimuth_pvis(
         hour_offset=hour_offset,
         time_output_units=time_output_units,
         angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     hour_angle = calculate_hour_angle(
         solar_time=solar_time,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     cosine_solar_azimuth = (C11 * cos(hour_angle.radians + C13)) / pow(
         pow((C22 * sin(hour_angle.radians)), 2)
@@ -104,6 +104,6 @@ def calculate_solar_azimuth_pvis(
     # convert east to north zero degrees convention --------------------------
 
     solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="radians") # zero_direction='East'
-    solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
+    # solar_azimuth = convert_to_degrees_if_requested(solar_azimuth, angle_output_units)
 
     return solar_azimuth

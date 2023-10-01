@@ -80,11 +80,11 @@ EccentricityCorrectionFactor:
 
 SolarTime:
   value:
-    type: Optional[float]
+    type: Optional[time]
     initial:
   unit:
-    type: Optional[str]
-    initial:
+    type: str
+    initial: time
 
 TrueSolarTime:
   value:

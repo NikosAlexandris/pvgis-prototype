@@ -72,7 +72,7 @@ def calculate_solar_altitude_pvis(
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     C31 = cos(latitude.radians) * cos(solar_declination.radians)
     C33 = sin(latitude.radians) * sin(solar_declination.radians)

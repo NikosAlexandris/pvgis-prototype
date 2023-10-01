@@ -17,12 +17,7 @@ class CalculateSolarDeclinationSkyfieldInputModel(
     pass
 
 
-class CalculateSolarAltitudeAzimuthSkyfieldInputModel(
-    BaseCoordinatesModel,
-    BaseTimeModel,
-    BaseAngleOutputUnitsModel,
-):
-    pass
+
 
 
 class CalculateSolarPositionSkyfieldInputModel(  # Angle output units are not usefull for solar position
