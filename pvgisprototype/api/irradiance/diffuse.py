@@ -65,7 +65,7 @@ from math import pi
 from math import atan2
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from ..geometry.solar_time import model_solar_time
-from ..utilities.timestamp import timestamp_to_decimal_hours
+# from ..utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_time_series
@@ -591,9 +591,10 @@ def calculate_diffuse_inclined_irradiance(
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
         )
-        solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-        hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
-        solar_incidence_angle = calculate_solar_incidence_pvis(
+        # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
+        # hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+        hour_angle = (solar_time.as_hours - 12)  *  np.radians(15)
+        solar_incidence_angle = calculate_solar_incidence(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
