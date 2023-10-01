@@ -74,7 +74,7 @@ def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
 
 class CalculateFractionalYearPVISInputModel(
     BaseTimestampModel,
-    BaseAngleInternalUnitsModel,
+    # BaseAngleInternalUnitsModel,
 ):
     pass
 
@@ -126,7 +126,7 @@ class ModelSolarTimeTimeSeriesInputModel(
     TimeOffsetModel,
     HourOffsetModel,
     SolarTimeModelModel,
-    BaseTimeOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
     # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
@@ -202,7 +202,7 @@ class SolarHourAnglePvisInput(
 class CalculateSolarHourAngleNOAAInput(
     LongitudeModel,
     BaseTimeModel,
-    BaseTimeOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
     # BaseAngleOutputUnitsModel,
 ):
     pass
@@ -220,7 +220,7 @@ class CalculateHourAngleSunriseInputModel(
     LatitudeModel,
     SurfaceTiltModel,
     SolarDeclinationModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -259,8 +259,8 @@ class CalculateSolarAltitudePVISInputModel(
     TimeOffsetModel,
     HourOffsetModel,
     SolarTimeModelModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
     # BaseAngleOutputUnitsModel,
 ):
     pass
@@ -278,7 +278,7 @@ class CalculateSolarAltitudeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
     ApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
     # BaseAngleOutputUnitsModel,
 ):
     pass
@@ -338,8 +338,8 @@ class CalculateSolarAzimuthPVISInputModel(
     TimeOffsetModel,
     HourOffsetModel,
     SolarTimeModelModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
     # BaseAngleOutputUnitsModel,
 ):
     pass
@@ -354,6 +354,7 @@ class ModelSolarAltitudeInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
+<<<<<<< HEAD
     HourOffsetModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
@@ -374,6 +375,10 @@ class ModelSolarAltitudeTimeSeriesInputModel(
     HourOffsetModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
+=======
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+>>>>>>> 77a00b7 (Comment out the following pydantic-models in the pydantic-inputs:)
     # BaseAngleOutputUnitsModel,
 ):
     pass
@@ -388,9 +393,14 @@ class ModelSolarAzimuthInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
+<<<<<<< HEAD
     HourOffsetModel,
     BaseTimeOutputUnitsModel,
     BaseAngleUnitsModel,
+=======
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+>>>>>>> 77a00b7 (Comment out the following pydantic-models in the pydantic-inputs:)
     # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
@@ -407,8 +417,8 @@ class ModelSolarPositionInputModel(
     EarthOrbitModel,
     TimeOffsetModel,
     HourOffsetModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
     # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
@@ -430,7 +440,7 @@ class CalculateSolarIncidenceInputModel(
     SolarDeclinationModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -448,7 +458,7 @@ class CalculateSolarIncidencePVISInputModel(
 class CalculateSolarIncidenceJencoInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    SolarHourAngleModel,
+    # SolarHourAngleModel,
     RandomTimeModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
