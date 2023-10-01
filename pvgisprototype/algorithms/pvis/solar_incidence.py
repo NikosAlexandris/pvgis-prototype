@@ -38,7 +38,7 @@ def calculate_solar_incidence_pvis(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = 'minutes',
     angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    # angle_output_units: str = 'radians',
 ) -> SolarIncidence:
     """Calculate the angle of incidence (θ) between the direction of the sun
     ray and the line normal to the surface measured in radian.
@@ -142,4 +142,4 @@ def calculate_solar_incidence_pvis(
         * sin(surface_tilt.radians)
     )
 
-    return SolarIncidence(value=solar_incidence, unit=angle_output_units)
+    return SolarIncidence(value=solar_incidence, unit='radians')

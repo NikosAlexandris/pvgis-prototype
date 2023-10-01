@@ -23,13 +23,8 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 @validate_with_pydantic(CalculateHourAngleInputModel)
 def calculate_hour_angle(
     solar_time: SolarTime,
-<<<<<<< HEAD
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
-):
-=======
-    angle_output_units: str = "radians",
+    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
 ) -> SolarHourAngle:
->>>>>>> 4f02c26 (Replace parameter HourAngle with SolarHourAngle and remove HourAngle)
     """Calculate the hour angle ω'
 
     ω = (ST / 3600 - 12) * 15 * pi / 180
@@ -144,17 +139,10 @@ def calculate_hour_angle(
 
     In this function:
     """
-<<<<<<< HEAD
     # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     # hour_angle = (solar_time_decimal_hours - 12) * radians(15)
     hour_angle = (solar_time.as_hours - 12) * radians(15)
-    hour_angle = HourAngle(value=hour_angle, unit='radians')
-=======
-    # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.timestamp)
-    hour_angle = radians(15) * (solar_time.as_hours - 12)
     hour_angle = SolarHourAngle(value=hour_angle, unit='radians')
->>>>>>> 4f02c26 (Replace parameter HourAngle with SolarHourAngle and remove HourAngle)
-    hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
 
     return hour_angle
 
@@ -164,7 +152,7 @@ def calculate_hour_angle_sunrise(
     latitude: Latitude,
     surface_tilt: float = 0,
     solar_declination: float = 0,
-    angle_output_units: str = "radians",
+    # angle_output_units: str = "radians",
 ) -> HourAngleSunrise:
     """Calculate the hour angle (ω) at sunrise and sunset
 
@@ -205,9 +193,9 @@ def calculate_hour_angle_sunrise(
         -tan(latitude.radians - surface_tilt.radians) * tan(solar_declination.radians)
     )
     hour_angle_sunrise = HourAngleSunrise(value=hour_angle_sunrise, unit="radians")
-    hour_angle_sunrise = convert_to_degrees_if_requested(
-        hour_angle_sunrise,
-        angle_output_units,
-    )
+    # hour_angle_sunrise = convert_to_degrees_if_requested(
+    #     hour_angle_sunrise,
+    #     angle_output_units,
+    # )
 
     return hour_angle_sunrise

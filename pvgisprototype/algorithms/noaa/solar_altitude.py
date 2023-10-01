@@ -29,7 +29,7 @@ def calculate_solar_altitude_noaa(
         timestamp: datetime,
         timezone: ZoneInfo,
         apply_atmospheric_refraction: bool = True,
-        time_output_units: str = 'minutes',
+        # time_output_units: str = 'minutes',
         # angle_output_units: str = 'radians',
     )-> SolarAltitude:
     """Calculate the solar zenith angle (φ) in radians
@@ -38,7 +38,7 @@ def calculate_solar_altitude_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        time_output_units=time_output_units,
+        # time_output_units=time_output_units,
         # angle_output_units='radians',
     )
     solar_zenith = calculate_solar_zenith_noaa(

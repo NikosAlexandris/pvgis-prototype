@@ -26,8 +26,8 @@ def calculate_event_time_noaa(
     event: str,
     refracted_solar_zenith: RefractedSolarZenith,  # radians
     apply_atmospheric_refraction: bool = False,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
+    # time_output_units: str = 'minutes',
+    # angle_units: str = 'radians',
     # angle_output_units: str = 'radians',
 )-> EventTime:
     """Calculate the sunrise or sunset
@@ -90,13 +90,13 @@ def calculate_event_time_noaa(
             latitude=latitude,
             timestamp=timestamp,
             refracted_solar_zenith=refracted_solar_zenith,
-            angle_units=angle_units,
+            # angle_units=angle_units,
             # angle_output_units=angle_output_units,
             )
     equation_of_time = calculate_equation_of_time_noaa(
             timestamp=timestamp,
             # time_output_units=time_output_units,
-            angle_units=angle_units,
+            # angle_units=angle_units,
             )  # minutes
     # 2 * pi radians equals a circle, 360 degrees or 24 hours
     # 60 minutes * 24 hours = 1440 minutes (in 24 hours or a day)

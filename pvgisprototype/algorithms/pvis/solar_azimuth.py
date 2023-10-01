@@ -19,7 +19,7 @@ from pvgisprototype.api.geometry.solar_declination import calculate_solar_declin
 from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 # from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 def convert_east_to_north_radians_convention(azimuth_east_radians):
@@ -42,8 +42,8 @@ def calculate_solar_azimuth_pvis(
     time_offset_global: int,
     hour_offset: int,
     solar_time_model: SolarTimeModels,
-    time_output_units: str,
-    angle_units: str,
+    # time_output_units: str,
+    # angle_units: str,
     # angle_output_units: str,
 ) -> SolarAzimuth:
     """Compute various solar geometry variables.
@@ -84,8 +84,8 @@ def calculate_solar_azimuth_pvis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
         # angle_output_units=angle_output_units,
     )
     hour_angle = calculate_hour_angle(

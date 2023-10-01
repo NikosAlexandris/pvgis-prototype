@@ -16,7 +16,7 @@ from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
@@ -33,9 +33,9 @@ def calculate_solar_altitude_pvis(
     time_offset_global: int,
     hour_offset: int,
     solar_time_model: SolarTimeModels,
-    time_output_units: str,
-    angle_units: str,
-    angle_output_units: str,
+    # time_output_units: str,
+    # angle_units: str,
+    # angle_output_units: str,
     verbose: int = 0,
 ) -> SolarAltitude:
     """Compute various solar geometry variables.
@@ -89,9 +89,9 @@ def calculate_solar_altitude_pvis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
     )
     hour_angle = calculate_hour_angle(
             solar_time=solar_time,
@@ -100,7 +100,7 @@ def calculate_solar_altitude_pvis(
     sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
     solar_altitude = asin(sine_solar_altitude)
     solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
-    solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
+    # solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
     if verbose == 3:
         debug(locals())
