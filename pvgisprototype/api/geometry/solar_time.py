@@ -20,7 +20,8 @@ from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import ALGORITHM_NAME
+from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import UNITS_NAME
 
 
@@ -168,7 +169,7 @@ def calculate_solar_time(
                 verbose=verbose,
             )
             results.append({
-                ALGORITHM_NAME: model,
+                POSITION_ALGORITHM_NAME: model,
                 'Solar time': getattr(solar_time, angle_output_units),
                 UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })

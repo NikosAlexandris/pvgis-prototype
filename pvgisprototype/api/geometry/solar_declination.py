@@ -27,6 +27,9 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import ALGORITHM_NAME
 from pvgisprototype.constants import DECLINATION_NAME
 from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME
+from pvgisprototype.constants import DECLINATION_NAME
+from pvgisprototype.constants import UNITS_NAME
 
 
 def model_solar_declination(
@@ -107,7 +110,7 @@ def calculate_solar_declination(
                 # angle_output_units=angle_output_units,
             )
             results.append({
-                ALGORITHM_NAME: model.value,
+                POSITION_ALGORITHM_NAME: model.value,
                 DECLINATION_NAME: getattr(solar_declination, angle_output_units),
                 UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })
