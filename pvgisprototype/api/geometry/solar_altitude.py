@@ -30,7 +30,7 @@ import pysolar
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
-from pvgisprototype.constants import ALGORITHM_NAME, ALTITUDE_NAME, UNITS_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME, ALTITUDE_NAME, UNITS_NAME
 
 
 @validate_with_pydantic(ModelSolarAltitudeInputModel)
@@ -205,7 +205,7 @@ def calculate_solar_altitude(
                 verbose=verbose,
             )
             results.append({
-                ALGORITHM_NAME: model.value,
+                POSITION_ALGORITHM_NAME: model.value,
                 ALTITUDE_NAME: getattr(solar_altitude, angle_output_units),
                 UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
             })
