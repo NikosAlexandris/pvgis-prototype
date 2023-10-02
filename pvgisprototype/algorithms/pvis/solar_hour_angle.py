@@ -61,7 +61,7 @@ def calculate_hour_angle_sunrise(  # rename to: calculate_event_hour_angle
         latitude: Latitude,
         surface_tilt: float = 0,
         solar_declination: float = 0,
-        angle_output_units: str = 'radians',
+        # angle_output_units: str = 'radians',
     ) -> HourAngleSunrise:
     """Calculate the hour angle (ω) at sunrise and sunset
 

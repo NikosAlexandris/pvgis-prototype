@@ -36,9 +36,8 @@ def calculate_solar_incidence_pvis(
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
-    # angle_output_units: str = 'radians',
+    # time_output_units: str = 'minutes',
+    # angle_units: str = 'radians',
 ) -> SolarIncidence:
     """Calculate the angle of incidence (θ) between the direction of the sun
     ray and the line normal to the surface measured in radian.
@@ -94,7 +93,7 @@ def calculate_solar_incidence_pvis(
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     solar_time = model_solar_time(
         longitude=longitude,
@@ -109,13 +108,13 @@ def calculate_solar_incidence_pvis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
     )
     hour_angle = calculate_solar_hour_angle_pvis(
         solar_time=solar_time,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     solar_incidence = acos(
         sin(latitude.radians)
