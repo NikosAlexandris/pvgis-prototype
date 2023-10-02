@@ -40,7 +40,7 @@ from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_azimut
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
-from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_hour_angle_pvis
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_hour_angle_skyfield
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 from pvgisprototype.algorithms.skyfield.solar_declination import calculate_solar_declination_skyfield
@@ -50,7 +50,7 @@ from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_de
 from pvgisprototype.algorithms.pvlib.solar_hour_angle import calculate_solar_hour_angle_pvlib
 from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_pvlib
 # from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
-from pvgisprototype.algorithms.milne1921.solar_time import calculate_solar_time_eot
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from pvgisprototype.constants import (
     POSITION_ALGORITHM_NAME,
@@ -268,13 +268,13 @@ def model_solar_geometry_overview(
             perigee_offset=perigee_offset,
             # angle_output_units=angle_output_units,
         )
-        solar_time_eot = calculate_solar_time_eot(
+        solar_time_milne1921 = calculate_apparent_solar_time_milne1921(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
         )
-        solar_hour_angle = calculate_hour_angle_pvis(
-            solar_time=solar_time_eot,                           # FIXME gounaol: Is this correct?
+        solar_hour_angle = calculate_solar_hour_angle_pvis(
+            solar_time=solar_time_milne1921,                           # FIXME gounaol: Is this correct?
             # angle_output_units=angle_output_units,
         )
         solar_altitude = calculate_solar_altitude_pvis(
@@ -433,14 +433,14 @@ def calculate_solar_geometry_overview(
                 verbose=verbose,
             )
             results.append({
-                POSITION_ALGORITHM_NAME: model.value,
-                DECLINATION_NAME if solar_declination is not None else None: getattr(solar_declination, angle_output_units) if solar_declination is not None else None,
-                HOUR_ANGLE_NAME if solar_hour_angle is not None else None: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle is not None else None,
-                ZENITH_NAME if solar_zenith is not None else None: getattr(solar_zenith, angle_output_units) if solar_zenith is not None else None,
-                ALTITUDE_NAME if solar_altitude is not None else None: getattr(solar_altitude, angle_output_units) if solar_altitude is not None else None,
-                AZIMUTH_NAME if solar_azimuth is not None else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth is not None else None,
-                UNITS_NAME: angle_output_units,
                 TIME_ALGORITHM_NAME: solar_time_model,
+                DECLINATION_NAME if solar_declination else None: getattr(solar_declination, angle_output_units) if solar_declination else None,
+                HOUR_ANGLE_NAME if solar_hour_angle else None: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle else None,
+                POSITION_ALGORITHM_NAME: model.value,
+                ZENITH_NAME if solar_zenith else None: getattr(solar_zenith, angle_output_units) if solar_zenith else None,
+                ALTITUDE_NAME if solar_altitude else None: getattr(solar_altitude, angle_output_units) if solar_altitude else None,
+                AZIMUTH_NAME if solar_azimuth else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
+                UNITS_NAME: angle_output_units,
             })
 
     return results
