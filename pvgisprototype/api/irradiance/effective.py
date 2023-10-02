@@ -23,6 +23,7 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
 from pvgisprototype.constants import SOLAR_CONSTANT
@@ -42,7 +43,6 @@ from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
 from ..geometry.solar_time import model_solar_time
-# from ..utilities.timestamp import timestamp_to_decimal_hours
 from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -319,7 +319,8 @@ def calculate_effective_irradiance(
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     solar_altitude = model_solar_altitude(
         longitude=longitude,
@@ -334,9 +335,10 @@ def calculate_effective_irradiance(
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_time_model=solar_time_model,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     solar_time = model_solar_time(
         longitude=longitude,
@@ -351,13 +353,14 @@ def calculate_effective_irradiance(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
+        verbose=verbose,
     )
-    # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    # hour_angle = (solar_time_decimal_hours - 12) * np.radians(15)
-    hour_angle = (solar_time.as_hours - 12) * np.radians(15)
+    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
+    hour_angle = (solar_time_decimal_hours - 12) * np.radians(15)
+    # hour_angle = (solar_time.as_hours - 12) * np.radians(15)
     solar_incidence_angle = model_solar_incidence(
         longitude=longitude,
         latitude=latitude,
@@ -378,9 +381,9 @@ def calculate_effective_irradiance(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
 
