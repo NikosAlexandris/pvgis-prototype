@@ -88,21 +88,20 @@ def calculate_true_solar_time_noaa(
         timezone=timezone,
         # time_output_units='minutes',
         )  # in minutes
-    time_offset_timedelta = timedelta(minutes=time_offset.value)
+    time_offset_timedelta = timedelta(minutes=time_offset.minutes)
     true_solar_time = timestamp + time_offset_timedelta
+    true_solar_time_minutes = (
+        true_solar_time.hour * 60
+        + true_solar_time.minute
+        + true_solar_time.second / 60
+    )
+    # true_solar_time = TrueSolarTime(value=true_solar_time_minutes, unit='minutes')
 
-    if time_output_units == 'minutes':
-        # if not 0 <= true_solar_time <= 1440:
-        # if not 0 <= true_solar_time <= 1580:
-        true_solar_time_minutes = (
-            true_solar_time.hour * 60
-            + true_solar_time.minute
-            + true_solar_time.second / 60
-        )
-        if not -1580 <= true_solar_time_minutes <= 1580:
-            raise ValueError(f'The calculated true solar time `{true_solar_time_minutes}` is out of the expected range [-1580, 1580] minutes!')
+    # if not -1580 <= true_solar_time.minutes <= 1580:
+    if not -1580 <= true_solar_time_minutes <= 1580:
+        raise ValueError(f'The calculated true solar time `{true_solar_time_minutes}` is out of the expected range [-1580, 1580] minutes!')
 
-    return TrueSolarTime(value=true_solar_time_minutes, unit='minutes')
+    return true_solar_time
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeTimeSeriesNOAAInput)
