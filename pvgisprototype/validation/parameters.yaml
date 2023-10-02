@@ -80,27 +80,27 @@ EccentricityCorrectionFactor:
 
 SolarTime:
   value:
-    type: Optional[time]
+    type: Optional[float]
     initial:
   unit:
     type: str
-    initial: time
+    initial: 
 
 TrueSolarTime:
   value:
-    type: Optional[datetime]
+    type: Optional[float]
     initial:
   unit:
     type: str
-    initial: datetime
+    initial: minutes
 
 EquationOfTime:
   value:
-    type: Optional[timedelta]
+    type: Optional[float]
     initial:
   unit:
     type: str
-    initial: timedelta
+    initial: minutes
 
 SolarHourAngle:
   value:
@@ -252,11 +252,11 @@ RelativeLongitude:
 
 TimeOffset:
   value:
-    type: Optional[timedelta]
+    type: Optional[float]
     initial:
   unit:
     type: str
-    initial: timedelta
+    initial: minutes
 
 HorizonHeight:
   value:
