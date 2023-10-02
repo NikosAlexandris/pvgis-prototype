@@ -60,7 +60,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_radians_if_reque
 from pvgisprototype.api.utilities.conversions import convert_dictionary_to_table
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
+# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 from pvgisprototype.api.utilities.timestamp import parse_timestamp
 from .loss import calculate_angular_loss_factor_for_direct_irradiance
@@ -258,17 +258,17 @@ def calculate_refracted_solar_altitude(
         0.061359
         * (
             0.1594
-            + 1.123 * solar_altitude.value
-            + 0.065656 * pow(solar_altitude.value, 2)
+            + 1.123 * solar_altitude.radians
+            + 0.065656 * pow(solar_altitude.radians, 2)
         )
         / (
             1
-            + 28.9344 * solar_altitude.value
-            + 277.3971 * pow(solar_altitude.value, 2)
+            + 28.9344 * solar_altitude.radians
+            + 277.3971 * pow(solar_altitude.radians, 2)
         )
     )
     refracted_solar_altitude = RefractedSolarAltitude(
-        value=solar_altitude.value + atmospheric_refraction,
+        value=solar_altitude.radians + atmospheric_refraction,
         unit=solar_altitude.unit,
     )
     refracted_solar_altitude = convert_to_radians_if_requested(
@@ -339,9 +339,9 @@ def calculate_optical_air_mass(
     """
     adjusted_elevation = adjust_elevation(elevation.value)
     optical_air_mass = adjusted_elevation.value / (
-        sin(refracted_solar_altitude.value)
+        sin(refracted_solar_altitude.radians)
         + 0.50572
-        * math.pow((refracted_solar_altitude.value + 6.07995), -1.6364)
+        * math.pow((refracted_solar_altitude.radians + 6.07995), -1.6364)
     )
     optical_air_mass = OpticalAirMass(
         value=optical_air_mass,
@@ -510,9 +510,9 @@ def calculate_direct_horizontal_irradiance(
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
     )
     # The refraction equation expects the solar altitude angle in degrees! ---
     expected_solar_altitude_units = 'degrees'
@@ -540,7 +540,7 @@ def calculate_direct_horizontal_irradiance(
             eccentricity_correction_factor=eccentricity_correction_factor,
             verbose=verbose,
             )
-    direct_horizontal_irradiance = direct_normal_irradiance * sin(solar_altitude.value)
+    direct_horizontal_irradiance = direct_normal_irradiance * sin(solar_altitude.radians)
 
     # table_with_inputs = convert_dictionary_to_table(locals())
     # console.print(table_with_inputs)
@@ -633,11 +633,11 @@ def calculate_direct_inclined_irradiance_pvgis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
     )
-    sine_solar_altitude = sin(solar_altitude.value)
+    sine_solar_altitude = sin(solar_altitude.radians)
 
     # make it a function -----------------------------------------------------
     #
@@ -649,15 +649,15 @@ def calculate_direct_inclined_irradiance_pvgis(
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     sine_relative_latitude = -cos(latitude) * sin(surface_tilt) * cos(
         surface_orientation
     ) + sin(latitude) * cos(surface_tilt)
     relative_latitude = math.asin(sine_relative_latitude)
     # calculate C3x geometry parameters for inclined surface
-    C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination.value)
-    C33_inclined = sine_relative_latitude * math.sin(solar_declination.value)
+    C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination.radians)
+    C33_inclined = sine_relative_latitude * math.sin(solar_declination.radians)
 
     # Left-over comment from ? -----------------------------------------------
     # cos(hour_angle - relative_longitude) = C33_inclined / C31_inclined
@@ -676,22 +676,22 @@ def calculate_direct_inclined_irradiance_pvgis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
     )
     hour_angle = calculate_hour_angle(
         solar_time=solar_time,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     relative_longitude = calculate_relative_longitude(
         latitude,
         surface_tilt,
         surface_orientation,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
     )
     sine_solar_incidence_angle = (
-        C31_inclined * math.cos(hour_angle.value - relative_longitude.value) + C33_inclined
+        C31_inclined * math.cos(hour_angle.radians - relative_longitude.radians) + C33_inclined
     )
 
     #
