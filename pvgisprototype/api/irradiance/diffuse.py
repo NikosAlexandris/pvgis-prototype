@@ -65,7 +65,7 @@ from math import pi
 from math import atan2
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from ..geometry.solar_time import model_solar_time
-# from ..utilities.timestamp import timestamp_to_decimal_hours
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_time_series
@@ -543,7 +543,7 @@ def calculate_diffuse_inclined_irradiance(
         )
 
         # on a horizontal surface : G0h = G0 sin(h0)
-        extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(
+        extraterrestrial_horizontal_irradiance = extraterrestrial_normal_irradiance * sin(
             solar_altitude.radians
         )
 
@@ -553,8 +553,8 @@ def calculate_diffuse_inclined_irradiance(
         # Dhc [W.m-2]
         diffuse_horizontal_component = (
             extraterrestrial_normal_irradiance
-            * diffuse_transmission_function(solar_altitude.value)
-            * diffuse_solar_altitude_function(solar_altitude.value, linke_turbidity_factor)
+            * diffuse_transmission_function(solar_altitude.radians)
+            * diffuse_solar_altitude_function(solar_altitude.radians, linke_turbidity_factor)
         )
 
         # the N term
@@ -566,42 +566,42 @@ def calculate_diffuse_inclined_irradiance(
 
         # surface in shade, requires : solar declination for/and incidence angles
         solar_declination = model_solar_declination(
-                timestamp=timestamp,
-                timezone=timezone,
-                model=solar_declination_model,
-                days_in_a_year=days_in_a_year,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                perigee_offset=perigee_offset,
-                angle_output_units=angle_output_units,
-                )
-        solar_time = model_solar_time(
-                longitude=longitude,
-                latitude=latitude,
-                timestamp=timestamp,
-                timezone=timezone,
-                model=solar_time_model,
-                refracted_solar_zenith=refracted_solar_zenith,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                days_in_a_year=days_in_a_year,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                time_offset_global=time_offset_global,
-                hour_offset=hour_offset,
-                time_output_units=time_output_units,
-                angle_units=angle_units,
-                angle_output_units=angle_output_units,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=solar_declination_model,
+            days_in_a_year=days_in_a_year,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            perigee_offset=perigee_offset,
+            # angle_output_units=angle_output_units,
         )
-        # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-        # hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
-        hour_angle = (solar_time.as_hours - 12)  *  np.radians(15)
-        solar_incidence_angle = calculate_solar_incidence(
+        solar_time = model_solar_time(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=solar_time_model,
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            days_in_a_year=days_in_a_year,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
+            # angle_output_units=angle_output_units,
+        )
+        solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
+        hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
+        # hour_angle = (solar_time.as_hours - 12)  *  np.radians(15)
+        solar_incidence_angle = calculate_solar_incidence_pvis(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
             hour_angle=hour_angle,
-            angle_output_units=angle_output_units,
+            # angle_output_units=angle_output_units,
             verbose=verbose,
         )
         if sin(solar_incidence_angle.radians) < 0 and solar_altitude.radians >=0:
@@ -623,7 +623,7 @@ def calculate_diffuse_inclined_irradiance(
                     + kb * sin(solar_incidence_angle.radians) / sin(solar_altitude.radians)
                 )
 
-            else:  # if solar_altitude.value < 0.1:
+            else:  # if solar_altitude.radians < 0.1:
                 # requires the solar azimuth
                 solar_azimuth = model_solar_azimuth(
                     longitude=longitude,
@@ -638,9 +638,9 @@ def calculate_diffuse_inclined_irradiance(
                     time_offset_global=time_offset_global,
                     hour_offset=hour_offset,
                     solar_time_model=solar_time_model,
-                    time_output_units=time_output_units,
-                    angle_units=angle_units,
-                    angle_output_units=angle_output_units,
+                    # time_output_units=time_output_units,
+                    # angle_units=angle_units,
+                    # angle_output_units=angle_output_units,
                 )
 
                 # Normalize the azimuth difference to be within the range -pi to pi
@@ -648,7 +648,7 @@ def calculate_diffuse_inclined_irradiance(
                 # ALN : angle between the vertical surface containing the normal to the
                 #   surface and vertical surface passing through the centre of the solar
                 #   disc [rad]
-                azimuth_difference = solar_azimuth.value - surface_orientation
+                azimuth_difference = solar_azimuth.radians - surface_orientation
                 azimuth_difference = atan2(sin(azimuth_difference), cos(azimuth_difference))
                 diffuse_inclined_irradiance = diffuse_horizontal_component * (
                     diffuse_sky_irradiance * (1 - kb)
