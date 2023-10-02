@@ -111,8 +111,8 @@ def calculate_solar_declination(
             )
             results.append({
                 POSITION_ALGORITHM_NAME: model.value,
-                DECLINATION_NAME: getattr(solar_declination, angle_output_units),
-                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
+                DECLINATION_NAME if solar_declination else None: getattr(solar_declination, angle_output_units) if solar_declination else None,
+                UNITS_NAME: angle_output_units,
             })
 
     return results
