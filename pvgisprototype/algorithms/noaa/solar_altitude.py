@@ -29,8 +29,6 @@ def calculate_solar_altitude_noaa(
         timestamp: datetime,
         timezone: ZoneInfo,
         apply_atmospheric_refraction: bool = True,
-        # time_output_units: str = 'minutes',
-        # angle_output_units: str = 'radians',
     )-> SolarAltitude:
     """Calculate the solar zenith angle (φ) in radians
     """
@@ -38,15 +36,12 @@ def calculate_solar_altitude_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        # time_output_units=time_output_units,
-        # angle_output_units='radians',
     )
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
         timestamp=timestamp,
         solar_hour_angle=solar_hour_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # angle_output_units='radians',
     )
     solar_altitude = pi/2 - solar_zenith.radians
     if (
@@ -71,8 +66,6 @@ def calculate_solar_altitude_time_series_noaa(
     timestamps: Union[float, Sequence[float]],
     timezone: str,
     apply_atmospheric_refraction: bool = True,
-    time_output_units: str = "minutes",
-    angle_output_units: str = "radians",
     verbose: int = 0,
 ):
     """Calculate the solar zenith angle (φ) in radians for a time series"""
@@ -80,15 +73,12 @@ def calculate_solar_altitude_time_series_noaa(
         longitude,
         timestamps,
         timezone,
-        time_output_units,
-        angle_output_units,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
         timestamps=timestamps,
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        angle_output_units="radians",
     )
     solar_altitude_series = np.pi / 2 - np.array(
         [zenith.radians for zenith in solar_zenith_series]

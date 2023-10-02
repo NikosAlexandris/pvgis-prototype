@@ -48,10 +48,10 @@ def model_solar_altitude(
     days_in_a_year: float,
     perigee_offset: float,
     eccentricity_correction_factor: float,
-    # time_output_units: str,
-    # angle_units: str,
-    # angle_output_units: str,
     verbose: int = 0,
+    # time_output_units: str = 'minutes',
+    # angle_units: str = 'radians',
+    # angle_output_units: str = 'radians',
 ) -> SolarAltitude:
     """
     The solar altitude angle measures from the horizon up towards the zenith

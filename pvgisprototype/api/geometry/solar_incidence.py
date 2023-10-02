@@ -39,7 +39,6 @@ def model_solar_incidence(
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     random_time: bool = RANDOM_DAY_FLAG_DEFAULT,
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.effective,
-    # hour_angle: float = None,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     shadow_indicator: Path = None,
@@ -96,7 +95,6 @@ def model_solar_incidence(
             perigee_offset=perigee_offset,
             # time_output_units=time_output_units,
             # angle_units=angle_units,
-            # angle_output_units=angle_output_units,
             verbose=verbose,
         )
         # solar_incidence = convert_to_degrees_if_requested(
