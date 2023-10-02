@@ -22,12 +22,13 @@ import numpy as np
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
 def calculate_solar_altitude_noaa(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: ZoneInfo,
-        apply_atmospheric_refraction: bool = True,
-    )-> SolarAltitude:
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: ZoneInfo,
+    apply_atmospheric_refraction: bool = True,
+    verbose: int = 0,
+)-> SolarAltitude:
     """Calculate the solar altitude angle for a location and moment in time"""
     solar_hour_angle = calculate_solar_hour_angle_noaa(
         longitude=longitude,
