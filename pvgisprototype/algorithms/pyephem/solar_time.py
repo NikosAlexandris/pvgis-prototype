@@ -99,8 +99,6 @@ def calculate_solar_time_ephem(
           logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
   # Handle Me during input validation? -------------------------------------
 
-  longitude = longitude.value
-  latitude = latitude.value
   observer = ephem.Observer()
   observer.date = timestamp
   observer.lon = longitude.degrees
