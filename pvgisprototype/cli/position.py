@@ -19,6 +19,7 @@ from math import radians
 import numpy as np
 from rich.table import Table
 from rich import box
+from rich import print
 from .typer_parameters import OrderCommands
 from .typer_parameters import typer_argument_longitude
 from .typer_parameters import typer_argument_latitude
@@ -99,8 +100,8 @@ from .rich_help_panel_names import rich_help_panel_solar_time
 from .rich_help_panel_names import rich_help_panel_earth_orbit
 from .rich_help_panel_names import rich_help_panel_atmospheric_properties
 from .rich_help_panel_names import rich_help_panel_output
-from pvgisprototype.constants import ZENITH_NAME, ALTITUDE_NAME
->>>>>>> 7e6280c (Add `solar time algorithm` in overview table)
+from pvgisprototype.constants import ZENITH_NAME
+from pvgisprototype.constants import ALTITUDE_NAME
 
 from .print import print_table
 from .print import print_solar_position_table
@@ -158,7 +159,7 @@ def overview(
     model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.pvlib],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
@@ -235,6 +236,7 @@ def overview(
         timezone=timezone,
         table=solar_position,
         rounding_places=rounding_places,
+        timing=True,
         declination=True,
         hour_angle=True,
         zenith=True,
@@ -327,7 +329,7 @@ def altitude(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
@@ -418,7 +420,7 @@ def zenith(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
@@ -522,30 +524,17 @@ def azimuth(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
-<<<<<<< HEAD
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    # time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
+    # angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-=======
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
-    # time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    # angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
->>>>>>> e43b0f7 (In `solar geometry overview` comment out everything related to:)
 ) -> float:
     """Calculate the solar azimuth angle
 
@@ -768,7 +757,6 @@ def sunrise(
     surface_tilt = SurfaceTilt(value=surface_tilt, unit='radians')
     output_surface_tilt = convert_to_degrees_if_requested(surface_tilt, angle_output_units)
 
-<<<<<<< HEAD
     solar_declination = SolarDeclination(value=solar_declination, unit='radians')
     output_solar_declination = convert_to_degrees_if_requested(solar_declination, angle_output_units)
 
@@ -783,10 +771,6 @@ def sunrise(
             hour_angle=hour_angle.value,
             units=angle_output_units,
     )
-=======
-    output_latitude = convert_to_degrees_if_requested(latitude, angle_output_units)
-    typer.echo(f'Hour angle at {output_latitude} at sun rise/set: {getattr(hour_angle, angle_output_units)} {angle_output_units}')
->>>>>>> e43b0f7 (In `solar geometry overview` comment out everything related to:)
 
 
 @app.command('incidence', no_args_is_help=True, help='Calculate the solar incidence angle')
@@ -802,25 +786,15 @@ def incidence(
     random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
-<<<<<<< HEAD
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    # time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
+    # angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-=======
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
-    # time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    # angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    verbose: Annotated[Optional[bool], typer_option_verbose]= False,
->>>>>>> e43b0f7 (In `solar geometry overview` comment out everything related to:)
 ):
     """Calculate the angle of solar incidence
 
@@ -858,9 +832,9 @@ def incidence(
         surface_tilt = random.vonmisesvariate(math.pi, kappa=0)  # radians
 
     # Why does the callback function `_parse_model` not work? ----------------
-    if SolarPositionModels.all in solar_incidence_model:
+    if SolarIncidenceModels.all in solar_incidence_model:
         solar_incidence_model = [
-            model for model in SolarPositionModels if solar_incidence_model != SolarPositionModels.all
+            model for model in SolarIncidenceModels if solar_incidence_model != SolarIncidenceModels.all
         ]
     solar_incidence = calculate_solar_incidence(
         longitude=longitude,
@@ -873,6 +847,7 @@ def incidence(
         # shadow_indicator=shadow_indicator,
         # horizon_heights=horizon_heights,
         # horizon_interval=horizon_interval,
+        solar_time_model=solar_time_model,
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
@@ -881,7 +856,7 @@ def incidence(
         # hour_offset=hour_offset,
         # time_output_units=time_output_units,
         # angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
