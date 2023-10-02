@@ -145,6 +145,68 @@ def main(
 
 
 @app.command(
+    'intro',
+    no_args_is_help=False,
+    help='A short primer on solar geometry',
+ )
+# @debug_if_needed(app)
+def intro():
+    """A short introduction on solar geometry"""
+    introduction = """
+    [underline]Solar geometry[/underline] consists of a series of angular
+    measurements between the position of the sun in the sky and a location on
+    the surface of the earth for a moment or series of moments in time.
+    """
+
+    note = """
+    Internally, timestamps are converted to UTC and angles are measured in radians!
+    """
+    from rich.panel import Panel
+    note_in_a_panel = Panel(
+        "[italic]{}[/italic]".format(note),
+        title="[bold cyan]Important Note[/bold cyan]",
+        width=78,
+    )
+    solar_geometry_primer = """
+    The first calculation is the position of the Earth in its orbit around the
+    sun expressed through the angle [cyan]Fractional Year[/cyan] measured in
+    radians.
+
+    The second most important measurement is the [cyan]Equation of
+    Time[/cyan] which corrects for ...
+
+    The [cyan]Time Offset[/cyan] measured in minutes, incorporates the
+    [italic]Equation of Time[/italic] and accounts for the variation of the
+    Local Solar Time (LST) within a given time zone due to the longitude
+    variations within the time zone.
+
+    Next if the [cyan]True solar time[/cyan], also known as the [cyan]Apparent
+    solar time[/cyan] upon which depends the calculation of the [cyan]Solar
+    hour angle[/cyan]
+
+    The [cyan]solar hour angle[/cyan] measures the Earth's rotation and
+    indicates the time of the day relative to the position of the sun. It bases
+    on the longitude and timestamp and by definition, the solar hour angle is :
+
+        - 0° at solar noon
+        - negative in the morning
+        - positive in the afternoon
+
+    The order of dependency is :
+
+    - [cyan]Fractional year[/cyan]  < [cyan]Equation of time[/cyan]  < [cyan]Time offset[/cyan]  < [cyan]True solar time[/cyan]  < [cyan]Solar hour angle[/cyan]
+    - Solar declination  < Solar zenith  < Solar altitude  < Solar azimuth
+    """
+
+    from rich.console import Console
+    console = Console()
+    # introduction.wrap(console, 30)
+    console.print(introduction)
+    console.print(note_in_a_panel)
+    console.print(solar_geometry_primer)
+
+
+@app.command(
     'overview',
     no_args_is_help=True,
     help='⦩⦬ Calculate important solar position parameters',
