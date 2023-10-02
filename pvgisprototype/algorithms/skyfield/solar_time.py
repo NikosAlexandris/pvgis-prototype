@@ -77,16 +77,7 @@ def calculate_solar_time_skyfield(
     hours = int(hours_since_solar_noon)
     minutes = int((hours_since_solar_noon - hours) * 60)
     seconds = int(((hours_since_solar_noon - hours) * 60 - minutes) * 60)
-    # local_solar_time = datetime_time(hours, minutes, seconds)
-    local_solar_time = time(
-            # year=timestamp.year,
-            # month=timestamp.month,
-            # day=timestamp.day,
-            hour=int(hours),
-            minute=int(minutes),
-            second=int(seconds),
-            tzinfo=timestamp.tzinfo,
-    )
+    local_solar_time = datetime_time(hours, minutes, seconds)
     # local_solar_time = previous_solar_noon.utc_datetime() + timedelta(hours=hours_since_solar_noon)
 
     if verbose:
@@ -98,4 +89,4 @@ def calculate_solar_time_skyfield(
         next_solar_noon_string = next_solar_noon.astimezone(timezone).strftime('%Y-%m-%d %H:%M:%S')
         typer.echo(f'Next solar noon: {next_solar_noon_string}')
 
-    return SolarTime(value=local_solar_time, unit='timestamp')
+    return local_solar_time
