@@ -21,7 +21,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import UNITS_NAME
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME
+from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import UNITS_NAME
 
 
@@ -42,7 +42,7 @@ def model_solar_time(
     # time_output_units: str = "minutes",
     # angle_units: str = "radians",
     # angle_output_units: str = "radians",
-    verbose: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 )->SolarTime:
     """Calculates the solar time and returns the calculated value and the units.
 
@@ -94,16 +94,17 @@ def model_solar_time(
 
     if solar_time_model.value == SolarTimeModels.noaa:
 
-        solar_time = calculate_local_solar_time_noaa(
+        solar_time = calculate_true_solar_time_noaa(
             longitude=longitude,
-            latitude=latitude,
+            # latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            refracted_solar_zenith=refracted_solar_zenith,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            # refracted_solar_zenith=refracted_solar_zenith,
+            # apply_atmospheric_refraction=apply_atmospheric_refraction,
             # time_output_units=time_output_units,
+            # angle_units=angle_units,
             # angle_output_units=angle_output_units,
-            verbose,
+            verbose=verbose,
         )
 
     if solar_time_model.value == SolarTimeModels.skyfield:
@@ -134,9 +135,9 @@ def calculate_solar_time(
     eccentricity_correction_factor: float = 0.03344,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    # time_output_units: str = "minutes",
+    time_output_units: str = "minutes",
     # angle_units: str = "radians",
-    angle_output_units: str = "radians",
+    # angle_output_units: str = "radians",
     verbose: int = 0,
 ) -> List:
     """Calculates the solar time using all models and returns the results in a table.
@@ -149,14 +150,14 @@ def calculate_solar_time(
 
     """
     results = []
-    for model in models:
-        if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
+    for solar_time_model in models:
+        if solar_time_model != SolarTimeModels.all:  # ignore 'all' in the enumeration
             solar_time = model_solar_time(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
-                solar_time_model=model,
+                solar_time_model=solar_time_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
                 days_in_a_year=days_in_a_year,
@@ -168,10 +169,11 @@ def calculate_solar_time(
                 # angle_output_units=angle_output_units,
                 verbose=verbose,
             )
+            debug(locals())
             results.append({
-                POSITION_ALGORITHM_NAME: model,
-                'Solar time': getattr(solar_time, angle_output_units),
-                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
+                TIME_ALGORITHM_NAME: solar_time_model,
+                'Solar time': solar_time,
+                UNITS_NAME: time_output_units,  # Don't trust me -- Redesign Me!
             })
 
     return results
