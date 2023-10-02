@@ -29,13 +29,15 @@ from pvgisprototype.api.utilities.conversions import convert_to_radians_if_reque
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_south_to_north_radians_convention
 from pvgisprototype.api.utilities.timestamp import attach_timezone
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME, AZIMUTH_NAME, UNITS_NAME
-
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import TIME_ALGORITHM_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME
+from pvgisprototype.constants import AZIMUTH_NAME
+from pvgisprototype.constants import UNITS_NAME
 
 
 @validate_with_pydantic(ModelSolarAzimuthInputModel)
@@ -47,7 +49,7 @@ def model_solar_azimuth(
     model: SolarPositionModels = SolarPositionModels.pvlib,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     days_in_a_year: float = DAYS_IN_A_YEAR,
@@ -237,9 +239,10 @@ def calculate_solar_azimuth(
                 verbose=verbose,
             )
             results.append({
+                TIME_ALGORITHM_NAME: solar_time_model,
                 POSITION_ALGORITHM_NAME: model.value,
-                AZIMUTH_NAME: getattr(solar_azimuth, angle_output_units),
-                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
+                AZIMUTH_NAME if solar_azimuth else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
+                UNITS_NAME: angle_output_units,
             })
 
     return results

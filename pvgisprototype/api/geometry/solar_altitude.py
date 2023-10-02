@@ -1,4 +1,5 @@
 from typing import List
+from typing import Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import cos
@@ -29,8 +30,15 @@ import suncalc
 import pysolar
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
-# from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME, ALTITUDE_NAME, UNITS_NAME
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import DAYS_IN_A_YEAR
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import TIME_ALGORITHM_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME
+from pvgisprototype.constants import ALTITUDE_NAME
+from pvgisprototype.constants import UNITS_NAME
 
 
 @validate_with_pydantic(ModelSolarAltitudeInputModel)
@@ -39,19 +47,19 @@ def model_solar_altitude(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    model: SolarPositionModels,
-    apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: RefractedSolarZenith,
-    solar_time_model: SolarTimeModels,
-    time_offset_global: float,
-    hour_offset: float,
-    days_in_a_year: float,
-    perigee_offset: float,
-    eccentricity_correction_factor: float,
-    verbose: int = 0,
+    model: SolarPositionModels = SolarPositionModels.pvlib,
+    apply_atmospheric_refraction: bool = True,
+    refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    days_in_a_year: float = DAYS_IN_A_YEAR,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     # time_output_units: str = 'minutes',
     # angle_units: str = 'radians',
     # angle_output_units: str = 'radians',
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarAltitude:
     """
     The solar altitude angle measures from the horizon up towards the zenith
@@ -172,8 +180,6 @@ def calculate_solar_altitude(
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     # time_output_units: str = 'minutes',
     # angle_units: str = 'radians',
     angle_output_units: str = 'radians',
@@ -205,9 +211,10 @@ def calculate_solar_altitude(
                 verbose=verbose,
             )
             results.append({
+                TIME_ALGORITHM_NAME: solar_time_model,
                 POSITION_ALGORITHM_NAME: model.value,
-                ALTITUDE_NAME: getattr(solar_altitude, angle_output_units),
-                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
+                ALTITUDE_NAME: getattr(solar_altitude, angle_output_units, None) if solar_altitude else None,
+                UNITS_NAME: angle_output_units,
             })
 
     return results
