@@ -137,7 +137,7 @@ def calculate_apparent_solar_time_milne1921(
     # ------------------------------------------------------------------------
     # the following equation requires longitude in degrees!
     time_correction_factor = (
-        4 * (longitude.degrees - local_standard_meridian_time) + equation_of_time
+        4 * (longitude.degrees - local_standard_time_meridian) + equation_of_time
     )
     # ------------------------------------------------------------------------
 
