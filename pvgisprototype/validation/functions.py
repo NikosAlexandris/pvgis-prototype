@@ -112,8 +112,8 @@ class ModelSolarTimeInputModel(
     TimeOffsetModel,
     HourOffsetModel,
     SolarTimeModelModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass
@@ -144,7 +144,7 @@ class CalculateSolarTimePVGISInputModel(
  
 
 class CalculateSolarTimeEoTInputModel(
-    BaseCoordinatesModel,
+    LongitudeModel,
     BaseTimeModel,
     EarthOrbitModel,
     TimeOffsetModel,
@@ -210,7 +210,7 @@ class CalculateSolarHourAngleNOAAInput(
 
 class CalculateSolarHourAnglePVISInputModel(
     SolarTimeModel,  # Parameter
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -225,7 +225,7 @@ class CalculateHourAngleSunriseInputModel(
     pass
 
 
-class SolarHourAngleSunrisePvisInput(
+class CalculateHourAngleSunrisePVISInputModel(
     CalculateHourAngleSunriseInputModel
 ):
     pass
@@ -354,11 +354,10 @@ class ModelSolarAltitudeInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
-<<<<<<< HEAD
     HourOffsetModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -368,17 +367,13 @@ class ModelSolarAltitudeTimeSeriesInputModel(
     BaseTimeSeriesModel,
     SolarPositionModel,
     SolarTimeModelModel,
-    ApplyAtmosphericRefraction,
+    ApplyAtmosphericRefractionModel,
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     HourOffsetModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
-=======
     # BaseTimeOutputUnitsModel,
     # BaseAngleUnitsModel,
->>>>>>> 77a00b7 (Comment out the following pydantic-models in the pydantic-inputs:)
     # BaseAngleOutputUnitsModel,
 ):
     pass
@@ -393,14 +388,9 @@ class ModelSolarAzimuthInputModel(
     RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
-<<<<<<< HEAD
     HourOffsetModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleUnitsModel,
-=======
     # BaseTimeOutputUnitsModel,
     # BaseAngleUnitsModel,
->>>>>>> 77a00b7 (Comment out the following pydantic-models in the pydantic-inputs:)
     # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
@@ -450,7 +440,7 @@ class CalculateSolarIncidencePVISInputModel(
     BaseTimeModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -463,9 +453,9 @@ class CalculateSolarIncidenceJencoInputModel(
     SurfaceTiltModel,
     SurfaceOrientationModel,
     EarthOrbitModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleInternalUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleInternalUnitsModel,
+    # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass
