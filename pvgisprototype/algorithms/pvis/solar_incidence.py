@@ -27,10 +27,8 @@ def calculate_solar_incidence_pvis(
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    # solar_declination: float = 0,
     surface_tilt: float = 0,
     surface_orientation: float = 180,
-    # hour_angle: float = None,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float = 1.5853349194640094,
     days_in_a_year: float = DAYS_IN_A_YEAR,
@@ -62,11 +60,6 @@ def calculate_solar_incidence_pvis(
         Latitude is the angle (Φ) between the sun's rays and its projection on
         the horizontal surface measured in radian.
 
-    solar_declination: flot
-        Solar declination is the angle (δ) between the equator and a line drawn
-        from the centre of the Earth to the centre of the sun measured in
-        radian.
-
     surface_tilt: float 
         Surface tilt or slope is the angle (β) between the inclined slope and
         the horizontal plane measured in radian.
@@ -75,11 +68,6 @@ def calculate_solar_incidence_pvis(
         Surface orientation or azimuth is the angle (γ) in the horizontal plane
         between the line due south and the horizontal projection of the normal
         to the inclined plane surface measured in radian.
-
-    hour_angle: float
-        Hour angle is the angle (ω) at any instant through which the earth has
-        to turn to bring the meridian of the observer directly in line with the
-        sun's rays measured in radian.
 
     Returns
     -------
@@ -123,7 +111,7 @@ def calculate_solar_incidence_pvis(
             * cos(surface_tilt.radians)
             + cos(solar_declination.radians)
             * cos(surface_orientation.radians)
-            * cos(hour_angle)
+            * cos(hour_angle.radians)
             * sin(surface_tilt.radians)
         )
         + cos(latitude.radians)
