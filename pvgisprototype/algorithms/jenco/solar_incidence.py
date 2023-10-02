@@ -228,15 +228,12 @@ def calculate_solar_incidence_jenco(
             surface_orientation=surface_orientation
         )
         sine_solar_incidence = (
-            c_inclined_31 * cos(solar_hour_angle.radians - relative_longitude.radians) + c_inclined_33
+            c_inclined_31 * cos(solar_hour_angle.radians - relative_longitude.radians)
+            + c_inclined_33
         )
-        solar_incidence = SolarIncidence(
-            value=asin(sine_solar_incidence),
-            unit=RADIANS,
-        )
+        solar_incidence = asin(sine_solar_incidence)
 
-    # return max(NO_SOLAR_INCIDENCE, solar_incidence)
-    return solar_incidence
+    return SolarIncidence(value=solar_incidence, unit=RADIANS)
 
 
 @validate_with_pydantic(CalculateSolarIncidenceTimeSeriesJencoInputModel)
