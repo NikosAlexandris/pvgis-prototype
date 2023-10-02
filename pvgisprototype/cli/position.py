@@ -800,11 +800,6 @@ def sunrise(
     from rich.table import Table
     from rich import box
 
-
-    #
-    # Update Me
-    #
-
     latitude = Latitude(value=latitude, unit='radians')
     output_latitude = convert_to_degrees_if_requested(latitude, angle_output_units)
 
@@ -812,7 +807,6 @@ def sunrise(
             latitude,
             surface_tilt,
             solar_declination,
-            # angle_output_units=angle_output_units,
             )
     output_hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
     
@@ -822,15 +816,13 @@ def sunrise(
     solar_declination = SolarDeclination(value=solar_declination, unit='radians')
     output_solar_declination = convert_to_degrees_if_requested(solar_declination, angle_output_units)
 
-    typer.echo(f'Hour angle at {output_latitude} {latitude.unit} latitude at sun rise/set: {hour_angle.value} {hour_angle.unit}')
-
     from pvgisprototype.cli.print import print_hour_angle_table
     print_hour_angle_table(
             latitude=output_latitude.value,
             rounding_places=rounding_places,
             surface_tilt=output_surface_tilt.value,
             declination=output_solar_declination.value,
-            hour_angle=hour_angle.value,
+            hour_angle=output_hour_angle.value,
             units=angle_output_units,
     )
 
