@@ -61,7 +61,7 @@ def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: Union[float, Sequence[float]],
-    timezone: str,
+    timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
 ):
