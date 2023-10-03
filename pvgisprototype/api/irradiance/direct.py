@@ -211,6 +211,7 @@ def correct_linke_turbidity_factor(
 	airMass2Linke = 0.8662 * sunRadVar->linke;
     """
     corrected_linke_turbidity_factor = -0.8662 * linke_turbidity_factor
+
     return corrected_linke_turbidity_factor
 
 
@@ -468,12 +469,14 @@ def calculate_direct_normal_irradiance(
             * rayleigh_optical_thickness.value
         )
     )
+
+    if verbose == 3:
+        debug(locals())
     if verbose > 1:
         print(f'Direct normal irradiance = Extraterrestial normal irradiance * exp( Corrected Linke turbidity factor * Optical air mass * Rayleigh Optical Thickness )')
     if verbose > 0:
         print(f'Direct normal irradiance: {direct_normal_irradiance}')  # B0c
-    if verbose == 3:
-        debug(locals())
+
     return direct_normal_irradiance  # B0c
 
 
@@ -486,7 +489,7 @@ def calculate_direct_horizontal_irradiance(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = LINKE_TURBIDITY_DEFAULT,
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    apply_atmospheric_refraction: Annotated[bool, typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
@@ -501,7 +504,7 @@ def calculate_direct_horizontal_irradiance(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
-    """Calculate the direct irradiatiance incident on a horizontal surface
+    """Calculate the direct irradiance incident on a horizontal surface
 
     Parameters
     ----------
@@ -534,39 +537,39 @@ def calculate_direct_horizontal_irradiance(
         # angle_output_units=angle_output_units,
     )
     # The refraction equation expects the solar altitude angle in degrees! ---
-    expected_solar_altitude_units = 'degrees'
-    solar_altitude_in_degrees = convert_to_degrees_if_requested(
-            solar_altitude,
-            expected_solar_altitude_units,  # Here!
-            )
+    # expected_solar_altitude_units = 'degrees'
+    # solar_altitude_in_degrees = convert_to_degrees_if_requested(
+    #     solar_altitude,
+    #     expected_solar_altitude_units,  # Here!
+    # )
     # refracted_solar_altitude, refracted_solar_altitude_units = calculate_refracted_solar_altitude(
     refracted_solar_altitude = calculate_refracted_solar_altitude(
-            solar_altitude=solar_altitude_in_degrees,
-            angle_output_units='radians',  # Here in radians!
-            ) 
+        # solar_altitude=solar_altitude_in_degrees,
+        solar_altitude=solar_altitude,
+        # angle_output_units='radians',  # Here in radians!
+    ) 
     optical_air_mass = calculate_optical_air_mass(
-            elevation=elevation,
-            refracted_solar_altitude=refracted_solar_altitude,
-            )
+        elevation=elevation,
+        refracted_solar_altitude=refracted_solar_altitude,
+    )
     # --------------------------------------expects solar altitude in degrees!
     direct_normal_irradiance = calculate_direct_normal_irradiance(
-            optical_air_mass=optical_air_mass,
-            linke_turbidity_factor=linke_turbidity_factor,
-            timestamp=timestamp,
-            solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            verbose=verbose,
-            )
+        optical_air_mass=optical_air_mass,
+        linke_turbidity_factor=linke_turbidity_factor,
+        timestamp=timestamp,
+        solar_constant=solar_constant,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        verbose=verbose,
+    )
     direct_horizontal_irradiance = direct_normal_irradiance * sin(solar_altitude.radians)
 
-    # table_with_inputs = convert_dictionary_to_table(locals())
-    # console.print(table_with_inputs)
-    if verbose > 0:
-        print(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')  # B0c
     if verbose == 3:
         debug(locals())
+    if verbose > 0:
+        print(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')  # B0c
+
     return direct_horizontal_irradiance
 
 
@@ -770,7 +773,7 @@ def calculate_direct_inclined_irradiance_pvgis(
                     angle_of_incidence_constant = 0.155,
                     )
             direct_inclined_irradiance = modified_direct_horizontal_irradiance * angular_loss_factor
-            print(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {PVGIS})')  # B0c
+            print(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on PVGIS)')  # B0c
 
             return direct_inclined_irradiance
 
@@ -783,10 +786,11 @@ def calculate_direct_inclined_irradiance_pvgis(
             logging.error(f"Which Error? {e}")
             raise ValueError
 
-    if verbose > 0:
-        print(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} (based on {solar_incidence_model})')  # B0c
     if verbose == 3:
         debug(locals())
+    if verbose > 0:
+        print(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} (based on {solar_incidence_model})')  # B0c
+
     return modified_direct_horizontal_irradiance
 
 
