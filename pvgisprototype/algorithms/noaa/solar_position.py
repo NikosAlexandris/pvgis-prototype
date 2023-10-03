@@ -9,22 +9,22 @@ See also: https://unpkg.com/solar-calculator@0.1.0/index.js
 
 import logging
 from datetime import datetime
-from datetime import timedelta
-from datetime import time
+# from datetime import timedelta
+# from datetime import time
 from zoneinfo import ZoneInfo
-from math import sin
-from math import cos
-from math import tan
-from math import acos
-from math import radians
-from math import degrees
+# from math import sin
+# from math import cos
+# from math import tan
+# from math import acos
+# from math import radians
+# from math import degrees
 from math import pi
-from math import isfinite
-from typing import Annotated
-from typing import Callable
-from typing import Optional
-from typing import Tuple
-from typing import Union
+# from math import isfinite
+# from typing import Annotated
+# from typing import Callable
+# from typing import Optional
+# from typing import Tuple
+# from typing import Union
 
 from .fractional_year import calculate_fractional_year_noaa 
 from .equation_of_time import calculate_equation_of_time_noaa
@@ -32,11 +32,11 @@ from .solar_declination import calculate_solar_declination_noaa
 from .time_offset import calculate_time_offset_noaa
 from .solar_time import calculate_true_solar_time_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
-from .solar_zenith import adjust_solar_zenith_for_atmospheric_refraction
+# from .solar_zenith import adjust_solar_zenith_for_atmospheric_refraction
 from .solar_zenith import calculate_solar_zenith_noaa
 from .solar_altitude import calculate_solar_altitude_noaa
 from .solar_azimuth import calculate_solar_azimuth_noaa
-from .event_hour_angle import calculate_event_hour_angle_noaa
+# from .event_hour_angle import calculate_event_hour_angle_noaa
 from .event_time import calculate_event_time_noaa
 from .local_time import calculate_local_solar_time_noaa
 

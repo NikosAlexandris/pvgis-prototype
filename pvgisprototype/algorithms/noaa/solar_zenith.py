@@ -8,7 +8,7 @@ from math import tan
 from math import acos
 from math import radians
 from math import degrees
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from math import isfinite
 from math import pi

@@ -12,33 +12,32 @@ from rich import box
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import math
-import numpy as np
+# import math
+# import numpy as np
 
-from ..api.utilities.timestamp import attach_timezone
-from ..api.utilities.timestamp import ctx_attach_requested_timezone
-from ..api.utilities.timestamp import ctx_convert_to_timezone
-from ..api.utilities.timestamp import now_utc_datetimezone
-from ..api.utilities.timestamp import random_datetimezone
-from ..api.utilities.conversions import convert_to_radians
-from ..api.utilities.conversions import convert_to_degrees_if_requested
+# from ..api.utilities.timestamp import attach_timezone
+# from ..api.utilities.timestamp import ctx_attach_requested_timezone
+# from ..api.utilities.timestamp import ctx_convert_to_timezone
+# from ..api.utilities.timestamp import now_utc_datetimezone
+# from ..api.utilities.timestamp import random_datetimezone
+# from ..api.utilities.conversions import convert_to_radians
+# from ..api.utilities.conversions import convert_to_degrees_if_requested
 from ..api.geometry.models import SolarTimeModels
 from ..api.geometry.solar_time import calculate_solar_time
-from ..api.geometry.solar_hour_angle import calculate_hour_angle
 
 from .typer_parameters import OrderCommands
 from .typer_parameters import typer_argument_longitude
 from .typer_parameters import typer_argument_latitude
 from .typer_parameters import typer_argument_timestamp
 from .typer_parameters import typer_option_timezone
-from .typer_parameters import typer_option_local_time
-from .typer_parameters import typer_option_random_time
-from .typer_parameters import typer_argument_solar_declination
-from .typer_parameters import typer_argument_surface_tilt
-from .typer_parameters import typer_argument_surface_orientation
-from .typer_parameters import typer_argument_hour_angle
-from .typer_parameters import typer_argument_true_solar_time
-from .typer_parameters import typer_option_solar_position_model
+# from .typer_parameters import typer_option_local_time
+# from .typer_parameters import typer_option_random_time
+# from .typer_parameters import typer_argument_solar_declination
+# from .typer_parameters import typer_argument_surface_tilt
+# from .typer_parameters import typer_argument_surface_orientation
+# from .typer_parameters import typer_argument_hour_angle
+# from .typer_parameters import typer_argument_true_solar_time
+# from .typer_parameters import typer_option_solar_position_model
 from .typer_parameters import typer_option_solar_time_model
 from .typer_parameters import typer_option_global_time_offset
 from .typer_parameters import typer_option_hour_offset
@@ -50,11 +49,13 @@ from .typer_parameters import typer_option_refracted_solar_zenith
 from .typer_parameters import typer_option_time_output_units
 from .typer_parameters import typer_option_angle_units
 from .typer_parameters import typer_option_angle_output_units
-from .typer_parameters import typer_option_rounding_places
+# from .typer_parameters import typer_option_rounding_places
 from .typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import SOLAR_TIME_COLUMN_NAME
+from pvgisprototype.constants import SOLAR_TIME_NAME
 
 
 app = typer.Typer(

@@ -15,15 +15,11 @@ from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ep
 from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
 from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_noaa
 from pvgisprototype.algorithms.skyfield.solar_time import calculate_solar_time_skyfield
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME, UNITS_NAME
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import SOLAR_TIME_NAME
 
 
 @validate_with_pydantic(ModelSolarTimeInputModel)

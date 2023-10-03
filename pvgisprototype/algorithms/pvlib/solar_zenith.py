@@ -2,7 +2,7 @@ from devtools import debug
 from zoneinfo import ZoneInfo
 import pvlib
 from datetime import datetime
-from math import pi
+# from math import pi
 from math import isfinite
 # from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 

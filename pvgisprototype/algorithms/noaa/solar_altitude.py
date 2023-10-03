@@ -1,5 +1,5 @@
 from devtools import debug
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitudeTimeSeriesNOAAInput

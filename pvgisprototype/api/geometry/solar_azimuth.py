@@ -1,5 +1,5 @@
 from devtools import debug
-from typing import Annotated
+# from typing import Annotated
 from typing import Optional
 from typing import List
 from datetime import datetime
@@ -13,7 +13,7 @@ from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import SolarAzimuth
 from .models import SolarPositionModels
 from .models import SolarTimeModels
-from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
+# from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_azimuth_noaa
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 import suncalc
@@ -23,10 +23,10 @@ from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimut
 # from .solar_declination import calculate_solar_declination
 # from ...models.pvgis.solar_geometry import calculate_solar_position_pvgis
 # from ...models.pvgis.solar_geometry import calculate_solar_time_pvgis
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_radians
+# from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_south_to_north_radians_convention
 from pvgisprototype.api.utilities.timestamp import attach_timezone
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT

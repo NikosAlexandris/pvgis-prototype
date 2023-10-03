@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from math import cos
 from math import sin
 from math import asin
-from typing import Optional
+# from typing import Optional
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel

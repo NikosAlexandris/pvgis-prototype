@@ -1,13 +1,13 @@
 from devtools import debug
-import typer
-from typing import Annotated
+# import typer
+# from typing import Annotated
 from functools import partial
 from datetime import datetime
 from datetime import timezone
 from math import sin
-from math import cos
+# from math import cos
 from math import radians
-from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationHargreavesInputModel
 from pvgisprototype import SolarDeclination

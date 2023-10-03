@@ -1,5 +1,5 @@
 from pydantic import field_validator
-from typing import Optional
+# from typing import Optional
 
 # Generic input/output
 from pvgisprototype.validation.parameters import VerbosityModel
@@ -20,12 +20,12 @@ from pvgisprototype.validation.parameters import BaseCoordinatesModel
 
 # Units?
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-from pvgisprototype.validation.parameters import BaseAngleUnitsModel
+# from pvgisprototype.validation.parameters import BaseAngleUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
 
 # What?
-from pvgisprototype.algorithms.noaa.parameter_models import BaseApplyAtmosphericRefractionModel
+from pvgisprototype.validation.parameters import ApplyAtmosphericRefractionModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
 from pvgisprototype.validation.parameters import RefractedSolarZenithModel
