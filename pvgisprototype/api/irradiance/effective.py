@@ -352,9 +352,6 @@ def calculate_effective_irradiance(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         solar_time_model=solar_time_model,
         verbose=verbose,
     )

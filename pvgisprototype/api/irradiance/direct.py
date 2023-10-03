@@ -676,15 +676,11 @@ def calculate_direct_inclined_irradiance_pvgis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         solar_time_model=solar_time_model,
         verbose=verbose,
     )
     hour_angle = calculate_hour_angle(
         solar_time=solar_time,
-        # angle_output_units=angle_output_units,
     )
     relative_longitude = calculate_relative_longitude(
         latitude,
