@@ -19,9 +19,6 @@ def calculate_local_solar_time_noaa(
         timezone: ZoneInfo,
         refracted_solar_zenith: RefractedSolarZenith,  # radians
         apply_atmospheric_refraction: bool = False,
-        # time_output_units: str = 'hours',
-        # angle_units: str = 'radians',
-        # angle_output_units: str = 'radians',
         verbose: int = 0,
     ) -> datetime:
     """
@@ -81,9 +78,6 @@ def calculate_local_solar_time_noaa(
         event='noon',
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
 
     if timestamp < solar_noon_timestamp.datetime:
@@ -102,15 +96,5 @@ def calculate_local_solar_time_noaa(
         typer.echo(f'Local solar time: {local_solar_timestamp}')
 
     local_solar_time = timestamp + timedelta(seconds=total_seconds)
-
-    # local_solar_time = time(
-    #     # year=local_solar_time.year,
-    #     # month=local_solar_time.month,
-    #     # day=local_solar_time.day,
-    #     hour=int(local_solar_time.hour),
-    #     minute=int(local_solar_time.minute),
-    #     second=int(local_solar_time.second),
-    #     tzinfo=local_solar_time.tzinfo,
-    # )
 
     return local_solar_time

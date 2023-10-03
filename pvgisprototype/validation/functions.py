@@ -78,6 +78,12 @@ class CalculateFractionalYearPVISInputModel(
 ):
     pass
 
+class CalculateFractionalYearPVGISInputModel(
+    BaseTimestampModel,
+    # BaseAngleInternalUnitsModel,
+):
+    pass
+
 
 class CalculateSolarDeclinationPVISInputModel(
     BaseTimeModel,
@@ -202,13 +208,6 @@ class CalculateSolarHourAngleNOAAInput(
     BaseTimeModel,
     # BaseTimeOutputUnitsModel,
     # BaseAngleOutputUnitsModel,
-):
-    pass
-
-
-class CalculateSolarHourAnglePVISInputModel(
-    SolarTimeModel,  # Parameter
-    BaseAngleOutputUnitsModel,
 ):
     pass
 

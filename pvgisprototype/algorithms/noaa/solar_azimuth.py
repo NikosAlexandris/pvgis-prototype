@@ -54,15 +54,12 @@ def calculate_solar_azimuth_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        # time_output_units=time_output_units,
-        # angle_output_units='radians',
     )
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
         timestamp=timestamp,
         solar_hour_angle=solar_hour_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # angle_output_units='radians',
     )
 
                    #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
@@ -140,7 +137,6 @@ def calculate_solar_azimuth_time_series_noaa(
     timezone: str,
     apply_atmospheric_refraction: bool = True,
     time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
     angle_output_units: str = 'radians',
 ):# -> np.ndarray:
     """Calculate the solar azimuth (θ) in radians for a time series"""

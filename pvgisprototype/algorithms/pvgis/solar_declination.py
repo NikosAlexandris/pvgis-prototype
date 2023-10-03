@@ -19,7 +19,6 @@ def calculate_solar_declination_pvgis(
     days_in_a_year: float = 365.25,
     eccentricity_correction_factor: float = 0.03344,
     perigee_offset: float = 0.048869,
-    # angle_output_units: str = 'radians',
 ) -> SolarDeclination:
     """Approximate the sun's declination for a given day of the year.
 
@@ -47,7 +46,6 @@ def calculate_solar_declination_pvgis(
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        # angle_output_units=angle_output_units,
         )
     
     solar_declination = SolarDeclination(

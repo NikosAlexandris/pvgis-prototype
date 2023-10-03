@@ -19,7 +19,6 @@ def calculate_solar_zenith_pvlib(
         latitude: Latitude,     # degrees
         timestamp: datetime,
         timezone: ZoneInfo,
-        # angle_output_units: str = 'radians',
     )-> SolarZenith:
     """Calculate the solar azimith (θ) in radians
     """
@@ -34,6 +33,4 @@ def calculate_solar_zenith_pvlib(
             value=solar_zenith,
             unit='degrees',
             )
-    # solar_zenith = convert_to_radians_if_requested(solar_zenith, angle_output_units)
-
     return solar_zenith

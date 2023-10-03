@@ -25,7 +25,6 @@ def calculate_time_offset_noaa(
         longitude: Longitude, 
         timestamp: datetime, 
         timezone: ZoneInfo,
-        # time_output_units: str = 'minutes',  # redesign me!
     ) -> TimeOffset:
     """Calculate the time offset (minutes) for NOAA's solar position calculations.
 
@@ -121,7 +120,6 @@ def calculate_time_offset_noaa(
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
-        # time_output_units='minutes',
         )  # minutes
     time_offset = longitude.as_minutes - timezone_offset_minutes + equation_of_time.minutes
     time_offset = TimeOffset(value=time_offset, unit='minutes')
