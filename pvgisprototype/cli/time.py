@@ -161,12 +161,12 @@ def solar_time(
         verbose=verbose,
     ) 
     solar_time_table = Table(
-        TIME_ALGORITHM_COLUMN_NAME, "Solar time", box=box.SIMPLE_HEAD  # UNITS_NAME,
+        TIME_ALGORITHM_COLUMN_NAME, SOLAR_TIME_COLUMN_NAME, box=box.SIMPLE_HEAD  # UNITS_NAME,
     )
     for model_result in solar_time:
         # typer.echo(f'Solar time: {solar_time} {units} ({timezone})')
         model_name = model_result.get(TIME_ALGORITHM_NAME, '')
-        solar_time = model_result.get('Solar time', '')
+        solar_time = model_result.get(SOLAR_TIME_NAME, '')
         # units = model_result.get(UNITS_NAME, '')
         solar_time_table.add_row(
                 model_name,
