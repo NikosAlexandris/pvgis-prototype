@@ -91,15 +91,6 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from .rich_help_panel_names import rich_help_panel_advanced_options
-from .rich_help_panel_names import rich_help_panel_geometry_time
-from .rich_help_panel_names import rich_help_panel_geometry_position
-from .rich_help_panel_names import rich_help_panel_geometry_refraction
-from .rich_help_panel_names import rich_help_panel_geometry_surface
-from .rich_help_panel_names import rich_help_panel_solar_time
-from .rich_help_panel_names import rich_help_panel_earth_orbit
-from .rich_help_panel_names import rich_help_panel_atmospheric_properties
-from .rich_help_panel_names import rich_help_panel_output
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 
@@ -168,12 +159,22 @@ def intro():
         width=78,
     )
     solar_geometry_primer = """
-    The first calculation is the position of the Earth in its orbit around the
-    sun expressed through the angle [cyan]Fractional Year[/cyan] measured in
-    radians.
+    The amount of solar irradiance incident on a solar surface at a location
+    and a moment in time, depends on the [cyan]Solar Incidence[/cyan] angle.
 
-    The second most important measurement is the [cyan]Equation of
-    Time[/cyan] which corrects for ...
+    To calculcate the critical solar incidence angle, PVGIS requires the
+    relative [cyan]Latitude[/cyan] and [cyan]Longitude[/cyan] coordinates of
+    the surface in question, the [cyan]Surface Tilt[/cyan] and [cyan]Surface
+    Orientation[/cyan] angles, the [cyan]Solar Declination[/cyan] and the
+    [cyan]Solar Hour[/cyan] angles both of which are derived from the
+    [cyan]Timestamp[/cyan] of interest.
+
+    First in order is the calculation of the position of the Earth in its orbit
+    around the sun expressed through the angle [cyan]Fractional Year[/cyan]
+    measured in radians.
+
+    Second is the [cyan]Equation of Time[/cyan] measured in minutes that
+    corrects for the eccentricity of the Earth's orbit and axial tilt.
 
     The [cyan]Time Offset[/cyan] measured in minutes, incorporates the
     [italic]Equation of Time[/italic] and accounts for the variation of the
@@ -182,9 +183,9 @@ def intro():
 
     Next if the [cyan]True solar time[/cyan], also known as the [cyan]Apparent
     solar time[/cyan] upon which depends the calculation of the [cyan]Solar
-    hour angle[/cyan]
+    hour angle[/cyan].
 
-    The [cyan]solar hour angle[/cyan] measures the Earth's rotation and
+    The [cyan]Solar Hour angle[/cyan] measures the Earth's rotation and
     indicates the time of the day relative to the position of the sun. It bases
     on the longitude and timestamp and by definition, the solar hour angle is :
 
