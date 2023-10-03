@@ -221,7 +221,7 @@ def correct_linke_turbidity_factor(
 )
 def calculate_refracted_solar_altitude(
     solar_altitude: Annotated[float, typer_argument_solar_altitude],
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
+    # angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Adjust the solar altitude angle for atmospheric refraction
@@ -251,33 +251,35 @@ def calculate_refracted_solar_altitude(
 	drefract = 0.061359 * temp1 / temp2;    /* in radians */
 	h0refract = locSolarAltitude + drefract;
     """
-    if solar_altitude.unit != "degrees":
-        raise ValueError(f"The atmospheric refraction equation expects the solar altitude angle in `degrees`!")
+    # if solar_altitude.unit != "degrees":
+    #     raise ValueError(f"The atmospheric refraction equation expects the solar altitude angle in `degrees`!")
 
     atmospheric_refraction = (
         0.061359
         * (
             0.1594
-            + 1.123 * solar_altitude.radians
-            + 0.065656 * pow(solar_altitude.radians, 2)
+            + 1.123 * solar_altitude.degrees
+            + 0.065656 * pow(solar_altitude.degrees, 2)
         )
         / (
             1
-            + 28.9344 * solar_altitude.radians
-            + 277.3971 * pow(solar_altitude.radians, 2)
+            + 28.9344 * solar_altitude.degrees
+            + 277.3971 * pow(solar_altitude.degrees, 2)
         )
     )
     refracted_solar_altitude = RefractedSolarAltitude(
-        value=solar_altitude.radians + atmospheric_refraction,
-        unit=solar_altitude.unit,
+        value=solar_altitude.degrees + atmospheric_refraction,
+        unit='degrees',
     )
     refracted_solar_altitude = convert_to_radians_if_requested(
         refracted_solar_altitude,
-        angle_output_units,
+        # angle_output_units,
+        'radians',
     )
 
     if verbose == 3:
         debug(locals())
+
     return refracted_solar_altitude
 
 
