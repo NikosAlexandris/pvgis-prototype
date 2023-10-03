@@ -17,8 +17,6 @@ from zoneinfo import ZoneInfo
 import math
 from math import radians
 import numpy as np
-from rich.table import Table
-from rich import box
 from rich import print
 from .typer_parameters import OrderCommands
 from .typer_parameters import typer_argument_longitude
@@ -717,9 +715,9 @@ def hour_angle(
 @app.command('sunrise', no_args_is_help=True, help=':sunrise: Calculate the hour angle (ω) at sun rise and set')
 def sunrise(
     latitude: Annotated[float, typer_argument_latitude],
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     solar_declination: Annotated[Optional[float], typer_argument_solar_declination] = 45,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -732,34 +730,34 @@ def sunrise(
     increases by 15° per hour, negative before solar noon and positive after
     solar noon.
     """
-    from rich.console import Console
-    from rich.table import Table
-    from rich import box
-
-    latitude = Latitude(value=latitude, unit='radians')
+    latitude = Latitude(value=latitude, unit="radians")
     output_latitude = convert_to_degrees_if_requested(latitude, angle_output_units)
 
     hour_angle = calculate_hour_angle_sunrise(
-            latitude,
-            surface_tilt,
-            solar_declination,
-            )
+        latitude=latitude,
+        surface_tilt=surface_tilt,
+        solar_declination=solar_declination,
+    )
     output_hour_angle = convert_to_degrees_if_requested(hour_angle, angle_output_units)
-    
-    surface_tilt = SurfaceTilt(value=surface_tilt, unit='radians')
-    output_surface_tilt = convert_to_degrees_if_requested(surface_tilt, angle_output_units)
 
-    solar_declination = SolarDeclination(value=solar_declination, unit='radians')
-    output_solar_declination = convert_to_degrees_if_requested(solar_declination, angle_output_units)
+    surface_tilt = SurfaceTilt(value=surface_tilt, unit="radians")
+    output_surface_tilt = convert_to_degrees_if_requested(
+        surface_tilt, angle_output_units
+    )
+
+    solar_declination = SolarDeclination(value=solar_declination, unit="radians")
+    output_solar_declination = convert_to_degrees_if_requested(
+        solar_declination, angle_output_units
+    )
 
     from pvgisprototype.cli.print import print_hour_angle_table
     print_hour_angle_table(
-            latitude=output_latitude.value,
-            rounding_places=rounding_places,
-            surface_tilt=output_surface_tilt.value,
-            declination=output_solar_declination.value,
-            hour_angle=output_hour_angle.value,
-            units=angle_output_units,
+        latitude=output_latitude.value,
+        rounding_places=rounding_places,
+        surface_tilt=output_surface_tilt.value,
+        declination=output_solar_declination.value,
+        hour_angle=output_hour_angle.value,
+        units=angle_output_units,
     )
 
 
