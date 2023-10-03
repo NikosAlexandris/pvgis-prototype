@@ -72,6 +72,7 @@ def print_solar_position_table(
     rounded_table = round_float_values(table, rounding_places)
     quantities = [declination, zenith, altitude, azimuth, incidence]
 
+    debug(locals())
     columns = []
     if longitude is not None:
         columns.append(LONGITUDE_COLUMN_NAME)
@@ -100,14 +101,12 @@ def print_solar_position_table(
     if incidence is not None:
         columns.append(INCIDENCE_COLUMN_NAME)
     columns.append(UNITS_COLUMN_NAME)
-    
 
     table = Table(*columns, box=box.SIMPLE_HEAD)
-
     for model_result in rounded_table:
         declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination else None
         hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle else None
-        solar_time_model = model_result.get(TIME_ALGORITHM_NAME, '')
+        solar_time_model = model_result.get(TIME_ALGORITHM_NAME, '') if timing else None
         algorithm = model_result.get(POSITION_ALGORITHM_NAME, '')
         zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith else None
         altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude else None
@@ -115,7 +114,12 @@ def print_solar_position_table(
         incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence else None
         units = model_result.get(UNITS_NAME, UNITLESSS_COLUMN_NAME)
 
-        row = [str(longitude), str(latitude), str(timestamp), str(timezone)]
+        row = []
+        if longitude:
+            row.append(str(longitude))
+        if latitude:
+            row.append(str(latitude))
+        row.extend([str(timestamp), str(timezone)])
 
        # ---------------------------------------------------- Implement-Me---
        # Convert the result back to the user's time zone
