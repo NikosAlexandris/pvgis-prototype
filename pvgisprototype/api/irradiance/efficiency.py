@@ -1,8 +1,12 @@
 from devtools import debug
 import typer
+from typing import Annotated
+from typing import List
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.constants import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 import numpy as np
 
 
@@ -24,10 +28,11 @@ app = typer.Typer(
 def calculate_pv_efficiency(
     irradiance: float,
     temperature: float,
-    model_constants = EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
+    model_constants: List[float] = EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
     wind_speed: float = None,
     use_faiman_model: bool = False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """
     Calculate the efficiency of a photovoltaic system under varying
@@ -62,10 +67,8 @@ def calculate_pv_efficiency(
     >>> calculate_pv_efficiency(1000, 30, [1, 2, 3, 4, 5, 6, 7, 8, 9], 25, wind_speed=None, use_faiman_model=False)
     'Calculated efficiency is out of logical range (0 to 1).'
     """
-    # Validate model constants -----------------------------------------------
     if len(model_constants) < 7:
         return "Insufficient number of model constants."
-    # ------------------------------------------------------------------------
     
     relative_irradiance = 0.001 * irradiance
     if relative_irradiance <= 0:
@@ -73,8 +76,7 @@ def calculate_pv_efficiency(
 
     log_relative_irradiance = np.log(relative_irradiance)
 
-    # Adjust the temperature based on the model
-    if use_faiman_model and wind_speed is not None:
+    if use_faiman_model and wind_speed is not None:  # Adjust temperature
         if len(model_constants) < 9:
             return "Insufficient number of model constants for Faiman model with wind speed."
         temperature += irradiance / (model_constants[7] + model_constants[8] * wind_speed)
@@ -104,5 +106,10 @@ def calculate_pv_efficiency(
 
     if 0 > efficiency > 1:
         return "The calculated efficiency is out of the expected range [0, 1]!"
+
+    if verbose == 3:
+        debug(locals())
+    if verbose > 0:
+        print(f'Efficiciency : {efficiency}')
 
     return efficiency
