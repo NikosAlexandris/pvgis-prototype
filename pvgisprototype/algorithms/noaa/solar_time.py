@@ -120,20 +120,21 @@ def calculate_true_solar_time_time_series_noaa(
             timestamp=timestamp,
             timezone=timezone,
             # time_output_units=time_output_units,
-            angle_units=angle_units,
+            # angle_units=angle_units,
         )  # in minutes
-        true_solar_time = (
-            timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.as_minutes
+        time_offset_timedelta = timedelta(minutes=time_offset.minutes)
+        true_solar_time = timestamp + time_offset_timedelta
+        true_solar_time_minutes = (
+            true_solar_time.hour * 60
+            + true_solar_time.minute
+            + true_solar_time.second / 60
         )
 
-        if time_output_units == 'minutes':
-            # if not 0 <= true_solar_time <= 1440:
-            # if not 0 <= true_solar_time <= 1580:
-            if not -1580 <= true_solar_time <= 1580:
-                raise ValueError(f'The calculated true solar time `{true_solar_time}` is out of the expected range [-1580, 1580] minutes!')
+        if not -1580 <= true_solar_time_minutes <= 1580:
+            raise ValueError(f'The calculated true solar time `{true_solar_time}` is out of the expected range [-1580, 1580] minutes!')
 
         # Convert to datetime object
-        hours, remainder = divmod(true_solar_time, 60)
+        hours, remainder = divmod(true_solar_time_minutes, 60)
         minutes, seconds = divmod(remainder * 60, 60)
         true_solar_time = datetime(
                 year=timestamp.year,
