@@ -1,4 +1,5 @@
 from devtools import debug
+from rich import print
 from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
 from datetime import datetime
 from math import sin
@@ -211,6 +212,9 @@ def calculate_refracted_solar_altitude_time_series(
 
     if verbose == 3:
         debug(locals())
+    if verbose > 1:
+        print(f'Refracted solar altitude series : {refracted_solar_altitude_series}')
+
     return refracted_solar_altitude_series
 
 
@@ -245,6 +249,9 @@ def calculate_optical_air_mass_time_series(
 
     if verbose == 3:
         debug(locals())
+    if verbose > 1:
+        print(f'optical air mass series : {optical_air_mass_series}')
+
     return optical_air_mass_series
 
 
@@ -294,6 +301,9 @@ def rayleigh_optical_thickness_time_series(
 
     if verbose == 3:
         debug(locals())
+    if verbose > 1:
+        print(f'Rayleigh thickness series : {rayleigh_thickness_series}')
+
     return rayleigh_thickness_series
 
 
@@ -349,12 +359,11 @@ def calculate_direct_normal_irradiance_time_series(
         )
     )
 
-    if verbose == 1:
-        pass
-
     if verbose == 3:
         debug(locals())
-    typer.echo(f'Direct normal irradiance series: {direct_normal_irradiance_series}')  # B0c
+    if verbose > 0:
+        print(f'Direct normal irradiance series: {direct_normal_irradiance_series}')  # B0c
+
     return direct_normal_irradiance_series
 
 
@@ -441,16 +450,14 @@ def calculate_direct_horizontal_irradiance_time_series(
     solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
     direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
 
-    if verbose == 1:
-        pass
-
     if verbose == 3:
         debug(locals())
+    if verbose > 0:
+        # timestamps = np.array(timestamps)
+        # results = np.column_stack((timestamps, direct_horizontal_irradiance_series))
+        # print(f'Direct horizontal irradiance series:\n{results}')
+        print(f'Direct horizontal irradiance series: {direct_horizontal_irradiance_series}')  # B0c
 
-    timestamps = np.array(timestamps)
-    results = np.column_stack((timestamps, direct_horizontal_irradiance_series))
-    # typer.echo(f'Direct horizontal irradiance series: {direct_horizontal_irradiance_series}')  # B0c
-    typer.echo(f'Direct horizontal irradiance series:\n{results}')
     return direct_horizontal_irradiance_series
 
 
@@ -682,7 +689,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         )
     except ZeroDivisionError:
         logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
-        typer.echo("Is the solar altitude angle zero?")
+        print("Is the solar altitude angle zero?")
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
@@ -701,7 +708,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
                     angle_of_incidence_constant = 0.155,
                     )
             direct_inclined_irradiance_series = modified_direct_horizontal_irradiance_series * angular_loss_factor
-            typer.echo(f'Direct inclined irradiance series: {direct_inclined_irradiance_series} (based on PVGIS)')  # B0c
+            print(f'Direct inclined irradiance series: {direct_inclined_irradiance_series} (based on PVGIS)')  # B0c
 
             return direct_inclined_irradiance
 
@@ -714,8 +721,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             logging.error(f"Which Error? {e}")
             raise ValueError
 
-    typer.echo(f'Direct inclined irradiance series: {modified_direct_horizontal_irradiance_series} (based on {solar_incidence_model})')  # B0c
-
     if verbose == 3:
         debug(locals())
+    if verbose > 0:
+        print(f'Direct inclined irradiance series: {modified_direct_horizontal_irradiance_series} (based on {solar_incidence_model})')  # B0c
+
     return modified_direct_horizontal_irradiance_series
