@@ -3,8 +3,7 @@ from enum import Enum
 
 class SolarIncidenceModels(str, Enum):
     all = 'all'
-    # pvis = 'pvis'
-    effective = 'effective'
+    pvis = 'pvis'
     jenco = 'Jenco'
 
 

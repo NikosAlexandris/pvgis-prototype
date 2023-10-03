@@ -17,20 +17,23 @@ def model_hash(self):
 def _degrees_to_timedelta(degrees):
     return degrees / 15.0
 
+
 def _radians_to_timedelta(radians):
     degrees = np.degrees(radians)
     return _degrees_to_timedelta(degrees)
 
+
 def _radians_to_minutes(radians):
     return (1440 / (2 * np.pi)) * radians
+
 
 def _degrees_to_minutes(degrees):
     radians = np.radians(degrees)
     return _radians_to_minutes(radians)
 
+
 def _timestamp_to_hours(timestamp):
     return timestamp.hour + timestamp.minute / 60 + timestamp.second / 3600 + timestamp.microsecond / 3600000000
-
 
 
 @property
@@ -57,6 +60,14 @@ def radians_property(self):
             return np.radians(self.value)
         else:
             return None
+    else:
+        return None
+
+
+@property
+def minutes_property(self):
+    if self.unit == 'minutes':
+        return self.value
     else:
         return None
 
@@ -118,7 +129,6 @@ def as_hours_property(self):
         return None
 
 
-
 def generate_dataclass_models(yaml_file: str):
 
     with open(yaml_file, 'r') as f:
@@ -144,6 +154,7 @@ def generate_dataclass_models(yaml_file: str):
                 '__hash__': model_hash,
                 'degrees': degrees_property,
                 'radians': radians_property,
+                'minutes': minutes_property,
                 'timedelta': timedelta_property,
                 'as_minutes': as_minutes_property,
                 'datetime': datetime_property,
@@ -153,6 +164,7 @@ def generate_dataclass_models(yaml_file: str):
             }
         )
         globals()[model_name] = model_class
+
 
 package_root = Path(__file__).resolve().parent
 parameters_yaml_file_path = package_root / 'validation' / PARAMETERS_YAML_FILE

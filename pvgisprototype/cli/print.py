@@ -8,27 +8,29 @@ from rich.panel import Panel
 from rich import box
 from typing import List
 from pvgisprototype.constants import (
-    POSITION_ALGORITHM_COLUMN_NAME,
-    POSITION_ALGORITHM_NAME,
-    ALTITUDE_COLUMN_NAME,
-    ALTITUDE_NAME,
-    AZIMUTH_COLUMN_NAME,
-    AZIMUTH_NAME,
+    LONGITUDE_COLUMN_NAME,
+    LATITUDE_COLUMN_NAME,
+    SURFACE_TILT_COLUMN_NAME,
+    TIME_ALGORITHM_NAME,
+    TIME_ALGORITHM_COLUMN_NAME,
     DECLINATION_COLUMN_NAME,
     DECLINATION_NAME,
     HOUR_ANGLE_COLUMN_NAME,
     HOUR_ANGLE_NAME,
-    INCIDENCE_COLUMN_NAME,
-    INCIDENCE_NAME,
-    TIME_ALGORITHM_NAME,
-    TIME_ALGORITHM_COLUMN_NAME,
-    UNITS_COLUMN_NAME,
-    UNITS_NAME,
+    POSITION_ALGORITHM_COLUMN_NAME,
+    POSITION_ALGORITHM_NAME,
     ZENITH_COLUMN_NAME,
     ZENITH_NAME,
-    NOT_AVAILABLE_COLUMN_NAME,
+    ALTITUDE_COLUMN_NAME,
+    ALTITUDE_NAME,
+    AZIMUTH_COLUMN_NAME,
+    AZIMUTH_NAME,
+    INCIDENCE_COLUMN_NAME,
+    INCIDENCE_NAME,
+    UNITS_COLUMN_NAME,
     UNITLESSS_COLUMN_NAME,
-    SURFACE_TILT_COLUMN_NAME,               # FIXME: add this line in constants SURFACE_TILT_COLUMN_NAME = 'Tilt'
+    UNITS_NAME,
+    NOT_AVAILABLE_COLUMN_NAME,
 )
 
 
@@ -54,6 +56,7 @@ def print_solar_position_table(
     rounding_places,
     declination=None,
     hour_angle=None,
+    timing=None,
     zenith=None,
     altitude=None,
     azimuth=None,
@@ -67,16 +70,27 @@ def print_solar_position_table(
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
+    quantities = [declination, zenith, altitude, azimuth, incidence]
 
-    columns = ["Longitude", "Latitude", "Time", "Zone"]
+    columns = []
+    if longitude is not None:
+        columns.append(LONGITUDE_COLUMN_NAME)
+    if latitude is not None:
+        columns.append(LATITUDE_COLUMN_NAME)
+    if timestamp is not None:
+        columns.append('Time')
+    if timezone is not None:
+        columns.append('Zone')
     if user_requested_timestamp and user_requested_timezone:
         columns.extend(["Local Time", "Local Zone"])
-    columns.append(TIME_ALGORITHM_COLUMN_NAME)
+    if timing is not None:
+        columns.append(TIME_ALGORITHM_COLUMN_NAME)
     if declination is not None:
         columns.append(DECLINATION_COLUMN_NAME)
     if hour_angle is not None:
         columns.append(HOUR_ANGLE_COLUMN_NAME)
-    columns.append(POSITION_ALGORITHM_COLUMN_NAME)
+    if any(quantity is not None for quantity in quantities):
+        columns.append(POSITION_ALGORITHM_COLUMN_NAME)
     if zenith is not None:
         columns.append(ZENITH_COLUMN_NAME)
     if altitude is not None:
@@ -86,19 +100,20 @@ def print_solar_position_table(
     if incidence is not None:
         columns.append(INCIDENCE_COLUMN_NAME)
     columns.append(UNITS_COLUMN_NAME)
+    
 
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
     for model_result in rounded_table:
-        algorithm_name = model_result.get(POSITION_ALGORITHM_NAME, '')
-        declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination is not None else None
-        hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle is not None else None
-        zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith is not None else None
-        altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude is not None else None
-        azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth is not None else None
-        incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence is not None else None
-        units = model_result.get(UNITS_NAME, UNITLESSS_COLUMN_NAME)
+        declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination else None
+        hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle else None
         solar_time_model = model_result.get(TIME_ALGORITHM_NAME, '')
+        algorithm = model_result.get(POSITION_ALGORITHM_NAME, '')
+        zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith else None
+        altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude else None
+        azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth else None
+        incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence else None
+        units = model_result.get(UNITS_NAME, UNITLESSS_COLUMN_NAME)
 
         row = [str(longitude), str(latitude), str(timestamp), str(timezone)]
 
@@ -112,17 +127,14 @@ def print_solar_position_table(
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
 
-        is_pvis = algorithm_name.lower() == 'pvis'
-        style = "red" if is_pvis else None
-        # is_pvlib = algorithm_name.lower() == 'pvlib'
-        # style = "green" if is_pvlib else None
-        row.append(algorithm_name)
-
+        if solar_time_model is not None:
+            row.append(solar_time_model)
         if declination_value is not None:
             row.append(str(declination_value))
         if hour_angle_value is not None:
             row.append(str(hour_angle_value))
-        row.append(algorithm_name)
+        if algorithm is not None:
+            row.append(algorithm)
         if zenith_value is not None:
             row.append(str(zenith_value))
         if altitude_value is not None:
@@ -131,8 +143,13 @@ def print_solar_position_table(
             row.append(str(azimuth_value))
         if incidence_value is not None:
             row.append(str(incidence_value))
-
         row.append(str(units))
+
+        style_map = {
+            "pvis": "red",  # red because PVIS is incomplete!
+            "pvlib": "bold",
+        }
+        style = style_map.get(algorithm.lower(), None)
         table.add_row(*row, style=style)
 
     console.print(table)

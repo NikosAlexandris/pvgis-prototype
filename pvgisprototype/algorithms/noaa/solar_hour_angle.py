@@ -22,7 +22,7 @@ def calculate_solar_hour_angle_noaa(
     timestamp: datetime, 
     timezone: Optional[ZoneInfo] = None, 
     # time_output_units: str = 'minutes',
-    # angle_output_units: str = 'radians',
+    # angle_output_units: Optional[str] = 'radians',
     verbose: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
@@ -76,11 +76,12 @@ def calculate_solar_hour_angle_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        # time_output_units='minutes',                    # NOTE gounaol: Should not be None
-    )  # in minutes
+        # time_output_units='minutes',  # NOTE gounaol: Should not be None
+    )
 
-    # true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
-    solar_hour_angle = (true_solar_time.as_minutes - 720) * (pi / 720)
+    true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
+    # solar_hour_angle = (true_solar_time.minutes - 720) * (pi / 720)
+    solar_hour_angle = (true_solar_time_minutes - 720) * (pi / 720)
 
     # Important ! ------------------------------------------------------------
     # If (hourangle < -180) Then hourangle = hourangle + 360
@@ -88,14 +89,17 @@ def calculate_solar_hour_angle_noaa(
         solar_hour_angle += 2 * pi
     # ------------------------------------------------------------------------
 
-
     solar_hour_angle = SolarHourAngle(
         value=solar_hour_angle,
         unit='radians',
     )
 
+    if not -pi <= solar_hour_angle.radians <= pi:
+        raise ValueError(f'The calculated hour angle {solar_hour_angle} is out of the expected range [{-pi}, {pi}] radians')
+
     if verbose == 3:
         debug(locals())
+
     return solar_hour_angle
 
 

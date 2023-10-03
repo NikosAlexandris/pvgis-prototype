@@ -6,7 +6,6 @@ from zoneinfo import ZoneInfo
 from math import pi
 from math import sin
 from math import asin
-
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
 from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
@@ -25,7 +24,12 @@ from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME, DECLINATION_NAME, UNITS_NAME
+from pvgisprototype.constants import ALGORITHM_NAME
+from pvgisprototype.constants import DECLINATION_NAME
+from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME
+from pvgisprototype.constants import DECLINATION_NAME
+from pvgisprototype.constants import UNITS_NAME
 
 
 def model_solar_declination(
@@ -107,8 +111,8 @@ def calculate_solar_declination(
             )
             results.append({
                 POSITION_ALGORITHM_NAME: model.value,
-                DECLINATION_NAME: getattr(solar_declination, angle_output_units),
-                UNITS_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
+                DECLINATION_NAME if solar_declination else None: getattr(solar_declination, angle_output_units) if solar_declination else None,
+                UNITS_NAME: angle_output_units,
             })
 
     return results

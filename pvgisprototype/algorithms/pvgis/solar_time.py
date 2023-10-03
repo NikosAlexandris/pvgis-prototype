@@ -29,10 +29,10 @@ def calculate_solar_time_pvgis(
     timezone: ZoneInfo = None,
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,  # from the C code : = 0.165
     time_offset_global: float = 0,
     verbose: int = 0,
-) -> SolarTime:
+)->SolarTime:
     """Calculate the solar time.
 
     1. Map the day of the year onto the circumference of a circle, essentially
@@ -72,8 +72,6 @@ def calculate_solar_time_pvgis(
                   * np.sin(2 * day_of_year_in_radians + 0.34383)
 
     # Complicated implementation borrowed from SPECMAGIC!
-    longitude = longitude.value
-    latitude = latitude.value
     image_offset = get_image_offset(longitude, latitude)  # for `hour_offset`
 
     # adding longitude to UTC produces mean solar time!
@@ -90,4 +88,4 @@ def calculate_solar_time_pvgis(
         from devtools import debug
         debug(locals())
 
-    return SolarTime(value=solar_time, unit='timestamp')
+    return solar_time

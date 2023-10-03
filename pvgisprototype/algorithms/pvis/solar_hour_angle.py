@@ -4,24 +4,23 @@ import numpy as np
 from datetime import datetime
 from typing import Annotated
 from typing import Optional
-# from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype import SolarTime
-
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import SolarHourAnglePvisInput
-from pvgisprototype.validation.functions import SolarHourAngleSunrisePvisInput
+from pvgisprototype.validation.functions import CalculateSolarHourAnglePVISInputModel
+from pvgisprototype.validation.functions import CalculateHourAngleSunrisePVISInputModel
+from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 from math import pi
 
-@validate_with_pydantic(SolarHourAnglePvisInput)
+
+# @validate_with_pydantic(CalculateSolarHourAnglePVISInputModel)
 def calculate_solar_hour_angle_pvis(
-        solar_time: SolarTime,
-        # angle_output_units: str = 'radians',
-    ) -> SolarHourAngle:
+    solar_time,
+    # angle_output_units: str = 'radians',
+)-> SolarHourAngle:
     """Calculate the hour angle ω'
 
     ω = (ST / 3600 - 12) * 15 * pi / 180
@@ -50,16 +49,19 @@ def calculate_solar_hour_angle_pvis(
 
         where the solar time was given in seconds.
     """
-    hour_angle = (solar_time.as_minutes / 60 - 12) * 15 * pi / 180
-    return SolarHourAngle(value=hour_angle, unit='radians')
+    true_solar_time_minutes = timestamp_to_minutes(solar_time)
+    hour_angle = (true_solar_time_minutes / 60 - 12) * 15 * pi / 180
+    hour_angle = SolarHourAngle(value=hour_angle, unit='radians')
+
+    return hour_angle
 
 
-@validate_with_pydantic(SolarHourAngleSunrisePvisInput)
+@validate_with_pydantic(CalculateHourAngleSunrisePVISInputModel)
 def calculate_hour_angle_sunrise(  # rename to: calculate_event_hour_angle
         latitude: Latitude,
         surface_tilt: float = 0,
         solar_declination: float = 0,
-        angle_output_units: str = 'radians',
+        # angle_output_units: str = 'radians',
     ) -> HourAngleSunrise:
     """Calculate the hour angle (ω) at sunrise and sunset
 

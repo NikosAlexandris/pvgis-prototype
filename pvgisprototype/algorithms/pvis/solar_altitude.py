@@ -21,25 +21,23 @@ from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 
 @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
 def calculate_solar_altitude_pvis(
-        longitude: Longitude,
-        latitude: Latitude,
-        # longitude: Longitude_in_Radians,
-        # latitude: Latitude_in_Radians,
-        timestamp: datetime,
-        timezone: ZoneInfo,
-        apply_atmospheric_refraction: bool,
-        refracted_solar_zenith: RefractedSolarZenith,
-        days_in_a_year: float,
-        perigee_offset: float,
-        eccentricity_correction_factor: float,
-        time_offset_global: int,
-        hour_offset: int,
-        solar_time_model: SolarTimeModels,
-        # time_output_units: Optional[str] = 'minutes',
-        # angle_units: Optional[str] = 'radians',
-        # angle_output_units: Optional[str] = 'radians',
-        verbose: int = 0,
-    ) -> SolarAltitude:
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: ZoneInfo,
+    apply_atmospheric_refraction: bool,
+    refracted_solar_zenith: RefractedSolarZenith,
+    days_in_a_year: float,
+    perigee_offset: float,
+    eccentricity_correction_factor: float,
+    time_offset_global: int,
+    hour_offset: int,
+    solar_time_model: SolarTimeModels,
+    # time_output_units: str,
+    # angle_units: str,
+    # angle_output_units: str,
+    verbose: int = 0,
+) -> SolarAltitude:
     """Compute various solar geometry variables.
     Parameters
     ----------
@@ -97,16 +95,12 @@ def calculate_solar_altitude_pvis(
     )
     hour_angle = calculate_hour_angle(
             solar_time=solar_time,
-            angle_output_units='radians',
+            # angle_output_units='radians',
     )
     sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
     solar_altitude = asin(sine_solar_altitude)
     solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
     # solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
-    # solar_altitude = convert_to_degrees_if_requested(
-    #         solar_altitude,
-    #         output_units,
-    #         )
 
     if verbose == 3:
         debug(locals())

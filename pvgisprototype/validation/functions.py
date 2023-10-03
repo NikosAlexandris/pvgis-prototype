@@ -215,7 +215,7 @@ class CalculateSolarHourAnglePVISInputModel(
 
 class CalculateSolarHourAnglePVISInputModel(
     SolarTimeModel,  # Parameter
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -230,7 +230,7 @@ class CalculateHourAngleSunriseInputModel(
     pass
 
 
-class SolarHourAngleSunrisePvisInput(
+class CalculateHourAngleSunrisePVISInputModel(
     CalculateHourAngleSunriseInputModel
 ):
     pass
@@ -458,9 +458,9 @@ class CalculateSolarIncidenceJencoInputModel(
     SurfaceTiltModel,
     SurfaceOrientationModel,
     EarthOrbitModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleInternalUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleInternalUnitsModel,
+    # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass

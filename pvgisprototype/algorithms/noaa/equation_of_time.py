@@ -36,11 +36,9 @@ def calculate_equation_of_time_noaa(
         - 0.014615 * cos(2 * fractional_year.radians)
         - 0.040849 * sin(2 * fractional_year.radians)
     )
-    equation_of_time_timedelta = timedelta(minutes=equation_of_time_minutes)
+    equation_of_time = EquationOfTime(value=equation_of_time_minutes, unit='minutes')
 
-    equation_of_time = EquationOfTime(value=equation_of_time_timedelta, unit='timedelta')
-
-    if not EQUATIONOFTIME_MINIMUM <= equation_of_time.as_minutes <= EQUATIONOFTIME_MAXIMUM:
+    if not EQUATIONOFTIME_MINIMUM <= equation_of_time.minutes <= EQUATIONOFTIME_MAXIMUM:
         raise ValueError("The calculated equation of time is out of the expected range [{EQUATIONOFTIME_MINIMUM}, {EQUATIONOFTIME_MAXIMUM}] {EQUATIONOFTIME_UNITS}")
 
     return equation_of_time

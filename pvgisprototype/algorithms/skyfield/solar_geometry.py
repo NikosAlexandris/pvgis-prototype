@@ -85,15 +85,10 @@ def calculate_solar_position_skyfield(
     planets = skyfield.api.load('de421.bsp')
     sun = planets['Sun']
     earth = planets['Earth']
-    # N = skyfield.api.N
-    # W = skyfield.api.W
-    # E = skyfield.api.E
-
     location = skyfield.api.wgs84.latlon(latitude.degrees, longitude.degrees)
-
-    # sun position seen from observer location
     timescale = skyfield.api.load.timescale()
     requested_timestamp = timescale.from_datetime(timestamp)
+    # sun position seen from observer location
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
 
     return solar_position
