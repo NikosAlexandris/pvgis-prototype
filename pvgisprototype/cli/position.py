@@ -91,6 +91,7 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from .rich_help_panel_names import rich_help_panel_geometry_noaa
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 
@@ -310,116 +311,42 @@ def overview(
     )
 
 
-@app.command(
-    no_args_is_help=True,
-    help=':sun: :clock12: :triangular_ruler: NOAA\'s general solar position calculations',
-)
-# @debug_if_needed(app)
-def noaa(
-    ctx: typer.Context,
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
+@app.command('declination', no_args_is_help=True, help='∢ Calculate the solar declination')
+def declination(
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-):
-    """
-    """
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamp = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-    
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamp.tzinfo != utc_zoneinfo:
-
-        # Note the input timestamp and timezone
-        user_requested_timestamp = timestamp
-        user_requested_timezone = timezone
-
-        timestamp = timestamp.astimezone(utc_zoneinfo)
-        timezone = utc_zoneinfo
-        typer.echo(f'Input timestamp & zone ({user_requested_timestamp} & {user_requested_timezone}) converted to {timestamp} for all internal calculations!')
-
-    solar_position_calculations = calculate_noaa_solar_position(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
-    )
-    # Convert output timestamp back to the user-requested timezone
-    try:
-        timestamp = user_requested_timestamp
-        timezone = user_requested_timezone
-    except:
-        print(f'I guess there where no user requested timestamp and zone')
-
-    print_noaa_solar_position_table(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        solar_position_calculations=solar_position_calculations, 
-        rounding_places=rounding_places,
-        user_requested_timestamp=user_requested_timestamp, 
-        user_requested_timezone=user_requested_timezone,
-        angle_output_units=angle_output_units,
-        verbose=verbose,
-    )
-
-
-@app.command(
-    'altitude',
-    no_args_is_help=True,
-    help=f'⦩ Calculate the solar altitude',
-)
-# @debug_if_needed(app)
-def altitude(
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
-    hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    # time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    # angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
+    local_time: Annotated[bool, typer_option_local_time] = False,
+    random_time: Annotated[bool, typer_option_random_time] = False,
+    model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> float:
-    """Calculate the solar altitude angle above the horizon.
+    """Calculat the solar declination angle 
 
-    The solar altitude angle (SAA) is the complement of the solar zenith angle,
-    measuring from the horizon directly below the sun to the sun itself. An
-    altitude of 0 degrees means the sun is on the horizon, and an altitude of
-    90 degrees means the sun is directly overhead.
+    The solar declination (delta) is the angle between the line from the Earth
+    to the Sun and the plane of the Earth's equator. It varies between ±23.45
+    degrees over the course of a year as the Earth orbits the Sun.
 
     Parameters
     ----------
-    solar_geometry_day_constants : SolarGeometryDayConstants
-        The input solar geometry constants.
+
+    Returns
+    -------
+    solar_declination: float
     """
     # Initialize with None ---------------------------------------------------
     user_requested_timestamp = None
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
+
+    # Possible to move to a callback? ----------------------------------------
+    if random_time:
+        timestamp, timezone = random_datetimezone()
+    # ------------------------------------------------------------------------
 
     # Convert the input timestamp to UTC, for _all_ internal calculations
     utc_zoneinfo = ZoneInfo("UTC")
@@ -431,42 +358,31 @@ def altitude(
 
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
-    
+
     # Why does the callback function `_parse_model` not work? ----------------
-    if SolarPositionModels.all in model:
+    if SolarDeclinationModels.all in model:
         model = [
-            model for model in SolarPositionModels if model != SolarPositionModels.all
+            model for model in SolarDeclinationModels if model != SolarDeclinationModels.all
         ]
-    solar_altitude = calculate_solar_altitude(
-        longitude=longitude,
-        latitude=latitude,
+    solar_declination = calculate_solar_declination(
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
+        models=model,
         days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
+        perigee_offset=perigee_offset,
         angle_output_units=angle_output_units,
-        verbose=verbose,
     )
-    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
-    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     print_solar_position_table(
-        longitude=longitude,
-        latitude=latitude,
+        longitude=None,
+        latitude=None,
         timestamp=timestamp,
         timezone=timezone,
-        table=solar_altitude,
+        table=solar_declination,
         rounding_places=rounding_places,
-        altitude=True,
+        declination=True,
         user_requested_timestamp=user_requested_timestamp, 
-        user_requested_timezone=user_requested_timezone
+        user_requested_timezone=user_requested_timezone,
     )
 
 
@@ -555,9 +471,9 @@ def zenith(
         if ZENITH_NAME not in model_result:
             solar_altitude_angle = model_result.get(ALTITUDE_NAME, None)
             if solar_altitude_angle is not None:
-                model_result[ZENITH_NAME] = calculate_zenith(angle_output_units, solar_altitude_angle)
-
-
+                model_result[ZENITH_NAME] = calculate_zenith(
+                    angle_output_units, solar_altitude_angle
+                )
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -568,9 +484,102 @@ def zenith(
         timezone=timezone,
         table=solar_zenith,
         rounding_places=rounding_places,
+        timing=True,
         zenith=True,
-        user_requested_timestamp=user_requested_timestamp, 
+        user_requested_timestamp=user_requested_timestamp,
         user_requested_timezone=user_requested_timezone,
+    )
+
+
+@app.command(
+    'altitude',
+    no_args_is_help=True,
+    help=f'⦩ Calculate the solar altitude',
+)
+# @debug_if_needed(app)
+def altitude(
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
+    hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
+    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    # time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
+    # angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+) -> float:
+    """Calculate the solar altitude angle above the horizon.
+
+    The solar altitude angle (SAA) is the complement of the solar zenith angle,
+    measuring from the horizon directly below the sun to the sun itself. An
+    altitude of 0 degrees means the sun is on the horizon, and an altitude of
+    90 degrees means the sun is directly overhead.
+
+    Parameters
+    ----------
+    solar_geometry_day_constants : SolarGeometryDayConstants
+        The input solar geometry constants.
+    """
+    # Initialize with None ---------------------------------------------------
+    user_requested_timestamp = None
+    user_requested_timezone = None
+    # -------------------------------------------- Smarter way to do this? ---
+
+    # Convert the input timestamp to UTC, for _all_ internal calculations
+    utc_zoneinfo = ZoneInfo("UTC")
+    if timestamp.tzinfo != utc_zoneinfo:
+
+        # Note the input timestamp and timezone
+        user_requested_timestamp = timestamp
+        user_requested_timezone = timezone
+
+        timestamp = timestamp.astimezone(utc_zoneinfo)
+        typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
+    
+    # Why does the callback function `_parse_model` not work? ----------------
+    if SolarPositionModels.all in model:
+        model = [
+            model for model in SolarPositionModels if model != SolarPositionModels.all
+        ]
+    solar_altitude = calculate_solar_altitude(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        models=model,  # could be named models!
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        verbose=verbose,
+    )
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    print_solar_position_table(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        table=solar_altitude,
+        rounding_places=rounding_places,
+        timing=True,
+        altitude=True,
+        user_requested_timestamp=user_requested_timestamp, 
+        user_requested_timezone=user_requested_timezone
     )
 
 
@@ -662,84 +671,10 @@ def azimuth(
         timezone=timezone,
         table=solar_azimuth,
         rounding_places=rounding_places,
+        timing=True,
         azimuth=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
-    )
-
-
-@app.command('declination', no_args_is_help=True, help='∢ Calculate the solar declination')
-def declination(
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    local_time: Annotated[bool, typer_option_local_time] = False,
-    random_time: Annotated[bool, typer_option_random_time] = False,
-    model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-) -> float:
-    """Calculat the solar declination angle 
-
-    The solar declination (delta) is the angle between the line from the Earth
-    to the Sun and the plane of the Earth's equator. It varies between ±23.45
-    degrees over the course of a year as the Earth orbits the Sun.
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-    solar_declination: float
-    """
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamp = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-
-    # Possible to move to a callback? ----------------------------------------
-    if random_time:
-        timestamp, timezone = random_datetimezone()
-    # ------------------------------------------------------------------------
-
-    # Convert the input timestamp to UTC, for _all_ internal calculations
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamp.tzinfo != utc_zoneinfo:
-
-        # Note the input timestamp and timezone
-        user_requested_timestamp = timestamp
-        user_requested_timezone = timezone
-
-        timestamp = timestamp.astimezone(utc_zoneinfo)
-        typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
-
-    # Why does the callback function `_parse_model` not work? ----------------
-    if SolarDeclinationModels.all in model:
-        model = [
-            model for model in SolarDeclinationModels if model != SolarDeclinationModels.all
-        ]
-    solar_declination = calculate_solar_declination(
-        timestamp=timestamp,
-        timezone=timezone,
-        models=model,
-        days_in_a_year=days_in_a_year,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
-    )
-    print_solar_position_table(
-        longitude=None,
-        latitude=None,
-        timestamp=timestamp,
-        timezone=timezone,
-        table=solar_declination,
-        rounding_places=rounding_places,
-        declination=True,
-        user_requested_timestamp=user_requested_timestamp, 
-        user_requested_timezone=user_requested_timezone,
     )
 
 
@@ -911,11 +846,12 @@ def incidence(
         # hour_offset=hour_offset,
         # time_output_units=time_output_units,
         # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
+        angle_output_units=angle_output_units,
         verbose=verbose,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    debug(locals())
     print_solar_position_table(
         longitude=longitude,
         latitude=latitude,
@@ -923,9 +859,80 @@ def incidence(
         timezone=timezone,
         table=solar_incidence,
         rounding_places=rounding_places,
+        timing=True,
         incidence=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
+    )
+
+
+@app.command(
+    no_args_is_help=True,
+    help=':sun: :clock12: :triangular_ruler: NOAA\'s general solar position calculations',
+    rich_help_panel=rich_help_panel_geometry_noaa,
+)
+# @debug_if_needed(app)
+def noaa(
+    ctx: typer.Context,
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    """
+    """
+    # Initialize with None ---------------------------------------------------
+    user_requested_timestamp = None
+    user_requested_timezone = None
+    # -------------------------------------------- Smarter way to do this? ---
+    
+    utc_zoneinfo = ZoneInfo("UTC")
+    if timestamp.tzinfo != utc_zoneinfo:
+
+        # Note the input timestamp and timezone
+        user_requested_timestamp = timestamp
+        user_requested_timezone = timezone
+
+        timestamp = timestamp.astimezone(utc_zoneinfo)
+        timezone = utc_zoneinfo
+        typer.echo(f'Input timestamp & zone ({user_requested_timestamp} & {user_requested_timezone}) converted to {timestamp} for all internal calculations!')
+
+    solar_position_calculations = calculate_noaa_solar_position(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+    )
+    # Convert output timestamp back to the user-requested timezone
+    try:
+        timestamp = user_requested_timestamp
+        timezone = user_requested_timezone
+    except:
+        print(f'I guess there where no user requested timestamp and zone')
+
+    print_noaa_solar_position_table(
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        solar_position_calculations=solar_position_calculations, 
+        rounding_places=rounding_places,
+        user_requested_timestamp=user_requested_timestamp, 
+        user_requested_timezone=user_requested_timezone,
+        angle_output_units=angle_output_units,
+        verbose=verbose,
     )
 
 
