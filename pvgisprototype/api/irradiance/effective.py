@@ -345,7 +345,6 @@ def calculate_effective_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        model=solar_time_model,
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
@@ -356,6 +355,7 @@ def calculate_effective_irradiance(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
+        solar_time_model=solar_time_model,
         verbose=verbose,
     )
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)

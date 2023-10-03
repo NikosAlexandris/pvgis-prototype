@@ -148,7 +148,7 @@ def solar_time(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=solar_time_model,  # keep the CLI simple
+        solar_time_models=solar_time_model,  # keep the CLI simple
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         days_in_a_year=days_in_a_year,
