@@ -27,8 +27,8 @@ def model_solar_altitude_time_series(
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,
-    time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
+    # time_output_units: str = 'minutes',
+    # angle_units: str = 'radians',
     angle_output_units: str = 'radians',
     verbose: int = 0,
 ) -> List[SolarAltitude]:
@@ -44,8 +44,6 @@ def model_solar_altitude_time_series(
             timestamps=timestamps,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            time_output_units=time_output_units,
-            angle_output_units=angle_output_units,
             verbose=verbose,
         )
 
@@ -66,4 +64,5 @@ def model_solar_altitude_time_series(
 
     if verbose == 3:
         debug(locals())
+
     return solar_altitude_series
