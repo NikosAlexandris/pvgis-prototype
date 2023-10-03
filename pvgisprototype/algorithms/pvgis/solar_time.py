@@ -1,15 +1,15 @@
-import typer
-from typing import Annotated
-from typing import Optional
+# import typer
+# from typing import Annotated
+# from typing import Optional
 from datetime import datetime
-from datetime import time
+# from datetime import time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 import numpy as np
 from pvgisprototype.constants import double_numpi
-from pvgisprototype.api.utilities.conversions import convert_to_radians
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+# from pvgisprototype.api.utilities.conversions import convert_to_radians
+# # from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+# from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.image_offset_prototype import get_image_offset
 # from pvgisprototype import SolarTime
 from pvgisprototype import Latitude
@@ -78,7 +78,7 @@ def calculate_solar_time_pvgis(
     hour_offset = time_offset_global + longitude.degrees / 15 + image_offset  # for `solar_time`
     time_correction_factor_hours = hour_of_day + time_offset + hour_offset
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
-    
+
     if verbose == 2:
         print(f'Time offset : {time_offset}')
         print('..')

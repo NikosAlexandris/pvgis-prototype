@@ -16,26 +16,26 @@ from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irrad
 # from pvgisprototype.api.irradiance.reflected import calculate_reflected_inclined_irradiance_pvgis
 
 from datetime import datetime
-from pvgisprototype.validation.functions import ModelSolarPositionInputModel
+# from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.utilities.conversions import convert_to_radians
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
+# from pvgisprototype.api.utilities.conversions import convert_to_radians
+# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+# from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 
 from pvgisprototype.api.irradiance.diffuse import  calculate_diffuse_inclined_irradiance
 from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_inclined_irradiance

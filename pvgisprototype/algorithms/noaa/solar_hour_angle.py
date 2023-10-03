@@ -9,11 +9,11 @@ from pvgisprototype import SolarHourAngle
 from .solar_time import calculate_true_solar_time_noaa
 from math import pi
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleTimeSeriesNOAAInput
-from typing import Union
+# from typing import Union
 from typing import Sequence
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 import numpy as np
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)

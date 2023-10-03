@@ -2,9 +2,9 @@ from typing import List
 from typing import Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from math import cos
-from math import sin
-from math import asin
+# from math import cos
+# from math import sin
+# from math import asin
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeInputModel
@@ -19,9 +19,9 @@ from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_al
 import suncalc
 import pysolar
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.api.utilities.timestamp import attach_timezone
 
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa

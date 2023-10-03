@@ -2,7 +2,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateEquationOfTimeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
 from datetime import datetime
-from datetime import timedelta
+# from datetime import timedelta
 from pvgisprototype import EquationOfTime
 from pvgisprototype import FractionalYear
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_noaa 

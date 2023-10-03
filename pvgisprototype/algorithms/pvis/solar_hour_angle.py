@@ -1,9 +1,9 @@
 from devtools import debug
 import typer
-import numpy as np
+# import numpy as np
 from datetime import datetime
-from typing import Annotated
-from typing import Optional
+# from typing import Annotated
+# from typing import Optional
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise

@@ -1,12 +1,12 @@
 from devtools import debug
 import logging
-from functools import partial
+# from functools import partial
 from math import acos
 from math import cos
 from math import fabs
 from math import radians
 from math import sin
-from pydantic import BaseModel
+# from pydantic import BaseModel
 from typing import Annotated
 from typing_extensions import Annotated
 from typing import Optional
@@ -21,11 +21,11 @@ from pvgisprototype.constants import half_numpi
 from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
 from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_radians
-from pvgisprototype.api.utilities.timestamp import attach_timezone
+# from pvgisprototype.api.utilities.conversions import convert_to_radians
+# from pvgisprototype.api.utilities.timestamp import attach_timezone
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.utilities.timestamp import get_day_from_hour_of_year
+# from pvgisprototype.api.utilities.timestamp import get_day_from_hour_of_year
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from .solar_time import calculate_solar_time_pvgis
 

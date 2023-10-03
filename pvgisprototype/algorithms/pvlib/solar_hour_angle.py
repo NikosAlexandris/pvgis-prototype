@@ -5,7 +5,7 @@ from pvgisprototype.validation.functions import SolarHourAnglePVLIBInput
 from pvgisprototype import Longitude
 from datetime import datetime
 from pvgisprototype import SolarHourAngle
-from math import pi
+# from math import pi
 import pvlib
 import pandas as pd
 

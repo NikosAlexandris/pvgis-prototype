@@ -1,4 +1,4 @@
-from typing import Optional
+# from typing import Optional
 from datetime import datetime
 import pvlib
 # from ...api.utilities.conversions import convert_to_degrees_if_requested

@@ -61,6 +61,7 @@ from pvgisprototype.api.utilities.conversions import convert_dictionary_to_table
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 # from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
+# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 from pvgisprototype.api.utilities.timestamp import parse_timestamp
 from .loss import calculate_angular_loss_factor_for_direct_irradiance

@@ -6,19 +6,19 @@ Important sun and solar surface geometry parameters in calculating the amount of
 """
 
 import typer
-from typer.core import TyperGroup
-from click import Context
+# from typer.core import TyperGroup
+# from click import Context
 from typing import Annotated
 from typing import Optional
-from typing import Union
+# from typing import Union
 from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import math
 from math import radians
-import numpy as np
-from rich.table import Table
-from rich import box
+# import numpy as np
+# from rich.table import Table
+# from rich import box
 from rich import print
 from .typer_parameters import OrderCommands
 from .typer_parameters import typer_argument_longitude
@@ -49,20 +49,20 @@ from .typer_parameters import typer_option_angle_units
 from .typer_parameters import typer_option_angle_output_units
 from .typer_parameters import typer_option_rounding_places
 from .typer_parameters import typer_option_verbose
-from ..api.utilities.timestamp import now_utc_datetimezone
-from ..api.utilities.timestamp import now_local_datetimezone
-from ..api.utilities.timestamp import ctx_convert_to_timezone
-from ..api.utilities.timestamp import convert_hours_to_seconds
-from ..api.utilities.timestamp import convert_hours_to_datetime_time
+# from ..api.utilities.timestamp import now_utc_datetimezone
+# from ..api.utilities.timestamp import now_local_datetimezone
+# from ..api.utilities.timestamp import ctx_convert_to_timezone
+# from ..api.utilities.timestamp import convert_hours_to_seconds
+# from ..api.utilities.timestamp import convert_hours_to_datetime_time
 from ..api.utilities.timestamp import random_datetimezone
-from ..api.utilities.timestamp import ctx_attach_requested_timezone
-from ..api.utilities.conversions import convert_to_radians
-from ..api.utilities.conversions import convert_to_degrees_if_requested
+# from ..api.utilities.timestamp import ctx_attach_requested_timezone
+# from ..api.utilities.conversions import convert_to_radians
+# from ..api.utilities.conversions import convert_to_degrees_if_requested
 from ..api.utilities.conversions import convert_float_to_degrees_if_requested
-from ..api.utilities.conversions import round_float_values
+# from ..api.utilities.conversions import round_float_values
 from ..api.geometry.solar_declination import calculate_solar_declination
 from ..api.geometry.solar_incidence import calculate_solar_incidence
-from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
+# from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from ..api.geometry.solar_hour_angle import calculate_hour_angle
 from ..api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
 from ..api.geometry.solar_altitude import calculate_solar_altitude
@@ -91,19 +91,10 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from .rich_help_panel_names import rich_help_panel_advanced_options
-from .rich_help_panel_names import rich_help_panel_geometry_time
-from .rich_help_panel_names import rich_help_panel_geometry_position
-from .rich_help_panel_names import rich_help_panel_geometry_refraction
-from .rich_help_panel_names import rich_help_panel_geometry_surface
-from .rich_help_panel_names import rich_help_panel_solar_time
-from .rich_help_panel_names import rich_help_panel_earth_orbit
-from .rich_help_panel_names import rich_help_panel_atmospheric_properties
-from .rich_help_panel_names import rich_help_panel_output
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 
-from .print import print_table
+# from .print import print_table
 from .print import print_solar_position_table
 from .print import print_noaa_solar_position_table
 
