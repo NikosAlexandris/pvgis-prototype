@@ -31,6 +31,8 @@ from pvgisprototype.constants import (
     UNITLESSS_COLUMN_NAME,
     UNITS_NAME,
     NOT_AVAILABLE_COLUMN_NAME,
+    SOLAR_TIME_COLUMN_NAME,
+    SOLAR_TIME_NAME,
 )
 
 
@@ -167,7 +169,7 @@ def print_hour_angle_table_2(
     solar_time = round_float_values(solar_time, rounding_places)
     hour_angle = round_float_values(hour_angle, rounding_places)
 
-    columns = ["Solar time"]
+    columns = [SOLAR_TIME_COLUMN_NAME]
     if hour_angle is not None:
         columns.append(HOUR_ANGLE_COLUMN_NAME)
     columns.append(UNITS_COLUMN_NAME)
