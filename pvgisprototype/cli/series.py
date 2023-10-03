@@ -119,9 +119,7 @@ def select_time_series(
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
-    """
-    Plot location series
-    """
+    """Select location series"""
     if convert_longitude_360:
         longitude = longitude % 360
     warn_for_negative_longitude(longitude)
@@ -205,18 +203,6 @@ def select_time_series(
             debug(locals())
         return single_value
 
-    # ---------------------------------------------------------- Remove Me ---
-    typer.echo(location_time_series.values)
-    # ---------------------------------------------------------- Remove Me ---
-
-    # statistics after echoing series which might be Long!
-    if statistics:
-        data_statistics = calculate_series_statistics(location_time_series)
-        print_series_statistics(data_statistics)
-        if csv:
-            export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
-        # return print_series_statistics(series_statistics)
-
     # if output_filename:
     #     output_filename = Path(output_filename)
     #     extension = output_filename.suffix.lower()
@@ -230,10 +216,19 @@ def select_time_series(
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
 
-    if verbose > 0:
-        typer.echo(f'Series : {location_time_series.values}')
     if verbose == 3:
         debug(locals())
+    if verbose > 0:
+        print(f'Series : {location_time_series.values}')
+
+    # statistics after echoing series which might be Long!
+    if statistics:
+        data_statistics = calculate_series_statistics(location_time_series)
+        print_series_statistics(data_statistics)
+        if csv:
+            export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
+        # return print_series_statistics(series_statistics)
+
     return location_time_series
 
 
