@@ -234,23 +234,13 @@ class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
 
 
 class SolarTimeModel(BaseModel):
-    solar_time: datetime # Union[time, SolarTime]
+    solar_time: datetime
     model_config = ConfigDict(
         description="""The solar time (ST) is a calculation of the passage of time based
         on the position of the Sun in the sky. It is expected to be decimal hours in a
         24 hour format and measured internally in seconds.""",
     )
 
-    # @field_validator("solar_time")
-    # def validate_solar_time(cls, input) -> SolarTime:
-    #     if isinstance(input, SolarTime):
-    #         return input
-    #     elif isinstance(input, time):
-    #         return SolarTime(value=input, unit="timestamp")
-    #     else:
-    #         raise ValueError("Unsupported `solar_time` type provided")
-
-    
 
 
 # Solar surface
