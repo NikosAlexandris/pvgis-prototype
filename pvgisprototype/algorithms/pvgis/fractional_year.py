@@ -18,8 +18,6 @@ FRACTIONAL_YEAR_MAXIMUM = 2 * pi
 # @validate_with_pydantic(CalculateFractionalYearPVGISInputModel)
 def calculate_fractional_year_pvgis(
     timestamp: datetime,
-    # angle_units: str = 'radians',
-    # angle_output_units: str = 'radians',
 ) -> FractionalYear:
     """Calculate fractional year in radians using 365.25 days in a year
 
@@ -36,8 +34,5 @@ def calculate_fractional_year_pvgis(
     if not ((isclose(FRACTIONAL_YEAR_MINIMUM, fractional_year) or FRACTIONAL_YEAR_MINIMUM < fractional_year) and 
             (isclose(FRACTIONAL_YEAR_MAXIMUM, fractional_year) or fractional_year < FRACTIONAL_YEAR_MAXIMUM)):
         raise ValueError(f'Calculated fractional year {fractional_year} is out of the expected range [{FRACTIONAL_YEAR_MINIMUM}, {FRACTIONAL_YEAR_MAXIMUM}] radians')
-
-    fractional_year = FractionalYear(value=fractional_year, unit='radians')
-    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
             
-    return fractional_year
+    return FractionalYear(value=fractional_year, unit='radians')

@@ -96,13 +96,9 @@ def calculate_solar_incidence_pvis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     hour_angle = calculate_solar_hour_angle_pvis(
         solar_time=solar_time,
-        # angle_output_units=angle_output_units,
     )
     solar_incidence = acos(
         sin(latitude.radians)

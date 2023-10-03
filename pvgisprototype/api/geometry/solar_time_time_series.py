@@ -39,7 +39,7 @@ def model_solar_time_time_series(
     hour_offset: float = 0,
     time_output_units: str = "minutes",
     angle_units: str = "radians",
-    angle_output_units: str = "radians",
+    # angle_output_units: str = "radians",
     verbose: int = 0,
 ):
     """Calculates the solar time and returns the calculated value and the units.
