@@ -17,7 +17,6 @@ def calculate_solar_altitude_pvlib(
         latitude: Latitude,     # degrees
         timestamp: datetime,
         timezone: ZoneInfo,
-        # angle_output_units: str = 'radians',
     )-> SolarAltitude:
     """Calculate the solar zenith angle (φ) in radians
     """
@@ -28,7 +27,4 @@ def calculate_solar_altitude_pvlib(
     if not isfinite(solar_altitude) or not -90 <= solar_altitude <= 90:
         raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-90}, {90}] degrees')
 
-    solar_altitude = SolarAltitude(value=solar_altitude, unit='degrees')
-    # solar_altitude = convert_to_radians_if_requested(solar_altitude, angle_output_units)
-
-    return solar_altitude
+    return SolarAltitude(value=solar_altitude, unit='degrees')

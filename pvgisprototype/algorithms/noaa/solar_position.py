@@ -60,52 +60,38 @@ def calculate_noaa_solar_position(
     timezone: ZoneInfo,
     refracted_solar_zenith: RefractedSolarZenith,  # radians
     apply_atmospheric_refraction: bool = False,
-    # time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
-    # angle_output_units: str = 'radians',
 ) -> dict:
     """
     """
     result = {}
     fractional_year = calculate_fractional_year_noaa(
         timestamp=timestamp,
-        # angle_output_units=angle_output_units,
     )
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
     )
     solar_declination = calculate_solar_declination_noaa(
         timestamp=timestamp,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     time_offset = calculate_time_offset_noaa(
         longitude=longitude,
         timestamp=timestamp,
-        # time_output_units=time_output_units,  # for calculate_equation_of_time_noaa()
-        # angle_units=angle_units,  # for calculate_equation_of_time_noaa()
     )
     true_solar_time = calculate_true_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        # time_output_units=time_output_units,
     )  # in minutes
     solar_hour_angle = calculate_solar_hour_angle_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        # time_output_units=time_output_units,
-        # angle_output_units=angle_output_units,
     )  # for solar_zenith
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
         timestamp=timestamp,
         solar_hour_angle=solar_hour_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # angle_output_units=angle_output_units,
     )
     solar_altitude = calculate_solar_altitude_noaa(
         longitude=longitude,
@@ -113,9 +99,6 @@ def calculate_noaa_solar_position(
         timestamp=timestamp,
         timezone=timezone,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     solar_azimuth = calculate_solar_azimuth_noaa(
         longitude=longitude,
@@ -123,9 +106,6 @@ def calculate_noaa_solar_position(
         timestamp=timestamp,
         timezone=timezone,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     sunrise_time = calculate_event_time_noaa(
         longitude=longitude,
@@ -135,9 +115,6 @@ def calculate_noaa_solar_position(
         event="sunrise",
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     solar_noon_time = calculate_event_time_noaa(
         longitude=longitude,
@@ -147,9 +124,6 @@ def calculate_noaa_solar_position(
         event="noon",
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     local_solar_time = calculate_local_solar_time_noaa(
         longitude=longitude,
@@ -158,9 +132,6 @@ def calculate_noaa_solar_position(
         timezone=timezone,
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     sunset_time = calculate_event_time_noaa(
         longitude=longitude,
@@ -170,9 +141,6 @@ def calculate_noaa_solar_position(
         event="sunset",
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     result["fractional_year"] = fractional_year
     result["equation_of_time"] = equation_of_time

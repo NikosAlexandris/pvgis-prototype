@@ -104,11 +104,6 @@ def calculate_solar_hour_angle_noaa(
 
 
 
-
-
-
-
-
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,

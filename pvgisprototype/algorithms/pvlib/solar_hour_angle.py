@@ -14,7 +14,6 @@ import pandas as pd
 def calculate_solar_hour_angle_pvlib(
     longitude: Longitude,
     timestamp: datetime, 
-    # angle_output_units: str = 'radians',
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
     """
@@ -35,7 +34,4 @@ def calculate_solar_hour_angle_pvlib(
 
     if not -180 <= solar_hour_angle.degrees <= 180:
         raise ValueError(f'The calculated hour angle {solar_hour_angle} is out of the expected range [{-180}, {180}] degrees')
-
-    # solar_hour_angle = convert_to_radians_if_requested(solar_hour_angle, angle_output_units)
-
     return solar_hour_angle

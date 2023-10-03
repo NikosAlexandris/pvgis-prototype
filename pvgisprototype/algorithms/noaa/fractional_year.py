@@ -20,7 +20,6 @@ import numpy as np
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
 def calculate_fractional_year_noaa(
         timestamp: datetime,
-        # angle_output_units: str = "radians",
     ) -> FractionalYear:
     """Calculate fractional year in radians """
     fractional_year = (
@@ -38,8 +37,6 @@ def calculate_fractional_year_noaa(
         raise ValueError(f'The calculated fractional year {fractional_year} is outside the expected range [0, 2*pi] radians')
 
     fractional_year = FractionalYear(value=fractional_year, unit='radians')
-
-    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
     
     if not 0 <= fractional_year.degrees < 360:
             raise ValueError('Fractional year (in degrees) must be in the range [0, 360]')

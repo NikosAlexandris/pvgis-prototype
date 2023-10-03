@@ -17,7 +17,6 @@ from pvgisprototype import SolarDeclination
 def calculate_solar_declination_hargreaves(
         timestamp: datetime = partial(datetime.now, tz=timezone.utc),
         days_in_a_year: float = 365.25,
-        # angle_output_units: str = 'radians',
     ) -> SolarDeclination:
     """Approximate the solar declination based on the Hargreaves formula.
 
@@ -61,8 +60,4 @@ def calculate_solar_declination_hargreaves(
             )
         )
     )
-    # declination = generate('declination', )
-    declination = SolarDeclination(value=declination_value_in_degrees, unit='degrees')
-    # declination = convert_to_radians_if_requested(declination, angle_output_units)
-
-    return declination
+    return SolarDeclination(value=declination_value_in_degrees, unit='degrees')

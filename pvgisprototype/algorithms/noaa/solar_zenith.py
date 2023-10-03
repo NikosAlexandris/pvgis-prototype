@@ -108,7 +108,6 @@ def atmospheric_refraction_for_below_horizon(
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction(
     solar_zenith: SolarZenith,  # radians
-    # angle_output_units: str = 'radians',
     verbose: int = 0,
 ) -> SolarZenith:
     """Adjust solar zenith for atmospheric refraction
@@ -164,11 +163,6 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     # considering both its apparent size and atmospheric refraction.
     if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
-
-    # solar_zenith = convert_to_degrees_if_requested(
-    #     solar_zenith,
-    #     angle_output_units
-    # )
 
     if verbose == 3:
         debug(locals())
@@ -267,8 +261,7 @@ def calculate_solar_zenith_noaa(
     if apply_atmospheric_refraction:
         solar_zenith = adjust_solar_zenith_for_atmospheric_refraction(
             solar_zenith,
-            # angle_output_units="radians",  # always in radians!
-        )
+        )  # always in radians!
     
     # if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi/2 + 0.0146:
     if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:

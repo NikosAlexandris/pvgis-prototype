@@ -25,7 +25,6 @@ def calculate_solar_azimuth_pvlib(
         latitude: Latitude,     # degrees
         timestamp: datetime,
         timezone: ZoneInfo,
-        # angle_output_units: str = 'radians',
     )-> SolarAzimuth:
     """Calculate the solar azimith (θ) in radians
     """
@@ -40,6 +39,5 @@ def calculate_solar_azimuth_pvlib(
             value=solar_azimuth,
             unit='degrees',
             )
-    # solar_azimuth = convert_to_radians_if_requested(solar_azimuth, angle_output_units)
 
     return solar_azimuth
