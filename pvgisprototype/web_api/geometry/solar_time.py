@@ -43,7 +43,7 @@ async def get_calculate_solar_time(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            model=model,
+            solar_time_models=model,
             refracted_solar_zenith=refracted_solar_zenith,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             time_output_units=time_output_units,

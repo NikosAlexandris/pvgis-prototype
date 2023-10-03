@@ -86,7 +86,7 @@ def model_solar_time(
             timestamp=timestamp,
             timezone=timezone,
             # time_offset_global=time_offset_global,                          # FIXME: Are these usefull?
-            # verbose=verbose,
+            verbose=verbose,
         )
 
     if solar_time_model.value == SolarTimeModels.noaa:
@@ -125,7 +125,7 @@ def calculate_solar_time(
     timestamp: datetime,
     timezone: ZoneInfo,
     refracted_solar_zenith: RefractedSolarZenith,  # radians
-    models: List[SolarTimeModels] = [SolarTimeModels.skyfield],
+    solar_time_models: List[SolarTimeModels] = [SolarTimeModels.skyfield],
     apply_atmospheric_refraction: bool = True,
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
@@ -147,7 +147,7 @@ def calculate_solar_time(
 
     """
     results = []
-    for solar_time_model in models:
+    for solar_time_model in solar_time_models:
         if solar_time_model != SolarTimeModels.all:  # ignore 'all' in the enumeration
             solar_time = model_solar_time(
                 longitude=longitude,
