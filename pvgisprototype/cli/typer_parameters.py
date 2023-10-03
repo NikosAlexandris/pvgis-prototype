@@ -523,7 +523,6 @@ typer_option_optical_air_mass_series = typer.Option(
     # default_factory=OPTICAL_AIR_MASS_DEFAULT,
 )
 typer_option_apply_atmospheric_refraction = typer.Option(
-    '--apply-atmospheric-refraction',
     help='Apply atmospheric refraction functions',
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
