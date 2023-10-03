@@ -8,7 +8,7 @@ from pvgisprototype.validation.functions import ModelSolarTimeInputModel
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype import SolarTime
+# from pvgisprototype import SolarTime
 from .models import SolarTimeModels
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
@@ -44,7 +44,7 @@ def model_solar_time(
     # angle_units: str = "radians",
     # angle_output_units: str = "radians",
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-)->SolarTime:
+)->datetime:
     """Calculates the solar time and returns the calculated value and the units.
 
     Parameters
@@ -112,10 +112,10 @@ def model_solar_time(
 
         # vvv vvv vvv --------------------------------------- expects degrees!
         solar_time = calculate_solar_time_skyfield(
-            longitude=longitude=longitude,
-            latitude=latitude=latitude,
-            timestamp=timestamp=timestamp,
-            timezone=timezone=timezone,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
             verbose=verbose,
         )
         # ^^^ ^^^ ^^^ --------------------------------------- expects degrees!

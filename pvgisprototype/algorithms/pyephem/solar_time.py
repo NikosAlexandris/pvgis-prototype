@@ -10,7 +10,7 @@ import ephem
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype import SolarTime
+# from pvgisprototype import SolarTime
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -136,16 +136,6 @@ def calculate_solar_time_ephem(
   solar_time_decimal_hours = solar_time_hours * 24 / pi / 2  # convert to decimal hours
   solar_time_datetime = timestamp + timedelta(hours=solar_time_hours)
 
-  solar_time = time(
-          # year=solar_time_datetime.year,
-          # month=solar_time_datetime.month,
-          # day=solar_time_datetime.day,
-          hour=int(solar_time_datetime.hour),
-          minute=int(solar_time_datetime.minute),
-          second=int(solar_time_datetime.second),
-          tzinfo=solar_time_datetime.tzinfo,
-          )
-
   # if verbose:
   #     typer.echo(f'Local sidereal time: {sidereal_time}')
   #     typer.echo(f'Sun right ascension: {sun.ra}')
@@ -154,4 +144,3 @@ def calculate_solar_time_ephem(
   #     # typer.echo(f'Mean solar time: {solar_time}')
 
   return solar_time_datetime
-  # return SolarTime(value=solar_time, unit='timestamp')

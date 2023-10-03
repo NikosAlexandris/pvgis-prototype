@@ -78,21 +78,13 @@ EccentricityCorrectionFactor:
 
 # Solar time
 
-SolarTime:
-  value:
-    type: Optional[time]
-    initial:
-  unit:
-    type: str
-    initial: time
-
-TrueSolarTime:
-  value:
-    type: Optional[datetime]
-    initial:
-  unit:
-    type: str
-    initial: datetime
+# SolarTime:      # NOTE: Solar time is a datetime.datetime object, not a nested object
+#   value:
+#     type: Optional[datetime]
+#     initial:
+#   unit:
+#     type: str
+#     initial: datetime
 
 EquationOfTime:
   value:
@@ -117,15 +109,6 @@ EventHourAngle:
   unit:
     type: Optional[str]
     initial:
-
-EventHourAngle:
-  value:
-    type: Optional[datetime]
-    initial:
-  unit:
-    type: str
-    initial: datetime
-
 
 HourAngleSunrise:
   value:
