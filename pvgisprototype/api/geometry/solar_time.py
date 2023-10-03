@@ -37,7 +37,7 @@ def model_solar_time(
     time_offset_global: float = 0,
     hour_offset: float = 0,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-)->datetime:
+) -> datetime:
     """Calculates the solar time and returns the calculated value and the units.
 
     Parameters

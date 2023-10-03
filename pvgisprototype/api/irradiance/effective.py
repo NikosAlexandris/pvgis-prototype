@@ -355,9 +355,8 @@ def calculate_effective_irradiance(
         solar_time_model=solar_time_model,
         verbose=verbose,
     )
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = (solar_time_decimal_hours - 12) * np.radians(15)
-    # hour_angle = (solar_time.as_hours - 12) * np.radians(15)
+    # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.datetime)
+    # hour_angle = np.radians(15) * (solar_time.as_hours - 12)
     solar_incidence_angle = model_solar_incidence(
         longitude=longitude,
         latitude=latitude,
