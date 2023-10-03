@@ -25,13 +25,13 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
-# app = typer.Typer(
-#     cls=OrderCommands,
-#     add_completion=False,
-#     add_help_option=True,
-#     rich_markup_mode="rich",
-#     help=f"Calculate the extraterrestrial normal irradiance for a day in the year",
-# )
+app = typer.Typer(
+    # cls=OrderCommands,
+    add_completion=False,
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help=f"Calculate the extraterrestrial normal irradiance for a day in the year",
+)
 
 
 @app.callback(
