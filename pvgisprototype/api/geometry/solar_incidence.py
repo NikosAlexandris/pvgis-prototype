@@ -122,7 +122,7 @@ def calculate_solar_incidence(
     hour_offset: float = HOUR_OFFSET_DEFAULT,
     # time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
     # angle_units: str = "radians",
-    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
@@ -156,8 +156,8 @@ def calculate_solar_incidence(
                 {
                     TIME_ALGORITHM_NAME: solar_time_model,
                     POSITION_ALGORITHM_NAME: solar_incidence_model.value,
-                    INCIDENCE_NAME: solar_incidence.value,
-                    UNITS_NAME: solar_incidence.unit,
+                    INCIDENCE_NAME: getattr(solar_incidence, angle_output_units, None) if solar_incidence else None,
+                    UNITS_NAME: angle_output_units,
                 }
             )
     return results
