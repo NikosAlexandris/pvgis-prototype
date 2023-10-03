@@ -7,7 +7,7 @@ from pvgisprototype.algorithms.noaa.function_models import CalculateLocalSolarTi
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
-from pvgisprototype import SolarTime
+# from pvgisprototype import SolarTime
 from .event_time import calculate_event_time_noaa
 
 
@@ -23,7 +23,7 @@ def calculate_local_solar_time_noaa(
         # angle_units: str = 'radians',
         # angle_output_units: str = 'radians',
         verbose: int = 0,
-    ) -> SolarTime:
+    ) -> datetime:
     """
     Returns
     -------
@@ -103,14 +103,14 @@ def calculate_local_solar_time_noaa(
 
     local_solar_time = timestamp + timedelta(seconds=total_seconds)
 
-    local_solar_time = time(
-        # year=local_solar_time.year,
-        # month=local_solar_time.month,
-        # day=local_solar_time.day,
-        hour=int(local_solar_time.hour),
-        minute=int(local_solar_time.minute),
-        second=int(local_solar_time.second),
-        tzinfo=local_solar_time.tzinfo,
-    )
+    # local_solar_time = time(
+    #     # year=local_solar_time.year,
+    #     # month=local_solar_time.month,
+    #     # day=local_solar_time.day,
+    #     hour=int(local_solar_time.hour),
+    #     minute=int(local_solar_time.minute),
+    #     second=int(local_solar_time.second),
+    #     tzinfo=local_solar_time.tzinfo,
+    # )
 
-    return SolarTime(value=local_solar_time, unit='timestamp')
+    return local_solar_time

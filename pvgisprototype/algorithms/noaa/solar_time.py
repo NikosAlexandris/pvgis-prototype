@@ -3,7 +3,6 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateTrueSolarTimeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
-from pvgisprototype import TrueSolarTime
 from typing import Optional
 from typing import Union
 from typing import Sequence
@@ -94,8 +93,6 @@ def calculate_true_solar_time_noaa(
         + true_solar_time.minute
         + true_solar_time.second / 60
     )
-    # true_solar_time = TrueSolarTime(value=true_solar_time_minutes, unit='minutes')
-
     # if not -1580 <= true_solar_time.minutes <= 1580:
     if not -1580 <= true_solar_time_minutes <= 1580:
         raise ValueError(f'The calculated true solar time `{true_solar_time_minutes}` is out of the expected range [-1580, 1580] minutes!')

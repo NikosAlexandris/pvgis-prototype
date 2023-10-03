@@ -6,7 +6,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarTimeTimeSeriesInputModel
-from pvgisprototype import SolarTime
+# from pvgisprototype import SolarTime
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from .models import SolarTimeModels
