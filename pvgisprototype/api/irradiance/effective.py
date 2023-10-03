@@ -21,6 +21,7 @@ from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
@@ -201,8 +202,7 @@ def calculate_effective_irradiance(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
-    """Calculate the effective hourly irradiance for a location and moment in
-    time.
+    """Calculate the hourly irradiance incident on a surface for moment in time.
 
     The calculation applies efficiency coefficients to the direct (beam),
     diffuse, and reflected radiation considering : solar geometry,
@@ -286,7 +286,7 @@ def calculate_effective_irradiance(
     - bh :                       direct_radiation_coefficient
 
     Algorithmic structure
-    
+
     1. If `solar_altitude` > 0 ( = sun is above the horizon) :
            proceed with checking for low sun angles
 
@@ -497,8 +497,14 @@ def calculate_effective_irradiance(
     if verbose == 3:
         debug(locals())
     if verbose > 1:
-        print(f'Direct, Diffuse, Reflected : {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance} * {efficiency_coefficient} efficiency factor')
-        print(f'Effective irradiance values : {result}')
+        print(f'Hourly irradiance components incident on a surface on {timestamp}')
+        surface_tilt = convert_float_to_degrees_if_requested(surface_tilt, 'degrees')
+        surface_orientation = convert_float_to_degrees_if_requested(surface_orientation, 'degrees')
+        print(f'Surface tilted at {surface_tilt} oriented at {surface_orientation}')
+        print(f'Direct, Diffuse, Reflected : {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance}')
+        print(f'Efficiency factor : {efficiency_coefficient}')
+        print(f'Effective irradiances : {result}')
     if verbose > 0:
         print(f'Total irradiance : {np.sum(result)}')
+
     return result
