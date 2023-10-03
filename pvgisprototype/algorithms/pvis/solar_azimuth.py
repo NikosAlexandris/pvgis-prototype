@@ -72,7 +72,6 @@ def calculate_solar_azimuth_pvis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        model=solar_time_model,  # returns datetime.time object
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
@@ -80,6 +79,7 @@ def calculate_solar_azimuth_pvis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
+        solar_time_model=solar_time_model,
     )
     hour_angle = calculate_hour_angle(
         solar_time=solar_time,

@@ -80,7 +80,6 @@ def calculate_solar_altitude_pvis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_time_model=solar_time_model,  # returns datetime.time object
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
@@ -91,6 +90,8 @@ def calculate_solar_altitude_pvis(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
+        solar_time_model=solar_time_model,
+        verbose=verbose,
     )
     hour_angle = calculate_hour_angle(
             solar_time=solar_time,
