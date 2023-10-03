@@ -152,9 +152,9 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     BaseApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
     # BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass
