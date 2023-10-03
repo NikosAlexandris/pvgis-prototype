@@ -24,7 +24,6 @@ from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import ALGORITHM_NAME
 from pvgisprototype.constants import DECLINATION_NAME
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME

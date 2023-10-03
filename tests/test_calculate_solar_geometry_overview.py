@@ -5,7 +5,7 @@ from pvgisprototype.api.geometry.models import SolarPositionModels
 from .helpers import read_test_cases_file, test_cases_from_data
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.constants import (
-    ALGORITHM_NAME,
+    POSITION_ALGORITHM_NAME,
     ALTITUDE_NAME,
     AZIMUTH_NAME,
     DECLINATION_NAME,
@@ -73,7 +73,7 @@ def test_calculate_solar_geometry_overview(
 
     for idx in range(len(models)):
         assert isinstance(calculated[idx], dict)
-        assert isinstance(calculated[idx][ALGORITHM_NAME], str)
+        assert isinstance(calculated[idx][POSITION_ALGORITHM_NAME], str)
         assert DECLINATION_NAME not in calculated[idx] or isinstance(calculated[idx][DECLINATION_NAME], float)
         assert HOUR_ANGLE_NAME not in calculated[idx] or isinstance(calculated[idx][HOUR_ANGLE_NAME], float)
         assert isinstance(calculated[idx][ZENITH_NAME], float)
@@ -91,7 +91,7 @@ def test_calculate_solar_geometry_overview(
             tolerance,
             )
         
-        if calculated[idx][ALGORITHM_NAME] == 'NOAA':          # FIXME: Remove this when noaa-azimuth is fixed
+        if calculated[idx][POSITION_ALGORITHM_NAME] == 'NOAA':          # FIXME: Remove this when noaa-azimuth is fixed
             continue
 
         assert calculated[idx][AZIMUTH_NAME] == pytest.approx(
