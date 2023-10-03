@@ -34,6 +34,7 @@ from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
@@ -182,7 +183,7 @@ def calculate_solar_altitude(
     eccentricity_correction_factor: float = 0.01672,
     # time_output_units: str = 'minutes',
     # angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = 0,
 ) -> List:
     """
