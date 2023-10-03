@@ -35,6 +35,12 @@ def _degrees_to_minutes(degrees):
 def _timestamp_to_hours(timestamp):
     return timestamp.hour + timestamp.minute / 60 + timestamp.second / 3600 + timestamp.microsecond / 3600000000
 
+def _timestamp_to_minutes(timestamp):
+    total_seconds = timestamp.hour * 3600 + timestamp.minute * 60 + timestamp.second
+    return total_seconds / 60
+
+
+
 
 @property
 def degrees_property(self):
@@ -96,6 +102,8 @@ def as_minutes_property(self):
         return _radians_to_minutes(self.value)
     elif self.unit == 'degrees':
         return _degrees_to_minutes(self.value)
+    elif self.unit == 'timestamp':
+        return _timestamp_to_minutes(self.value)
     else:
         return None
 
@@ -129,6 +137,14 @@ def as_hours_property(self):
         return None
 
 
+@property
+def minutes_property(self):
+    if self.unit == 'minutes':
+        return self.value
+    else:
+        return None
+
+
 def generate_dataclass_models(yaml_file: str):
 
     with open(yaml_file, 'r') as f:
@@ -154,7 +170,7 @@ def generate_dataclass_models(yaml_file: str):
                 '__hash__': model_hash,
                 'degrees': degrees_property,
                 'radians': radians_property,
-                'minutes': minutes_property,
+                'minutes':minutes_property,
                 'timedelta': timedelta_property,
                 'as_minutes': as_minutes_property,
                 'datetime': datetime_property,
