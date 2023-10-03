@@ -353,8 +353,14 @@ def calculate_optical_air_mass(
     return optical_air_mass
 
 
+@app.command(
+    'rayleigh-optical-thickness',
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+)
 def calculate_rayleigh_optical_thickness(
     optical_air_mass: Annotated[float, typer_option_optical_air_mass] = OPTICAL_AIR_MASS_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> RayleighThickness:
     """
     δ R(m) = 1/(6.6296 + 1.7513m - 0.1202m2 + 0.0065m3 - 0.00013m4)
@@ -381,6 +387,17 @@ def calculate_rayleigh_optical_thickness(
         value=rayleigh_optical_thickness,
         unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
     )
+
+    if verbose == 3:
+        debug(locals())
+    if verbose > 1:
+        print(
+            f"R(m) = 1 / (6.6296 + 1.7513 * m - 0.1202 * m^2 + 0.0065 * m^3 - 0.00013 * m^4)"
+        )
+        print(f"[cyan]R[/cyan]: Rayleigh optical thickness, [cyan]m[/cyan]: optical air mass")
+    if verbose > 0:
+        print(f'Rayleigh optical thickness : {rayleigh_optical_thickness}')
+
     return rayleigh_optical_thickness
 
 
