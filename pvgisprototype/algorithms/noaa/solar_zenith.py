@@ -205,9 +205,12 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     mask_below = solar_altitude_series_array <= np.radians(-0.575)
 
     # Vectorized functions
-    function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).radians)
-    function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).radians)
-    function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).radians)
+    function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).value)
+    function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).value)
+    function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).value)
+    # function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).radians)
+    # function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).radians)
+    # function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).radians)
 
     # Adjust
     if mask_high.any():
@@ -237,19 +240,21 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
 
 @validate_with_pydantic(CalculateSolarZenithNOAAInput)
 def calculate_solar_zenith_noaa(
-        latitude: Latitude,  # radians
-        timestamp: datetime,
-        solar_hour_angle: SolarHourAngle,
-        apply_atmospheric_refraction: bool = True,
-        # angle_output_units: str = 'radians',
-        verbose: int = 0,
-    ) -> SolarZenith:
+    latitude: Latitude,  # radians
+    timestamp: datetime,
+    solar_hour_angle: SolarHourAngle,
+    apply_atmospheric_refraction: bool = True,
+    # angle_output_units: str = 'radians',
+    verbose: int = 0,
+) -> SolarZenith:
     """Calculate the solar zenith angle (φ) in radians """
+    if verbose == 3:
+        debug(locals())
 
     solar_declination = calculate_solar_declination_noaa(
-            timestamp=timestamp,
-            # angle_output_units='radians',
-            )
+        timestamp=timestamp,
+        # angle_output_units='radians',
+    )
     cosine_solar_zenith = sin(latitude.radians) * sin(solar_declination.radians) + cos(
         latitude.radians
     ) * cos(solar_declination.radians) * cos(solar_hour_angle.radians)
@@ -305,15 +310,11 @@ def calculate_solar_zenith_time_series_noaa(
 
     # convert to a NumPy array
     solar_hour_angle_series = np.array([item.radians for item in solar_hour_angle_series])
-
-    # latitude_value = latitude.value
-
     cosine_solar_zenith = (
         np.sin(latitude.radians) * np.sin(solar_declination_series)
         + np.cos(latitude.radians) * np.cos(solar_declination_series) * np.cos(solar_hour_angle_series)
     )
     solar_zenith_series = np.arccos(cosine_solar_zenith)
-
     solar_zenith_series = [SolarZenith(value=value, unit='radians') for value in solar_zenith_series]
     if apply_atmospheric_refraction:
         solar_zenith_series = adjust_solar_zenith_for_atmospheric_refraction_time_series(

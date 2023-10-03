@@ -19,7 +19,6 @@ from pvgisprototype.validation.parameters import LatitudeModel
 from pvgisprototype.validation.parameters import BaseCoordinatesModel
 
 # Units?
-
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
 from pvgisprototype.validation.parameters import BaseAngleUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
@@ -88,10 +87,6 @@ class CalculateSolarHourAngleTimeSeriesNOAAInput(
     pass
 
 
-
-
-
-
 class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     BaseAngleOutputUnitsModel,
@@ -153,9 +148,6 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     pass
 
 
-
-
-
 class CalculateSolarAltitudeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
@@ -172,7 +164,7 @@ class CalculateSolarAzimuthNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
     # BaseTimeOutputUnitsModel,
-    # # BaseAngleUnitsModel,
+    # BaseAngleUnitsModel,
     # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):

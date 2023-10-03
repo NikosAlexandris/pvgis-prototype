@@ -23,7 +23,9 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
+from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
@@ -41,7 +43,6 @@ from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
 from ..geometry.solar_time import model_solar_time
-# from ..utilities.timestamp import timestamp_to_decimal_hours
 from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -104,20 +105,14 @@ from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_efficiency
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_pv_module_efficiency_algorithm
+from pvgisprototype.constants import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency
 
-model_constants=[]
-model_constants.append(94.804)
-model_constants.append(3.151)
-model_constants.append(-0.8768)
-model_constants.append(-0.32148)
-model_constants.append(0.003795)
-model_constants.append(-0.001056)
-model_constants.append(-0.0005247)
-model_constants.append(0.035)
 
 AOIConstants = []
 AOIConstants.append(-0.074)
@@ -145,44 +140,6 @@ def is_surface_in_shade():
     """
     return False
 
-
-def system_efficiency():
-    return 0.86
-
-
-# @app.command('efficiency')
-def calculate_efficiency(
-    irradiance,
-    model_constants,
-    system_efficiency,
-    temperature,
-    wind_speed,
-    cell_temperature_under_standard_test_conditions: float = 25,  # degrees Celsius.
-):
-    """
-    # Calculate the efficiency coefficient as
-    # product of system efficiency
-    # and efficiency as a function of total irradiance, temperature, and wind speed.
-    """
-    relative_irradiance = 0.001 * irradiance  # what is this exactly?
-    if relative_irradiance <= 0:
-        return 0
-
-    ln_relative_irradiance = np.log(relative_irradiance)
-    temperature = irradiance / (model_constants[7] + model_constants[8] * windspeed) + temperature
-    temperature_deviation_from_standard = temperature - cell_temperature_under_standard_test_conditions
-    pm = (
-        model_constants[0]
-        + ln_relative_irradiance
-        * (model_constants[1] + ln_relative_irradiance * model_constants[2])
-        + temperature_deviation_from_standard
-        * (
-            model_constants[3]
-            + ln_relative_irradiance
-            * (model_constants[4] + ln_relative_irradiance * model_constants[5])
-            + model_constants[6] * temperature_deviation_from_standard
-        )
-    )
     efficiency = pm / model_constants[0]
 
     # Check the output before returning
@@ -190,8 +147,6 @@ def calculate_efficiency(
         raise ValueError("The computed efficiency is not a finite number.")
     elif not 0 <= efficiency <= 1:
         raise ValueError("The computed efficiency is not within the expected range (0 to 1).")
-
-    return pm / model_constants[0]
 
 
 # @numba.jit(nopython=True)
@@ -239,7 +194,10 @@ def calculate_effective_irradiance(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     horizon_heights: Annotated[List[float], typer_argument_horizon_heights] = None,
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
+    efficiency_model: Annotated[PVModuleEfficiencyAlgorithms,
+                                typer_option_pv_module_efficiency_algorithm] =
+    PVModuleEfficiencyAlgorithms.linear,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -361,7 +319,8 @@ def calculate_effective_irradiance(
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     solar_altitude = model_solar_altitude(
         longitude=longitude,
@@ -376,9 +335,10 @@ def calculate_effective_irradiance(
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_time_model=solar_time_model,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
+        verbose=verbose,
     )
     solar_time = model_solar_time(
         longitude=longitude,
@@ -393,12 +353,14 @@ def calculate_effective_irradiance(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
+        verbose=verbose,
     )
-    # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.datetime)
-    # hour_angle = np.radians(15) * (solar_time.as_hours - 12)
+    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
+    hour_angle = (solar_time_decimal_hours - 12) * np.radians(15)
+    # hour_angle = (solar_time.as_hours - 12) * np.radians(15)
     solar_incidence_angle = model_solar_incidence(
         longitude=longitude,
         latitude=latitude,
@@ -419,9 +381,9 @@ def calculate_effective_irradiance(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
 
@@ -455,7 +417,7 @@ def calculate_effective_irradiance(
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 angle_output_units=angle_output_units,
-                verbose=verbose,
+                verbose=0,
             )
 
         # In any case
@@ -481,6 +443,7 @@ def calculate_effective_irradiance(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            verbose=0,
         )
         reflected_irradiance = calculate_ground_reflected_inclined_irradiance(
             longitude=longitude,
@@ -505,29 +468,37 @@ def calculate_effective_irradiance(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            verbose=0,
         )
 
     else:  # the sun is below the horizon
         direct_irradiance = diffuse_irradiance = reflected_irradiance = 0
 
-    if not efficiency:
+    if not efficiency_model and not efficiency:
         efficiency_coefficient = system_efficiency
 
-    else:
+    if not efficiency_model and efficiency:
+        efficiency_coefficient = efficiency
+
+    if efficiency_model and not efficiency:
         total_irradiance = direct_irradiance + diffuse_irradiance + reflected_irradiance
         # total_irradiance = np.sum(direct_radiation) + np.sum(diffuse_radiation) + np.sum(reflected_radiation)
-        efficiency_coefficient = system_efficiency * efficiency_ww(
-            total_irradiance, temperature, wind_speed
+        efficiency_coefficient = calculate_pv_efficiency(
+            irradiance=total_irradiance,
+            temperature=temperature,
+            model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
+            standard_test_temperature=TEMPERATURE_DEFAULT,
+            wind_speed=wind_speed,
+            use_faiman_model=False,
         )
 
-    # ?
-    efficiency_coefficient = max(efficiency_coefficient, 0.0)  # limit to zero
-    
     result = efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
-    if verbose > 0:
-        print(f'Direct, Diffuse, Reflected: {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance}')
-        print(f'Efficiency coefficient : {efficiency_coefficient}')
-        print(f'Effective hourly irradiance values (Direct, Diffuse, Reflected): {result}')
+
     if verbose == 3:
         debug(locals())
+    if verbose > 1:
+        print(f'Direct, Diffuse, Reflected : {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance} * {efficiency_coefficient} efficiency factor')
+        print(f'Effective irradiance values : {result}')
+    if verbose > 0:
+        print(f'Total irradiance : {np.sum(result)}')
     return result

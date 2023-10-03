@@ -7,7 +7,6 @@ from datetime import time
 from datetime import timedelta
 from math import pi
 import ephem
-
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
@@ -25,7 +24,7 @@ def calculate_solar_time_ephem(
     timestamp: datetime,
     timezone: str = None,
     verbose: int = 0,
-  )->SolarTime:
+  )->datetime:
   """Calculate the solar time using PyEphem
 
   The position of the Sun in the sky changes slightly day to day due to the
@@ -100,8 +99,6 @@ def calculate_solar_time_ephem(
           logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
   # Handle Me during input validation? -------------------------------------
 
-  longitude = longitude.value
-  latitude = latitude.value
   observer = ephem.Observer()
   observer.date = timestamp
   observer.lon = longitude.degrees
@@ -156,5 +153,5 @@ def calculate_solar_time_ephem(
   #     typer.echo(f'Sun transit: {ephem.localtime(observer.date)}')
   #     # typer.echo(f'Mean solar time: {solar_time}')
 
-  # debug(locals())
-  return SolarTime(value=solar_time, unit='timestamp')
+  return solar_time_datetime
+  # return SolarTime(value=solar_time, unit='timestamp')

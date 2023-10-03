@@ -25,16 +25,16 @@ from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 
 @validate_with_pydantic(CalculateSolarTimeEoTInputModel)
 def calculate_apparent_solar_time_milne1921(
-        longitude: Longitude,
-        timestamp: datetime,
-        timezone: ZoneInfo = None,
-        # days_in_a_year: float = 365.25,
-        # perigee_offset: float = 0.048869,
-        # eccentricity_correction_factor: float = 0.03344,          # FIXME: Are these usefull ?
-        # time_offset_global: float = 0,
-        # hour_offset: float = 0,
-        verbose: int = 0,
-) -> SolarTime:
+    longitude: Longitude,
+    timestamp: datetime,
+    timezone: ZoneInfo = None,
+    # days_in_a_year: float = 365.25,
+    # perigee_offset: float = 0.048869,
+    # eccentricity_correction_factor: float = 0.03344,
+    # time_offset_global: float = 0,
+    # hour_offset: float = 0,
+    verbose: int = 0,
+) -> datetime:
     """Calculate the apparent solar time based on the equation of time by Milne 1921
 
     Notes
@@ -113,7 +113,6 @@ def calculate_apparent_solar_time_milne1921(
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # Handle Me during input validation? -------------------------------------
 
-
     # Equation of Time, Milne 1921 -------------------------------------------
 
     # The difference of local time from UTC equals the time zone, in hours
@@ -140,10 +139,12 @@ def calculate_apparent_solar_time_milne1921(
     time_correction_factor = (
         4 * (longitude.degrees - local_standard_time_meridian) + equation_of_time
     )
+    # ------------------------------------------------------------------------
+
     time_correction_factor_hours = time_correction_factor / 60
     apparent_solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
-    # ------------------------------------------------------------------------
-    if verbose:
+
+    if verbose > 0:
         print('Day of year : {day_of_year}')
         print('Equation of time : {equation_of_time}')
         print('Time correction factor : {time_correction_factor}')

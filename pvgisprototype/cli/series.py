@@ -59,6 +59,7 @@ from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype import Longitude
+from pvgisprototype.constants import UNITS_NAME
 
 from pvgisprototype.constants import UNITS_NAME
 

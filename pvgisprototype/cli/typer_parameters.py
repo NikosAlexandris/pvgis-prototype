@@ -589,6 +589,11 @@ typer_option_efficiency = typer.Option(
     # rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory=EFFICIENCY_DEFAULT,
 )
+typer_option_pv_module_efficiency_algorithm = typer.Option(
+    help='Algorithms for calculaton of the efficiency of a photovoltaic system as a function of total irradiance, temperature',
+    rich_help_panel=rich_help_panel_efficiency,
+)
+
 
 # Output options
 
