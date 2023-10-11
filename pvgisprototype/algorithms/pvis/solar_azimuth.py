@@ -1,7 +1,4 @@
 from devtools import debug
-# from typing import Annotated
-# from typing import Optional
-# from enum import Enum
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import pi
@@ -12,14 +9,11 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAzimuthPVISInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAzimuth
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.solar_time import model_solar_time
-from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
-# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
+from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
 
 
 def convert_east_to_north_radians_convention(azimuth_east_radians):

@@ -18,62 +18,49 @@ logging.basicConfig(
         logging.StreamHandler()  # Print log to the console
     ]
 )
-from functools import partial
-from pydantic import BaseModel
-from pydantic import Field
-from pydantic import validator
 import typer
 from typing import Annotated
 from typing import Optional
-from typing import Union
-from enum import Enum
 from rich import print
 from rich.console import Console
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 import math
 from math import sin
 from math import cos
 from math import exp
-from math import atan
-import numpy as np
 from datetime import datetime
-from pvgisprototype.constants import AOI_CONSTANTS
+# from pvgisprototype.constants import AOI_CONSTANTS
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_relative_longitude
-from pvgisprototype.api.utilities.conversions import convert_to_radians
+# from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_float_to_radians_if_requested
+# from pvgisprototype.api.utilities.conversions import convert_float_to_radians_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
-from pvgisprototype.api.utilities.conversions import convert_dictionary_to_table
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+# from pvgisprototype.api.utilities.conversions import convert_dictionary_to_table
+# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+# from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 # from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 # from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
-from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
-from pvgisprototype.api.utilities.timestamp import parse_timestamp
+# from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
+# from pvgisprototype.api.utilities.timestamp import parse_timestamp
 from .loss import calculate_angular_loss_factor_for_direct_irradiance
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 from pvgisprototype.validation.functions import AdjustElevationInputModel
 from pvgisprototype.validation.functions import CalculateOpticalAirMassInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pydantic import BaseModel
-from pydantic import Field
-from pydantic import validator
-from math import radians
-from math import degrees
 from pathlib import Path
 from pvgisprototype.cli.series import select_time_series
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -105,7 +92,7 @@ from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
-from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
+# from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model

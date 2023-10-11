@@ -1,18 +1,8 @@
 from devtools import debug
-# import logging
-# import typer
-# from typing import Annotated
-# from typing import Optional
-import skyfield
+from math import isfinite
+from skyfield.api import load, wgs84
 from datetime import datetime
-# from datetime import timedelta
-# import dateutil.parser
-# from calendar import monthrange
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
-# from pvgisprototype.api.utilities.conversions import convert_to_radians
-# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-# from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from typing import Tuple
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarPositionSkyfieldInputModel

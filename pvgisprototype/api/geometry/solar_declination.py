@@ -3,13 +3,8 @@ from typing import Annotated
 from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
-# from math import pi
-# from math import sin
-# from math import asin
-# from pvgisprototype.validation.functions import validate_with_pydantic
-# from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
-# from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
-# from pvgisprototype import FractionalYear
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import ModelSolarDeclinationInputModel
 from pvgisprototype import SolarDeclination
 from .models import SolarDeclinationModels
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis

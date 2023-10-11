@@ -1,7 +1,6 @@
 from datetime import date
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from datetime import datetime
 from pvgisprototype import FractionalYear
 from math import pi

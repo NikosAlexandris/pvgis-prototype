@@ -1,7 +1,5 @@
-# from typing import Optional
 from datetime import datetime
 import pvlib
-# from ...api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationPVLIBInput
 from pvgisprototype import SolarDeclination

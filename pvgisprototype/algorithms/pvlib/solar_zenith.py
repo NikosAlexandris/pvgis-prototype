@@ -2,9 +2,7 @@ from devtools import debug
 from zoneinfo import ZoneInfo
 import pvlib
 from datetime import datetime
-# from math import pi
 from math import isfinite
-# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarZenithPVLIBInputModel

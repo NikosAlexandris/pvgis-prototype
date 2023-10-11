@@ -5,13 +5,9 @@ from pydantic import confloat
 from typing import Union
 from typing import Optional
 from typing import Sequence
-from typing import List
 from zoneinfo import ZoneInfo
 from datetime import datetime
-from datetime import time
 from math import pi
-from pydantic import validator
-import numpy as np
 from numpy import ndarray
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import RefractedSolarZenith
@@ -22,12 +18,12 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
-# from pvgisprototype import SolarTime
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
 
