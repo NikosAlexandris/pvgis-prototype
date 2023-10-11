@@ -1,14 +1,10 @@
 from devtools import debug
 import typer
-# import numpy as np
 from datetime import datetime
-# from typing import Annotated
-# from typing import Optional
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
-# from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarHourAnglePVISInputModel
 from pvgisprototype.validation.functions import CalculateHourAngleSunrisePVISInputModel

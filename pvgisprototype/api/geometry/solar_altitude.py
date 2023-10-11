@@ -1,16 +1,11 @@
 from typing import List
-from typing import Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
-# from math import cos
-# from math import sin
-# from math import asin
-from math import pi
+from math import isfinite
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
@@ -18,10 +13,6 @@ from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitu
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 import suncalc
 import pysolar
-from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
-# from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.api.utilities.timestamp import attach_timezone
 
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
@@ -30,7 +21,6 @@ import suncalc
 import pysolar
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR

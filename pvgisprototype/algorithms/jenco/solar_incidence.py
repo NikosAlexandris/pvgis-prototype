@@ -1,7 +1,3 @@
-# import typer
-# from typing import Annotated
-# from typing import Union
-# from typing import Sequence
 from typing import List
 from typing import Optional
 from pathlib import Path
@@ -10,21 +6,17 @@ from zoneinfo import ZoneInfo
 from math import sin, cos
 from math import asin
 from math import atan
-# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
-# from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-# from pvgisprototype.api.utilities.conversions import convert_to_radians
-# from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 
 from pvgisprototype import RelativeLongitude
 from pvgisprototype import SolarIncidence
 from pvgisprototype import HorizonHeight
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-# from pvgisprototype import SolarHourAngle
+
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel

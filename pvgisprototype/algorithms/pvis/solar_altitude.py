@@ -4,19 +4,17 @@ from zoneinfo import ZoneInfo
 from math import cos
 from math import sin
 from math import asin
-# from typing import Optional
+from math import isfinite
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)

@@ -1,10 +1,8 @@
 from devtools import debug
 from pathlib import Path
-from math import cos
 from typing import Annotated
 from typing import List
 from typing import Optional
-import math
 import numpy as np
 import typer
 from enum import Enum
@@ -42,8 +40,8 @@ from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_
 from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from ..geometry.solar_time import model_solar_time
-from .direct import calculate_direct_horizontal_irradiance
+from ..geometry.solar_time import model_apparent_solar_time
+# from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -104,7 +102,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
 from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_efficiency
-from pvgisprototype.constants import EFFICIENCY_DEFAULT
+# from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_pv_module_efficiency_algorithm
 from pvgisprototype.constants import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places

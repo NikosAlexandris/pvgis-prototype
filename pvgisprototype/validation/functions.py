@@ -41,7 +41,6 @@ from pvgisprototype.validation.parameters import SurfaceTiltModel
 from pvgisprototype.validation.parameters import SurfaceOrientationModel
 
 # Output
-from pvgisprototype.validation.parameters import BaseAngleUnitsModel
 from pvgisprototype.validation.parameters import BaseAngleInternalUnitsModel
 from pvgisprototype.validation.parameters import BaseAngleOutputUnitsModel
 

@@ -4,35 +4,34 @@ import typer
 from pathlib import Path
 from typing import Annotated
 from typing import Optional
-from typing import Union
 from typing import List
 from rich.console import Console
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.cli.typer_parameters import typer_argument_time_series
-from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
-from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+# from pvgisprototype.cli.typer_parameters import typer_argument_time_series
+# from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
+# from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degrees
+# from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degrees
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
+# from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
+# from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
@@ -45,7 +44,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
+# from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude_series
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
