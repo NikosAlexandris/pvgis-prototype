@@ -90,7 +90,6 @@ def calculate_solar_altitude_azimuth_skyfield(
         latitude: Latitude,
         timestamp: datetime,
         timezone: str = None,
-        angle_output_units: str = 'radians',
     ) -> Tuple[SolarAltitude, SolarAzimuth]:
     """Calculate sun position"""
     solar_position = calculate_solar_position_skyfield(
@@ -128,7 +127,6 @@ def calculate_hour_angle_skyfield(      # NOTE gounaol: Declination is also calc
         latitude: Latitude,
         timestamp: datetime,
         timezone: str = None,
-        angle_output_units: str = 'radians',
     ) -> Tuple[SolarHourAngle, SolarDeclination]:
     """Calculate the hour angle ω'
 

@@ -23,17 +23,9 @@ def calculate_solar_altitude_pvis(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: RefractedSolarZenith,
-    days_in_a_year: float,
     perigee_offset: float,
     eccentricity_correction_factor: float,
-    time_offset_global: int,
-    hour_offset: int,
     solar_time_model: SolarTimeModels,
-    # time_output_units: str,
-    # angle_units: str,
-    # angle_output_units: str,
     verbose: int = 0,
 ) -> SolarAltitude:
     """Compute various solar geometry variables.
@@ -67,7 +59,6 @@ def calculate_solar_altitude_pvis(
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
         timezone=timezone,
-        days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
     )
@@ -78,27 +69,15 @@ def calculate_solar_altitude_pvis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         solar_time_model=solar_time_model,
         verbose=verbose,
     )
     hour_angle = calculate_hour_angle(
             solar_time=solar_time,
-            # angle_output_units='radians',
     )
     sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
     solar_altitude = asin(sine_solar_altitude)
     solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
-    # solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
 
     if verbose == 3:
         debug(locals())

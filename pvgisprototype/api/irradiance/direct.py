@@ -491,16 +491,9 @@ def calculate_direct_horizontal_irradiance(
         timezone=timezone,
         model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
-        solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     # The refraction equation expects the solar altitude angle in degrees! ---
     expected_solar_altitude_units = 'degrees'
@@ -614,16 +607,10 @@ def calculate_direct_inclined_irradiance_pvgis(
         timestamp=timestamp,
         timezone=timezone,
         solar_time_model=solar_time_model,
-        refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
     sine_solar_altitude = sin(solar_altitude.radians)
 
@@ -656,13 +643,6 @@ def calculate_direct_inclined_irradiance_pvgis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         solar_time_model=solar_time_model,
         verbose=verbose,
     )

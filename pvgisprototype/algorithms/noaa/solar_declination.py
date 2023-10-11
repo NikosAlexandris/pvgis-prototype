@@ -20,7 +20,6 @@ def calculate_solar_declination_noaa(
         """Calculate the solar declination in radians"""
         fractional_year = calculate_fractional_year_noaa(
                 timestamp=timestamp,
-                angle_output_units='radians',
                 )
         declination = (
         0.006918

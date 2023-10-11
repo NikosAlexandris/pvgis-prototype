@@ -18,11 +18,6 @@ def calculate_apparent_solar_time_milne1921(
     longitude: Longitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    # days_in_a_year: float = 365.25,
-    # perigee_offset: float = 0.048869,
-    # eccentricity_correction_factor: float = 0.03344,
-    # time_offset_global: float = 0,
-    # hour_offset: float = 0,
     verbose: int = 0,
 ) -> datetime:
     """Calculate the apparent solar time based on the equation of time by Milne 1921

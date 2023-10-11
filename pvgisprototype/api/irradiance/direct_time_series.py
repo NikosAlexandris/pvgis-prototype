@@ -313,7 +313,7 @@ def calculate_direct_normal_irradiance_time_series(
 ):
     """ """
    # Unpack custom objects to NumPy arrays
-    linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
+    # linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
     optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
 
     extraterrestrial_normal_irradiance_series = (

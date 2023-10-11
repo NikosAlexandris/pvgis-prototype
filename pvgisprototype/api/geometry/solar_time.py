@@ -30,13 +30,6 @@ def model_solar_time(
     timestamp: datetime,
     timezone: ZoneInfo,
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
-    apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    days_in_a_year: float = DAYS_IN_A_YEAR,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> datetime:
     """Calculates the solar time and returns the calculated value and the units.
@@ -55,15 +48,8 @@ def model_solar_time(
 
         solar_time = calculate_apparent_solar_time_milne1921(
             longitude=longitude,
-            # latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            # days_in_a_year=days_in_a_year,
-            # perigee_offset=perigee_offset,
-            # eccentricity_correction_factor=eccentricity_correction_factor,
-            # time_offset_global=time_offset_global,
-            # hour_offset=hour_offset,                          # FIXME: Are these usefull?
-            # verbose=verbose,
         )
 
     if solar_time_model.value == SolarTimeModels.ephem:
@@ -83,7 +69,6 @@ def model_solar_time(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            # time_offset_global=time_offset_global,                          # FIXME: Are these usefull?
             verbose=verbose,
         )
 
@@ -91,11 +76,8 @@ def model_solar_time(
 
         solar_time = calculate_true_solar_time_noaa(
             longitude=longitude,
-            # latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            # refracted_solar_zenith=refracted_solar_zenith,
-            # apply_atmospheric_refraction=apply_atmospheric_refraction,
             verbose=verbose,
         )
 
@@ -128,8 +110,6 @@ def calculate_solar_time(
     time_offset_global: float = 0,
     hour_offset: float = 0,
     time_output_units: str = "minutes",
-    # angle_units: str = "radians",
-    # angle_output_units: str = "radians",
     verbose: int = 0,
 ) -> List:
     """Calculates the solar time using all models and returns the results in a table.
@@ -157,8 +137,6 @@ def calculate_solar_time(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                # time_output_units=time_output_units,
-                # angle_output_units=angle_output_units,
                 verbose=verbose,
             )
             debug(locals())

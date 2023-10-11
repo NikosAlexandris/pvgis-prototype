@@ -78,7 +78,6 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
-    BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
@@ -148,8 +147,6 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     ApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass
@@ -158,9 +155,6 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
 class CalculateSolarAzimuthNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
-    # BaseTimeOutputUnitsModel,
-    # BaseAngleUnitsModel,
-    # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass

@@ -19,8 +19,6 @@ def calculate_solar_hour_angle_noaa(
     longitude: Longitude,
     timestamp: datetime, 
     timezone: Optional[ZoneInfo] = None, 
-    # time_output_units: str = 'minutes',
-    # angle_output_units: Optional[str] = 'radians',
     verbose: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
@@ -74,7 +72,6 @@ def calculate_solar_hour_angle_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        # time_output_units='minutes',  # NOTE gounaol: Should not be None
     )
 
     true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
@@ -107,7 +104,6 @@ def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
     timestamps: Sequence[datetime], 
     timezone: Optional[str] = None, 
-    time_output_units: Optional[str] = 'minutes',
     angle_output_units: Optional[str] = 'radians',
     verbose: int = 0,
 ):

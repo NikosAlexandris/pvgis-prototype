@@ -95,32 +95,32 @@ def calculate_solar_time_ephem(
   observer.date = timestamp
   observer.lon = longitude.degrees
   observer.lat = latitude.degrees
-  sidereal_time = observer.sidereal_time()
+  # sidereal_time = observer.sidereal_time()
 
   sun = ephem.Sun()  # a Sun object
   sun.compute(observer)  # sun position for observer's location and time
-  sun_right_ascension = sun.ra
+  # sun_right_ascension = sun.ra
 
   # hour_angle = sidereal_time - sun_right_ascension
   hour_angle = sun.ha
 
-  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------  # NOTE gounaol: This is not used anywhere
   # Calculate the start of a new (solar) day at 0:00 hrs : `base_date`
-  reference_date = round(observer.date)
-  if reference_date > observer.date:
-      base_date = reference_date - 1.5
-  else:
-      base_date = reference_date - 0.5
+  # reference_date = round(observer.date)
+  # if reference_date > observer.date:
+  #     base_date = reference_date - 1.5
+  # else:
+  #     base_date = reference_date - 0.5
 
   # mean solar time = UTC + longitude | solar time = mean solar time + equation of time
-  mean_solar_time = ephem.date(observer.date + (observer.lon / pi * 12) * ephem.hour)
-  hour, minute, second = mean_solar_time.tuple()[3:]
-  mean_solar_time_decimal_hours = hour + minute / 60 + second / 3600  # to decimal hours
+  # mean_solar_time = ephem.date(observer.date + (observer.lon / pi * 12) * ephem.hour)
+  # hour, minute, second = mean_solar_time.tuple()[3:]
+  # mean_solar_time_decimal_hours = hour + minute / 60 + second / 3600  # to decimal hours
 
   # solar time = hour angle + 12 hrs
-  solar_time_alternative = ephem.date(base_date + (hour_angle + ephem.hours('12:00')) / (2 * pi))
-  hour, minute, second = solar_time_alternative.tuple()[3:]
-  solar_time_alternative_decimal_hours = hour + minute / 60 + second / 3600
+  # solar_time_alternative = ephem.date(base_date + (hour_angle + ephem.hours('12:00')) / (2 * pi))
+  # hour, minute, second = solar_time_alternative.tuple()[3:]
+  # solar_time_alternative_decimal_hours = hour + minute / 60 + second / 3600
   # ------------------------------------------------------------------------
 
   # norm -> normalise to 24h

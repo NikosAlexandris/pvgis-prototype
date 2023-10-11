@@ -24,17 +24,8 @@ def convert_east_to_north_radians_convention(azimuth_east_radians):
 def calculate_solar_azimuth_pvis(
     longitude: Longitude,
     latitude: Latitude,
-    # longitude: Longitude_in_Radians,
-    # latitude: Latitude_in_Radians,
     timestamp: datetime,
     timezone: ZoneInfo,
-    apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: RefractedSolarZenith,
-    days_in_a_year: float,
-    perigee_offset: float,
-    eccentricity_correction_factor: float,
-    time_offset_global: int,
-    hour_offset: int,
     solar_time_model: SolarTimeModels,
 ) -> SolarAzimuth:
     """Compute various solar geometry variables.
@@ -43,15 +34,10 @@ def calculate_solar_azimuth_pvis(
     -------
     solar_azimuth: float
 
-
-    Returns
-    -------
-    solar_azimuth: float
-
     Notes
     -----
     According to ... solar azimuth is measured from East!
-    Conflicht with Jenvco 1992?
+    Conflicht with Jenco 1992?
     """
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
@@ -66,13 +52,6 @@ def calculate_solar_azimuth_pvis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         solar_time_model=solar_time_model,
     )
     hour_angle = calculate_hour_angle(
