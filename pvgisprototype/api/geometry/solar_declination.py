@@ -47,7 +47,6 @@ def model_solar_declination(
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
             timezone=timezone,
-            days_in_a_year=days_in_a_year,
             eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,
         )
@@ -71,8 +70,6 @@ def model_solar_declination(
 def calculate_solar_declination(
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    local_time: bool = False,
-    random_time: bool = False,
     models: List[SolarDeclinationModels] = [SolarDeclinationModels.pvis],
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,

@@ -59,10 +59,7 @@ def model_solar_geometry_overview(
     timezone: Optional[ZoneInfo],
     model: SolarPositionModels,
     apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: RefractedSolarZenith,
     solar_time_model: SolarTimeModels,
-    time_offset_global: float,
-    hour_offset: float,
     days_in_a_year: float,
     perigee_offset: float,
     eccentricity_correction_factor: float,
@@ -208,7 +205,6 @@ def model_solar_geometry_overview(
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
             timezone=timezone,
-            days_in_a_year=days_in_a_year,
             eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,
         )
@@ -218,21 +214,16 @@ def model_solar_geometry_overview(
             timezone=timezone,
         )
         solar_hour_angle = calculate_solar_hour_angle_pvis(
-            solar_time=solar_time_milne1921,                           # FIXME gounaol: Is this correct?
-            # angle_output_units=angle_output_units,
+            solar_time=solar_time_milne1921,
         )
         solar_altitude = calculate_solar_altitude_pvis(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
             solar_time_model=solar_time_model,
             )
         # ------------------------------------ TODO: calculate_solar_zenith_pvis
@@ -246,13 +237,6 @@ def model_solar_geometry_overview(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
             solar_time_model=solar_time_model,
         )
 
@@ -322,15 +306,12 @@ def calculate_solar_geometry_overview(
     latitude: Latitude,
     timestamp: datetime,
     timezone: Optional[ZoneInfo],
-    refracted_solar_zenith: RefractedSolarZenith,
     models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
     days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     angle_output_units: str = 'radians',
     verbose: int = 0,
 ) -> List:
@@ -347,10 +328,7 @@ def calculate_solar_geometry_overview(
                 timezone=timezone,
                 model=model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
                 solar_time_model=solar_time_model,
-                time_offset_global=time_offset_global,
-                hour_offset=hour_offset,
                 days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,

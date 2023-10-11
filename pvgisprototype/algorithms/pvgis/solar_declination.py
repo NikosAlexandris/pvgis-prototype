@@ -10,7 +10,7 @@ from pvgisprototype import SolarDeclination
 def calculate_solar_declination_pvgis(
     timestamp: datetime,
     timezone: str = None,
-    days_in_a_year: float = 365.25,
+    # days_in_a_year: float = 365.25,
     eccentricity_correction_factor: float = 0.03344,
     perigee_offset: float = 0.048869,
 ) -> SolarDeclination:
@@ -33,11 +33,10 @@ def calculate_solar_declination_pvgis(
     which is actually : `declination = - declination`. Why? The value is
     inverted again at some other part of the program when it gets to read data.
     """
-    day_of_year = timestamp.timetuple().tm_yday
+    # day_of_year = timestamp.timetuple().tm_yday
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
         timezone=timezone,
-        days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
         )

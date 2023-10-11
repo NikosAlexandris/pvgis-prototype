@@ -38,13 +38,7 @@ def model_solar_azimuth(
     timezone: ZoneInfo,
     model: SolarPositionModels = SolarPositionModels.pvlib,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarAzimuth:
     """
@@ -120,13 +114,6 @@ def model_solar_azimuth(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
             solar_time_model=solar_time_model,
         )
 

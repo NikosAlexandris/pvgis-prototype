@@ -108,7 +108,6 @@ def calculate_solar_incidence_jenco(
     timestamp: datetime,
     timezone: ZoneInfo = None,
     random_time: bool = False,
-    # hour_angle: SolarHourAngle = None,
     surface_tilt: float = None,
     surface_orientation: float = None,
     shadow_indicator: Path = None,
@@ -198,7 +197,6 @@ def calculate_solar_incidence_jenco(
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
             timezone=timezone,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
         )
@@ -262,7 +260,6 @@ def calculate_solar_incidence_time_series_jenco(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
-        time_output_units=time_output_units,
         angle_output_units=angle_output_units,
     )
     solar_hour_angle_series = np.array([item.radians for item in solar_hour_angle_series])

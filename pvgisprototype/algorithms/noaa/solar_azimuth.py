@@ -31,9 +31,6 @@ def calculate_solar_azimuth_noaa(
     timestamp: datetime,
     timezone: str,
     apply_atmospheric_refraction: bool = True,
-    # time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
-    # angle_output_units: str = 'radians',
     verbose: int = 0,
 )-> SolarAzimuth:
     """Calculate the solar azimuth angle (θ) in radians
@@ -46,8 +43,6 @@ def calculate_solar_azimuth_noaa(
     # Review & Cache Me ! ----------------------------------------------------
     solar_declination = calculate_solar_declination_noaa(
         timestamp=timestamp,
-        # angle_units,
-        # angle_output_units='radians',
     )
     # ------------------------------------------------------------------------
     solar_hour_angle = calculate_solar_hour_angle_noaa(

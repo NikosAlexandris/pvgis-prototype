@@ -268,15 +268,10 @@ def overview(
         timezone=timezone,
         models=model,  # could be named models!
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
@@ -433,15 +428,10 @@ def altitude(
         timestamp=timestamp,
         timezone=timezone,
         models=model,  # could be named models!
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
         solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
@@ -533,10 +523,6 @@ def zenith(
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )

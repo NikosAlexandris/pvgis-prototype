@@ -14,7 +14,6 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 def calculate_solar_declination_pvis(
     timestamp: datetime,
     timezone: ZoneInfo,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
 ) -> SolarDeclination:

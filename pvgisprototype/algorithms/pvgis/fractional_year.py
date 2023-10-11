@@ -23,7 +23,7 @@ def calculate_fractional_year_pvgis(
     - NOAA's corresponding equation uses 365 days in a year
     """
     year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1)
+    # start_of_year = datetime(year=year, month=1, day=1)
     day_of_year = timestamp.timetuple().tm_yday
     fractional_year = 2 * pi * day_of_year / 365.25
 

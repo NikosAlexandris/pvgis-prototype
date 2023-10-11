@@ -15,7 +15,6 @@ from math import pi
 @validate_with_pydantic(CalculateSolarHourAnglePVISInputModel)
 def calculate_solar_hour_angle_pvis(
     solar_time:datetime,
-    # angle_output_units: str = 'radians',
 )-> SolarHourAngle:
     """Calculate the hour angle ω'
 

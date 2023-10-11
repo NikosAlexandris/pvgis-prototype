@@ -317,7 +317,6 @@ def calculate_effective_irradiance(
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
     solar_altitude = model_solar_altitude(
@@ -326,16 +325,9 @@ def calculate_effective_irradiance(
         timestamp=timestamp,
         timezone=timezone,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        solar_time_model=solar_time_model,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
     solar_time = model_solar_time(
@@ -343,13 +335,6 @@ def calculate_effective_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         solar_time_model=solar_time_model,
         verbose=verbose,
     )
