@@ -110,12 +110,14 @@ def model_solar_geometry_overview(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
+            verbose=verbose,
         )
         solar_zenith = calculate_solar_zenith_noaa(
             latitude=latitude,
             timestamp=timestamp,
             solar_hour_angle=solar_hour_angle,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            verbose=verbose,
         )
         solar_altitude = calculate_solar_altitude_noaa(
             longitude=longitude,
@@ -123,6 +125,7 @@ def model_solar_geometry_overview(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            verbose=verbose,
         )
         solar_azimuth = calculate_solar_azimuth_noaa(
             longitude=longitude,
@@ -130,6 +133,7 @@ def model_solar_geometry_overview(
             timestamp=timestamp,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            verbose=verbose,
         )
     
     if model.value == SolarPositionModels.skyfield:
@@ -212,6 +216,7 @@ def model_solar_geometry_overview(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
+            verbose=verbose,
         )
         solar_hour_angle = calculate_solar_hour_angle_pvis(
             solar_time=solar_time_milne1921,
