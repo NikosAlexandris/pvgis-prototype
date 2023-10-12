@@ -41,7 +41,7 @@ from datetime import datetime
 # from pvgisprototype.constants import AOI_CONSTANTS
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
+from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_relative_longitude
 # from pvgisprototype.api.utilities.conversions import convert_to_radians

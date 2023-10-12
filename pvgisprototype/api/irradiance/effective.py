@@ -40,7 +40,7 @@ from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_
 from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from ..geometry.solar_time import model_apparent_solar_time
+from ..geometry.solar_time import model_solar_time
 # from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands

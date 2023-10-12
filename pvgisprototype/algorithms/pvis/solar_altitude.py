@@ -13,7 +13,7 @@ from pvgisprototype import Longitude
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
+from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 
 

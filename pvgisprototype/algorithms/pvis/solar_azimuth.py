@@ -13,7 +13,7 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAzimuth
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
-from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
+from pvgisprototype.api.geometry.solar_time import model_solar_time
 
 
 def convert_east_to_north_radians_convention(azimuth_east_radians):
