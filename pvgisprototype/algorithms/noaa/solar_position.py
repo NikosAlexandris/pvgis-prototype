@@ -61,7 +61,7 @@ def calculate_noaa_solar_position(
         longitude=longitude,
         timestamp=timestamp,
     )
-    true_solar_time = calculate_true_solar_time_noaa(
+    true_solar_time = calculate_apparent_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,

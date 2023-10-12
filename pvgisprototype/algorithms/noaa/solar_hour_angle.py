@@ -68,7 +68,7 @@ def calculate_solar_hour_angle_noaa(
     to radians. A circle is 360 degrees, dividing by 1440 minutes in a day,
     each minute equals to 0.25 radians.
     """
-    true_solar_time = calculate_true_solar_time_noaa(
+    true_solar_time = calculate_apparent_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
@@ -111,7 +111,7 @@ def calculate_solar_hour_angle_time_series_noaa(
     solar_hour_angle_series = []
     
     for timestamp in timestamps:
-        true_solar_time = calculate_true_solar_time_noaa(
+        true_solar_time = calculate_apparent_solar_time_noaa(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,

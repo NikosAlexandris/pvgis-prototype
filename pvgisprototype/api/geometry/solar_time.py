@@ -74,7 +74,7 @@ def model_solar_time(
 
     if solar_time_model.value == SolarTimeModels.noaa:
 
-        solar_time = calculate_true_solar_time_noaa(
+        solar_time = calculate_apparent_solar_time_noaa(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
