@@ -109,15 +109,20 @@ def print_solar_position_table(
     for model_result in rounded_table:
         declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination else None
         hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle else None
-        solar_time_model = model_result.get(TIME_ALGORITHM_NAME, '')
-        algorithm = model_result.get(POSITION_ALGORITHM_NAME, '')
+        timing_algorithm = model_result.get(TIME_ALGORITHM_NAME, '')                # FIXME
+        position_algorithm = model_result.get(POSITION_ALGORITHM_NAME, '')
         zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith else None
         altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude else None
         azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth else None
         incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence else None
         units = model_result.get(UNITS_NAME, UNITLESSS_COLUMN_NAME)
 
-        row = [str(longitude), str(latitude), str(timestamp), str(timezone)]
+        row = []
+        if longitude:
+            row.append(longitude)
+        if latitude:
+            row.append(str(latitude))
+        row.extend([str(timestamp), str(timezone)])
 
        # ---------------------------------------------------- Implement-Me---
        # Convert the result back to the user's time zone
@@ -129,14 +134,14 @@ def print_solar_position_table(
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
 
-        if solar_time_model is not None:
-            row.append(solar_time_model)
+        if timing:
+            row.append(timing_algorithm)
         if declination_value is not None:
             row.append(str(declination_value))
         if hour_angle_value is not None:
             row.append(str(hour_angle_value))
-        if algorithm is not None:
-            row.append(algorithm)
+        if position_algorithm is not None:
+            row.append(position_algorithm)
         if zenith_value is not None:
             row.append(str(zenith_value))
         if altitude_value is not None:
@@ -151,7 +156,7 @@ def print_solar_position_table(
             "pvis": "red",  # red because PVIS is incomplete!
             "pvlib": "bold",
         }
-        style = style_map.get(algorithm.lower(), None)
+        style = style_map.get(position_algorithm.lower(), None)
         table.add_row(*row, style=style)
 
     console.print(table)
