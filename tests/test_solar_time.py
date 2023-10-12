@@ -127,7 +127,7 @@ def test_calculate_solar_time(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=[model],
+        solar_time_models=[model],
     )
     debug(locals())
     assert result == pytest.approx(expected_solar_time)
