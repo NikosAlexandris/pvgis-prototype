@@ -311,7 +311,7 @@ def calculate_solar_geometry_overview(
     latitude: Latitude,
     timestamp: datetime,
     timezone: Optional[ZoneInfo],
-    models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
+    solar_position_models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
     days_in_a_year: float = 365.25,
@@ -324,14 +324,14 @@ def calculate_solar_geometry_overview(
     Calculates the solar position using all models and returns the results in a table.
     """
     results = []
-    for model in models:
-        if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
+    for solar_position_model in solar_position_models:
+        if solar_position_model != SolarPositionModels.all:  # ignore 'all' in the enumeration
             solar_declination, solar_hour_angle, solar_zenith, solar_altitude, solar_azimuth = model_solar_geometry_overview(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
-                model=model,
+                solar_position_model=solar_position_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 solar_time_model=solar_time_model,
                 days_in_a_year=days_in_a_year,
