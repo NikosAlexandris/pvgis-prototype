@@ -28,6 +28,8 @@ def calculate_solar_hour_angle_pvlib(
     solar_hour_angle = SolarHourAngle(
         value=solar_hour_angle,
         unit='degrees',
+        position_algorithm='pvlib',
+        timing_algorithm='pvlib',
     )
 
     if not -180 <= solar_hour_angle.degrees <= 180:

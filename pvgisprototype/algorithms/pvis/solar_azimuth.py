@@ -68,4 +68,9 @@ def calculate_solar_azimuth_pvis(
     # solar_azimuth = convert_east_to_north_radians_convention(solar_azimuth)
     # convert east to north zero degrees convention --------------------------
 
-    return SolarAzimuth(value=solar_azimuth, unit="radians") # zero_direction='East'
+    return SolarAzimuth(
+        value=solar_azimuth,
+        unit="radians",
+        position_algorithm='pvis',
+        timing_algorithm=solar_time_model.value,
+    ) # zero_direction='East'

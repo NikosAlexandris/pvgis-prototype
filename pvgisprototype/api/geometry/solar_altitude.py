@@ -91,7 +91,13 @@ def model_solar_altitude(
             lng=longitude.degrees,
             lat=latitude.degrees,
         ).values()  # zero points to south
-        solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+        solar_altitude = SolarAltitude(
+            value=solar_altitude,
+            unit='radians',
+            position_algorithm='suncalc',
+            timing_algorithm='suncalc',
+        )
+
 
     if solar_position_model.value == SolarPositionModels.pysolar:
 
@@ -103,7 +109,13 @@ def model_solar_altitude(
             when=timestamp,
         )  # returns degrees by default
         # required by output function
-        solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
+        solar_altitude = SolarAltitude(
+            value=solar_altitude,
+            unit="degrees",
+            position_algorithm='pysolar',
+            timing_algorithm='pysolar',
+        )
+
 
     if solar_position_model.value  == SolarPositionModels.pvis:
 

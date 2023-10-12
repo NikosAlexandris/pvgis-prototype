@@ -64,4 +64,9 @@ def calculate_solar_declination_pvis(
             * sin(fractional_year.radians - perigee_offset)
         )
     )
-    return SolarDeclination(value=solar_declination, unit="radians")
+    return SolarDeclination(
+        value=solar_declination,
+        unit="radians",
+        position_algorithm='pvis',
+        timing_algorithm='pvis',
+    )

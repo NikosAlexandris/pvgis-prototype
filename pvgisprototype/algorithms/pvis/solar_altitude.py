@@ -77,7 +77,12 @@ def calculate_solar_altitude_pvis(
     )
     sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
     solar_altitude = asin(sine_solar_altitude)
-    solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+    solar_altitude = SolarAltitude(
+        value=solar_altitude,
+        unit='radians',
+        position_algorithm='pvis',
+        timing_algorithm=solar_time_model.value,
+    )
 
     if verbose == 3:
         debug(locals())
