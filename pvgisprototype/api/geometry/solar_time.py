@@ -141,7 +141,7 @@ def calculate_solar_time(
             )
             debug(locals())
             results.append({
-                TIME_ALGORITHM_NAME: solar_time_model,
+                TIME_ALGORITHM_NAME: solar_time.timing_algorithm,
                 SOLAR_TIME_NAME: solar_time,
                 UNITS_NAME: time_output_units,  # Don't trust me -- Redesign Me!
             })
