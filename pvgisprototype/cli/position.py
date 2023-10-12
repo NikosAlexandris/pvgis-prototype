@@ -429,6 +429,7 @@ def altitude(
         timezone=timezone,
         solar_position_models=model,  # could be named models!
         solar_time_model=solar_time_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
