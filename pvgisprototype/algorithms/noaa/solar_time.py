@@ -116,7 +116,7 @@ def calculate_true_solar_time_time_series_noaa(
             angle_units=angle_units,
         )  # in minutes
         true_solar_time = (
-            timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.as_minutes
+            timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.minutes
         )
 
         if time_output_units == 'minutes':
