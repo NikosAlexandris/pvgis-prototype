@@ -494,6 +494,7 @@ def calculate_direct_horizontal_irradiance(
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        verbose=verbose,
     )
     # The refraction equation expects the solar altitude angle in degrees! ---
     expected_solar_altitude_units = 'degrees'
@@ -611,6 +612,7 @@ def calculate_direct_inclined_irradiance_pvgis(
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        verbose=verbose,
     )
     sine_solar_altitude = sin(solar_altitude.radians)
 

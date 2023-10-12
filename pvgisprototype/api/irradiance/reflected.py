@@ -138,6 +138,7 @@ def calculate_ground_reflected_inclined_irradiance(
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        verbose=verbose,
         )
 
     # on a horizontal surface : G0h = G0 sin(h0)

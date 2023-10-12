@@ -531,6 +531,7 @@ def calculate_diffuse_inclined_irradiance(
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             solar_time_model=solar_time_model,
+            verbose=verbose,
         )
 
         # on a horizontal surface : G0h = G0 sin(h0)
