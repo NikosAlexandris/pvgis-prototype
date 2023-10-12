@@ -57,7 +57,7 @@ def model_solar_geometry_overview(
     latitude: Latitude,
     timestamp: datetime,
     timezone: Optional[ZoneInfo],
-    model: SolarPositionModels,
+    solar_position_model: SolarPositionModels,
     apply_atmospheric_refraction: bool,
     solar_time_model: SolarTimeModels,
     days_in_a_year: float,
@@ -101,7 +101,7 @@ def model_solar_geometry_overview(
     solar_altitude = None
     solar_azimuth = None
 
-    if model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModels.noaa:
 
         solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
@@ -136,7 +136,7 @@ def model_solar_geometry_overview(
             verbose=verbose,
         )
     
-    if model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModels.skyfield:
 
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude=longitude,
@@ -157,7 +157,7 @@ def model_solar_geometry_overview(
             timezone=timezone,
         )
 
-    if model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
@@ -177,7 +177,7 @@ def model_solar_geometry_overview(
         )
         # --------------------------------------------------------------------
 
-    if model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModels.pysolar:
 
         timestamp = attach_timezone(timestamp, timezone)
 
@@ -204,7 +204,7 @@ def model_solar_geometry_overview(
         # required by output function
         solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="degrees")
 
-    if model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModels.pvis:
 
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
@@ -245,7 +245,7 @@ def model_solar_geometry_overview(
             solar_time_model=solar_time_model,
         )
 
-    if model.value == SolarPositionModels.pvlib:
+    if solar_position_model.value == SolarPositionModels.pvlib:
 
         solar_declination = calculate_solar_declination_pvlib(
             timestamp=timestamp,

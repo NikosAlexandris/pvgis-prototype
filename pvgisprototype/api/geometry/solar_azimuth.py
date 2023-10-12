@@ -36,7 +36,7 @@ def model_solar_azimuth(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    model: SolarPositionModels = SolarPositionModels.pvlib,
+    solar_position_model: SolarPositionModels = SolarPositionModels.pvlib,
     apply_atmospheric_refraction: bool = True,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -63,7 +63,7 @@ def model_solar_azimuth(
 
     - The result is returned with units.
     """
-    if model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModels.noaa:
 
         solar_azimuth = calculate_solar_azimuth_noaa(
             longitude=longitude,
@@ -74,7 +74,7 @@ def model_solar_azimuth(
             verbose=verbose,
         )
     
-    if model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModels.skyfield:
 
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude=longitude,
@@ -83,7 +83,7 @@ def model_solar_azimuth(
                 timezone=timezone,
                 )
 
-    if model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
@@ -95,7 +95,7 @@ def model_solar_azimuth(
         )
         solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="radians")
 
-    if model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModels.pysolar:
 
         timestamp = attach_timezone(timestamp, timezone)
 
@@ -107,7 +107,7 @@ def model_solar_azimuth(
         # required by output function
         solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="degrees")
 
-    if model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModels.pvis:
 
         solar_azimuth = calculate_solar_azimuth_pvis(
             longitude=longitude,
@@ -117,7 +117,7 @@ def model_solar_azimuth(
             solar_time_model=solar_time_model,
         )
 
-    if model.value  == SolarPositionModels.pvlib:
+    if solar_position_model.value  == SolarPositionModels.pvlib:
 
         solar_azimuth = calculate_solar_azimuth_pvlib(
             longitude=longitude,
@@ -159,7 +159,7 @@ def calculate_solar_azimuth(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
+    solar_position_models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -175,14 +175,14 @@ def calculate_solar_azimuth(
     Calculates the solar position using all models and returns the results in a table.
     """
     results = []
-    for model in models:
-        if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
+    for solar_position_model in solar_position_models:
+        if solar_position_model != SolarPositionModels.all:  # ignore 'all' in the enumeration
             solar_azimuth = model_solar_azimuth(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
-                model=model,
+                solar_position_model=solar_position_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
                 solar_time_model=solar_time_model,
@@ -195,7 +195,7 @@ def calculate_solar_azimuth(
             )
             results.append({
                 TIME_ALGORITHM_NAME: solar_time_model,
-                POSITION_ALGORITHM_NAME: model.value,
+                POSITION_ALGORITHM_NAME: solar_position_model.value,
                 AZIMUTH_NAME if solar_azimuth else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
                 UNITS_NAME: angle_output_units,
             })

@@ -525,7 +525,7 @@ def calculate_diffuse_inclined_irradiance(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            model=solar_position_model,
+            solar_position_model=solar_position_model,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
@@ -560,7 +560,7 @@ def calculate_diffuse_inclined_irradiance(
         solar_declination = model_solar_declination(
             timestamp=timestamp,
             timezone=timezone,
-            model=solar_declination_model,
+            declination_model=solar_declination_model,
             days_in_a_year=days_in_a_year,
             eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,

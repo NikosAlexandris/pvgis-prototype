@@ -212,7 +212,7 @@ class SolarDeclinationModel(BaseModel):
 
 
 class SolarPositionModel(BaseModel):
-    model: SolarPositionModels = SolarPositionModels.skyfield
+    solar_position_model: SolarPositionModels = SolarPositionModels.skyfield
     apply_atmospheric_refraction: bool = True
 
 
