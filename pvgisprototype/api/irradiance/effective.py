@@ -324,6 +324,8 @@ def calculate_effective_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
+        solar_position_model=solar_position_model,
+        solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
