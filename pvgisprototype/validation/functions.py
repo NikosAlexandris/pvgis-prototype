@@ -188,11 +188,6 @@ class CalculateHourAngleInputModel(
 ):
     pass
 
-class SolarHourAnglePvisInput(
-    SolarTimeModel,
-):
-    pass
-
 
 class CalculateSolarHourAngleNOAAInput(
     LongitudeModel,
