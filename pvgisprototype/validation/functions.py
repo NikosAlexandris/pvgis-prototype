@@ -275,10 +275,6 @@ class CalculateSolarDeclinationPVLIBInput(
 ):
     pass
 
-class CalculateSolarDeclinationSkyfieldInput(
-    BaseTimestampModel,
-):
-    pass
 
 class CalculateSolarZenithPVLIBInputModel(
     CalculateSolarAltitudePVLIBInputModel
