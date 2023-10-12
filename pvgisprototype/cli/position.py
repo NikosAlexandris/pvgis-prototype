@@ -444,6 +444,7 @@ def altitude(
         timezone=timezone,
         table=solar_altitude,
         rounding_places=rounding_places,
+        timing=True,
         altitude=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
@@ -638,6 +639,7 @@ def azimuth(
         timezone=timezone,
         table=solar_azimuth,
         rounding_places=rounding_places,
+        timing=True,
         azimuth=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
