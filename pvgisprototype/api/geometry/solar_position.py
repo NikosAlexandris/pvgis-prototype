@@ -150,7 +150,7 @@ def model_solar_geometry_overview(
             unit = 'degrees'
         )
         # --------------------------------------------------------------------
-        solar_hour_angle, solar_declination = calculate_hour_angle_skyfield(
+        solar_hour_angle, solar_declination = calculate_solar_hour_angle_declination_skyfield(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
