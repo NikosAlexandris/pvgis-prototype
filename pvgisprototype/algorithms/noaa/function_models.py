@@ -1,5 +1,4 @@
 from pydantic import field_validator
-# from typing import Optional
 
 # Generic input/output
 from pvgisprototype.validation.parameters import VerbosityModel
@@ -20,7 +19,6 @@ from pvgisprototype.validation.parameters import BaseCoordinatesModel
 
 # Units?
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-# from pvgisprototype.validation.parameters import BaseAngleUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
 
@@ -80,7 +78,6 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
-    BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
@@ -150,8 +147,6 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     ApplyAtmosphericRefractionModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass
@@ -160,9 +155,6 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
 class CalculateSolarAzimuthNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
-    # BaseTimeOutputUnitsModel,
-    # BaseAngleUnitsModel,
-    # BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass

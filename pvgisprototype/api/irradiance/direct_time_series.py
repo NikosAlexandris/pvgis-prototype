@@ -23,7 +23,7 @@ from pvgisprototype.api.geometry.solar_declination_time_series import model_sola
 from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
@@ -42,11 +42,11 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_optical_air_mass_series
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+# from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+# from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
+# from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
@@ -168,9 +168,9 @@ def calculate_refracted_solar_altitude_time_series(
     is_scalar = False
     if isinstance(solar_altitude_series, SolarAltitude):
         is_scalar = True
-        solar_altitude_series = [solar_altitude_series.value]
+        solar_altitude_series = [solar_altitude_series.degrees]
     else:
-        solar_altitude_series = [altitude.value for altitude in solar_altitude_series]
+        solar_altitude_series = [altitude.degrees for altitude in solar_altitude_series]
 
     # Unpack SolarAltitude objects to NumPy Arrays ----------------------- vvv
     solar_altitude_series_array = np.array(solar_altitude_series)
@@ -224,9 +224,9 @@ def calculate_optical_air_mass_time_series(
     is_scalar = False
     if isinstance(refracted_solar_altitude_series, RefractedSolarAltitude):
         is_scalar = True
-        refracted_solar_altitude_series = [refracted_solar_altitude_series.value]
+        refracted_solar_altitude_series = [refracted_solar_altitude_series.radians]
     else:
-        refracted_solar_altitude_series = [altitude.value for altitude in refracted_solar_altitude_series]
+        refracted_solar_altitude_series = [altitude.radians for altitude in refracted_solar_altitude_series]
     
     # Unpack RefractedSolarAltitude objects to a NumPy array
     refracted_solar_altitude_series_array = np.array(refracted_solar_altitude_series)
@@ -313,7 +313,7 @@ def calculate_direct_normal_irradiance_time_series(
 ):
     """ """
    # Unpack custom objects to NumPy arrays
-    linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
+    # linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
     optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
 
     extraterrestrial_normal_irradiance_series = (
@@ -438,7 +438,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         eccentricity_correction_factor=eccentricity_correction_factor,
         verbose=verbose,
     )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
+    solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
     direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
 
     if verbose == 1:
@@ -571,7 +571,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         angle_output_units=angle_output_units,
         verbose=verbose,
         )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
+    solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
     sine_solar_altitude_series = np.sin(solar_altitude_series_array)
 
     # make it a function -----------------------------------------------------
@@ -605,7 +605,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             angle_output_units=angle_output_units,
     )
     solar_declination_series_array = np.array(
-        [declination.value for declination in solar_declination_series]
+        [declination.radians for declination in solar_declination_series]
     )
     solar_time_decimal_hours_series = timestamp_to_decimal_hours_time_series(
         solar_time_series

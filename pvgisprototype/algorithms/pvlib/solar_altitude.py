@@ -3,7 +3,6 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import isfinite
 import pvlib
-# from ...api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVLIBInputModel
 from pvgisprototype import Longitude

@@ -1,10 +1,8 @@
 from devtools import debug
 from pathlib import Path
-from math import cos
 from typing import Annotated
 from typing import List
 from typing import Optional
-import math
 import numpy as np
 import typer
 from enum import Enum
@@ -42,8 +40,8 @@ from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_
 from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from ..geometry.solar_time import model_solar_time
-from .direct import calculate_direct_horizontal_irradiance
+from ..geometry.solar_time import model_apparent_solar_time
+# from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -104,7 +102,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
 from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_efficiency
-from pvgisprototype.constants import EFFICIENCY_DEFAULT
+# from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_pv_module_efficiency_algorithm
 from pvgisprototype.constants import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
@@ -315,11 +313,10 @@ def calculate_effective_irradiance(
     solar_declination = model_solar_declination(
         timestamp=timestamp,
         timezone=timezone,
-        model=solar_declination_model,
+        declination_model=solar_declination_model,
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
     solar_altitude = model_solar_altitude(
@@ -328,16 +325,9 @@ def calculate_effective_irradiance(
         timestamp=timestamp,
         timezone=timezone,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        solar_time_model=solar_time_model,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
     solar_time = model_solar_time(
@@ -345,13 +335,6 @@ def calculate_effective_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         solar_time_model=solar_time_model,
         verbose=verbose,
     )
@@ -383,9 +366,9 @@ def calculate_effective_irradiance(
         verbose=verbose,
     )
 
-    if solar_altitude.value > 0.0:  # the sun is above the horizon
+    if solar_altitude.radians > 0.0:  # the sun is above the horizon
 
-        if solar_altitude.value < 0.04:  # for very low sun angles
+        if solar_altitude.radians < 0.04:  # for very low sun angles
             direct_horizontal_component = 0.0  # direct radiation is negligible
         
         # if not in_shade and solar_incidence > 0:

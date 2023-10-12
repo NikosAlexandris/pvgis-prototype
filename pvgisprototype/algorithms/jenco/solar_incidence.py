@@ -1,7 +1,3 @@
-# import typer
-# from typing import Annotated
-# from typing import Union
-# from typing import Sequence
 from typing import List
 from typing import Optional
 from pathlib import Path
@@ -10,21 +6,17 @@ from zoneinfo import ZoneInfo
 from math import sin, cos
 from math import asin
 from math import atan
-# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
-# from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-# from pvgisprototype.api.utilities.conversions import convert_to_radians
-# from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 
 from pvgisprototype import RelativeLongitude
 from pvgisprototype import SolarIncidence
 from pvgisprototype import HorizonHeight
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-# from pvgisprototype import SolarHourAngle
+
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel
@@ -116,7 +108,6 @@ def calculate_solar_incidence_jenco(
     timestamp: datetime,
     timezone: ZoneInfo = None,
     random_time: bool = False,
-    # hour_angle: SolarHourAngle = None,
     surface_tilt: float = None,
     surface_orientation: float = None,
     shadow_indicator: Path = None,
@@ -206,7 +197,6 @@ def calculate_solar_incidence_jenco(
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
             timezone=timezone,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
         )
@@ -256,8 +246,8 @@ def calculate_solar_incidence_time_series_jenco(
     )
     solar_declination_series = np.array([item.radians for item in solar_declination_series])
     sine_relative_inclined_latitude = -(
-        cos(latitude.radians) * sin(surface_tilt) * cos(surface_orientation)
-        + sin(latitude.radians) * cos(surface_tilt)
+        cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
+        + sin(latitude.radians) * cos(surface_tilt.radians)
     )
     relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
     c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
@@ -270,7 +260,6 @@ def calculate_solar_incidence_time_series_jenco(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
-        time_output_units=time_output_units,
         angle_output_units=angle_output_units,
     )
     solar_hour_angle_series = np.array([item.radians for item in solar_hour_angle_series])

@@ -14,11 +14,10 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
-def calculate_true_solar_time_noaa(
+def calculate_apparent_solar_time_noaa(
     longitude: Longitude,   # radians
     timestamp: datetime, 
     timezone: Optional[ZoneInfo],
-    # time_output_units: str = 'minutes',
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> datetime:
     """Calculate the true solar time.
@@ -117,7 +116,7 @@ def calculate_true_solar_time_time_series_noaa(
             angle_units=angle_units,
         )  # in minutes
         true_solar_time = (
-            timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.as_minutes
+            timestamp.hour * 60 + timestamp.minute + timestamp.second / 60 + time_offset.minutes
         )
 
         if time_output_units == 'minutes':

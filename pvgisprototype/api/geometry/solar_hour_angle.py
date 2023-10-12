@@ -1,7 +1,4 @@
 from devtools import debug
-# from typing import Annotated
-# from typing import Optional
-# from math import pi
 from math import radians
 from math import acos
 from math import tan
@@ -12,13 +9,10 @@ from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype.constants import RADIANS
-# from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import CalculateHourAngleInputModel
 from pvgisprototype.validation.functions import CalculateHourAngleSunriseInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
-# from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateHourAngleInputModel)

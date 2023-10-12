@@ -44,8 +44,8 @@ def model_solar_altitude_time_series(
             timestamps=timestamps,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            time_output_units=time_output_units,
-            angle_output_units=angle_output_units,
+            # time_output_units=time_output_units,
+            # angle_output_units=angle_output_units,
             verbose=verbose,
         )
 

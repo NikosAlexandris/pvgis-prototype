@@ -3,13 +3,8 @@ from typing import Annotated
 from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
-# from math import pi
-# from math import sin
-# from math import asin
-# from pvgisprototype.validation.functions import validate_with_pydantic
-# from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
-# from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
-# from pvgisprototype import FractionalYear
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import ModelSolarDeclinationInputModel
 from pvgisprototype import SolarDeclination
 from .models import SolarDeclinationModels
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
@@ -31,40 +26,40 @@ from pvgisprototype.constants import DECLINATION_NAME
 from pvgisprototype.constants import UNITS_NAME
 
 
+@validate_with_pydantic(ModelSolarDeclinationInputModel)
 def model_solar_declination(
     timestamp: datetime,
     timezone: ZoneInfo,
-    model: SolarDeclinationModels = SolarDeclinationModels.pvis,
+    declination_model: SolarDeclinationModels = SolarDeclinationModels.pvis,
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarDeclination:
     """ """
-    if model.value == SolarDeclinationModels.noaa:
+    if declination_model.value == SolarDeclinationModels.noaa:
 
         solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
         )
 
-    if model.value  == SolarDeclinationModels.pvis:
+    if declination_model.value  == SolarDeclinationModels.pvis:
 
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
             timezone=timezone,
-            days_in_a_year=days_in_a_year,
             eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,
         )
 
-    if model.value  == SolarDeclinationModels.hargreaves:
+    if declination_model.value  == SolarDeclinationModels.hargreaves:
 
         solar_declination = calculate_solar_declination_hargreaves(
             timestamp=timestamp,
             days_in_a_year=days_in_a_year,
         ) # returns values in degrees by default
 
-    if model.value  == SolarDeclinationModels.pvlib:
+    if declination_model.value  == SolarDeclinationModels.pvlib:
 
         solar_declination = calculate_solar_declination_pvlib(
             timestamp=timestamp,
@@ -76,9 +71,7 @@ def model_solar_declination(
 def calculate_solar_declination(
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    local_time: bool = False,
-    random_time: bool = False,
-    models: List[SolarDeclinationModels] = [SolarDeclinationModels.pvis],
+    declination_models: List[SolarDeclinationModels] = [SolarDeclinationModels.pvis],
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -92,18 +85,18 @@ def calculate_solar_declination(
     azimuth angles.
     """
     results = []
-    for model in models:
-        if model != SolarDeclinationModels.all:  # ignore 'all' in the enumeration
+    for declination_model in declination_models:
+        if declination_model != SolarDeclinationModels.all:  # ignore 'all' in the enumeration
             solar_declination = model_solar_declination(
                 timestamp=timestamp,
                 timezone=timezone,
-                model=model,
+                declination_model=declination_model,
                 days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
             )
             results.append({
-                POSITION_ALGORITHM_NAME: model.value,
+                POSITION_ALGORITHM_NAME: declination_model.value,
                 DECLINATION_NAME if solar_declination else None: getattr(solar_declination, angle_output_units) if solar_declination else None,
                 UNITS_NAME: angle_output_units,
             })

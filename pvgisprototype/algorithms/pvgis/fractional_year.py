@@ -1,12 +1,8 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVGISInputModel
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype import FractionalYear
-# from pvgisprototype.cli.typer_parameters import DAYS_IN_A_YEAR
 from datetime import datetime
-# from datetime import date
-# from datetime import timedelta
 from math import pi
 from math import isclose
 
@@ -15,7 +11,7 @@ FRACTIONAL_YEAR_MINIMUM = 0
 FRACTIONAL_YEAR_MAXIMUM = 2 * pi
 
 
-# @validate_with_pydantic(CalculateFractionalYearPVGISInputModel)
+@validate_with_pydantic(CalculateFractionalYearPVGISInputModel)
 def calculate_fractional_year_pvgis(
     timestamp: datetime,
 ) -> FractionalYear:
@@ -27,7 +23,7 @@ def calculate_fractional_year_pvgis(
     - NOAA's corresponding equation uses 365 days in a year
     """
     year = timestamp.year
-    start_of_year = datetime(year=year, month=1, day=1)
+    # start_of_year = datetime(year=year, month=1, day=1)
     day_of_year = timestamp.timetuple().tm_yday
     fractional_year = 2 * pi * day_of_year / 365.25
 

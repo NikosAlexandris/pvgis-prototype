@@ -1,16 +1,8 @@
 from devtools import debug
-# from typing import Union
 from zoneinfo import ZoneInfo
-# from typing import Sequence
-# import numpy as np
 import pvlib
 from datetime import datetime
-# from math import sin
-# from math import cos
-# from math import acos
-from math import pi
 from math import isfinite
-# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAzimuthPVLIBInputModel

@@ -1,7 +1,4 @@
 from devtools import debug
-# from typing import Annotated
-# from typing import Optional
-# from enum import Enum
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import pi
@@ -12,14 +9,11 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAzimuthPVISInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAzimuth
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.solar_time import model_solar_time
-from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
-# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
+from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
 
 
 def convert_east_to_north_radians_convention(azimuth_east_radians):
@@ -30,17 +24,8 @@ def convert_east_to_north_radians_convention(azimuth_east_radians):
 def calculate_solar_azimuth_pvis(
     longitude: Longitude,
     latitude: Latitude,
-    # longitude: Longitude_in_Radians,
-    # latitude: Latitude_in_Radians,
     timestamp: datetime,
     timezone: ZoneInfo,
-    apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: RefractedSolarZenith,
-    days_in_a_year: float,
-    perigee_offset: float,
-    eccentricity_correction_factor: float,
-    time_offset_global: int,
-    hour_offset: int,
     solar_time_model: SolarTimeModels,
 ) -> SolarAzimuth:
     """Compute various solar geometry variables.
@@ -49,15 +34,10 @@ def calculate_solar_azimuth_pvis(
     -------
     solar_azimuth: float
 
-
-    Returns
-    -------
-    solar_azimuth: float
-
     Notes
     -----
     According to ... solar azimuth is measured from East!
-    Conflicht with Jenvco 1992?
+    Conflicht with Jenco 1992?
     """
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
@@ -72,13 +52,6 @@ def calculate_solar_azimuth_pvis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         solar_time_model=solar_time_model,
     )
     hour_angle = calculate_hour_angle(

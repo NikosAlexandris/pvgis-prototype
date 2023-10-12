@@ -13,41 +13,38 @@ logging.basicConfig(
     ]
 )
 import typer
-from typer import Option
 from typing import Annotated
 from typing import Optional
-from typing import Union
-from enum import Enum
 from datetime import datetime
 from rich import print
 from rich.console import Console
 from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.api.series.hardcodings import check_mark
-from pvgisprototype.api.series.hardcodings import x_mark
-from pandas import Timestamp
-from ..utilities.conversions import convert_to_radians
-from ..utilities.timestamp import parse_timestamp
-from ..utilities.timestamp import now_utc_datetimezone
-from ..utilities.timestamp import ctx_convert_to_timezone
-from ..utilities.timestamp import ctx_attach_requested_timezone
+# from pvgisprototype.api.series.hardcodings import check_mark
+# from pvgisprototype.api.series.hardcodings import x_mark
+# from pandas import Timestamp
+# from ..utilities.conversions import convert_to_radians
+# from ..utilities.timestamp import parse_timestamp
+# from ..utilities.timestamp import now_utc_datetimezone
+# from ..utilities.timestamp import ctx_convert_to_timezone
+# from ..utilities.timestamp import ctx_attach_requested_timezone
 from ..series.statistics import calculate_series_statistics
 from ..series.statistics import print_series_statistics
 from ..series.statistics import export_statistics_to_csv
 from pathlib import Path
-import xarray as xr
+# import xarray as xr
 import numpy as np
-from scipy.stats import mode
-from rich.table import Table
+# from scipy.stats import mode
+# from rich.table import Table
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
-import csv
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+# import csv
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 from .direct import calculate_direct_horizontal_irradiance
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
@@ -64,11 +61,11 @@ from math import cos
 from math import pi
 from math import atan2
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
-from ..geometry.solar_time import model_solar_time
+from ..geometry.solar_time import model_apparent_solar_time
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.cli.typer_parameters import typer_argument_time_series
+# from pvgisprototype.cli.typer_parameters import typer_argument_time_series
 from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -528,18 +525,13 @@ def calculate_diffuse_inclined_irradiance(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            model=solar_position_model,
+            solar_position_model=solar_position_model,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
             days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
             solar_time_model=solar_time_model,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
+            verbose=verbose,
         )
 
         # on a horizontal surface : G0h = G0 sin(h0)
@@ -568,7 +560,7 @@ def calculate_diffuse_inclined_irradiance(
         solar_declination = model_solar_declination(
             timestamp=timestamp,
             timezone=timezone,
-            model=solar_declination_model,
+            declination_model=solar_declination_model,
             days_in_a_year=days_in_a_year,
             eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,
