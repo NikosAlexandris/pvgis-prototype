@@ -6,14 +6,12 @@ from datetime import datetime
 from typing import Optional
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarHourAngle
-from .solar_time import calculate_true_solar_time_noaa
+from .solar_time import calculate_apparent_solar_time_noaa
 from math import pi
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleTimeSeriesNOAAInput
-# from typing import Union
 from typing import Sequence
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 import numpy as np
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
@@ -21,8 +19,6 @@ def calculate_solar_hour_angle_noaa(
     longitude: Longitude,
     timestamp: datetime, 
     timezone: Optional[ZoneInfo] = None, 
-    # time_output_units: str = 'minutes',
-    # angle_output_units: Optional[str] = 'radians',
     verbose: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
@@ -72,11 +68,10 @@ def calculate_solar_hour_angle_noaa(
     to radians. A circle is 360 degrees, dividing by 1440 minutes in a day,
     each minute equals to 0.25 radians.
     """
-    true_solar_time = calculate_true_solar_time_noaa(
+    true_solar_time = calculate_apparent_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        # time_output_units='minutes',  # NOTE gounaol: Should not be None
     )
 
     true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
@@ -109,7 +104,6 @@ def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
     timestamps: Sequence[datetime], 
     timezone: Optional[str] = None, 
-    time_output_units: Optional[str] = 'minutes',
     angle_output_units: Optional[str] = 'radians',
     verbose: int = 0,
 ):
@@ -117,11 +111,10 @@ def calculate_solar_hour_angle_time_series_noaa(
     solar_hour_angle_series = []
     
     for timestamp in timestamps:
-        true_solar_time = calculate_true_solar_time_noaa(
+        true_solar_time = calculate_apparent_solar_time_noaa(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
-            # time_output_units=time_output_units,
         )  # in minutes
 
         true_solar_time_minutes = timestamp_to_minutes(true_solar_time)

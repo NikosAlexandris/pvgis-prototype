@@ -5,13 +5,9 @@ from pydantic import confloat
 from typing import Union
 from typing import Optional
 from typing import Sequence
-from typing import List
 from zoneinfo import ZoneInfo
 from datetime import datetime
-from datetime import time
 from math import pi
-from pydantic import validator
-import numpy as np
 from numpy import ndarray
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import RefractedSolarZenith
@@ -22,12 +18,12 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
-# from pvgisprototype import SolarTime
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
 
@@ -216,7 +212,7 @@ class SolarDeclinationModel(BaseModel):
 
 
 class SolarPositionModel(BaseModel):
-    model: SolarPositionModels = SolarPositionModels.skyfield
+    solar_position_model: SolarPositionModels = SolarPositionModels.skyfield
     apply_atmospheric_refraction: bool = True
 
 
@@ -246,7 +242,7 @@ class SolarTimeModel(BaseModel):
 # Solar surface
 
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt]
+    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = SURFACE_TILT_DEFAULT
     model_config = ConfigDict(
         description="""Surface tilt (or slope) (β) is the angle between the inclined
         surface (slope) and the horizontal plane.""",
@@ -318,7 +314,7 @@ class SolarHourAngleSeriesModel(BaseModel):
 
 
 class ApplyAtmosphericRefractionModel(BaseModel):
-    apply_atmospheric_refraction: bool
+    apply_atmospheric_refraction: Optional[bool] = True
 
 
 class RefractedSolarAltitudeModel(BaseModel):

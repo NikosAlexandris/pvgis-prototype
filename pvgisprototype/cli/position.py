@@ -266,17 +266,12 @@ def overview(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
+        solar_position_models=model,  # could be named models!
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
@@ -432,16 +427,11 @@ def altitude(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        solar_position_models=model,  # could be named models!
         solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
@@ -454,6 +444,7 @@ def altitude(
         timezone=timezone,
         table=solar_altitude,
         rounding_places=rounding_places,
+        timing=True,
         altitude=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
@@ -527,16 +518,12 @@ def zenith(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
+        solar_position_models=model,  # could be named models!
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
@@ -630,7 +617,7 @@ def azimuth(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
+        solar_position_models=model,  # could be named models!
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
@@ -652,6 +639,7 @@ def azimuth(
         timezone=timezone,
         table=solar_azimuth,
         rounding_places=rounding_places,
+        timing=True,
         azimuth=True,
         user_requested_timestamp=user_requested_timestamp, 
         user_requested_timezone=user_requested_timezone
@@ -664,7 +652,7 @@ def declination(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     local_time: Annotated[bool, typer_option_local_time] = False,
     random_time: Annotated[bool, typer_option_random_time] = False,
-    model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
+    solar_declination_model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
@@ -707,14 +695,14 @@ def declination(
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     # Why does the callback function `_parse_model` not work? ----------------
-    if SolarDeclinationModels.all in model:
-        model = [
-            model for model in SolarDeclinationModels if model != SolarDeclinationModels.all
+    if SolarDeclinationModels.all in solar_declination_model:
+        solar_declination_model = [
+            solar_declination_model for solar_declination_model in SolarDeclinationModels if solar_declination_model != SolarDeclinationModels.all
         ]
     solar_declination = calculate_solar_declination(
         timestamp=timestamp,
         timezone=timezone,
-        models=model,
+        declination_models=solar_declination_model,
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,

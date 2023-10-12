@@ -8,7 +8,6 @@ from math import tan
 from math import acos
 from math import radians
 from math import degrees
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from math import isfinite
 from math import pi
@@ -179,9 +178,9 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     is_scalar = False
     if isinstance(solar_zenith_series, SolarZenith):
         is_scalar=True
-        solar_zenith_series = [solar_zenith_series.value]
+        solar_zenith_series = [solar_zenith_series.radians]
     else:
-        solar_zenith_series = [zenith.value for zenith in solar_zenith_series]
+        solar_zenith_series = [zenith.radians for zenith in solar_zenith_series]
 
     atmospheric_refraction_functions = {
         'high_solar_altitude': np.vectorize(atmospheric_refraction_for_high_solar_altitude),
@@ -238,7 +237,6 @@ def calculate_solar_zenith_noaa(
     timestamp: datetime,
     solar_hour_angle: SolarHourAngle,
     apply_atmospheric_refraction: bool = True,
-    # angle_output_units: str = 'radians',
     verbose: int = 0,
 ) -> SolarZenith:
     """Calculate the solar zenith angle (φ) in radians """
@@ -247,7 +245,6 @@ def calculate_solar_zenith_noaa(
 
     solar_declination = calculate_solar_declination_noaa(
         timestamp=timestamp,
-        # angle_output_units='radians',
     )
     cosine_solar_zenith = sin(latitude.radians) * sin(solar_declination.radians) + cos(
         latitude.radians
@@ -266,11 +263,6 @@ def calculate_solar_zenith_noaa(
     # if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi/2 + 0.0146:
     if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')
-    
-    # solar_zenith = convert_to_degrees_if_requested(
-    #     solar_zenith,
-    #     angle_output_units
-    # )
 
     if verbose == 3:
         debug(locals())
@@ -315,7 +307,7 @@ def calculate_solar_zenith_time_series_noaa(
         )
 
     # Convert SolarZenith objects to a NumPy array of float values
-    solar_zenith_values = np.array([zenith.value for zenith in solar_zenith_series])
+    solar_zenith_values = np.array([zenith.radians for zenith in solar_zenith_series])
 
     # Validate
     if not np.all(np.isfinite(solar_zenith_values)) or not np.all((0 <= solar_zenith_values) & (solar_zenith_values <= np.pi + 0.0146)):

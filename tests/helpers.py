@@ -1,17 +1,27 @@
 from typing import Literal
 import pandas as pd
+from zoneinfo import ZoneInfo
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from pvgisprototype import SolarHourAngle
+from pvgisprototype import SolarZenith
+from pvgisprototype import EquationOfTime
+from datetime import datetime, timezone, timedelta
 from pvgisprototype.constants import (
     DECLINATION_NAME,
     ALTITUDE_NAME,
     AZIMUTH_NAME,
+    SOLAR_TIME_NAME,
+    HOUR_ANGLE_NAME,
+    ZENITH_NAME,
 )
+import sys
+import os
+from timezonefinder import TimezoneFinder
+
 
 
 def read_test_cases_file(

@@ -1,11 +1,9 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import SolarHourAnglePVLIBInput
-# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype import Longitude
 from datetime import datetime
 from pvgisprototype import SolarHourAngle
-# from math import pi
 import pvlib
 import pandas as pd
 

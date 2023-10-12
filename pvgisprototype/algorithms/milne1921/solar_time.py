@@ -1,24 +1,14 @@
 from devtools import debug
-# import typer
 from rich import print
-# from typing import Annotated
-# from typing import Optional
 from datetime import datetime
-# from datetime import time
 from datetime import timedelta
 
 from math import radians
-# from math import degrees
 from math import sin
 from math import cos
-# import numpy as np
 from zoneinfo import ZoneInfo
 
-# from ...api.utilities.conversions import convert_to_radians
-# from ...api.utilities.timestamp import now_utc_datetimezone
-# from ...api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype import Longitude
-# from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
 
@@ -28,11 +18,6 @@ def calculate_apparent_solar_time_milne1921(
     longitude: Longitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    # days_in_a_year: float = 365.25,
-    # perigee_offset: float = 0.048869,
-    # eccentricity_correction_factor: float = 0.03344,
-    # time_offset_global: float = 0,
-    # hour_offset: float = 0,
     verbose: int = 0,
 ) -> datetime:
     """Calculate the apparent solar time based on the equation of time by Milne 1921

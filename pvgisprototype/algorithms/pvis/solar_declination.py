@@ -4,10 +4,8 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarDeclination
 from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from math import sin
 from math import asin
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 
@@ -16,7 +14,6 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 def calculate_solar_declination_pvis(
     timestamp: datetime,
     timezone: ZoneInfo,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
 ) -> SolarDeclination:

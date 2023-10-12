@@ -1,26 +1,16 @@
 import typer
-# from typing import Annotated
-# from typing import Optional
 from datetime import datetime
-# from datetime import time
-# from datetime import time as datetime_time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 from skyfield import almanac
-# from skyfield.api import Topos
 from skyfield.api import load
 from skyfield.api import N
 from skyfield.api import W
 from skyfield.api import E
 from skyfield.api import wgs84
 from skyfield.api import load
-# from pvgisprototype.api.utilities.conversions import convert_to_radians
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees
-# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-# from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarTimeSkyfieldInputModel
-# from pvgisprototype import SolarTime
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 
