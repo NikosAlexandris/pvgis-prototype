@@ -54,7 +54,7 @@ def calculate_solar_azimuth_pvis(
         timezone=timezone,
         solar_time_model=solar_time_model,
     )
-    hour_angle = calculate_hour_angle(
+    hour_angle = calculate_solar_hour_angle_pvis(
         solar_time=solar_time,
     )
     cosine_solar_azimuth = (C11 * cos(hour_angle.radians) + C13) / pow(
