@@ -141,7 +141,7 @@ def calculate_solar_azimuth_time_series_noaa(
         angle_output_units=angle_output_units,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
-        longitude, timestamps, timezone, time_output_units, angle_output_units
+        longitude, timestamps, timezone, angle_output_units
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
