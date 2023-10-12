@@ -266,7 +266,7 @@ def overview(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
+        solar_position_models=model,  # could be named models!
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         solar_time_model=solar_time_model,
         days_in_a_year=days_in_a_year,
@@ -427,7 +427,7 @@ def altitude(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
+        solar_position_models=model,  # could be named models!
         solar_time_model=solar_time_model,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
@@ -517,7 +517,7 @@ def zenith(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
+        solar_position_models=model,  # could be named models!
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
@@ -616,7 +616,7 @@ def azimuth(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
+        solar_position_models=model,  # could be named models!
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
@@ -701,6 +701,7 @@ def declination(
         timestamp=timestamp,
         timezone=timezone,
         models=model,
+        declination_models=solar_declination_model,
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
