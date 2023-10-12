@@ -102,6 +102,15 @@ class CalculateSolarDeclinationNOAAInput(
     pass
 
 
+class ModelSolarDeclinationInputModel(
+    BaseTimeModel,
+    EarthOrbitModel,
+    DaysInAYearModel,
+    VerbosityModel,
+):
+    pass
+
+
 # Solar time
 
 class ModelSolarTimeInputModel(
