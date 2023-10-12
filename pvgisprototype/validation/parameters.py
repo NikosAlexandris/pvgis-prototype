@@ -314,7 +314,7 @@ class SolarHourAngleSeriesModel(BaseModel):
 
 
 class ApplyAtmosphericRefractionModel(BaseModel):
-    apply_atmospheric_refraction: bool
+    apply_atmospheric_refraction: Optional[bool] = True
 
 
 class RefractedSolarAltitudeModel(BaseModel):
