@@ -194,7 +194,7 @@ def calculate_solar_azimuth(
                 verbose=verbose,
             )
             results.append({
-                TIME_ALGORITHM_NAME: solar_time_model,
+                TIME_ALGORITHM_NAME: solar_time_model.value,
                 POSITION_ALGORITHM_NAME: solar_position_model.value,
                 AZIMUTH_NAME if solar_azimuth else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
                 UNITS_NAME: angle_output_units,
