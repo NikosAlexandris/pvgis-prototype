@@ -122,7 +122,7 @@ def calculate_solar_altitude_azimuth_skyfield(
 
 
 @validate_with_pydantic(SolarHourAngleSkyfieldInput)
-def calculate_hour_angle_skyfield(      # NOTE gounaol: Declination is also calculated by skyfield.solar_declination.calculate_solar_declination_skyfield
+def calculate_solar_hour_angle_declination_skyfield(
         longitude: Longitude,
         latitude: Latitude,
         timestamp: datetime,
