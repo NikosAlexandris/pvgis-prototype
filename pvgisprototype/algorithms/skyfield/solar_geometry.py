@@ -72,11 +72,11 @@ def calculate_solar_position_skyfield(
     # except Exception:
     #     logging.warning(f'tzinfo already set for timestamp = {timestamp}')
     # # Handle Me during input validation? -------------------------------------
-    planets = skyfield.api.load('de421.bsp')
+    planets = load('de421.bsp')
     sun = planets['Sun']
     earth = planets['Earth']
-    location = skyfield.api.wgs84.latlon(latitude.degrees, longitude.degrees)
-    timescale = skyfield.api.load.timescale()
+    location = wgs84.latlon(latitude.degrees, longitude.degrees)
+    timescale = load.timescale()
     requested_timestamp = timescale.from_datetime(timestamp)
     # sun position seen from observer location
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
