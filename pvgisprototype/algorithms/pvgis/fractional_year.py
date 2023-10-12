@@ -11,7 +11,7 @@ FRACTIONAL_YEAR_MINIMUM = 0
 FRACTIONAL_YEAR_MAXIMUM = 2 * pi
 
 
-# @validate_with_pydantic(CalculateFractionalYearPVGISInputModel)
+@validate_with_pydantic(CalculateFractionalYearPVGISInputModel)
 def calculate_fractional_year_pvgis(
     timestamp: datetime,
 ) -> FractionalYear:
