@@ -94,6 +94,7 @@ def calculate_solar_declination(
                 days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
+                verbose=verbose,
             )
             results.append({
                 POSITION_ALGORITHM_NAME: declination_model.value,
