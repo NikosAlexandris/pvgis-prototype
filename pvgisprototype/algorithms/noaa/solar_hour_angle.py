@@ -115,7 +115,6 @@ def calculate_solar_hour_angle_time_series_noaa(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
-            # time_output_units=time_output_units,
         )  # in minutes
 
         true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
