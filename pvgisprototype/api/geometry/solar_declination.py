@@ -26,6 +26,7 @@ from pvgisprototype.constants import DECLINATION_NAME
 from pvgisprototype.constants import UNITS_NAME
 
 
+@validate_with_pydantic(ModelSolarDeclinationInputModel)
 def model_solar_declination(
     timestamp: datetime,
     timezone: ZoneInfo,
