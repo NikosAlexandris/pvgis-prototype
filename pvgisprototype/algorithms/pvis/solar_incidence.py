@@ -11,7 +11,7 @@ from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
+from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
 from math import sin
 from math import cos
