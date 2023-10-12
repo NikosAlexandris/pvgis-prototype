@@ -83,6 +83,14 @@ def calculate_solar_altitude_pvis(
         position_algorithm='pvis',
         timing_algorithm=solar_time_model.value,
     )
+    if (
+        not isfinite(solar_altitude.degrees)
+        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+        )
 
     if verbose == 3:
         debug(locals())
