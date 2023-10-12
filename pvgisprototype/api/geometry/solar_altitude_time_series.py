@@ -28,7 +28,6 @@ def model_solar_altitude_time_series(
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,
     time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
     angle_output_units: str = 'radians',
     verbose: int = 0,
 ) -> List[SolarAltitude]:
