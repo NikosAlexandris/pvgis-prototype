@@ -14,7 +14,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
-def calculate_true_solar_time_noaa(
+def calculate_apparent_solar_time_noaa(
     longitude: Longitude,   # radians
     timestamp: datetime, 
     timezone: Optional[ZoneInfo],
