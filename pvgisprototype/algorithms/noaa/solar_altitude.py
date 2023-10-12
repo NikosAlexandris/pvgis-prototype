@@ -48,11 +48,12 @@ def calculate_solar_altitude_noaa(
         timing_algorithm='NOAA',
         )
     if (
-        not isfinite(solar_altitude.radians)
-        or not -pi / 2 <= solar_altitude.radians <= pi / 2
+        not isfinite(solar_altitude.degrees)
+        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
     ):
         raise ValueError(
-            f"The calculated solar altitude angle {solar_altitude} is out of the expected range [{-pi/2}, {pi/2}] radians"
+            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
         )
     if verbose == 3:
         debug(locals())

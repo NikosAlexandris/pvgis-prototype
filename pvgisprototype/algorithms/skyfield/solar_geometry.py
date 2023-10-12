@@ -113,14 +113,14 @@ def calculate_solar_altitude_azimuth_skyfield(
         timing_algorithm='Skyfield',
     )
 
-    solar_altitude = convert_to_degrees_if_requested(
-        solar_altitude,
-        angle_output_units,
-    )
-    solar_azimuth = convert_to_degrees_if_requested(
-        solar_azimuth,
-        angle_output_units,
-    )
+    if (
+        not isfinite(solar_altitude.degrees)
+        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+        )
 
     return solar_altitude, solar_azimuth   # distance_to_sun
 
