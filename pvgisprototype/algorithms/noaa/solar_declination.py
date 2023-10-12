@@ -30,7 +30,9 @@ def calculate_solar_declination_noaa(
         - 0.002697 * cos(3 * fractional_year.radians)
         + 0.00148 * sin(3 * fractional_year.radians)
         )
-        return SolarDeclination(value=declination, unit='radians')
+        return SolarDeclination(
+            value=declination, unit='radians', position_algorithm='NOAA', timing_algorithm='NOAA'
+        )
 
 
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)

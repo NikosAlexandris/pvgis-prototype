@@ -103,10 +103,14 @@ def calculate_solar_altitude_azimuth_skyfield(
     solar_altitude = SolarAltitude(
         value=solar_altitude.radians,
         unit='radians',
+        position_algorithm='Skyfield',
+        timing_algorithm='Skyfield',
     )
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth.radians,
         unit='radians',
+        position_algorithm='Skyfield',
+        timing_algorithm='Skyfield',
     )
 
     solar_altitude = convert_to_degrees_if_requested(
@@ -153,10 +157,14 @@ def calculate_solar_hour_angle_declination_skyfield(
     hour_angle = SolarHourAngle(
         value=hour_angle.radians,
         unit='radians',
+        position_algorithm='Skyfield',
+        timing_algorithm='Skyfield',
     )
     solar_declination = SolarDeclination(
         value=solar_declination.radians,
         unit='radians',
+        position_algorithm='Skyfield',
+        timing_algorithm='Skyfield',
     )
 
     return hour_angle, solar_declination

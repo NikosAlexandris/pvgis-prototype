@@ -30,5 +30,7 @@ def calculate_solar_zenith_pvlib(
     solar_zenith = SolarZenith(
             value=solar_zenith,
             unit='degrees',
+            position_algorithm='pvlib',
+            timing_algorithm='pvlib',
             )
     return solar_zenith

@@ -101,6 +101,12 @@ SolarHourAngle:
   unit:
     type: Optional[str]
     initial:
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
+    type: Optional[str]
+    initial:
 
 EventHourAngle:
   value:
@@ -135,12 +141,24 @@ SolarDeclination:
   unit:
     type: Optional[str]
     initial:
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
+    type: Optional[str]
+    initial:
 
 SolarZenith:
   value:
     type: Optional[float]
     initial:
   unit:
+    type: Optional[str]
+    initial:
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
     type: Optional[str]
     initial:
 
@@ -159,7 +177,13 @@ SolarAltitude:
   unit:
     type: Optional[str]
     initial:
-
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
+    type: Optional[str]
+    initial:
+    
 RefractedSolarAltitude:
   value:
     type: Optional[float]
@@ -197,6 +221,12 @@ SolarAzimuth:
     type: Optional[float]
     initial:
   unit:
+    type: Optional[str]
+    initial:
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
     type: Optional[str]
     initial:
 

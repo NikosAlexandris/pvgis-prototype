@@ -87,6 +87,8 @@ def calculate_solar_hour_angle_noaa(
     solar_hour_angle = SolarHourAngle(
         value=solar_hour_angle,
         unit='radians',
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
     )
 
     if not -pi <= solar_hour_angle.radians <= pi:

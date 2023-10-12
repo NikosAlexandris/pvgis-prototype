@@ -41,7 +41,12 @@ def calculate_solar_altitude_noaa(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
     solar_altitude = pi / 2 - solar_zenith.radians
-    solar_altitude = SolarAltitude(value=solar_altitude, unit=RADIANS)
+    solar_altitude = SolarAltitude(
+        value=solar_altitude,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+        )
     if (
         not isfinite(solar_altitude.radians)
         or not -pi / 2 <= solar_altitude.radians <= pi / 2

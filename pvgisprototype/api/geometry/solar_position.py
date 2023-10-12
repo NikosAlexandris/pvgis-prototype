@@ -147,7 +147,9 @@ def model_solar_geometry_overview(
         # ------------------------------------ TODO: calculate_solar_zenith_skyfield
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
-            unit = 'degrees'
+            unit = 'degrees',
+            position_algorithm=solar_azimuth.position_algorithm,
+            timing_algorithm=solar_azimuth.timing_algorithm,
         )
         # --------------------------------------------------------------------
         solar_hour_angle, solar_declination = calculate_solar_hour_angle_declination_skyfield(
@@ -167,13 +169,25 @@ def model_solar_geometry_overview(
         solar_azimuth = convert_south_to_north_radians_convention(
             solar_azimuth_south_radians_convention
         )
-        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="radians")
+        solar_azimuth = SolarAzimuth(
+            value=solar_azimuth,
+            unit="radians",
+            position_algorithm='suncalc',
+            timing_algorithm='suncalc',
+        )
 
-        solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+        solar_altitude = SolarAltitude(
+            value=solar_altitude,
+            unit='radians',
+            position_algorithm='suncalc',
+            timing_algorithm='suncalc',
+        )
         # ------------------------------------ TODO: calculate_solar_zenith_suncalc
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
-            unit = 'degrees'
+            unit = 'degrees',
+            position_algorithm=solar_altitude.position_algorithm,
+            timing_algorithm=solar_altitude.timing_algorithm,
         )
         # --------------------------------------------------------------------
 
@@ -187,12 +201,19 @@ def model_solar_geometry_overview(
             when=timestamp,
         )  # returns degrees by default
         # required by output function
-        solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
+        solar_altitude = SolarAltitude(
+            value=solar_altitude,
+            unit="degrees",
+            position_algorithm='pysolar',
+            timing_algorithm='pysolar',
+        )
 
         # ------------------------------------ TODO: calculate_solar_zenith_pysolar
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
-            unit = 'degrees'
+            unit = 'degrees',
+            position_algorithm=solar_altitude.position_algorithm,
+            timing_algorithm=solar_altitude.timing_algorithm,
         )
         # --------------------------------------------------------------------
 
@@ -202,7 +223,12 @@ def model_solar_geometry_overview(
             when=timestamp,
         )  # returns degrees by default
         # required by output function
-        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="degrees")
+        solar_azimuth = SolarAzimuth(
+            value=solar_azimuth,
+            unit="degrees",
+            position_algorithm='pysolar',
+            timing_algorithm='pysolar',
+        )
 
     if solar_position_model.value  == SolarPositionModels.pvis:
 
@@ -234,7 +260,9 @@ def model_solar_geometry_overview(
         # ------------------------------------ TODO: calculate_solar_zenith_pvis
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
-            unit = 'degrees'
+            unit = 'degrees',
+            position_algorithm=solar_altitude.position_algorithm,
+            timing_algorithm=solar_altitude.timing_algorithm,
         )
         # --------------------------------------------------------------------
         solar_azimuth = calculate_solar_azimuth_pvis(

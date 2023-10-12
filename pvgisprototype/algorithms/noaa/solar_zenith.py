@@ -253,6 +253,8 @@ def calculate_solar_zenith_noaa(
     solar_zenith = SolarZenith(
         value=solar_zenith,
         unit='radians',
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
     )
 
     if apply_atmospheric_refraction:

@@ -113,6 +113,8 @@ def calculate_solar_azimuth_noaa(
     solar_azimuth = SolarAzimuth(
             value=solar_azimuth,
             unit='radians',
+            position_algorithm='NOAA',
+            timing_algorithm='NOAA',
             )
 
     if verbose == 3:

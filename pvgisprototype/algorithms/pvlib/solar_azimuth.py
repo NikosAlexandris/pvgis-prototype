@@ -30,6 +30,8 @@ def calculate_solar_azimuth_pvlib(
     solar_azimuth = SolarAzimuth(
             value=solar_azimuth,
             unit='degrees',
+            position_algorithm='pvlib',
+            timing_algorithm='pvlib',
             )
 
     return solar_azimuth
