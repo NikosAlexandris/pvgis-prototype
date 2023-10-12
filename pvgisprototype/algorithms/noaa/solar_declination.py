@@ -47,7 +47,7 @@ def calculate_solar_declination_time_series_noaa(
         angle_output_units="radians",
     )
     fractional_year_series_array = np.array([fy.radians for fy in fractional_year_series])
-    declinations = (
+    declination_series = (
         0.006918
         - 0.399912 * np.cos(fractional_year_series_array)
         + 0.070257 * np.sin(fractional_year_series_array)
@@ -65,6 +65,6 @@ def calculate_solar_declination_time_series_noaa(
         declination_series = convert_series_to_degrees_if_requested(declination_series, angle_output_units)
 
     if np.isscalar(timestamps):
-        return declinations[0]
+        return declination_series[0]
     else:
         return np.array(declination_series, dtype=object)
