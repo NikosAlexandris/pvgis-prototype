@@ -650,7 +650,7 @@ def declination(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     local_time: Annotated[bool, typer_option_local_time] = False,
     random_time: Annotated[bool, typer_option_random_time] = False,
-    model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
+    solar_declination_model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
     days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
@@ -693,14 +693,13 @@ def declination(
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     # Why does the callback function `_parse_model` not work? ----------------
-    if SolarDeclinationModels.all in model:
-        model = [
-            model for model in SolarDeclinationModels if model != SolarDeclinationModels.all
+    if SolarDeclinationModels.all in solar_declination_model:
+        solar_declination_model = [
+            solar_declination_model for solar_declination_model in SolarDeclinationModels if solar_declination_model != SolarDeclinationModels.all
         ]
     solar_declination = calculate_solar_declination(
         timestamp=timestamp,
         timezone=timezone,
-        models=model,
         declination_models=solar_declination_model,
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,

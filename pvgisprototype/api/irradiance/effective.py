@@ -313,7 +313,7 @@ def calculate_effective_irradiance(
     solar_declination = model_solar_declination(
         timestamp=timestamp,
         timezone=timezone,
-        model=solar_declination_model,
+        declination_model=solar_declination_model,
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,

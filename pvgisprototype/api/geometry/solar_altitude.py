@@ -37,6 +37,7 @@ def model_solar_altitude(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
+    solar_position_model: SolarPositionModels = SolarPositionModels.pvlib,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -63,7 +64,7 @@ def model_solar_altitude(
 
     - The result is returned with units.
     """
-    if model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModels.noaa:
 
         solar_altitude = calculate_solar_altitude_noaa(
             longitude=longitude,
@@ -74,7 +75,7 @@ def model_solar_altitude(
             verbose=verbose,
         )
 
-    if model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModels.skyfield:
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
             longitude=longitude,
             latitude=latitude,
@@ -83,7 +84,7 @@ def model_solar_altitude(
             verbose=verbose,
         )
 
-    if model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModels.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
@@ -92,7 +93,7 @@ def model_solar_altitude(
         ).values()  # zero points to south
         solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
 
-    if model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModels.pysolar:
 
         timestamp = attach_timezone(timestamp, timezone)
 
@@ -104,7 +105,7 @@ def model_solar_altitude(
         # required by output function
         solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
 
-    if model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModels.pvis:
 
         solar_altitude = calculate_solar_altitude_pvis(
             longitude=longitude,
@@ -118,7 +119,7 @@ def model_solar_altitude(
             verbose=verbose,
         )
 
-    if model.value  == SolarPositionModels.pvlib:
+    if solar_position_model.value  == SolarPositionModels.pvlib:
 
         solar_altitude = calculate_solar_altitude_pvlib(
             longitude=longitude,
@@ -136,6 +137,7 @@ def calculate_solar_altitude(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
+    solar_position_models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
     days_in_a_year: float = 365.25,
@@ -148,13 +150,14 @@ def calculate_solar_altitude(
     Calculates the solar position using all models and returns the results in a table.
     """
     results = []
-    for model in models:
-        if model != SolarPositionModels.all:  # ignore 'all' in the enumeration
+    for solar_position_model in solar_position_models:
+        if solar_position_model != SolarPositionModels.all:  # ignore 'all' in the enumeration
             solar_altitude = model_solar_altitude(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
+                solar_position_model=solar_position_model,
                 solar_time_model=solar_time_model,
                 days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
@@ -163,7 +166,7 @@ def calculate_solar_altitude(
             )
             results.append({
                 TIME_ALGORITHM_NAME: solar_time_model,
-                POSITION_ALGORITHM_NAME: model.value,
+                POSITION_ALGORITHM_NAME: solar_position_model.value,
                 ALTITUDE_NAME: getattr(solar_altitude, angle_output_units, None) if solar_altitude else None,
                 UNITS_NAME: angle_output_units,
             })
