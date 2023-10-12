@@ -64,7 +64,7 @@ def model_solar_geometry_overview(
     perigee_offset: float,
     eccentricity_correction_factor: float,
     verbose: int = 0,
-) -> Tuple[SolarAltitude, SolarAzimuth]:
+) -> List:
     """
     The solar altitude angle measures from the horizon up towards the zenith
     (positive, and down towards the nadir (negative)). The altitude is zero all
