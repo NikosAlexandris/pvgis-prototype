@@ -426,7 +426,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            model=solar_position_model,
+            solar_position_model=solar_position_model,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             solar_time_model=solar_time_model,
