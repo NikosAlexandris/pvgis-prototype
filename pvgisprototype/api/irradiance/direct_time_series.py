@@ -168,9 +168,9 @@ def calculate_refracted_solar_altitude_time_series(
     is_scalar = False
     if isinstance(solar_altitude_series, SolarAltitude):
         is_scalar = True
-        solar_altitude_series = [solar_altitude_series.value]
+        solar_altitude_series = [solar_altitude_series.degrees]
     else:
-        solar_altitude_series = [altitude.value for altitude in solar_altitude_series]
+        solar_altitude_series = [altitude.degrees for altitude in solar_altitude_series]
 
     # Unpack SolarAltitude objects to NumPy Arrays ----------------------- vvv
     solar_altitude_series_array = np.array(solar_altitude_series)
