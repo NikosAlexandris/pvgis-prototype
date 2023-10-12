@@ -366,9 +366,9 @@ def calculate_effective_irradiance(
         verbose=verbose,
     )
 
-    if solar_altitude.value > 0.0:  # the sun is above the horizon
+    if solar_altitude.radians > 0.0:  # the sun is above the horizon
 
-        if solar_altitude.value < 0.04:  # for very low sun angles
+        if solar_altitude.radians < 0.04:  # for very low sun angles
             direct_horizontal_component = 0.0  # direct radiation is negligible
         
         # if not in_shade and solar_incidence > 0:

@@ -224,9 +224,9 @@ def calculate_optical_air_mass_time_series(
     is_scalar = False
     if isinstance(refracted_solar_altitude_series, RefractedSolarAltitude):
         is_scalar = True
-        refracted_solar_altitude_series = [refracted_solar_altitude_series.value]
+        refracted_solar_altitude_series = [refracted_solar_altitude_series.radians]
     else:
-        refracted_solar_altitude_series = [altitude.value for altitude in refracted_solar_altitude_series]
+        refracted_solar_altitude_series = [altitude.radians for altitude in refracted_solar_altitude_series]
     
     # Unpack RefractedSolarAltitude objects to a NumPy array
     refracted_solar_altitude_series_array = np.array(refracted_solar_altitude_series)
@@ -438,7 +438,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         eccentricity_correction_factor=eccentricity_correction_factor,
         verbose=verbose,
     )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
+    solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
     direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
 
     if verbose == 1:
@@ -571,7 +571,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         angle_output_units=angle_output_units,
         verbose=verbose,
         )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
+    solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
     sine_solar_altitude_series = np.sin(solar_altitude_series_array)
 
     # make it a function -----------------------------------------------------
@@ -605,7 +605,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             angle_output_units=angle_output_units,
     )
     solar_declination_series_array = np.array(
-        [declination.value for declination in solar_declination_series]
+        [declination.radians for declination in solar_declination_series]
     )
     solar_time_decimal_hours_series = timestamp_to_decimal_hours_time_series(
         solar_time_series

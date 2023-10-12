@@ -302,7 +302,7 @@ def diffuse_solar_altitude_function_time_series(
     a1_series, a2_series, a3_series = diffuse_solar_altitude_coefficients_time_series(
         linke_turbidity_factor_series
     )
-    solar_altitude_series_array = np.array([altitude.value for altitude in solar_altitude_series])
+    solar_altitude_series_array = np.array([altitude.radians for altitude in solar_altitude_series])
     return (
         a1_series
         + a2_series * np.sin(solar_altitude_series_array)
@@ -440,7 +440,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             angle_output_units=angle_output_units,
             verbose=verbose,
             )
-        solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
+        solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
         # on a horizontal surface : G0h = G0 sin(h0)
         extraterrestial_horizontal_irradiance_series = (
             extraterrestrial_normal_irradiance_series
@@ -535,7 +535,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
         else:  # sunlit surface and non-overcast sky
             # extract float values from the SolarAltitude objects
-            solar_altitude_series_array = np.array([altitude.value for altitude in solar_altitude_series])
+            solar_altitude_series_array = np.array([altitude.radians for altitude in solar_altitude_series])
             if np.any(solar_altitude_series_array >= 0.1):  # radians or 5.7 degrees
                 diffuse_inclined_irradiance_series = diffuse_horizontal_component_series * (
                     diffuse_sky_irradiance_series * (1 - kb_series)
