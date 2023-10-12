@@ -178,9 +178,9 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     is_scalar = False
     if isinstance(solar_zenith_series, SolarZenith):
         is_scalar=True
-        solar_zenith_series = [solar_zenith_series.value]
+        solar_zenith_series = [solar_zenith_series.radians]
     else:
-        solar_zenith_series = [zenith.value for zenith in solar_zenith_series]
+        solar_zenith_series = [zenith.radians for zenith in solar_zenith_series]
 
     atmospheric_refraction_functions = {
         'high_solar_altitude': np.vectorize(atmospheric_refraction_for_high_solar_altitude),
@@ -307,7 +307,7 @@ def calculate_solar_zenith_time_series_noaa(
         )
 
     # Convert SolarZenith objects to a NumPy array of float values
-    solar_zenith_values = np.array([zenith.value for zenith in solar_zenith_series])
+    solar_zenith_values = np.array([zenith.radians for zenith in solar_zenith_series])
 
     # Validate
     if not np.all(np.isfinite(solar_zenith_values)) or not np.all((0 <= solar_zenith_values) & (solar_zenith_values <= np.pi + 0.0146)):
