@@ -45,8 +45,6 @@ def calculate_solar_azimuth_pvis(
     C11 = sin(latitude.radians) * cos(solar_declination.radians)
     C13 = -cos(latitude.radians) * sin(solar_declination.radians)
     C22 = cos(solar_declination.radians)
-    C31 = cos(latitude.radians) * cos(solar_declination.radians)
-    C33 = sin(latitude.radians) * sin(solar_declination.radians)
     solar_time = model_solar_time(
         longitude=longitude,
         latitude=latitude,
