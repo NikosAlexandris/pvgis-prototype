@@ -94,7 +94,7 @@ def test_calculate_solar_position(model):
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            models=[model],
+            solar_position_models=[model],
         )
         print(f' Result : {solar_position}')
         for model_result in solar_position:
