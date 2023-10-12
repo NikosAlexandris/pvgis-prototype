@@ -10,7 +10,6 @@ from pvgisprototype import SolarDeclination
 def calculate_solar_declination_pvgis(
     timestamp: datetime,
     timezone: str = None,
-    # days_in_a_year: float = 365.25,
     eccentricity_correction_factor: float = 0.03344,
     perigee_offset: float = 0.048869,
 ) -> SolarDeclination:

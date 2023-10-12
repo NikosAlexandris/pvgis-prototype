@@ -113,7 +113,6 @@ def calculate_solar_incidence_jenco(
     shadow_indicator: Path = None,
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: int = VERBOSE_LEVEL_DEFAULT,

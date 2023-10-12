@@ -347,7 +347,6 @@ def calculate_effective_irradiance(
         timezone=timezone,
         solar_time_model=solar_time_model,
         solar_incidence_model=solar_incidence_model,
-        # hour_angle=hour_angle,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         # shadow_indicator=shadow_indicator,
@@ -355,14 +354,10 @@ def calculate_effective_irradiance(
         # horizon_interval=horizon_interval,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
 

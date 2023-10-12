@@ -31,11 +31,8 @@ def calculate_solar_incidence_pvis(
     surface_orientation: float = 180,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float = 1.5853349194640094,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    # time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
 ) -> SolarIncidence:
     """Calculate the angle of incidence (θ) between the direction of the sun
     ray and the line normal to the surface measured in radian.
