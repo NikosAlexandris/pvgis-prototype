@@ -242,7 +242,7 @@ class SolarTimeModel(BaseModel):
 # Solar surface
 
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt]
+    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = SURFACE_TILT_DEFAULT
     model_config = ConfigDict(
         description="""Surface tilt (or slope) (β) is the angle between the inclined
         surface (slope) and the horizontal plane.""",
