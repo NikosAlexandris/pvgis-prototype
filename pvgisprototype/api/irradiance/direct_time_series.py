@@ -516,6 +516,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_time_series: bool = False,
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
@@ -527,6 +528,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
     solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
@@ -594,7 +596,27 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     )
     solar_altitude_series_array = np.array([solar_altitude.radians for solar_altitude in solar_altitude_series])
 
+    # ========================================================================
+    # Essentially, perform calculations for when:
+    # - solar altitude > 0
+    # - not in shade
+    # - solar incidence > 0
     #
+    # To add : ---------------------------------------------------------------
+    mask_solar_altitude_positive = solar_altitude_series_array > 0
+    mask_solar_incidence_positive = solar_incidence_series_array > 0
+    mask_not_in_shade = np.full_like(
+        solar_altitude_series_array, True
+    )  # Stub, replace with actual condition
+    mask = np.logical_and.reduce(
+        (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
+    )
+    # Else, the following runs:
+    # --------------------------------- Review & Add ?
+    # 1. surface is shaded
+    # 3. solar incidence = 0
+    # --------------------------------- Review & Add ?
+    # ========================================================================
 
     if not direct_horizontal_component:
         print(f'Modelling irradiance...')
@@ -643,43 +665,39 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             in_memory=in_memory,
             verbose=verbose,
         )
+        print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance_series}')
 
     try:
-        modified_direct_horizontal_irradiance_series = (
+        direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
-            * sine_solar_incidence_angle_series
-            / sine_solar_altitude_series
+            * np.sin(solar_incidence_series_array)
+            / np.sin(solar_altitude_series_array)
         )
+
+        # additional check! Is it required here? -----------------------------
+        if len(timestamps) != len(direct_inclined_irradiance_series): raise
+        ValueError( "The number of timestamps {len(timestamps)} and irradiance values {len(direct_inclined_irradiance_series)} differ!")
+       # --------------------------------------------------------------------
+
     except ZeroDivisionError:
         logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
         print("Is the solar altitude angle zero?")
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
-    # "Simpler" way to calculate the inclined solar declination?
-    if solar_incidence_model == 'PVGIS':
-
-        # In the old C source code, the following runs if:
-        # --------------------------------- Review & Add ?
-            # 1. surface is NOT shaded
-            # 3. solar declination > 0
-        # --------------------------------- Review & Add ?
+    if apply_angular_loss_factor:
 
         try:
-            angular_loss_factor_series = calculate_angular_loss_factor_for_direct_irradiance_series(
-                    sine_solar_incidence_angle_series,
-                    angle_of_incidence_constant = 0.155,
-                    )
-            direct_inclined_irradiance_series = modified_direct_horizontal_irradiance_series * angular_loss_factor
-            print(f'Direct inclined irradiance series: {direct_inclined_irradiance_series} (based on PVGIS)')  # B0c
+            angular_loss_factor_series = (
+                calculate_angular_loss_factor_for_direct_irradiance_time_series(
+                    solar_incidence_series=solar_incidence_series_array,
+                    verbose=verbose,
+                )
+            )
+            direct_inclined_irradiance_series = (
+                direct_horizontal_irradiance_series * angular_loss_factor_series
+            )
 
-            return direct_inclined_irradiance
-
-        # Else, the following runs:
-        # --------------------------------- Review & Add ?
-            # 1. surface is shaded
-            # 3. solar declination = 0
-        # --------------------------------- Review & Add ?
         except ZeroDivisionError as e:
             logging.error(f"Which Error? {e}")
             raise ValueError
@@ -710,6 +728,22 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             # "Shade": in_shade,
         }
         results = results | more_extended_results
+
+
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+
     if verbose == 4:
         debug(locals())
 
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title=f'Direct inclined irradiance series {IRRADIANCE_UNITS}',
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
+
+    return direct_inclined_irradiance_series
