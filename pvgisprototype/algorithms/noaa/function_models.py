@@ -45,7 +45,6 @@ class CalculateFractionalYearNOAAInput(
 
 class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     BaseTimestampSeriesModel,  # != BaseTimestampModel
-    AngleInRadiansOutputUnitsModel,
 ):
     pass
 
@@ -174,9 +173,9 @@ class CalculateSolarAzimuthNOAAInput(
 class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    BaseTimeOutputUnitsModel,
+    # BaseTimeOutputUnitsModel,
     # BaseAngleUnitsModel,
-    BaseAngleOutputUnitsModel,
+    # BaseAngleOutputUnitsModel,
 ):
     pass
 
