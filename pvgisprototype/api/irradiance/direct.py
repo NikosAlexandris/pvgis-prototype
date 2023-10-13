@@ -329,8 +329,7 @@ def calculate_optical_air_mass(
         - R = 6.371229 X 106
 
     ...
-    m, and a function f(γ) for approximating m(γ) was found for 
-    in degrees.
+    m, and a function f(γ) for approximating m(γ) was found for in degrees.
     ...
     UPDATE-Me
 
@@ -349,12 +348,14 @@ def calculate_optical_air_mass(
     optical_air_mass = adjusted_elevation.value / (
         sin(refracted_solar_altitude.radians)
         + 0.50572
-        * math.pow((refracted_solar_altitude.radians + 6.07995), -1.6364)
+        * math.pow((refracted_solar_altitude.degrees + 6.07995), -1.6364)
     )
     optical_air_mass = OpticalAirMass(
         value=optical_air_mass,
         unit=OPTICAL_AIR_MASS_UNIT,
     )
+    if verbose == 3:
+        debug(locals())
 
     return optical_air_mass
 
