@@ -118,7 +118,7 @@ state = {"verbose": False}
 @app.callback()
 def main(
     ctx: typer.Context,
-    verbose: Annotated[Optional[int], typer_option_verbose] = 0,
+    verbose: Annotated[Optional[int], typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     debug: Annotated[Optional[bool], typer.Option(
         "--debug",
         help="Enable debug mode")] = False,
@@ -126,8 +126,9 @@ def main(
     """
     Solar position algorithms
     """
-    # print(f"Executing command: {ctx.invoked_subcommand}")
-    if verbose:
+    # if verbose > 2:
+    #     print(f"Executing command: {ctx.invoked_subcommand}")
+    if verbose > 0:
         print("Will output verbosely")
         # state["verbose"] = True
 
