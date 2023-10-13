@@ -357,3 +357,56 @@ def print_noaa_solar_position_table(
         console.print(Panel(verbose_info, title="Verbose Information"))
 
 
+def print_irradiance_table_2(
+    longitude=None,
+    latitude=None,
+    timestamps: datetime = [datetime.now()],
+    dictionary: dict = dict(),
+    title: str ='Irradiance series',
+    rounding_places: int = 5,
+    verbose=1,
+):
+    console = Console()
+    table = Table(title=title, box=box.SIMPLE_HEAD)
+    
+    # base columns
+    if longitude:
+        table.add_column('Longitude')
+    if latitude:
+        table.add_column('Latitude')
+    table.add_column('Time')
+    
+    # additional columns based dictionary keys
+    for key in dictionary.keys():
+        if dictionary[key] is not None:
+            table.add_column(key)
+    
+    # Convert single float or int values to arrays of the same length as timestamps
+    for key, value in dictionary.items():
+        if isinstance(value, (float, int)):
+            dictionary[key] = np.full(len(timestamps), value)
+        if isinstance(value, str):
+            dictionary[key] = np.full(len(timestamps), str(value))
+    
+    # Zip series and timestamps
+    zipped_series = zip(*dictionary.values())
+    zipped_data = zip(timestamps, zipped_series)
+    
+    # Populate table
+    for timestamp, values in zipped_data:
+        row = []
+        if longitude and latitude:
+            row = [
+                round_float_values(longitude, rounding_places),
+                round_float_values(latitude, rounding_places),
+            ]
+        row.append(timestamp.strftime('%Y-%m-%d %H:%M:%S'))
+        for value in values:
+            if not isinstance(value, str):
+                row.append(str(round_float_values(value, rounding_places)))
+            else:
+                row.append(value)
+        table.add_row(*row)
+    
+    if verbose:
+        console.print(table)
