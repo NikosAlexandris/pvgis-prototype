@@ -24,6 +24,7 @@ from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
 from pvgisprototype import SolarTime
 from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -220,11 +221,17 @@ class SolarPositionModel(BaseModel):
     apply_atmospheric_refraction: bool = True
 
 
+class SolarIncidenceModel(BaseModel):
+    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco
+    apply_atmospheric_refraction: bool = True
+
+
 class DaysInAYearModel(BaseModel):
     days_in_a_year: float = DAYS_IN_A_YEAR  # TODO: Validator
 
 
-class EarthOrbitModel(DaysInAYearModel):
+# class EarthOrbitModel(DaysInAYearModel):
+class EarthOrbitModel(BaseModel):
     perigee_offset: float = PERIGEE_OFFSET
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR
 
@@ -256,7 +263,7 @@ class SolarTimeModel(BaseModel):
 # Solar surface
 
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt]
+    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = pi / 4
     model_config = ConfigDict(
         description="""Surface tilt (or slope) (β) is the angle between the inclined
         surface (slope) and the horizontal plane.""",
@@ -273,7 +280,7 @@ class SurfaceTiltModel(BaseModel):
 
 
 class SurfaceOrientationModel(BaseModel):
-    surface_orientation: Union[confloat(ge=0, le=2 * pi), SurfaceOrientation] = 180
+    surface_orientation: Union[confloat(ge=0, le=2 * pi), SurfaceOrientation] = pi
     model_config = ConfigDict(
         description="""Surface orientation (also known as aspect or azimuth) is the projected angle measured clockwise from true north"""
     )
@@ -286,6 +293,10 @@ class SurfaceOrientationModel(BaseModel):
             return SurfaceOrientation(value=input, unit="radians")
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_orientation`")
+
+
+# class ShadowIndicatorModel(BaseModel):
+#     shadow_indicator: Path = None
 
 
 class SolarHourAngleModel(BaseModel):
