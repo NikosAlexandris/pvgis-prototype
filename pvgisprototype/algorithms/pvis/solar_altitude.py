@@ -26,8 +26,7 @@ def calculate_solar_altitude_pvis(
     timestamp: datetime,
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool,
-    refracted_solar_zenith: RefractedSolarZenith,
-    days_in_a_year: float,
+    # refracted_solar_zenith: RefractedSolarZenith,
     perigee_offset: float,
     eccentricity_correction_factor: float,
     time_offset_global: int,
@@ -69,7 +68,6 @@ def calculate_solar_altitude_pvis(
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
         timezone=timezone,
-        days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
         # angle_output_units=angle_output_units,
@@ -82,9 +80,8 @@ def calculate_solar_altitude_pvis(
         timestamp=timestamp,
         timezone=timezone,
         solar_time_model=solar_time_model,  # returns datetime.time object
-        refracted_solar_zenith=refracted_solar_zenith,
+        # refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
@@ -104,4 +101,5 @@ def calculate_solar_altitude_pvis(
 
     if verbose == 3:
         debug(locals())
+
     return solar_altitude
