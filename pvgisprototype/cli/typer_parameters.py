@@ -151,10 +151,20 @@ typer_argument_timestamps = typer.Argument(
     parser=parse_timestamp_series,
 #     default_factory=now_utc_datetimezone_series,
 )
+typer_option_timestamps = typer.Option(
+    help='Timestamps',
+    parser=parse_timestamp_series,
+#     default_factory=now_utc_datetimezone_series,
+)
 typer_option_start_time = typer.Option(
     help=f'Start timestamp of the period. [yellow]Overrides the `timestamps` paramter![/yellow]',
     rich_help_panel=rich_help_panel_time_series,
     default_factory = None,
+)
+typer_option_frequency = typer.Option(
+    help=f'Frequency for the timestamp generation function',
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory='h'
 )
 typer_option_end_time = typer.Option(
     help='End timestamp of the period. [yellow]Overrides the `timestamps` paramter![/yellow]',
@@ -180,6 +190,12 @@ typer_option_random_day = typer.Option(
     # '--random-day',
     # '--random',
     help='Generate a random day to demonstrate calculation',
+    # default_factory=RANDOM_DAY_FLAG_DEFAULT,
+)
+typer_option_random_days = typer.Option(
+    # '--random-day',
+    # '--random',
+    help='Generate random days to demonstrate calculation',
     # default_factory=RANDOM_DAY_FLAG_DEFAULT,
 )
 # day_of_year: Annotated[float, typer.Argument(
@@ -381,7 +397,14 @@ typer_argument_refracted_solar_altitude_series = typer.Argument(
     help='Refracted solar altitude',
     rich_help_panel=rich_help_panel_solar_position,
 )
-
+typer_argument_solar_incidence = typer.Argument(
+    help='Solar incidence',
+    rich_help_panel=rich_help_panel_solar_position,
+)
+typer_argument_solar_incidence_series = typer.Argument(
+    help='Solar incidence series',
+    rich_help_panel=rich_help_panel_solar_position,
+)
 
 # Solar time
 
