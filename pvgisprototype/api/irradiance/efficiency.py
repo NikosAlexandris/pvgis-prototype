@@ -2,8 +2,9 @@ from devtools import debug
 import typer
 from typing import Annotated
 from typing import List
+from rich import print
 from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.constants import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -68,7 +69,7 @@ def calculate_pv_efficiency(
     'Calculated efficiency is out of logical range (0 to 1).'
     """
     if len(model_constants) < 7:
-        return "Insufficient number of model constants."
+        return "Insufficient number of model constants!"
     
     relative_irradiance = 0.001 * irradiance
     if relative_irradiance <= 0:
