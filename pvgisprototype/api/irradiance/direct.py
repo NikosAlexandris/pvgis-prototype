@@ -46,12 +46,8 @@ from math import exp
 from math import atan
 import numpy as np
 from datetime import datetime
-from pvgisprototype.constants import AOI_CONSTANTS
-from pvgisprototype.api.geometry.solar_declination import model_solar_declination
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.geometry.solar_time import model_solar_time
-from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
-from pvgisprototype.algorithms.jenco.solar_incidence import calculate_relative_longitude
+from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
@@ -107,12 +103,11 @@ from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
-from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
-from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
+from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
@@ -790,8 +785,8 @@ def calculate_direct_irradiance(
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = LINKE_TURBIDITY_DEFAULT,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
