@@ -49,6 +49,7 @@ from datetime import time
 from typing import Annotated
 from typing import Optional
 from typing import Union
+from typing import List
 from typing import Sequence
 import calendar
 import random
@@ -58,9 +59,17 @@ import zoneinfo
 from zoneinfo import ZoneInfo
 from rich import print
 import numpy as np
+from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 
 
-def parse_timestamp(timestamp_string):
+def parse_timestamp(
+    ctx: typer.Context,
+    timestamp_string: str,
+    param: typer.CallbackParam,
+) -> datetime:
+    print(f'[yellow]i[/yellow] Context: {ctx}')
+    print(f'[yellow]i[/yellow] Context: {ctx.params}')
+    print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
     if timestamp_string:
         formats = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%Y-%m', '%Y']
         for fmt in formats:
@@ -152,6 +161,7 @@ def ctx_attach_requested_timezone(
     """Returns the current datetime in the user-requested timezone."""
 
     print(f'[yellow]i[/yellow] Context: {ctx.params}')
+    print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
     print(f'  [yellow]>[/yellow] Executing ctx_attach_requested_timezone()')
     timezone = ctx.params.get('timezone')
     print(f'  [yellow]>[/yellow] User defined input parameter `timezone` = {timezone}')
@@ -205,6 +215,26 @@ def ctx_attach_requested_timezone(
 
 
 def get_days_in_year(year):
+    """ Calculate the number of days in a given year, accounting for leap years.
+
+    Parameters
+    ----------
+    year : int
+        The year for which to calculate the number of days.
+
+    Returns
+    -------
+    int
+        The number of days in the given year.
+
+    Examples
+    --------
+    >>> get_days_in_year(2020)
+    366
+
+    >>> get_days_in_year(2021)
+    365
+    """
     start_date = datetime(year, 1, 1)  # First day of the year
     end_date = datetime(year + 1, 1, 1)  # First day of the next year
     return (end_date - start_date).days
