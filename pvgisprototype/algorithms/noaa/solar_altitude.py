@@ -87,7 +87,7 @@ def calculate_solar_altitude_time_series_noaa(
             f"The `solar_altitude` should be a finite number ranging in [{-np.pi/2}, {np.pi/2}] radians"
         )
     solar_altitude_series = [
-        SolarAltitude(value=value, unit=RADIANS) for value in solar_altitude_series
+        SolarAltitude(value=altitude, unit=RADIANS) for altitude in solar_altitude_series
     ]
     if verbose == 3:
         debug(locals())
