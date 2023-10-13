@@ -144,4 +144,3 @@ def calculate_solar_time_ephem(
       typer.echo(f'Mean solar time: {mean_solar_time}')
 
   return solar_time_datetime
-  # return SolarTime(value=solar_time, unit='timestamp')
