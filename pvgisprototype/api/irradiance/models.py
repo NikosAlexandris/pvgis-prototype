@@ -14,6 +14,14 @@ class MethodsForInexactMatches(str, Enum):
     nearest = 'nearest' # use nearest valid index value
 
 
+class SolarPanelTechnology(str, Enum):
+    none = None
+    cSi = 'cSi'
+    old_cSi = 'Old cSi'
+    CIS = 'CIS'
+    CdTe = 'CdTe'
+
+
 class PVModuleEfficiencyAlgorithms(str, Enum):
     none = None
     linear = 'Linear'
