@@ -54,7 +54,6 @@ def model_solar_altitude(
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     # time_output_units: str = 'minutes',
@@ -96,6 +95,7 @@ def model_solar_altitude(
         )
 
     if model.value == SolarPositionModels.skyfield:
+
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
             longitude=longitude,
             latitude=latitude,
@@ -106,16 +106,15 @@ def model_solar_altitude(
         )
 
     if model.value == SolarPositionModels.suncalc:
+
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
             lng=longitude.degrees,
             lat=latitude.degrees,
         ).values()  # zero points to south
+        # create SolarAltitude object as required by the output function
         solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
-        # solar_altitude = convert_to_degrees_if_requested(
-        #     solar_altitude, angle_output_units
-        # )
 
     if model.value == SolarPositionModels.pysolar:
 
@@ -125,12 +124,9 @@ def model_solar_altitude(
             latitude_deg=latitude.degrees,  # this comes first
             longitude_deg=longitude.degrees,
             when=timestamp,
-        )  # returns degrees by default
-        # required by output function
+        )  # returns degrees by default !
+        # create SolarAltitude object as required by the output function
         solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
-        # solar_altitude = convert_to_radians_if_requested(
-        #     solar_altitude, angle_output_units
-        # )
 
     if model.value  == SolarPositionModels.pvis:
 
@@ -141,7 +137,6 @@ def model_solar_altitude(
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
@@ -160,7 +155,6 @@ def model_solar_altitude(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            # angle_output_units=angle_output_units,
             verbose=verbose,
         )
 
@@ -178,7 +172,6 @@ def calculate_solar_altitude(
     time_offset_global: float = 0,
     hour_offset: float = 0,
     apply_atmospheric_refraction: bool = True,
-    days_in_a_year: float = 365.25,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,
     # time_output_units: str = 'minutes',
@@ -203,12 +196,8 @@ def calculate_solar_altitude(
                 solar_time_model=solar_time_model,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
-                # time_output_units=time_output_units,
-                # angle_units=angle_units,
-                # angle_output_units=angle_output_units,
                 verbose=verbose,
             )
             results.append({
