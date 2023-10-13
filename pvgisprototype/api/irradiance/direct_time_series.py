@@ -141,7 +141,7 @@ def correct_linke_turbidity_factor_time_series(
     # Perform calculations
     corrected_linke_turbidity_factors_array = -0.8662 * linke_turbidity_factor_series_array
 
-    if verbose == 3:
+    if verbose == 4:
         debug(locals())
 
     # Convert back to custom data class objects
@@ -210,10 +210,8 @@ def calculate_refracted_solar_altitude_time_series(
         refracted_solar_altitude_series, angle_output_units
     )
 
-    if verbose == 3:
+    if verbose == 4:
         debug(locals())
-    if verbose > 1:
-        print(f'Refracted solar altitude series : {refracted_solar_altitude_series}')
 
     return refracted_solar_altitude_series
 
@@ -247,10 +245,10 @@ def calculate_optical_air_mass_time_series(
     else:
         optical_air_mass_series = OpticalAirMass(value=optical_air_mass_series[0], unit=OPTICAL_AIR_MASS_UNIT)
 
-    if verbose == 3:
+    if verbose == 4:
         debug(locals())
     if verbose > 1:
-        print(f'optical air mass series : {optical_air_mass_series}')
+        print(f'Optical air mass series : {optical_air_mass_series}')
 
     return optical_air_mass_series
 
@@ -299,7 +297,7 @@ def rayleigh_optical_thickness_time_series(
             unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
         )
 
-    if verbose == 3:
+    if verbose == 4:
         debug(locals())
     if verbose > 1:
         print(f'Rayleigh thickness series : {rayleigh_thickness_series}')
@@ -359,10 +357,28 @@ def calculate_direct_normal_irradiance_time_series(
         )
     )
 
-    if verbose == 3:
+    if verbose == 4:
         debug(locals())
-    if verbose > 0:
-        print(f'Direct normal irradiance series: {direct_normal_irradiance_series}')  # B0c
+    results = {
+        'Normal': direct_normal_irradiance_series,
+        }
+    if verbose > 1:
+        extended_results = {
+        'Extra. normal': extraterrestrial_normal_irradiance_series,
+        'Rayleigh': rayleigh_thickness_series_array,
+        'Air mass': np.array([x.value for x in optical_air_mass_series]),
+        'Correct Linke': corrected_linke_turbidity_factor_series_array,
+        'Linke': linke_turbidity_factor_series_array,
+        }
+        results = results | extended_results
+
+    print_irradiance_table_2(
+        timestamps=timestamps,
+        dictionary=results,
+        title='Direct normal irradiance series',
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
 
     return direct_normal_irradiance_series
 
@@ -394,9 +410,6 @@ def calculate_direct_horizontal_irradiance_time_series(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> np.ndarray:
     """ """
-    if verbose == 3:
-        debug(locals())
-
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -429,6 +442,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         solar_altitude_series=solar_altitude_series_in_degrees,
         angle_input_units=expected_solar_altitude_units,
         angle_output_units="radians",  # Here in radians!
+        verbose=verbose,
     )
     optical_air_mass_series = calculate_optical_air_mass_time_series(
         elevation=elevation,
@@ -445,18 +459,25 @@ def calculate_direct_horizontal_irradiance_time_series(
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        verbose=verbose,
+        verbose=0,
     )
     solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
     direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
 
-    if verbose == 3:
+    if verbose == 4:
         debug(locals())
-    if verbose > 0:
-        # timestamps = np.array(timestamps)
-        # results = np.column_stack((timestamps, direct_horizontal_irradiance_series))
-        # print(f'Direct horizontal irradiance series:\n{results}')
-        print(f'Direct horizontal irradiance series: {direct_horizontal_irradiance_series}')  # B0c
+
+    results = {
+            "Horizontal": direct_horizontal_irradiance_series,
+    }
+    if verbose > 1:
+        extended_results = {
+            'Normal': direct_normal_irradiance_series,
+            "Air mass": np.array([x.value for x in optical_air_mass_series]),
+            "Refracted alt.": np.array( [x.value for x in refracted_solar_altitude_series]) if apply_atmospheric_refraction else np.array(["-"]),
+            "Altitude": solar_altitude_series_array,
+        }
+        results = results | extended_results
 
     return direct_horizontal_irradiance_series
 
@@ -635,6 +656,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     # ----------------------------------------------------- make it a function
 
     if not direct_horizontal_component:
+        print(f'Modelling irradiance...')
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
             longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
@@ -658,9 +680,10 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             rounding_places=rounding_places,
-            verbose=verbose,
+            verbose=0,  # no verbosity here by choice!
         )
     else:  # read from a time series dataset
+        print(f'Reading from external dataset...')
         # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
         longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
         latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
@@ -721,9 +744,32 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             logging.error(f"Which Error? {e}")
             raise ValueError
 
-    if verbose == 3:
-        debug(locals())
-    if verbose > 0:
-        print(f'Direct inclined irradiance series: {modified_direct_horizontal_irradiance_series} (based on {solar_incidence_model})')  # B0c
+    results = {
+        "Direct": direct_inclined_irradiance_series,
+    }
+    if np.any(direct_inclined_irradiance_series < 0):
+        print("[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
 
-    return modified_direct_horizontal_irradiance_series
+    if verbose > 2:
+        extended_results = {
+            "Loss": 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
+            "Horizontal": direct_horizontal_irradiance_series,
+            'Incidence': convert_series_to_degrees_if_requested(solar_incidence_series_array, angle_output_units),
+            'Tilt': convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            'Orientation': convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+        }
+        results = results | extended_results
+
+    if verbose > 3:
+        more_extended_results = {
+            'Irradiance source': 'External data' if direct_horizontal_component else 'Model (Hofierka, 2002)',
+            'Incidence algorithm': solar_incidence_model.value,
+            'Positioning': solar_position_model.value,
+            'Timing': solar_time_model.value,
+            # "Shade": in_shade,
+        }
+        results = results | more_extended_results
+    if verbose == 4:
+        debug(locals())
+
