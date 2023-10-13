@@ -389,6 +389,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,#Annotated[Optional[ZoneInfo], typer_option_timezone] = None,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
@@ -428,6 +429,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
+    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
     
     # expects solar altitude in degrees! ----------------------------------vvv
     expected_solar_altitude_units = "degrees"
@@ -460,8 +462,19 @@ def calculate_direct_horizontal_irradiance_time_series(
         eccentricity_correction_factor=eccentricity_correction_factor,
         verbose=0,
     )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
-    direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
+
+    # Mask conditions -------------------------------------------------------
+    mask_solar_altitude_positive = solar_altitude_series_array > 0
+    mask_not_in_shade = np.full_like(solar_altitude_series_array, True)  # Stub, replace with actual condition
+    mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
+
+    # Initialize the direct irradiance series to zeros
+    direct_horizontal_irradiance_series = np.zeros_like(solar_altitude_series_array)
+    if np.any(mask):
+        # direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
+        direct_horizontal_irradiance_series[mask] = (
+            direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
+        )[mask]
 
     if verbose == 4:
         debug(locals())
@@ -477,6 +490,18 @@ def calculate_direct_horizontal_irradiance_time_series(
             "Altitude": solar_altitude_series_array,
         }
         results = results | extended_results
+
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title='Direct horizontal irradiance series',
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
 
     return direct_horizontal_irradiance_series
 
