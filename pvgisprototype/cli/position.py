@@ -757,6 +757,11 @@ def incidence(
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
 
+    # Possible to move to a callback? ----------------------------------------
+    if random_time:
+        timestamp, timezone = random_datetimezone()
+    # ------------------------------------------------------------------------
+
     # Convert the input timestamp to UTC, for _all_ internal calculations
     utc_zoneinfo = ZoneInfo("UTC")
     if timestamp.tzinfo != utc_zoneinfo:
