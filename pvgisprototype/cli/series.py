@@ -44,6 +44,7 @@ import logging
 from pvgisprototype.api.series.log import logger
 import warnings
 
+from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
 from pvgisprototype.api.series.utilities import get_scale_and_offset
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.plot import plot_series
@@ -170,6 +171,10 @@ def select_time_series(
         )
 
     
+    # if 'timestamps' is a single datetime object, parse it
+    if isinstance(timestamps, datetime):
+        timestamps = parse_timestamp_series(timestamps)
+
     if timestamps and not start_time and not end_time:
         # convert timestamp to ISO format string without fractional seconds
         # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
