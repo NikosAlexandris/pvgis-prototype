@@ -2,41 +2,14 @@ from datetime import date
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from datetime import datetime
 from pvgisprototype import FractionalYear
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import FRACTIONAL_YEAR_MINIMUM
+from pvgisprototype.constants import FRACTIONAL_YEAR_MAXIMUM
 from math import pi
 from math import isclose
-
-
-FRACTIONAL_YEAR_MINIMUM = 0
-FRACTIONAL_YEAR_MAXIMUM = 2 * pi
-
-
-def days_in_year(year):
-    """ Calculate the number of days in a given year, accounting for leap years.
-
-    Parameters
-    ----------
-    year : int
-        The year for which to calculate the number of days.
-
-    Returns
-    -------
-    int
-        The number of days in the given year.
-
-    Examples
-    --------
-    >>> days_in_year(2020)
-    366
-
-    >>> days_in_year(2021)
-    365
-    """
-    start_date = date(year, 1, 1)
-    end_date = date(year + 1, 1, 1)
-    delta = end_date - start_date
-    return delta.days
 
 
 @validate_with_pydantic(CalculateFractionalYearPVISInputModel)
@@ -61,15 +34,14 @@ def calculate_fractional_year_pvis(
         )
     """
     year = timestamp.year
-    # start_of_year = datetime(year=year, month=1, day=1)
     day_of_year = timestamp.timetuple().tm_yday
-    fractional_year = 2 * pi * day_of_year / days_in_year(year)
+    days_in_year = get_days_in_year(timestamp.year)
+    fractional_year = 2 * pi * day_of_year / days_in_year
 
     if not ((isclose(FRACTIONAL_YEAR_MINIMUM, fractional_year) or FRACTIONAL_YEAR_MINIMUM < fractional_year) and 
             (isclose(FRACTIONAL_YEAR_MAXIMUM, fractional_year) or fractional_year < FRACTIONAL_YEAR_MAXIMUM)):
         raise ValueError(f'Calculated fractional year {fractional_year} is out of the expected range [{FRACTIONAL_YEAR_MINIMUM}, {FRACTIONAL_YEAR_MAXIMUM}] radians')
 
-    fractional_year = FractionalYear(value=fractional_year, unit='radians')
-    # fractional_year = convert_to_degrees_if_requested(fractional_year, angle_output_units)
+    fractional_year = FractionalYear(value=fractional_year, unit=RADIANS)
             
     return fractional_year
