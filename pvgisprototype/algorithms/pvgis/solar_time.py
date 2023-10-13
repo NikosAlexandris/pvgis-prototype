@@ -10,6 +10,7 @@ from pvgisprototype.constants import double_numpi
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from pvgisprototype.api.utilities.image_offset_prototype import get_image_offset
 from pvgisprototype import SolarTime
 from pvgisprototype import Latitude
@@ -27,7 +28,6 @@ def calculate_solar_time_pvgis(
     latitude: Longitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,  # from the C code : = 0.165
     time_offset_global: float = 0,
@@ -61,7 +61,8 @@ def calculate_solar_time_pvgis(
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     day_of_year = timestamp.timetuple().tm_yday
-    day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
+    days_in_year = get_days_in_year(timestamp.year)
+    day_of_year_in_radians = double_numpi * day_of_year / days_in_year  
     hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
     hour_of_day = hour_of_year % 24  # integer
 
