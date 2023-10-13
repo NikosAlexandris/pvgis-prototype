@@ -593,7 +593,9 @@ typer_argument_conversion_efficiency = typer.Argument(
 )
 typer_option_system_efficiency = typer.Option(
     '--system-efficiency-factor',
+    '-se',
     help='System efficiency factor',
+    show_default=True,
     rich_help_panel=rich_help_panel_efficiency,
     # rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory=SYSTEM_EFFICIENCY_DEFAULT,
@@ -601,14 +603,20 @@ typer_option_system_efficiency = typer.Option(
 typer_option_efficiency = typer.Option(
     '--efficiency-factor',
     '-e',
-    help='Efficiency factor',
+    help='PV efficiency factor. [red]Overrides internal PV module efficiency algorithms![/red]',
     rich_help_panel=rich_help_panel_efficiency,
     # rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory=EFFICIENCY_DEFAULT,
 )
 typer_option_pv_module_efficiency_algorithm = typer.Option(
+    '--efficiency-model',
+    '-em',
     help='Algorithms for calculaton of the efficiency of a photovoltaic system as a function of total irradiance, temperature',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
     rich_help_panel=rich_help_panel_efficiency,
+    # default_factory='Faiman'
 )
 
 
