@@ -328,7 +328,7 @@ def uniplot(
         time_series=time_series,
         longitude=longitude,
         latitude=latitude,
-        time=time,
+        timestamps=timestamp,
         convert_longitude_360=convert_longitude_360,
         statistics=False,
         output_filename=None,
