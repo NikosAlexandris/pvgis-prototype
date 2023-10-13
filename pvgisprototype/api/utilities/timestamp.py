@@ -73,6 +73,31 @@ def parse_timestamp(timestamp_string):
         return None
 
 
+def parse_timestamp_series(
+    timestamps: Union[str, datetime],
+    # ctx: typer.Context,
+    # param: typer.CallbackParam,
+) -> List[datetime]:
+    # print(f"[yellow]i[/yellow] Context: {ctx}")
+    # print(f"[yellow]i[/yellow] Context: {ctx.params}")
+    # print(f"[yellow]i[/yellow] typer.CallbackParam: {param}")
+    print("[yellow]i[/yellow] Runnning the parse_timestamp_series() function!")
+    if isinstance(timestamps, datetime):
+        return [timestamps]  # return a list in case of a single datetime object
+
+    datetime_strings = timestamps.split(",")
+    try:
+        datetime_series = [
+            # datetime.fromisoformat(string) for string in datetime_strings
+            datetime.fromisoformat(string.strip())
+            for string in datetime_strings
+        ]
+    except Exception as e:
+        raise ValueError(f"Error parsing datetime: {e}")
+
+    return datetime_series
+
+
 def now_local_datetimezone():
     """Get current local date and time and zone
     """

@@ -146,15 +146,6 @@ typer_argument_timestamp = typer.Argument(
     # rich_help_panel=rich_help_panel_time_series,
     default_factory=now_utc_datetimezone,
 )
-
-
-def parse_timestamp_series(value: str) -> List[float]:
-    datetime_strings = value.split(',')
-    datetime_series = [datetime.fromisoformat(string) for string in datetime_strings]
-    # return BaseTimestampSeriesModel(timestamps=datetime_series)
-    return datetime_series
-
-
 typer_argument_timestamps = typer.Argument(
     help='Timestamps',
     parser=parse_timestamp_series,
