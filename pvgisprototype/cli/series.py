@@ -140,7 +140,7 @@ def select_time_series(
         logger.info(coordinates)
 
     location_time_series = select_location_time_series(
-        time_series,
+        time_series=time_series,
         longitude=longitude,
         latitude=latitude,
         inexact_matches_method=inexact_matches_method,
@@ -149,7 +149,7 @@ def select_time_series(
     )
     # ------------------------------------------------------------------------
     if start_time or end_time:
-        timestamp = None  # we don't need a timestamp anymore!
+        timestamps = None  # we don't need a timestamp anymore!
 
         if start_time and not end_time:  # set `end_time` to end of series
             end_time = location_time_series.time.values[-1]
@@ -169,6 +169,7 @@ def select_time_series(
             location_time_series.sel(time=slice(start_time, end_time))
         )
 
+    
     if timestamps and not start_time and not end_time:
         # convert timestamp to ISO format string without fractional seconds
         # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
@@ -196,11 +197,13 @@ def select_time_series(
             + f'{single_value}'
             + Style.RESET_ALL
         )
+
         logger.warning(warning)
         if verbose > 0:
             typer.echo(Fore.YELLOW + warning)
         if verbose == 3:
             debug(locals())
+
         return single_value
 
     # if output_filename:
@@ -267,7 +270,7 @@ def plot(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
@@ -275,18 +278,18 @@ def plot(
 ):
     """Plot selected time series"""
     data_array = select_time_series(
-            time_series,
-            longitude,
-            latitude,
-            time,
-            convert_longitude_360,
-            output_filename,
-            variable_name_as_suffix,
+            time_series=time_series,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            convert_longitude_360=convert_longitude_360,
+            output_filename=output_filename,
+            variable_name_as_suffix=variable_name_as_suffix,
             )
     try:
         output_filename = plot_series(
                 data_array=data_array,
-                time=time,
+                timestamps=timestamps,
                 figure_name=output_filename,
                 # add_offset=add_offset,
                 variable_name_as_suffix=variable_name_as_suffix,
