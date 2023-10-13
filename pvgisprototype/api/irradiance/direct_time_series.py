@@ -321,7 +321,6 @@ def calculate_direct_normal_irradiance_time_series(
 ):
     """ """
    # Unpack custom objects to NumPy arrays
-    linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
     optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
 
     extraterrestrial_normal_irradiance_series = (
@@ -334,7 +333,7 @@ def calculate_direct_normal_irradiance_time_series(
             random_days=random_days,
         )
     )
-    corrected_linke_turbidity_factors = correct_linke_turbidity_factor_time_series(
+    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
         linke_turbidity_factor_series,
         verbose=verbose,
     )
@@ -343,7 +342,8 @@ def calculate_direct_normal_irradiance_time_series(
         verbose=verbose,
     )
     # Unpack the custom objects into NumPy arrays
-    corrected_linke_turbidity_factor_series_array = np.array([x.value for x in corrected_linke_turbidity_factors])
+    linke_turbidity_factor_series_array = np.array([x.value for x in linke_turbidity_factor_series])
+    corrected_linke_turbidity_factor_series_array = np.array([x.value for x in corrected_linke_turbidity_factor_series])
     optical_air_mass_series_array = np.array([x.value for x in optical_air_mass_series])
     rayleigh_thickness_series_array = np.array([x.value for x in rayleigh_thickness_series])
 
