@@ -22,7 +22,6 @@ from typing import List
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
-from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
@@ -103,9 +102,9 @@ from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.cli.series import select_time_series
 # from pvgisprototype.api.series.utilities import select_location_time_series
 from pathlib import Path
-
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.cli.print import print_irradiance_table_2
 
 
 app = typer.Typer(
@@ -115,6 +114,8 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f"Estimate the direct solar radiation for a time series",
 )
+
+
 
 
 def correct_linke_turbidity_factor_time_series(
@@ -327,9 +328,6 @@ def calculate_direct_normal_irradiance_time_series(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """ """
-   # Unpack custom objects to NumPy arrays
-    optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
-
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
@@ -349,10 +347,10 @@ def calculate_direct_normal_irradiance_time_series(
     )
 
     # Unpack the custom objects into NumPy arrays
-    linke_turbidity_factor_series_array = np.array([x.value for x in linke_turbidity_factor_series])
-    corrected_linke_turbidity_factor_series_array = np.array([x.value for x in corrected_linke_turbidity_factor_series])
-    optical_air_mass_series_array = np.array([x.value for x in optical_air_mass_series])
-    rayleigh_thickness_series_array = np.array([x.value for x in rayleigh_thickness_series])
+    linke_turbidity_factor_series_array = np.array([lt.value for lt in linke_turbidity_factor_series])
+    corrected_linke_turbidity_factor_series_array = np.array([clt.value for clt in corrected_linke_turbidity_factor_series])
+    optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
+    rayleigh_thickness_series_array = np.array([rt.value for rt in rayleigh_thickness_series])
 
     # Calculate
     direct_normal_irradiance_series = (
