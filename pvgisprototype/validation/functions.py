@@ -39,6 +39,8 @@ from pvgisprototype.validation.parameters import SolarHourAngleModel
 # Solar Surface
 from pvgisprototype.validation.parameters import SurfaceTiltModel
 from pvgisprototype.validation.parameters import SurfaceOrientationModel
+# from pvgisprototype.validation.parameters import ShadowIndicatorModel
+from pvgisprototype.validation.parameters import SolarIncidenceModel
 
 # Output
 from pvgisprototype.validation.parameters import BaseAngleUnitsModel
@@ -80,7 +82,7 @@ class CalculateFractionalYearPVISInputModel(
 
 
 class CalculateSolarDeclinationPVISInputModel(
-    BaseTimeModel,
+    BaseTimestampModel,
     EarthOrbitModel,
     # BaseAngleOutputUnitsModel,
 ):
@@ -89,7 +91,6 @@ class CalculateSolarDeclinationPVISInputModel(
 
 class CalculateSolarDeclinationHargreavesInputModel(
     BaseTimestampModel,
-    DaysInAYearModel,
     # BaseAngleOutputUnitsModel,
 ):
     pass
@@ -107,7 +108,7 @@ class CalculateSolarDeclinationNOAAInput(
 class ModelSolarTimeInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    RefractedSolarZenithModel,
+    # RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     HourOffsetModel,
@@ -143,11 +144,9 @@ class CalculateSolarTimePVGISInputModel(
     pass
  
 
-class CalculateSolarTimeEoTInputModel(
+class CalculateSolarTimeMilne1921InputModel(
     LongitudeModel,
-    BaseTimeModel,
-    EarthOrbitModel,
-    TimeOffsetModel,
+    BaseTimestampModel,
     VerbosityModel,
 ):
     pass
@@ -247,14 +246,13 @@ class SolarHourAngleSkyfieldInput(
     pass
 
 
-
 # Solar geometry
 
 class CalculateSolarAltitudePVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
     ApplyAtmosphericRefractionModel,
-    RefractedSolarZenithModel,
+    # RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     HourOffsetModel,
@@ -297,17 +295,20 @@ class CalculateSolarAzimuthPVLIBInputModel(
 ):
     pass
 
+
 class CalculateSolarDeclinationPVLIBInput(
     BaseTimestampModel,
     # BaseAngleOutputUnitsModel,
 ):
     pass
 
+
 class CalculateSolarDeclinationSkyfieldInput(
     BaseTimestampModel,
     BaseAngleOutputUnitsModel,
 ):
     pass
+
 
 class CalculateSolarZenithPVLIBInputModel(
     CalculateSolarAltitudePVLIBInputModel
@@ -325,15 +326,11 @@ class CalculateSolarZenithNOAAInput(
     pass
 
 
-
-
-
-
 class CalculateSolarAzimuthPVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
     ApplyAtmosphericRefractionModel,
-    RefractedSolarZenithModel,
+    # RefractedSolarZenithModel,
     EarthOrbitModel,
     TimeOffsetModel,
     HourOffsetModel,
@@ -366,12 +363,12 @@ class ModelSolarAltitudeTimeSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     SolarPositionModel,
-    SolarTimeModelModel,
+    # SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
-    RefractedSolarZenithModel,
-    EarthOrbitModel,
-    TimeOffsetModel,
-    HourOffsetModel,
+    # RefractedSolarZenithModel,
+    # EarthOrbitModel,
+    # TimeOffsetModel,
+    # HourOffsetModel,
     # BaseTimeOutputUnitsModel,
     # BaseAngleUnitsModel,
     # BaseAngleOutputUnitsModel,
@@ -449,7 +446,7 @@ class CalculateSolarIncidenceJencoInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
     # SolarHourAngleModel,
-    RandomTimeModel,
+    # RandomTimeModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
     EarthOrbitModel,
@@ -464,12 +461,56 @@ class CalculateSolarIncidenceJencoInputModel(
 class CalculateSolarIncidenceTimeSeriesJencoInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    RandomTimeSeriesModel,
+    # RandomTimeSeriesModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
-    EarthOrbitModel,
+    # EarthOrbitModel,
     BaseTimeOutputUnitsModel,
-    BaseAngleInternalUnitsModel,
+    # BaseAngleInternalUnitsModel,
+    BaseAngleOutputUnitsModel,
+    VerbosityModel,
+):
+    pass
+
+
+class ModelSolarIncidenceInputModel(
+    BaseCoordinatesModel,
+    BaseTimeModel,
+    SolarTimeModelModel,
+    # RandomTimeModel,
+    SolarIncidenceModel,
+    SurfaceTiltModel,
+    SurfaceOrientationModel,
+    # ShadowIndicatorModel,
+    # HorizonHeightModel,
+    ApplyAtmosphericRefractionModel,
+    RefractedSolarZenithModel,
+    EarthOrbitModel,
+    TimeOffsetModel,
+    HourOffsetModel,
+    # BaseTimeOutputUnitsModel,
+    # BaseAngleUnitsModel,
+    # BaseAngleOutputUnitsModel,
+    VerbosityModel,
+):
+    pass
+
+
+class ModelSolarIncidenceTimeSeriesInputModel(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    SolarTimeModelModel,
+    RandomTimeSeriesModel,
+    SolarIncidenceModel,
+    SurfaceTiltModel,
+    SurfaceOrientationModel,
+    ApplyAtmosphericRefractionModel,
+    RefractedSolarZenithModel,
+    EarthOrbitModel,
+    # TimeOffsetModel,
+    # HourOffsetModel,
+    BaseTimeOutputUnitsModel,
+    BaseAngleUnitsModel,
     BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
