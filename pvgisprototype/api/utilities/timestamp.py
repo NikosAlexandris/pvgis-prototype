@@ -370,3 +370,20 @@ def hour_of_year_to_datetime(year, hour):
     desired_datetime = start_of_year + timedelta_hours
 
     return desired_datetime
+def callback_generate_datetime_series(
+    ctx: typer.Context,
+    value: Union[str, datetime, List[datetime]],
+    # param: typer.CallbackParam,
+) -> Optional[List[datetime]]:
+    # print(f'[yellow]i[/yellow] Context: {ctx}')
+    # print(f'[yellow]i[/yellow] Context: {ctx.params}')
+    # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
+    # print(f'  Value: {value}')
+    start_time = ctx.params.get('start_time')
+    end_time = ctx.params.get('end_time')
+    if start_time is not None and end_time is not None:
+        frequency = ctx.params.get('frequency', 'h')
+        timestamps = generate_datetime_series(start_time, end_time, frequency)
+        return timestamps.tolist()
+
+    return value

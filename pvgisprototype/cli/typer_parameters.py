@@ -13,6 +13,7 @@ from ..api.utilities.timestamp import ctx_attach_requested_timezone
 from ..api.utilities.timestamp import ctx_convert_to_timezone
 from ..api.utilities.timestamp import now_local_datetimezone
 from ..api.utilities.timestamp import convert_hours_to_datetime_time
+from ..api.utilities.timestamp import callback_generate_datetime_series
 from ..api.utilities.timestamp import parse_timestamp_series
 from .rich_help_panel_names import rich_help_panel_advanced_options
 # from .rich_help_panel_names import rich_help_panel_geometry_time
@@ -150,11 +151,13 @@ typer_argument_timestamp = typer.Argument(
 typer_argument_timestamps = typer.Argument(
     help='Timestamps',
     parser=parse_timestamp_series,
+    callback=callback_generate_datetime_series,
 #     default_factory=now_utc_datetimezone_series,
 )
 typer_option_timestamps = typer.Option(
     help='Timestamps',
     parser=parse_timestamp_series,
+    callback=callback_generate_datetime_series,
 #     default_factory=now_utc_datetimezone_series,
 )
 typer_option_start_time = typer.Option(
