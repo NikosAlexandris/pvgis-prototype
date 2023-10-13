@@ -7,6 +7,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich import box
 from typing import List
+import numpy as np
 from pvgisprototype.constants import (
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
@@ -31,6 +32,8 @@ from pvgisprototype.constants import (
     UNITLESSS_COLUMN_NAME,
     UNITS_NAME,
     NOT_AVAILABLE_COLUMN_NAME,
+    NOT_AVAILABLE,
+    ROUNDING_PLACES_DEFAULT
 )
 
 
@@ -53,7 +56,6 @@ def print_solar_position_table(
     timestamp,
     timezone,
     table,
-    rounding_places,
     declination=None,
     hour_angle=None,
     timing=None,
@@ -63,16 +65,15 @@ def print_solar_position_table(
     incidence=None,
     user_requested_timestamp=None,
     user_requested_timezone=None,
+    rounding_places=ROUNDING_PLACES_DEFAULT,
 ):
     """ """
-    console = Console()
 
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
     quantities = [declination, zenith, altitude, azimuth, incidence]
 
-    debug(locals())
     columns = []
     if longitude is not None:
         columns.append(LONGITUDE_COLUMN_NAME)
@@ -111,7 +112,7 @@ def print_solar_position_table(
         zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith else None
         altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude else None
         azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth else None
-        incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence else None
+        incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE) if incidence else None
         units = model_result.get(UNITS_NAME, UNITLESSS_COLUMN_NAME)
 
         row = []
@@ -156,6 +157,7 @@ def print_solar_position_table(
         style = style_map.get(algorithm.lower(), None)
         table.add_row(*row, style=style)
 
+    console = Console()
     console.print(table)
 
 
@@ -344,7 +346,7 @@ def print_noaa_solar_position_table(
     console.print(solar_position_table)
 
     if verbose:
-            verbose_info = f"""
+        verbose_info = f"""
             Fractional Year: {solar_position_calculations['fractional_year']}
             Equation of Time: {solar_position_calculations['equation_of_time']}
             Solar Declination: {solar_position_calculations['solar_declination']}
@@ -352,4 +354,6 @@ def print_noaa_solar_position_table(
             True Solar Time: {solar_position_calculations['true_solar_time']}
             Solar Hour Angle: {solar_position_calculations['solar_hour_angle']}
             Solar Zenith: {solar_position_calculations['solar_zenith']} """
-            console.print(Panel(verbose_info, title="Verbose Information"))
+        console.print(Panel(verbose_info, title="Verbose Information"))
+
+
