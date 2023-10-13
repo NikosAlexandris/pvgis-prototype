@@ -17,4 +17,4 @@ class MethodsForInexactMatches(str, Enum):
 class PVModuleEfficiencyAlgorithms(str, Enum):
     none = None
     linear = 'Linear'
-    fainman = 'Fainman'
+    faiman = 'Faiman'
