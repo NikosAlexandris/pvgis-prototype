@@ -20,16 +20,18 @@ from typing import Union
 from typing import Sequence
 from typing import List
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.solar_declination_time_series import model_solar_declination_time_series
-from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
+from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
+from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
@@ -43,13 +45,13 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_optical_air_mass_series
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
@@ -78,6 +80,11 @@ from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
 from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import (
+    LONGITUDE_COLUMN_NAME,
+    LATITUDE_COLUMN_NAME,
+)
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
@@ -316,6 +323,7 @@ def calculate_direct_normal_irradiance_time_series(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """ """
