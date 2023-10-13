@@ -10,6 +10,7 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import RADIANS
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
@@ -31,7 +32,6 @@ def calculate_solar_incidence_pvis(
     surface_orientation: float = 180,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float = 1.5853349194640094,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     # time_output_units: str = 'minutes',
@@ -77,11 +77,8 @@ def calculate_solar_incidence_pvis(
     """
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
-        timezone=timezone,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # angle_output_units=angle_output_units,
     )
     solar_time = model_solar_time(
         longitude=longitude,
@@ -91,7 +88,6 @@ def calculate_solar_incidence_pvis(
         solar_time_model=solar_time_model,  # returns datetime.time object
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
@@ -129,4 +125,4 @@ def calculate_solar_incidence_pvis(
         * sin(surface_tilt.radians)
     )
 
-    return SolarIncidence(value=solar_incidence, unit='radians')
+    return SolarIncidence(value=solar_incidence, unit=RADIANS)
