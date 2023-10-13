@@ -370,6 +370,31 @@ def hour_of_year_to_datetime(year, hour):
     desired_datetime = start_of_year + timedelta_hours
 
     return desired_datetime
+
+
+def generate_datetime_series(
+    start_time: Optional[str] = None,
+    end_time: Optional[str] = None,
+    frequency: Optional[str] = TIMESTAMPS_FREQUENCY_DEFAULT,
+):
+    """
+    Example
+    -------
+    >>> start_time = '2010-06-01 06:00:00'
+    >>> end_time = '2010-06-01 08:00:00'
+    >>> frequency = 'h'  # 'h' for hourly
+    >>> generate_datetime_series(start_time, end_time, frequency)
+    array(['2010-06-01T06:00:00', '2010-06-01T07:00:00', '2010-06-01T08:00:00'],
+          dtype='datetime64[s]')
+    """
+    start = np.datetime64(start_time)
+    end = np.datetime64(end_time)
+    freq = np.timedelta64(1, frequency)
+    timestamps = np.arange(start, end + freq, freq)  # +freq to include the end time
+
+    return timestamps.astype('datetime64')
+
+
 def callback_generate_datetime_series(
     ctx: typer.Context,
     value: Union[str, datetime, List[datetime]],
