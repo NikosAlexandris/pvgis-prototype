@@ -649,6 +649,7 @@ def calculate_direct_inclined_irradiance_pvgis(
         timestamp=timestamp,
         timezone=timezone,
         solar_time_model=solar_time_model,
+        models=solar_position_model,
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
@@ -656,69 +657,27 @@ def calculate_direct_inclined_irradiance_pvgis(
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
-    sine_solar_altitude = sin(solar_altitude.radians)
-
-    # make it a function -----------------------------------------------------
-    #
-
-    solar_declination = model_solar_declination(
-        timestamp=timestamp,
-        timezone=timezone,
-        model=solar_declination_model,
-        days_in_a_year=days_in_a_year,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
-        # angle_output_units=angle_output_units,
-    )
-    sine_relative_latitude = -cos(latitude) * sin(surface_tilt) * cos(
-        surface_orientation
-    ) + sin(latitude) * cos(surface_tilt)
-    relative_latitude = math.asin(sine_relative_latitude)
-    # calculate C3x geometry parameters for inclined surface
-    C31_inclined = math.cos(relative_latitude) * math.cos(solar_declination.radians)
-    C33_inclined = sine_relative_latitude * math.sin(solar_declination.radians)
-
-    # Left-over comment from ? -----------------------------------------------
-    # cos(hour_angle - relative_longitude) = C33_inclined / C31_inclined
-    # ------------------------------------------------------------------------
-
-    solar_time = model_solar_time(
+    solar_incidence = model_solar_incidence(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        model=solar_time_model,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        random_time=random_time,
+        solar_time_model=solar_time_model,
+        solar_incidence_model=solar_incidence_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        # shadow_indicator=shadow_indicator,
+        # horizon_heights=horizon_heights,
+        # horizon_interval=horizon_interval,
+        days_in_a_year=days_in_a_year,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        perigee_offset=perigee_offset,
+        verbose=verbose,
     )
-    hour_angle = calculate_hour_angle(
-        solar_time=solar_time,
-        # angle_output_units=angle_output_units,
-    )
-    relative_longitude = calculate_relative_longitude(
-        latitude,
-        surface_tilt,
-        surface_orientation,
-        # angle_output_units=angle_output_units,
-    )
-    sine_solar_incidence_angle = (
-        C31_inclined * math.cos(hour_angle.radians - relative_longitude.radians) + C33_inclined
-    )
-
-    #
-    # ----------------------------------------------------- make it a function
 
     if not direct_horizontal_component:
         direct_horizontal_irradiance = calculate_direct_horizontal_irradiance(
@@ -729,6 +688,8 @@ def calculate_direct_inclined_irradiance_pvgis(
                 timezone=timezone,
                 linke_turbidity_factor=linke_turbidity_factor,
                 )
+        print(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')
+
     else:  # read from a time series dataset
         # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
         longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
@@ -746,42 +707,47 @@ def calculate_direct_inclined_irradiance_pvgis(
         print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance}')
 
     try:
-        modified_direct_horizontal_irradiance = (
+        direct_inclined_irradiance = (
             direct_horizontal_irradiance
-            * sine_solar_incidence_angle
-            / sine_solar_altitude
+            * sin(solar_incidence.radians)
+            / sin(solar_altitude.radians)
         )
         if verbose == 3:
             debug(locals())
+        # if verbose > 0:
+        #     print(f'Direct inclined irradiance: {direct_inclined_irradiance}')  # B0c
+
     except ZeroDivisionError:
         logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
         print("Is the solar altitude angle zero?")
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
-    # "Simpler" way to calculate the inclined solar declination?
-    if solar_incidence_model == 'PVGIS':
+    verbosity_message = ''
+    if apply_angular_loss_factor:
 
         # In the old C source code, the following runs if:
         # --------------------------------- Review & Add ?
             # 1. surface is NOT shaded
-            # 3. solar declination > 0
+            # 3. solar incidence > 0
         # --------------------------------- Review & Add ?
 
         try:
             angular_loss_factor = calculate_angular_loss_factor_for_direct_irradiance(
-                    sine_solar_incidence_angle,
-                    angle_of_incidence_constant = 0.155,
+                    solar_incidence=solar_incidence.radians,
                     )
-            direct_inclined_irradiance = modified_direct_horizontal_irradiance * angular_loss_factor
-            print(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on PVGIS)')  # B0c
+            direct_inclined_irradiance = direct_horizontal_irradiance * angular_loss_factor
 
-            return direct_inclined_irradiance
+            if verbose == 3:
+                debug(locals())
+            if verbose > 0:
+                # print(f'Direct inclined irradiance: {direct_inclined_irradiance} (with angular loss)')  # B0c
+                verbosity_message = ' with angular loss'
 
         # Else, the following runs:
         # --------------------------------- Review & Add ?
             # 1. surface is shaded
-            # 3. solar declination = 0
+            # 3. solar incidence = 0
         # --------------------------------- Review & Add ?
         except ZeroDivisionError as e:
             logging.error(f"Which Error? {e}")
@@ -790,9 +756,9 @@ def calculate_direct_inclined_irradiance_pvgis(
     if verbose == 3:
         debug(locals())
     if verbose > 0:
-        print(f'Direct inclined irradiance: {modified_direct_horizontal_irradiance} (based on {solar_incidence_model})')  # B0c
+        print(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {solar_incidence_model}{verbosity_message})')  # B0c
 
-    return modified_direct_horizontal_irradiance
+    return direct_inclined_irradiance
 
 
 # from: rsun_base.c
