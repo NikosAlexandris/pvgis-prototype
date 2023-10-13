@@ -239,7 +239,14 @@ def calculate_refracted_solar_altitude(
     h    = h  + ∆h                                          
      0      0     0                                         
 
+    0.061359 ( 0.1594 + 1.123 * h0 + 0.065656 * h02 ) / ( 1 + 28.9344 * h0 + 277.3971 * h02)
+
+    where :
+        - ∆h0ref : the atmospheric refraction component
+        - h0ref : the corrected solar altitude h0 in degrees
+
     This function implements the algorithm described by Hofierka :cite:`p:hofierka2002`.
+
 
     Notes
     -----
@@ -252,9 +259,7 @@ def calculate_refracted_solar_altitude(
 	drefract = 0.061359 * temp1 / temp2;    /* in radians */
 	h0refract = locSolarAltitude + drefract;
     """
-    # if solar_altitude.unit != "degrees":
-    #     raise ValueError(f"The atmospheric refraction equation expects the solar altitude angle in `degrees`!")
-
+    # The atmospheric refraction equation expects the solar altitude angle in `degrees`!"
     atmospheric_refraction = (
         0.061359
         * (
@@ -277,7 +282,6 @@ def calculate_refracted_solar_altitude(
         # angle_output_units,
         'radians',
     )
-
     if verbose == 3:
         debug(locals())
 
@@ -293,6 +297,7 @@ def calculate_refracted_solar_altitude(
 def calculate_optical_air_mass(
     elevation: Annotated[float, typer_argument_elevation],
     refracted_solar_altitude: Annotated[float, typer_argument_refracted_solar_altitude],
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> OpticalAirMass:
     """Approximate the relative optical air mass.
 
