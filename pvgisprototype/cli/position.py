@@ -240,7 +240,7 @@ def overview(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
-        days_in_a_year=days_in_a_year,
+        # days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
@@ -415,7 +415,6 @@ def zenith(
         models=model,  # could be named models!
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
@@ -518,7 +517,6 @@ def altitude(
         solar_time_model=solar_time_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         # time_output_units=time_output_units,
@@ -800,7 +798,6 @@ def incidence(
         days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        random_time=random_time,
         # time_offset_global=time_offset_global,
         # hour_offset=hour_offset,
         # time_output_units=time_output_units,
@@ -810,7 +807,6 @@ def incidence(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    debug(locals())
     print_solar_position_table(
         longitude=longitude,
         latitude=latitude,
