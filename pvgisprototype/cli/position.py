@@ -151,7 +151,9 @@ def intro():
     """
 
     note = """
-    Internally, timestamps are converted to UTC and angles are measured in radians!
+    Internally,
+        - [bold]timestamps[/bold] are converted to [magenta]UTC[/magenta]
+        - angles are measured in radians!
     """
     from rich.panel import Panel
     note_in_a_panel = Panel(
