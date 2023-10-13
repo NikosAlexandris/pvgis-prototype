@@ -78,7 +78,6 @@ from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
 from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
@@ -327,7 +326,6 @@ def calculate_direct_normal_irradiance_time_series(
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             random_days=random_days,
@@ -341,6 +339,7 @@ def calculate_direct_normal_irradiance_time_series(
         optical_air_mass_series,
         verbose=verbose,
     )
+
     # Unpack the custom objects into NumPy arrays
     linke_turbidity_factor_series_array = np.array([x.value for x in linke_turbidity_factor_series])
     corrected_linke_turbidity_factor_series_array = np.array([x.value for x in corrected_linke_turbidity_factor_series])
@@ -504,7 +503,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
-    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvlib,
     solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
@@ -523,63 +521,33 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
+
+    Notes
+    -----
+              B   ⋅ sin ⎛δ   ⎞                    
+               hc       ⎝ exp⎠         ⎛ W ⎞
+        B   = ────────────────     in  ⎜───⎟
+         ic       sin ⎛h ⎞             ⎜ -2⎟           
+                      ⎝ 0⎠             ⎝m  ⎠           
     """
-    # Notes
-    # -----
-    #           B   ⋅ sin ⎛δ   ⎞                    
-    #            hc       ⎝ exp⎠         ⎛ W ⎞
-    #     B   = ────────────────     in  ⎜───⎟
-    #      ic       sin ⎛h ⎞             ⎜ -2⎟           
-    #                   ⎝ 0⎠             ⎝m  ⎠           
-
-    # Hofierka, 2002 ------------------------------------------------------
-    # tangent_relative_longitude = - sin(surface_tilt)
-    #                              * sin(surface_orientation) /
-    #                                sin(latitude) 
-    #                              * sin(surface_tilt) 
-    #                              * cos(surface_orientation) 
-    #                              + cos(latitude) 
-    #                              * cos(surface_tilt)
-    tangent_relative_longitude = -sin(surface_tilt) * sin(
-        surface_orientation
-    ) / sin(latitude) * sin(surface_tilt) * cos(
-        surface_orientation
-    ) + cos(
-        latitude
-    ) * cos(
-        surface_tilt
+    solar_incidence_series = model_solar_incidence_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        solar_incidence_model=solar_incidence_model,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        days_in_a_year=days_in_a_year,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        verbose=verbose,
     )
-    # C source code -------------------------------------------------------
-    # There is an error of one negative sign in either of the expressions!
-    # That is so because : cos(pi/2 + x) = -sin(x)
-    # tangent_relative_longitude = - cos(half_pi - surface_tilt)  # cos(pi/2 - x) = sin(x)
-    #                              * cos(half_pi + surface_orientation) /  # cos(pi/2 + x) = -sin(x)
-    #                                sin(latitude) 
-    #                              * cos(half_pi - surface_tilt) 
-    #                              * sin(half_pi + surface_orientation)  # sin(pi/2 + x) = cos(x)
-    #                              + cos(latitude) 
-    #                              * sin(half_pi - surface_tilt)  # sin(pi/2 - x) = cos(x)
-    # --------------------------------------------------------------------
-
-    relative_longitude = atan(tangent_relative_longitude)
-    # cos(hour_angle - relative_longitude) = C33_inclined / C31_inclined
-
-    # Hofierka, 2002
-    # sine_relative_latitude = -cos(latitude) 
-    #                          * sin(surface_tilt)
-    #                          * cos(surface_orientation)
-    #                          + sin(latitude)
-    #                          * cos (surface_tilt)
-    sine_relative_latitude = -cos(latitude) * sin(surface_tilt) * cos(
-        surface_orientation
-    ) + sin(latitude) * cos(surface_tilt)
-    # Verified the following is equal to above.
-    # Huld ?
-    # sine_relative_latitude = -cos(latitude)
-    #                          * cos(half_pi - surface_tilt)
-    #                          * sin(half_pi + surface_orientation)
-    #                          + sin(latitude)
-    #                          * sin(half_pi - surface_tilt)
+    solar_incidence_series_array = np.array([x.value for x in solar_incidence_series])
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -598,62 +566,10 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
-        )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
-    sine_solar_altitude_series = np.sin(solar_altitude_series_array)
+    )
+    solar_altitude_series_array = np.array([solar_altitude.radians for solar_altitude in solar_altitude_series])
 
-    # make it a function -----------------------------------------------------
     #
-
-    # calculate solar declination + C3x geometry parameters
-    solar_declination_series = model_solar_declination_time_series(
-        timestamps=timestamps,
-        timezone=timezone,
-        model=SolarDeclinationModels.noaa,  #solar_declination_model,
-        days_in_a_year=days_in_a_year,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
-    )
-    solar_time_series = model_solar_time_time_series(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
-            solar_time_model=SolarTimeModels.noaa,  #solar_time_model,
-            refracted_solar_zenith=refracted_solar_zenith,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
-    )
-    solar_declination_series_array = np.array(
-        [declination.value for declination in solar_declination_series]
-    )
-    solar_time_decimal_hours_series = timestamp_to_decimal_hours_time_series(
-        solar_time_series
-    )
-    hour_angle_series = np.radians(15) * (solar_time_decimal_hours_series - 12)
-
-    # calculate C3x geometry parameters for inclined surface
-    relative_latitude = asin(sine_relative_latitude)
-    C31_inclined_series = cos(relative_latitude) * np.cos(
-        solar_declination_series_array
-    )
-    C33_inclined_series = sin(relative_latitude) * np.sin(
-        solar_declination_series_array
-    )
-    sine_solar_incidence_angle_series = (
-        C31_inclined_series * np.cos(hour_angle_series - relative_longitude)
-        + C33_inclined_series
-    )
-    #
-    # ----------------------------------------------------- make it a function
 
     if not direct_horizontal_component:
         print(f'Modelling irradiance...')
@@ -702,7 +618,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             in_memory=in_memory,
             verbose=verbose,
         )
-        # print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance_series}')
 
     try:
         modified_direct_horizontal_irradiance_series = (
