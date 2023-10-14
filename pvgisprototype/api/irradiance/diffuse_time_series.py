@@ -88,11 +88,6 @@ from math import sin
 from math import pi
 
 
-AOIConstants = []
-AOIConstants.append(-0.074)
-AOIConstants.append(0.155)
-
-
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=False,
@@ -101,7 +96,6 @@ app = typer.Typer(
     help=f"Calculate the diffuse irradiance incident on a surface",
 )
 console = Console()
-
 
 
 from pvgisprototype import LinkeTurbidityFactor
@@ -130,7 +124,7 @@ def calculate_term_n_time_series(
     N: float
         The N term
     """
-    if verbose == 3:
+    if verbose == 5:
         debug(locals())
     return 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2)
 
@@ -213,8 +207,8 @@ def diffuse_transmission_function_time_series(
         + 0.3797 * linke_turbidity_factor_series_squared_array
     )
 
-    if verbose > 0:
-        debug(locals())  # assuming debug is a predefined function
+    if verbose > 5:
+        debug(locals())
 
     if is_scalar:
         return diffuse_transmission_series[0]
@@ -280,7 +274,7 @@ def diffuse_solar_altitude_coefficients_time_series(
         + 0.0085079 * linke_turbidity_factor_series_squared_array
     )
 
-    if verbose == 3:
+    if verbose == 5:
         debug(locals())
     if is_scalar:
         return a1_series[0], a2_series[0], a3_series[0]
@@ -381,9 +375,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
     - surface_orientation :
     - diffuse_irradiance
     """
-    if verbose == 3:
-        debug(locals())
-
     # from the model
     direct_horizontal_component_series = calculate_direct_horizontal_irradiance_time_series(
         longitude=longitude,
@@ -400,7 +391,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
-        verbose=verbose,
+        verbose=0,  # no verbosity here by choice!
     )
 
     if surface_tilt == 0:  # horizontal surface
@@ -592,8 +583,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
             solar_incidence_angle_1=AOIConstants[0],
             solar_incidence_angle_2=AOIConstants[1],
         )
-        if verbose == 3:
-            debug(locals())
 
         diffuse_irradiance_series *= diffuse_irradiance_loss_factor
 
@@ -602,11 +591,45 @@ def calculate_diffuse_inclined_irradiance_time_series(
     #     print_series_statistics(data_statistics, title='Diffuse horizontal irradiance from SARAH')
     #     if csv:
     #         export_statistics_to_csv(data_statistics, 'diffuse_horizontal_component')
+    if verbose > 1 :
+        # solar_declination_series_array = np.array([declination.value for declination in solar_declination_series])
+        extended_results = {
+            "Loss": 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
+            "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+        }
+        results = results | extended_results
 
-    if verbose == 3:
+    if verbose > 2:
+        more_extended_results = {
+            'Diffuse horizontal': diffuse_horizontal_irradiance_series,
+            'Diffuse clear-sky': diffuse_sky_irradiance_series,
+        }
+        results = results | more_extended_results
+        title += ' & relevant components'
+
+    if verbose > 3:
+        even_more_extended_results = {
+            'term N': n_series,
+            'Kb': kb_series,
+            'Tilt': surface_tilt,
+            'Azimuth difference': azimuth_difference_series_array,
+            'Azimuth': solar_azimuth_series_array,
+            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+        }
+        results = results | even_more_extended_results
+
+    if verbose > 4:
+        linke_turbidity_factor_series_array = np.array([x.value for x in linke_turbidity_factor_series])
+        plus_even_more_extended_results = {
+            "Direct horizontal": direct_horizontal_irradiance_series,
+            'Extra. horizontal': extraterrestrial_horizontal_irradiance_series,
+            "Extra. normal": extraterrestrial_normal_irradiance_series,
+            'Linke': linke_turbidity_factor_series_array,
+            'Incidence': convert_series_to_degrees_if_requested(solar_incidence_series_array, angle_output_units),
+        }
+        results = results | plus_even_more_extended_results
+
+    if verbose == 5:
         debug(locals())
-    # ---------------------------------------------------------- Remove Me ---
-    typer.echo(f'Diffuse irradiance series on inclined surface: {diffuse_irradiance_series}')
-    # ---------------------------------------------------------- Remove Me ---
 
     return diffuse_irradiance_series
