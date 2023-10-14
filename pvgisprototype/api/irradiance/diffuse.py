@@ -51,8 +51,8 @@ import csv
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 from .direct import calculate_direct_horizontal_irradiance
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
-from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.geometry.solar_azimuth import model_solar_azimuth
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
+from pvgisprototype.api.geometry.azimuth import model_solar_azimuth
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
@@ -63,7 +63,7 @@ from math import sin
 from math import cos
 from math import pi
 from math import atan2
-from ..geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.time import model_solar_time
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -649,6 +649,7 @@ def calculate_diffuse_inclined_irradiance(
         diffuse_irradiance = diffuse_inclined_irradiance
 
     # one more thing
+    # if(calculateAngleLoss())
     if apply_angular_loss_factor:
         diffuse_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
             pi - surface_tilt - sin(surface_tilt)

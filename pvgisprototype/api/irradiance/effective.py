@@ -41,9 +41,9 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 
 from pvgisprototype.api.irradiance.diffuse import  calculate_diffuse_inclined_irradiance
 from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_inclined_irradiance
-from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
-from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from ..geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.incidence import model_solar_incidence
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
+from pvgisprototype.api.geometry.time import model_solar_time
 from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -62,6 +62,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_time_s
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -353,6 +354,31 @@ def calculate_effective_irradiance(
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = (solar_time_decimal_hours - 12) * np.radians(15)
     # hour_angle = (solar_time.as_hours - 12) * np.radians(15)
+    # solar_incidence_angle = model_solar_incidence(
+    #     longitude=longitude,
+    #     latitude=latitude,
+    #     timestamp=timestamp,
+    #     timezone=timezone,
+    #     solar_time_model=solar_time_model,
+    #     solar_incidence_model=solar_incidence_model,
+    #     # hour_angle=hour_angle,
+    #     surface_tilt=surface_tilt,
+    #     surface_orientation=surface_orientation,
+    #     # shadow_indicator=shadow_indicator,
+    #     # horizon_heights=horizon_heights,
+    #     # horizon_interval=horizon_interval,
+    #     apply_atmospheric_refraction=apply_atmospheric_refraction,
+    #     refracted_solar_zenith=refracted_solar_zenith,
+    #     days_in_a_year=days_in_a_year,
+    #     perigee_offset=perigee_offset,
+    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    #     time_offset_global=time_offset_global,
+    #     hour_offset=hour_offset,
+    #     # time_output_units=time_output_units,
+    #     # angle_units=angle_units,
+    #     # angle_output_units=angle_output_units,
+    #     verbose=verbose,
+    # )
 
     if solar_altitude.value > 0:  # the sun is above the horizon
 

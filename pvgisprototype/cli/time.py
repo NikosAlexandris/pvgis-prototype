@@ -23,8 +23,8 @@ from ..api.utilities.timestamp import random_datetimezone
 from ..api.utilities.conversions import convert_to_radians
 from ..api.utilities.conversions import convert_to_degrees_if_requested
 from ..api.geometry.models import SolarTimeModels
-from ..api.geometry.solar_time import calculate_solar_time
-from ..api.geometry.solar_hour_angle import calculate_hour_angle
+from ..api.geometry.time import calculate_solar_time
+from ..api.geometry.hour_angle import calculate_hour_angle
 
 from .typer_parameters import OrderCommands
 from .typer_parameters import typer_argument_longitude

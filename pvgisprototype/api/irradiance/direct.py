@@ -46,8 +46,8 @@ from math import exp
 from math import atan
 import numpy as np
 from datetime import datetime
-from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
+from pvgisprototype.api.geometry.incidence import model_solar_incidence
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
