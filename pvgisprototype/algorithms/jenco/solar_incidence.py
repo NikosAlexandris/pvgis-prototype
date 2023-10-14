@@ -13,7 +13,7 @@ from math import asin
 from math import atan
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
+from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone

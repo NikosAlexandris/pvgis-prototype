@@ -122,6 +122,7 @@ def model_solar_geometry_overview(
 
     if model.value == SolarPositionModels.noaa:
 
+        print('NOAA')
         solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
             # angle_output_units=angle_output_units
@@ -162,6 +163,7 @@ def model_solar_geometry_overview(
     
     if model.value == SolarPositionModels.skyfield:
 
+        print('Skyfield')
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude=longitude,
                 latitude=latitude,
@@ -260,6 +262,7 @@ def model_solar_geometry_overview(
 
     if model.value  == SolarPositionModels.pvis:
 
+        print('PVIS')
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
             # timezone=timezone,

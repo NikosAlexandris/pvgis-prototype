@@ -1,7 +1,7 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarIncidenceInputModel
-from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
+from pvgisprototype.api.geometry.hour_angle import calculate_hour_angle
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_jenco
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
 from pvgisprototype import Latitude
@@ -14,7 +14,7 @@ from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pathlib import Path
 from typing import List
 from pvgisprototype import SolarIncidence
-from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.time import model_solar_time
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
