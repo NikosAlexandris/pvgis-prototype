@@ -234,7 +234,7 @@ def select_time_series(
         data_statistics = calculate_series_statistics(location_time_series)
         print_series_statistics(data_statistics)
         if csv:
-            export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
+            export_statistics_to_csv(data_statistics, 'location_time_series_statistics')
         # return print_series_statistics(series_statistics)
 
     return location_time_series
