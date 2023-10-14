@@ -201,10 +201,12 @@ def diffuse_transmission_function_time_series(
     linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
     linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series_array, 2)
 
+    # From r.pv's source code:
+    # tn = -0.015843 + locLinke * (0.030543 + 0.0003797 * locLinke);
     diffuse_transmission_series = (
         -0.015843
         + 0.030543 * linke_turbidity_factor_series_array
-        + 0.3797 * linke_turbidity_factor_series_squared_array
+        + 0.0003797 * linke_turbidity_factor_series_squared_array
     )
 
     if verbose > 5:
