@@ -24,15 +24,15 @@ from pvgisprototype import SolarHourAngle
 from pvgisprototype import SolarDeclination
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from pvgisprototype.constants import RADIANS
 
 
 @validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel)
 def calculate_solar_position_skyfield(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-    ):
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+):
     """Calculate sun position above the local horizon using Skyfield.
 
     Returns
@@ -82,9 +82,9 @@ def calculate_solar_position_skyfield(
     # except Exception:
     #     logging.warning(f'tzinfo already set for timestamp = {timestamp}')
     # # Handle Me during input validation? -------------------------------------
-    planets = skyfield.api.load('de421.bsp')
-    sun = planets['Sun']
-    earth = planets['Earth']
+    planets = skyfield.api.load("de421.bsp")
+    sun = planets["Sun"]
+    earth = planets["Earth"]
     location = skyfield.api.wgs84.latlon(latitude.degrees, longitude.degrees)
     timescale = skyfield.api.load.timescale()
     requested_timestamp = timescale.from_datetime(timestamp)
@@ -96,11 +96,11 @@ def calculate_solar_position_skyfield(
 
 @validate_with_pydantic(CalculateSolarAltitudeAzimuthSkyfieldInputModel)
 def calculate_solar_altitude_azimuth_skyfield(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-    ) -> Tuple[SolarAltitude, SolarAzimuth]:
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: str = None,
+) -> Tuple[SolarAltitude, SolarAzimuth]:
     """Calculate sun position"""
     solar_position = calculate_solar_position_skyfield(
         longitude=longitude,
@@ -112,25 +112,24 @@ def calculate_solar_altitude_azimuth_skyfield(
 
     solar_altitude = SolarAltitude(
         value=solar_altitude.radians,
-        unit='radians',
+        unit=RADIANS,
     )
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth.radians,
-        unit='radians',
+        unit=RADIANS,
     )
 
-
-    return solar_altitude, solar_azimuth   # distance_to_sun
+    return solar_altitude, solar_azimuth  # , distance_to_sun
 
 
 @validate_with_pydantic(SolarHourAngleSkyfieldInput)
-def calculate_hour_angle_skyfield(      # NOTE gounaol: Declination is also calculated by skyfield.solar_declination.calculate_solar_declination_skyfield
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-        angle_output_units: str = 'radians',
-    ) -> Tuple[SolarHourAngle, SolarDeclination]:
+def calculate_hour_angle_skyfield(  # NOTE gounaol: Declination is also calculated by skyfield.solar_declination.calculate_solar_declination_skyfield
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: str = None,
+    angle_output_units: str = "radians",
+) -> Tuple[SolarHourAngle, SolarDeclination]:
     """Calculate the hour angle ω'
 
     Parameters
@@ -146,36 +145,32 @@ def calculate_hour_angle_skyfield(      # NOTE gounaol: Declination is also calc
         sun's rays measured in radian.
     """
     solar_position = calculate_solar_position_skyfield(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            )
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+    )
     hour_angle, solar_declination, distance_to_sun = solar_position.hadec()
 
-    if angle_output_units == 'minutes':
+    if angle_output_units == "minutes":
         hour_angle = hour_angle.minutes
         solar_declination = solar_declination.minutes
 
-    if angle_output_units == 'hours':
+    if angle_output_units == "hours":
         hour_angle = hour_angle.hours
         solar_declination = solar_declination.hours
 
-    if angle_output_units == 'radians':
+    if angle_output_units == "radians":
         hour_angle = hour_angle.radians
         solar_declination = solar_declination.radians
 
-    if angle_output_units == 'degrees':
+    if angle_output_units == "degrees":
         hour_angle = hour_angle._degrees
         solar_declination = solar_declination.degrees
 
-    hour_angle = SolarHourAngle(
-        value=hour_angle,
-        unit=angle_output_units
-    )
+    hour_angle = SolarHourAngle(value=hour_angle, unit=angle_output_units)
     solar_declination = SolarDeclination(
-        value=solar_declination,
-        unit=angle_output_units
+        value=solar_declination, unit=angle_output_units
     )
 
     return hour_angle, solar_declination
