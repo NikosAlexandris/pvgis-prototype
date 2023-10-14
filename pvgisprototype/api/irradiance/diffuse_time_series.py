@@ -49,7 +49,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude_series
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
@@ -66,14 +65,12 @@ from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_ho
 from pvgisprototype.api.irradiance.direct_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
-# from pvgisprototype.api.geometry.solar_declination_time_series import model_solar_declination_time_series
 from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
 from pvgisprototype.api.geometry.solar_azimuth_time_series import model_solar_azimuth_time_series
-
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -568,6 +565,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     #     print_series_statistics(data_statistics, title='Diffuse horizontal irradiance from SARAH')
     #     if csv:
     #         export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance_series')
+
     # Reporting --------------------------------------------------------------
     results = {
         "Diffuse": diffuse_inclined_irradiance_series,
@@ -575,7 +573,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
     title = 'Diffuse'
 
     if verbose > 1 :
-        # solar_declination_series_array = np.array([declination.value for declination in solar_declination_series])
         extended_results = {
             "Loss": 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
             "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
