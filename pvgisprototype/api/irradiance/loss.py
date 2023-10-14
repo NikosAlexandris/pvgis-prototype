@@ -108,13 +108,10 @@ def calculate_angular_loss_factor_for_direct_irradiance(
         br *= (1 - exp(-sh / a_r)) * angular_loss_denom;
         ```
 
-
-        - `cos (aoi)`  !=  `(-sin(aoi))`
-
         where:
 
         - br : direct inclined irradiance
-        - sh : _sine_ of solar incidence angle (as per Jenco)
+        - sh : _sine_ of solar incidence angle (as per Jenco) *Error*
         - a_r : angular loss coefficient
 
 
