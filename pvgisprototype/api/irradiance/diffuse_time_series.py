@@ -163,15 +163,15 @@ def calculate_diffuse_sky_irradiance_time_series(
     """
     sky_view_fraction = (1 + cos(surface_tilt)) / 2
     diffuse_sky_irradiance_series = sky_view_fraction
-    +(
+    + (
         sin(surface_tilt)
         - surface_tilt
         * cos(surface_tilt)
         - pi
         * sin(surface_tilt / 2) ** 2
-    ) * n_series
+    )
 
-    return diffuse_sky_irradiance_series
+    return diffuse_sky_irradiance_series * n_series
 
 
 @app.command(
