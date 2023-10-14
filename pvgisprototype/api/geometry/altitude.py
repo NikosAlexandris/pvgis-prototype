@@ -23,11 +23,8 @@ from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.api.utilities.timestamp import attach_timezone
-
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
-import suncalc
-import pysolar
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
