@@ -419,4 +419,3 @@ def calculate_global_irradiance_time_series(
         )
 
     return global_irradiance_series
-

@@ -215,7 +215,7 @@ def calculate_effective_irradiance_time_series(
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
         verbose=verbose,
-        )
+    )
     solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
 
     # Masks based on the solar altitude series
