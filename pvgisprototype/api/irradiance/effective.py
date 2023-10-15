@@ -305,16 +305,6 @@ def calculate_effective_irradiance(
        to the beam, diffuse, and reflected radiation.
     """
     in_shade = is_surface_in_shade()
-    # solar_declination = model_solar_declination(
-    #     timestamp=timestamp,
-    #     timezone=timezone,
-    #     model=solar_declination_model,
-    #     days_in_a_year=days_in_a_year,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
-    #     perigee_offset=perigee_offset,
-    #     # angle_output_units=angle_output_units,
-    #     verbose=verbose,
-    # )
     solar_altitude = model_solar_altitude(
         longitude=longitude,
         latitude=latitude,
@@ -333,52 +323,6 @@ def calculate_effective_irradiance(
         # angle_output_units=angle_output_units,
         verbose=verbose,
     )
-    solar_time = model_solar_time(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        model=solar_time_model,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
-        verbose=verbose,
-    )
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = (solar_time_decimal_hours - 12) * np.radians(15)
-    # hour_angle = (solar_time.as_hours - 12) * np.radians(15)
-    # solar_incidence_angle = model_solar_incidence(
-    #     longitude=longitude,
-    #     latitude=latitude,
-    #     timestamp=timestamp,
-    #     timezone=timezone,
-    #     solar_time_model=solar_time_model,
-    #     solar_incidence_model=solar_incidence_model,
-    #     # hour_angle=hour_angle,
-    #     surface_tilt=surface_tilt,
-    #     surface_orientation=surface_orientation,
-    #     # shadow_indicator=shadow_indicator,
-    #     # horizon_heights=horizon_heights,
-    #     # horizon_interval=horizon_interval,
-    #     apply_atmospheric_refraction=apply_atmospheric_refraction,
-    #     refracted_solar_zenith=refracted_solar_zenith,
-    #     days_in_a_year=days_in_a_year,
-    #     perigee_offset=perigee_offset,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
-    #     time_offset_global=time_offset_global,
-    #     hour_offset=hour_offset,
-    #     # time_output_units=time_output_units,
-    #     # angle_units=angle_units,
-    #     # angle_output_units=angle_output_units,
-    #     verbose=verbose,
-    # )
 
     if solar_altitude.value > 0:  # the sun is above the horizon
 
@@ -467,28 +411,35 @@ def calculate_effective_irradiance(
     else:  # the sun is below the horizon
         direct_irradiance = diffuse_irradiance = reflected_irradiance = 0
 
-    if not efficiency_model and not efficiency:
-        efficiency_coefficient = system_efficiency
+    # sum components
+    global_irradiance = direct_irradiance + diffuse_irradiance + reflected_irradiance
 
-    if not efficiency_model and efficiency:
-        efficiency_coefficient = efficiency
+    if not efficiency_model:
+        if not efficiency:
+            print(f'Using preset system efficiency {system_efficiency}')
+            efficiency_coefficient_series = system_efficiency
+        else:
+            print(f'Efficiency set to {efficiency}')
+            efficiency_coefficient_series = efficiency
+    else:
+        if not efficiency:
+            print(f'Using PV module efficiency algorithm {efficiency_model}')
+            efficiency_coefficient = calculate_pv_efficiency(
+                irradiance=global_irradiance,
+                temperature=temperature,
+                model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
+                standard_test_temperature=TEMPERATURE_DEFAULT,
+                wind_speed=wind_speed,
+                use_faiman_model=False,
+            )
 
-    if efficiency_model and not efficiency:
-        total_irradiance = direct_irradiance + diffuse_irradiance + reflected_irradiance
-        # total_irradiance = np.sum(direct_radiation) + np.sum(diffuse_radiation) + np.sum(reflected_radiation)
-        efficiency_coefficient = calculate_pv_efficiency(
-            irradiance=total_irradiance,
-            temperature=temperature,
-            model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
-            standard_test_temperature=TEMPERATURE_DEFAULT,
-            wind_speed=wind_speed,
-            use_faiman_model=False,
-        )
-
-    result = efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
+    effective_irradiance = (
+        global_irradiance * efficiency_coefficient
+    )
 
     if verbose == 3:
         debug(locals())
+
     if verbose > 1:
         print(f'Hourly irradiance components incident on a surface on {timestamp}')
         surface_tilt = convert_float_to_degrees_if_requested(surface_tilt, 'degrees')
@@ -496,8 +447,8 @@ def calculate_effective_irradiance(
         print(f'Surface tilted at {surface_tilt} oriented at {surface_orientation}')
         print(f'Direct, Diffuse, Reflected : {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance}')
         print(f'Efficiency factor : {efficiency_coefficient}')
-        print(f'Effective irradiances : {result}')
+        print(f'Effective irradiances : {effective_irradiance}')
     if verbose > 0:
-        print(f'Total irradiance : {np.sum(result)}')
+        print(f'Total irradiance : {global_irradiance}')
 
-    return result
+    return effective_irradiance
