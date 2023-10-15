@@ -310,6 +310,32 @@ def parse_timestamp(
 
 # Time series
 
+def get_days_in_year(year):
+    """ Calculate the number of days in a given year, accounting for leap years.
+
+    Parameters
+    ----------
+    year : int
+        The year for which to calculate the number of days.
+
+    Returns
+    -------
+    int
+        The number of days in the given year.
+
+    Examples
+    --------
+    >>> get_days_in_year(2020)
+    366
+
+    >>> get_days_in_year(2021)
+    365
+    """
+    start_date = datetime(year, 1, 1)  # First day of the year
+    end_date = datetime(year + 1, 1, 1)  # First day of the next year
+    return (end_date - start_date).days
+
+
 def parse_timestamp_series(
     # ctx: typer.Context,
     timestamps: Union[str, datetime, List[datetime]],
@@ -338,6 +364,14 @@ def parse_timestamp_series(
         return datetime_strings
 
 
+def generate_timestamps_for_a_year(year, frequency_minutes=60):
+    start_date = datetime(year, 1, 1)
+    days_in_year = get_days_in_year(year)
+    end_date = start_date + timedelta(days=days_in_year)
+    total_minutes = int((end_date - start_date).total_seconds() // 60)
+    intervals = total_minutes // frequency_minutes
+    
+    return [start_date + timedelta(minutes=(idx * frequency_minutes)) for idx in range(intervals)]
 
 
 def generate_datetime_series(
