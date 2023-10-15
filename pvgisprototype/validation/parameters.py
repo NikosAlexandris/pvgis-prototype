@@ -9,6 +9,7 @@ from typing import List
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import time
+from pandas import DatetimeIndex
 from math import pi
 from pydantic import validator
 import numpy as np
@@ -87,13 +88,17 @@ class BaseTimestampModel(BaseModel):
 
 
 class BaseTimestampSeriesModel(BaseModel):
-    timestamps: Union[datetime, Sequence[datetime]]
+    timestamps: Union[datetime, Sequence[datetime], DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamps')
     def check_empty_list(cls, value):
         if isinstance(value, list) and not value:
             raise ValueError('Empty list of timestamps provided')
+        if isinstance(value, DatetimeIndex):
+            return value.to_pydatetime().tolist()
+        if isinstance(value, str):
+            return [value]
         return value
 
 
