@@ -400,7 +400,8 @@ def print_irradiance_table_2(
                 round_float_values(longitude, rounding_places),
                 round_float_values(latitude, rounding_places),
             ]
-        row.append(timestamp.strftime('%Y-%m-%d %H:%M:%S'))
+        from pandas import to_datetime
+        row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
         for value in values:
             if not isinstance(value, str):
                 row.append(str(round_float_values(value, rounding_places)))
