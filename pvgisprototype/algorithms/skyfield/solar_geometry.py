@@ -99,7 +99,6 @@ def calculate_solar_altitude_azimuth_skyfield(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
-    timezone: str = None,
 ) -> Tuple[SolarAltitude, SolarAzimuth]:
     """Calculate sun position"""
     solar_position = calculate_solar_position_skyfield(
@@ -108,7 +107,6 @@ def calculate_solar_altitude_azimuth_skyfield(
         timestamp=timestamp,
     )
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
-
     solar_altitude = SolarAltitude(
         value=solar_altitude.radians,
         unit=RADIANS,
