@@ -249,13 +249,16 @@ def plot(
     help=f'  Plot time series in the terminal',)
 def uniplot(
     time_series: Annotated[Path, typer_argument_time_series],
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
-    variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
-    tufte_style: Annotated[bool, typer_option_tufte_style] = False,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     lines: bool = True,
     title: str = 'Uniplot',
     unit: str = UNITS_NAME,  #" °C")
@@ -267,23 +270,33 @@ def uniplot(
         time_series=time_series,
         longitude=longitude,
         latitude=latitude,
-        timestamps=timestamp,
-        convert_longitude_360=convert_longitude_360,
-        statistics=False,
-        output_filename=None,
-        variable_name_as_suffix=variable_name_as_suffix,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        nearest_neighbor_lookup=nearest_neighbor_lookup,
+        inexact_matches_method=inexact_matches_method,
+        tolerance=tolerance,
+        # in_memory=in_memory,
         verbose=verbose,
     )
-    supertitle = f'{data_array.long_name}'
-    y_label = data_array.units
-    plot(
-        # x=data_array,
-        # xs=data_array,
-        ys=data_array,
-        lines=True,
-        title=supertitle,
-        y_unit=" °C",
-    )
+    if isinstance(data_array, float):
+        print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
+        typer.Abort()
+
+    if isinstance(data_array, xr.DataArray):
+        supertitle = f'{data_array.long_name}'
+        unit = data_array.units
+        debug(locals())
+        plot(
+            # x=data_array,
+            # xs=data_array,
+            ys=data_array,
+            lines=lines,
+            title=supertitle,
+            y_unit=unit,
+        )
 
 
 if __name__ == "__main__":
