@@ -2,7 +2,9 @@ from devtools import debug
 
 import typer
 from typing_extensions import Annotated
+from typing import Any
 from typing import Optional
+from typing import List
 from typing import Tuple
 from enum import Enum
 
@@ -31,6 +33,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from rich import print
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
@@ -196,33 +199,46 @@ def resample(
 )
 def plot(
     time_series: Annotated[Path, typer_argument_time_series],
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
     timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     tufte_style: Annotated[bool, typer_option_tufte_style] = False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot selected time series"""
     data_array = select_time_series(
-            time_series=time_series,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            convert_longitude_360=convert_longitude_360,
-            output_filename=output_filename,
-            variable_name_as_suffix=variable_name_as_suffix,
-            )
+        time_series=time_series,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        nearest_neighbor_lookup=nearest_neighbor_lookup,
+        inexact_matches_method=inexact_matches_method,
+        tolerance=tolerance,
+        # in_memory=in_memory,
+        verbose=verbose,
+    )
     try:
-        output_filename = plot_series(
-                data_array=data_array,
-                timestamps=timestamps,
-                figure_name=output_filename,
-                # add_offset=add_offset,
-                variable_name_as_suffix=variable_name_as_suffix,
-                tufte_style=tufte_style,
-                )
+        plot_series(
+            data_array=data_array,
+            time=timestamps,
+            figure_name=output_filename,
+            # add_offset=add_offset,
+            variable_name_as_suffix=variable_name_as_suffix,
+            tufte_style=tufte_style,
+        )
     except Exception as exc:
         typer.echo(f"Something went wrong in plotting the data: {str(exc)}")
         raise SystemExit(33)
