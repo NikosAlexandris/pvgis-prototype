@@ -1,4 +1,5 @@
 from devtools import debug
+from rich import print
 import warnings
 import typer
 import netCDF4
@@ -219,12 +220,14 @@ def select_location_time_series(
     try:
         location_time_series = data_array.sel(
                 **indexers,
-                method=inexact_matches_method)
+                method=inexact_matches_method,
+                tolerance=tolerance,)
         # location_time_series.load()  # load into memory for fast processing
     except Exception as exc:
-        typer.echo(f"Something went wrong in selecting the data: {str(exc)}")
+        print(f"Something went wrong in selecting the data: {str(exc)}")
         raise SystemExit(33)
 
     if verbose == 3:
         debug(locals())
+
     return location_time_series
