@@ -99,7 +99,7 @@ from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.cli.series import select_time_series
+from pvgisprototype.api.series.select import select_time_series
 # from pvgisprototype.api.series.utilities import select_location_time_series
 from pathlib import Path
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
