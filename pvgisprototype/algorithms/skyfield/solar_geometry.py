@@ -106,7 +106,6 @@ def calculate_solar_altitude_azimuth_skyfield(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
-        timezone=timezone,
     )
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
 
