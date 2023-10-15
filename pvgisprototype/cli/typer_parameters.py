@@ -483,7 +483,7 @@ def linke_turbidity_callback(value: str, ctx: Context):
         return [LinkeTurbidityFactor(value=v, unit=LINKE_TURBIDITY_FACTOR_UNIT) for v in parsed_values]
 
     timestamps = ctx.params.get('timestamps')
-    if timestamps:
+    if timestamps is not None:
         return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_FACTOR_UNIT) for _ in timestamps]
     else:
         return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_FACTOR_UNIT)]
