@@ -286,6 +286,58 @@ def get_day_from_hour_of_year(year: int, hour_of_year: int):
 
 # Single timestamp
 
+def parse_timestamp(
+    ctx: typer.Context,
+    timestamp_string: str,
+    param: typer.CallbackParam,
+) -> datetime:
+    print(f'[yellow]i[/yellow] Context: {ctx}')
+    print(f'[yellow]i[/yellow] Context: {ctx.params}')
+    print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
+    # if timestamp_string:
+    #     formats = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%Y-%m', '%Y']
+    #     for fmt in formats:
+    #         try:
+    #             return datetime.strptime(timestamp_string, fmt)
+    #         except ValueError:
+    #             pass
+    #     raise ValueError(f"Invalid timestamp format: {timestamp_string}")
+    # else:
+    #     return None
+    from pandas import to_datetime
+    return to_datetime(timestamp_string, errors='raise')
+
+
+# Time series
+
+def parse_timestamp_series(
+    # ctx: typer.Context,
+    timestamps: Union[str, datetime, List[datetime]],
+    # param: typer.CallbackParam,
+):
+    # print(f"[yellow]i[/yellow] Context: {ctx}")
+    # print(f"[yellow]i[/yellow] Context: {ctx.params}")
+    # print(f"[yellow]i[/yellow] typer.CallbackParam: {param}")
+    print(f"[yellow]i[/yellow] Runnning the parse_timestamp_series() function!")
+    # print(f"  Input [yellow]timestamps[/yellow] : {timestamps}")
+    # print(f"  Type : {type(timestamps)}")
+
+    if isinstance(timestamps, str):
+        datetime_strings = timestamps.strip().split(",")
+        # print(f"  Returning : {datetime_strings}")
+        return datetime_strings  # List of strings
+
+    if isinstance(timestamps, datetime):
+        return_value = [timestamps]
+        # print(f"  Returning : {return_value}")
+        return [timestamps]  # return a list in case of a single datetime object
+
+    if isinstance(timestamps, list):
+        datetime_strings = [string.strip() for string in timestamps]
+        # print(f"Returning: {datetime_strings}")
+        return datetime_strings
+
+
 
 
 def generate_datetime_series(
@@ -308,23 +360,32 @@ def generate_datetime_series(
     freq = np.timedelta64(1, frequency)
     timestamps = np.arange(start, end + freq, freq)  # +freq to include the end time
 
-    return timestamps.astype('datetime64')
+    from pandas import DatetimeIndex
+    timestamps = DatetimeIndex(timestamps.astype('datetime64[ns]'))
+    return timestamps.astype('datetime64[ns]')
 
 
 def callback_generate_datetime_series(
     ctx: typer.Context,
-    value: Union[str, datetime, List[datetime]],
-    # param: typer.CallbackParam,
-) -> Optional[List[datetime]]:
-    # print(f'[yellow]i[/yellow] Context: {ctx}')
-    # print(f'[yellow]i[/yellow] Context: {ctx.params}')
+    timestamps: str,
+    # timestamps: List[datetime],
+    # value: Union[str, datetime, List[datetime]],
+    param: typer.CallbackParam,
+):
+    print("[yellow]i[/yellow] Runnning the callback_generate_datetime_series() function!")
+    print(f'[yellow]i[/yellow] Context: {ctx.params}')
     # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
-    # print(f'  Value: {value}')
+    # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
     start_time = ctx.params.get('start_time')
     end_time = ctx.params.get('end_time')
-    if start_time is not None and end_time is not None:
-        frequency = ctx.params.get('frequency', 'h')
-        timestamps = generate_datetime_series(start_time, end_time, frequency)
-        return timestamps.tolist()
+    frequency = ctx.params.get('frequency', 'h')
 
-    return value
+    if start_time is not None and end_time is not None:
+        timestamps = generate_datetime_series(start_time, end_time, frequency)
+        print(f" Returning [yellow]timestamps[/yellow] : {timestamps}")
+        return timestamps
+
+    else:
+        from pandas import to_datetime
+        print(f" Returning [yellow]timestamps[/yellow] : {to_datetime(timestamps)}")
+        return to_datetime(timestamps, format='mixed')
