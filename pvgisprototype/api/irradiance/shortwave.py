@@ -110,7 +110,7 @@ def estimate_global_irradiance(
         elevation=elevation,
         timestamp=timestamp,
         timezone=timezone,
-        direct_horizontal_component=direct_horizontal_irradiance,
+        direct_horizontal_component=direct_horizontal_component,
         mask_and_scale=mask_and_scale,
         inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
@@ -184,6 +184,6 @@ def estimate_global_irradiance(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
-    shortwave_irradiance = direct_irradiance + diffuse_irradiance
+    global_irradiance = direct_irradiance + diffuse_irradiance + reflected_irradiance
 
-    return shortwave_irradiance
+    return global_irradiance
