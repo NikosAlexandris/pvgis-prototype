@@ -15,7 +15,7 @@ from bokeh.plotting import figure
 from bokeh.plotting import output_file
 from bokeh.plotting import save
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
+from pvgisprototype.api.geometry.declination import calculate_solar_declination
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
 from pvgisprototype.algorithms.pvgis.solar_declination import calculate_solar_declination_pvgis
