@@ -15,13 +15,9 @@ from enum import Enum
 from pathlib import Path
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.series.models import MethodsForInexactMatches
-
-
-# Hardcodings
-# exclamation_mark = u'\N{heavy exclamation mark symbol}'
-exclamation_mark = u'\N{exclamation mark}'
-check_mark = u'\N{check mark}'
-x_mark = u'\N{Ballot Script X}'
+from pvgisprototype.api.series.hardcodings import exclamation_mark
+from pvgisprototype.api.series.hardcodings import check_mark
+from pvgisprototype.api.series.hardcodings import x_mark
 
 
 def load_or_open_dataarray(function, filename_or_object, mask_and_scale):
