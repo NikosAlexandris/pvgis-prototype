@@ -70,7 +70,7 @@ from pydantic import validator
 from math import radians
 from math import degrees
 from pathlib import Path
-from pvgisprototype.cli.series import select_time_series
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude

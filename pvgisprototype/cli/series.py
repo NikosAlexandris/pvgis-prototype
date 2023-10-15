@@ -44,9 +44,9 @@ import logging
 from pvgisprototype.api.series.log import logger
 import warnings
 
+from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
-from pvgisprototype.api.series.utilities import get_scale_and_offset
-from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.plot import plot_series
 
 from pvgisprototype.api.series.hardcodings import exclamation_mark
@@ -72,13 +72,6 @@ app = typer.Typer(
 )
 
 
-class MethodsForInexactMatches(str, Enum):
-    none = None # only exact matches
-    pad = 'pad' # ffill: propagate last valid index value forward
-    backfill = 'backfill' # bfill: propagate next valid index value backward
-    nearest = 'nearest' # use nearest valid index value
-
-
 def warn_for_negative_longitude(
     longitude: Longitude = None,
 ):
@@ -95,17 +88,16 @@ def warn_for_negative_longitude(
         typer.echo(Fore.YELLOW + warning)
 
 
-# @app.callback('series', invoke_without_command=True)
 @app.command(
     'select',
     no_args_is_help=True,
     help='  Select time series over a location',
 )
-def select_time_series(
+def select(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    timestamps: Annotated[Optional[Any], typer_argument_timestamps],
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
@@ -125,92 +117,22 @@ def select_time_series(
         longitude = longitude % 360
     warn_for_negative_longitude(longitude)
 
-    logger.handlers = []  # Remove any existing handlers
-    file_handler = logging.FileHandler(f'{output_filename}_{time_series.name}.log')
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s, %(msecs)d; %(levelname)-8s; %(lineno)4d: %(message)s", datefmt="%I:%M:%S")
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    logger.info(f'Dataset : {time_series.name}')
-    logger.info(f'Path to : {time_series.parent.absolute()}')
-    scale_factor, add_offset = get_scale_and_offset(time_series)
-    logger.info(f'Scale factor : {scale_factor}, Offset : {add_offset}')
-
-    if (longitude and latitude):
-        coordinates = f'Coordinates : {longitude}, {latitude}'
-        logger.info(coordinates)
-
-    location_time_series = select_location_time_series(
+    location_time_series = select_time_series(
         time_series=time_series,
         longitude=longitude,
         latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        nearest_neighbor_lookup=nearest_neighbor_lookup,
         inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
+        in_memory=in_memory,
+        variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
     )
-    # ------------------------------------------------------------------------
-    if start_time or end_time:
-        timestamps = None  # we don't need a timestamp anymore!
-
-        if start_time and not end_time:  # set `end_time` to end of series
-            end_time = location_time_series.time.values[-1]
-            # end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
-
-        elif end_time and not start_time:  # set `start_time` to beginning of series
-            start_time = location_time_series.time.values[0]
-            # start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-
-        else:  # Convert `start_time` & `end_time` to the correct string format
-            # if isinstance(start_time, datetime):
-            start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-            # if isinstance(end_time, datetime):
-            end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
-    
-        location_time_series = (
-            location_time_series.sel(time=slice(start_time, end_time))
-        )
-
-    
-    # if 'timestamps' is a single datetime object, parse it
-    if isinstance(timestamps, datetime):
-        timestamps = parse_timestamp_series(timestamps)
-
-    if timestamps and not start_time and not end_time:
-        # convert timestamp to ISO format string without fractional seconds
-        # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        time_array = np.array([t.strftime('%Y-%m-%d %H:%M:%S') for t in timestamps])
-        if not nearest_neighbor_lookup:
-            inexact_matches_method = None
-        try:
-            location_time_series = (
-                location_time_series.sel(time=time_array, method=inexact_matches_method)
-            )
-        except KeyError:
-            print("No data found for one or more of the given timestamps.")
-
-    if location_time_series.size == 1:
-        single_value = float(location_time_series.values)
-        print(f'Indexes : {location_time_series.indexes}')
-        warning = (
-            Fore.YELLOW
-            + f"{exclamation_mark} The selected timestamp "
-            + Fore.GREEN
-            + f"{location_time_series[location_time_series.indexes].time.values}"
-            + Fore.YELLOW
-            + f" matches the single value "
-            + Fore.GREEN
-            + f'{single_value}'
-            + Style.RESET_ALL
-        )
-
-        logger.warning(warning)
-        if verbose > 0:
-            typer.echo(Fore.YELLOW + warning)
-        if verbose == 3:
-            debug(locals())
-
-        return single_value
-
     # if output_filename:
     #     output_filename = Path(output_filename)
     #     extension = output_filename.suffix.lower()
@@ -224,10 +146,8 @@ def select_time_series(
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
 
-    if verbose == 3:
+    if verbose == 5:
         debug(locals())
-    if verbose > 0:
-        print(f'Series : {location_time_series.values}')
 
     # statistics after echoing series which might be Long!
     if statistics:
@@ -235,9 +155,12 @@ def select_time_series(
         print_series_statistics(data_statistics)
         if csv:
             export_statistics_to_csv(data_statistics, 'location_time_series_statistics')
-        # return print_series_statistics(series_statistics)
 
-    return location_time_series
+    if isinstance(location_time_series, float):
+        print(float)
+
+    if isinstance(location_time_series, xr.DataArray):
+        print(f'Series : {location_time_series.values}')
 
 
 @app.command(
