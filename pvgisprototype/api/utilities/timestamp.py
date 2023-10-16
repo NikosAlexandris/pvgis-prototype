@@ -416,10 +416,8 @@ def callback_generate_datetime_series(
 
     if start_time is not None and end_time is not None:
         timestamps = generate_datetime_series(start_time, end_time, frequency)
-        print(f" Returning [yellow]timestamps[/yellow] : {timestamps}")
         return timestamps
 
     else:
         from pandas import to_datetime
-        print(f" Returning [yellow]timestamps[/yellow] : {to_datetime(timestamps)}")
         return to_datetime(timestamps, format='mixed')

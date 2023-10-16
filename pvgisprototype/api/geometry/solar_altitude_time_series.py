@@ -26,7 +26,6 @@ def model_solar_altitude_time_series(
     # solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     # time_offset_global: float = 0,
     # hour_offset: float = 0,
-    # days_in_a_year: float = 365.25,
     # perigee_offset: float = 0.048869,
     # eccentricity_correction_factor: float = 0.01672,
     # time_output_units: str = 'minutes',

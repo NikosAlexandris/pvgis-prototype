@@ -53,7 +53,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
@@ -338,7 +337,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
@@ -392,7 +390,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_constant=solar_constant,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
@@ -428,7 +425,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
             solar_time_model=solar_time_model,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
@@ -475,7 +471,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
             random_time_series=random_time_series,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
