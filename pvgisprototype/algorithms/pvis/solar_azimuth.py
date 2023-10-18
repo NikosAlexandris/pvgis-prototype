@@ -14,7 +14,7 @@ from pvgisprototype import SolarAzimuth
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
-from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.time import model_solar_time
 
 
 def convert_east_to_north_radians_convention(azimuth_east_radians):
@@ -58,7 +58,7 @@ def calculate_solar_azimuth_pvis(
         timezone=timezone,
         solar_time_model=solar_time_model,
     )
-    hour_angle = calculate_hour_angle(
+    hour_angle = calculate_solar_hour_angle_pvis(
         solar_time=solar_time,
     )
     cosine_solar_azimuth = (C11 * cos(hour_angle.radians) + C13) / pow(
@@ -73,4 +73,9 @@ def calculate_solar_azimuth_pvis(
     # convert east to north zero degrees convention --------------------------
     solar_azimuth = SolarAzimuth(value=solar_azimuth, unit=RADIANS) # zero_direction = 'East'
 
-    return solar_azimuth
+    return SolarAzimuth(
+        value=solar_azimuth,
+        unit=RADIANS,
+        position_algorithm='PVIS',
+        timing_algorithm=solar_time_model.value,
+    ) # zero_direction='East'

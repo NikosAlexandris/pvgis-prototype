@@ -101,11 +101,24 @@ def calculate_solar_altitude_azimuth_skyfield(
     solar_altitude = SolarAltitude(
         value=solar_altitude.radians,
         unit=RADIANS,
+        position_algorithm='Skyfield',
+        timing_algorithm='Skyfield',
     )
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth.radians,
         unit=RADIANS,
+        position_algorithm='Skyfield',
+        timing_algorithm='Skyfield',
     )
+
+    if (
+        not isfinite(solar_altitude.degrees)
+        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+        )
 
     return solar_altitude, solar_azimuth  # , distance_to_sun
 
@@ -142,10 +155,14 @@ def calculate_solar_hour_angle_declination_skyfield(
     hour_angle = SolarHourAngle(
         value=hour_angle.radians,
         unit='radians',
+        position_algorithm='Skyfield',
+        timing_algorithm='Skyfield',
     )
     solar_declination = SolarDeclination(
         value=solar_declination.radians,
         unit='radians',
+        position_algorithm='Skyfield',
+        timing_algorithm='Skyfield',
     )
 
     return hour_angle, solar_declination

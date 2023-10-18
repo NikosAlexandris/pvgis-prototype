@@ -25,7 +25,10 @@ from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.api.irradiance.diffuse import  calculate_diffuse_inclined_irradiance
 from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_inclined_irradiance
+from pvgisprototype.api.geometry.incidence import model_solar_incidence
+from pvgisprototype.api.geometry.declination import model_solar_declination
 from pvgisprototype.api.geometry.altitude import model_solar_altitude
+from pvgisprototype.api.geometry.time import model_solar_time
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -290,16 +293,14 @@ def calculate_effective_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
+        solar_position_model=solar_position_model,
+        solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        solar_time_model=solar_time_model,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
 
