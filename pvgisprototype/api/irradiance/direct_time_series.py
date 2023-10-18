@@ -11,8 +11,14 @@ from pvgisprototype.api.irradiance.direct import adjust_elevation
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
+from pvgisprototype.api.geometry.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
+from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from typing import Annotated
 from typing import Optional
 from typing import Union
@@ -83,21 +89,15 @@ from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_radians_if_requested
-
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAltitude
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import OpticalAirMass
 from pvgisprototype import RayleighThickness
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.series.select import select_time_series
 # from pvgisprototype.api.series.utilities import select_location_time_series
 from pathlib import Path
-
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.cli.print import print_irradiance_table_2
@@ -114,7 +114,7 @@ app = typer.Typer(
 
 def correct_linke_turbidity_factor_time_series(
     linke_turbidity_factor_series: Union[ List[LinkeTurbidityFactor], LinkeTurbidityFactor] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    verbose: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> Union[List[LinkeTurbidityFactor], LinkeTurbidityFactor]:
     """
     Vectorized function to calculate the air mass 2 Linke atmospheric turbidity factor for a time series.
@@ -246,6 +246,7 @@ def calculate_optical_air_mass_time_series(
 
     if verbose > 5:
         debug(locals())
+
     if verbose > 1:
         print(f'Optical air mass series : {optical_air_mass_series}')
 
@@ -254,8 +255,8 @@ def calculate_optical_air_mass_time_series(
 
 def rayleigh_optical_thickness_time_series(
     optical_air_mass_series: Union[List[OpticalAirMass], OpticalAirMass] = OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
-    verbose: int = 0,
-):
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+) -> List[RayleighThickness]:
     """Vectorized function to calculate Rayleigh optical thickness for a time series."""
     # Check if input is scalar or array-like
     is_scalar = False
@@ -332,15 +333,16 @@ def calculate_direct_normal_irradiance_time_series(
         linke_turbidity_factor_series,
         verbose=verbose,
     )
-    rayleigh_thickness_series = rayleigh_optical_thickness_time_series(
+    rayleigh_optical_thickness_series = rayleigh_optical_thickness_time_series(
         optical_air_mass_series,
         verbose=verbose,
     )
-    # Unpack the custom objects into NumPy arrays
+
+    # Unpack custom objects into NumPy arrays
     linke_turbidity_factor_series_array = np.array([lt.value for lt in linke_turbidity_factor_series])
     corrected_linke_turbidity_factor_series_array = np.array([clt.value for clt in corrected_linke_turbidity_factor_series])
     optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
-    rayleigh_thickness_series_array = np.array([rt.value for rt in rayleigh_thickness_series])
+    rayleigh_optical_thickness_series_array = np.array([rt.value for rt in rayleigh_optical_thickness_series])
 
     # Calculate
     direct_normal_irradiance_series = (
@@ -348,7 +350,7 @@ def calculate_direct_normal_irradiance_time_series(
         * np.exp(
             corrected_linke_turbidity_factor_series_array
             * optical_air_mass_series_array
-            * rayleigh_thickness_series_array
+            * rayleigh_optical_thickness_series_array
         )
     )
 
@@ -375,8 +377,8 @@ def calculate_direct_normal_irradiance_time_series(
         extended_results = {
             "Extra. normal": extraterrestrial_normal_irradiance_series,
             "Linke Adjusted": corrected_linke_turbidity_factor_series_array,
-            "Rayleigh": rayleigh_thickness_series_array,
             "Linke": linke_turbidity_factor_series_array,
+            "Rayleigh": rayleigh_optical_thickness_series_array,
             "Air mass": np.array([x.value for x in optical_air_mass_series]),
         }
         results = results | extended_results
@@ -402,13 +404,13 @@ def calculate_direct_horizontal_irradiance_time_series(
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,#Annotated[Optional[ZoneInfo], typer_option_timezone] = None,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT],
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -459,7 +461,6 @@ def calculate_direct_horizontal_irradiance_time_series(
         verbose=verbose,
     )
     # ^^^ --------------------------------- expects solar altitude in degrees!
-
     direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
         timestamps=timestamps,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
@@ -489,6 +490,8 @@ def calculate_direct_horizontal_irradiance_time_series(
     results = {
             "Horizontal": direct_horizontal_irradiance_series,
     }
+    title = 'Direct'
+
     if verbose > 1:
         extended_results = {
             'Normal': direct_normal_irradiance_series,
@@ -497,6 +500,7 @@ def calculate_direct_horizontal_irradiance_time_series(
             "Altitude": solar_altitude_series_array,
         }
         results = results | extended_results
+        title += ' & components'
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -505,7 +509,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         latitude=latitude,
         timestamps=timestamps,
         dictionary=results,
-        title='Direct horizontal irradiance series',
+        title=title + f" horizontal irradiance series {IRRADIANCE_UNITS}",
         rounding_places=rounding_places,
         verbose=verbose,
     )
@@ -536,9 +540,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
-    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,

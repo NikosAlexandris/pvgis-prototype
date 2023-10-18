@@ -49,6 +49,7 @@ def atmospheric_refraction_for_high_solar_altitude(
 
     if verbose == 3:
         debug(locals())
+
     return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
 
 
@@ -78,6 +79,7 @@ def atmospheric_refraction_for_near_horizon(
 
     if verbose == 3:
         debug(locals())
+
     return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
 
 
@@ -101,6 +103,7 @@ def atmospheric_refraction_for_below_horizon(
 
     if verbose == 3:
         debug(locals())
+
     return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
 
 
@@ -162,8 +165,9 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
+
     return solar_zenith
 
 
@@ -225,8 +229,9 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     if angle_output_units == 'degrees':
         adjusted_solar_zenith_series = convert_series_to_degrees_if_requested(adjusted_solar_zenith_series, angle_output_units)
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
+
     return adjusted_solar_zenith_series
 
 
