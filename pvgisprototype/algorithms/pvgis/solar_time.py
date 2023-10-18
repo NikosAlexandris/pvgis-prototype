@@ -8,7 +8,6 @@ from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimePVGISInputModel
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 
@@ -19,7 +18,6 @@ def calculate_solar_time_pvgis(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,  # from the C code : = 0.165
     time_offset_global: float = 0,
@@ -53,7 +51,8 @@ def calculate_solar_time_pvgis(
     year = timestamp.year
     start_of_year = datetime(year=year, month=1, day=1, tzinfo=timestamp.tzinfo)
     day_of_year = timestamp.timetuple().tm_yday
-    day_of_year_in_radians = double_numpi * day_of_year / days_in_a_year  
+    days_in_year = get_days_in_year(timestamp.year)
+    day_of_year_in_radians = double_numpi * day_of_year / days_in_year  
     hour_of_year = int((timestamp - start_of_year).total_seconds() / 3600)
     hour_of_day = hour_of_year % 24  # integer
 

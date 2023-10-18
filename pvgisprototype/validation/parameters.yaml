@@ -78,14 +78,6 @@ EccentricityCorrectionFactor:
 
 # Solar time
 
-# SolarTime:      # NOTE: Solar time is a datetime.datetime object, not a nested object
-#   value:
-#     type: Optional[datetime]
-#     initial:
-#   unit:
-#     type: str
-#     initial: datetime
-
 EquationOfTime:
   value:
     type: Optional[float]

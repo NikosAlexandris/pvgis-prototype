@@ -30,6 +30,7 @@ from pvgisprototype.validation.parameters import RefractedSolarZenithModel
 from math import pi
 import numpy as np
 
+
 # In order of dependency:
 # Fractional year  < Equation of time  < Time offset  < True solar time  < Solar hour angle 
 # Solar declination  < Solar zenith  < Solar altitude  < Solar azimuth
@@ -42,7 +43,11 @@ class CalculateFractionalYearNOAAInput(
 
 class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     BaseTimestampSeriesModel,  # != BaseTimestampModel
-    AngleInRadiansOutputUnitsModel,
+):
+    pass
+
+class CalculateEquationOfTimeNOAAInput(
+    BaseTimestampModel,
 ):
     pass
 
@@ -54,14 +59,12 @@ class CalculateEquationOfTimeTimeSeriesNOAAInput(
     pass
 
 
-
 class CalculateTimeOffsetTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
 ):
     pass
-
 
 
 class CalculateTrueSolarTimeTimeSeriesNOAAInput(
@@ -72,13 +75,9 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     pass
 
 
-
-
-
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
-    BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -121,7 +120,7 @@ class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
         return v
 
 
-class CalculateSolarZenithNOAAInput(                # FIXME: Move this to function models, keep VerbosityModel
+class CalculateSolarZenithNOAAInput(
     LatitudeModel,
     BaseTimestampModel,
     SolarHourAngleModel,
@@ -163,8 +162,6 @@ class CalculateSolarAzimuthNOAAInput(
 class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
 ):
     pass
 

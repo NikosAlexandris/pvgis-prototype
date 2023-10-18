@@ -19,20 +19,17 @@ from bokeh.embed import components
 from bokeh.resources import INLINE
 from bokeh.resources import CDN
 
+from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 
+from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_noaa_solar_position
+from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 
-from .api.utilities.conversions import convert_to_radians_fastapi
-from .api.utilities.timestamp import now_utc_datetimezone
-from .api.utilities.timestamp import convert_to_timezone
-
-
-from .web_api.geometry.noaa.solar_position import get_calculate_noaa_solar_position
-from .web_api.geometry.solar_time import get_calculate_solar_time
-
-from .plot.plot import plot_line
-from .plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
-from .web_api.plot.plot_example import plot_example
-from .web_api.plot.plot_example import graph_example
+from pvgisprototype.plot.plot import plot_line
+from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
+from pvgisprototype.web_api.plot.plot_example import plot_example
+from pvgisprototype.web_api.plot.plot_example import graph_example
 
 
 app = FastAPI()
@@ -105,4 +102,4 @@ async def get_plot(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app,host="localhost",port=8001)
+    uvicorn.run(app, host="localhost", port=8001)

@@ -7,29 +7,18 @@ import matplotlib.dates as mdates
 from pathlib import Path
 import numpy as np
 from colorama import Fore, Style
+import xarray as xr
+from rich import print
+from pvgisprototype.api.series.hardcodings import exclamation_mark
+from pvgisprototype.api.series.hardcodings import check_mark
+from pvgisprototype.api.series.hardcodings import x_mark
 
 
-# Hardcodings
-# exclamation_mark = u'\N{heavy exclamation mark symbol}'
-exclamation_mark = u'\N{exclamation mark}'
-check_mark = u'\N{check mark}'
-x_mark = u'\N{Ballot Script X}'
-
-
-def plot_series(
-        data_array,
-        time,
-        figure_name,
-        add_offset=False,
-        variable_name_as_suffix=None,
-        tufte_style=None,
-        ):
+def get_coordinates(data_array: xr.DataArray) -> tuple:
     """
-    Plot series over a location
+    Ugly hack for when dimensions 'longitude', 'latitude' are not spelled out!
+    Use `coords` : a time series of a single pair of coordinates has only a `time` dimension!
     """
-    # ----------------------------------------------------------- Deduplicate me
-    # Ugly hack for when dimensions 'longitude', 'latitude' are not spelled out!
-    # Use `coords` : a time series of a single pair of coordinates has only a `time` dimension!
     dimensions = [dimension for dimension in data_array.coords if isinstance(dimension, str)]
     if set(['lon', 'lat']) & set(dimensions):
         x = 'lon'
@@ -37,9 +26,27 @@ def plot_series(
     elif set(['longitude', 'latitude']) & set(dimensions):
         x = 'longitude'
         y = 'latitude'
-    # Deduplicate me -----------------------------------------------------------
     if (x and y):
         logger.info(f'Dimensions  : {x}, {y}')
+    return x, y
+
+
+def plot_series(
+    data_array,
+    time,
+    figure_name,
+    add_offset=False,
+    variable_name_as_suffix=None,
+    tufte_style=None,
+):
+    """
+    Plot series over a location
+    """
+    if not isinstance(data_array, xr.DataArray):
+        raise ValueError(
+            f"The input array {data_array} is not an xarray DataArray and cannot be plotted!"
+        )
+    x, y = get_coordinates(data_array)
 
     # Prepare plot
     fig, ax = plt.subplots(figsize=(16, 9))
@@ -158,14 +165,14 @@ def plot_series(
             # supertitle = f'{data_array.long_name}'
             # supertitle += f'\n{title}'
             supertitle_right = ax.text(
-                    maximum_timestamp,
-                    maximum_value,
-                    f'{data_array.long_name}',
-                    fontsize='x-large',
-                    # bbox=dict(boxstyle='round', facecolor='white', edgecolor='gray'),
-                    va='top',
-                    ha='right',
-                    )
+                maximum_timestamp,
+                maximum_value,
+                f"{data_array.long_name}",
+                fontsize="x-large",
+                # bbox=dict(boxstyle='round', facecolor='white', edgecolor='gray'),
+                va="top",
+                ha="right",
+            )
             supertitle_right_bbox = supertitle_right.get_window_extent()
             supertitle_right_height = supertitle_right_bbox.height
             ax.text(
@@ -196,7 +203,7 @@ def plot_series(
             name = data_array.name.replace(' ', '_')
             figure_name = Path(str(figure_name) + '_' + name)
 
-    if time:
+    if len(time) == 1:
         time = str(time).replace('-', '')
         figure_name = Path(str(figure_name) + '_' + str(time))
     else:
@@ -216,10 +223,10 @@ def plot_series(
             # bbox_inches='tight'
             )
 
-    # Report...
+    # Report
     number_of_values = int(data_array.count())
     logger.info(Fore.GREEN + f'{check_mark} Time series plot of {number_of_values} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!' + Style.RESET_ALL)
-    typer.echo(Fore.GREEN + check_mark + f' Time series plot of {number_of_values} values over ({float(data_array[x])}, {float(data_array[y])}) exported in \'{output_filename}\'')
+    print(f'[green]{check_mark}[/green] Time series plot of {number_of_values} values over ({float(data_array[x])}, {float(data_array[y])}) exported in \'{output_filename}\'')
 
     return output_filename
 

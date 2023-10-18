@@ -4,19 +4,13 @@ from typing import Annotated
 from typing import Optional
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.geometry.models import SolarTimeModels
-# from ..utilities.conversions import convert_to_radians
+from pvgisprototype.api.geometry.models import SolarPositionModels
 from datetime import datetime
-# from ..utilities.timestamp import now_utc_datetimezone
 from rich import print
-# from ..utilities.timestamp import ctx_convert_to_timezone
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
 from pathlib import Path
 from .direct import calculate_direct_horizontal_irradiance
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
-from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
 from math import sin
 from math import cos
 from .diffuse import diffuse_transmission_function
@@ -38,10 +32,10 @@ from pvgisprototype.cli.typer_parameters import typer_option_albedo
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
@@ -59,7 +53,7 @@ AOIConstants.append(0.155)
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
-    help=f"Calculate reflected solar irradiance",
+    help=f"Calculate the clear-sky diffuse ground reflected solar irradiance on an inclined surface"
 )
 
 
@@ -68,7 +62,7 @@ app = typer.Typer(
        invoke_without_command=True,
        no_args_is_help=True,
        # context_settings={"ignore_unknown_options": True},
-       help=f'Calculate the clear-sky ground reflected irradiance',
+       help=f'Calculate the clear-sky diffuse ground reflected irradiance on an inclined surface',
        )
 def calculate_ground_reflected_inclined_irradiance(
     longitude: Annotated[float, typer_argument_longitude],
@@ -85,10 +79,10 @@ def calculate_ground_reflected_inclined_irradiance(
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
@@ -117,7 +111,6 @@ def calculate_ground_reflected_inclined_irradiance(
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_constant=solar_constant,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
@@ -134,13 +127,17 @@ def calculate_ground_reflected_inclined_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        # solar_position_model=solar_position_model,        # FIXME: Why always with default model ??
-        solar_time_model=solar_time_model,
+        solar_position_models=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
+        refracted_solar_zenith=refracted_solar_zenith,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        verbose=verbose,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_time_model=solar_time_model,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
         )
 
     # on a horizontal surface : G0h = G0 sin(h0)
@@ -159,11 +156,11 @@ def calculate_ground_reflected_inclined_irradiance(
     ground_reflected_irradiance = albedo * global_horizontal_irradiance * ground_view_fraction
 
     if apply_angular_loss_factor:
-        ground_reflected_irradiance_angular_loss_coefficient = sin(surface_tilt) + (surface_tilt - sin(surface_tilt)) / (1 - cos(surface_tilt))
+        ground_reflected_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
+            surface_tilt - sin(surface_tilt)
+        ) / (1 - cos(surface_tilt))
         ground_reflected_irradiance_loss_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
-            angular_loss_coefficient=ground_reflected_irradiance_angular_loss_coefficient,
-            solar_incidence_angle_1=AOIConstants[0],
-            solar_incidence_angle_2=AOIConstants[1],
+            indirect_angular_loss_coefficient=ground_reflected_irradiance_angular_loss_coefficient,
         )
         ground_reflected_irradiance *= ground_reflected_irradiance_loss_factor
 

@@ -110,7 +110,7 @@ def estimate_global_irradiance(
         elevation=elevation,
         timestamp=timestamp,
         timezone=timezone,
-        direct_horizontal_component=direct_horizontal_irradiance,
+        direct_horizontal_component=direct_horizontal_component,
         mask_and_scale=mask_and_scale,
         inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
@@ -122,7 +122,6 @@ def estimate_global_irradiance(
         solar_time_model=solar_time_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
@@ -140,7 +139,6 @@ def estimate_global_irradiance(
         timezone=timezone,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
@@ -177,13 +175,12 @@ def estimate_global_irradiance(
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_constant=solar_constant,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
     )
-    shortwave_irradiance = direct_irradiance + diffuse_irradiance
+    global_irradiance = direct_irradiance + diffuse_irradiance + reflected_irradiance
 
-    return shortwave_irradiance
+    return global_irradiance

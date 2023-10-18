@@ -14,15 +14,15 @@ from pvgisprototype import SolarHourAngle
 from pvgisprototype import SolarDeclination
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from pvgisprototype.constants import RADIANS
 
 
 @validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel)
 def calculate_solar_position_skyfield(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-    ):
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+):
     """Calculate sun position above the local horizon using Skyfield.
 
     Returns
@@ -86,41 +86,29 @@ def calculate_solar_position_skyfield(
 
 @validate_with_pydantic(CalculateSolarAltitudeAzimuthSkyfieldInputModel)
 def calculate_solar_altitude_azimuth_skyfield(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-    ) -> Tuple[SolarAltitude, SolarAzimuth]:
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+) -> Tuple[SolarAltitude, SolarAzimuth]:
     """Calculate sun position"""
     solar_position = calculate_solar_position_skyfield(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
-        timezone=timezone,
     )
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
-
     solar_altitude = SolarAltitude(
         value=solar_altitude.radians,
-        unit='radians',
+        unit=RADIANS,
         position_algorithm='Skyfield',
         timing_algorithm='Skyfield',
     )
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth.radians,
-        unit='radians',
+        unit=RADIANS,
         position_algorithm='Skyfield',
         timing_algorithm='Skyfield',
     )
-
-    if (
-        not isfinite(solar_altitude.degrees)
-        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
-        )
 
     return solar_altitude, solar_azimuth   # distance_to_sun
 
@@ -147,22 +135,22 @@ def calculate_solar_hour_angle_declination_skyfield(
         sun's rays measured in radian.
     """
     solar_position = calculate_solar_position_skyfield(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            )
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+    )
     hour_angle, solar_declination, distance_to_sun = solar_position.hadec()
 
     hour_angle = SolarHourAngle(
         value=hour_angle.radians,
-        unit='radians',
+        unit=RADIANS,
         position_algorithm='Skyfield',
         timing_algorithm='Skyfield',
     )
     solar_declination = SolarDeclination(
         value=solar_declination.radians,
-        unit='radians',
+        unit=RADIANS,
         position_algorithm='Skyfield',
         timing_algorithm='Skyfield',
     )

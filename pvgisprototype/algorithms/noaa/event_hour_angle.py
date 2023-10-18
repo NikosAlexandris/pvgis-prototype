@@ -1,5 +1,5 @@
 from devtools import debug
-# from typing import Tuple
+from typing import Tuple
 from datetime import datetime
 from math import cos
 from math import tan
@@ -10,7 +10,6 @@ from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import EventHourAngle
 from .solar_declination import calculate_solar_declination_noaa
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateEventHourAngleNOAAInput)
@@ -68,4 +67,6 @@ def calculate_event_hour_angle_noaa(
         cos(latitude.radians) * cos(solar_declination.radians)
     ) - tan(latitude.radians) * tan(solar_declination.radians)
     event_hour_angle = acos(cosine_event_hour_angle)  # radians
-    return EventHourAngle(value=event_hour_angle, unit='radians')
+    event_hour_angle = EventHourAngle(value=event_hour_angle, unit='radians')
+
+    return event_hour_angle

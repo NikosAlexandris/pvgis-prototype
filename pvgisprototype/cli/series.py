@@ -2,7 +2,9 @@ from devtools import debug
 
 import typer
 from typing_extensions import Annotated
+from typing import Any
 from typing import Optional
+from typing import List
 from typing import Tuple
 from enum import Enum
 
@@ -31,6 +33,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from rich import print
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
@@ -44,8 +47,11 @@ import logging
 from pvgisprototype.api.series.log import logger
 import warnings
 
+from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.series.utilities import get_scale_and_offset
 from pvgisprototype.api.series.utilities import select_location_time_series
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
 from pvgisprototype.api.series.plot import plot_series
 
 from pvgisprototype.api.series.hardcodings import exclamation_mark
@@ -61,8 +67,6 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype import Longitude
 from pvgisprototype.constants import UNITS_NAME
 
-from pvgisprototype.constants import UNITS_NAME
-
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -71,13 +75,6 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f':chart: Work with time series',
 )
-
-
-class MethodsForInexactMatches(str, Enum):
-    none = None # only exact matches
-    pad = 'pad' # ffill: propagate last valid index value forward
-    backfill = 'backfill' # bfill: propagate next valid index value backward
-    nearest = 'nearest' # use nearest valid index value
 
 
 def warn_for_negative_longitude(
@@ -96,17 +93,16 @@ def warn_for_negative_longitude(
         typer.echo(Fore.YELLOW + warning)
 
 
-# @app.callback('series', invoke_without_command=True)
 @app.command(
     'select',
     no_args_is_help=True,
     help='  Select time series over a location',
 )
-def select_time_series(
+def select(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    timestamps: Annotated[Optional[Any], typer_argument_timestamps],
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
@@ -121,104 +117,27 @@ def select_time_series(
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
-    """
-    Plot location series
-    """
+    """Select location series"""
     if convert_longitude_360:
         longitude = longitude % 360
     warn_for_negative_longitude(longitude)
 
-    logger.handlers = []  # Remove any existing handlers
-    file_handler = logging.FileHandler(f'{output_filename}_{time_series.name}.log')
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s, %(msecs)d; %(levelname)-8s; %(lineno)4d: %(message)s", datefmt="%I:%M:%S")
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    logger.info(f'Dataset : {time_series.name}')
-    logger.info(f'Path to : {time_series.parent.absolute()}')
-    scale_factor, add_offset = get_scale_and_offset(time_series)
-    logger.info(f'Scale factor : {scale_factor}, Offset : {add_offset}')
-
-    if (longitude and latitude):
-        coordinates = f'Coordinates : {longitude}, {latitude}'
-        logger.info(coordinates)
-
-    location_time_series = select_location_time_series(
-        time_series,
+    location_time_series = select_time_series(
+        time_series=time_series,
         longitude=longitude,
         latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        nearest_neighbor_lookup=nearest_neighbor_lookup,
         inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
+        in_memory=in_memory,
+        variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
     )
-    # ------------------------------------------------------------------------
-    if start_time or end_time:
-        timestamp = None  # we don't need a timestamp anymore!
-
-        if start_time and not end_time:  # set `end_time` to end of series
-            end_time = location_time_series.time.values[-1]
-            # end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
-
-        elif end_time and not start_time:  # set `start_time` to beginning of series
-            start_time = location_time_series.time.values[0]
-            # start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-
-        else:  # Convert `start_time` & `end_time` to the correct string format
-            # if isinstance(start_time, datetime):
-            start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-            # if isinstance(end_time, datetime):
-            end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
-    
-        location_time_series = (
-            location_time_series.sel(time=slice(start_time, end_time))
-        )
-
-    if timestamps and not start_time and not end_time:
-        # convert timestamp to ISO format string without fractional seconds
-        # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        time_array = np.array([t.strftime('%Y-%m-%d %H:%M:%S') for t in timestamps])
-        if not nearest_neighbor_lookup:
-            inexact_matches_method = None
-        try:
-            location_time_series = (
-                location_time_series.sel(time=time_array, method=inexact_matches_method)
-            )
-        except KeyError:
-            print("No data found for one or more of the given timestamps.")
-
-    if location_time_series.size == 1:
-        single_value = float(location_time_series.values)
-        print(f'Indexes : {location_time_series.indexes}')
-        warning = (
-            Fore.YELLOW
-            + f"{exclamation_mark} The selected timestamp "
-            + Fore.GREEN
-            + f"{location_time_series[location_time_series.indexes].time.values}"
-            + Fore.YELLOW
-            + f" matches the single value "
-            + Fore.GREEN
-            + f'{single_value}'
-            + Style.RESET_ALL
-        )
-        logger.warning(warning)
-        if verbose > 0:
-            typer.echo(Fore.YELLOW + warning)
-        if verbose == 3:
-            debug(locals())
-        return single_value
-
-    # ---------------------------------------------------------- Remove Me ---
-    typer.echo(location_time_series.values)
-    # ---------------------------------------------------------- Remove Me ---
-
-    # statistics after echoing series which might be Long!
-    if statistics:
-        data_statistics = calculate_series_statistics(location_time_series)
-        print_series_statistics(data_statistics)
-        if csv:
-            export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
-        # return print_series_statistics(series_statistics)
-
     # if output_filename:
     #     output_filename = Path(output_filename)
     #     extension = output_filename.suffix.lower()
@@ -232,11 +151,21 @@ def select_time_series(
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
 
-    if verbose > 0:
-        typer.echo(f'Series : {location_time_series.values}')
-    if verbose == 3:
+    if verbose == 5:
         debug(locals())
-    return location_time_series
+
+    # statistics after echoing series which might be Long!
+    if statistics:
+        data_statistics = calculate_series_statistics(location_time_series)
+        print_series_statistics(data_statistics)
+        if csv:
+            export_statistics_to_csv(data_statistics, 'location_time_series_statistics')
+
+    if isinstance(location_time_series, float):
+        print(float)
+
+    if isinstance(location_time_series, xr.DataArray):
+        print(f'Series : {location_time_series.values}')
 
 
 @app.command(
@@ -272,33 +201,46 @@ def resample(
 )
 def plot(
     time_series: Annotated[Path, typer_argument_time_series],
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     tufte_style: Annotated[bool, typer_option_tufte_style] = False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot selected time series"""
     data_array = select_time_series(
-            time_series,
-            longitude,
-            latitude,
-            time,
-            convert_longitude_360,
-            output_filename,
-            variable_name_as_suffix,
-            )
+        time_series=time_series,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        nearest_neighbor_lookup=nearest_neighbor_lookup,
+        inexact_matches_method=inexact_matches_method,
+        tolerance=tolerance,
+        # in_memory=in_memory,
+        verbose=verbose,
+    )
     try:
-        output_filename = plot_series(
-                data_array=data_array,
-                time=time,
-                figure_name=output_filename,
-                # add_offset=add_offset,
-                variable_name_as_suffix=variable_name_as_suffix,
-                tufte_style=tufte_style,
-                )
+        plot_series(
+            data_array=data_array,
+            time=timestamps,
+            figure_name=output_filename,
+            # add_offset=add_offset,
+            variable_name_as_suffix=variable_name_as_suffix,
+            tufte_style=tufte_style,
+        )
     except Exception as exc:
         typer.echo(f"Something went wrong in plotting the data: {str(exc)}")
         raise SystemExit(33)
@@ -309,13 +251,16 @@ def plot(
     help=f'  Plot time series in the terminal',)
 def uniplot(
     time_series: Annotated[Path, typer_argument_time_series],
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
-    variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
-    tufte_style: Annotated[bool, typer_option_tufte_style] = False,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     lines: bool = True,
     title: str = 'Uniplot',
     unit: str = UNITS_NAME,  #" °C")
@@ -327,23 +272,33 @@ def uniplot(
         time_series=time_series,
         longitude=longitude,
         latitude=latitude,
-        time=time,
-        convert_longitude_360=convert_longitude_360,
-        statistics=False,
-        output_filename=None,
-        variable_name_as_suffix=variable_name_as_suffix,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        nearest_neighbor_lookup=nearest_neighbor_lookup,
+        inexact_matches_method=inexact_matches_method,
+        tolerance=tolerance,
+        # in_memory=in_memory,
         verbose=verbose,
     )
-    supertitle = f'{data_array.long_name}'
-    y_label = data_array.units
-    plot(
-        # x=data_array,
-        # xs=data_array,
-        ys=data_array,
-        lines=True,
-        title=supertitle,
-        y_unit=" °C",
-    )
+    if isinstance(data_array, float):
+        print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
+        typer.Abort()
+
+    if isinstance(data_array, xr.DataArray):
+        supertitle = f'{data_array.long_name}'
+        unit = data_array.units
+        debug(locals())
+        plot(
+            # x=data_array,
+            # xs=data_array,
+            ys=data_array,
+            lines=lines,
+            title=supertitle,
+            y_unit=' ' + unit,
+        )
 
 
 if __name__ == "__main__":

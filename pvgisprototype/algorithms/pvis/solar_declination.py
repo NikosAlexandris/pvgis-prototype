@@ -1,19 +1,18 @@
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
 from datetime import datetime
-from zoneinfo import ZoneInfo
 from pvgisprototype import SolarDeclination
 from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
 from math import sin
 from math import asin
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import RADIANS
 
 
 @validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
 def calculate_solar_declination_pvis(
     timestamp: datetime,
-    timezone: ZoneInfo,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
 ) -> SolarDeclination:
@@ -64,9 +63,11 @@ def calculate_solar_declination_pvis(
             * sin(fractional_year.radians - perigee_offset)
         )
     )
-    return SolarDeclination(
+    solar_declination = SolarDeclination(
         value=solar_declination,
-        unit="radians",
-        position_algorithm='pvis',
-        timing_algorithm='pvis',
+        unit=RADIANS,
+        position_algorithm='PVIS',
+        timing_algorithm='PVIS',
     )
+
+    return solar_declination

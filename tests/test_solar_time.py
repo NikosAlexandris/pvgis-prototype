@@ -323,7 +323,6 @@ def test_calculate_hour_angle_plot(angle_output_units):
         solar_time_in_seconds = solar_time * 3600
         calculated_hour_angle = calculate_hour_angle(
             solar_time=solar_time_in_seconds,
-            # angle_output_units=angle_output_units,
         )
         calculated_hour_angles.append(calculated_hour_angle.value)
         expected_hour_angles.append(expected_hour_angle)

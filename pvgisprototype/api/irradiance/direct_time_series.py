@@ -19,16 +19,17 @@ from typing import Union
 from typing import Sequence
 from typing import List
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.solar_declination_time_series import model_solar_declination_time_series
-from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
+from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
@@ -42,19 +43,15 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_optical_air_mass_series
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-# from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
-# from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
-# from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
@@ -67,7 +64,6 @@ from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
@@ -77,7 +73,11 @@ from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
 from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-
+from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import (
+    LONGITUDE_COLUMN_NAME,
+    LATITUDE_COLUMN_NAME,
+)
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
@@ -93,12 +93,13 @@ from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.cli.series import select_time_series
+from pvgisprototype.api.series.select import select_time_series
 # from pvgisprototype.api.series.utilities import select_location_time_series
 from pathlib import Path
 
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.cli.print import print_irradiance_table_2
 
 
 app = typer.Typer(
@@ -140,7 +141,7 @@ def correct_linke_turbidity_factor_time_series(
     # Perform calculations
     corrected_linke_turbidity_factors_array = -0.8662 * linke_turbidity_factor_series_array
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
 
     # Convert back to custom data class objects
@@ -209,8 +210,9 @@ def calculate_refracted_solar_altitude_time_series(
         refracted_solar_altitude_series, angle_output_units
     )
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
+
     return refracted_solar_altitude_series
 
 
@@ -243,8 +245,11 @@ def calculate_optical_air_mass_time_series(
     else:
         optical_air_mass_series = OpticalAirMass(value=optical_air_mass_series[0], unit=OPTICAL_AIR_MASS_UNIT)
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
+    if verbose > 1:
+        print(f'Optical air mass series : {optical_air_mass_series}')
+
     return optical_air_mass_series
 
 
@@ -292,8 +297,11 @@ def rayleigh_optical_thickness_time_series(
             unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
         )
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
+    if verbose > 1:
+        print(f'Rayleigh thickness series : {rayleigh_thickness_series}')
+
     return rayleigh_thickness_series
 
 
@@ -305,28 +313,23 @@ def calculate_direct_normal_irradiance_time_series(
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,#: np.ndarray,
     optical_air_mass_series: Annotated[List[float], typer_option_optical_air_mass_series] = None,#: np.ndarray,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """ """
-   # Unpack custom objects to NumPy arrays
-    # linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
-    optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
-
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             random_days=random_days,
         )
     )
-    corrected_linke_turbidity_factors = correct_linke_turbidity_factor_time_series(
+    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
         linke_turbidity_factor_series,
         verbose=verbose,
     )
@@ -335,9 +338,10 @@ def calculate_direct_normal_irradiance_time_series(
         verbose=verbose,
     )
     # Unpack the custom objects into NumPy arrays
-    corrected_linke_turbidity_factor_series_array = np.array([x.value for x in corrected_linke_turbidity_factors])
-    optical_air_mass_series_array = np.array([x.value for x in optical_air_mass_series])
-    rayleigh_thickness_series_array = np.array([x.value for x in rayleigh_thickness_series])
+    linke_turbidity_factor_series_array = np.array([lt.value for lt in linke_turbidity_factor_series])
+    corrected_linke_turbidity_factor_series_array = np.array([clt.value for clt in corrected_linke_turbidity_factor_series])
+    optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
+    rayleigh_thickness_series_array = np.array([rt.value for rt in rayleigh_thickness_series])
 
     # Calculate
     direct_normal_irradiance_series = (
@@ -349,12 +353,43 @@ def calculate_direct_normal_irradiance_time_series(
         )
     )
 
-    if verbose == 1:
-        pass
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+    out_of_range_indices = np.where(
+        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    )
+    if out_of_range_indices[0].size > 0:
+        print(
+            f"[red]Warning[/red] : I found some [red]out-of-range values[/red] in `` at {out_of_range_indices[0]}!"
+        )
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
-    typer.echo(f'Direct normal irradiance series: {direct_normal_irradiance_series}')  # B0c
+
+    results = {
+        "Normal": direct_normal_irradiance_series,
+    }
+
+    if verbose > 1:
+        extended_results = {
+            "Extra. normal": extraterrestrial_normal_irradiance_series,
+            "Rayleigh": rayleigh_thickness_series_array,
+            "Air mass": np.array([x.value for x in optical_air_mass_series]),
+            "Correct Linke": corrected_linke_turbidity_factor_series_array,
+            "Linke": linke_turbidity_factor_series_array,
+        }
+        results = results | extended_results
+
+    print_irradiance_table_2(
+        timestamps=timestamps,
+        dictionary=results,
+        title="Direct normal irradiance series",
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
+
     return direct_normal_irradiance_series
 
 
@@ -365,6 +400,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,#Annotated[Optional[ZoneInfo], typer_option_timezone] = None,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
@@ -375,7 +411,6 @@ def calculate_direct_horizontal_irradiance_time_series(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
@@ -385,9 +420,6 @@ def calculate_direct_horizontal_irradiance_time_series(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> np.ndarray:
     """ """
-    if verbose == 3:
-        debug(locals())
-
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -399,7 +431,6 @@ def calculate_direct_horizontal_irradiance_time_series(
         solar_time_model=solar_time_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_output_units=time_output_units,
@@ -407,6 +438,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
+    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
     
     # expects solar altitude in degrees! ----------------------------------vvv
     expected_solar_altitude_units = "degrees"
@@ -420,6 +452,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         solar_altitude_series=solar_altitude_series_in_degrees,
         angle_input_units=expected_solar_altitude_units,
         angle_output_units="radians",  # Here in radians!
+        verbose=verbose,
     )
     optical_air_mass_series = calculate_optical_air_mass_time_series(
         elevation=elevation,
@@ -433,24 +466,51 @@ def calculate_direct_horizontal_irradiance_time_series(
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         optical_air_mass_series=optical_air_mass_series,
         solar_constant=solar_constant,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        verbose=verbose,
+        verbose=0,
     )
-    solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
-    direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
 
-    if verbose == 1:
-        pass
+    # Mask conditions -------------------------------------------------------
+    mask_solar_altitude_positive = solar_altitude_series_array > 0
+    mask_not_in_shade = np.full_like(solar_altitude_series_array, True)  # Stub, replace with actual condition
+    mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
 
-    if verbose == 3:
+    # Initialize the direct irradiance series to zeros
+    direct_horizontal_irradiance_series = np.zeros_like(solar_altitude_series_array)
+    if np.any(mask):
+        # direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
+        direct_horizontal_irradiance_series[mask] = (
+            direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
+        )[mask]
+
+    if verbose > 5:
         debug(locals())
 
-    timestamps = np.array(timestamps)
-    results = np.column_stack((timestamps, direct_horizontal_irradiance_series))
-    # typer.echo(f'Direct horizontal irradiance series: {direct_horizontal_irradiance_series}')  # B0c
-    typer.echo(f'Direct horizontal irradiance series:\n{results}')
+    results = {
+            "Horizontal": direct_horizontal_irradiance_series,
+    }
+    if verbose > 1:
+        extended_results = {
+            'Normal': direct_normal_irradiance_series,
+            "Air mass": np.array([x.value for x in optical_air_mass_series]),
+            "Refracted alt.": np.array( [x.value for x in refracted_solar_altitude_series]) if apply_atmospheric_refraction else np.array(["-"]),
+            "Altitude": solar_altitude_series_array,
+        }
+        results = results | extended_results
+
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title='Direct horizontal irradiance series',
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
+
     return direct_horizontal_irradiance_series
 
 
@@ -464,6 +524,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_time_series: bool = False,
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
@@ -475,14 +536,13 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
-    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvlib,
     solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
@@ -495,63 +555,32 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     This function implements the algorithm described by Hofierka
     :cite:`p:hofierka2002`.
+
+    Notes
+    -----
+              B   ⋅ sin ⎛δ   ⎞                    
+               hc       ⎝ exp⎠         ⎛ W ⎞
+        B   = ────────────────     in  ⎜───⎟
+         ic       sin ⎛h ⎞             ⎜ -2⎟           
+                      ⎝ 0⎠             ⎝m  ⎠           
     """
-    # Notes
-    # -----
-    #           B   ⋅ sin ⎛δ   ⎞                    
-    #            hc       ⎝ exp⎠         ⎛ W ⎞
-    #     B   = ────────────────     in  ⎜───⎟
-    #      ic       sin ⎛h ⎞             ⎜ -2⎟           
-    #                   ⎝ 0⎠             ⎝m  ⎠           
-
-    # Hofierka, 2002 ------------------------------------------------------
-    # tangent_relative_longitude = - sin(surface_tilt)
-    #                              * sin(surface_orientation) /
-    #                                sin(latitude) 
-    #                              * sin(surface_tilt) 
-    #                              * cos(surface_orientation) 
-    #                              + cos(latitude) 
-    #                              * cos(surface_tilt)
-    tangent_relative_longitude = -sin(surface_tilt) * sin(
-        surface_orientation
-    ) / sin(latitude) * sin(surface_tilt) * cos(
-        surface_orientation
-    ) + cos(
-        latitude
-    ) * cos(
-        surface_tilt
+    solar_incidence_series = model_solar_incidence_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        solar_incidence_model=solar_incidence_model,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        verbose=verbose,
     )
-    # C source code -------------------------------------------------------
-    # There is an error of one negative sign in either of the expressions!
-    # That is so because : cos(pi/2 + x) = -sin(x)
-    # tangent_relative_longitude = - cos(half_pi - surface_tilt)  # cos(pi/2 - x) = sin(x)
-    #                              * cos(half_pi + surface_orientation) /  # cos(pi/2 + x) = -sin(x)
-    #                                sin(latitude) 
-    #                              * cos(half_pi - surface_tilt) 
-    #                              * sin(half_pi + surface_orientation)  # sin(pi/2 + x) = cos(x)
-    #                              + cos(latitude) 
-    #                              * sin(half_pi - surface_tilt)  # sin(pi/2 - x) = cos(x)
-    # --------------------------------------------------------------------
-
-    relative_longitude = atan(tangent_relative_longitude)
-    # cos(hour_angle - relative_longitude) = C33_inclined / C31_inclined
-
-    # Hofierka, 2002
-    # sine_relative_latitude = -cos(latitude) 
-    #                          * sin(surface_tilt)
-    #                          * cos(surface_orientation)
-    #                          + sin(latitude)
-    #                          * cos (surface_tilt)
-    sine_relative_latitude = -cos(latitude) * sin(surface_tilt) * cos(
-        surface_orientation
-    ) + sin(latitude) * cos(surface_tilt)
-    # Verified the following is equal to above.
-    # Huld ?
-    # sine_relative_latitude = -cos(latitude)
-    #                          * cos(half_pi - surface_tilt)
-    #                          * sin(half_pi + surface_orientation)
-    #                          + sin(latitude)
-    #                          * sin(half_pi - surface_tilt)
+    solar_incidence_series_array = np.array([x.value for x in solar_incidence_series])
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -563,71 +592,39 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         solar_time_model=solar_time_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
-        )
-    solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
-    sine_solar_altitude_series = np.sin(solar_altitude_series_array)
+    )
+    solar_altitude_series_array = np.array([solar_altitude.radians for solar_altitude in solar_altitude_series])
 
-    # make it a function -----------------------------------------------------
+    # ========================================================================
+    # Essentially, perform calculations for when:
+    # - solar altitude > 0
+    # - not in shade
+    # - solar incidence > 0
     #
-
-    # calculate solar declination + C3x geometry parameters
-    solar_declination_series = model_solar_declination_time_series(
-        timestamps=timestamps,
-        timezone=timezone,
-        model=SolarDeclinationModels.noaa,  #solar_declination_model,
-        days_in_a_year=days_in_a_year,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
+    # To add : ---------------------------------------------------------------
+    mask_solar_altitude_positive = solar_altitude_series_array > 0
+    mask_solar_incidence_positive = solar_incidence_series_array > 0
+    mask_not_in_shade = np.full_like(
+        solar_altitude_series_array, True
+    )  # Stub, replace with actual condition
+    mask = np.logical_and.reduce(
+        (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
     )
-    solar_time_series = model_solar_time_time_series(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
-            solar_time_model=SolarTimeModels.noaa,  #solar_time_model,
-            refracted_solar_zenith=refracted_solar_zenith,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            days_in_a_year=days_in_a_year,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
-    )
-    solar_declination_series_array = np.array(
-        [declination.radians for declination in solar_declination_series]
-    )
-    solar_time_decimal_hours_series = timestamp_to_decimal_hours_time_series(
-        solar_time_series
-    )
-    hour_angle_series = np.radians(15) * (solar_time_decimal_hours_series - 12)
-
-    # calculate C3x geometry parameters for inclined surface
-    relative_latitude = asin(sine_relative_latitude)
-    C31_inclined_series = cos(relative_latitude) * np.cos(
-        solar_declination_series_array
-    )
-    C33_inclined_series = sin(relative_latitude) * np.sin(
-        solar_declination_series_array
-    )
-    sine_solar_incidence_angle_series = (
-        C31_inclined_series * np.cos(hour_angle_series - relative_longitude)
-        + C33_inclined_series
-    )
-    #
-    # ----------------------------------------------------- make it a function
+    # Else, the following runs:
+    # --------------------------------- Review & Add ?
+    # 1. surface is shaded
+    # 3. solar incidence = 0
+    # --------------------------------- Review & Add ?
+    # ========================================================================
 
     if not direct_horizontal_component:
+        print(f'Modelling irradiance...')
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
             longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
@@ -644,16 +641,16 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             rounding_places=rounding_places,
-            verbose=verbose,
+            verbose=0,  # no verbosity here by choice!
         )
     else:  # read from a time series dataset
+        print(f'Reading from external dataset...')
         # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
         longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
         latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
@@ -672,50 +669,93 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             in_memory=in_memory,
             verbose=verbose,
         )
-        # print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance_series}')
+        print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance_series}')
 
     try:
-        modified_direct_horizontal_irradiance_series = (
+        direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
-            * sine_solar_incidence_angle_series
-            / sine_solar_altitude_series
+            * np.sin(solar_incidence_series_array)
+            / np.sin(solar_altitude_series_array)
         )
+
+        # additional check! Is it required here? -----------------------------
+        if len(timestamps) != len(direct_inclined_irradiance_series): raise
+        ValueError( "The number of timestamps {len(timestamps)} and irradiance values {len(direct_inclined_irradiance_series)} differ!")
+       # --------------------------------------------------------------------
+
     except ZeroDivisionError:
         logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
-        typer.echo("Is the solar altitude angle zero?")
+        print("Is the solar altitude angle zero?")
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
-    # "Simpler" way to calculate the inclined solar declination?
-    if solar_incidence_model == 'PVGIS':
-
-        # In the old C source code, the following runs if:
-        # --------------------------------- Review & Add ?
-            # 1. surface is NOT shaded
-            # 3. solar declination > 0
-        # --------------------------------- Review & Add ?
+    if apply_angular_loss_factor:
 
         try:
-            angular_loss_factor_series = calculate_angular_loss_factor_for_direct_irradiance_series(
-                    sine_solar_incidence_angle_series,
-                    angle_of_incidence_constant = 0.155,
-                    )
-            direct_inclined_irradiance_series = modified_direct_horizontal_irradiance_series * angular_loss_factor
-            typer.echo(f'Direct inclined irradiance series: {direct_inclined_irradiance_series} (based on PVGIS)')  # B0c
+            angular_loss_factor_series = (
+                calculate_angular_loss_factor_for_direct_irradiance_time_series(
+                    solar_incidence_series=solar_incidence_series_array,
+                    verbose=verbose,
+                )
+            )
+            direct_inclined_irradiance_series = (
+                direct_horizontal_irradiance_series * angular_loss_factor_series
+            )
 
-            return direct_inclined_irradiance
-
-        # Else, the following runs:
-        # --------------------------------- Review & Add ?
-            # 1. surface is shaded
-            # 3. solar declination = 0
-        # --------------------------------- Review & Add ?
         except ZeroDivisionError as e:
             logging.error(f"Which Error? {e}")
             raise ValueError
 
-    typer.echo(f'Direct inclined irradiance series: {modified_direct_horizontal_irradiance_series} (based on {solar_incidence_model})')  # B0c
+    if np.any(direct_inclined_irradiance_series < 0):
+        print("[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
 
-    if verbose == 3:
+    results = {
+        "Direct": direct_inclined_irradiance_series,
+    }
+    title = 'Direct'
+
+    if verbose > 1 :
+        extended_results = {
+            "Loss": 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
+            'Tilt': convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            'Orientation': convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+        }
+        results = results | extended_results
+
+    if verbose > 2:
+        more_extended_results = {
+            "Horizontal": direct_horizontal_irradiance_series,
+            'Incidence': convert_series_to_degrees_if_requested(solar_incidence_series_array, angle_output_units),
+            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+        }
+        results = results | more_extended_results
+        title += ' & relevant components'
+
+    if verbose > 3:
+        even_more_extended_results = {
+            'Irradiance source': 'External data' if direct_horizontal_component else 'Model (Hofierka, 2002)',
+            'Incidence algorithm': solar_incidence_model.value,
+            'Positioning': solar_position_model.value,
+            'Timing': solar_time_model.value,
+            # "Shade": in_shade,
+        }
+        results = results | even_more_extended_results
+
+
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+
+    if verbose > 5:
         debug(locals())
-    return modified_direct_horizontal_irradiance_series
+
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title=f'Direct inclined irradiance series {IRRADIANCE_UNITS}',
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
+
+    return direct_inclined_irradiance_series

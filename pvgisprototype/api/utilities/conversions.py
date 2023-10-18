@@ -189,6 +189,8 @@ def round_float_values(obj, decimal_places=3):
             elif isinstance(v, float):
                 obj[i] = f"{round(v, decimal_places):.{decimal_places}f}"
         return obj
+    elif isinstance(obj, np.ndarray):
+        return np.around(obj, decimals=decimal_places)
     else:
         return obj
 

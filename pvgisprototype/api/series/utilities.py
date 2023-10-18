@@ -1,4 +1,5 @@
 from devtools import debug
+from rich import print
 import warnings
 import typer
 import netCDF4
@@ -15,19 +16,15 @@ from enum import Enum
 from pathlib import Path
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.hardcodings import exclamation_mark
+from pvgisprototype.api.series.hardcodings import check_mark
+from pvgisprototype.api.series.hardcodings import x_mark
 
 
-# Hardcodings
-# exclamation_mark = u'\N{heavy exclamation mark symbol}'
-exclamation_mark = u'\N{exclamation mark}'
-check_mark = u'\N{check mark}'
-x_mark = u'\N{Ballot Script X}'
-
-
-def load_or_open_dataarray(function, filename_or_obj, mask_and_scale):
+def load_or_open_dataarray(function, filename_or_object, mask_and_scale):
     try:
         dataarray = function(
-            filename_or_obj=filename_or_obj,
+            filename_or_obj=filename_or_object,
             mask_and_scale=mask_and_scale,
         )
         return dataarray
@@ -48,7 +45,7 @@ def open_data_array(
     # try:
     #     if in_memory:
     #         dataarray = xr.load_dataarray(
-    #                 filename_or_obj=netcdf,
+    #                 filename_or_object=netcdf,
     #                 mask_and_scale=mask_and_scale,
     #                 )
     #         return dataarray
@@ -56,7 +53,7 @@ def open_data_array(
     #     typer.echo(f"Could not load the data in memory: {str(exc)}")
     #     try:
     #         dataarray = xr.open_dataarray(
-    #                 filename_or_obj=netcdf,
+    #                 filename_or_object=netcdf,
     #                 mask_and_scale=mask_and_scale,
     #                 )
     #         return dataarray
@@ -65,12 +62,20 @@ def open_data_array(
     #         raise typer.Exit(code=33)
     if in_memory:
         if verbose > 0:
-            print('In memory')
-        return load_or_open_dataarray(xr.load_dataarray, netcdf, mask_and_scale)
+            print("In memory")
+        return load_or_open_dataarray(
+            function=xr.load_dataarray,
+            filename_or_object=netcdf,
+            mask_and_scale=mask_and_scale,
+        )
     else:
         if verbose > 0:
-            print('Open file')
-        return load_or_open_dataarray(xr.open_dataarray, netcdf, mask_and_scale)
+            print("Open file")
+        return load_or_open_dataarray(
+            function=xr.open_dataarray,
+            filename_or_object=netcdf,
+            mask_and_scale=mask_and_scale,
+        )
 
 
 def get_scale_and_offset(netcdf):
@@ -190,7 +195,7 @@ def select_coordinates(
 
 
 def select_location_time_series(
-    time_series_filename: Path = None,
+    time_series: Path = None,
     longitude: Longitude = None,
     latitude: Latitude = None,
     inexact_matches_method: MethodsForInexactMatches  = MethodsForInexactMatches.nearest,
@@ -202,7 +207,7 @@ def select_location_time_series(
     """Select a location from a time series dataset format supported by
     xarray"""
     data_array = open_data_array(
-        time_series_filename,
+        time_series,
         mask_and_scale,
         in_memory,
     )
@@ -215,12 +220,14 @@ def select_location_time_series(
     try:
         location_time_series = data_array.sel(
                 **indexers,
-                method=inexact_matches_method)
+                method=inexact_matches_method,
+                tolerance=tolerance,)
         # location_time_series.load()  # load into memory for fast processing
     except Exception as exc:
-        typer.echo(f"Something went wrong in selecting the data: {str(exc)}")
+        print(f"Something went wrong in selecting the data: {str(exc)}")
         raise SystemExit(33)
 
     if verbose == 3:
         debug(locals())
+
     return location_time_series
