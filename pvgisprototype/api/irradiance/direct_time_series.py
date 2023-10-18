@@ -68,7 +68,8 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_FACTOR_UNIT
+from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
+from pvgisprototype.constants import OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
 from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
@@ -112,9 +113,7 @@ app = typer.Typer(
 
 
 def correct_linke_turbidity_factor_time_series(
-    linke_turbidity_factor_series: Union[
-        List[LinkeTurbidityFactor], LinkeTurbidityFactor
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: Union[ List[LinkeTurbidityFactor], LinkeTurbidityFactor] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     verbose: int = 0,
 ) -> Union[List[LinkeTurbidityFactor], LinkeTurbidityFactor]:
     """
@@ -146,9 +145,9 @@ def correct_linke_turbidity_factor_time_series(
 
     # Convert back to custom data class objects
     if is_scalar:
-        return LinkeTurbidityFactor(value=corrected_linke_turbidity_factors_array[0], unit=LINKE_TURBIDITY_FACTOR_UNIT)
+        return LinkeTurbidityFactor(value=corrected_linke_turbidity_factors_array[0], unit=LINKE_TURBIDITY_UNIT)
     else:
-        return [LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_FACTOR_UNIT) for value in corrected_linke_turbidity_factors_array]
+        return [LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_UNIT) for value in corrected_linke_turbidity_factors_array]
 
 
 def calculate_refracted_solar_altitude_time_series(
@@ -221,7 +220,7 @@ def calculate_optical_air_mass_time_series(
     elevation: Annotated[float, typer_argument_elevation],
     refracted_solar_altitude_series: Union[RefractedSolarAltitude, Sequence[RefractedSolarAltitude]],
     verbose: Annotated[int, typer_option_verbose] = 0,
-):
+)->List[OpticalAirMass]:
     """Vectorized function to approximate the relative optical air mass for a time series."""
     is_scalar = False
     if isinstance(refracted_solar_altitude_series, RefractedSolarAltitude):
@@ -254,11 +253,10 @@ def calculate_optical_air_mass_time_series(
 
 
 def rayleigh_optical_thickness_time_series(
-    optical_air_mass_series,  #: np.ndarray,
+    optical_air_mass_series: Union[List[OpticalAirMass], OpticalAirMass] = OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
     verbose: int = 0,
 ):
     """Vectorized function to calculate Rayleigh optical thickness for a time series."""
-    
     # Check if input is scalar or array-like
     is_scalar = False
     if isinstance(optical_air_mass_series, OpticalAirMass):
@@ -299,6 +297,7 @@ def rayleigh_optical_thickness_time_series(
 
     if verbose > 5:
         debug(locals())
+
     if verbose > 1:
         print(f'Rayleigh thickness series : {rayleigh_thickness_series}')
 
@@ -310,8 +309,8 @@ def calculate_direct_normal_irradiance_time_series(
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,#: np.ndarray,
-    optical_air_mass_series: Annotated[List[float], typer_option_optical_air_mass_series] = None,#: np.ndarray,
+    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT],
+    optical_air_mass_series: Annotated[List[float], typer_option_optical_air_mass_series] = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT],
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -375,10 +374,10 @@ def calculate_direct_normal_irradiance_time_series(
     if verbose > 1:
         extended_results = {
             "Extra. normal": extraterrestrial_normal_irradiance_series,
+            "Linke Adjusted": corrected_linke_turbidity_factor_series_array,
             "Rayleigh": rayleigh_thickness_series_array,
-            "Air mass": np.array([x.value for x in optical_air_mass_series]),
-            "Correct Linke": corrected_linke_turbidity_factor_series_array,
             "Linke": linke_turbidity_factor_series_array,
+            "Air mass": np.array([x.value for x in optical_air_mass_series]),
         }
         results = results | extended_results
 

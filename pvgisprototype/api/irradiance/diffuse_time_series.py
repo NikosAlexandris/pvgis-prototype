@@ -86,7 +86,7 @@ console = Console()
 
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.constants import LINKE_TURBIDITY_FACTOR_UNIT
+from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 
 
 @app.command(
