@@ -143,8 +143,9 @@ def select_time_series(
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
+
     if verbose > 0:
         print(f'Series : {location_time_series.values}')
 
