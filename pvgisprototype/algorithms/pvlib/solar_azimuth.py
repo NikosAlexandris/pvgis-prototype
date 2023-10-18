@@ -22,6 +22,7 @@ def calculate_solar_azimuth_pvlib(
     """
 
     solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
+    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_azimuth = solar_position['azimuth'].values[0]
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 360:

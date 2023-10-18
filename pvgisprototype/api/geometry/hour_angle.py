@@ -15,7 +15,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 
 
-@validate_with_pydantic(CalculateHourAngleInputModel)
+# @validate_with_pydantic(CalculateHourAngleInputModel)
 def calculate_hour_angle(
     solar_time: datetime,
 ) -> SolarHourAngle:

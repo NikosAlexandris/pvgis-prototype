@@ -37,6 +37,9 @@ def calculate_fractional_year(
                 POSITION_ALGORITHM_NAME: model.value,
                 ALTITUDE_NAME: getattr(fractional_year, angle_output_units),
                 UNITS_NAME: fractional_year.unit,  # Don't trust me -- Redesign Me!
+                POSITION_ALGORITHM_NAME: model.value,
+                ALTITUDE_NAME: getattr(fractional_year, angle_output_units),
+                UNITS_NAME: fractional_year.unit,  # Don't trust me -- Redesign Me!
             })
 
     return results

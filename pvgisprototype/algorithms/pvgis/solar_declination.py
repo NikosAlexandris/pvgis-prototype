@@ -33,7 +33,6 @@ def calculate_solar_declination_pvgis(
     which is actually : `declination = - declination`. Why? The value is
     inverted again at some other part of the program when it gets to read data.
     """
-    # day_of_year = timestamp.timetuple().tm_yday
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
         timezone=timezone,

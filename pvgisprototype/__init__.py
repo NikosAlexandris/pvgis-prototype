@@ -4,9 +4,13 @@ from typing import Optional
 from datetime import timedelta
 from datetime import datetime
 from datetime import time
+from datetime import timedelta
+from datetime import datetime
+from datetime import time
 from devtools import debug
 from pathlib import Path
 from pvgisprototype.constants import PARAMETERS_YAML_FILE
+import numpy as np
 import numpy as np
 
 
@@ -154,6 +158,7 @@ def generate_dataclass_models(yaml_file: str):
         annotations = {}
         default_values = {}
 
+
         for field_name, field_data in fields.items():
             annotations[field_name] = eval(field_data['type'])
             if 'initial' in field_data:
@@ -180,6 +185,7 @@ def generate_dataclass_models(yaml_file: str):
             }
         )
         globals()[model_name] = model_class
+
 
 
 package_root = Path(__file__).resolve().parent

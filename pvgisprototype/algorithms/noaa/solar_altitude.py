@@ -1,9 +1,14 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudeNOAAInput
+from pvgisprototype.validation.functions import CalculateSolarAltitudeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitudeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from datetime import datetime
+from typing import Union
+from typing import Sequence
+from zoneinfo import ZoneInfo
 from datetime import datetime
 from typing import Union
 from typing import Sequence
@@ -17,10 +22,25 @@ from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_t
 from math import pi
 from math import isfinite
 import numpy as np
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
+from math import pi
+from math import isfinite
+import numpy as np
 
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
 def calculate_solar_altitude_noaa(
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+    timezone: ZoneInfo,
+    apply_atmospheric_refraction: bool = True,
+    verbose: int = 0,
+)-> SolarAltitude:
+    """Calculate the solar altitude angle for a location and moment in time"""
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
@@ -41,7 +61,17 @@ def calculate_solar_altitude_noaa(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
     solar_altitude = pi / 2 - solar_zenith.radians
+    solar_altitude = pi / 2 - solar_zenith.radians
     solar_altitude = SolarAltitude(value=solar_altitude, unit=RADIANS)
+    if (
+        not isfinite(solar_altitude.radians)
+        or not -pi / 2 <= solar_altitude.radians <= pi / 2
+    ):
+        raise ValueError(
+            f"The calculated solar altitude angle {solar_altitude} is out of the expected range [{-pi/2}, {pi/2}] radians"
+        )
+    if verbose == 3:
+        debug(locals())
     if (
         not isfinite(solar_altitude.radians)
         or not -pi / 2 <= solar_altitude.radians <= pi / 2
@@ -59,11 +89,14 @@ def calculate_solar_altitude_noaa(
 def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,
     latitude: Latitude,
+    longitude: Longitude,
+    latitude: Latitude,
     timestamps: Union[float, Sequence[float]],
-    timezone: str,
+    timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
 ):
+    """Calculate the solar altitude angle for a location over a time series"""
     """Calculate the solar altitude angle for a location over a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude,
@@ -78,6 +111,7 @@ def calculate_solar_altitude_time_series_noaa(
     )
     solar_altitude_series = np.pi / 2 - np.array(
         [zenith.radians for zenith in solar_zenith_series]
+        [zenith.radians for zenith in solar_zenith_series]
     )
     if not np.all(np.isfinite(solar_altitude_series)) or not np.all(
         (-np.pi / 2 <= solar_altitude_series) & (solar_altitude_series <= np.pi / 2)
@@ -86,7 +120,7 @@ def calculate_solar_altitude_time_series_noaa(
             f"The `solar_altitude` should be a finite number ranging in [{-np.pi/2}, {np.pi/2}] radians"
         )
     solar_altitude_series = [
-        SolarAltitude(value=value, unit=RADIANS) for value in solar_altitude_series
+        SolarAltitude(value=altitude, unit=RADIANS) for altitude in solar_altitude_series
     ]
     if verbose == 3:
         debug(locals())

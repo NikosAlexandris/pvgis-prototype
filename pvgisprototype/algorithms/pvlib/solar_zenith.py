@@ -22,6 +22,7 @@ def calculate_solar_zenith_pvlib(
     """
 
     solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
+    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_zenith = solar_position['zenith'].values[0]
 
     if not isfinite(solar_zenith) or not 0 <= solar_zenith <= 180.836518:

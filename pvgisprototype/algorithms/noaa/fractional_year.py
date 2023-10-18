@@ -1,20 +1,15 @@
 from devtools import debug
 from datetime import datetime
-# from datetime import date
-# from typing import Optional
 from typing import Union
 from typing import Sequence
 from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearTimeSeriesNOAAInput
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype import FractionalYear
+from pvgisprototype.constants import RADIANS
 from math import pi
 import numpy as np
-
-
-
 
 
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
@@ -22,18 +17,20 @@ def calculate_fractional_year_noaa(
         timestamp: datetime,
     ) -> FractionalYear:
     """Calculate fractional year in radians """
+    days_in_year = get_days_in_year(timestamp.year)
     fractional_year = (
         2
         * pi
-        / get_days_in_year(timestamp.year)
+        / days_in_year
         * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
     )
 
     # slightly less than 0 ?
     if -pi/365 <= fractional_year < 0:  # for example, consider values > -1e-6 as close enough to 0
         fractional_year = 0
+    fractional_year = FractionalYear(value=fractional_year, unit=RADIANS)
 
-    if not 0 <= fractional_year < 2 * pi:
+    if not 0 <= fractional_year.radians < 2 * pi:
         raise ValueError(f'The calculated fractional year {fractional_year} is outside the expected range [0, 2*pi] radians')
 
     fractional_year = FractionalYear(value=fractional_year, unit='radians')
@@ -47,7 +44,6 @@ def calculate_fractional_year_noaa(
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
-        angle_output_units: str = "radians"
     ):
     """ """
     is_scalar_input = isinstance(timestamps, datetime)
@@ -60,7 +56,8 @@ def calculate_fractional_year_time_series_noaa(
     if not np.all((0 <= fractional_year_series) & (fractional_year_series < 2 * np.pi)):
         raise ValueError(f'The calculated fractional years are outside the expected range [0, {2*pi}] radians')
 
-    if is_scalar_input:
-        return FractionalYear(value=fractional_year_series[0], unit='radians')
-    else:
-        return np.array([FractionalYear(value=value, unit='radians') for value in fractional_year_series], dtype=object)
+    fractional_year_series = [
+        FractionalYear(value=value, unit='radians') for value in fractional_year_series
+    ]
+
+    return np.array(fractional_year_series, dtype=object)

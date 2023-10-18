@@ -14,15 +14,15 @@ from pvgisprototype import SolarHourAngle
 from pvgisprototype import SolarDeclination
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from pvgisprototype.constants import RADIANS
 
 
 @validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel)
 def calculate_solar_position_skyfield(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-    ):
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+):
     """Calculate sun position above the local horizon using Skyfield.
 
     Returns
@@ -79,6 +79,7 @@ def calculate_solar_position_skyfield(
     timescale = load.timescale()
     requested_timestamp = timescale.from_datetime(timestamp)
     # sun position seen from observer location
+    # sun position seen from observer location
     solar_position = (earth + location).at(requested_timestamp).observe(sun).apparent()
 
     return solar_position
@@ -86,39 +87,27 @@ def calculate_solar_position_skyfield(
 
 @validate_with_pydantic(CalculateSolarAltitudeAzimuthSkyfieldInputModel)
 def calculate_solar_altitude_azimuth_skyfield(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-    ) -> Tuple[SolarAltitude, SolarAzimuth]:
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: datetime,
+) -> Tuple[SolarAltitude, SolarAzimuth]:
     """Calculate sun position"""
     solar_position = calculate_solar_position_skyfield(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
-        timezone=timezone,
     )
     solar_altitude, solar_azimuth, distance_to_sun = solar_position.altaz()
-
     solar_altitude = SolarAltitude(
         value=solar_altitude.radians,
-        unit='radians',
+        unit=RADIANS,
     )
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth.radians,
-        unit='radians',
+        unit=RADIANS,
     )
 
-    solar_altitude = convert_to_degrees_if_requested(
-        solar_altitude,
-        angle_output_units,
-    )
-    solar_azimuth = convert_to_degrees_if_requested(
-        solar_azimuth,
-        angle_output_units,
-    )
-
-    return solar_altitude, solar_azimuth   # distance_to_sun
+    return solar_altitude, solar_azimuth  # , distance_to_sun
 
 
 @validate_with_pydantic(SolarHourAngleSkyfieldInput)

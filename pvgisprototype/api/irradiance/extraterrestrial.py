@@ -8,7 +8,7 @@ from math import cos
 import numpy as np
 from pvgisprototype.api.utilities.timestamp import random_day_of_year
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-from pvgisprototype.cli.typer_parameters import OrderCommands
+# from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
@@ -26,19 +26,19 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
 app = typer.Typer(
-    cls=OrderCommands,
+    # cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f"Calculate the extraterrestial normal irradiance for a day in the year",
+    help=f"Calculate the extraterrestrial normal irradiance for a day in the year",
 )
 
 
 @app.callback(
-    'extraterrestial',
+    'extraterrestrial',
     invoke_without_command=True,
     no_args_is_help=True,
-    help=f"Calculate the extraterrestial normal irradiance for a day in the year",
+    help=f"Calculate the extraterrestrial normal irradiance for a day in the year",
 )
 def calculate_extraterrestrial_normal_irradiance(
     timestamp: Annotated[datetime, typer_argument_timestamp],
@@ -51,7 +51,7 @@ def calculate_extraterrestrial_normal_irradiance(
     random_day: Annotated[bool, typer_option_random_day] = RANDOM_DAY_FLAG_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> float:
-    """Calculate the extraterrestial irradiance for the given day of the year.
+    """Calculate the extraterrestrial irradiance for the given day of the year.
 
     The solar constant is a flux density measuring the amount of solar
     electromagnetic radiation received at the outer atmosphere of Earth in a
@@ -85,8 +85,8 @@ def calculate_extraterrestrial_normal_irradiance(
 
     Returns
     -------
-    extraterrestial_irradiance: float
-        The extraterrestial irradiance for the given day of the year.
+    extraterrestrial_irradiance: float
+        The extraterrestrial irradiance for the given day of the year.
 
     Notes
     -----
@@ -128,10 +128,11 @@ def calculate_extraterrestrial_normal_irradiance(
     distance_correction_factor = 1 + eccentricity_correction_factor * cos(
         position_of_earth - perigee_offset
     )
-    extraterrestial_normal_irradiance = solar_constant * distance_correction_factor
+    extraterrestrial_normal_irradiance = solar_constant * distance_correction_factor
 
-    if verbose > 0:
-        typer.echo(f"Extraterrestrial irradiance: {extraterrestial_normal_irradiance}")
     if verbose == 3:
         debug(locals())
-    return extraterrestial_normal_irradiance
+    if verbose > 0:
+        typer.echo(f"Extraterrestrial irradiance : {extraterrestrial_normal_irradiance}")
+
+    return extraterrestrial_normal_irradiance

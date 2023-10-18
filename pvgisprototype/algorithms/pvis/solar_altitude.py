@@ -13,7 +13,7 @@ from pvgisprototype import Longitude
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.solar_time import model_apparent_solar_time
+from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
 
 
@@ -64,7 +64,11 @@ def calculate_solar_altitude_pvis(
     )
     C31 = cos(latitude.radians) * cos(solar_declination.radians)
     C33 = sin(latitude.radians) * sin(solar_declination.radians)
+    C31 = cos(latitude.radians) * cos(solar_declination.radians)
+    C33 = sin(latitude.radians) * sin(solar_declination.radians)
     solar_time = model_solar_time(
+        longitude=longitude,
+        latitude=latitude,
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
@@ -77,8 +81,9 @@ def calculate_solar_altitude_pvis(
     )
     sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
     solar_altitude = asin(sine_solar_altitude)
-    solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+    solar_altitude = SolarAltitude(value=solar_altitude, unit='RADIANS')
 
     if verbose == 3:
         debug(locals())
+
     return solar_altitude

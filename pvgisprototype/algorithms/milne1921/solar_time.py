@@ -1,6 +1,7 @@
 from devtools import debug
 from rich import print
 from datetime import datetime
+from datetime import time
 from datetime import timedelta
 
 from math import radians
@@ -10,14 +11,13 @@ from zoneinfo import ZoneInfo
 
 from pvgisprototype import Longitude
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateSolarTimeEoTInputModel
+from pvgisprototype.validation.functions import CalculateSolarTimeMilne1921InputModel
 
 
-@validate_with_pydantic(CalculateSolarTimeEoTInputModel)
+@validate_with_pydantic(CalculateSolarTimeMilne1921InputModel)
 def calculate_apparent_solar_time_milne1921(
     longitude: Longitude,
     timestamp: datetime,
-    timezone: ZoneInfo = None,
     verbose: int = 0,
 ) -> datetime:
     """Calculate the apparent solar time based on the equation of time by Milne 1921

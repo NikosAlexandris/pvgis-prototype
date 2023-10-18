@@ -1,8 +1,9 @@
-import skyfield
-from pvgisprototype.validation.functions import validate_with_pydantic
-from datetime import datetime
-from pvgisprototype.validation.functions import CalculateSolarDeclinationSkyfieldInput
-from pvgisprototype import SolarDeclination
+# from typing import Optional
+# import skyfield
+# from pvgisprototype.validation.functions import validate_with_pydantic
+# from datetime import datetime
+# from pvgisprototype.validation.functions import CalculateSolarDeclinationSkyfieldInput
+# from pvgisprototype import SolarDeclination
 
 
 # NOTE gounaol: Skyfield solar declination is also computed by skyfield.solar_geometry.calculate_solar_hour_angle_declination_skyfield()
