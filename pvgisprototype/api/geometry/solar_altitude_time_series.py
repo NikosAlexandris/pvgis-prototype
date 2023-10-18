@@ -20,24 +20,15 @@ def model_solar_altitude_time_series(
     latitude: Latitude,
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: str,
-    model: SolarPositionModels,
+    solar_position_model: SolarPositionModels,
     apply_atmospheric_refraction: bool = True,
-    # refracted_solar_zenith: float = 1.5853349194640094,
-    # solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
-    # time_offset_global: float = 0,
-    # hour_offset: float = 0,
-    # perigee_offset: float = 0.048869,
-    # eccentricity_correction_factor: float = 0.01672,
-    # time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
-    # angle_output_units: str = 'radians',
     verbose: int = 0,
 ) -> List[SolarAltitude]:
 
     if verbose == 3:
         debug(locals())
 
-    if model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModels.noaa:
 
         solar_altitude_series = calculate_solar_altitude_time_series_noaa(
             longitude=longitude,
@@ -48,19 +39,19 @@ def model_solar_altitude_time_series(
             verbose=verbose,
         )
 
-    if model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModels.skyfield:
         pass
 
-    if model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModels.suncalc:
         pass
 
-    if model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModels.pysolar:
         pass
 
-    if model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModels.pvis:
         pass
 
-    if model.value  == SolarPositionModels.pvlib:
+    if solar_position_model.value  == SolarPositionModels.pvlib:
         pass
 
     return solar_altitude_series

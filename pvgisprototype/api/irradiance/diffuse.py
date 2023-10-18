@@ -61,7 +61,7 @@ from math import cos
 from math import pi
 from math import atan2
 from pvgisprototype.api.geometry.solar_declination import model_solar_declination
-from ..geometry.solar_time import model_apparent_solar_time
+from ..geometry.solar_time import model_solar_time
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -619,7 +619,6 @@ def calculate_diffuse_inclined_irradiance(
                     timezone=timezone,
                     apply_atmospheric_refraction=apply_atmospheric_refraction,
                     refracted_solar_zenith=refracted_solar_zenith,
-                    days_in_a_year=days_in_a_year,
                     perigee_offset=perigee_offset,
                     eccentricity_correction_factor=eccentricity_correction_factor,
                     time_offset_global=time_offset_global,

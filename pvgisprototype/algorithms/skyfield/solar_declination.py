@@ -1,4 +1,3 @@
-# from typing import Optional
 # import skyfield
 # from pvgisprototype.validation.functions import validate_with_pydantic
 # from datetime import datetime

@@ -23,24 +23,20 @@ from typing import Annotated
 from typing import Optional
 from rich import print
 from rich.console import Console
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 import math
 from math import sin
 from math import cos
 from math import exp
 from datetime import datetime
+# from pvgisprototype.constants import AOI_CONSTANTS
+from pvgisprototype.api.geometry.declination import model_solar_declination
 from pvgisprototype.api.geometry.altitude import model_solar_altitude
-from pvgisprototype.api.geometry.incidence import model_solar_incidence
-from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.geometry.time import model_solar_time
+from pvgisprototype.api.geometry.hour_angle import calculate_hour_angle
+from pvgisprototype.algorithms.jenco.solar_incidence import calculate_relative_longitude
+# from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 # from pvgisprototype.api.utilities.conversions import convert_float_to_radians_if_requested
@@ -506,6 +502,7 @@ def calculate_direct_horizontal_irradiance(
         timestamp=timestamp,
         timezone=timezone,
         solar_position_model=solar_position_model,
+        solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
@@ -618,6 +615,7 @@ def calculate_direct_inclined_irradiance_pvgis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
+        solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         days_in_a_year=days_in_a_year,

@@ -127,7 +127,7 @@ def test_calculate_solar_time(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=[model],
+        solar_time_models=[model],
     )
     debug(locals())
     assert result == pytest.approx(expected_solar_time)
@@ -307,7 +307,7 @@ tolerances = [
 def test_calculate_hour_angle(solar_time, angle_output_units, expected, tolerance):
     # expected is a `time` object
     solar_time = time(hour=solar_time, minute=0, second=0) 
-    calculated = calculate_hour_angle(solar_time, angle_output_units)
+    calculated = calculate_hour_angle(solar_time)
     assert isinstance(calculated, SolarHourAngle)
     assert pytest.approx(expected, tolerance) == calculated.value
     assert angle_output_units == calculated.unit

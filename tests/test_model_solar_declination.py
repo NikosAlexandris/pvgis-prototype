@@ -1,0 +1,55 @@
+
+import pytest
+from pvgisprototype.api.geometry.solar_declination import model_solar_declination
+from pvgisprototype.api.geometry.models import SolarDeclinationModels
+from .helpers import read_noaa_spreadsheet, test_cases_from_data
+from pvgisprototype.constants import DECLINATION_NAME
+from pvgisprototype import SolarDeclination
+
+
+test_cases_data = read_noaa_spreadsheet(
+    './tests/data/test_cases_noaa_spreadsheet.xlsx'
+)
+test_cases = test_cases_from_data(
+    test_cases_data,
+    against_unit='degrees',
+    timestamp='timestamp',
+    timezone='timezone',
+    declination=DECLINATION_NAME,
+)
+tolerances = [0.1]
+
+declination_models = [
+    SolarDeclinationModels.hargreaves,
+    SolarDeclinationModels.noaa,
+    SolarDeclinationModels.pvis,
+    SolarDeclinationModels.pvlib,
+]
+
+@pytest.mark.parametrize(
+    "timestamp, timezone,\
+    expected_solar_declination, against_unit", test_cases,
+)
+@pytest.mark.parametrize('declination_model', declination_models)
+@pytest.mark.parametrize('tolerance', tolerances)
+def test_model_solar_declination(
+    timestamp,
+    timezone,
+    expected_solar_declination,
+    against_unit,
+    declination_model,
+    tolerance,
+):
+    calculated_solar_declination = model_solar_declination(
+        timestamp=timestamp,
+        timezone=timezone,
+        declination_model=declination_model,
+    )
+
+    # Check types
+    assert isinstance(calculated_solar_declination, SolarDeclination)
+
+    # Assert output
+    assert pytest.approx(
+        getattr(expected_solar_declination, against_unit), tolerance) == getattr(
+            calculated_solar_declination, against_unit)

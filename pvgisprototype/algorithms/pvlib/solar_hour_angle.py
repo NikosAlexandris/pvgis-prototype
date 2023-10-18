@@ -7,6 +7,7 @@ from pvgisprototype import SolarHourAngle
 import pvlib
 import pandas as pd
 import pandas as pd
+from pvgisprototype.constants import DEGREES
 
 
 @validate_with_pydantic(SolarHourAnglePVLIBInput)
@@ -36,8 +37,9 @@ def calculate_solar_hour_angle_pvlib(
 
     solar_hour_angle = SolarHourAngle(
         value=solar_hour_angle,
-        unit='degrees',
-        unit='degrees',
+        unit=DEGREES,
+        position_algorithm='PVLIB',
+        timing_algorithm='PVLIB',
     )
 
     if not -180 <= solar_hour_angle.degrees <= 180:

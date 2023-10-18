@@ -233,7 +233,6 @@ class DaysInAYearModel(BaseModel):
     days_in_a_year: float = DAYS_IN_A_YEAR  # TODO: Validator
 
 
-# class EarthOrbitModel(DaysInAYearModel):
 class EarthOrbitModel(BaseModel):
     perigee_offset: float = PERIGEE_OFFSET
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR

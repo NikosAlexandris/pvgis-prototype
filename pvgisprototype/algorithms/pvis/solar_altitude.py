@@ -12,9 +12,10 @@ from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.solar_time import model_solar_time
-from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
+from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
+from pvgisprototype.api.geometry.time import model_solar_time
+from pvgisprototype.api.geometry.hour_angle import calculate_hour_angle
+from pvgisprototype.constants import RADIANS
 
 
 @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
@@ -81,7 +82,20 @@ def calculate_solar_altitude_pvis(
     )
     sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
     solar_altitude = asin(sine_solar_altitude)
-    solar_altitude = SolarAltitude(value=solar_altitude, unit='RADIANS')
+    solar_altitude = SolarAltitude(
+        value=solar_altitude,
+        unit=RADIANS,
+        position_algorithm='PVIS',
+        timing_algorithm=solar_time_model.value,
+    )
+    if (
+        not isfinite(solar_altitude.degrees)
+        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+        )
 
     if verbose == 3:
         debug(locals())
