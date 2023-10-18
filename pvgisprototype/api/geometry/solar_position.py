@@ -2,6 +2,7 @@ from devtools import debug
 from typing import Optional
 from typing import List
 from typing import Tuple
+from math import isfinite
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import suncalc
@@ -175,6 +176,14 @@ def model_solar_geometry_overview(
             position_algorithm='suncalc',
             timing_algorithm='suncalc',
         )
+        if (
+            not isfinite(solar_azimuth.degrees)
+            or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+        ):
+            raise ValueError(
+                f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
+                [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+            )
 
         solar_altitude = SolarAltitude(
             value=solar_altitude,
@@ -182,6 +191,14 @@ def model_solar_geometry_overview(
             position_algorithm='suncalc',
             timing_algorithm='suncalc',
         )
+        if (
+            not isfinite(solar_altitude.degrees)
+            or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+        ):
+            raise ValueError(
+                f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
+            )
         # ------------------------------------ TODO: calculate_solar_zenith_suncalc
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
@@ -207,7 +224,14 @@ def model_solar_geometry_overview(
             position_algorithm='pysolar',
             timing_algorithm='pysolar',
         )
-
+        if (
+            not isfinite(solar_altitude.degrees)
+            or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+        ):
+            raise ValueError(
+                f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
+            )
         # ------------------------------------ TODO: calculate_solar_zenith_pysolar
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
@@ -229,6 +253,15 @@ def model_solar_geometry_overview(
             position_algorithm='pysolar',
             timing_algorithm='pysolar',
         )
+
+        if (
+            not isfinite(solar_azimuth.degrees)
+            or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+        ):
+            raise ValueError(
+                f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
+                [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+            )
 
     if solar_position_model.value  == SolarPositionModels.pvis:
 

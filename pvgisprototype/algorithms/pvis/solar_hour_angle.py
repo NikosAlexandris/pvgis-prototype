@@ -1,5 +1,6 @@
 from devtools import debug
 import typer
+from math import isfinite
 from datetime import datetime
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype import SolarHourAngle
@@ -52,7 +53,14 @@ def calculate_solar_hour_angle_pvis(
         position_algorithm='pvis',
         timing_algorithm='pvis',
     )
-
+    if (
+        not isfinite(hour_angle.degrees)
+        or not hour_angle.min_degrees <= hour_angle.degrees <= hour_angle.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar hour angle {hour_angle.degrees} is out of the expected range\
+            [{hour_angle.min_degrees}, {hour_angle.max_degrees}] degrees"
+        )
     return hour_angle
 
 

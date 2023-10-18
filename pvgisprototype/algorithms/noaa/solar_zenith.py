@@ -160,8 +160,16 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     # i.e. at 90.833 degrees or about π/2 + 0.0146 radians
     # which is the solar zenith angle when the center of the sun is at the horizon,
     # considering both its apparent size and atmospheric refraction.
-    if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
+    # if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
+    #     raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
+    if (
+        not isfinite(solar_zenith.degrees)
+        or not solar_zenith.min_degrees <= solar_zenith.degrees <= solar_zenith.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar zenith angle {solar_zenith.degrees} is out of the expected range\
+            [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
+        )
 
     if verbose == 3:
         debug(locals())
@@ -263,8 +271,16 @@ def calculate_solar_zenith_noaa(
         )  # always in radians!
     
     # if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi/2 + 0.0146:
-    if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')
+    # if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
+    #     raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')
+    if (
+        not isfinite(solar_zenith.degrees)
+        or not solar_zenith.min_degrees <= solar_zenith.degrees <= solar_zenith.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar zenith angle {solar_zenith.degrees} is out of the expected range\
+            [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
+        )
 
     if verbose == 3:
         debug(locals())

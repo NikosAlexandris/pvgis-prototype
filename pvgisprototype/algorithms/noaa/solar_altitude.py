@@ -53,7 +53,7 @@ def calculate_solar_altitude_noaa(
     ):
         raise ValueError(
             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
         )
     if verbose == 3:
         debug(locals())

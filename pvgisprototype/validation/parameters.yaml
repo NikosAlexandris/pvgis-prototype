@@ -78,7 +78,7 @@ EccentricityCorrectionFactor:
 
 # Solar time
 
-# SolarTime:      # NOTE: Solar time is a datetime.datetime object, not a nested object
+# SolarTime:      # NOTE: Removed! Solar time is a datetime.datetime object, not a nested object
 #   value:
 #     type: Optional[datetime]
 #     initial:
@@ -107,6 +107,12 @@ SolarHourAngle:
   timing_algorithm:
     type: Optional[str]
     initial:
+  min_degrees:
+    type: float
+    initial: -180
+  max_degrees:
+    type: float
+    initial: 180
 
 EventHourAngle:
   value:
@@ -147,6 +153,12 @@ SolarDeclination:
   timing_algorithm:
     type: Optional[str]
     initial:
+  min_degrees:
+    type: float
+    initial: -23.44
+  max_degrees:
+    type: float
+    initial: 23.44
 
 SolarZenith:
   value:
@@ -161,6 +173,12 @@ SolarZenith:
   timing_algorithm:
     type: Optional[str]
     initial:
+  min_degrees:
+    type: float
+    initial: 0
+  max_degrees:
+    type: float
+    initial: 180.836518
 
 RefractedSolarZenith:
   value:
@@ -235,6 +253,12 @@ SolarAzimuth:
   timing_algorithm:
     type: Optional[str]
     initial:
+  min_degrees:
+    type: float
+    initial: 0
+  max_degrees:
+    type: float
+    initial: 360
 
 CompassSolarAzimuth:
   value:
