@@ -29,6 +29,8 @@ from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import DEGREES
 
 
 @validate_with_pydantic(ModelSolarAltitudeInputModel)
@@ -92,7 +94,20 @@ def model_solar_altitude(
             lng=longitude.degrees,
             lat=latitude.degrees,
         ).values()  # zero points to south
-        solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+        solar_altitude = SolarAltitude(
+            value=solar_altitude,
+            unit=RADIANS,
+            position_algorithm='suncalc',
+            timing_algorithm='suncalc',
+        )
+        if (
+            not isfinite(solar_altitude.degrees)
+            or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+        ):
+            raise ValueError(
+                f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
+            )
 
     if solar_position_model.value == SolarPositionModels.pysolar:
 
@@ -104,7 +119,20 @@ def model_solar_altitude(
             when=timestamp,
         )  # returns degrees by default
         # required by output function
-        solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
+        solar_altitude = SolarAltitude(
+            value=solar_altitude,
+            unit=DEGREES,
+            position_algorithm='pysolar',
+            timing_algorithm='pysolar',
+        )
+        if (
+            not isfinite(solar_altitude.degrees)
+            or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+        ):
+            raise ValueError(
+                f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
+            )
 
     if solar_position_model.value  == SolarPositionModels.pvis:
 
