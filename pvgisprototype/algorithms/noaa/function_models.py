@@ -27,6 +27,7 @@ from pvgisprototype.validation.parameters import ApplyAtmosphericRefractionModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithModel
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
 from pvgisprototype.validation.parameters import RefractedSolarZenithModel
+from pvgisprototype.validation.parameters import RefractedSolarZenithModel
 from math import pi
 import numpy as np
 
@@ -42,7 +43,6 @@ class CalculateFractionalYearNOAAInput(
 
 class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     BaseTimestampSeriesModel,  # != BaseTimestampModel
-    AngleInRadiansOutputUnitsModel,
 ):
     pass
 
@@ -97,6 +97,7 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     @field_validator('solar_zenith')
     @classmethod
     def solar_zenith_range(cls, v):
+        if not (0 <= v.radians <= pi):
         if not (0 <= v.radians <= pi):
             raise ValueError('solar_zenith must range within [0, π]')
         return v
@@ -163,8 +164,7 @@ class CalculateSolarAzimuthNOAAInput(
 class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
+
 ):
     pass
 
@@ -181,6 +181,7 @@ class CalculateEventHourAngleNOAAInput(
         target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
         error_margin = 0.01
         if not (target_zenith - error_margin) <= v.radians <= (target_zenith + error_margin):
+        if not (target_zenith - error_margin) <= v.radians <= (target_zenith + error_margin):
             raise ValueError(
                 f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
@@ -190,6 +191,7 @@ class CalculateEventHourAngleNOAAInput(
 class CalculateEventTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
     RefractedSolarZenithModel,
     BaseTimeEventModel,
     ApplyAtmosphericRefractionModel,

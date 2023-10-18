@@ -9,6 +9,7 @@ from pvgisprototype.validation.functions import ModelSolarTimeInputModel
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype import SolarTime
 from .models import SolarTimeModels
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
@@ -101,14 +102,7 @@ def calculate_solar_time(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    refracted_solar_zenith: RefractedSolarZenith,  # radians
     solar_time_models: List[SolarTimeModels] = [SolarTimeModels.skyfield],
-    apply_atmospheric_refraction: bool = True,
-    days_in_a_year: float = 365.25,
-    perigee_offset: float = 0.048869,
-    eccentricity_correction_factor: float = 0.03344,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     time_output_units: str = "minutes",
     verbose: int = 0,
 ) -> List:
@@ -130,13 +124,6 @@ def calculate_solar_time(
                 timestamp=timestamp,
                 timezone=timezone,
                 solar_time_model=solar_time_model,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
-                days_in_a_year=days_in_a_year,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                time_offset_global=time_offset_global,
-                hour_offset=hour_offset,
                 verbose=verbose,
             )
             debug(locals())

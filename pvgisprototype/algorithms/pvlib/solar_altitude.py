@@ -24,6 +24,8 @@ def calculate_solar_altitude_pvlib(
     solar_altitude = solar_position['apparent_elevation'].values[0]
 
     if not isfinite(solar_altitude) or not -90 <= solar_altitude <= 90:
-        raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-90}, {90}] degrees')
+        raise ValueError(f'The calculated solar altitude angle {solar_altitude} is out of the expected range [{-90}, {90}] degrees')
 
-    return SolarAltitude(value=solar_altitude, unit='degrees')
+    solar_altitude = SolarAltitude(value=solar_altitude, unit='degrees')
+
+    return solar_altitude

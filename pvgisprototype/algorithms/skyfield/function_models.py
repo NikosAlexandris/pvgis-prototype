@@ -9,15 +9,13 @@ class CalculateSolarTimeSkyfieldInputModel(
     BaseTimeModel,
 ):
     verbose: int = 0
+    verbose: int = 0
 
 
 class CalculateSolarDeclinationSkyfieldInputModel(
     BaseTimestampModel,
         ):
     pass
-
-
-
 
 
 class CalculateSolarPositionSkyfieldInputModel(  # Angle output units are not usefull for solar position

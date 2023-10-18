@@ -14,6 +14,7 @@ from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype import AtmosphericRefraction
 from pvgisprototype.validation.functions import CalculateSolarZenithNOAAInput
+from pvgisprototype.validation.functions import CalculateSolarZenithNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarZenithTimeSeriesNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput
@@ -134,6 +135,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     }
 
     solar_altitude = radians(90) - solar_zenith.radians # in radians
+    solar_altitude = radians(90) - solar_zenith.radians # in radians
     if solar_altitude <= radians(85):
 
         if solar_altitude > radians(5):
@@ -148,7 +150,13 @@ def adjust_solar_zenith_for_atmospheric_refraction(
         # solar zenith = 0 degrees + refraction correction.
         atmospheric_refraction_adjustment_radians = function(solar_altitude)  # in radians
         adjusted_solar_zenith = solar_zenith.radians - atmospheric_refraction_adjustment_radians.radians  # in radians
+        adjusted_solar_zenith = solar_zenith.radians - atmospheric_refraction_adjustment_radians.radians  # in radians
         # solar_zenith += function(solar_altitude)  # in radians
+
+    solar_zenith = SolarZenith(
+        value=adjusted_solar_zenith,
+        unit='radians',
+    )
 
     solar_zenith = SolarZenith(
         value=adjusted_solar_zenith,
@@ -160,6 +168,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     # i.e. at 90.833 degrees or about π/2 + 0.0146 radians
     # which is the solar zenith angle when the center of the sun is at the horizon,
     # considering both its apparent size and atmospheric refraction.
+    if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
     if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
         raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
 
@@ -204,6 +213,9 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     # function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).radians)
     # function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).radians)
     # function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).radians)
+    # function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).radians)
+    # function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).radians)
+    # function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).radians)
 
     # Adjust
     if mask_high.any():
@@ -242,6 +254,7 @@ def calculate_solar_zenith_noaa(
     """Calculate the solar zenith angle (φ) in radians """
     if verbose == 3:
         debug(locals())
+
 
     solar_declination = calculate_solar_declination_noaa(
         timestamp=timestamp,
@@ -285,6 +298,7 @@ def calculate_solar_zenith_time_series_noaa(
             angle_output_units='radians',
             )
     solar_declination_series = np.array([item.radians for item in solar_declination_series])
+    solar_declination_series = np.array([item.radians for item in solar_declination_series])
 
     if isinstance(timestamps, datetime):
         timestamps = [timestamps]
@@ -295,7 +309,10 @@ def calculate_solar_zenith_time_series_noaa(
 
     # convert to a NumPy array
     solar_hour_angle_series = np.array([item.radians for item in solar_hour_angle_series])
+    solar_hour_angle_series = np.array([item.radians for item in solar_hour_angle_series])
     cosine_solar_zenith = (
+        np.sin(latitude.radians) * np.sin(solar_declination_series)
+        + np.cos(latitude.radians) * np.cos(solar_declination_series) * np.cos(solar_hour_angle_series)
         np.sin(latitude.radians) * np.sin(solar_declination_series)
         + np.cos(latitude.radians) * np.cos(solar_declination_series) * np.cos(solar_hour_angle_series)
     )

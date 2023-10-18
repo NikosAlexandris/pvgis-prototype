@@ -41,7 +41,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f"PVGIS core CLI prototype",
+    help=f"PVGIS Command Line Interface [bold][magenta]prototype[/magenta][/bold]",
 )
 
 

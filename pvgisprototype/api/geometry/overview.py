@@ -1,7 +1,6 @@
 from devtools import debug
 from typing import Optional
 from typing import List
-from typing import Tuple
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import suncalc
@@ -16,7 +15,6 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import SolarZenith
-from pvgisprototype import RefractedSolarZenith
 
 from .models import SolarTimeModels
 from .models import SolarPositionModels
@@ -39,6 +37,8 @@ from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_de
 from pvgisprototype.algorithms.pvlib.solar_hour_angle import calculate_solar_hour_angle_pvlib
 from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_pvlib
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
+from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
+from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_constants
 from pvgisprototype.constants import (
     POSITION_ALGORITHM_NAME,
     ALTITUDE_NAME,
@@ -103,6 +103,7 @@ def model_solar_geometry_overview(
 
     if solar_position_model.value == SolarPositionModels.noaa:
 
+        print('NOAA')
         solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
         )
@@ -138,6 +139,7 @@ def model_solar_geometry_overview(
     
     if solar_position_model.value == SolarPositionModels.skyfield:
 
+        print('Skyfield')
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude=longitude,
                 latitude=latitude,
@@ -206,6 +208,7 @@ def model_solar_geometry_overview(
 
     if solar_position_model.value  == SolarPositionModels.pvis:
 
+        print('PVIS')
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
             timezone=timezone,
@@ -343,7 +346,7 @@ def calculate_solar_geometry_overview(
                 TIME_ALGORITHM_NAME: solar_time_model,
                 DECLINATION_NAME if solar_declination else None: getattr(solar_declination, angle_output_units) if solar_declination else None,
                 HOUR_ANGLE_NAME if solar_hour_angle else None: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle else None,
-                POSITION_ALGORITHM_NAME: model.value,
+                POSITION_ALGORITHM_NAME: solar_position_models.value,
                 ZENITH_NAME if solar_zenith else None: getattr(solar_zenith, angle_output_units) if solar_zenith else None,
                 ALTITUDE_NAME if solar_altitude else None: getattr(solar_altitude, angle_output_units) if solar_altitude else None,
                 AZIMUTH_NAME if solar_azimuth else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,

@@ -103,17 +103,22 @@ def test_calculate_solar_position(model):
             if declination is not None:
                 assert isinstance(declination, float)
             altitude = model_result.get(ALTITUDE_NAME, None)
+            altitude = model_result.get(ALTITUDE_NAME, None)
             if altitude is not None:
                 assert isinstance(altitude, float)
+            azimuth = model_result.get(AZIMUTH_NAME, None)
             azimuth = model_result.get(AZIMUTH_NAME, None)
             if azimuth is not None:
                 assert isinstance(azimuth, float)
             zenith = model_result.get(ZENITH_NAME, None)
+            zenith = model_result.get(ZENITH_NAME, None)
             if zenith is not None:
                 assert isinstance(zenith, float)
             incidence = model_result.get(INCIDENCE_NAME, None)
+            incidence = model_result.get(INCIDENCE_NAME, None)
             if incidence is not None:
                 assert isinstance(incidence, float)
+            units = model_result.get(UNITS_NAME, None)
             units = model_result.get(UNITS_NAME, None)
             if units is not None:
                 assert isinstance(units, str)

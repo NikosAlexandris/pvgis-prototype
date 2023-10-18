@@ -1,8 +1,11 @@
 from devtools import debug
+from devtools import debug
 from datetime import datetime
+from datetime import timedelta
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import CalculateTimeOffsetNOAAInput
 from pvgisprototype.validation.functions import CalculateTimeOffsetNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import TimeOffset
@@ -111,7 +114,7 @@ def calculate_time_offset_noaa(
       speed and axial tilt. It varies throughout the year, but is typically
       within the range of about -20 minutes to +20 minutes.
     """
-    # longitude_in_minutes = radians_to_time_minutes(longitude.radians)  # time
+
 
     # This will be 0 for UTC, obviously! Review-Me! --------------------------
 

@@ -6,6 +6,7 @@ from datetime import datetime
 from pvgisprototype import SolarHourAngle
 import pvlib
 import pandas as pd
+import pandas as pd
 
 
 @validate_with_pydantic(SolarHourAnglePVLIBInput)
@@ -18,7 +19,15 @@ def calculate_solar_hour_angle_pvlib(
     equation_of_time = pvlib.solarposition.equation_of_time_spencer71(timestamp.timetuple().tm_yday)
     
     timestamp = pd.DatetimeIndex([timestamp.strftime("%Y/%m/%d %H:%M:%S.%f%z")])
+    equation_of_time = pvlib.solarposition.equation_of_time_spencer71(timestamp.timetuple().tm_yday)
+    
+    timestamp = pd.DatetimeIndex([timestamp.strftime("%Y/%m/%d %H:%M:%S.%f%z")])
 
+    solar_hour_angle = pvlib.solarposition.hour_angle(
+        timestamp,
+        longitude.degrees,
+        equation_of_time=equation_of_time
+        )
     solar_hour_angle = pvlib.solarposition.hour_angle(
         timestamp,
         longitude.degrees,
@@ -27,6 +36,7 @@ def calculate_solar_hour_angle_pvlib(
 
     solar_hour_angle = SolarHourAngle(
         value=solar_hour_angle,
+        unit='degrees',
         unit='degrees',
     )
 

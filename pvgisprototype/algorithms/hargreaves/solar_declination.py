@@ -7,6 +7,7 @@ from math import radians
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationHargreavesInputModel
 from pvgisprototype import SolarDeclination
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 
 
 @validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)
@@ -41,19 +42,20 @@ def calculate_solar_declination_hargreaves(
         variation and is usually chosen to align with the summer solstice,
         which typically occurs around June 21st.
     """
-    # year = timestamp.year
-    # start_of_year = datetime(year=year, month=1, day=1, tzinfo=timezone.utc)
+    days_in_year = get_days_in_year(timestamp.year)
     day_of_year = timestamp.timetuple().tm_yday
     declination_value_in_degrees = 23.45 * sin(
         radians(
             360
-            / days_in_a_year
+            / days_in_year
             * (
                 284
                 + day_of_year
                 + 0.4
-                * sin(radians(360 / days_in_a_year * (day_of_year - 100)))
+                * sin(radians(360 / days_in_year * (day_of_year - 100)))
             )
         )
     )
-    return SolarDeclination(value=declination_value_in_degrees, unit='degrees')
+    declination = SolarDeclination(value=declination_value_in_degrees, unit='degrees')
+
+    return declination

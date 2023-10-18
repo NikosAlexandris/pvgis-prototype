@@ -110,6 +110,14 @@ EventHourAngle:
     type: Optional[str]
     initial:
 
+EventTime:
+  value:
+    type: Optional[datetime]
+    initial:
+  unit:
+    type: str
+    initial: datetime
+
 HourAngleSunrise:
   value:
     type: Optional[float]
@@ -255,15 +263,15 @@ HorizonHeight:
 SurfaceTilt:
   value:
     type: float
-    initial: 45
+    initial:
   unit:
     type: str
-    initial: 'degrees'
+    initial:
 
 SurfaceOrientation:
   value:
     type: float
-    initial: 180.0
+    initial:
   unit:
     type: str
-    initial: 'degrees'
+    initial:

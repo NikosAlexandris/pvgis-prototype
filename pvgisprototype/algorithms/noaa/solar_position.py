@@ -29,6 +29,7 @@ from pvgisprototype.algorithms.noaa.function_models import CalculateSolarPositio
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
+from pvgisprototype import RefractedSolarZenith
 
 
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
@@ -41,6 +42,8 @@ def calculate_noaa_solar_position(
     longitude: Longitude,       # radians 
     latitude: Latitude,         # radians
     timestamp: datetime,
+    timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,  # radians
     timezone: ZoneInfo,
     refracted_solar_zenith: RefractedSolarZenith,  # radians
     apply_atmospheric_refraction: bool = False,

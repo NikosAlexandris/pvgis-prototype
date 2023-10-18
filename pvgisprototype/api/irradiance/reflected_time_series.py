@@ -1,4 +1,3 @@
-
 from devtools import debug
 import typer
 from typing import Annotated
@@ -10,9 +9,12 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 from ..utilities.conversions import convert_to_radians
 from datetime import datetime
-from ..utilities.timestamp import now_utc_datetimezone
-from ..utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from rich.console import Console
+from rich import print
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
@@ -31,6 +33,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
@@ -46,7 +49,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
@@ -55,9 +57,11 @@ from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
+from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -69,6 +73,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import IRRADIANCE_UNITS
 
 
 
@@ -93,12 +98,13 @@ console = Console()
     help=f'☀ Calculate the clear-sky ground reflected irradiance',
     rich_help_panel=rich_help_panel_series_irradiance,
 )
-def calculate_ground_reflected_inclined_irradiance(
+def calculate_ground_reflected_inclined_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
@@ -114,7 +120,6 @@ def calculate_ground_reflected_inclined_irradiance(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
@@ -135,33 +140,38 @@ def calculate_ground_reflected_inclined_irradiance(
     rg(γN).
     """
     # from the model
-    direct_horizontal_component_series = calculate_direct_horizontal_irradiance_time_series(
+    direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
         timestamps=timestamps,
+        start_time=start_time,
+        frequency=frequency,
+        end_time=end_time,
         timezone=timezone,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         solar_time_model=solar_time_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_constant=solar_constant,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
-        verbose=verbose,
+        verbose=0,  # no verbosity here by choice!
     )
 
     # G0
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
+            start_time=start_time,
+            frequency=frequency,
+            end_time=end_time,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             random_days=random_days,
+            verbose=0,  # no verbosity here by choice!
         )
     )
 
@@ -177,23 +187,16 @@ def calculate_ground_reflected_inclined_irradiance(
         solar_time_model=solar_time_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
-        )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
-    # on a horizontal surface : G0h = G0 sin(h0)
-    extraterrestial_horizontal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series
-        * np.sin(solar_altitude_series_array)
     )
 
     # Dhc [W.m-2]
-    diffuse_horizontal_component_series = (
+    diffuse_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series
         * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
         * diffuse_solar_altitude_function_time_series(
@@ -201,25 +204,69 @@ def calculate_ground_reflected_inclined_irradiance(
         )
     )
     global_horizontal_irradiance_series = (
-        direct_horizontal_component_series + diffuse_horizontal_component_series
+        direct_horizontal_irradiance_series + diffuse_horizontal_irradiance_series
     )
-
     ground_view_fraction = (1 - cos(surface_tilt)) / 2
 
     # clear-sky ground reflected irradiance
-    ground_reflected_irradiance_series = albedo * global_horizontal_irradiance_series * ground_view_fraction
+    ground_reflected_inclined_irradiance_series = (
+        albedo * global_horizontal_irradiance_series * ground_view_fraction
+    )
 
     if apply_angular_loss_factor:
         ground_reflected_irradiance_angular_loss_coefficient = sin(surface_tilt) + (surface_tilt - sin(surface_tilt)) / (1 - cos(surface_tilt))
         ground_reflected_irradiance_loss_factor_series = calculate_angular_loss_factor_for_nondirect_irradiance(
-            angular_loss_coefficient=ground_reflected_irradiance_angular_loss_coefficient,
-            solar_incidence_angle_1=AOIConstants[0],
-            solar_incidence_angle_2=AOIConstants[1],
+            indirect_angular_loss_coefficient=ground_reflected_irradiance_angular_loss_coefficient,
         )
-        ground_reflected_irradiance_series *= (
+        ground_reflected_inclined_irradiance_series *= (
             ground_reflected_irradiance_loss_factor_series
         )
 
-    typer.echo(ground_reflected_irradiance_series)
+    results = {
+        "Reflected": ground_reflected_inclined_irradiance_series,
+    }
+    title = 'Reflected'
 
-    return ground_reflected_irradiance_series
+    if verbose > 1 :
+        solar_altitude_series_array = np.array([solar_altitude.radians for solar_altitude in solar_altitude_series])
+        extended_results = {
+            "Albedo": albedo,
+            "Global": global_horizontal_irradiance_series,
+            "View fraction": ground_view_fraction,
+        }
+        results = results | extended_results
+
+    if verbose > 2:
+        more_extended_results = {
+            "Loss": 1 - ground_reflected_irradiance_loss_factor_series,
+            "Direct horizontal": direct_horizontal_irradiance_series,
+            "Diffuse horizontal": diffuse_horizontal_irradiance_series,
+        }
+        results = results | more_extended_results
+        title += ' & horizontal components'
+
+
+    if verbose > 3:
+        even_more_extended_results = {
+            "Extraterrestrial normal": extraterrestrial_normal_irradiance_series,
+            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+        }
+        results = results | even_more_extended_results
+
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+
+    if verbose == 5:
+        debug(locals())
+
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title=title + f' irradiance series {IRRADIANCE_UNITS}',
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
+
+    return ground_reflected_inclined_irradiance_series

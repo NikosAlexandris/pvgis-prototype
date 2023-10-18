@@ -1,5 +1,7 @@
 from devtools import debug
-from typing import List, Union, Sequence
+from typing import List
+from typing import Union
+from typing import Sequence
 from datetime import datetime
 from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -20,16 +22,15 @@ def model_solar_altitude_time_series(
     timezone: str,
     model: SolarPositionModels,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
-    days_in_a_year: float = 365.25,
-    perigee_offset: float = 0.048869,
-    eccentricity_correction_factor: float = 0.01672,
-    time_output_units: str = 'minutes',
+    # refracted_solar_zenith: float = 1.5853349194640094,
+    # solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    # time_offset_global: float = 0,
+    # hour_offset: float = 0,
+    # perigee_offset: float = 0.048869,
+    # eccentricity_correction_factor: float = 0.01672,
+    # time_output_units: str = 'minutes',
     # angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    # angle_output_units: str = 'radians',
     verbose: int = 0,
 ) -> List[SolarAltitude]:
 
@@ -44,8 +45,6 @@ def model_solar_altitude_time_series(
             timestamps=timestamps,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            # time_output_units=time_output_units,
-            # angle_output_units=angle_output_units,
             verbose=verbose,
         )
 
@@ -64,6 +63,4 @@ def model_solar_altitude_time_series(
     if model.value  == SolarPositionModels.pvlib:
         pass
 
-    if verbose == 3:
-        debug(locals())
     return solar_altitude_series

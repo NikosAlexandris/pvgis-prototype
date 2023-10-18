@@ -48,8 +48,8 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 from .direct import calculate_direct_horizontal_irradiance
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
-from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from pvgisprototype.api.geometry.solar_azimuth import model_solar_azimuth
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
+from pvgisprototype.api.geometry.azimuth import model_solar_azimuth
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
@@ -93,7 +93,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_r
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_declination_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
@@ -111,11 +110,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-
-
-AOIConstants = []
-AOIConstants.append(-0.074)
-AOIConstants.append(0.155)
+from pvgisprototype.constants import TERM_N_IN_SHADE
 
 
 app = typer.Typer(
@@ -250,10 +245,11 @@ def calculate_diffuse_horizontal_component_from_sarah(
             + Style.RESET_ALL
         )
         logging.warning(warning)
-        if verbose > 0:
-            print(Fore.YELLOW + warning)
         if verbose == 3:
             debug(locals())
+        if verbose > 0:
+            print(Fore.YELLOW + warning)
+
         return single_value
 
     # ---------------------------------------------------------- Remove Me ---
@@ -267,10 +263,11 @@ def calculate_diffuse_horizontal_component_from_sarah(
         if csv:
             export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
 
-    if verbose > 0:
-        print(f'Series : {location_time_series.values}')
     if verbose == 3:
         debug(locals())
+    if verbose > 0:
+        print(f'Series : {location_time_series.values}')
+
     return diffuse_horizontal_irradiance
 
 
@@ -347,11 +344,11 @@ def calculate_diffuse_sky_irradiance(
 
 
 @app.command(
-        'transmission-function',
-        no_args_is_help=True,
-        help=f'⇝ Calculate the diffuse transmission function',
-        rich_help_panel=rich_help_panel_toolbox,
-        )
+    'transmission-function',
+    no_args_is_help=True,
+    help=f'⇝ Calculate the diffuse transmission function',
+    rich_help_panel=rich_help_panel_toolbox,
+)
 def diffuse_transmission_function(
     linke_turbidity_factor: Annotated[Optional[float], typer_argument_linke_turbidity_factor] = 2,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -361,11 +358,12 @@ def diffuse_transmission_function(
     diffuse_transmission = (
         -0.015843
         + 0.030543 * linke_turbidity_factor
-        + 0.3797 * linke_turbidity_factor**2
+        + 0.0003797 * linke_turbidity_factor ** 2
     )
 
     if verbose == 3:
         debug(locals())
+
     return diffuse_transmission
 
 
@@ -405,6 +403,7 @@ def diffuse_solar_altitude_coefficients(
 
     if verbose == 3:
         debug(locals())
+
     return a1, a2, a3
 
 
@@ -443,9 +442,8 @@ def calculate_diffuse_inclined_irradiance(
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_argument_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.pvlib,
-    solar_declination_model: Annotated[SolarDeclinationModels, typer_option_solar_declination_model] = SolarDeclinationModels.pvis,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.skyfield,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.pvlib,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
@@ -579,9 +577,6 @@ def calculate_diffuse_inclined_irradiance(
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
-            # time_output_units=time_output_units,
-            # angle_units=angle_units,
-            # angle_output_units=angle_output_units,
         )
         solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
         hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
@@ -601,7 +596,7 @@ def calculate_diffuse_inclined_irradiance(
             # F(γN)
             diffuse_sky_irradiance = calculate_diffuse_sky_irradiance(
                     surface_tilt,
-                    n=0.25227,  # term N for surfaces in shade
+                    n=TERM_N_IN_SHADE,  # term N for surfaces in shade
                     )
             diffuse_inclined_irradiance = (
                 diffuse_horizontal_component * diffuse_sky_irradiance
@@ -630,9 +625,6 @@ def calculate_diffuse_inclined_irradiance(
                     time_offset_global=time_offset_global,
                     hour_offset=hour_offset,
                     solar_time_model=solar_time_model,
-                    # time_output_units=time_output_units,
-                    # angle_units=angle_units,
-                    # angle_output_units=angle_output_units,
                 )
 
                 # Normalize the azimuth difference to be within the range -pi to pi
@@ -648,22 +640,22 @@ def calculate_diffuse_inclined_irradiance(
                     * sin(surface_tilt)
                     * cos(azimuth_difference)
                     / (0.1 - 0.008 * solar_altitude.radians)
+                    / (0.1 - 0.008 * solar_altitude.radians)
                 )
         # finally, we need to set
         diffuse_irradiance = diffuse_inclined_irradiance
 
     # one more thing
+    # if(calculateAngleLoss())
     if apply_angular_loss_factor:
-
         diffuse_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
             pi - surface_tilt - sin(surface_tilt)
         ) / (1 + cos(surface_tilt))
-        diffuse_irradiance_loss_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
-            angular_loss_coefficient=diffuse_irradiance_angular_loss_coefficient,
-            solar_incidence_angle_1=AOIConstants[0],
-            solar_incidence_angle_2=AOIConstants[1],
+        diffuse_irradiance_loss_factor = (
+            calculate_angular_loss_factor_for_nondirect_irradiance(
+                indirect_angular_loss_coefficient=diffuse_irradiance_angular_loss_coefficient,
+            )
         )
-
         diffuse_irradiance *= diffuse_irradiance_loss_factor
 
     # if statistics:
@@ -672,9 +664,9 @@ def calculate_diffuse_inclined_irradiance(
     #     if csv:
     #         export_statistics_to_csv(data_statistics, 'diffuse_horizontal_component')
 
-    if verbose > 0:
-        print(f'Diffuse irradiance : {diffuse_irradiance}')
     if verbose == 3:
         debug(locals())
+    if verbose > 0:
+        print(f'Diffuse irradiance : {diffuse_irradiance}')
 
     return diffuse_irradiance
