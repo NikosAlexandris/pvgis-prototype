@@ -67,7 +67,6 @@ from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
@@ -181,7 +180,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        model=solar_position_model,
+        solar_position_model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
@@ -245,7 +244,6 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         results = results | more_extended_results
         title += ' & horizontal components'
 
-
     if verbose > 3:
         even_more_extended_results = {
             "Extraterrestrial normal": extraterrestrial_normal_irradiance_series,
@@ -256,7 +254,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
-    if verbose == 5:
+    if verbose > 5:
         debug(locals())
 
     print_irradiance_table_2(
@@ -264,7 +262,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         latitude=latitude,
         timestamps=timestamps,
         dictionary=results,
-        title=title + f' irradiance series {IRRADIANCE_UNITS}',
+        title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
         verbose=verbose,
     )

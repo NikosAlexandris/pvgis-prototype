@@ -2,9 +2,7 @@ from devtools import debug
 from zoneinfo import ZoneInfo
 import pvlib
 from datetime import datetime
-from math import pi
 from math import isfinite
-# from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarZenithPVLIBInputModel
@@ -19,11 +17,9 @@ def calculate_solar_zenith_pvlib(
         latitude: Latitude,     # degrees
         timestamp: datetime,
         timezone: ZoneInfo,
-        # angle_output_units: str = 'radians',
     )-> SolarZenith:
     """Calculate the solar azimith (θ) in radians
     """
-
     solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_zenith = solar_position['zenith'].values[0]
 
@@ -33,7 +29,7 @@ def calculate_solar_zenith_pvlib(
     solar_zenith = SolarZenith(
             value=solar_zenith,
             unit='degrees',
+            position_algorithm='pvlib',
+            timing_algorithm='pvlib',
             )
-    # solar_zenith = convert_to_radians_if_requested(solar_zenith, angle_output_units)
-
     return solar_zenith

@@ -30,11 +30,8 @@ def calculate_solar_azimuth_noaa(
     longitude: Longitude,   # radians
     latitude: Latitude,     # radians
     timestamp: datetime,
-    timezone: str,
+    timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
-    # time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
-    # angle_output_units: str = 'radians',
     verbose: int = 0,
 )-> SolarAzimuth:
     """Calculate the solar azimuth angle (θ) in radians
@@ -47,23 +44,18 @@ def calculate_solar_azimuth_noaa(
     # Review & Cache Me ! ----------------------------------------------------
     solar_declination = calculate_solar_declination_noaa(
         timestamp=timestamp,
-        # angle_units,
-        # angle_output_units='radians',
     )
     # ------------------------------------------------------------------------
     solar_hour_angle = calculate_solar_hour_angle_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,
-        # time_output_units=time_output_units,
-        # angle_output_units='radians',
     )
     solar_zenith = calculate_solar_zenith_noaa(
         latitude=latitude,
         timestamp=timestamp,
         solar_hour_angle=solar_hour_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # angle_output_units='radians',
     )
 
                    #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
@@ -117,7 +109,7 @@ def calculate_solar_azimuth_noaa(
     cosine_solar_azimuth = -1 * numerator / denominator
     solar_azimuth = acos(cosine_solar_azimuth)
 
-    if solar_hour_angle.value > 0:
+    if solar_hour_angle.radians > 0:
         solar_azimuth = 2 * pi - solar_azimuth
 
     if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
@@ -126,6 +118,8 @@ def calculate_solar_azimuth_noaa(
     solar_azimuth = SolarAzimuth(
             value=solar_azimuth,
             unit='radians',
+            position_algorithm='NOAA',
+            timing_algorithm='NOAA',
             )
 
     if verbose == 3:
@@ -144,9 +138,6 @@ def calculate_solar_azimuth_time_series_noaa(
     timestamps: Union[float, Sequence[float]],
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
-    # time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
-    # angle_output_units: str = 'radians',
     verbose: int = 0,
 ):# -> np.ndarray:
     """Calculate the solar azimuth (θ) in radians for a time series"""

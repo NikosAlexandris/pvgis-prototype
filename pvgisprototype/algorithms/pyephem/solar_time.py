@@ -1,16 +1,8 @@
 from devtools import debug
-import typer
-from typing import Annotated
-from typing import Optional
 from datetime import datetime
-from datetime import time
 from datetime import timedelta
 from math import pi
 import ephem
-from ...api.utilities.timestamp import ctx_convert_to_timezone
-from ...api.utilities.conversions import convert_to_radians
-from ...api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype import SolarTime
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -24,7 +16,7 @@ def calculate_solar_time_ephem(
     timestamp: datetime,
     timezone: str = None,
     verbose: int = 0,
-)->SolarTime:
+  )->datetime:
   """Calculate the solar time using PyEphem
 
   The position of the Sun in the sky changes slightly day to day due to the
@@ -134,7 +126,7 @@ def calculate_solar_time_ephem(
   # norm -> normalise to 24h
   solar_time_hours = ephem.hours(hour_angle + ephem.hours('12:00')).norm
   solar_time_decimal_hours = solar_time_hours * 24 / pi / 2  # convert to decimal hours
-  solar_time_datetime = timestamp + timedelta(hours=solar_time_hours)
+  #solar_time_datetime = timestamp + timedelta(hours=solar_time_hours)
 
   if verbose:
       typer.echo(f'Local sidereal time: {sidereal_time}')

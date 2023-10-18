@@ -4,7 +4,6 @@ from rich import print
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
-from datetime import time
 from datetime import timedelta
 
 from math import radians
@@ -12,13 +11,11 @@ from math import degrees
 from math import sin
 from math import cos
 import numpy as np
-from zoneinfo import ZoneInfo
 
 from ...api.utilities.conversions import convert_to_radians
 from ...api.utilities.timestamp import now_utc_datetimezone
 from ...api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype import Longitude
-from pvgisprototype import SolarTime
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimeMilne1921InputModel
 
@@ -106,6 +103,7 @@ def calculate_apparent_solar_time_milne1921(
     #     except Exception as e:
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # Handle Me during input validation? -------------------------------------
+
 
     # Equation of Time, Milne 1921 -------------------------------------------
 

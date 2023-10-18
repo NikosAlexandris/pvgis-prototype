@@ -1,10 +1,8 @@
 from devtools import debug
 from pathlib import Path
-from math import cos
 from typing import Annotated
 from typing import List
 from typing import Optional
-import math
 import numpy as np
 import typer
 from enum import Enum
@@ -12,19 +10,10 @@ from rich import print
 
 
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_pvgis
-# from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance
-# from pvgisprototype.api.irradiance.reflected import calculate_reflected_inclined_irradiance_pvgis
-
 from datetime import datetime
-from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.utilities.conversions import convert_to_radians
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
@@ -91,8 +80,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
@@ -182,7 +169,6 @@ def calculate_effective_irradiance(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
@@ -195,7 +181,8 @@ def calculate_effective_irradiance(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
-    """Calculate the hourly irradiance incident on a surface for moment in time.
+    """Calculate the effective hourly irradiance for a location and moment in
+    time.
 
     The calculation applies efficiency coefficients to the direct (beam),
     diffuse, and reflected radiation considering : solar geometry,
@@ -312,15 +299,11 @@ def calculate_effective_irradiance(
         timezone=timezone,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_time_model=solar_time_model,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         verbose=verbose,
     )
 
@@ -350,7 +333,6 @@ def calculate_effective_irradiance(
                 solar_time_model=solar_time_model,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 angle_output_units=angle_output_units,
@@ -374,7 +356,6 @@ def calculate_effective_irradiance(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
@@ -399,7 +380,6 @@ def calculate_effective_irradiance(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,

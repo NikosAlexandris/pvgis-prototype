@@ -7,14 +7,13 @@ from math import pi
 from math import cos
 import numpy as np
 from pvgisprototype.api.utilities.timestamp import random_day_of_year
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
 # from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
@@ -45,7 +44,6 @@ def calculate_extraterrestrial_normal_irradiance(
     # Make `day_of_year` optional ?
     # timezone: Annotated[Optional[str], typer_option_timezone] = None,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_day: Annotated[bool, typer_option_random_day] = RANDOM_DAY_FLAG_DEFAULT,
@@ -70,9 +68,6 @@ def calculate_extraterrestrial_normal_irradiance(
     solar_constant: float
         1360.8 W/m^2
     
-    days_in_a_year: float
-        365.25
-
     perigee_offset: float
         0.048869 (in angular units). The earth's closest position to the sun is
         January 2 at 8:18pm or day number 2.8408. In angular units :
@@ -119,12 +114,13 @@ def calculate_extraterrestrial_normal_irradiance(
     1412.71 W/m^2 and on July 6 it gets down to around 1321 W/m^2. This value
     is for what hits the top of the atmosphere before any energy is attenuated.
     """
+    days_in_year = get_days_in_year(timestamp.year)
     # Possible to move to a callback? ----------------------------------------
     if random_day:
-        day_of_year = random_day_of_year(int(days_in_a_year))
+        day_of_year = random_day_of_year(int(days_in_year))
     # ------------------------------------------------------------------------
     day_of_year = timestamp.timetuple().tm_yday
-    position_of_earth = 2 * pi * day_of_year / days_in_a_year
+    position_of_earth = 2 * pi * day_of_year / days_in_year
     distance_correction_factor = 1 + eccentricity_correction_factor * cos(
         position_of_earth - perigee_offset
     )

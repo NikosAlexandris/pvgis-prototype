@@ -14,7 +14,7 @@ from pvgisprototype.plot.plot_solar_position import plot_analemma
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from pvgisprototype.constants import (
-    ALGORITHM_NAME,
+    POSITION_ALGORITHM_NAME,
     ALTITUDE_NAME,
     DECLINATION_NAME,
     ZENITH_NAME,
@@ -94,11 +94,11 @@ def test_calculate_solar_position(model):
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            models=[model],
+            solar_position_models=[model],
         )
         print(f' Result : {solar_position}')
         for model_result in solar_position:
-            model_name = model_result.get(ALGORITHM_NAME, None)
+            model_name = model_result.get(POSITION_ALGORITHM_NAME, None)
             declination = model_result.get(DECLINATION_NAME, None)
             if declination is not None:
                 assert isinstance(declination, float)

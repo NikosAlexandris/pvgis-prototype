@@ -37,7 +37,6 @@ from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
@@ -131,7 +130,6 @@ def calculate_relative_longitude(
     latitude: Latitude,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
-    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
 ) -> RelativeLongitude:
     """
     Notes
@@ -183,7 +181,7 @@ def calculate_relative_longitude(
     relative_longitude = atan(tangent_relative_longitude)
     relative_longitude = RelativeLongitude(
         value=relative_longitude,
-        unit='radians'     # angle_output_units,
+        unit=RADIANS,
     )
     return relative_longitude
 
@@ -194,7 +192,6 @@ def calculate_solar_incidence_jenco(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    # hour_angle: SolarHourAngle = None,
     surface_tilt: SurfaceTilt = None,
     surface_orientation: SurfaceOrientation = None,
     shadow_indicator: Path = None,
@@ -202,9 +199,6 @@ def calculate_solar_incidence_jenco(
     horizon_interval: Optional[float] = None,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    # time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
-    # angle_units: str = 'radians',
-    # angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
     """Calculate the solar incidence angle based on the position of the sun and
@@ -298,8 +292,6 @@ def calculate_solar_incidence_jenco(
             longitude=longitude,
             timestamp=timestamp,
             timezone=timezone,
-            # time_output_units=time_output_units,
-            # angle_output_units=angle_output_units,
         )
         relative_longitude = calculate_relative_longitude(
             latitude=latitude,
@@ -326,10 +318,7 @@ def calculate_solar_incidence_time_series_jenco(
     timezone: Optional[ZoneInfo] = None,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
-    # perigee_offset: float = PERIGEE_OFFSET,
-    # eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
-    # angle_units: str = 'radians',
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> np.array:
@@ -373,9 +362,7 @@ def calculate_solar_incidence_time_series_jenco(
     solar_incidence_series = [
         SolarIncidence(value=value, unit=RADIANS) for value in solar_incidence_series
     ]
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
 
     return np.array(solar_incidence_series, dtype=object)
-
-

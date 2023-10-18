@@ -91,8 +91,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
@@ -174,7 +172,6 @@ def calculate_global_irradiance_time_series(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
@@ -191,13 +188,12 @@ def calculate_global_irradiance_time_series(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        model=solar_position_model,
+        solar_position_model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
         # time_offset_global=time_offset_global,
         # hour_offset=hour_offset,
-        # days_in_a_year=days_in_a_year,
         # perigee_offset=perigee_offset,
         # eccentricity_correction_factor=eccentricity_correction_factor,
         # time_output_units=time_output_units,
@@ -258,7 +254,6 @@ def calculate_global_irradiance_time_series(
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
                 solar_constant=solar_constant,
-                days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 time_output_units=time_output_units,
@@ -292,7 +287,6 @@ def calculate_global_irradiance_time_series(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
@@ -325,7 +319,6 @@ def calculate_global_irradiance_time_series(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
@@ -342,6 +335,9 @@ def calculate_global_irradiance_time_series(
         + diffuse_irradiance_series
         + reflected_irradiance_series
     )
+
+    if np.any(global_irradiance_series < -4):
+        print("[red]Warning: I found some values out of the expected range [-4, ] in `direct_normal_irradiance_series`![/red]")
 
     # Reporting --------------------------------------------------------------
     results = {
@@ -369,7 +365,7 @@ def calculate_global_irradiance_time_series(
             "Shade": in_shade,
         }
         results = results | extended_results
-        title += ' & in-plane components'
+        title += ' & components'
 
     if verbose > 3:
         even_more_extended_results = {
@@ -391,7 +387,7 @@ def calculate_global_irradiance_time_series(
         latitude=latitude,
         timestamps=timestamps,
         dictionary=results,
-        title=title + f' irradiance series {IRRADIANCE_UNITS}',
+        title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
         verbose=verbose,
     )

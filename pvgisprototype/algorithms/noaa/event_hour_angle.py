@@ -10,7 +10,6 @@ from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import EventHourAngle
 from .solar_declination import calculate_solar_declination_noaa
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 
 
 @validate_with_pydantic(CalculateEventHourAngleNOAAInput)
@@ -18,8 +17,6 @@ def calculate_event_hour_angle_noaa(
         latitude: Latitude, # radians
         timestamp: datetime,
         refracted_solar_zenith: RefractedSolarZenith,
-        # angle_units: str = 'radians',
-        # angle_output_units: str = 'radians',
     ) -> EventHourAngle:
     """
     Calculates the event hour angle using the NOAA method.
@@ -65,19 +62,11 @@ def calculate_event_hour_angle_noaa(
     """
     solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
-            # angle_units=angle_units,
-            # angle_output_units='radians',
             )  # radians
     cosine_event_hour_angle = cos(refracted_solar_zenith.radians) / (
         cos(latitude.radians) * cos(solar_declination.radians)
     ) - tan(latitude.radians) * tan(solar_declination.radians)
     event_hour_angle = acos(cosine_event_hour_angle)  # radians
-
     event_hour_angle = EventHourAngle(value=event_hour_angle, unit='radians')
-
-    # event_hour_angle = convert_to_degrees_if_requested(
-    #         event_hour_angle,
-    #         angle_output_units,
-    #         )
 
     return event_hour_angle

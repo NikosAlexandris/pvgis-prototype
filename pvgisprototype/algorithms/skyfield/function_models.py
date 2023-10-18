@@ -1,19 +1,18 @@
 from pvgisprototype.validation.parameters import BaseCoordinatesModel
 from pvgisprototype.validation.parameters import BaseTimestampModel
 from pvgisprototype.validation.parameters import BaseTimeModel
-from pvgisprototype.validation.parameters import BaseAngleOutputUnitsModel
 
 
 class CalculateSolarTimeSkyfieldInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
 ):
-    verbose: int = 0
+    pass
 
 
 class CalculateSolarDeclinationSkyfieldInputModel(
     BaseTimestampModel,
-        ):
+):
     pass
 
 

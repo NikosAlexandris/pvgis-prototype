@@ -1,11 +1,6 @@
 from devtools import debug
-import typer
-from typing import Annotated
-from typing import Optional
 from datetime import datetime
 from datetime import timezone
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
@@ -16,10 +11,8 @@ from pvgisprototype import SolarDeclination
 def calculate_solar_declination_pvgis(
     timestamp: datetime,
     timezone: str = None,
-    days_in_a_year: float = 365.25,
     eccentricity_correction_factor: float = 0.03344,
     perigee_offset: float = 0.048869,
-    # angle_output_units: str = 'radians',
 ) -> SolarDeclination:
     """Approximate the sun's declination for a given day of the year.
 
@@ -40,14 +33,11 @@ def calculate_solar_declination_pvgis(
     which is actually : `declination = - declination`. Why? The value is
     inverted again at some other part of the program when it gets to read data.
     """
-    day_of_year = timestamp.timetuple().tm_yday
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
         timezone=timezone,
-        days_in_a_year=days_in_a_year,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        # angle_output_units=angle_output_units,
         )
     
     solar_declination = SolarDeclination(

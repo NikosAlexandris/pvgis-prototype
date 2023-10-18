@@ -1,4 +1,3 @@
-from typing import Optional
 from datetime import datetime
 import pvlib
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -14,6 +13,11 @@ def calculate_solar_declination_pvlib(
         """Calculate the solar declination in radians"""
         doy = timestamp.timetuple().tm_yday
         solar_declination = pvlib.solarposition.declination_spencer71(doy)
-        solar_declination = SolarDeclination(value=solar_declination, unit='radians')
+        solar_declination = SolarDeclination(
+                value=solar_declination,
+                unit='radians',
+                position_algorithm='pvlib',
+                timing_algorithm='pvlib',
+                )
 
         return solar_declination

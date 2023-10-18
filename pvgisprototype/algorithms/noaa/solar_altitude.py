@@ -1,5 +1,4 @@
 from devtools import debug
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitudeTimeSeriesNOAAInput
@@ -42,13 +41,19 @@ def calculate_solar_altitude_noaa(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
     solar_altitude = pi / 2 - solar_zenith.radians
-    solar_altitude = SolarAltitude(value=solar_altitude, unit=RADIANS)
+    solar_altitude = SolarAltitude(
+        value=solar_altitude,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+        )
     if (
-        not isfinite(solar_altitude.radians)
-        or not -pi / 2 <= solar_altitude.radians <= pi / 2
+        not isfinite(solar_altitude.degrees)
+        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
     ):
         raise ValueError(
-            f"The calculated solar altitude angle {solar_altitude} is out of the expected range [{-pi/2}, {pi/2}] radians"
+            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
         )
     if verbose == 3:
         debug(locals())
@@ -67,9 +72,9 @@ def calculate_solar_altitude_time_series_noaa(
 ):
     """Calculate the solar altitude angle for a location over a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
-        longitude,
-        timestamps,
-        timezone,
+        longitude=longitude,
+        timestamps=timestamps,
+        timezone=timezone,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,

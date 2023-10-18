@@ -7,7 +7,6 @@ from pvgisprototype import Latitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
@@ -26,16 +25,10 @@ def calculate_solar_incidence_pvis(
     timestamp: datetime,
     timezone: ZoneInfo,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     surface_tilt: float = 0,
     surface_orientation: float = 180,
-    apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float = 1.5853349194640094,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    # time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
 ) -> SolarIncidence:
     """Calculate the angle of incidence (θ) between the direction of the sun
     ray and the line normal to the surface measured in radian.
@@ -85,20 +78,10 @@ def calculate_solar_incidence_pvis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_time_model=solar_time_model,  # returns datetime.time object
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
+        solar_time_model=solar_time_model,
     )
     hour_angle = calculate_solar_hour_angle_pvis(
         solar_time=solar_time,
-        # angle_output_units=angle_output_units,
     )
     solar_incidence = acos(
         sin(latitude.radians)

@@ -78,22 +78,6 @@ EccentricityCorrectionFactor:
 
 # Solar time
 
-SolarTime:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: str
-    initial: 
-
-TrueSolarTime:
-  value:
-    type: Optional[float]
-    initial:
-  unit:
-    type: str
-    initial: minutes
-
 EquationOfTime:
   value:
     type: Optional[float]
@@ -109,6 +93,12 @@ SolarHourAngle:
   unit:
     type: Optional[str]
     initial:
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
+    type: Optional[str]
+    initial:
 
 EventHourAngle:
   value:
@@ -117,14 +107,6 @@ EventHourAngle:
   unit:
     type: Optional[str]
     initial:
-
-EventTime:
-  value:
-    type: Optional[datetime]
-    initial:
-  unit:
-    type: str
-    initial: datetime
 
 HourAngleSunrise:
   value:
@@ -151,12 +133,24 @@ SolarDeclination:
   unit:
     type: Optional[str]
     initial:
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
+    type: Optional[str]
+    initial:
 
 SolarZenith:
   value:
     type: Optional[float]
     initial:
   unit:
+    type: Optional[str]
+    initial:
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
     type: Optional[str]
     initial:
 
@@ -175,7 +169,19 @@ SolarAltitude:
   unit:
     type: Optional[str]
     initial:
-
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
+    type: Optional[str]
+    initial:
+  min_degrees:
+    type: float
+    initial: -90
+  max_degrees:
+    type: float
+    initial: 90
+    
 RefractedSolarAltitude:
   value:
     type: Optional[float]
@@ -213,6 +219,12 @@ SolarAzimuth:
     type: Optional[float]
     initial:
   unit:
+    type: Optional[str]
+    initial:
+  position_algorithm:
+    type: Optional[str]
+    initial:
+  timing_algorithm:
     type: Optional[str]
     initial:
 
@@ -271,15 +283,15 @@ HorizonHeight:
 SurfaceTilt:
   value:
     type: float
-    initial:
+    initial: 45
   unit:
     type: str
-    initial:
+    initial: 'degrees'
 
 SurfaceOrientation:
   value:
     type: float
-    initial:
+    initial: 180.0
   unit:
     type: str
-    initial:
+    initial: 'degrees'

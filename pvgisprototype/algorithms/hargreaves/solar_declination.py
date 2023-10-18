@@ -11,7 +11,6 @@ from pvgisprototype.api.utilities.conversions import convert_to_radians_if_reque
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationHargreavesInputModel
 from pvgisprototype import SolarDeclination
-from pvgisprototype.api.utilities.timestamp import get_days_in_year
 
 
 @validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)

@@ -4,19 +4,17 @@ from zoneinfo import ZoneInfo
 from math import cos
 from math import sin
 from math import asin
-from typing import Optional
-
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.time import model_solar_time
-from pvgisprototype.api.geometry.hour_angle import calculate_hour_angle
-# from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
+from pvgisprototype.constants import RADIANS
+from math import isfinite
 
 
 @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
@@ -25,16 +23,10 @@ def calculate_solar_altitude_pvis(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    apply_atmospheric_refraction: bool,
-    # refracted_solar_zenith: RefractedSolarZenith,
     perigee_offset: float,
     eccentricity_correction_factor: float,
     time_offset_global: int,
-    hour_offset: int,
     solar_time_model: SolarTimeModels,
-    # time_output_units: str,
-    # angle_units: str,
-    # angle_output_units: str,
     verbose: int = 0,
 ) -> SolarAltitude:
     """Compute various solar geometry variables.
@@ -70,7 +62,6 @@ def calculate_solar_altitude_pvis(
         timezone=timezone,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
-        # angle_output_units=angle_output_units,
     )
     C31 = cos(latitude.radians) * cos(solar_declination.radians)
     C33 = sin(latitude.radians) * sin(solar_declination.radians)
@@ -80,24 +71,29 @@ def calculate_solar_altitude_pvis(
         timestamp=timestamp,
         timezone=timezone,
         solar_time_model=solar_time_model,  # returns datetime.time object
-        # refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
     )
-    hour_angle = calculate_hour_angle(
+    hour_angle = calculate_solar_hour_angle_pvis(
             solar_time=solar_time,
-            # angle_output_units='radians',
     )
     sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
     solar_altitude = asin(sine_solar_altitude)
-    solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
-    # solar_altitude = convert_to_degrees_if_requested(solar_altitude, angle_output_units)
+    solar_altitude = SolarAltitude(
+        value=solar_altitude,
+        unit=RADIANS,
+        position_algorithm='PVIS',
+        timing_algorithm=solar_time_model.value,
+    )
+    if (
+        not isfinite(solar_altitude.degrees)
+        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+        )
 
     if verbose == 3:
         debug(locals())

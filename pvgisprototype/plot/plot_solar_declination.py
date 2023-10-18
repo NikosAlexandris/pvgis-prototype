@@ -32,7 +32,7 @@ def calculate_declinations(
     solar_declinations = np.vectorize(calculate_solar_declination)(
         timestamp=timestamps,
         timezone=ZoneInfo('UTC'),
-        # models=[SolarDeclinationModels.noaa],
+        # declination_models=[SolarDeclinationModels.noaa],
         angle_output_units=output_units, # in degrees
     )
     # restructure for plotting
@@ -153,8 +153,8 @@ def plot_solar_declination_one_year_bokeh(
         ):
     timestamps = [datetime(year, 1, 1) + timedelta(days=i) for i in range((datetime(year+1, 1, 1) - datetime(year, 1, 1)).days)]
     timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime
-    solar_declinations = calculate_solar_declination(timestamp=timestamps, angle_output_units=angle_output_units)
-    solar_declinations_pvgis = calculate_solar_declination_pvgis(timestamps, angle_output_units)
+    solar_declinations = calculate_solar_declination(timestamp=timestamps)
+    solar_declinations_pvgis = calculate_solar_declination_pvgis(timestamps)
     # debug(locals())
     solar_declinations_hargreaves = calculate_solar_declination_hargreaves(timestamps, angle_output_units)
 

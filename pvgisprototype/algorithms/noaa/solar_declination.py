@@ -2,8 +2,6 @@ from typing import Optional
 from typing import Union
 from typing import Sequence
 from datetime import datetime
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarDeclinationTimeSeriesNOAAInput
@@ -12,7 +10,6 @@ from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_
 from math import sin
 from math import cos
 import numpy as np
-
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import RADIANS
 
@@ -25,7 +22,6 @@ def calculate_solar_declination_noaa(
     """Calculate the solar declination angle in radians"""
     fractional_year = calculate_fractional_year_noaa(
         timestamp=timestamp,
-        angle_output_units=RADIANS,
     )
     declination = (
         0.006918
@@ -77,8 +73,8 @@ def calculate_solar_declination_time_series_noaa(
         for declination in declination_series
     ]
 
-    if angle_output_units == "degrees":
-        declination_series = convert_series_to_degrees_if_requested(declination_series, angle_output_units)
+    #if angle_output_units == "degrees":
+    #    declination_series = convert_series_to_degrees_if_requested(declination_series, angle_output_units)
 
     if np.isscalar(timestamps):
         return declination_series[0]

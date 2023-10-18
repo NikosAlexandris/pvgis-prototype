@@ -1,7 +1,6 @@
 from math import pi
 from datetime import time
 from datetime import timedelta
-
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventTimeNOAAInput
 from pvgisprototype import Longitude
@@ -67,9 +66,9 @@ def calculate_event_time_noaa(
     #   from a range of [0, 2 * pi] which is a full circle
     #   to a range of [0, 1440] which is a full day in minutes
     event_calculations = {
-        'sunrise': 720 - (longitude_minutes + event_hour_angle_minutes) - equation_of_time.minutes,
-        'noon': 720 - longitude_minutes - equation_of_time.minutes,
-        'sunset': 720 - (longitude_minutes - event_hour_angle_minutes) - equation_of_time.minutes,
+        'sunrise': 720 - (longitude.minutes + event_hour_angle.minutes) - equation_of_time.minutes,
+        'noon': 720 - longitude.minutes - equation_of_time.minutes,
+        'sunset': 720 - (longitude.minutes - event_hour_angle.minutes) - equation_of_time.minutes,
     }
     event_time = event_calculations.get(event.lower())
     event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(minutes=event_time)

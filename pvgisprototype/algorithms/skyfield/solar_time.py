@@ -1,26 +1,16 @@
 import typer
-from typing import Annotated
-from typing import Optional
 from datetime import datetime
-from datetime import time
-from datetime import time as datetime_time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 from skyfield import almanac
-from skyfield.api import Topos
 from skyfield.api import load
 from skyfield.api import N
 from skyfield.api import W
 from skyfield.api import E
 from skyfield.api import wgs84
 from skyfield.api import load
-from pvgisprototype.api.utilities.conversions import convert_to_radians
-from pvgisprototype.api.utilities.conversions import convert_to_degrees
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarTimeSkyfieldInputModel
-from pvgisprototype import SolarTime
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 
@@ -32,7 +22,7 @@ def calculate_solar_time_skyfield(
         timestamp: datetime,
         timezone: str = None,
         verbose: int = 0,
-    )->SolarTime:
+)->datetime:
 
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -77,7 +67,15 @@ def calculate_solar_time_skyfield(
     hours = int(hours_since_solar_noon)
     minutes = int((hours_since_solar_noon - hours) * 60)
     seconds = int(((hours_since_solar_noon - hours) * 60 - minutes) * 60)
-    local_solar_time = datetime_time(hours, minutes, seconds)
+    local_solar_time = datetime(                                    # NOTE gounaol: Maybe wrong implementation
+            year=timestamp.year,
+            month=timestamp.month,
+            day=timestamp.day,
+            hour=int(hours),
+            minute=int(minutes),
+            second=int(seconds),
+            tzinfo=timestamp.tzinfo,
+    )
     # local_solar_time = previous_solar_noon.utc_datetime() + timedelta(hours=hours_since_solar_noon)
 
     if verbose:

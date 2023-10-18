@@ -1,6 +1,5 @@
 from devtools import debug
 from datetime import datetime
-from datetime import timedelta
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -25,7 +24,6 @@ def calculate_time_offset_noaa(
         longitude: Longitude, 
         timestamp: datetime, 
         timezone: ZoneInfo,
-        # time_output_units: str = 'minutes',  # redesign me!
     ) -> TimeOffset:
     """Calculate the time offset (minutes) for NOAA's solar position calculations.
 
@@ -113,7 +111,6 @@ def calculate_time_offset_noaa(
       speed and axial tilt. It varies throughout the year, but is typically
       within the range of about -20 minutes to +20 minutes.
     """
-    longitude_in_minutes = radians_to_time_minutes(longitude.radians)  # time
 
     # This will be 0 for UTC, obviously! Review-Me! --------------------------
 
@@ -121,14 +118,14 @@ def calculate_time_offset_noaa(
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
-        # time_output_units='minutes',
         )  # minutes
-    time_offset = longitude_in_minutes - timezone_offset_minutes + equation_of_time.minutes
+    time_offset = longitude.as_minutes - timezone_offset_minutes + equation_of_time.minutes
+    time_offset = TimeOffset(value=time_offset, unit='minutes')
     # if not -720 + 70 <= time_offset <= 720 + 70:
-    if not -790 <= time_offset <= 790:
+    if not -790 <= time_offset.minutes <= 790:
         raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
 
-    return TimeOffset(value=time_offset, unit='minutes')
+    return time_offset
 
 
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
@@ -153,7 +150,7 @@ def calculate_time_offset_time_series_noaa(
         timestamps,
         time_output_units,
     )
-    equation_of_time_series = np.array([item.value if isinstance(item, EquationOfTime) else item for item in equation_of_time_series])
+    equation_of_time_series = np.array([eot.minutes if isinstance(item, EquationOfTime) else eot for eot in equation_of_time_series])
     time_offset_series = longitude_in_minutes - timezone_offset_minutes_series + equation_of_time_series
 
     if not np.all((-790 <= time_offset_series) & (time_offset_series <= 790)):

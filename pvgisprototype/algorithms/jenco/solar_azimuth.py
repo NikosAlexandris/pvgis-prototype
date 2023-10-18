@@ -7,7 +7,6 @@ def calculate_solar_azimuth_jenco(
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool,
     refracted_solar_zenith: RefractedSolarZenith,
-    days_in_a_year: float,
     perigee_offset: float,
     eccentricity_correction_factor: float,
     time_offset_global: int,
@@ -39,7 +38,6 @@ def calculate_solar_azimuth_jenco(
         model=solar_time_model,  # returns datetime.time object
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,

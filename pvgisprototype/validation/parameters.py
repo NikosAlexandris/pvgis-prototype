@@ -5,10 +5,8 @@ from pydantic import confloat
 from typing import Union
 from typing import Optional
 from typing import Sequence
-from typing import List
 from zoneinfo import ZoneInfo
 from datetime import datetime
-from datetime import time
 from pandas import DatetimeIndex
 from math import pi
 from pydantic import validator
@@ -23,13 +21,14 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
-from pvgisprototype import SolarTime
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
 
@@ -40,7 +39,7 @@ MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
 
 
 class VerbosityModel(BaseModel):
-    verbose: int = 0
+    verbose: int = VERBOSE_LEVEL_DEFAULT
 
 
 # Where?
@@ -161,7 +160,7 @@ class BaseTimeOutputUnitsModel(BaseModel):
 # Angular units
 
 class BaseAngleUnitsModel(BaseModel):
-    angle_units: str = 'radians'
+    angle_units: str = RADIANS
 
     @field_validator("angle_units")
     @classmethod
@@ -222,20 +221,14 @@ class SolarDeclinationModel(BaseModel):
 
 
 class SolarPositionModel(BaseModel):
-    model: SolarPositionModels = SolarPositionModels.skyfield
+    solar_position_model: SolarPositionModels = SolarPositionModels.skyfield
     apply_atmospheric_refraction: bool = True
 
 
 class SolarIncidenceModel(BaseModel):
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco
-    apply_atmospheric_refraction: bool = True
 
 
-class DaysInAYearModel(BaseModel):
-    days_in_a_year: float = DAYS_IN_A_YEAR  # TODO: Validator
-
-
-# class EarthOrbitModel(DaysInAYearModel):
 class EarthOrbitModel(BaseModel):
     perigee_offset: float = PERIGEE_OFFSET
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR
@@ -246,29 +239,18 @@ class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
 
 
 class SolarTimeModel(BaseModel):
-    solar_time: Union[time, SolarTime]
+    solar_time: datetime
     model_config = ConfigDict(
         description="""The solar time (ST) is a calculation of the passage of time based
         on the position of the Sun in the sky. It is expected to be decimal hours in a
         24 hour format and measured internally in seconds.""",
     )
 
-    @field_validator("solar_time")
-    def validate_solar_time(cls, input) -> SolarTime:
-        if isinstance(input, SolarTime):
-            return input
-        elif isinstance(input, time):
-            return SolarTime(value=input, unit="timestamp")
-        else:
-            raise ValueError("Unsupported `solar_time` type provided")
-
-    
-
 
 # Solar surface
 
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = pi / 4
+    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = SURFACE_TILT_DEFAULT
     model_config = ConfigDict(
         description="""Surface tilt (or slope) (β) is the angle between the inclined
         surface (slope) and the horizontal plane.""",
@@ -298,10 +280,6 @@ class SurfaceOrientationModel(BaseModel):
             return SurfaceOrientation(value=input, unit="radians")
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_orientation`")
-
-
-# class ShadowIndicatorModel(BaseModel):
-#     shadow_indicator: Path = None
 
 
 class SolarHourAngleModel(BaseModel):
@@ -344,7 +322,7 @@ class SolarHourAngleSeriesModel(BaseModel):
 
 
 class ApplyAtmosphericRefractionModel(BaseModel):
-    apply_atmospheric_refraction: bool
+    apply_atmospheric_refraction: Optional[bool] = True
 
 
 class RefractedSolarAltitudeModel(BaseModel):
@@ -384,7 +362,6 @@ class RefractedSolarZenithModel(BaseModel):
             return RefractedSolarZenith(value=input, unit="radians")
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_zenith`")
-
 
 
 class ElevationModel(BaseModel):
