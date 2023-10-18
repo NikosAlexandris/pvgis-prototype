@@ -581,7 +581,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
-        verbose=verbose,
+        verbose=0,
     )
     solar_incidence_series_array = np.array([x.value for x in solar_incidence_series])
     solar_altitude_series = model_solar_altitude_time_series(
@@ -600,7 +600,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
-        verbose=verbose,
+        verbose=0,
     )
     solar_altitude_series_array = np.array([solar_altitude.radians for solar_altitude in solar_altitude_series])
 
@@ -653,8 +653,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             verbose=0,  # no verbosity here by choice!
         )
     else:  # read from a time series dataset
-        print(f'Reading from external dataset...')
-        # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        print(f'Reading direct horizontal irradiance from external dataset...')
         longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
         latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
         direct_horizontal_irradiance_series = select_time_series(
@@ -664,15 +663,15 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             timestamps=timestamps,
             start_time=start_time,
             end_time=end_time,
-            convert_longitude_360=convert_longitude_360,
+            # convert_longitude_360=convert_longitude_360,
             nearest_neighbor_lookup=nearest_neighbor_lookup,
             inexact_matches_method=inexact_matches_method,
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,
             in_memory=in_memory,
-            verbose=verbose,
+            verbose=0,  # no verbosity here by choice!
         )
-        print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance_series}')
+        # print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance_series}')
 
     try:
         direct_inclined_irradiance_series = (

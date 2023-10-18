@@ -40,7 +40,6 @@ def calculate_solar_altitude_noaa(
         solar_hour_angle=solar_hour_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
-    print(f'Solar zenith : {solar_zenith}')
     solar_altitude = pi / 2 - solar_zenith.radians
     solar_altitude = SolarAltitude(
         value=solar_altitude,
@@ -85,7 +84,6 @@ def calculate_solar_altitude_time_series_noaa(
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
-    print(f'Solar zenith series : {solar_zenith_series}')
     solar_altitude_series = np.pi / 2 - np.array(
         [zenith.radians for zenith in solar_zenith_series]
     )
