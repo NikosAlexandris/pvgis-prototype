@@ -92,7 +92,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
@@ -194,14 +193,14 @@ def calculate_effective_irradiance_time_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
-    verbose: Annotated[int, typer_option_verbose] = False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        model=solar_position_model,
+        solar_position_model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
@@ -212,7 +211,7 @@ def calculate_effective_irradiance_time_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
-        verbose=verbose,
+        verbose=0,
     )
     solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
 

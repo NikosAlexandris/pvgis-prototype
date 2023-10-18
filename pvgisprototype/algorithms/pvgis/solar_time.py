@@ -1,5 +1,4 @@
 from datetime import datetime
-from datetime import time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 import numpy as np
@@ -9,7 +8,6 @@ from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimePVGISInputModel
-import get_days_in_year
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 

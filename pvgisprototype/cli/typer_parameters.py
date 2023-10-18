@@ -438,7 +438,7 @@ typer_option_hour_offset = typer.Option(
 typer_option_days_in_a_year = typer.Option(
     help='Number of days in a year',
     rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=days_in_a_year_default,
+    # default_factory=DAYS_IN_A_YEAR,
 )
 typer_option_perigee_offset = typer.Option(
     help='Perigee offset',
@@ -528,7 +528,7 @@ def optical_air_mass_series_callback(value: str, ctx: Context):
         return parse_optical_air_mass_series(value)
 
     timestamps = ctx.params.get('timestamps')
-    if timestamps:
+    if timestamps is not None:
         return [OpticalAirMass(value=OPTICAL_AIR_MASS_DEFAULT, unit=OPTICAL_AIR_MASS_UNIT) for _ in timestamps]
     else:
         return [OpticalAirMass(value=OPTICAL_AIR_MASS_DEFAULT, unit=OPTICAL_AIR_MASS_UNIT)]

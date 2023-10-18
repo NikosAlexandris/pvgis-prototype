@@ -17,7 +17,6 @@ from pvgisprototype import SolarDeclination
 from .models import SolarDeclinationModels
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 
@@ -26,7 +25,6 @@ def model_solar_declination_time_series(
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo = None,
     model: SolarDeclinationModels = SolarDeclinationModels.pvis,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = 'radians',

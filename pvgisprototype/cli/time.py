@@ -12,42 +12,19 @@ from rich import box
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
-# import math
-# import numpy as np
-
-# from ..api.utilities.timestamp import attach_timezone
-# from ..api.utilities.timestamp import ctx_attach_requested_timezone
-# from ..api.utilities.timestamp import ctx_convert_to_timezone
-# from ..api.utilities.timestamp import now_utc_datetimezone
-# from ..api.utilities.timestamp import random_datetimezone
-# from ..api.utilities.conversions import convert_to_radians
-# from ..api.utilities.conversions import convert_to_degrees_if_requested
-from ..api.geometry.models import SolarTimeModels
-from ..api.geometry.time import calculate_solar_time
-from ..api.geometry.hour_angle import calculate_hour_angle
-
-from .typer_parameters import OrderCommands
-from .typer_parameters import typer_argument_longitude
-from .typer_parameters import typer_argument_latitude
-from .typer_parameters import typer_argument_timestamp
-from .typer_parameters import typer_option_timezone
-# from .typer_parameters import typer_option_local_time
-# from .typer_parameters import typer_option_random_time
-# from .typer_parameters import typer_argument_solar_declination
-# from .typer_parameters import typer_argument_surface_tilt
-# from .typer_parameters import typer_argument_surface_orientation
-# from .typer_parameters import typer_argument_hour_angle
-# from .typer_parameters import typer_argument_true_solar_time
-# from .typer_parameters import typer_option_solar_position_model
-from .typer_parameters import typer_option_solar_time_model
-from .typer_parameters import typer_option_global_time_offset
-from .typer_parameters import typer_option_hour_offset
-from .typer_parameters import typer_option_perigee_offset
-from .typer_parameters import typer_option_eccentricity_correction_factor
-from .typer_parameters import typer_option_apply_atmospheric_refraction
-from .typer_parameters import typer_option_refracted_solar_zenith
-from .typer_parameters import typer_option_rounding_places
-from .typer_parameters import typer_option_verbose
+from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.time import calculate_solar_time
+from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
+from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
+from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
+from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
@@ -55,7 +32,6 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import SOLAR_TIME_COLUMN_NAME
 from pvgisprototype.constants import SOLAR_TIME_NAME
-
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -141,7 +117,7 @@ def solar_time(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=solar_time_model,  # keep the CLI simple
+        solar_time_models=solar_time_model,  # keep the CLI simple
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,

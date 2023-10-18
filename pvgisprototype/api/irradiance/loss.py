@@ -154,7 +154,7 @@ def calculate_angular_loss_factor_for_direct_irradiance_time_series(
         numerator = 1 - np.exp( - np.cos(solar_incidence_series) / angular_loss_coefficient )
         denominator =  1 / ( 1 - exp( -1 / angular_loss_coefficient))
         incidence_angle_modifier_series = numerator / denominator
-        if verbose == 3:
+        if verbose > 5:
             debug(locals())
         return incidence_angle_modifier_series
 

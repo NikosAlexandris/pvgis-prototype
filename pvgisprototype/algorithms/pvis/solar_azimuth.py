@@ -12,10 +12,10 @@ from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAzimuth
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
+from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.time import model_solar_time
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
+from pvgisprototype.constants import RADIANS
 
 
 def convert_east_to_north_radians_convention(azimuth_east_radians):
@@ -72,15 +72,12 @@ def calculate_solar_azimuth_pvis(
     # PVGIS' follows Hofierka (2002) who states : azimuth is measured from East
     # solar_azimuth = convert_east_to_north_radians_convention(solar_azimuth)
     # convert east to north zero degrees convention --------------------------
-    solar_azimuth = SolarAzimuth(value=solar_azimuth, unit=RADIANS) # zero_direction = 'East'
-
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth,
         unit=RADIANS,
         position_algorithm='PVIS',
         timing_algorithm=solar_time_model.value,
     ) # zero_direction='East'
-
     if (
         not isfinite(solar_azimuth.degrees)
         or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
@@ -89,5 +86,4 @@ def calculate_solar_azimuth_pvis(
             f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
             [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
         )
-
     return solar_azimuth

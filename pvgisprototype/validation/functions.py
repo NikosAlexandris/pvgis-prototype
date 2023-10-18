@@ -37,9 +37,13 @@ from pvgisprototype.validation.parameters import SolarHourAngleModel
 # Solar Surface
 from pvgisprototype.validation.parameters import SurfaceTiltModel
 from pvgisprototype.validation.parameters import SurfaceOrientationModel
+
+# Incidence
 from pvgisprototype.validation.parameters import SolarIncidenceModel
 
 # Output
+from pvgisprototype.validation.parameters import BaseAngleUnitsModel
+from pvgisprototype.validation.parameters import BaseAngleInternalUnitsModel
 from pvgisprototype.validation.parameters import BaseAngleOutputUnitsModel
 
 # Validator
@@ -178,13 +182,13 @@ class CalculateEquationOfTimeNOAAInput(
 
 # Hour angle
 
-class CalculateHourAngleInputModel(
+class CalculateSolarHourAngleInputModel(
     SolarTimeModel,
 ):
     pass
 
 
-class SolarHourAnglePvisInput(
+class SolarHourAnglePVISInput(
     SolarTimeModel,
 ):
     pass
@@ -203,8 +207,7 @@ class CalculateSolarHourAnglePVISInputModel(
     pass
 
 
-# rename to : CalculateEventHourAngleInputModel
-class CalculateHourAngleSunriseInputModel(
+class CalculateEventHourAngleInputModel(
     LatitudeModel,
     SurfaceTiltModel,
     SolarDeclinationModel,
@@ -212,9 +215,7 @@ class CalculateHourAngleSunriseInputModel(
     pass
 
 
-class CalculateHourAngleSunrisePVISInputModel(
-    CalculateHourAngleSunriseInputModel
-):
+class CalculateEventHourAnglePVISInputModel(CalculateEventHourAngleInputModel):
     pass
 
 
@@ -239,7 +240,6 @@ class SolarHourAngleSkyfieldInput(
     pass
 
 
-
 # Solar geometry
 
 class CalculateSolarAltitudePVISInputModel(
@@ -247,6 +247,7 @@ class CalculateSolarAltitudePVISInputModel(
     BaseTimeModel,
     ApplyAtmosphericRefractionModel,
     EarthOrbitModel,
+    TimeOffsetModel,
     SolarTimeModelModel,
 ):
     pass
@@ -339,12 +340,7 @@ class ModelSolarAltitudeTimeSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     SolarPositionModel,
-    SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
-    RefractedSolarZenithModel,
-    EarthOrbitModel,
-    TimeOffsetModel,
-    HourOffsetModel,
 ):
     pass
 
@@ -444,12 +440,9 @@ class ModelSolarIncidenceTimeSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     SolarTimeModelModel,
-    RandomTimeSeriesModel,
     SolarIncidenceModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
-    ApplyAtmosphericRefractionModel,
-    RefractedSolarZenithModel,
     EarthOrbitModel,
     BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
@@ -471,6 +464,14 @@ class CalculateOpticalAirMassInputModel(
     RefractedSolarAltitudeModel,
 ):
     pass
+
+    # @field_validator("angle_units")
+    # @classmethod
+    # def validate_angle_output_units(cls, v):
+    #     valid_units = "degrees"
+    #     if not v == valid_units:
+    #         raise ValueError(f"angle_units must be {valid_units}")
+    #     return v
 
 
 class CalculateOpticalAirMassTimeSeriesInputModel(

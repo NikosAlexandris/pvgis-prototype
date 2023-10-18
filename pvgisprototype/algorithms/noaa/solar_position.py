@@ -16,7 +16,7 @@ from .fractional_year import calculate_fractional_year_noaa
 from .equation_of_time import calculate_equation_of_time_noaa
 from .solar_declination import calculate_solar_declination_noaa
 from .time_offset import calculate_time_offset_noaa
-from .solar_time import calculate_apparent_solar_time_noaa
+from .solar_time import calculate_true_solar_time_noaa
 from .solar_hour_angle import calculate_solar_hour_angle_noaa
 from .solar_zenith import calculate_solar_zenith_noaa
 from .solar_altitude import calculate_solar_altitude_noaa
@@ -64,7 +64,7 @@ def calculate_noaa_solar_position(
         longitude=longitude,
         timestamp=timestamp,
     )
-    true_solar_time = calculate_apparent_solar_time_noaa(
+    true_solar_time = calculate_true_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,

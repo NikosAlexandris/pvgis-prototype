@@ -1,6 +1,4 @@
 from devtools import debug
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarIncidenceInputModel
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_jenco
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
 from pvgisprototype import Latitude
@@ -17,33 +15,29 @@ from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
+from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import INCIDENCE_NAME
 from pvgisprototype.constants import UNITS_NAME
-from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 
 
-@validate_with_pydantic(ModelSolarIncidenceInputModel)
 def model_solar_incidence(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    random_time: bool = RANDOM_DAY_FLAG_DEFAULT,
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = TIME_OFFSET_GLOBAL_DEFAULT,
@@ -58,12 +52,10 @@ def model_solar_incidence(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            random_time=random_time,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
-            days_in_a_year=days_in_a_year,
-            eccentricity_correction_factor=eccentricity_correction_factor,
             perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             verbose=verbose,
         )
 
@@ -81,7 +73,6 @@ def model_solar_incidence(
             surface_orientation=surface_orientation,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
         )
@@ -101,7 +92,6 @@ def calculate_solar_incidence(
     horizon_heights: List[float] = None,
     horizon_interval: float = None,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = TIME_OFFSET_GLOBAL_DEFAULT,
@@ -118,23 +108,19 @@ def calculate_solar_incidence(
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
-                random_time=random_time,
                 solar_time_model=solar_time_model,
                 solar_incidence_model=solar_incidence_model,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
                 surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
-                horizon_heights=horizon_heights,
-                horizon_interval=horizon_interval,
-                days_in_a_year=days_in_a_year,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 perigee_offset=perigee_offset,
                 verbose=verbose,
             )
             results.append(
                 {
-                    TIME_ALGORITHM_NAME: solar_time_model,
+                    TIME_ALGORITHM_NAME: solar_time_model.value,
                     POSITION_ALGORITHM_NAME: solar_incidence_model.value,
                     INCIDENCE_NAME: getattr(solar_incidence, angle_output_units, None) if solar_incidence else None,
                     UNITS_NAME: angle_output_units,

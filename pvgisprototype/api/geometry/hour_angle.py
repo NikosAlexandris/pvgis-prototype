@@ -10,14 +10,14 @@ from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.validation.functions import CalculateHourAngleInputModel
-from pvgisprototype.validation.functions import CalculateHourAngleSunriseInputModel
+from pvgisprototype.validation.functions import CalculateSolarHourAngleInputModel
+from pvgisprototype.validation.functions import CalculateEventHourAngleInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 
 
-# @validate_with_pydantic(CalculateHourAngleInputModel)
-def calculate_hour_angle(
+@validate_with_pydantic(CalculateSolarHourAngleInputModel)
+def calculate_solar_hour_angle(
     solar_time: datetime,
 ) -> SolarHourAngle:
     """Calculate the hour angle ω'
@@ -136,7 +136,6 @@ def calculate_hour_angle(
     """
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = (solar_time_decimal_hours - 12) * radians(15)
-    # hour_angle = (solar_time.as_hours - 12) * radians(15)
     hour_angle = SolarHourAngle(value=hour_angle, unit='radians')
     if (
         not isfinite(hour_angle.degrees)
@@ -149,8 +148,8 @@ def calculate_hour_angle(
     return hour_angle
 
 
-@validate_with_pydantic(CalculateHourAngleSunriseInputModel)
-def calculate_hour_angle_sunrise(
+@validate_with_pydantic(CalculateEventHourAngleInputModel)
+def calculate_event_hour_angle(
     latitude: Latitude,
     surface_tilt: float = 0,
     solar_declination: float = 0,

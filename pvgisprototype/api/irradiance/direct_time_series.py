@@ -1,5 +1,4 @@
 from devtools import debug
-from rich import print
 from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
 from datetime import datetime
 from math import sin
@@ -21,9 +20,9 @@ from typing import Sequence
 from typing import List
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
@@ -43,11 +42,9 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_optical_air_mass_series
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-
+from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
-# from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
-# from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
@@ -66,7 +63,6 @@ from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
@@ -99,6 +95,7 @@ from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.series.select import select_time_series
 # from pvgisprototype.api.series.utilities import select_location_time_series
 from pathlib import Path
+
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.cli.print import print_irradiance_table_2
@@ -111,8 +108,6 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f"Estimate the direct solar radiation for a time series",
 )
-
-
 
 
 def correct_linke_turbidity_factor_time_series(
@@ -145,7 +140,7 @@ def correct_linke_turbidity_factor_time_series(
     # Perform calculations
     corrected_linke_turbidity_factors_array = -0.8662 * linke_turbidity_factor_series_array
 
-    if verbose == 4:
+    if verbose > 5:
         debug(locals())
 
     # Convert back to custom data class objects
@@ -214,7 +209,7 @@ def calculate_refracted_solar_altitude_time_series(
         refracted_solar_altitude_series, angle_output_units
     )
 
-    if verbose == 4:
+    if verbose > 5:
         debug(locals())
 
     return refracted_solar_altitude_series
@@ -249,7 +244,7 @@ def calculate_optical_air_mass_time_series(
     else:
         optical_air_mass_series = OpticalAirMass(value=optical_air_mass_series[0], unit=OPTICAL_AIR_MASS_UNIT)
 
-    if verbose == 4:
+    if verbose > 5:
         debug(locals())
     if verbose > 1:
         print(f'Optical air mass series : {optical_air_mass_series}')
@@ -301,7 +296,7 @@ def rayleigh_optical_thickness_time_series(
             unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
         )
 
-    if verbose == 4:
+    if verbose > 5:
         debug(locals())
     if verbose > 1:
         print(f'Rayleigh thickness series : {rayleigh_thickness_series}')
@@ -341,7 +336,6 @@ def calculate_direct_normal_irradiance_time_series(
         optical_air_mass_series,
         verbose=verbose,
     )
-
     # Unpack the custom objects into NumPy arrays
     linke_turbidity_factor_series_array = np.array([lt.value for lt in linke_turbidity_factor_series])
     corrected_linke_turbidity_factor_series_array = np.array([clt.value for clt in corrected_linke_turbidity_factor_series])
@@ -358,25 +352,39 @@ def calculate_direct_normal_irradiance_time_series(
         )
     )
 
-    if verbose == 4:
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+    out_of_range_indices = np.where(
+        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    )
+    if out_of_range_indices[0].size > 0:
+        print(
+            f"[red]Warning[/red] : I found some [red]out-of-range values[/red] in `` at {out_of_range_indices[0]}!"
+        )
+
+    if verbose > 5:
         debug(locals())
+
     results = {
-        'Normal': direct_normal_irradiance_series,
-        }
+        "Normal": direct_normal_irradiance_series,
+    }
+
     if verbose > 1:
         extended_results = {
-        'Extra. normal': extraterrestrial_normal_irradiance_series,
-        'Rayleigh': rayleigh_thickness_series_array,
-        'Air mass': np.array([x.value for x in optical_air_mass_series]),
-        'Correct Linke': corrected_linke_turbidity_factor_series_array,
-        'Linke': linke_turbidity_factor_series_array,
+            "Extra. normal": extraterrestrial_normal_irradiance_series,
+            "Rayleigh": rayleigh_thickness_series_array,
+            "Air mass": np.array([x.value for x in optical_air_mass_series]),
+            "Correct Linke": corrected_linke_turbidity_factor_series_array,
+            "Linke": linke_turbidity_factor_series_array,
         }
         results = results | extended_results
 
     print_irradiance_table_2(
         timestamps=timestamps,
         dictionary=results,
-        title='Direct normal irradiance series',
+        title="Direct normal irradiance series",
         rounding_places=rounding_places,
         verbose=verbose,
     )
@@ -475,7 +483,7 @@ def calculate_direct_horizontal_irradiance_time_series(
             direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
         )[mask]
 
-    if verbose == 4:
+    if verbose > 5:
         debug(locals())
 
     results = {
@@ -697,38 +705,46 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             logging.error(f"Which Error? {e}")
             raise ValueError
 
-    results = {
-        "Direct": direct_inclined_irradiance_series,
-    }
     if np.any(direct_inclined_irradiance_series < 0):
         print("[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
 
-    if verbose > 2:
+    results = {
+        "Direct": direct_inclined_irradiance_series,
+    }
+    title = 'Direct'
+
+    if verbose > 1 :
         extended_results = {
             "Loss": 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
-            "Horizontal": direct_horizontal_irradiance_series,
-            'Incidence': convert_series_to_degrees_if_requested(solar_incidence_series_array, angle_output_units),
             'Tilt': convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             'Orientation': convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
-            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
         }
         results = results | extended_results
 
-    if verbose > 3:
+    if verbose > 2:
         more_extended_results = {
+            "Horizontal": direct_horizontal_irradiance_series,
+            'Incidence': convert_series_to_degrees_if_requested(solar_incidence_series_array, angle_output_units),
+            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+        }
+        results = results | more_extended_results
+        title += ' & relevant components'
+
+    if verbose > 3:
+        even_more_extended_results = {
             'Irradiance source': 'External data' if direct_horizontal_component else 'Model (Hofierka, 2002)',
             'Incidence algorithm': solar_incidence_model.value,
             'Positioning': solar_position_model.value,
             'Timing': solar_time_model.value,
             # "Shade": in_shade,
         }
-        results = results | more_extended_results
+        results = results | even_more_extended_results
 
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
-    if verbose == 4:
+    if verbose > 5:
         debug(locals())
 
     print_irradiance_table_2(

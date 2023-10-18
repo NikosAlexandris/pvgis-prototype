@@ -17,7 +17,6 @@ from .models import SolarTimeModels
 from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_time_series_noaa
 # from pvgisprototype.algorithms.skyfield.solar_time import calculate_solar_time_skyfield
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 # from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -32,7 +31,6 @@ def model_solar_time_time_series(
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = 0,
