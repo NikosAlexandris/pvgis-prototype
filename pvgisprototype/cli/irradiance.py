@@ -22,6 +22,8 @@ from pvgisprototype.api.irradiance.effective import app as effective_irradiance
 from pvgisprototype.api.irradiance.effective_time_series import app as effective_irradiance_series
 from pvgisprototype.api.irradiance.efficiency import app as pv_efficiency
 from pvgisprototype.api.irradiance.efficiency_time_series import app as pv_efficiency_series
+from pvgisprototype.api.irradiance.limits import app as limits
+
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
@@ -138,5 +140,11 @@ app.add_typer(
     name="pv-efficiency-series",
     no_args_is_help=True,
     # rich_help_panel=rich_help_panel_efficiency,
+    rich_help_panel=rich_help_panel_toolbox,
+)
+app.add_typer(
+    limits,
+    name="limits",
+    no_args_is_help=True,
     rich_help_panel=rich_help_panel_toolbox,
 )
