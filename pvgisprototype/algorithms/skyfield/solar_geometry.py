@@ -114,12 +114,21 @@ def calculate_solar_altitude_azimuth_skyfield(
     )
 
     if (
+        not isfinite(solar_azimuth.degrees)
+        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
+            [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+        )
+
+    if (
         not isfinite(solar_altitude.degrees)
         or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
     ):
         raise ValueError(
             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
         )
 
     return solar_altitude, solar_azimuth   # distance_to_sun
@@ -166,5 +175,20 @@ def calculate_solar_hour_angle_declination_skyfield(
         position_algorithm='Skyfield',
         timing_algorithm='Skyfield',
     )
-
+    if (
+        not isfinite(hour_angle.degrees)
+        or not hour_angle.min_degrees <= hour_angle.degrees <= hour_angle.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar hour angle {hour_angle.degrees} is out of the expected range\
+            [{hour_angle.min_degrees}, {hour_angle.max_degrees}] degrees"
+        )
+    if (
+            not isfinite(solar_declination.degrees)
+            or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
+            [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
+        )
     return hour_angle, solar_declination

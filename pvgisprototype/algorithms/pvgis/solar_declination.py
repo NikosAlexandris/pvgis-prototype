@@ -1,5 +1,6 @@
 from devtools import debug
 from datetime import datetime
+from math import isfinite
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
@@ -44,5 +45,12 @@ def calculate_solar_declination_pvgis(
         value=-solar_declination.value,
         unit=solar_declination.unit,
         )
-
+    if (
+        not isfinite(solar_declination.degrees)
+        or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
+            [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
+        )
     return solar_declination

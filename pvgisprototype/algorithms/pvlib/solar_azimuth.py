@@ -24,14 +24,20 @@ def calculate_solar_azimuth_pvlib(
     solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_azimuth = solar_position['azimuth'].values[0]
 
-    if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 360:
-        raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 360] degrees')
-
     solar_azimuth = SolarAzimuth(
             value=solar_azimuth,
             unit='degrees',
             position_algorithm='pvlib',
             timing_algorithm='pvlib',
             )
+
+    if (
+        not isfinite(solar_azimuth.degrees)
+        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
+            [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+        )
 
     return solar_azimuth

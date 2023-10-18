@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 from pvgisprototype import SolarHourAngle
 from .solar_time import calculate_apparent_solar_time_noaa
 from math import pi
+from math import isfinite
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleTimeSeriesNOAAInput
 from typing import Sequence
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
@@ -90,9 +91,14 @@ def calculate_solar_hour_angle_noaa(
         position_algorithm='NOAA',
         timing_algorithm='NOAA',
     )
-
-    if not -pi <= solar_hour_angle.radians <= pi:
-        raise ValueError(f'The calculated hour angle {solar_hour_angle} is out of the expected range [{-pi}, {pi}] radians')
+    if (
+        not isfinite(solar_hour_angle.degrees)
+        or not solar_hour_angle.min_degrees <= solar_hour_angle.degrees <= solar_hour_angle.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar hour angle {solar_hour_angle.degrees} is out of the expected range\
+            [{solar_hour_angle.min_degrees}, {solar_hour_angle.max_degrees}] degrees"
+        )
 
     if verbose == 3:
         debug(locals())

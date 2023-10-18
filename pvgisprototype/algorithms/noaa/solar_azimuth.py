@@ -107,9 +107,6 @@ def calculate_solar_azimuth_noaa(
     if solar_hour_angle.radians > 0:
         solar_azimuth = 2 * pi - solar_azimuth
 
-    if not isfinite(solar_azimuth) or not 0 <= solar_azimuth <= 2*pi:
-        raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
-
     solar_azimuth = SolarAzimuth(
             value=solar_azimuth,
             unit='radians',
@@ -117,11 +114,17 @@ def calculate_solar_azimuth_noaa(
             timing_algorithm='NOAA',
             )
 
+    if (
+        not isfinite(solar_azimuth.degrees)
+        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
+            [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+        )
+
     if verbose == 3:
         debug(locals())
-
-    if not isfinite(solar_azimuth.radians) or not 0 <= solar_azimuth.radians <= 2*pi:
-        raise ValueError('The `solar_azimuth` should be a finite number ranging in [0, 2π] radians')
 
     return solar_azimuth
 

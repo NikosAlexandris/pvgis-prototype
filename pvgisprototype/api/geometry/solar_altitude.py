@@ -98,14 +98,13 @@ def model_solar_altitude(
             position_algorithm='suncalc',
             timing_algorithm='suncalc',
         )
-
         if (
             not isfinite(solar_altitude.degrees)
             or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
         ):
             raise ValueError(
                 f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
             )
 
     if solar_position_model.value == SolarPositionModels.pysolar:
@@ -124,14 +123,13 @@ def model_solar_altitude(
             position_algorithm='pysolar',
             timing_algorithm='pysolar',
         )
-
         if (
             not isfinite(solar_altitude.degrees)
             or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
         ):
             raise ValueError(
                 f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
             )
 
     if solar_position_model.value  == SolarPositionModels.pvis:

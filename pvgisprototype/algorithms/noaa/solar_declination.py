@@ -8,6 +8,7 @@ from .fractional_year import calculate_fractional_year_noaa
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa
 from math import sin
 from math import cos
+from math import isfinite
 import numpy as np
 from pvgisprototype import SolarDeclination
 
@@ -30,9 +31,18 @@ def calculate_solar_declination_noaa(
         - 0.002697 * cos(3 * fractional_year.radians)
         + 0.00148 * sin(3 * fractional_year.radians)
         )
-        return SolarDeclination(
+        solar_declination = SolarDeclination(
             value=declination, unit='radians', position_algorithm='NOAA', timing_algorithm='NOAA'
         )
+        if (
+            not isfinite(solar_declination.degrees)
+            or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+        ):
+            raise ValueError(
+                f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
+                [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
+            )
+        return solar_declination
 
 
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)
