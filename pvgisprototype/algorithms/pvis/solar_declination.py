@@ -6,6 +6,7 @@ from pvgisprototype import SolarDeclination
 from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
 from math import sin
 from math import asin
+from math import isfinite
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
@@ -67,8 +68,15 @@ def calculate_solar_declination_pvis(
     solar_declination = SolarDeclination(
         value=solar_declination,
         unit=RADIANS,
-        position_algorithm='pvis',
-        timing_algorithm='pvis',
+        position_algorithm='PVIS',
+        timing_algorithm='PVIS',
     )
-
+    if (
+        not isfinite(solar_declination.degrees)
+        or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
+            [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
+        )
     return solar_declination

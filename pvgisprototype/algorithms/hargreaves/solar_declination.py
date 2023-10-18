@@ -4,6 +4,7 @@ from datetime import datetime
 from datetime import timezone
 from math import sin
 from math import radians
+from math import isfinite
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationHargreavesInputModel
 from pvgisprototype import SolarDeclination
@@ -56,6 +57,13 @@ def calculate_solar_declination_hargreaves(
             )
         )
     )
-    declination = SolarDeclination(value=declination_value_in_degrees, unit='degrees')
-
-    return declination
+    solar_declination = SolarDeclination(value=declination_value_in_degrees, unit='degrees')
+    if (
+        not isfinite(solar_declination.degrees)
+        or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
+            [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
+        )
+    return solar_declination

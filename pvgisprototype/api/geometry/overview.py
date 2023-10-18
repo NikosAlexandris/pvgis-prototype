@@ -2,6 +2,7 @@ from devtools import debug
 from typing import Optional
 from typing import List
 from typing import Tuple
+from math import isfinite
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import suncalc
@@ -48,6 +49,8 @@ from pvgisprototype.constants import (
     ZENITH_NAME,
     UNITS_NAME,
     TIME_ALGORITHM_NAME,
+    RADIANS,
+    DEGREES,
 )
 
 
@@ -167,9 +170,19 @@ def model_solar_geometry_overview(
         solar_azimuth = convert_south_to_north_radians_convention(
             solar_azimuth_south_radians_convention
         )
-        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="radians")
+        solar_azimuth = SolarAzimuth(
+            value=solar_azimuth,
+            unit=RADIANS,
+            position_algorithm='suncalc',
+            timing_algorithm='suncalc',
+        )
 
-        solar_altitude = SolarAltitude(value=solar_altitude, unit='radians')
+        solar_altitude = SolarAltitude(
+            value=solar_altitude,
+            unit=RADIANS,
+            position_algorithm='suncalc',
+            timing_algorithm='suncalc',
+        )
         # ------------------------------------ TODO: calculate_solar_zenith_suncalc
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
@@ -187,7 +200,12 @@ def model_solar_geometry_overview(
             when=timestamp,
         )  # returns degrees by default
         # required by output function
-        solar_altitude = SolarAltitude(value=solar_altitude, unit="degrees")
+        solar_altitude = SolarAltitude(
+            value=solar_altitude,
+            unit=DEGREES,
+            position_algorithm='pysolar',
+            timing_algorithm='pysolar',
+        )
 
         # ------------------------------------ TODO: calculate_solar_zenith_pysolar
         solar_zenith = SolarZenith(
@@ -202,7 +220,12 @@ def model_solar_geometry_overview(
             when=timestamp,
         )  # returns degrees by default
         # required by output function
-        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="degrees")
+        solar_azimuth = SolarAzimuth(
+            value=solar_azimuth,
+            unit=DEGREES,
+            position_algorithm='pysolar',
+            timing_algorithm='pysolar',
+        )
 
     if solar_position_model.value  == SolarPositionModels.pvis:
 
