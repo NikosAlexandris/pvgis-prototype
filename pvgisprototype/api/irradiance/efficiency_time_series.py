@@ -87,7 +87,6 @@ def calculate_pv_efficiency_time_series(
     efficiency_series[mask_zero_irradiance] = 0
     log_relative_irradiance_series = np.log(relative_irradiance_series)
 
-    
     # Adjust temperature based on conditions
     if model.value  == PVModuleEfficiencyAlgorithms.faiman:
         if wind_speed_series:

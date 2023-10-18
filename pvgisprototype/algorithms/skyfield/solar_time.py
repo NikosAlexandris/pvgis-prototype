@@ -22,7 +22,7 @@ def calculate_solar_time_skyfield(
         timestamp: datetime,
         timezone: str = None,
         verbose: int = 0,
-    )->datetime:
+)->datetime:
 
     # Handle Me during input validation? -------------------------------------
     if timezone != timestamp.tzinfo:
@@ -72,7 +72,6 @@ def calculate_solar_time_skyfield(
     hours = int(hours_since_solar_noon)
     minutes = int((hours_since_solar_noon - hours) * 60)
     seconds = int(((hours_since_solar_noon - hours) * 60 - minutes) * 60)
-    # local_solar_time = datetime_time(hours, minutes, seconds)
     local_solar_time = datetime(                                    # NOTE gounaol: Maybe wrong implementation
             year=timestamp.year,
             month=timestamp.month,

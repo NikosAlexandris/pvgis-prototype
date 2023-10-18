@@ -26,7 +26,6 @@ def calculate_fractional_year(
                 solar_time_model=solar_time_model,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 time_output_units=time_output_units,

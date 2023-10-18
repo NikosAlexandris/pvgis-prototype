@@ -1,6 +1,5 @@
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from datetime import datetime
 from pvgisprototype import FractionalYear
@@ -30,7 +29,6 @@ def calculate_fractional_year_pvis(
             * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
         )
     """
-
     day_of_year = timestamp.timetuple().tm_yday
     days_in_year = get_days_in_year(timestamp.year)
     fractional_year = 2 * pi * day_of_year / days_in_year

@@ -20,31 +20,13 @@ from rich import print
 from rich.console import Console
 from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
-# from pvgisprototype.api.series.hardcodings import check_mark
-# from pvgisprototype.api.series.hardcodings import x_mark
-# from pandas import Timestamp
-# from ..utilities.conversions import convert_to_radians
-# from ..utilities.timestamp import parse_timestamp
-# from ..utilities.timestamp import now_utc_datetimezone
-# from ..utilities.timestamp import ctx_convert_to_timezone
-# from ..utilities.timestamp import ctx_attach_requested_timezone
 from ..series.statistics import calculate_series_statistics
 from ..series.statistics import print_series_statistics
 from ..series.statistics import export_statistics_to_csv
 from pathlib import Path
-# import xarray as xr
 import numpy as np
-# from scipy.stats import mode
-# from rich.table import Table
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
-# import csv
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
 from .direct import calculate_direct_horizontal_irradiance
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
@@ -52,7 +34,6 @@ from pvgisprototype.api.geometry.altitude import model_solar_altitude
 from pvgisprototype.api.geometry.azimuth import model_solar_azimuth
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
 from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.series.utilities import select_location_time_series
@@ -60,12 +41,11 @@ from math import sin
 from math import cos
 from math import pi
 from math import atan2
-from pvgisprototype.api.geometry.solar_declination import model_solar_declination
-from ..geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.time import model_solar_time
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import OrderCommands
-# from pvgisprototype.cli.typer_parameters import typer_argument_time_series
+from pvgisprototype.cli.typer_parameters import typer_argument_time_series
 from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -97,8 +77,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
@@ -221,15 +199,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
     diffuse_horizontal_irradiance = (
         global_irradiance_location_time_series - direct_irradiance_location_time_series
     )
-
-    # in PVGIS' C code -- is this needed? ------------------------------------
-    # beam_coefficient = direct_time_series
-    # diff_coefficient = global_time_series - direct_time_series
-    # hourly_var_data = xr.Dataset({
-    #         "beam_coefficient": beam_coefficient,
-    #         "diff_coefficient": diff_coefficient,
-    # })
-    # ------------------------------------------------------------------------
 
     if diffuse_horizontal_irradiance.size == 1:
         single_value = float(diffuse_horizontal_irradiance.values)
@@ -447,7 +416,6 @@ def calculate_diffuse_inclined_irradiance(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
@@ -500,7 +468,6 @@ def calculate_diffuse_inclined_irradiance(
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_constant=solar_constant,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
@@ -525,11 +492,10 @@ def calculate_diffuse_inclined_irradiance(
             timezone=timezone,
             solar_position_model=solar_position_model,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             solar_time_model=solar_time_model,
-            verbose=verbose,
+            verbose=0,
         )
 
         # on a horizontal surface : G0h = G0 sin(h0)
@@ -554,16 +520,7 @@ def calculate_diffuse_inclined_irradiance(
             n,
         )
 
-        # surface in shade, requires : solar declination for/and incidence angles
-        solar_declination = model_solar_declination(
-            timestamp=timestamp,
-            timezone=timezone,
-            declination_model=solar_declination_model,
-            days_in_a_year=days_in_a_year,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            perigee_offset=perigee_offset,
-            # angle_output_units=angle_output_units,
-        )
+        # surface in shade, requires solar incidence
         solar_time = model_solar_time(
             longitude=longitude,
             latitude=latitude,
@@ -572,7 +529,6 @@ def calculate_diffuse_inclined_irradiance(
             model=solar_time_model,
             refracted_solar_zenith=refracted_solar_zenith,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
@@ -580,7 +536,6 @@ def calculate_diffuse_inclined_irradiance(
         )
         solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
         hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
-        # hour_angle = (solar_time.as_hours - 12)  *  np.radians(15)
         solar_incidence_angle = calculate_solar_incidence_pvis(
             longitude=longitude,
             latitude=latitude,
@@ -588,7 +543,6 @@ def calculate_diffuse_inclined_irradiance(
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
             hour_angle=hour_angle,
-            # angle_output_units=angle_output_units,
             verbose=verbose,
         )
         if sin(solar_incidence_angle.radians) < 0 and solar_altitude.radians >=0:
@@ -596,7 +550,7 @@ def calculate_diffuse_inclined_irradiance(
             # F(γN)
             diffuse_sky_irradiance = calculate_diffuse_sky_irradiance(
                     surface_tilt,
-                    n=TERM_N_IN_SHADE,  # term N for surfaces in shade
+                    n=TERM_N_IN_SHADE,
                     )
             diffuse_inclined_irradiance = (
                 diffuse_horizontal_component * diffuse_sky_irradiance
@@ -617,13 +571,10 @@ def calculate_diffuse_inclined_irradiance(
                     latitude=latitude,
                     timestamp=timestamp,
                     timezone=timezone,
+                    solar_time_model=solar_time_model,
                     apply_atmospheric_refraction=apply_atmospheric_refraction,
-                    refracted_solar_zenith=refracted_solar_zenith,
                     perigee_offset=perigee_offset,
                     eccentricity_correction_factor=eccentricity_correction_factor,
-                    time_offset_global=time_offset_global,
-                    hour_offset=hour_offset,
-                    solar_time_model=solar_time_model,
                 )
 
                 # Normalize the azimuth difference to be within the range -pi to pi
@@ -645,7 +596,6 @@ def calculate_diffuse_inclined_irradiance(
         diffuse_irradiance = diffuse_inclined_irradiance
 
     # one more thing
-    # if(calculateAngleLoss())
     if apply_angular_loss_factor:
         diffuse_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
             pi - surface_tilt - sin(surface_tilt)

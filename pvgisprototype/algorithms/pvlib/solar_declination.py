@@ -20,9 +20,7 @@ def calculate_solar_declination_pvlib(
                 unit=RADIANS,
                 position_algorithm='PVLIB',
                 timing_algorithm='PVLIB',
-)
-
-        return solar_declination
+        )
         if (
                 not isfinite(solar_declination.degrees)
                 or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees

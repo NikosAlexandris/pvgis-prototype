@@ -154,22 +154,22 @@ def calculate_solar_hour_angle_declination_skyfield(
         sun's rays measured in radian.
     """
     solar_position = calculate_solar_position_skyfield(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            )
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+    )
     hour_angle, solar_declination, distance_to_sun = solar_position.hadec()
 
     hour_angle = SolarHourAngle(
         value=hour_angle.radians,
-        unit='radians',
+        unit=RADIANS,
         position_algorithm='Skyfield',
         timing_algorithm='Skyfield',
     )
     solar_declination = SolarDeclination(
         value=solar_declination.radians,
-        unit='radians',
+        unit=RADIANS,
         position_algorithm='Skyfield',
         timing_algorithm='Skyfield',
     )

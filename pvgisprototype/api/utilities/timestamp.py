@@ -64,11 +64,11 @@ from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 
 # Random time
 
-def random_day_of_year(days_in_a_year) -> int:
+def random_day_of_year(days_in_year: int) -> int:
     """
     Generate a random datetime and timezone object
     """
-    return random.randint(1, days_in_a_year)
+    return random.randint(1, days_in_year)
 
 
 def random_datetimezone() -> tuple:
@@ -239,13 +239,6 @@ def timestamp_to_minutes(timestamp: datetime) -> float:
 
 def timestamp_to_decimal_hours(t):  # NOTE: Integrated in dateclasses
     return t.hour + t.minute / 60 + t.second / 3600 + t.microsecond / 3600000000
-
-
-def datetime_to_decimal_hours(timestamp: float, timezone_string: str = 'UTC') -> float:
-    dt = datetime.fromtimestamp(timestamp, ZoneInfo(timezone_string))
-    decimal_hours = dt.hour + dt.minute / 60 + dt.second / 3600
-
-    return decimal_hours
 
 
 def timestamp_to_decimal_hours_time_series(

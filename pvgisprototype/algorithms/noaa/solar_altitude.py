@@ -65,16 +65,6 @@ def calculate_solar_altitude_noaa(
     ):
         raise ValueError(
             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
-        )
-    if verbose == 3:
-        debug(locals())
-    if (
-        not isfinite(solar_altitude.degrees)
-        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
             [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
         )
     if verbose == 3:
@@ -95,9 +85,9 @@ def calculate_solar_altitude_time_series_noaa(
     """Calculate the solar altitude angle for a location over a time series"""
     """Calculate the solar altitude angle for a location over a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
-        longitude,
-        timestamps,
-        timezone,
+        longitude=longitude,
+        timestamps=timestamps,
+        timezone=timezone,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,

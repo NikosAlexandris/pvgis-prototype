@@ -6,13 +6,7 @@ from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from datetime import datetime
-# from ..utilities.timestamp import now_utc_datetimezone
 from rich import print
-# from ..utilities.timestamp import ctx_convert_to_timezone
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
 from pathlib import Path
 from .direct import calculate_direct_horizontal_irradiance
 from .extraterrestrial import calculate_extraterrestrial_normal_irradiance
@@ -42,7 +36,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_solar_position_mode
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
@@ -90,7 +83,6 @@ def calculate_ground_reflected_inclined_irradiance(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = 365.25,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
@@ -119,7 +111,6 @@ def calculate_ground_reflected_inclined_irradiance(
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         solar_constant=solar_constant,
-        days_in_a_year=days_in_a_year,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
@@ -136,12 +127,17 @@ def calculate_ground_reflected_inclined_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_time_model=solar_time_model,
+        solar_position_models=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
+        refracted_solar_zenith=refracted_solar_zenith,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        verbose=verbose,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_time_model=solar_time_model,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
         )
 
     # on a horizontal surface : G0h = G0 sin(h0)

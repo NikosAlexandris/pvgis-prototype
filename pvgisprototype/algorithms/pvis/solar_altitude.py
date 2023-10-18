@@ -4,8 +4,6 @@ from zoneinfo import ZoneInfo
 from math import cos
 from math import sin
 from math import asin
-from math import isfinite
-
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
 from pvgisprototype import Latitude
@@ -14,8 +12,9 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.time import model_solar_time
-from pvgisprototype.api.geometry.hour_angle import calculate_hour_angle
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
 from pvgisprototype.constants import RADIANS
+from math import isfinite
 
 
 @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
@@ -26,6 +25,7 @@ def calculate_solar_altitude_pvis(
     timezone: ZoneInfo,
     perigee_offset: float,
     eccentricity_correction_factor: float,
+    time_offset_global: int,
     solar_time_model: SolarTimeModels,
     verbose: int = 0,
 ) -> SolarAltitude:
@@ -74,10 +74,12 @@ def calculate_solar_altitude_pvis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_time_model=solar_time_model,
-        verbose=verbose,
+        solar_time_model=solar_time_model,  # returns datetime.time object
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_offset_global=time_offset_global,
     )
-    hour_angle = calculate_hour_angle(
+    hour_angle = calculate_solar_hour_angle_pvis(
             solar_time=solar_time,
     )
     sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
@@ -94,7 +96,7 @@ def calculate_solar_altitude_pvis(
     ):
         raise ValueError(
             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
+            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
         )
 
     if verbose == 3:

@@ -18,9 +18,7 @@ def calculate_solar_altitude_pvlib(
         timestamp: datetime,
         timezone: ZoneInfo,
     )-> SolarAltitude:
-    """Calculate the solar zenith angle (φ) in radians
-    """
-
+    """Calculate the solar altitude angle in degrees using pvlib"""
     solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_altitude = solar_position['apparent_elevation'].values[0]
 

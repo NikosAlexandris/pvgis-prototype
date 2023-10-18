@@ -1,7 +1,6 @@
 from devtools import debug
 from devtools import debug
 from datetime import datetime
-from datetime import timedelta
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -115,7 +114,6 @@ def calculate_time_offset_noaa(
       within the range of about -20 minutes to +20 minutes.
     """
 
-
     # This will be 0 for UTC, obviously! Review-Me! --------------------------
 
     timestamp = timestamp.astimezone(timezone)
@@ -154,7 +152,7 @@ def calculate_time_offset_time_series_noaa(
         timestamps,
         time_output_units,
     )
-    equation_of_time_series = np.array([item.minutes if isinstance(item, EquationOfTime) else item for item in equation_of_time_series])
+    equation_of_time_series = np.array([eot.minutes if isinstance(item, EquationOfTime) else eot for eot in equation_of_time_series])
     time_offset_series = longitude_in_minutes - timezone_offset_minutes_series + equation_of_time_series
 
     if not np.all((-790 <= time_offset_series) & (time_offset_series <= 790)):

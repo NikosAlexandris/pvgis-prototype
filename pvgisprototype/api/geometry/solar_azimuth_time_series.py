@@ -27,13 +27,12 @@ def model_solar_azimuth_time_series(
     latitude: Latitude,
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo,
-    model: SolarPositionModels = SolarPositionModels.pvlib,
+    solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    # days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     # time_output_units: str = 'minutes',
@@ -42,10 +41,10 @@ def model_solar_azimuth_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List[SolarAzimuth]:
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
 
-    if model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModels.noaa:
 
         solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
             longitude=longitude,
@@ -56,19 +55,19 @@ def model_solar_azimuth_time_series(
             verbose=verbose,
         )
 
-    if model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModels.skyfield:
         pass
 
-    if model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModels.suncalc:
         pass
 
-    if model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModels.pysolar:
         pass
 
-    if model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModels.pvis:
         pass
 
-    if model.value  == SolarPositionModels.pvlib:
+    if solar_position_model.value  == SolarPositionModels.pvlib:
         pass
 
     return solar_azimuth_series

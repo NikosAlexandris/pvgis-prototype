@@ -30,7 +30,7 @@ def calculate_solar_azimuth_noaa(
     longitude: Longitude,   # radians
     latitude: Latitude,     # radians
     timestamp: datetime,
-    timezone: str,
+    timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
 )-> SolarAzimuth:
@@ -75,6 +75,10 @@ def calculate_solar_azimuth_noaa(
                    # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
           # cos(θ) = ----------------------------------------------------------
                    #             cos(latitude) * sin(solar_zenith)
+
+                          # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # θ = arccos(  -------------------------------------------------------------- )
+                            #      cos(latitude) * sin(solar_zenith)
 
 
     # or else, from the first equation, after multiplying by -1 :

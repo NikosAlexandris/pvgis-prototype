@@ -9,31 +9,18 @@ from rich.console import Console
 from rich import print
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 from pvgisprototype.cli.typer_parameters import OrderCommands
-# from pvgisprototype.cli.typer_parameters import typer_argument_time_series
-# from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
-# from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-# from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degrees
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-# from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
-from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
-# from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
@@ -45,7 +32,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-# from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude_series
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
@@ -75,7 +61,6 @@ from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
@@ -126,8 +111,9 @@ def calculate_term_n_time_series(
     N: float
         The N term
     """
-    if verbose == 5:
+    if verbose > 5:
         debug(locals())
+
     return 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2)
 
 
@@ -164,6 +150,17 @@ def calculate_diffuse_sky_irradiance_time_series(
     sky dome viewed by a tilted (or inclined) surface `ri(γN)`.
     """
     sky_view_fraction = (1 + cos(surface_tilt)) / 2
+    # -----------------------------------------------------------------------
+    # Verify the following : does it work ?
+    # diffuse_sky_irradiance_series = sky_view_fraction
+    # +(
+    #     sin(surface_tilt)
+    #     - surface_tilt
+    #     * cos(surface_tilt)
+    #     - pi
+    #     * sin(surface_tilt / 2) ** 2
+    # ) * n_series
+    # -----------------------------------------------------------------------
     diffuse_sky_irradiance_series = sky_view_fraction
     + (
         sin(surface_tilt)
@@ -511,7 +508,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
                     latitude=latitude,
                     timestamps=timestamps,
                     timezone=timezone,
-                    model=solar_position_model,
+                    solar_position_model=solar_position_model,
                     apply_atmospheric_refraction=apply_atmospheric_refraction,
                     refracted_solar_zenith=refracted_solar_zenith,
                     solar_time_model=solar_time_model,
@@ -605,7 +602,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
-    if verbose == 5:
+    if verbose > 5:
         debug(locals())
 
     print_irradiance_table_2(
@@ -613,7 +610,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         latitude=latitude,
         timestamps=timestamps,
         dictionary=results,
-        title=title + f' irradiance series {IRRADIANCE_UNITS}',
+        title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
         verbose=verbose,
     )

@@ -78,14 +78,6 @@ EccentricityCorrectionFactor:
 
 # Solar time
 
-# SolarTime:      # NOTE: Removed! Solar time is a datetime.datetime object, not a nested object
-#   value:
-#     type: Optional[datetime]
-#     initial:
-#   unit:
-#     type: str
-#     initial: datetime
-
 EquationOfTime:
   value:
     type: Optional[float]
@@ -121,14 +113,6 @@ EventHourAngle:
   unit:
     type: Optional[str]
     initial:
-
-EventTime:
-  value:
-    type: Optional[datetime]
-    initial:
-  unit:
-    type: str
-    initial: datetime
 
 HourAngleSunrise:
   value:
@@ -323,15 +307,15 @@ HorizonHeight:
 SurfaceTilt:
   value:
     type: float
-    initial:
+    initial: 45
   unit:
     type: str
-    initial:
+    initial: 'degrees'
 
 SurfaceOrientation:
   value:
     type: float
-    initial:
+    initial: 180.0
   unit:
     type: str
-    initial:
+    initial: 'degrees'

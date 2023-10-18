@@ -1,8 +1,7 @@
 from devtools import debug
-from typing import List
-from typing import Union
-from typing import Sequence
+from typing import List, Union, Sequence
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
@@ -19,8 +18,8 @@ def model_solar_altitude_time_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: Union[datetime, Sequence[datetime]],
-    timezone: str,
-    solar_position_model: SolarPositionModels,
+    timezone: ZoneInfo,
+    solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
 ) -> List[SolarAltitude]:
@@ -53,5 +52,8 @@ def model_solar_altitude_time_series(
 
     if solar_position_model.value  == SolarPositionModels.pvlib:
         pass
+
+    if verbose == 3:
+        debug(locals())
 
     return solar_altitude_series

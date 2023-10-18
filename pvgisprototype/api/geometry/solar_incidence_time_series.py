@@ -16,7 +16,6 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
@@ -36,16 +35,12 @@ def model_solar_incidence_time_series(
     timestamps: np.array,
     timezone: Optional[ZoneInfo] = None,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    random_time_series: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
-    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: str = RADIANS,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List[SolarIncidence]:
@@ -58,13 +53,9 @@ def model_solar_incidence_time_series(
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            random_time_series=random_time_series,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
-            angle_units=angle_units,
             angle_output_units=angle_output_units,
             verbose=verbose,
         )

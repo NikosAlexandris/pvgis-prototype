@@ -20,8 +20,6 @@ def calculate_solar_azimuth_pvlib(
     )-> SolarAzimuth:
     """Calculate the solar azimith (θ) in radians
     """
-
-    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_azimuth = solar_position['azimuth'].values[0]
 
@@ -31,7 +29,6 @@ def calculate_solar_azimuth_pvlib(
             position_algorithm='pvlib',
             timing_algorithm='pvlib',
             )
-
     if (
         not isfinite(solar_azimuth.degrees)
         or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
@@ -40,5 +37,4 @@ def calculate_solar_azimuth_pvlib(
             f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
             [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
         )
-
     return solar_azimuth
