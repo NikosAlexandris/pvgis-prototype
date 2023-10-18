@@ -16,6 +16,15 @@ class SolarDeclinationModels(str, Enum):
     pvlib = 'pvlib'
 
 
+class SolarTimeModels(str, Enum):
+    all = 'all'
+    ephem = 'ephem'
+    milne = 'Milne (1921)'
+    noaa = 'NOAA'
+    pvgis = 'PVGIS'
+    skyfield = 'Skyfield'
+
+
 class SolarPositionModels(str, Enum):
     all = 'all'
     noaa = 'NOAA'
@@ -27,10 +36,7 @@ class SolarPositionModels(str, Enum):
     suncalc = 'suncalc'
 
 
-class SolarTimeModels(str, Enum):
-    all = 'all'
-    ephem = 'ephem'
-    milne = 'Milne (1921)'
-    noaa = 'NOAA'
-    pvgis = 'PVGIS'
-    skyfield = 'Skyfield'
+SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModels.jenco
+SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModels.noaa
+SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModels.milne
+SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModels.noaa
