@@ -20,7 +20,6 @@ def calculate_solar_zenith_pvlib(
     )-> SolarZenith:
     """Calculate the solar azimith (θ) in radians
     """
-
     solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_zenith = solar_position['zenith'].values[0]
 

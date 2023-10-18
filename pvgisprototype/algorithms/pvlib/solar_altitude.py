@@ -17,18 +17,18 @@ def calculate_solar_altitude_pvlib(
         timestamp: datetime,
         timezone: ZoneInfo,
     )-> SolarAltitude:
-    """Calculate the solar zenith angle (φ) in radians
-    """
-
+    """Calculate the solar altitude angle in degrees using pvlib"""
     solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
     solar_altitude = solar_position['apparent_elevation'].values[0]
 
     if not isfinite(solar_altitude) or not -90 <= solar_altitude <= 90:
-        raise ValueError(f'The `solar_altitude` should be a finite number ranging in [{-90}, {90}] degrees')
+        raise ValueError(f'The calculated solar altitude angle {solar_altitude} is out of the expected range [{-90}, {90}] degrees')
 
-    return SolarAltitude(
+    solar_altitude = SolarAltitude(
         value=solar_altitude,
         unit='degrees',
         position_algorithm='pvlib',
         timing_algorithm='pvlib',
         )
+
+    return solar_altitude

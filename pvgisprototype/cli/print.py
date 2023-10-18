@@ -7,12 +7,14 @@ from rich.table import Table
 from rich.panel import Panel
 from rich import box
 from typing import List
+import numpy as np
 from pvgisprototype.constants import (
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
+    SOLAR_TIME_COLUMN_NAME,
     DECLINATION_COLUMN_NAME,
     DECLINATION_NAME,
     HOUR_ANGLE_COLUMN_NAME,
@@ -28,11 +30,11 @@ from pvgisprototype.constants import (
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
     UNITS_COLUMN_NAME,
-    UNITLESSS_COLUMN_NAME,
+    UNITLESS,
     UNITS_NAME,
     NOT_AVAILABLE_COLUMN_NAME,
-    SOLAR_TIME_COLUMN_NAME,
-    SOLAR_TIME_NAME,
+    NOT_AVAILABLE,
+    ROUNDING_PLACES_DEFAULT
 )
 
 
@@ -55,7 +57,6 @@ def print_solar_position_table(
     timestamp,
     timezone,
     table,
-    rounding_places,
     declination=None,
     hour_angle=None,
     timing=None,
@@ -65,10 +66,9 @@ def print_solar_position_table(
     incidence=None,
     user_requested_timestamp=None,
     user_requested_timezone=None,
+    rounding_places=ROUNDING_PLACES_DEFAULT,
 ):
     """ """
-    console = Console()
-
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
@@ -102,24 +102,23 @@ def print_solar_position_table(
     if incidence is not None:
         columns.append(INCIDENCE_COLUMN_NAME)
     columns.append(UNITS_COLUMN_NAME)
-    
 
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
     for model_result in rounded_table:
-        declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE_COLUMN_NAME) if declination else None
-        hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE_COLUMN_NAME) if hour_angle else None
-        timing_algorithm = model_result.get(TIME_ALGORITHM_NAME, '')                # FIXME
-        position_algorithm = model_result.get(POSITION_ALGORITHM_NAME, '')
-        zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE_COLUMN_NAME) if zenith else None
-        altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE_COLUMN_NAME) if altitude else None
-        azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE_COLUMN_NAME) if azimuth else None
-        incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE_COLUMN_NAME) if incidence else None
-        units = model_result.get(UNITS_NAME, UNITLESSS_COLUMN_NAME)
+        declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE) if declination else None
+        hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE) if hour_angle else None
+        timing_algorithm = model_result.get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)                # FIXME
+        position_algorithm = model_result.get(POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
+        zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE) if zenith else None
+        altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE) if altitude else None
+        azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE) if azimuth else None
+        incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE) if incidence else None
+        units = model_result.get(UNITS_NAME, UNITLESS)
 
         row = []
         if longitude:
-            row.append(longitude)
+            row.append(str(longitude))
         if latitude:
             row.append(str(latitude))
         row.extend([str(timestamp), str(timezone)])
@@ -134,7 +133,7 @@ def print_solar_position_table(
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
 
-        if timing:
+        if timing_algorithm:
             row.append(timing_algorithm)
         if declination_value is not None:
             row.append(str(declination_value))
@@ -159,6 +158,7 @@ def print_solar_position_table(
         style = style_map.get(position_algorithm.lower(), None)
         table.add_row(*row, style=style)
 
+    console = Console()
     console.print(table)
 
 
@@ -169,8 +169,6 @@ def print_hour_angle_table_2(
     units=None,
 ):
     """ """
-    console = Console()
-
     solar_time = round_float_values(solar_time, rounding_places)
     hour_angle = round_float_values(hour_angle, rounding_places)
 
@@ -194,6 +192,7 @@ def print_hour_angle_table_2(
     # table.add_row(*row, style=style)
     table.add_row(*row)
 
+    console = Console()
     console.print(table)
 
 
@@ -347,7 +346,7 @@ def print_noaa_solar_position_table(
     console.print(solar_position_table)
 
     if verbose:
-            verbose_info = f"""
+        verbose_info = f"""
             Fractional Year: {solar_position_calculations['fractional_year']}
             Equation of Time: {solar_position_calculations['equation_of_time']}
             Solar Declination: {solar_position_calculations['solar_declination']}
@@ -355,4 +354,61 @@ def print_noaa_solar_position_table(
             True Solar Time: {solar_position_calculations['true_solar_time']}
             Solar Hour Angle: {solar_position_calculations['solar_hour_angle']}
             Solar Zenith: {solar_position_calculations['solar_zenith']} """
-            console.print(Panel(verbose_info, title="Verbose Information"))
+        console.print(Panel(verbose_info, title="Verbose Information"))
+
+
+def print_irradiance_table_2(
+    longitude=None,
+    latitude=None,
+    timestamps: datetime = [datetime.now()],
+    dictionary: dict = dict(),
+    title: str ='Irradiance series',
+    rounding_places: int = 5,
+    verbose=1,
+):
+    console = Console()
+    table = Table(title=title, box=box.SIMPLE_HEAD)
+    
+    # base columns
+    if verbose > 0:
+        if longitude:
+            table.add_column('Longitude')
+        if latitude:
+            table.add_column('Latitude')
+    table.add_column('Time')
+    
+    # additional columns based dictionary keys
+    for key in dictionary.keys():
+        if dictionary[key] is not None:
+            table.add_column(key)
+    
+    # Convert single float or int values to arrays of the same length as timestamps
+    for key, value in dictionary.items():
+        if isinstance(value, (float, int)):
+            dictionary[key] = np.full(len(timestamps), value)
+        if isinstance(value, str):
+            dictionary[key] = np.full(len(timestamps), str(value))
+    
+    # Zip series and timestamps
+    zipped_series = zip(*dictionary.values())
+    zipped_data = zip(timestamps, zipped_series)
+    
+    # Populate table
+    for timestamp, values in zipped_data:
+        row = []
+        if verbose > 0 and longitude and latitude:
+            row = [
+                round_float_values(longitude, rounding_places),
+                round_float_values(latitude, rounding_places),
+            ]
+        from pandas import to_datetime
+        row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
+        for value in values:
+            if not isinstance(value, str):
+                row.append(str(round_float_values(value, rounding_places)))
+            else:
+                row.append(value)
+        table.add_row(*row)
+    
+    if verbose:
+        console.print(table)

@@ -13,9 +13,11 @@ def calculate_solar_declination_pvlib(
         """Calculate the solar declination in radians"""
         doy = timestamp.timetuple().tm_yday
         solar_declination = pvlib.solarposition.declination_spencer71(doy)
-        return SolarDeclination(
+        solar_declination = SolarDeclination(
                 value=solar_declination,
                 unit='radians',
                 position_algorithm='pvlib',
                 timing_algorithm='pvlib',
                 )
+
+        return solar_declination

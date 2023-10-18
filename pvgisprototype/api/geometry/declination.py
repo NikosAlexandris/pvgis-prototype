@@ -11,11 +11,9 @@ from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_dec
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
 from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_pvlib
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -31,7 +29,6 @@ def model_solar_declination(
     timestamp: datetime,
     timezone: ZoneInfo,
     declination_model: SolarDeclinationModels = SolarDeclinationModels.pvis,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -56,7 +53,6 @@ def model_solar_declination(
 
         solar_declination = calculate_solar_declination_hargreaves(
             timestamp=timestamp,
-            days_in_a_year=days_in_a_year,
         ) # returns values in degrees by default
 
     if declination_model.value  == SolarDeclinationModels.pvlib:
@@ -72,7 +68,6 @@ def calculate_solar_declination(
     timestamp: datetime,
     timezone: ZoneInfo = None,
     declination_models: List[SolarDeclinationModels] = [SolarDeclinationModels.pvis],
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = 'radians',
@@ -91,7 +86,6 @@ def calculate_solar_declination(
                 timestamp=timestamp,
                 timezone=timezone,
                 declination_model=declination_model,
-                days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 verbose=verbose,

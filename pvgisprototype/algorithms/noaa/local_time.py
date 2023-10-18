@@ -1,5 +1,4 @@
 from datetime import datetime
-# from datetime import time
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -7,7 +6,6 @@ from pvgisprototype.algorithms.noaa.function_models import CalculateLocalSolarTi
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
-# from pvgisprototype import SolarTime
 from .event_time import calculate_event_time_noaa
 
 
@@ -80,12 +78,12 @@ def calculate_local_solar_time_noaa(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
 
-    if timestamp < solar_noon_timestamp.datetime:
-        previous_solar_noon_timestamp = solar_noon_timestamp.datetime - timedelta(days=1)
+    if timestamp < solar_noon_timestamp:
+        previous_solar_noon_timestamp = solar_noon_timestamp - timedelta(days=1)
         local_solar_time_delta = timestamp - previous_solar_noon_timestamp
 
     else:
-        local_solar_time_delta = timestamp - solar_noon_timestamp.datetime
+        local_solar_time_delta = timestamp - solar_noon_timestamp
 
     total_seconds = int(local_solar_time_delta.total_seconds())
     # hours, remainder = divmod(total_seconds, 3600)

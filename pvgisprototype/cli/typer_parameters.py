@@ -13,6 +13,8 @@ from ..api.utilities.timestamp import ctx_attach_requested_timezone
 from ..api.utilities.timestamp import ctx_convert_to_timezone
 from ..api.utilities.timestamp import now_local_datetimezone
 from ..api.utilities.timestamp import convert_hours_to_datetime_time
+from ..api.utilities.timestamp import callback_generate_datetime_series
+from ..api.utilities.timestamp import parse_timestamp_series
 from .rich_help_panel_names import rich_help_panel_advanced_options
 # from .rich_help_panel_names import rich_help_panel_geometry_time
 # from .rich_help_panel_names import rich_help_panel_geometry_position
@@ -146,24 +148,27 @@ typer_argument_timestamp = typer.Argument(
     # rich_help_panel=rich_help_panel_time_series,
     default_factory=now_utc_datetimezone,
 )
-
-
-def parse_timestamp_series(value: str) -> List[float]:
-    datetime_strings = value.split(',')
-    datetime_series = [datetime.fromisoformat(string) for string in datetime_strings]
-    # return BaseTimestampSeriesModel(timestamps=datetime_series)
-    return datetime_series
-
-
 typer_argument_timestamps = typer.Argument(
     help='Timestamps',
     parser=parse_timestamp_series,
+    callback=callback_generate_datetime_series,
+#     default_factory=now_utc_datetimezone_series,
+)
+typer_option_timestamps = typer.Option(
+    help='Timestamps',
+    parser=parse_timestamp_series,
+    callback=callback_generate_datetime_series,
 #     default_factory=now_utc_datetimezone_series,
 )
 typer_option_start_time = typer.Option(
     help=f'Start timestamp of the period. [yellow]Overrides the `timestamps` paramter![/yellow]',
     rich_help_panel=rich_help_panel_time_series,
     default_factory = None,
+)
+typer_option_frequency = typer.Option(
+    help=f'Frequency for the timestamp generation function',
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory='h'
 )
 typer_option_end_time = typer.Option(
     help='End timestamp of the period. [yellow]Overrides the `timestamps` paramter![/yellow]',
@@ -189,6 +194,12 @@ typer_option_random_day = typer.Option(
     # '--random-day',
     # '--random',
     help='Generate a random day to demonstrate calculation',
+    # default_factory=RANDOM_DAY_FLAG_DEFAULT,
+)
+typer_option_random_days = typer.Option(
+    # '--random-day',
+    # '--random',
+    help='Generate random days to demonstrate calculation',
     # default_factory=RANDOM_DAY_FLAG_DEFAULT,
 )
 # day_of_year: Annotated[float, typer.Argument(
@@ -390,7 +401,14 @@ typer_argument_refracted_solar_altitude_series = typer.Argument(
     help='Refracted solar altitude',
     rich_help_panel=rich_help_panel_solar_position,
 )
-
+typer_argument_solar_incidence = typer.Argument(
+    help='Solar incidence',
+    rich_help_panel=rich_help_panel_solar_position,
+)
+typer_argument_solar_incidence_series = typer.Argument(
+    help='Solar incidence series',
+    rich_help_panel=rich_help_panel_solar_position,
+)
 
 # Solar time
 
@@ -420,7 +438,7 @@ typer_option_hour_offset = typer.Option(
 typer_option_days_in_a_year = typer.Option(
     help='Number of days in a year',
     rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=days_in_a_year_default,
+    # default_factory=DAYS_IN_A_YEAR,
 )
 typer_option_perigee_offset = typer.Option(
     help='Perigee offset',
@@ -465,7 +483,7 @@ def linke_turbidity_callback(value: str, ctx: Context):
         return [LinkeTurbidityFactor(value=v, unit=LINKE_TURBIDITY_FACTOR_UNIT) for v in parsed_values]
 
     timestamps = ctx.params.get('timestamps')
-    if timestamps:
+    if timestamps is not None:
         return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_FACTOR_UNIT) for _ in timestamps]
     else:
         return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_FACTOR_UNIT)]
@@ -510,7 +528,7 @@ def optical_air_mass_series_callback(value: str, ctx: Context):
         return parse_optical_air_mass_series(value)
 
     timestamps = ctx.params.get('timestamps')
-    if timestamps:
+    if timestamps is not None:
         return [OpticalAirMass(value=OPTICAL_AIR_MASS_DEFAULT, unit=OPTICAL_AIR_MASS_UNIT) for _ in timestamps]
     else:
         return [OpticalAirMass(value=OPTICAL_AIR_MASS_DEFAULT, unit=OPTICAL_AIR_MASS_UNIT)]
@@ -523,7 +541,6 @@ typer_option_optical_air_mass_series = typer.Option(
     # default_factory=OPTICAL_AIR_MASS_DEFAULT,
 )
 typer_option_apply_atmospheric_refraction = typer.Option(
-    '--apply-atmospheric-refraction',
     help='Apply atmospheric refraction functions',
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -576,7 +593,9 @@ typer_argument_conversion_efficiency = typer.Argument(
 )
 typer_option_system_efficiency = typer.Option(
     '--system-efficiency-factor',
+    '-se',
     help='System efficiency factor',
+    show_default=True,
     rich_help_panel=rich_help_panel_efficiency,
     # rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory=SYSTEM_EFFICIENCY_DEFAULT,
@@ -584,14 +603,20 @@ typer_option_system_efficiency = typer.Option(
 typer_option_efficiency = typer.Option(
     '--efficiency-factor',
     '-e',
-    help='Efficiency factor',
+    help='PV efficiency factor. [red]Overrides internal PV module efficiency algorithms![/red]',
     rich_help_panel=rich_help_panel_efficiency,
     # rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory=EFFICIENCY_DEFAULT,
 )
 typer_option_pv_module_efficiency_algorithm = typer.Option(
+    '--efficiency-model',
+    '-em',
     help='Algorithms for calculaton of the efficiency of a photovoltaic system as a function of total irradiance, temperature',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
     rich_help_panel=rich_help_panel_efficiency,
+    # default_factory='Faiman'
 )
 
 

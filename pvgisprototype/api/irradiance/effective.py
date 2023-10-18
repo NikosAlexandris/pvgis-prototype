@@ -10,38 +10,30 @@ from rich import print
 
 
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_pvgis
-# from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance
-# from pvgisprototype.api.irradiance.reflected import calculate_reflected_inclined_irradiance_pvgis
-
 from datetime import datetime
-# from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-# from pvgisprototype.api.utilities.conversions import convert_to_radians
-# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-# from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-# from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.constants import SOLAR_CONSTANT
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-# from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 
 from pvgisprototype.api.irradiance.diffuse import  calculate_diffuse_inclined_irradiance
 from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_inclined_irradiance
-from pvgisprototype.api.geometry.solar_incidence import model_solar_incidence
-from pvgisprototype.api.geometry.solar_declination import model_solar_declination
-from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
-from ..geometry.solar_time import model_solar_time
-# from .direct import calculate_direct_horizontal_irradiance
+from pvgisprototype.api.geometry.incidence import model_solar_incidence
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
+from pvgisprototype.api.geometry.time import model_solar_time
+from .direct import calculate_direct_horizontal_irradiance
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -59,6 +51,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_time_s
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -87,8 +80,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.typer_parameters import typer_option_days_in_a_year
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
@@ -102,9 +93,9 @@ from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
 from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_efficiency
-# from pvgisprototype.constants import EFFICIENCY_DEFAULT
+from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_pv_module_efficiency_algorithm
-from pvgisprototype.constants import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
@@ -124,13 +115,6 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f"Estimate the direct solar radiation",
 )
-
-
-class MethodsForInexactMatches(str, Enum):
-    none = None # only exact matches
-    pad = 'pad' # ffill: propagate last valid index value forward
-    backfill = 'backfill' # bfill: propagate next valid index value backward
-    nearest = 'nearest' # use nearest valid index value
 
 
 def is_surface_in_shade():
@@ -167,6 +151,7 @@ def calculate_effective_irradiance(
     temperature: Annotated[float, typer_argument_temperature_time_series] = TEMPERATURE_DEFAULT,
     wind_speed: Annotated[float, typer_argument_wind_speed_time_series] = WIND_SPEED_DEFAULT,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
@@ -184,7 +169,6 @@ def calculate_effective_irradiance(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    days_in_a_year: Annotated[float, typer_option_days_in_a_year] = DAYS_IN_A_YEAR,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
@@ -192,9 +176,7 @@ def calculate_effective_irradiance(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     horizon_heights: Annotated[List[float], typer_argument_horizon_heights] = None,
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    efficiency_model: Annotated[PVModuleEfficiencyAlgorithms,
-                                typer_option_pv_module_efficiency_algorithm] =
-    PVModuleEfficiencyAlgorithms.linear,
+    efficiency_model: Annotated[PVModuleEfficiencyAlgorithms, typer_option_pv_module_efficiency_algorithm] = PVModuleEfficiencyAlgorithms.linear,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -284,7 +266,7 @@ def calculate_effective_irradiance(
     - bh :                       direct_radiation_coefficient
 
     Algorithmic structure
-    
+
     1. If `solar_altitude` > 0 ( = sun is above the horizon) :
            proceed with checking for low sun angles
 
@@ -310,63 +292,25 @@ def calculate_effective_irradiance(
        to the beam, diffuse, and reflected radiation.
     """
     in_shade = is_surface_in_shade()
-    solar_declination = model_solar_declination(
-        timestamp=timestamp,
-        timezone=timezone,
-        declination_model=solar_declination_model,
-        days_in_a_year=days_in_a_year,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
-        verbose=verbose,
-    )
     solar_altitude = model_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position_model=solar_position_model,
-        solar_time_model=solar_time_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        days_in_a_year=days_in_a_year,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        verbose=verbose,
-    )
-    solar_time = model_solar_time(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        solar_time_model=solar_time_model,
-        verbose=verbose,
-    )
-    # solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time.datetime)
-    # hour_angle = np.radians(15) * (solar_time.as_hours - 12)
-    solar_incidence_angle = model_solar_incidence(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        solar_time_model=solar_time_model,
-        solar_incidence_model=solar_incidence_model,
-        surface_tilt=surface_tilt,
-        surface_orientation=surface_orientation,
-        # shadow_indicator=shadow_indicator,
-        # horizon_heights=horizon_heights,
-        # horizon_interval=horizon_interval,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
+        solar_time_model=solar_time_model,
         verbose=verbose,
     )
 
-    if solar_altitude.radians > 0.0:  # the sun is above the horizon
+    if solar_altitude.value > 0:  # the sun is above the horizon
 
-        if solar_altitude.radians < 0.04:  # for very low sun angles
-            direct_horizontal_component = 0.0  # direct radiation is negligible
+        if solar_altitude.value < 0.04:  # for very low sun angles
+            direct_horizontal_component = 0  # direct radiation is negligible
         
         # if not in_shade and solar_incidence > 0:
         elif not in_shade:  # for solar_altitude > 0.04 and a sunlit surface
@@ -389,7 +333,6 @@ def calculate_effective_irradiance(
                 solar_time_model=solar_time_model,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 angle_output_units=angle_output_units,
@@ -413,7 +356,6 @@ def calculate_effective_irradiance(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
@@ -438,7 +380,6 @@ def calculate_effective_irradiance(
             time_offset_global=time_offset_global,
             hour_offset=hour_offset,
             solar_constant=solar_constant,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
@@ -450,31 +391,44 @@ def calculate_effective_irradiance(
     else:  # the sun is below the horizon
         direct_irradiance = diffuse_irradiance = reflected_irradiance = 0
 
-    if not efficiency_model and not efficiency:
-        efficiency_coefficient = system_efficiency
+    # sum components
+    global_irradiance = direct_irradiance + diffuse_irradiance + reflected_irradiance
 
-    if not efficiency_model and efficiency:
-        efficiency_coefficient = efficiency
+    if not efficiency_model:
+        if not efficiency:
+            print(f'Using preset system efficiency {system_efficiency}')
+            efficiency_coefficient_series = system_efficiency
+        else:
+            print(f'Efficiency set to {efficiency}')
+            efficiency_coefficient_series = efficiency
+    else:
+        if not efficiency:
+            print(f'Using PV module efficiency algorithm {efficiency_model}')
+            efficiency_coefficient = calculate_pv_efficiency(
+                irradiance=global_irradiance,
+                temperature=temperature,
+                model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
+                standard_test_temperature=TEMPERATURE_DEFAULT,
+                wind_speed=wind_speed,
+                use_faiman_model=False,
+            )
 
-    if efficiency_model and not efficiency:
-        total_irradiance = direct_irradiance + diffuse_irradiance + reflected_irradiance
-        # total_irradiance = np.sum(direct_radiation) + np.sum(diffuse_radiation) + np.sum(reflected_radiation)
-        efficiency_coefficient = calculate_pv_efficiency(
-            irradiance=total_irradiance,
-            temperature=temperature,
-            model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
-            standard_test_temperature=TEMPERATURE_DEFAULT,
-            wind_speed=wind_speed,
-            use_faiman_model=False,
-        )
-
-    result = efficiency_coefficient * np.array([direct_irradiance, diffuse_irradiance, reflected_irradiance])
+    effective_irradiance = (
+        global_irradiance * efficiency_coefficient
+    )
 
     if verbose == 3:
         debug(locals())
+
     if verbose > 1:
-        print(f'Direct, Diffuse, Reflected : {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance} * {efficiency_coefficient} efficiency factor')
-        print(f'Effective irradiance values : {result}')
+        print(f'Hourly irradiance components incident on a surface on {timestamp}')
+        surface_tilt = convert_float_to_degrees_if_requested(surface_tilt, 'degrees')
+        surface_orientation = convert_float_to_degrees_if_requested(surface_orientation, 'degrees')
+        print(f'Surface tilted at {surface_tilt} oriented at {surface_orientation}')
+        print(f'Direct, Diffuse, Reflected : {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance}')
+        print(f'Efficiency factor : {efficiency_coefficient}')
+        print(f'Effective irradiances : {effective_irradiance}')
     if verbose > 0:
-        print(f'Total irradiance : {np.sum(result)}')
-    return result
+        print(f'Total irradiance : {global_irradiance}')
+
+    return effective_irradiance

@@ -1,7 +1,6 @@
-# from math import pi
+from math import pi
 from datetime import time
 from datetime import timedelta
-
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventTimeNOAAInput
 from pvgisprototype import Longitude
@@ -53,13 +52,13 @@ def calculate_event_time_noaa(
     - cosine(90.833) = -0.9629159426075866
     """
     event_hour_angle = calculate_event_hour_angle_noaa(
-            latitude=latitude,
-            timestamp=timestamp,
-            refracted_solar_zenith=refracted_solar_zenith,
-            )
+        latitude=latitude,
+        timestamp=timestamp,
+        refracted_solar_zenith=refracted_solar_zenith,
+    )
     equation_of_time = calculate_equation_of_time_noaa(
-            timestamp=timestamp,
-            )  # minutes
+        timestamp=timestamp,
+    )
     # 2 * pi radians equals a circle, 360 degrees or 24 hours
     # 60 minutes * 24 hours = 1440 minutes (in 24 hours or a day)
     # The calculation `(1440 / (2 * pi)) * value_in_radians`

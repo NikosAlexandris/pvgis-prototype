@@ -1,7 +1,7 @@
 from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from math import isfinite
+#from math import isfinite
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeInputModel
 from pvgisprototype import Latitude
@@ -14,14 +14,10 @@ from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_al
 import suncalc
 import pysolar
 from pvgisprototype.api.utilities.timestamp import attach_timezone
-
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
-import suncalc
-import pysolar
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -39,8 +35,6 @@ def model_solar_altitude(
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModels = SolarPositionModels.pvlib,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    apply_atmospheric_refraction: bool = True,
-    days_in_a_year: float = DAYS_IN_A_YEAR,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -94,24 +88,23 @@ def model_solar_altitude(
         ).values()  # zero points to south
         solar_altitude = SolarAltitude(
             value=solar_altitude,
-            unit='radians',
+            unit=RADIANS,
             position_algorithm='suncalc',
             timing_algorithm='suncalc',
         )
 
-        if (
-            not isfinite(solar_altitude.degrees)
-            or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
-        ):
-            raise ValueError(
-                f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
-            )
+#        if (
+#            not isfinite(solar_altitude.degrees)
+#            or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+#        ):
+#            raise ValueError(
+#                f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+#                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+#            )
 
     if solar_position_model.value == SolarPositionModels.pysolar:
 
         timestamp = attach_timezone(timestamp, timezone)
-
         solar_altitude = pysolar.solar.get_altitude(
             latitude_deg=latitude.degrees,  # this comes first
             longitude_deg=longitude.degrees,
@@ -125,14 +118,14 @@ def model_solar_altitude(
             timing_algorithm='pysolar',
         )
 
-        if (
-            not isfinite(solar_altitude.degrees)
-            or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
-        ):
-            raise ValueError(
-                f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
-            )
+#        if (
+#            not isfinite(solar_altitude.degrees)
+#            or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+#        ):
+#            raise ValueError(
+#                f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+#                [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
+#            )
 
     if solar_position_model.value  == SolarPositionModels.pvis:
 
@@ -141,7 +134,6 @@ def model_solar_altitude(
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
-            days_in_a_year=days_in_a_year,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             solar_time_model=solar_time_model,
@@ -169,10 +161,8 @@ def calculate_solar_altitude(
     solar_position_models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
     apply_atmospheric_refraction: bool = True,
-    days_in_a_year: float = 365.25,
-    perigee_offset: float = 0.048869,
-    eccentricity_correction_factor: float = 0.01672,
-    angle_output_units: str = 'radians',
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: int = 0,
 ) -> List:
     """
@@ -189,7 +179,6 @@ def calculate_solar_altitude(
                 solar_position_model=solar_position_model,
                 solar_time_model=solar_time_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
-                days_in_a_year=days_in_a_year,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 verbose=verbose,

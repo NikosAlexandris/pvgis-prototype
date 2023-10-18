@@ -7,10 +7,10 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAzimuthInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import SolarAzimuth
 from .models import SolarPositionModels
 from .models import SolarTimeModels
+from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_azimuth_noaa
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 import suncalc
@@ -19,8 +19,8 @@ from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth
 from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimuth_pvlib
 from pvgisprototype.api.utilities.conversions import convert_south_to_north_radians_convention
 from pvgisprototype.api.utilities.timestamp import attach_timezone
+
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT

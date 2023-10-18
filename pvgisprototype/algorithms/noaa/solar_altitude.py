@@ -66,15 +66,15 @@ def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: Union[float, Sequence[float]],
-    timezone: str,
+    timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
 ):
     """Calculate the solar altitude angle for a location over a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
-        longitude,
-        timestamps,
-        timezone,
+        longitude=longitude,
+        timestamps=timestamps,
+        timezone=timezone,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
@@ -92,7 +92,7 @@ def calculate_solar_altitude_time_series_noaa(
             f"The `solar_altitude` should be a finite number ranging in [{-np.pi/2}, {np.pi/2}] radians"
         )
     solar_altitude_series = [
-        SolarAltitude(value=value, unit=RADIANS) for value in solar_altitude_series
+        SolarAltitude(value=altitude, unit=RADIANS) for altitude in solar_altitude_series
     ]
     if verbose == 3:
         debug(locals())

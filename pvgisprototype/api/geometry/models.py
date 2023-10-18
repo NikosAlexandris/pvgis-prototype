@@ -3,7 +3,7 @@ from enum import Enum
 
 class SolarIncidenceModels(str, Enum):
     all = 'all'
-    pvis = 'pvis'
+    pvis = 'PVIS'
     jenco = 'Jenco'
 
 
@@ -12,7 +12,7 @@ class SolarDeclinationModels(str, Enum):
     # pvgis = 'PVGIS'
     hargreaves = 'Hargreaves'
     noaa = 'NOAA'
-    pvis = 'pvis'
+    pvis = 'PVIS'
     pvlib = 'pvlib'
 
 
@@ -20,7 +20,7 @@ class SolarPositionModels(str, Enum):
     all = 'all'
     noaa = 'NOAA'
     # pvgis = 'PVGIS'
-    pvis = 'pvis'
+    pvis = 'PVIS'
     pvlib = 'pvlib'
     pysolar = 'pysolar'
     skyfield = 'Skyfield'
