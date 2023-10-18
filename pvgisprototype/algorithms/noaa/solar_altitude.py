@@ -40,6 +40,7 @@ def calculate_solar_altitude_noaa(
         solar_hour_angle=solar_hour_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
+    print(f'Solar zenith : {solar_zenith}')
     solar_altitude = pi / 2 - solar_zenith.radians
     solar_altitude = SolarAltitude(
         value=solar_altitude,
@@ -48,14 +49,16 @@ def calculate_solar_altitude_noaa(
         timing_algorithm='NOAA',
         )
     if (
-        not isfinite(solar_altitude.degrees)
-        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+        # not isfinite(solar_altitude.degrees)
+        # or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+        not isfinite(solar_altitude.radians)
+        or not solar_altitude.min_radians <= solar_altitude.radians <= solar_altitude.max_radians
     ):
         raise ValueError(
             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
             [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
         )
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
 
     return solar_altitude
@@ -82,6 +85,7 @@ def calculate_solar_altitude_time_series_noaa(
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
+    print(f'Solar zenith series : {solar_zenith_series}')
     solar_altitude_series = np.pi / 2 - np.array(
         [zenith.radians for zenith in solar_zenith_series]
     )
@@ -94,7 +98,7 @@ def calculate_solar_altitude_time_series_noaa(
     solar_altitude_series = [
         SolarAltitude(value=altitude, unit=RADIANS) for altitude in solar_altitude_series
     ]
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
 
     return np.array(solar_altitude_series, dtype=object)
