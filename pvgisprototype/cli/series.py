@@ -290,7 +290,6 @@ def uniplot(
     if isinstance(data_array, xr.DataArray):
         supertitle = f'{data_array.long_name}'
         unit = data_array.units
-        debug(locals())
         plot(
             # x=data_array,
             # xs=data_array,

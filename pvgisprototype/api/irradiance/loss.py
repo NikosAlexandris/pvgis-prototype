@@ -36,11 +36,6 @@ app = typer.Typer(
 )
 
 
-AOIConstants = []
-AOIConstants.append(-0.074)
-AOIConstants.append(0.155)
-
-
 # @app.callback(invoke_without_command=True)
 def calculate_angular_loss_factor_for_direct_irradiance(
     solar_incidence: Annotated[float, typer_argument_solar_incidence],

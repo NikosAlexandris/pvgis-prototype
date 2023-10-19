@@ -51,7 +51,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import LINKE_TURBIDITY_MINIMUM
 from pvgisprototype.constants import LINKE_TURBIDITY_MAXIMUM
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_FACTOR_UNIT
+from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
 # from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -454,6 +454,8 @@ typer_option_eccentricity_correction_factor = typer.Option(
 
 # Atmospheric properties
 
+## Linke turbidity
+
 linke_turbidity_factor_typer_help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
 typer_argument_linke_turbidity_factor = typer.Argument(
     help=linke_turbidity_factor_typer_help,
@@ -471,22 +473,25 @@ typer_option_linke_turbidity_factor = typer.Option(
 )
 
 
-def parse_linke_turbidity_factor_series(value: str):
-    linke_turbidity_factor_strings = value.split(',')
-    linke_turbidity_factor_series = [linke_turbidity_factor.fromisoformat(string) for string in linke_turbidity_factor_strings]
-    return linke_turbidity_factor_series
+def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):
+    print(f'Value for Linke Turbidity : {linke_turbidity_factor_input}')
+    if isinstance(linke_turbidity_factor_input, str):
+        linke_turbidity_factor_strings = linke_turbidity_factor_input.split(',')
+        return linke_turbidity_factor_strings
+    else:
+        return linke_turbidity_factor_input
 
 
 def linke_turbidity_callback(value: str, ctx: Context):
     if value:
         parsed_values = parse_linke_turbidity_factor_series(value)
-        return [LinkeTurbidityFactor(value=v, unit=LINKE_TURBIDITY_FACTOR_UNIT) for v in parsed_values]
+        return [LinkeTurbidityFactor(value=lt, unit=LINKE_TURBIDITY_UNIT) for lt in parsed_values]
 
     timestamps = ctx.params.get('timestamps')
     if timestamps is not None:
-        return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_FACTOR_UNIT) for _ in timestamps]
+        return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_UNIT) for _ in timestamps]
     else:
-        return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_FACTOR_UNIT)]
+        return [LinkeTurbidityFactor(value=LINKE_TURBIDITY_DEFAULT, unit=LINKE_TURBIDITY_UNIT)]
 
 
 linke_turbidity_factor_series_typer_help='Ratio series of total to Rayleigh optical depth measuring atmospheric turbidity'
@@ -499,6 +504,16 @@ typer_option_linke_turbidity_factor_series = typer.Option(
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
+
+## Optical air mass
+
+def parse_optical_air_mass(optical_air_mass_input: str):
+    print(f'Value for Optical Air Mass : {optical_air_mass_input}')
+    if isinstance(optical_air_mass_input, str):
+        optical_air_mass_strings = optical_air_mass_input.split(',')
+        return optical_air_mass_strings
+    else:
+        return optical_air_mass_input
 
 
 def optical_air_mass_callback(value: str, ctx: Context):
@@ -514,18 +529,24 @@ typer_option_optical_air_mass = typer.Option(
     callback=optical_air_mass_callback,
 )
 
+## Optical air mass series
 
-def parse_optical_air_mass_series(value: str) -> List[float]:
+def parse_optical_air_mass_series(optical_air_mass_factor_input: str) -> List[float]:
     """Parse a string of optical air mass values separated by commas into a list of floats."""
-    optical_air_mass_strings = value.split(',')
-    optical_air_mass_series = [float(string) for string in optical_air_mass_strings]
-    return optical_air_mass_series
+    if isinstance(optical_air_mass_factor_input, str):
+        optical_air_mass_factor_strings = optical_air_mass_factor_input.split(',')
+        optical_air_mass_factor_series = [lt for lt in optical_air_mass_factor_strings]
+        return optical_air_mass_factor_series
+    else:
+        return optical_air_mass_factor_input
 
 
 def optical_air_mass_series_callback(value: str, ctx: Context):
     """Callback to handle the optical air mass series input or provide a default series."""
+    print(f'Input value for Optical Air Mass : {value}')
     if value:
-        return parse_optical_air_mass_series(value)
+        parsed_values = parse_optical_air_mass_series(value)
+        return [OpticalAirMass(value=lt, unit=OPTICAL_AIR_MASS_UNIT) for lt in parsed_values]
 
     timestamps = ctx.params.get('timestamps')
     if timestamps is not None:

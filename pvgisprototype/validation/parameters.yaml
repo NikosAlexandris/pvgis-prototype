@@ -193,6 +193,12 @@ SolarAltitude:
   timing_algorithm:
     type: Optional[str]
     initial:
+  min_radians:
+    type: float
+    initial: -3.15
+  max_radians:
+    type: float
+    initial: 3.15
   min_degrees:
     type: float
     initial: -90
