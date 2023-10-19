@@ -75,7 +75,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
-from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.cli.documentation import A_PRIMER_ON_SOLAR_GEOMETRY
 from .rich_help_panel_names import rich_help_panel_geometry_noaa
 from .print import print_solar_position_table
@@ -83,7 +83,7 @@ from .print import print_noaa_solar_position_table
 
 
 def calculate_zenith(angle_output_units, solar_altitude_angle):
-    if angle_output_units == 'degrees':
+    if angle_output_units == DEGREES:
         return 90 - solar_altitude_angle
     else:
         return radians(90) - radians(solar_altitude_angle)
@@ -254,7 +254,7 @@ def declination(
     model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> float:
@@ -300,7 +300,7 @@ def declination(
     solar_declination = calculate_solar_declination(
         timestamp=timestamp,
         timezone=timezone,
-        models=model,
+        declination_models=model,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
         angle_output_units=angle_output_units,
@@ -382,13 +382,11 @@ def zenith(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        models=model,  # could be named models!
+        solar_position_models=model,
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
@@ -475,11 +473,9 @@ def altitude(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position_models=model,  # could be named models!
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        solar_position_models=model,
         solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
@@ -651,7 +647,6 @@ def sunrise(
     surface_tilt = SurfaceTilt(value=surface_tilt, unit=RADIANS)
     solar_declination = SolarDeclination(value=solar_declination, unit=RADIANS)
 
-
     from pvgisprototype.cli.print import print_hour_angle_table
     print_hour_angle_table(
             latitude=getattr(latitude, angle_output_units),
@@ -773,7 +768,7 @@ def noaa(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,

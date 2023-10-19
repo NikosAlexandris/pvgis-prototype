@@ -5,7 +5,7 @@ from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
 from typing import Optional
-from zoneinfo import ZoneInfo
+from pvgisprototype.constants import RADIANS
 
 
 async def get_calculate_noaa_solar_position(
@@ -16,8 +16,8 @@ async def get_calculate_noaa_solar_position(
     refracted_solar_zenith: float = Query(1.5853349194640094),
     apply_atmospheric_refraction: Optional[bool] = Query(True),
     time_output_units: str = Query('minutes'),
-    angle_units: str = Query('radians'),
-    angle_output_units: str = Query('radians'),
+    angle_units: str = Query(RADIANS),
+    angle_output_units: str = Query(RADIANS),
     rounding_places: Optional[int] = Query(5),
     verbose: bool = Query(False)
 ):

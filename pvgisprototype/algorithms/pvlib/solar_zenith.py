@@ -27,8 +27,8 @@ def calculate_solar_zenith_pvlib(
     solar_zenith = SolarZenith(
             value=solar_zenith,
             unit=DEGREES,
-            position_algorithm='pvlib',
-            timing_algorithm='pvlib',
+            position_algorithm='PVLIB',
+            timing_algorithm='PVLIB',
             )
     if (
         not isfinite(solar_zenith.degrees)

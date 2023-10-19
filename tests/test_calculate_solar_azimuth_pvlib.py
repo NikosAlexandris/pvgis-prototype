@@ -2,7 +2,7 @@ import pytest
 from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimuth_pvlib
 from pvgisprototype import SolarAzimuth
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import AZIMUTH_NAME
+from pvgisprototype.constants import AZIMUTH_NAME, DEGREES
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -10,7 +10,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',

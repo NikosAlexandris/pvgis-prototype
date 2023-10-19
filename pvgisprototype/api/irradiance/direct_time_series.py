@@ -73,6 +73,7 @@ from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.constants import (
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
@@ -152,8 +153,8 @@ def correct_linke_turbidity_factor_time_series(
 
 def calculate_refracted_solar_altitude_time_series(
     solar_altitude_series,#: np.ndarray,
-    angle_input_units: str = 'degrees',
-    angle_output_units: str = 'radians',
+    angle_input_units: str = DEGREES,
+    angle_output_units: str = RADIANS,
     verbose: int = 0,
 ):
     """Adjust the solar altitude angle for atmospheric refraction for a time series.
@@ -162,7 +163,7 @@ def calculate_refracted_solar_altitude_time_series(
     ----
     This function is vectorized to handle arrays of solar altitudes.
     """
-    if angle_input_units != "degrees":
+    if angle_input_units != DEGREES:
         raise ValueError("Only degrees are supported for angle_input_units.")
 
     is_scalar = False
@@ -196,12 +197,12 @@ def calculate_refracted_solar_altitude_time_series(
     # Pack results back to SolarAltitude objects -----------------------------
     if not is_scalar:
         refracted_solar_altitude_series = [
-            RefractedSolarAltitude(value=value, unit="degrees")
+            RefractedSolarAltitude(value=value, unit=DEGREES)
             for value in refracted_solar_altitude_series_array
         ]
     else:
         refracted_solar_altitude_series = RefractedSolarAltitude(
-            value=refracted_solar_altitude_series_array[0], unit="degrees"
+            value=refracted_solar_altitude_series_array[0], unit=DEGREES
         )
     # -------------------------------------------------------------------- ^^^
     
@@ -413,8 +414,8 @@ def calculate_direct_horizontal_irradiance_time_series(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> np.ndarray:
@@ -440,7 +441,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
     
     # expects solar altitude in degrees! ----------------------------------vvv
-    expected_solar_altitude_units = "degrees"
+    expected_solar_altitude_units = DEGREES
     solar_altitude_series_in_degrees = convert_series_to_degrees_if_requested(
         solar_altitude_series,
         angle_output_units=expected_solar_altitude_units,  # Here!
@@ -450,7 +451,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     refracted_solar_altitude_series = calculate_refracted_solar_altitude_time_series(
         solar_altitude_series=solar_altitude_series_in_degrees,
         angle_input_units=expected_solar_altitude_units,
-        angle_output_units="radians",  # Here in radians!
+        angle_output_units=RADIANS,  # Here in radians!
         verbose=verbose,
     )
     optical_air_mass_series = calculate_optical_air_mass_time_series(
@@ -545,8 +546,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -651,8 +652,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     else:  # read from a time series dataset
         print(f'Reading from external dataset...')
         # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
-        latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
+        longitude_for_selection = convert_float_to_degrees_if_requested(longitude, DEGREES)
+        latitude_for_selection = convert_float_to_degrees_if_requested(latitude, DEGREES)
         direct_horizontal_irradiance_series = select_time_series(
             time_series=direct_horizontal_component,
             longitude=longitude_for_selection,

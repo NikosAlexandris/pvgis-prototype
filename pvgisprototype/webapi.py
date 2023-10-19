@@ -30,6 +30,7 @@ from pvgisprototype.plot.plot import plot_line
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
 from pvgisprototype.web_api.plot.plot_example import graph_example
+from pvgisprototype.constants import RADIANS
 
 
 app = FastAPI()
@@ -77,7 +78,7 @@ async def get_plot(
         request: Request,
         year: int,
         title: Optional[str] = 'Annual Variation of Solar Declination',
-        output_units: Optional[str] = 'radians',
+        output_units: Optional[str] = RADIANS,
         inline: Optional[bool] = True
         ):
     js_resources = INLINE.render_js()

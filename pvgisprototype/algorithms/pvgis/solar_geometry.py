@@ -140,7 +140,7 @@ def calculate_solar_geometry_pvgis_variables(
             '--output-units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+            help="Output units for solar geometry variables (degrees or radians)")] = RADIANS,
         ) -> SolarGeometryDayVariables:
     """Calculate solar geometry variables based on PVGIS' C code
 
@@ -273,7 +273,7 @@ def calculate_solar_position_pvgis(
             '--output-units',
             show_default=True,
             case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = 'radians',
+            help="Output units for solar geometry variables (degrees or radians)")] = RADIANS,
         ) -> SolarGeometryDayVariables:
     """Calculate solar altitude, azimuth and sun azimuth angles based on PVGIS'
     implementation in C.

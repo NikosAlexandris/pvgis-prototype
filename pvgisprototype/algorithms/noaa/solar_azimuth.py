@@ -115,11 +115,11 @@ def calculate_solar_azimuth_noaa(
         solar_azimuth = 2 * pi - solar_azimuth
 
     solar_azimuth = SolarAzimuth(
-            value=solar_azimuth,
-            unit=RADIANS,
-            position_algorithm='NOAA',
-            timing_algorithm='NOAA',
-            )
+        value=solar_azimuth,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
 
     if (
         not isfinite(solar_azimuth.degrees)
@@ -182,7 +182,7 @@ def calculate_solar_azimuth_time_series_noaa(
         raise ValueError(f'The `solar_azimuth` is out of the expected range [0, {2* np.pi}] radians')
 
     solar_azimuth_series = [
-        SolarAzimuth(value=azimuth, unit='radians') for azimuth in solar_azimuth_series
+        SolarAzimuth(value=azimuth, unit=RADIANS) for azimuth in solar_azimuth_series
     ]
     if verbose == 3:
         debug(locals())

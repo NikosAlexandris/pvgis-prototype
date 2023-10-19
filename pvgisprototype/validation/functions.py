@@ -245,7 +245,6 @@ class SolarHourAngleSkyfieldInput(
 class CalculateSolarAltitudePVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    ApplyAtmosphericRefractionModel,
     EarthOrbitModel,
     TimeOffsetModel,
     SolarTimeModelModel,
@@ -270,7 +269,7 @@ class CalculateSolarAltitudeNOAAInput(
 
 class CalculateSolarAltitudeAzimuthSkyfieldInputModel(
     BaseCoordinatesModel,
-    BaseTimeModel,
+    BaseTimestampModel,
 ):
     pass
 
@@ -316,10 +315,6 @@ class CalculateSolarZenithNOAAInput(
 class CalculateSolarAzimuthPVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    ApplyAtmosphericRefractionModel,
-    EarthOrbitModel,
-    TimeOffsetModel,
-    HourOffsetModel,
     SolarTimeModelModel,
 ):
     pass
@@ -468,7 +463,7 @@ class CalculateOpticalAirMassInputModel(
     # @field_validator("angle_units")
     # @classmethod
     # def validate_angle_output_units(cls, v):
-    #     valid_units = "degrees"
+    #     valid_units = DEGREES
     #     if not v == valid_units:
     #         raise ValueError(f"angle_units must be {valid_units}")
     #     return v

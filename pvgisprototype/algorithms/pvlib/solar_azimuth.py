@@ -9,6 +9,7 @@ from pvgisprototype.validation.functions import CalculateSolarAzimuthPVLIBInputM
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype.constants import DEGREES
 
 
 @validate_with_pydantic(CalculateSolarAzimuthPVLIBInputModel)
@@ -25,9 +26,9 @@ def calculate_solar_azimuth_pvlib(
 
     solar_azimuth = SolarAzimuth(
             value=solar_azimuth,
-            unit='degrees',
-            position_algorithm='pvlib',
-            timing_algorithm='pvlib',
+            unit=DEGREES,
+            position_algorithm='PVLIB',
+            timing_algorithm='PVLIB',
             )
     if (
         not isfinite(solar_azimuth.degrees)

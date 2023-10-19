@@ -137,16 +137,13 @@ def estimate_global_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
+        solar_position_models=solar_position_models,
+        solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        solar_time_model=solar_time_model,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
         angle_output_units=angle_output_units,
+        verbose=verbose,
         )
     # on a horizontal surface : G0h = G0 sin(h0)
     extraterrestial_horizontal_irradiance = extraterrestial_normal_irradiance * sin(

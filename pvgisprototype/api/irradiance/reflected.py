@@ -43,6 +43,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.constants import RADIANS
 
 
 AOIConstants = []
@@ -86,8 +87,8 @@ def calculate_ground_reflected_inclined_irradiance(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     verbose: Annotated[int, typer_option_verbose]= False,
 ):
@@ -127,17 +128,12 @@ def calculate_ground_reflected_inclined_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position_models=solar_position_model,
+        solar_position_model=solar_position_model,
+        solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        solar_time_model=solar_time_model,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        verbose=verbose,
         )
 
     # on a horizontal surface : G0h = G0 sin(h0)

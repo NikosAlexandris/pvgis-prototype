@@ -1,5 +1,6 @@
 from devtools import debug
 from datetime import datetime
+from datetime import timedelta
 from math import pi
 import ephem
 from pvgisprototype import Latitude
@@ -125,7 +126,7 @@ def calculate_solar_time_ephem(
   # norm -> normalise to 24h
   solar_time_hours = ephem.hours(hour_angle + ephem.hours('12:00')).norm
   solar_time_decimal_hours = solar_time_hours * 24 / pi / 2  # convert to decimal hours
-  #solar_time_datetime = timestamp + timedelta(hours=solar_time_hours)
+  solar_time_datetime = timestamp + timedelta(hours=solar_time_decimal_hours)     # FIXME: solar_time_hours or solar_time_decimal_hours ?
 
   if verbose:
       typer.echo(f'Local sidereal time: {sidereal_time}')

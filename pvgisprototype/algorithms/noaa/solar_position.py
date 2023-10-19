@@ -44,8 +44,6 @@ def calculate_noaa_solar_position(
     timestamp: datetime,
     timezone: ZoneInfo,
     refracted_solar_zenith: RefractedSolarZenith,  # radians
-    timezone: ZoneInfo,
-    refracted_solar_zenith: RefractedSolarZenith,  # radians
     apply_atmospheric_refraction: bool = False,
 ) -> dict:
     """
