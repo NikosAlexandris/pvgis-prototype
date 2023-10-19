@@ -30,6 +30,7 @@ from math import sin
 from math import cos
 from math import exp
 from datetime import datetime
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
@@ -75,12 +76,15 @@ from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
+from pvgisprototype.api.geometry.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
+from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
@@ -111,6 +115,8 @@ from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.api.geometry.altitude import model_solar_altitude
 from pvgisprototype.api.geometry.incidence import model_solar_incidence
 from pvgisprototype.constants import RADIANS, DEGREES
+from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.cli.print import print_irradiance_table_2
 
 
 app = typer.Typer(
@@ -377,6 +383,7 @@ def calculate_direct_normal_irradiance(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the direct normal irradiance attenuated by the cloudless atmosphere
@@ -417,30 +424,52 @@ def calculate_direct_normal_irradiance(
         journal = {Solar Energy}
     }
     """
-    extraterrestial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(
+    extraterrestrial_normal_irradiance = calculate_extraterrestrial_normal_irradiance(
         # day_of_year=timestamp.timetuple().tm_yday,  # make `day_of_year` optional ?
         timestamp=timestamp,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
     )
-    corrected_linke_turbidity_factor = correct_linke_turbidity_factor(linke_turbidity_factor)
+    corrected_linke_turbidity_factor = correct_linke_turbidity_factor(
+        linke_turbidity_factor
+    )
     rayleigh_optical_thickness = calculate_rayleigh_optical_thickness(optical_air_mass)
-    direct_normal_irradiance = (
-        extraterrestial_normal_irradiance
-        * exp(
-            corrected_linke_turbidity_factor
-            * optical_air_mass.value
-            * rayleigh_optical_thickness.value
-        )
+    direct_normal_irradiance = extraterrestrial_normal_irradiance * exp(
+        corrected_linke_turbidity_factor
+        * optical_air_mass.value
+        * rayleigh_optical_thickness.value
     )
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
-    if verbose > 1:
+
+    if verbose > 2:
         print(f'Direct normal irradiance = Extraterrestial normal irradiance * exp( Corrected Linke turbidity factor * Optical air mass * Rayleigh Optical Thickness )')
-    if verbose > 0:
-        print(f'Direct normal irradiance: {direct_normal_irradiance}')  # B0c
+
+    results = {
+        "Normal": direct_normal_irradiance,
+    }
+    title = 'Direct'
+
+    if verbose > 1:
+        extended_results = {
+            "Extra. normal": extraterrestrial_normal_irradiance,
+            "Rayleigh": rayleigh_optical_thickness.value,
+            "Air mass": optical_air_mass.value,
+            "Correct Linke": corrected_linke_turbidity_factor,
+            "Linke": linke_turbidity_factor,
+        }
+        results = results | extended_results
+        title += ' & components'
+
+    print_irradiance_table_2(
+        timestamps=[timestamp],
+        dictionary=results,
+        title=title + f" normal irradiance series {IRRADIANCE_UNITS}",
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
 
     return direct_normal_irradiance  # B0c
 
@@ -452,10 +481,10 @@ def calculate_direct_horizontal_irradiance(
     elevation: Annotated[float, typer_argument_elevation],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] =SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = LINKE_TURBIDITY_DEFAULT,
     apply_atmospheric_refraction: Annotated[bool, typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -492,7 +521,7 @@ def calculate_direct_horizontal_irradiance(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        verbose=0,
+        verbose=verbose,
     )
     # The refraction equation expects the solar altitude angle in degrees! ---
     refracted_solar_altitude = calculate_refracted_solar_altitude(
@@ -516,8 +545,9 @@ def calculate_direct_horizontal_irradiance(
     )
     direct_horizontal_irradiance = direct_normal_irradiance * sin(solar_altitude.radians)
 
-    if verbose == 3:
+    if verbose > 5:
         debug(locals())
+
     if verbose > 0:
         print(f'Direct horizontal irradiance: {direct_horizontal_irradiance}')  # B0c
 
@@ -543,9 +573,9 @@ def calculate_direct_inclined_irradiance_pvgis(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
-    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
@@ -653,6 +683,7 @@ def calculate_direct_inclined_irradiance_pvgis(
         )
         if verbose == 3:
             debug(locals())
+
     except ZeroDivisionError:
         logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
         print("Is the solar altitude angle zero?")
@@ -676,6 +707,7 @@ def calculate_direct_inclined_irradiance_pvgis(
 
             if verbose == 3:
                 debug(locals())
+
             if verbose > 0:
                 # print(f'Direct inclined irradiance: {direct_inclined_irradiance} (with angular loss)')  # B0c
                 verbosity_message = ' with angular loss'
@@ -691,6 +723,7 @@ def calculate_direct_inclined_irradiance_pvgis(
 
     if verbose == 3:
         debug(locals())
+
     if verbose > 0:
         print(f'Direct inclined irradiance: {direct_inclined_irradiance} (based on {solar_incidence_model}{verbosity_message})')  # B0c
 
@@ -726,8 +759,8 @@ def calculate_direct_irradiance(
     linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = LINKE_TURBIDITY_DEFAULT,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
-    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
