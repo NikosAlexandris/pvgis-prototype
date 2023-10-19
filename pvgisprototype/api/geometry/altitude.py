@@ -16,7 +16,6 @@ import pysolar
 from pvgisprototype.api.utilities.timestamp import attach_timezone
 
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
-from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 import suncalc
 import pysolar
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
@@ -82,8 +81,6 @@ def model_solar_altitude(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
-            timezone=timezone,
-            verbose=verbose,
         )
 
     if solar_position_model.value == SolarPositionModels.suncalc:
@@ -169,7 +166,7 @@ def calculate_solar_altitude(
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
-    verbose: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """
     Calculates the solar position using all models and returns the results in a table.

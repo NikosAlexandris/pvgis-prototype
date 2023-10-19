@@ -52,7 +52,7 @@ def calculate_fractional_year_time_series_noaa(
         raise ValueError(f'The calculated fractional years are outside the expected range [0, {2*pi}] radians')
 
     fractional_year_series = [
-        FractionalYear(value=value, unit='radians') for value in fractional_year_series
+        FractionalYear(value=value, unit=RADIANS) for value in fractional_year_series
     ]
 
     return np.array(fractional_year_series, dtype=object)

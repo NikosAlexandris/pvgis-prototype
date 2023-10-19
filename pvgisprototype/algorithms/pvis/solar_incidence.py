@@ -14,6 +14,7 @@ from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_dec
 from pvgisprototype.api.geometry.time import model_solar_time
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
 from math import sin
+from math import cos
 from math import acos
 
 
@@ -84,14 +85,7 @@ def calculate_solar_incidence_pvis(
     )
     solar_incidence = acos(
         sin(latitude.radians)
-        sin(latitude.radians)
         * (
-            sin(solar_declination.radians)
-            * cos(surface_tilt.radians)
-            + cos(solar_declination.radians)
-            * cos(surface_orientation.radians)
-            * cos(hour_angle.radians)
-            * sin(surface_tilt.radians)
             sin(solar_declination.radians)
             * cos(surface_tilt.radians)
             + cos(solar_declination.radians)
@@ -100,7 +94,6 @@ def calculate_solar_incidence_pvis(
             * sin(surface_tilt.radians)
         )
         + cos(latitude.radians)
-        + cos(latitude.radians)
         * (
             cos(solar_declination.radians)
             * cos(hour_angle.radians)
@@ -108,17 +101,7 @@ def calculate_solar_incidence_pvis(
             - sin(solar_declination.radians)
             * cos(surface_orientation.radians)
             * sin(surface_tilt.radians)
-            cos(solar_declination.radians)
-            * cos(hour_angle.radians)
-            * cos(surface_tilt.radians)
-            - sin(solar_declination.radians)
-            * cos(surface_orientation.radians)
-            * sin(surface_tilt.radians)
         )
-        + cos(solar_declination.radians)
-        * sin(surface_orientation.radians)
-        * sin(hour_angle.radians)
-        * sin(surface_tilt.radians)
         + cos(solar_declination.radians)
         * sin(surface_orientation.radians)
         * sin(hour_angle.radians)

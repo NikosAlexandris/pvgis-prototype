@@ -1,5 +1,5 @@
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeNOAAInput
+from pvgisprototype.validation.functions import CalculateEquationOfTimeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
 from datetime import datetime
 from pvgisprototype import EquationOfTime
@@ -11,6 +11,7 @@ from typing import Union
 from typing import Sequence
 import numpy as np
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa 
+from pvgisprototype.constants import RADIANS
 
 EQUATIONOFTIME_MINIMUM = -20
 EQUATIONOFTIME_MAXIMUM = 20
@@ -51,7 +52,7 @@ def calculate_equation_of_time_time_series_noaa(
     # timestamps = np.atleast_1d(np.array(timestamps, dtype=datetime))
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
-        angle_output_units='radians'
+        angle_output_units=RADIANS
     )
     if is_scalar_input:
         fractional_year_series = np.array(

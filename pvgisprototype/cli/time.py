@@ -121,7 +121,6 @@ def solar_time(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         verbose=verbose,
     ) 
     solar_time_table = Table(

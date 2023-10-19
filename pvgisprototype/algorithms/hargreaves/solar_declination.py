@@ -1,6 +1,4 @@
 from devtools import debug
-import typer
-from typing import Annotated
 from functools import partial
 from datetime import datetime
 from datetime import timezone
@@ -8,10 +6,10 @@ from math import sin
 from math import cos
 from math import radians
 from math import isfinite
-from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationHargreavesInputModel
 from pvgisprototype import SolarDeclination
+from pvgisprototype.constants import DEGREES
 
 
 @validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)
@@ -59,7 +57,12 @@ def calculate_solar_declination_hargreaves(
             )
         )
     )
-    solar_declination = SolarDeclination(value=declination_value_in_degrees, unit='degrees')
+    solar_declination = SolarDeclination(
+        value=declination_value_in_degrees,
+        unit=DEGREES,
+        position_algorithm='Hargreaves',
+        timing_algorithm='Hargreaves'
+    )
     if (
         not isfinite(solar_declination.degrees)
         or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees

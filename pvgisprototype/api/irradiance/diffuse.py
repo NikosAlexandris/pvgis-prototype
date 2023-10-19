@@ -89,6 +89,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TERM_N_IN_SHADE
+from pvgisprototype.constants import RADIANS
 
 
 app = typer.Typer(
@@ -419,8 +420,8 @@ def calculate_diffuse_inclined_irradiance(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
@@ -491,10 +492,10 @@ def calculate_diffuse_inclined_irradiance(
             timestamp=timestamp,
             timezone=timezone,
             solar_position_model=solar_position_model,
+            solar_time_model=solar_time_model,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            solar_time_model=solar_time_model,
             verbose=0,
         )
 

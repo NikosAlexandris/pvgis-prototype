@@ -108,6 +108,9 @@ from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
+from pvgisprototype.api.geometry.incidence import model_solar_incidence
+from pvgisprototype.constants import RADIANS, DEGREES
 
 
 app = typer.Typer(
@@ -233,11 +236,11 @@ def calculate_refracted_solar_altitude(
     )
     refracted_solar_altitude = RefractedSolarAltitude(
         value=solar_altitude.degrees + atmospheric_refraction,
-        unit='degrees',
+        unit=DEGREES,
     )
     refracted_solar_altitude = convert_to_radians_if_requested(
         refracted_solar_altitude,
-        'radians',
+        RADIANS,
     )
 
     if verbose == 3:
@@ -460,7 +463,7 @@ def calculate_direct_horizontal_irradiance(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -485,11 +488,8 @@ def calculate_direct_horizontal_irradiance(
         timestamp=timestamp,
         timezone=timezone,
         solar_position_model=solar_position_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         verbose=0,
@@ -552,7 +552,7 @@ def calculate_direct_inclined_irradiance_pvgis(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -598,30 +598,23 @@ def calculate_direct_inclined_irradiance_pvgis(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
-        refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
     )
     solar_incidence = model_solar_incidence(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        random_time=random_time,
         solar_time_model=solar_time_model,
         solar_incidence_model=solar_incidence_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
-        # shadow_indicator=shadow_indicator,
-        # horizon_heights=horizon_heights,
-        # horizon_interval=horizon_interval,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
         verbose=verbose,
@@ -638,8 +631,8 @@ def calculate_direct_inclined_irradiance_pvgis(
                 )
     else:  # read from a time series dataset
         # time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
-        latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
+        longitude_for_selection = convert_float_to_degrees_if_requested(longitude, DEGREES)
+        latitude_for_selection = convert_float_to_degrees_if_requested(latitude, DEGREES)
         direct_horizontal_irradiance = select_time_series(
             time_series=direct_horizontal_component,
             longitude=longitude_for_selection,
@@ -741,7 +734,7 @@ def calculate_direct_irradiance(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,

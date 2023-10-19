@@ -136,7 +136,7 @@ def calculate_solar_hour_angle(
     """
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = (solar_time_decimal_hours - 12) * radians(15)
-    hour_angle = SolarHourAngle(value=hour_angle, unit='radians')
+    hour_angle = SolarHourAngle(value=hour_angle, unit=RADIANS)
     if (
         not isfinite(hour_angle.degrees)
         or not hour_angle.min_degrees <= hour_angle.degrees <= hour_angle.max_degrees

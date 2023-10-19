@@ -32,9 +32,9 @@ from pvgisprototype.constants import (
     UNITS_COLUMN_NAME,
     UNITLESS,
     UNITS_NAME,
-    NOT_AVAILABLE_COLUMN_NAME,
     NOT_AVAILABLE,
-    ROUNDING_PLACES_DEFAULT
+    ROUNDING_PLACES_DEFAULT,
+    RADIANS,
 )
 
 
@@ -133,7 +133,7 @@ def print_solar_position_table(
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
 
-        if timing_algorithm:
+        if timing is not None:
             row.append(timing_algorithm)
         if declination_value is not None:
             row.append(str(declination_value))
@@ -253,7 +253,7 @@ def print_noaa_solar_position_table(
     rounding_places: int = 5,
     user_requested_timestamp: datetime = None, 
     user_requested_timezone: str = None,
-    angle_output_units: str = 'radians',
+    angle_output_units: str = RADIANS,
     verbose: bool = False,  # New verbose argument
 ):
     console = Console()

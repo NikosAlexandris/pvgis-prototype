@@ -2,7 +2,7 @@ import pytest
 from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
 from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import ALTITUDE_NAME
+from pvgisprototype.constants import ALTITUDE_NAME, DEGREES
 from pvgisprototype import SolarAltitude
 
 
@@ -11,7 +11,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',
@@ -62,6 +62,10 @@ def test_model_solar_altitude(
         timezone=timezone,
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        verbose=verbose,
     )
 
     # Check types

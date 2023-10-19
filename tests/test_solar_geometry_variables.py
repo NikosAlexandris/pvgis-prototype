@@ -9,6 +9,7 @@ from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geome
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_geometry_pvgis_variables
 from pvgisprototype.plot.plot_solar_geometry_pvgis import plot_solar_geometry_pvgis_variables
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.constants import DEGREES
 
 
 # Set a seed to ensure agreement of plots between tests!
@@ -29,7 +30,7 @@ def test_convert_to_degrees_if_requested():
     
     angle_in_radians = np.pi
     expected_angle_in_degrees = 180
-    converted_angle = convert_to_degrees_if_requested(angle_in_radians, 'degrees')
+    converted_angle = convert_to_degrees_if_requested(angle_in_radians, DEGREES)
     assert converted_angle == expected_angle_in_degrees
 
     angle_in_radians = np.pi
@@ -74,7 +75,7 @@ def test_calculate_solar_geometry_pvgis_variables(
         timestamp: datetime.datetime,
         expected_output,
         ):
-    # variables = calculate_solar_geometry_variables(constants, output_units='degrees')
+    # variables = calculate_solar_geometry_variables(constants, output_units=DEGREES)
     variables = calculate_solar_geometry_pvgis_variables(
             solar_geometry_day_constants,
             timestamp,

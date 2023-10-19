@@ -43,7 +43,9 @@ def calculate_solar_declination_pvgis(
     solar_declination = SolarDeclination(
         value=-solar_declination.value,
         unit=solar_declination.unit,
-        )
+        position_algorithm='PVGIS',
+        timing_algorithm='PVGIS'
+    )
     if (
         not isfinite(solar_declination.degrees)
         or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees

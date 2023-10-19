@@ -117,6 +117,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.efficiency_time_series import calculate_pv_efficiency_time_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
+from pvgisprototype.constants import RADIANS
 
 
 app = typer.Typer(
@@ -184,8 +185,8 @@ def calculate_effective_irradiance_time_series(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     efficiency_model: Annotated[PVModuleEfficiencyAlgorithms, typer_option_pv_module_efficiency_algorithm] = None,

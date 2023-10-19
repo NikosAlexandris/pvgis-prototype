@@ -12,6 +12,7 @@ from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import RADIANS
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
@@ -106,7 +107,7 @@ def calculate_true_solar_time_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]], 
         timezone: Optional[ZoneInfo],
         time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
+        angle_units: str = RADIANS,
         verbose: int = VERBOSE_LEVEL_DEFAULT,
     ) -> Sequence[datetime]:
     true_solar_time_series = []

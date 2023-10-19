@@ -73,7 +73,7 @@ from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
-
+from pvgisprototype.constants import RADIANS
 
 
 AOIConstants = []
@@ -123,8 +123,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',

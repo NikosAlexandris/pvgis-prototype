@@ -70,8 +70,6 @@ def calculate_solar_altitude_pvis(
     solar_time = model_solar_time(
         longitude=longitude,
         latitude=latitude,
-        longitude=longitude,
-        latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
         solar_time_model=solar_time_model,  # returns datetime.time object

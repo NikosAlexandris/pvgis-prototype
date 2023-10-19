@@ -136,11 +136,10 @@ def model_solar_geometry_overview(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
-                timezone=timezone,
                 )
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
-            unit = 'degrees',
+            unit = DEGREES,
             position_algorithm=solar_azimuth.position_algorithm,
             timing_algorithm=solar_azimuth.timing_algorithm,
         )
@@ -200,7 +199,7 @@ def model_solar_geometry_overview(
         )
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,
-            unit = 'degrees',
+            unit = DEGREES,
             position_algorithm=solar_altitude.position_algorithm,
             timing_algorithm=solar_altitude.timing_algorithm,
         )
@@ -241,6 +240,7 @@ def model_solar_geometry_overview(
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             solar_time_model=solar_time_model,
+            verbose=verbose,
         )
         solar_zenith = SolarZenith(
             value = 90 - solar_altitude.degrees,

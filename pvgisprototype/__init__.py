@@ -1,17 +1,14 @@
 import yaml
 from pydantic import BaseModel
-from typing import Optional
-from datetime import timedelta
-from datetime import datetime
-from datetime import time
-from datetime import timedelta
-from datetime import datetime
-from datetime import time
 from devtools import debug
 from pathlib import Path
 from pvgisprototype.constants import PARAMETERS_YAML_FILE
 import numpy as np
-import numpy as np
+from pvgisprototype.constants import RADIANS, DEGREES
+from typing import Optional
+from datetime import timedelta
+from datetime import datetime
+from datetime import time
 
 
 def model_hash(self):
@@ -49,9 +46,9 @@ def _timestamp_to_minutes(timestamp):
 def degrees_property(self):
     """Instance property to convert to degrees"""
     if self.value is not None:
-        if self.unit == 'degrees':
+        if self.unit == DEGREES:
             return self.value
-        elif self.unit == 'radians':
+        elif self.unit == RADIANS:
             return np.degrees(self.value)
         else:
             return None
@@ -63,9 +60,9 @@ def degrees_property(self):
 def radians_property(self):
     """Instance property to convert to radians"""
     if self.value is not None:
-        if self.unit == 'radians':
+        if self.unit == RADIANS:
             return self.value
-        elif self.unit == 'degrees':
+        elif self.unit == DEGREES:
             return np.radians(self.value)
         else:
             return None
@@ -84,9 +81,9 @@ def minutes_property(self):
 @property
 def timedelta_property(self):
     """Instance property to convert to timedelta"""
-    if self.unit == 'radians':
+    if self.unit == RADIANS:
         return _radians_to_timedelta(self.value)
-    elif self.unit == 'degrees':
+    elif self.unit == DEGREES:
         return _degrees_to_timedelta(self.value)
     elif self.unit == 'timedelta':
         return self.value
@@ -101,9 +98,9 @@ def as_minutes_property(self):
         return self.value.total_seconds() / 60
     elif self.unit == 'datetime':
         return (self.value.hour * 3600 + self.value.minute * 60 + self.value.second) / 60
-    elif self.unit == 'radians':
+    elif self.unit == RADIANS:
         return _radians_to_minutes(self.value)
-    elif self.unit == 'degrees':
+    elif self.unit == DEGREES:
         return _degrees_to_minutes(self.value)
     elif self.unit == 'timestamp':
         return _timestamp_to_minutes(self.value)
@@ -172,8 +169,8 @@ def generate_dataclass_models(yaml_file: str):
                 '__module__': __name__,
                 '__qualname__': model_name,
                 '__hash__': model_hash,
-                'degrees': degrees_property,
-                'radians': radians_property,
+                DEGREES: degrees_property,
+                RADIANS: radians_property,
                 'minutes': minutes_property,
                 'timedelta': timedelta_property,
                 'as_minutes': as_minutes_property,

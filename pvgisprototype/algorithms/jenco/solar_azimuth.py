@@ -1,3 +1,15 @@
+from devtools import debug
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from math import sin
+from math import cos
+from math import isfinite
+from pvgisprototype import SolarAzimuth
+from pvgisprototype import Longitude
+from pvgisprototype import Latitude
+from pvgisprototype.constants import RADIANS
+
+
 def calculate_solar_azimuth_jenco(
 ):
     """ """
@@ -48,6 +60,21 @@ def calculate_solar_azimuth_jenco(
         C11 * cos(hour_angle.radians) - C13
     )
     solar_azimuth = atan(tangent_solar_azimuth)
-    solar_azimuth = SolarAzimuth(value=solar_azimuth, unit=RADIANS) # zero_direction ='East'
+
+    solar_azimuth = SolarAzimuth(
+        value=solar_azimuth,
+        unit=RADIANS,
+        position_algorithm='Jenco',
+        timing_algorithm='Jenco',
+    ) # zero_direction ='East'
+
+    if (
+        not isfinite(solar_azimuth.degrees)
+        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
+            [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+        )
 
     return solar_azimuth

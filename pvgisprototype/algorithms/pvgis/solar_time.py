@@ -10,6 +10,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimePVGISInputModel
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 
 
 @validate_with_pydantic(CalculateSolarTimePVGISInputModel)
