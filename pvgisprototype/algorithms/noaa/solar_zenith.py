@@ -81,6 +81,7 @@ def atmospheric_refraction_for_near_horizon(
 
     if verbose == 3:
         debug(locals())
+
     return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
 
 
@@ -104,6 +105,7 @@ def atmospheric_refraction_for_below_horizon(
 
     if verbose == 3:
         debug(locals())
+
     return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
 
 
