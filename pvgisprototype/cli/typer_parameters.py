@@ -474,7 +474,6 @@ typer_option_linke_turbidity_factor = typer.Option(
 
 
 def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):
-    print(f'Value for Linke Turbidity : {linke_turbidity_factor_input}')
     if isinstance(linke_turbidity_factor_input, str):
         linke_turbidity_factor_strings = linke_turbidity_factor_input.split(',')
         return linke_turbidity_factor_strings
@@ -508,7 +507,6 @@ typer_option_linke_turbidity_factor_series = typer.Option(
 ## Optical air mass
 
 def parse_optical_air_mass(optical_air_mass_input: str):
-    print(f'Value for Optical Air Mass : {optical_air_mass_input}')
     if isinstance(optical_air_mass_input, str):
         optical_air_mass_strings = optical_air_mass_input.split(',')
         return optical_air_mass_strings
@@ -543,7 +541,6 @@ def parse_optical_air_mass_series(optical_air_mass_factor_input: str) -> List[fl
 
 def optical_air_mass_series_callback(value: str, ctx: Context):
     """Callback to handle the optical air mass series input or provide a default series."""
-    print(f'Input value for Optical Air Mass : {value}')
     if value:
         parsed_values = parse_optical_air_mass_series(value)
         return [OpticalAirMass(value=lt, unit=OPTICAL_AIR_MASS_UNIT) for lt in parsed_values]
