@@ -138,6 +138,11 @@ def select(
         variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
     )
+
+    if verbose == 5:
+        debug(locals())
+
+
     # if output_filename:
     #     output_filename = Path(output_filename)
     #     extension = output_filename.suffix.lower()
@@ -150,9 +155,6 @@ def select(
 
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
-
-    if verbose == 5:
-        debug(locals())
 
     # statistics after echoing series which might be Long!
     if statistics:

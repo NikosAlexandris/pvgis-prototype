@@ -88,9 +88,9 @@ def select_time_series(
         )
 
     
-    # if 'timestamps' is a single datetime object, parse it
-    if isinstance(timestamps, datetime):
-        timestamps = parse_timestamp_series(timestamps)
+    # # if 'timestamps' is a single datetime object, parse it
+    # if isinstance(timestamps, datetime):
+    #     timestamps = parse_timestamp_series(timestamps)
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
@@ -106,7 +106,7 @@ def select_time_series(
                 # )
             )
         except KeyError:
-            print("No data found for one or more of the given timestamps.")
+            print(f"No data found for one or more of the given {timestamps}.")
 
     if location_time_series.size == 1:
         single_value = float(location_time_series.values)
@@ -130,24 +130,7 @@ def select_time_series(
 
         return single_value
 
-    # if output_filename:
-    #     output_filename = Path(output_filename)
-    #     extension = output_filename.suffix.lower()
-
-    #     if extension.lower() == '.nc':
-    #         location_time_series.to_time_series(output_filename)
-
-    #     elif extension.lower() == '.csv':
-    #         location_time_series.to_pandas().to_csv(output_filename)
-
-    #     else:
-    #         raise ValueError(f'Unsupported file extension: {extension}')
-
     if verbose > 5:
         debug(locals())
 
-    if verbose > 0:
-        print(f'Series : {location_time_series.values}')
-
     return location_time_series
-
