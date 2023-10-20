@@ -85,6 +85,171 @@ app = typer.Typer(
 console = Console()
 
 
+@app.command(
+    'from-sarah',
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
+def calculate_diffuse_horizontal_component_from_sarah(
+    shortwave: Annotated[Path, typer_argument_global_horizontal_irradiance],
+    direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    """Calculate the diffuse irradiance incident on a solar surface from SARAH
+    time series.
+
+    Parameters
+    ----------
+    shortwave: Path
+        Filename of surface short-wave (solar) radiation downwards time series
+        (short name : `ssrd`) from ECMWF which is the solar radiation that
+        reaches a horizontal plane at the surface of the Earth. This parameter
+        comprises both direct and diffuse solar radiation.
+
+    Returns
+    -------
+    diffuse_irradiance: float
+        The diffuse radiant flux incident on a surface per unit area in W/m².
+    """
+    global_horizontal_irradiance_location_time_series = select_location_time_series(
+        shortwave, longitude, latitude  # global is a reserved word!
+    )
+    global_horizontal_irradiance_location_time_series.load()  # load into memory for fast processing
+    direct_horizontal_irradiance_location_time_series = select_location_time_series(
+        direct, longitude, latitude
+    )
+    direct_horizontal_irradiance_location_time_series.load()
+
+    # ------------------------------------------------------------------------
+    if start_time or end_time:
+        timestamps = None  # we don't need a timestamp anymore!
+
+        if start_time and not end_time:  # set `end_time` to end of series
+            end_time = direct_horizontal_irradiance_location_time_series.time.values[
+                -1
+            ]  #
+            # assuming it'd be identical reading global_horizontal_irradiance_location_time_series
+
+        elif end_time and not start_time:  # set `start_time` to beginning of series
+            start_time = direct_horizontal_irradiance_location_time_series.time.values[
+                0
+            ]
+            # assuming it'd be identical reading global_horizontal_irradiance_location_time_series
+
+        else:  # Convert `start_time` & `end_time` to the correct string format
+            start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
+            end_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        global_horizontal_irradiance_location_time_series = (
+            global_horizontal_irradiance_location_time_series.sel(
+                time=slice(start_time, end_time)
+            )
+        )
+        direct_horizontal_irradiance_location_time_series = (
+            direct_horizontal_irradiance_location_time_series.sel(
+                time=slice(start_time, end_time)
+            )
+        )
+
+    # if 'timestamps' is a single datetime object, parse it
+    if isinstance(timestamps, datetime):
+        timestamps = parse_timestamp_series(timestamps)
+
+    if timestamps is not None and not start_time and not end_time:
+        if len(timestamps) == 1:
+            start_time = end_time = timestamps[0]
+
+        if not nearest_neighbor_lookup:
+            inexact_matches_method = None
+        try:
+            global_horizontal_irradiance_location_time_series = (
+                global_horizontal_irradiance_location_time_series.sel(
+                    time=timestamps, method=inexact_matches_method
+                )
+            )
+            direct_horizontal_irradiance_location_time_series = (
+                direct_horizontal_irradiance_location_time_series.sel(
+                    time=timestamps, method=inexact_matches_method
+                )
+            )
+        except KeyError:
+            print(f"No data found for one or more of the requested {timestamps}.")
+    # ------------------------------------------------------------------------
+
+    diffuse_horizontal_irradiance_series = (
+        global_horizontal_irradiance_location_time_series
+        - direct_horizontal_irradiance_location_time_series
+    )
+
+    if diffuse_horizontal_irradiance_series.size == 1:
+        single_value = float(diffuse_horizontal_irradiance_series.values)
+        warning = (
+            Fore.YELLOW
+            + f"{exclamation_mark} The selected timestamp "
+            + Fore.GREEN
+            # + f"{diffuse_horizontal_irradiance_series[diffuse_horizontal_irradiance_series.indexes].time.values}"
+            + f"{diffuse_horizontal_irradiance_series.time.values}"
+            + Fore.YELLOW
+            + f" matches the single value "
+            + Fore.GREEN
+            + f"{single_value}"
+            + Style.RESET_ALL
+        )
+        logging.warning(warning)
+
+        if verbose > 5:
+            debug(locals())
+
+        if verbose > 0:
+            print(Fore.YELLOW + warning)
+
+        # return np.arr  # required by further functions!
+
+    results = {
+        "Diffuse": diffuse_horizontal_irradiance_series.to_numpy(),
+    }
+    title = 'Diffuse horizontal'
+
+    if verbose > 1 :
+        extended_results = {
+            "Shortwave": global_horizontal_irradiance_location_time_series.to_numpy(),
+            "Direct": direct_horizontal_irradiance_location_time_series.to_numpy(),
+        }
+        results = results | extended_results
+
+    if verbose > 5:
+        debug(locals())
+
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
+
+    if statistics:  # after echoing series which might be Long!
+        data_statistics = calculate_series_statistics(diffuse_horizontal_irradiance_series)
+        print_series_statistics(
+            data_statistics, title="Diffuse horizontal irradiance from SARAH"
+        )
+        if csv:
+            export_statistics_to_csv(data_statistics, "diffuse_horizontal_irradiance")
+
+    return diffuse_horizontal_irradiance_series
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 
