@@ -45,6 +45,8 @@ from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
+
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
@@ -135,7 +137,7 @@ def is_surface_in_shade_time_series(input_array, threshold=10):
 
 
 @app.callback(
-    'global-time-series',
+   'global-time-series',
    invoke_without_command=True,
    no_args_is_help=True,
    # context_settings={"ignore_unknown_options": True},
@@ -183,6 +185,12 @@ def calculate_global_irradiance_time_series(
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = False,
 ):
+    """Calculate the global horizontal irradiance (GHI)
+
+    The global horizontal irradiance represents the total amount of shortwave
+    radiation received from above by a surface horizontal to the ground. It
+    includes both the direct and the diffuse solar radiation.
+    """
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -337,9 +345,10 @@ def calculate_global_irradiance_time_series(
     )
 
     if np.any(global_irradiance_series < -4):
-        print("[red]Warning: I found some values out of the expected range [-4, ] in `direct_normal_irradiance_series`![/red]")
+        print("[red on white]{WARNING_NEGATIVE_VALUES} in `direct_normal_irradiance_series`![/red on white]")
 
-    # Reporting --------------------------------------------------------------
+    # Reporting =============================================================
+
     results = {
             "Global": global_irradiance_series,
     }

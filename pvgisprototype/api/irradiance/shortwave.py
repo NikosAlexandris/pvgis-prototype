@@ -31,7 +31,7 @@ from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pathlib import Path
 
-from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_global_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
@@ -73,7 +73,7 @@ app = typer.Typer(
     help=f"Estimate the global (shortwave) irradiance time series {NOT_IMPLEMENTED_CLI}",
 )
 def estimate_global_irradiance(
-    shortwave: Annotated[Path, typer_argument_shortwave_irradiance],
+    shortwave: Annotated[Path, typer_argument_global_horizontal_irradiance],  # use another typer definition for SIS from SARAH3!
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
