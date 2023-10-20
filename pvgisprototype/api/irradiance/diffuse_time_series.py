@@ -557,55 +557,62 @@ def calculate_diffuse_inclined_irradiance_time_series(
         verbose=0,  # no verbosity here by choice!
     )
 
-    if surface_tilt == 0:  # horizontal surface
-        diffuse_irradiance = diffuse_horizontal_component
-
-    else:  # tilted (or inclined) surface
-    # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
-
-        # G0
-        extraterrestrial_normal_irradiance_series = (
-            calculate_extraterrestrial_normal_irradiance_time_series(
-                timestamps=timestamps,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                random_days=random_days,
-            )
-        )
-
-        # extraterrestrial on a horizontal surface requires the solar altitude
-        solar_altitude_series = model_solar_altitude_time_series(
-            longitude=longitude,
-            latitude=latitude,
+    # G0
+    extraterrestrial_normal_irradiance_series = (
+        calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
-            timezone=timezone,
-            solar_position_model=solar_position_model,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
-            solar_time_model=solar_time_model,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
+            solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
-            verbose=verbose,
+            random_days=random_days,
+        )
+    )
+
+    # extraterrestrial on a horizontal surface requires the solar altitude
+    solar_altitude_series = model_solar_altitude_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_position_model=solar_position_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        verbose=verbose,
+        )
+    solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
+    # on a horizontal surface : G0h = G0 sin(h0)
+    extraterrestrial_horizontal_irradiance_series = (
+        extraterrestrial_normal_irradiance_series
+        * np.sin(solar_altitude_series_array)
+    )
+
+    # from external data
+    if global_horizontal_component and direct_horizontal_component:
+        diffuse_horizontal_irradiance_series = (
+            calculate_diffuse_horizontal_component_from_sarah(
+                shortwave=global_horizontal_component,
+                direct=direct_horizontal_component,
+                longitude=convert_float_to_degrees_if_requested(longitude, "degrees"),
+                latitude=convert_float_to_degrees_if_requested(latitude, "degrees"),
+                timestamps=timestamps,
+                start_time=start_time,
+                end_time=end_time,
+                timezone=timezone,
+                nearest_neighbor_lookup=nearest_neighbor_lookup,
+                inexact_matches_method=inexact_matches_method,
+                verbose=0,
             )
-        solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
-        # on a horizontal surface : G0h = G0 sin(h0)
-        extraterrestrial_horizontal_irradiance_series = (
-            extraterrestrial_normal_irradiance_series
-            * np.sin(solar_altitude_series_array)
-        )
+        ).to_numpy()  # We need NumPy!
 
-        # proportion between direct (beam) and extraterrestrial irradiance : Kb
-        kb_series = (
-            direct_horizontal_irradiance_series
-            / extraterrestrial_horizontal_irradiance_series
-        )
-
+    else:  # model it
         # Dhc [W.m-2]
         diffuse_horizontal_irradiance_series = (
             extraterrestrial_normal_irradiance_series
@@ -615,6 +622,18 @@ def calculate_diffuse_inclined_irradiance_time_series(
             )
         )
 
+    if surface_tilt == 0:  # horizontal surface
+        diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series
+
+    else:  # tilted (or inclined) surface
+    # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
+
+        # proportion between direct (beam) and extraterrestrial irradiance : Kb
+        kb_series = (
+            direct_horizontal_irradiance_series
+            / extraterrestrial_horizontal_irradiance_series
+        )
+
         # the N term
         n_series = calculate_term_n_time_series(kb_series)
         diffuse_sky_irradiance_series = calculate_diffuse_sky_irradiance_time_series(
@@ -622,7 +641,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             surface_tilt=surface_tilt,
         )
 
-        # surface in shade : requires solar incidence angles -- REVIEW-ME ----
+        # surface in shade requires solar incidence angles -- REVIEW-ME ----
         solar_incidence_series = calculate_solar_incidence_time_series_jenco(
             longitude=longitude,
             latitude=latitude,
@@ -660,6 +679,11 @@ def calculate_diffuse_inclined_irradiance_time_series(
         else:  # sunlit surface and non-overcast sky
             # extract float values from the SolarAltitude objects
             solar_altitude_series_array = np.array([altitude.radians for altitude in solar_altitude_series])
+            # ----------------------------------------------------------------
+            azimuth_difference_series_array = None  # Avoid UnboundLocalError!
+            solar_azimuth_series_array = None
+            # ----------------------------------------------------------------
+
             if np.any(solar_altitude_series_array >= 0.1):  # radians or 5.7 degrees
                 diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series * (
                     diffuse_sky_irradiance_series * (1 - kb_series)
@@ -712,16 +736,22 @@ def calculate_diffuse_inclined_irradiance_time_series(
         )
         diffuse_inclined_irradiance_series *= diffuse_irradiance_loss_factor
 
-    if np.any(diffuse_inclined_irradiance_series < 0):
-        print("[red]Warning: Negative values found in `diffuse_inclined_irradiance_series`![/red]")
+    # Warning
 
-    # if statistics:
-    #     data_statistics = calculate_series_statistics(diffuse_irradiance)
-    #     print_series_statistics(data_statistics, title='Diffuse horizontal irradiance from SARAH')
-    #     if csv:
-    #         export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance_series')
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+    out_of_range_indices = np.where(
+        (diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    )
+    if out_of_range_indices[0].size > 0:
+        print(
+            f"[blink red on white]{WARNING_NEGATIVE_VALUES} in `diffuse_inclined_irradiance_series`![/blink red on white]"
+        )
 
-    # Reporting --------------------------------------------------------------
+    # Reporting ==============================================================
+
     results = {
         "Diffuse": diffuse_inclined_irradiance_series,
     }
