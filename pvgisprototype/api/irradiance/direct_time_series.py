@@ -26,9 +26,11 @@ from typing import Sequence
 from typing import List
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
+from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from rich import print
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
@@ -64,7 +66,9 @@ from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
 
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -317,9 +321,16 @@ def calculate_direct_normal_irradiance_time_series(
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
-    """ """
+    """Calculate the direct normal irradiance (SID)
+
+    The direct normal irradiance represents the amount of solar radiation
+    received per unit area by a surface that is perpendicular (normal) to the
+    rays that come in a straight line from the direction of the sun at its
+    current position in the sky.
+    """
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
@@ -354,20 +365,7 @@ def calculate_direct_normal_irradiance_time_series(
         )
     )
 
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
-    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
-    out_of_range_indices = np.where(
-        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
-        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    )
-    if out_of_range_indices[0].size > 0:
-        print(
-            f"[red]Warning[/red] : I found some [red]out-of-range values[/red] in `` at {out_of_range_indices[0]}!"
-        )
-
-    if verbose > 5:
-        debug(locals())
+    # Reporting =============================================================
 
     results = {
         "Normal": direct_normal_irradiance_series,
@@ -383,6 +381,9 @@ def calculate_direct_normal_irradiance_time_series(
         }
         results = results | extended_results
 
+    if verbose > 5:
+        debug(locals())
+
     print_irradiance_table_2(
         timestamps=timestamps,
         dictionary=results,
@@ -390,6 +391,28 @@ def calculate_direct_normal_irradiance_time_series(
         rounding_places=rounding_places,
         verbose=verbose,
     )
+
+    if csv:
+        write_irradiance_csv(
+            longitude=None,
+            latitude=None,
+            timestamps=timestamps,
+            dictionary=results,
+            filename=csv,
+        )
+    # Warning
+
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+    out_of_range_indices = np.where(
+        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    )
+    if out_of_range_indices[0].size > 0:
+        print(
+                f"[red on white]{WARNING_NEGATIVE_VALUES} in `direct_normal_irradiance_series` : {out_of_range_indices[0]}![/red on white]"
+        )
 
     return direct_normal_irradiance_series
 
@@ -484,8 +507,7 @@ def calculate_direct_horizontal_irradiance_time_series(
             direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
         )[mask]
 
-    if verbose > 5:
-        debug(locals())
+    # Reporting =============================================================
 
     results = {
             "Horizontal": direct_horizontal_irradiance_series,
@@ -504,6 +526,10 @@ def calculate_direct_horizontal_irradiance_time_series(
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+
+    if verbose > 5:
+        debug(locals())
+
     print_irradiance_table_2(
         longitude=longitude,
         latitude=latitude,

@@ -1,4 +1,13 @@
 from devtools import debug
+import logging
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler('error.log'),  # Save log to a file
+        logging.StreamHandler()  # Print log to the console
+    ]
+)
 from datetime import datetime
 import typer
 from pathlib import Path
@@ -7,6 +16,11 @@ from typing import Optional
 from typing import List
 from rich.console import Console
 from rich import print
+from colorama import Fore, Style
+from pvgisprototype.api.series.hardcodings import exclamation_mark
+from pvgisprototype.api.series.statistics import calculate_series_statistics
+from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.api.geometry.models import SolarPositionModels
@@ -30,6 +44,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
+from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude_series
@@ -45,6 +60,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
@@ -68,7 +84,16 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import TERM_N_IN_SHADE
-
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
+from pvgisprototype.cli.typer_parameters import typer_argument_global_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degrees
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
+from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
+from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
+from pvgisprototype.api.series.utilities import select_location_time_series
+from pvgisprototype.api.series.models import MethodsForInexactMatches
 import numpy as np
 from math import cos
 from math import sin
@@ -250,8 +275,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
             export_statistics_to_csv(data_statistics, "diffuse_horizontal_irradiance")
 
     return diffuse_horizontal_irradiance_series
-from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 
 
 @app.command(
@@ -486,12 +509,13 @@ def calculate_diffuse_inclined_irradiance_time_series(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_time_series: bool = False,
+    global_horizontal_component: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.noaa,
@@ -504,6 +528,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
+    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
@@ -777,8 +803,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
             'term N': n_series,
             'Kb': kb_series,
             'Tilt': surface_tilt,
-            'Azimuth difference': azimuth_difference_series_array,
-            'Azimuth': solar_azimuth_series_array,
+            'Azimuth difference': azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',
+            'Azimuth': solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
             'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
         }
         results = results | even_more_extended_results
@@ -791,23 +817,28 @@ def calculate_diffuse_inclined_irradiance_time_series(
             "Extra. normal": extraterrestrial_normal_irradiance_series,
             'Linke': linke_turbidity_factor_series_array,
             'Incidence': convert_series_to_degrees_if_requested(solar_incidence_series_array, angle_output_units),
+            'Out-of-range': out_of_range_indices,
         }
         results = results | plus_even_more_extended_results
-
-    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
-    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
     if verbose > 5:
         debug(locals())
 
     print_irradiance_table_2(
-        longitude=longitude,
-        latitude=latitude,
+        longitude=convert_float_to_degrees_if_requested(longitude, angle_output_units),
+        latitude=convert_float_to_degrees_if_requested(latitude, angle_output_units),
         timestamps=timestamps,
         dictionary=results,
-        title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
+        title=title + f" in-plane irradiance series {IRRADIANCE_UNITS}",
         rounding_places=rounding_places,
         verbose=verbose,
     )
+
+    # if statistics:
+    #     data_statistics = calculate_series_statistics(diffuse_irradiance)
+    #     print_series_statistics(data_statistics, title='Diffuse horizontal irradiance from SARAH')
+    #     if csv:
+    #         export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance_series')
+
 
     return diffuse_inclined_irradiance_series
