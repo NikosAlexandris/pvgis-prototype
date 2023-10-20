@@ -142,14 +142,16 @@ typer_argument_area = typer.Argument(
 
 # When?
 
+timestamp_typer_help = "Quoted date-time string of data to extract from series, example: [yellow]'2112-12-21 21:12:12'[/yellow]'"
 typer_argument_timestamp = typer.Argument(
-    help='Timestamp of data to extract from series. [yellow]Use quotes for a date-time string![/yellow]',
+    help=timestamp_typer_help,
     callback=ctx_attach_requested_timezone,
     # rich_help_panel=rich_help_panel_time_series,
     default_factory=now_utc_datetimezone,
 )
+timestamps_typer_help = "Quoted date-time strings of data to extract from series, example: [yellow]'2112-12-21, 2112-12-21 12:21:21, 2112-12-21 21:12:12'[/yellow]'"
 typer_argument_timestamps = typer.Argument(
-    help='Timestamps',
+    help=timestamps_typer_help,
     parser=parse_timestamp_series,
     callback=callback_generate_datetime_series,
 #     default_factory=now_utc_datetimezone_series,
@@ -221,7 +223,6 @@ typer_option_mask_and_scale = typer.Option(
 )
 # Rename to nearest_neighbor_method ?
 typer_option_nearest_neighbor_lookup = typer.Option(
-    '--nearest_neighbor_lookup',
     help='Enable nearest neighbor (inexact) lookups by use of the methods `pad`, `backfill` or `nearest`',
     show_default=True,
     show_choices=True,
@@ -272,7 +273,7 @@ typer_option_solar_declination_model = typer.Option(
     rich_help_panel=rich_help_panel_solar_position,
 )
 
-solar_constant_typer_help='Top-of-Atmosphere mean solar electromagnetic radiation (W/m2) 1 au (astronomical unit) away from the Sun.'  #  (~1360.8 W/m2)
+solar_constant_typer_help='Top-of-Atmosphere mean solar electromagnetic radiation (W/m-2) 1 au (astronomical unit) away from the Sun.'  #  (~1360.8 W/m2)
 typer_argument_solar_constant = typer.Argument(
     help=solar_constant_typer_help,
     min=SOLAR_CONSTANT_MINIMUM,
@@ -577,8 +578,15 @@ typer_option_albedo = typer.Option(
 
 # Solar irradiance
 
-typer_argument_shortwave_irradiance = typer.Argument(
-    help='Global horizontal irradiance (Surface Incoming Shortwave Irradiance (SIS), `ssrd`',
+global_horizontal_irradiance_typer_help='Global horizontal irradiance (Surface Incoming Shortwave Irradiance (SIS), `ssrd`'
+typer_argument_global_horizontal_irradiance = typer.Argument(
+    help=global_horizontal_irradiance_typer_help,
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
+typer_option_global_horizontal_irradiance = typer.Option(
+    # help=global_horizontal_irradiance_typer_help,
+    rich_help_panel=rich_help_panel_series_irradiance,
+    # default_factory = Path(),
 )
 direct_horizontal_irradiance_typer_help='Direct (or beam) horizontal irradiance (Surface Incoming Direct radiation (SID), `fdir`'
 typer_argument_direct_horizontal_irradiance = typer.Argument(
