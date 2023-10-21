@@ -223,28 +223,33 @@ typer_option_mask_and_scale = typer.Option(
     # default_factory=False,
 )
 # Rename to nearest_neighbor_method ?
+# typer_option_nearest_neighbor_lookup = typer.Option(
+#     help='Enable nearest neighbor (inexact) lookups by use of the methods `pad`, `backfill` or `nearest`',
+#     show_default=True,
+#     show_choices=True,
+#     rich_help_panel=rich_help_panel_time_series,
+#     # default_factory=False,
+# )
 typer_option_nearest_neighbor_lookup = typer.Option(
-    help='Enable nearest neighbor (inexact) lookups by use of the methods `pad`, `backfill` or `nearest`',
-    show_default=True,
-    show_choices=True,
-    rich_help_panel=rich_help_panel_time_series,
-    # default_factory=False,
-)
-typer_option_inexact_matches_method = typer.Option(
-    '--method-for-inexact-matches',
-    '-m',
-    help='Method for nearest neighbor (inexact) lookups',
+    help='Enable nearest neighbor (inexact) lookups. Read Xarray manual on [underline]nearest-neighbor-lookups[/underline]',
     show_default=True,
     show_choices=True,
     case_sensitive=False,
-    rich_help_panel=rich_help_panel_time_series,
+    rich_help_panel=rich_help_panel_time_series_selection,
+    # default_factory=None, # default_factory=MethodsForInexactMatches.nearest,
+)
+typer_option_inexact_matches_method = typer.Option(
+    help='Method for nearest neighbor (inexact) lookups. Read Xarray manual on [underline]nearest-neighbor-lookups[/underline]',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_time_series_selection,
     # default_factory=MethodsForInexactMatches.nearest,
 )
 typer_option_tolerance = typer.Option(
-    # help=f'Maximum distance between original and new labels for inexact matches. See nearest-neighbor-lookups Xarray documentation',
-    # help=f'Maximum distance between original and new labels for inexact matches. See [nearest-neighbor-lookups](https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups) @ Xarray documentation',
-    help=f'Maximum distance between original & new labels for inexact matches. See https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups',
-    rich_help_panel=rich_help_panel_time_series,
+    help=f'Maximum distance between original & new labels for inexact matches. Read Xarray manual on [underline]nearest-neighbor-lookups[/underline]',
+    #  https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups',
+    rich_help_panel=rich_help_panel_time_series_selection,
     # default_factory=0.1,
 )
 
