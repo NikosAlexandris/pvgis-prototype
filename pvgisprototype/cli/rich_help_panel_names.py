@@ -2,8 +2,9 @@ rich_help_panel_output = 'Input / Output'                           # 1
 rich_help_panel_advanced_options = 'Advanced'                       # 3
 rich_help_panel_performance = 'Performance'                         # 1
 
-rich_help_panel_time_series = 'Time series'                         # 1
 rich_help_panel_series = 'Time series'                              # 1
+rich_help_panel_time_series = 'Time series'                         # 1
+rich_help_panel_time_series_selection = 'Selection'                         # 1
 rich_help_panel_series_irradiance = 'Solar irradiance'              # level 2
 rich_help_panel_series_meteorology = 'Meteorology'                  # level 2
 
