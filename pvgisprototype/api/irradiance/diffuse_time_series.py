@@ -90,8 +90,12 @@ from pvgisprototype.cli.typer_parameters import typer_argument_global_horizontal
 from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degrees
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
+from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
+from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
-from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
+from pvgisprototype.cli.typer_parameters import typer_option_tolerance
+from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 import numpy as np
@@ -124,8 +128,10 @@ def calculate_diffuse_horizontal_component_from_sarah(
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
@@ -528,8 +534,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
@@ -632,8 +640,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 start_time=start_time,
                 end_time=end_time,
                 timezone=timezone,
-                nearest_neighbor_lookup=nearest_neighbor_lookup,
-                inexact_matches_method=inexact_matches_method,
+                neighbor_lookup=neighbor_lookup,
                 verbose=0,
             )
         ).to_numpy()  # We need NumPy!
