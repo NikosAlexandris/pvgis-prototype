@@ -156,8 +156,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
     """
     global_horizontal_irradiance_series = select_time_series(
         time_series=shortwave,
-        # longitude=convert_float_to_degrees_if_requested(longitude, "degrees"),
-        # latitude=convert_float_to_degrees_if_requested(latitude, "degrees"),
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -169,8 +167,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
 
     direct_horizontal_irradiance_series = select_time_series(
         time_series=direct,
-        # longitude=convert_float_to_degrees_if_requested(longitude, "degrees"),
-        # latitude=convert_float_to_degrees_if_requested(latitude, "degrees"),
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -191,7 +187,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
             Fore.YELLOW
             + f"{exclamation_mark} The selected timestamp "
             + Fore.GREEN
-            # + f"{diffuse_horizontal_irradiance_series[diffuse_horizontal_irradiance_series.indexes].time.values}"
             + f"{diffuse_horizontal_irradiance_series.time.values}"
             + Fore.YELLOW
             + f" matches the single value "
@@ -207,8 +202,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
         if verbose > 0:
             print(Fore.YELLOW + warning)
 
-        # return np.arr  # required by further functions!
-
     results = {
         "Diffuse": diffuse_horizontal_irradiance_series.to_numpy(),
     }
@@ -216,8 +209,8 @@ def calculate_diffuse_horizontal_component_from_sarah(
 
     if verbose > 1 :
         extended_results = {
-            "Shortwave": global_horizontal_irradiance_location_time_series.to_numpy(),
-            "Direct": direct_horizontal_irradiance_location_time_series.to_numpy(),
+            "Shortwave": global_horizontal_irradiance_series.to_numpy(),
+            "Direct": direct_horizontal_irradiance_series.to_numpy(),
         }
         results = results | extended_results
 
@@ -790,8 +783,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
             'Kb': kb_series,
             'Tilt': surface_tilt,
             'Azimuth difference': azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',
-            'Azimuth': solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
-            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+            '⦬ Azimuth': solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
+            '⦩ Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
         }
         results = results | even_more_extended_results
 
