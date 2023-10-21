@@ -23,4 +23,5 @@ rich_help_panel_reference = 'Reference'                             # 1
 
 rich_help_panel_efficiency = 'Efficiency'                           # 3
 rich_help_panel_earth_orbit = 'Earth orbit'                         # 3
+
 rich_help_panel_plotting = 'Plotting'

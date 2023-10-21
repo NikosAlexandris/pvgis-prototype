@@ -19,6 +19,7 @@ from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.hardcodings import check_mark
 from pvgisprototype.api.series.hardcodings import x_mark
+from pvgisprototype.cli.messages import ERROR_IN_SELECTING_DATA
 
 
 def load_or_open_dataarray(function, filename_or_object, mask_and_scale):
@@ -187,8 +188,8 @@ def select_coordinates(
                     )
             # Review-Me ------------------------------------------------------
 
-    except Exception as exc:
-        typer.echo(f"Something went wrong in selecting the data: {str(exc)}")
+    except Exception as exception:
+        print(f"{x_mark} {ERROR_IN_SELECTING_DATA} : {exception}")
         raise SystemExit(33)
 
     return data_array
@@ -223,8 +224,8 @@ def select_location_time_series(
                 method=inexact_matches_method,
                 tolerance=tolerance,)
         # location_time_series.load()  # load into memory for fast processing
-    except Exception as exc:
-        print(f"Something went wrong in selecting the data: {str(exc)}")
+    except Exception as exception:
+        print(f"{ERROR_IN_SELECTING_DATA} : {exception}")
         raise SystemExit(33)
 
     if verbose == 3:

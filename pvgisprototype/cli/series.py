@@ -68,6 +68,8 @@ from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.series.statistics import export_statistics_to_csv
 
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
+from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype import Longitude
 from pvgisprototype.constants import UNITS_NAME
@@ -245,8 +247,8 @@ def plot(
             variable_name_as_suffix=variable_name_as_suffix,
             tufte_style=tufte_style,
         )
-    except Exception as exc:
-        typer.echo(f"Something went wrong in plotting the data: {str(exc)}")
+    except Exception as exception:
+        print(f"{ERROR_IN_PLOTTING_DATA} : {exception}")
         raise SystemExit(33)
 
 
