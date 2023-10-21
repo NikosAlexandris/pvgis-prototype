@@ -535,8 +535,23 @@ def calculate_diffuse_inclined_irradiance_time_series(
     - surface_orientation :
     - diffuse_irradiance
     """
-    # from the model
-    direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
+
+    # 1. Calculate the direct horizontal irradiance
+
+    if direct_horizontal_component:  # read from external dataset
+        direct_horizontal_irradiance_series = select_time_series(
+            time_series=direct_horizontal_component,
+            longitude=convert_float_to_degrees_if_requested(longitude, "degrees"),
+            latitude=convert_float_to_degrees_if_requested(latitude, "degrees"),
+            timestamps=timestamps,
+            mask_and_scale=mask_and_scale,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
+        ).to_numpy()  # We need NumPy!
+
+    else:  # from the model
+        direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -552,6 +567,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         angle_output_units=angle_output_units,
         verbose=0,  # no verbosity here by choice!
     )
+
+    # 2. Get quantities to calculate the diffuse horizontal irradiance
 
     # G0
     extraterrestrial_normal_irradiance_series = (
@@ -590,7 +607,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         * np.sin(solar_altitude_series_array)
     )
 
-    # from external data
+    # calculate from external data
     if global_horizontal_component and direct_horizontal_component:
         diffuse_horizontal_irradiance_series = (
             calculate_diffuse_horizontal_component_from_sarah(
