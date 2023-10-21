@@ -395,7 +395,6 @@ def calculate_direct_normal_irradiance_time_series(
         rounding_places=rounding_places,
         verbose=verbose,
     )
-
     if csv:
         write_irradiance_csv(
             longitude=None,
@@ -405,7 +404,6 @@ def calculate_direct_normal_irradiance_time_series(
             filename=csv,
         )
     # Warning
-
     LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
     UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
     # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
