@@ -16,6 +16,8 @@ from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
@@ -81,6 +83,8 @@ from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_albedo
 from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
@@ -166,21 +170,21 @@ def calculate_effective_irradiance_time_series(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
-    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
+    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.noaa,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
