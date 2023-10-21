@@ -26,6 +26,7 @@ from .rich_help_panel_names import rich_help_panel_earth_orbit
 from .rich_help_panel_names import rich_help_panel_atmospheric_properties
 from .rich_help_panel_names import rich_help_panel_output
 from .rich_help_panel_names import rich_help_panel_time_series
+from .rich_help_panel_names import rich_help_panel_plotting
 from .rich_help_panel_names import rich_help_panel_efficiency
 from .rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
@@ -747,6 +748,20 @@ typer_option_in_memory = typer.Option(
     # default_factory=False
 )
 
+# Plotting
+
+typer_option_uniplot_lines = typer.Option(
+    help='Symbol for plotting data points with uniplot',
+    rich_help_panel=rich_help_panel_plotting,
+)
+typer_option_uniplot_title = typer.Option(
+    help='Title for the Uniplot',
+    rich_help_panel=rich_help_panel_plotting,
+)
+typer_option_uniplot_unit = typer.Option(
+    help='Unit for the Uniplot',
+    rich_help_panel=rich_help_panel_plotting,
+)
 typer_option_tufte_style = typer.Option(
     help='Use Tufte-style in the output',  # You may need to customize the help text
     # default_factory=False
