@@ -410,7 +410,7 @@ def calculate_effective_irradiance_time_series(
     if verbose > 4:
         and_even_more_extended_results = {
             "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
-            "Orientation": convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+            "🧭 Orientation": convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             "Above horizon": mask_above_horizon,
             "Low angle": mask_low_angle,
             "Below horizon": mask_below_horizon,
