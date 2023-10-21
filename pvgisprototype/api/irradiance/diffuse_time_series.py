@@ -472,7 +472,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
+    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
