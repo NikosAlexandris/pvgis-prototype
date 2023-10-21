@@ -97,6 +97,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 from pvgisprototype.api.series.utilities import select_location_time_series
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 import numpy as np
 from math import cos
@@ -153,74 +154,35 @@ def calculate_diffuse_horizontal_component_from_sarah(
     diffuse_irradiance: float
         The diffuse radiant flux incident on a surface per unit area in W/m².
     """
-    global_horizontal_irradiance_location_time_series = select_location_time_series(
-        shortwave, longitude, latitude  # global is a reserved word!
-    )
-    global_horizontal_irradiance_location_time_series.load()  # load into memory for fast processing
-    direct_horizontal_irradiance_location_time_series = select_location_time_series(
-        direct, longitude, latitude
-    )
-    direct_horizontal_irradiance_location_time_series.load()
+    global_horizontal_irradiance_series = select_time_series(
+        time_series=shortwave,
+        # longitude=convert_float_to_degrees_if_requested(longitude, "degrees"),
+        # latitude=convert_float_to_degrees_if_requested(latitude, "degrees"),
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+    )#.to_numpy()  # We need NumPy!
 
-    # ------------------------------------------------------------------------
-    if start_time or end_time:
-        timestamps = None  # we don't need a timestamp anymore!
-
-        if start_time and not end_time:  # set `end_time` to end of series
-            end_time = direct_horizontal_irradiance_location_time_series.time.values[
-                -1
-            ]  #
-            # assuming it'd be identical reading global_horizontal_irradiance_location_time_series
-
-        elif end_time and not start_time:  # set `start_time` to beginning of series
-            start_time = direct_horizontal_irradiance_location_time_series.time.values[
-                0
-            ]
-            # assuming it'd be identical reading global_horizontal_irradiance_location_time_series
-
-        else:  # Convert `start_time` & `end_time` to the correct string format
-            start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
-            end_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
-
-        global_horizontal_irradiance_location_time_series = (
-            global_horizontal_irradiance_location_time_series.sel(
-                time=slice(start_time, end_time)
-            )
-        )
-        direct_horizontal_irradiance_location_time_series = (
-            direct_horizontal_irradiance_location_time_series.sel(
-                time=slice(start_time, end_time)
-            )
-        )
-
-    # if 'timestamps' is a single datetime object, parse it
-    if isinstance(timestamps, datetime):
-        timestamps = parse_timestamp_series(timestamps)
-
-    if timestamps is not None and not start_time and not end_time:
-        if len(timestamps) == 1:
-            start_time = end_time = timestamps[0]
-
-        if not nearest_neighbor_lookup:
-            inexact_matches_method = None
-        try:
-            global_horizontal_irradiance_location_time_series = (
-                global_horizontal_irradiance_location_time_series.sel(
-                    time=timestamps, method=inexact_matches_method
-                )
-            )
-            direct_horizontal_irradiance_location_time_series = (
-                direct_horizontal_irradiance_location_time_series.sel(
-                    time=timestamps, method=inexact_matches_method
-                )
-            )
-        except KeyError:
-            print(f"No data found for one or more of the requested {timestamps}.")
-    # ------------------------------------------------------------------------
+    direct_horizontal_irradiance_series = select_time_series(
+        time_series=direct,
+        # longitude=convert_float_to_degrees_if_requested(longitude, "degrees"),
+        # latitude=convert_float_to_degrees_if_requested(latitude, "degrees"),
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+    )#.to_numpy()  # We need NumPy!
 
     diffuse_horizontal_irradiance_series = (
-        global_horizontal_irradiance_location_time_series
-        - direct_horizontal_irradiance_location_time_series
+        global_horizontal_irradiance_series
+        - direct_horizontal_irradiance_series
     )
 
     if diffuse_horizontal_irradiance_series.size == 1:
