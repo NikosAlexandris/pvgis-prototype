@@ -549,7 +549,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
+    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
@@ -557,7 +557,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     random_time_series: bool = False,
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = None,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
@@ -653,7 +653,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     # ========================================================================
 
     if not direct_horizontal_component:
-        print(f'Modelling irradiance...')
+        print(f'i [bold]Modelling[/bold] [bold magenta]direct horizontal irradiance[/bold magenta]...')
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
             longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
@@ -679,13 +679,13 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             verbose=0,  # no verbosity here by choice!
         )
     else:  # read from a time series dataset
-        print(f'Reading direct horizontal irradiance from external dataset...')
-        longitude_for_selection = convert_float_to_degrees_if_requested(longitude, 'degrees')
-        latitude_for_selection = convert_float_to_degrees_if_requested(latitude, 'degrees')
+        print(f'i [bold]Reading[/bold] [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...')
         direct_horizontal_irradiance_series = select_time_series(
             time_series=direct_horizontal_component,
-            longitude=longitude_for_selection,
-            latitude=latitude_for_selection,
+            # longitude=longitude_for_selection,
+            # latitude=latitude_for_selection,
+            longitude=convert_float_to_degrees_if_requested(longitude, 'degrees'),
+            latitude=convert_float_to_degrees_if_requested(latitude, 'degrees'),
             timestamps=timestamps,
             start_time=start_time,
             end_time=end_time,
@@ -695,8 +695,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             mask_and_scale=mask_and_scale,
             in_memory=in_memory,
             verbose=0,  # no verbosity here by choice!
-        )
-        # print(f'Direct horizontal irradiance from time series: {direct_horizontal_irradiance_series}')
+        ).to_numpy()
 
     try:
         direct_inclined_irradiance_series = (
