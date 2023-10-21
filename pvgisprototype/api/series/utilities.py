@@ -199,7 +199,7 @@ def select_location_time_series(
     time_series: Path = None,
     longitude: Longitude = None,
     latitude: Latitude = None,
-    inexact_matches_method: MethodsForInexactMatches  = MethodsForInexactMatches.nearest,
+    neighbor_lookup: MethodsForInexactMatches = MethodsForInexactMatches.nearest,
     tolerance: float = 0.1,
     mask_and_scale: bool = False,
     in_memory: bool = False,
@@ -221,7 +221,7 @@ def select_location_time_series(
     try:
         location_time_series = data_array.sel(
                 **indexers,
-                method=inexact_matches_method,
+                method=neighbor_lookup,
                 tolerance=tolerance,)
         # location_time_series.load()  # load into memory for fast processing
     except Exception as exception:
