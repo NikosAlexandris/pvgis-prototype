@@ -157,15 +157,14 @@ def calculate_global_irradiance_time_series(
     temperature_series: Annotated[float, typer_argument_temperature_time_series] = 25,
     wind_speed_series: Annotated[float, typer_argument_wind_speed_time_series] = 0,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
@@ -174,8 +173,8 @@ def calculate_global_irradiance_time_series(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
@@ -246,8 +245,7 @@ def calculate_global_irradiance_time_series(
                 random_time_series=random_time_series,
                 direct_horizontal_component=direct_horizontal_irradiance,
                 mask_and_scale=mask_and_scale,
-                nearest_neighbor_lookup=nearest_neighbor_lookup,
-                inexact_matches_method=inexact_matches_method,
+                neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
                 in_memory=in_memory,
                 surface_tilt=surface_tilt,
@@ -411,9 +409,11 @@ def calculate_global_irradiance_time_series(
     global_irradiance_data_array.attrs['long_name'] = 'Effective Solar Irradiance'
 
     if statistics:
-        data_statistics = calculate_series_statistics(global_irradiance_data_array)
-        print_series_statistics(data_statistics)
-
+        print_series_statistics(
+            data_array=global_irradiance_data_array,
+            timestamps=timestamps,
+            title="Global irradiance",
+        )
     if csv:
         write_irradiance_csv(
             longitude=longitude,

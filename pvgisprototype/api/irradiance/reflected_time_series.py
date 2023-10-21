@@ -26,6 +26,8 @@ from math import sin
 from math import cos
 from pvgisprototype.api.irradiance.diffuse_time_series import diffuse_transmission_function_time_series
 from pvgisprototype.api.irradiance.diffuse_time_series import diffuse_solar_altitude_function_time_series
+from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
@@ -48,7 +50,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_solar_position_mode
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
-from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
+from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
@@ -118,7 +120,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.noaa,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
-    solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
@@ -127,7 +129,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the clear-sky diffuse ground reflected irradiance on an inclined surface (Ri).
@@ -266,5 +268,19 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         rounding_places=rounding_places,
         verbose=verbose,
     )
+    if statistics:
+        print_series_statistics(
+            data_array=ground_reflected_inclined_irradiance_series,
+            timestamps=timestamps,
+            title="Effective irradiance",
+        )
+    if csv:
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            filename=csv,
+        )
 
     return ground_reflected_inclined_irradiance_series
