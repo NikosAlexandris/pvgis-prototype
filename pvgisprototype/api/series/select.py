@@ -27,8 +27,7 @@ def select_time_series(
     end_time: Optional[datetime] = None,
     # convert_longitude_360: bool = False,
     mask_and_scale: bool = False,
-    nearest_neighbor_lookup: bool = False,
-    inexact_matches_method: MethodsForInexactMatches = MethodsForInexactMatches.nearest,
+    neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = 0.1, # Customize default if needed
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,
@@ -60,7 +59,7 @@ def select_time_series(
         time_series=time_series,
         longitude=longitude,
         latitude=latitude,
-        inexact_matches_method=inexact_matches_method,
+        neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         verbose=verbose,
@@ -96,14 +95,9 @@ def select_time_series(
         if len(timestamps) == 1:
             start_time = end_time = timestamps[0]
         
-        if not nearest_neighbor_lookup:
-            inexact_matches_method = None
         try:
             location_time_series = (
-                location_time_series.sel(time=timestamps, method=inexact_matches_method)
-                # location_time_series.sel(
-                #     time=slice(start_time, end_time), method=inexact_matches_method
-                # )
+                location_time_series.sel(time=timestamps, method=neighbor_lookup)
             )
         except KeyError:
             print(f"No data found for one or more of the given {timestamps}.")
