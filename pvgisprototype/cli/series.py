@@ -292,6 +292,7 @@ def uniplot(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    time_series_2: Annotated[Path, typer_option_time_series] = None,
     timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
@@ -319,6 +320,17 @@ def uniplot(
         tolerance=tolerance,
         # in_memory=in_memory,
         verbose=verbose,
+    )
+    data_array_2 = select_time_series(
+        time_series=time_series_2,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         # in_memory=in_memory,
         verbose=verbose,
@@ -329,13 +341,16 @@ def uniplot(
 
     if isinstance(data_array, xr.DataArray):
         supertitle = f'{data_array.long_name}'
+        label = f'{data_array.name}'
+        label_2 = f'{data_array_2.name}' if data_array_2 is not None else None
         unit = data_array.units
         plot(
             # x=data_array,
             # xs=data_array,
-            ys=data_array,
+            ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
+            legend_labels = [label, label_2],
             lines=lines,
-            title=supertitle,
+            title=supertitle if not title else title,
             y_unit=' ' + unit,
         )
 
