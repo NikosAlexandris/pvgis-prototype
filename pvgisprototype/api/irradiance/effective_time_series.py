@@ -55,7 +55,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
-# from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_temperature_time_series
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -160,13 +160,13 @@ def calculate_effective_irradiance_time_series(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_time_series: bool = False,
-    direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    global_horizontal_component: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     temperature_series: Annotated[float, typer_argument_temperature_time_series] = 25,
     wind_speed_series: Annotated[float, typer_argument_wind_speed_time_series] = 0,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
@@ -248,10 +248,9 @@ def calculate_effective_irradiance_time_series(
                 end_time=end_time,
                 timezone=timezone,
                 random_time_series=random_time_series,
-                direct_horizontal_component=direct_horizontal_irradiance,
+                direct_horizontal_component=direct_horizontal_component,
                 mask_and_scale=mask_and_scale,
-                nearest_neighbor_lookup=nearest_neighbor_lookup,
-                inexact_matches_method=inexact_matches_method,
+                neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
                 in_memory=in_memory,
                 surface_tilt=surface_tilt,
@@ -292,7 +291,8 @@ def calculate_effective_irradiance_time_series(
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
-            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            global_horizontal_component=global_horizontal_component,
+            direct_horizontal_component=direct_horizontal_component,  # time series, optional
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
@@ -324,7 +324,7 @@ def calculate_effective_irradiance_time_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             albedo=albedo,
-            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            direct_horizontal_component=direct_horizontal_component,  # time series, optional
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,

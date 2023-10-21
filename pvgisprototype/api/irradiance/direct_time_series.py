@@ -70,6 +70,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
 
+from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
@@ -556,9 +557,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     random_time_series: bool = False,
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
@@ -690,8 +690,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             start_time=start_time,
             end_time=end_time,
             # convert_longitude_360=convert_longitude_360,
-            nearest_neighbor_lookup=nearest_neighbor_lookup,
-            inexact_matches_method=inexact_matches_method,
+            neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,
             in_memory=in_memory,
