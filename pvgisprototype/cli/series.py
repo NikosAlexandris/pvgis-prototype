@@ -121,7 +121,7 @@ def select(
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = 'series.csv',
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
