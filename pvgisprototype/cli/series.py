@@ -24,6 +24,9 @@ from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lo
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_lines
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_title
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_unit
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_output_filename
@@ -263,9 +266,9 @@ def uniplot(
     nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
-    lines: bool = True,
-    title: str = 'Uniplot',
-    unit: str = UNITS_NAME,  #" °C")
+    lines: Annotated[bool, typer_option_uniplot_lines] = True,
+    title: Annotated[str, typer_option_uniplot_title] = None,
+    unit: Annotated[str, typer_option_uniplot_unit] = UNITS_NAME,  #" °C")
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot time series in the terminal"""
