@@ -34,6 +34,8 @@ def select_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Select location series"""
+    if time_series is None:
+        return None
 
     # if convert_longitude_360:
     #     longitude = longitude % 360
@@ -70,23 +72,18 @@ def select_time_series(
 
         if start_time and not end_time:  # set `end_time` to end of series
             end_time = location_time_series.time.values[-1]
-            # end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
 
         elif end_time and not start_time:  # set `start_time` to beginning of series
             start_time = location_time_series.time.values[0]
-            # start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
 
         else:  # Convert `start_time` & `end_time` to the correct string format
-            # if isinstance(start_time, datetime):
             start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-            # if isinstance(end_time, datetime):
             end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
     
         location_time_series = (
             location_time_series.sel(time=slice(start_time, end_time))
         )
 
-    
     # # if 'timestamps' is a single datetime object, parse it
     # if isinstance(timestamps, datetime):
     #     timestamps = parse_timestamp_series(timestamps)
@@ -122,7 +119,7 @@ def select_time_series(
         if verbose == 3:
             debug(locals())
 
-        return single_value
+        # return single_value
 
     if verbose > 5:
         debug(locals())

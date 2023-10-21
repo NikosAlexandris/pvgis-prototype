@@ -45,9 +45,10 @@ def calculate_series_statistics(data_array):
 #     console.print(table)
 
 
-def print_series_statistics(statistics, title='Time series'):
+def print_series_statistics(data_array, title='Time series'):
     """
     """
+    statistics = calculate_series_statistics(data_array)
     table = Table(
         title=title,
         show_header=True,
@@ -91,7 +92,8 @@ def print_series_statistics(statistics, title='Time series'):
     console.print(table)
 
 
-def export_statistics_to_csv(statistics, filename):
+def export_statistics_to_csv(data_array, filename):
+    statistics = calculate_series_statistics(data_array)
     with open(f'{filename}.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Statistic", "Value"])

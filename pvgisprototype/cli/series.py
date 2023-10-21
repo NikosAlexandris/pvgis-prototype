@@ -30,6 +30,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_uniplot_lines
 from pvgisprototype.cli.typer_parameters import typer_option_uniplot_title
 from pvgisprototype.cli.typer_parameters import typer_option_uniplot_unit
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
+from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_output_filename
 from pvgisprototype.cli.typer_parameters import typer_option_variable_name_as_suffix
@@ -38,12 +39,14 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.cli.print import print_irradiance_table_2
 from rich import print
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
 import xarray as xr
 import xarray_extras
+from pvgisprototype.api.series.csv import to_csv
 import numpy as np
 from distributed import LocalCluster, Client
 import dask
@@ -121,6 +124,7 @@ def select(
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Select location series"""
@@ -148,7 +152,6 @@ def select(
     if verbose == 5:
         debug(locals())
 
-
     # if output_filename:
     #     output_filename = Path(output_filename)
     #     extension = output_filename.suffix.lower()
@@ -162,18 +165,48 @@ def select(
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
 
+    # if isinstance(location_time_series, float):
+    #     print(float)
+
+    # if isinstance(location_time_series, xr.DataArray):
+    #     # print(f'Series : {location_time_series.values}')
+
+    results = {
+        "Series": location_time_series.to_numpy(),
+    }
+    title = 'Location time series'
+    
+    # special case!
+    if location_time_series is not None and timestamps is None:
+        timestamps = location_time_series.time.to_numpy()
+
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title=title,
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
+
     # statistics after echoing series which might be Long!
+
     if statistics:
-        data_statistics = calculate_series_statistics(location_time_series)
-        print_series_statistics(data_statistics)
-        if csv:
-            export_statistics_to_csv(data_statistics, 'location_time_series_statistics')
+        print_series_statistics(
+            data_array=location_time_series,
+            title='Selected series',
+        )
 
-    if isinstance(location_time_series, float):
-        print(float)
-
-    if isinstance(location_time_series, xr.DataArray):
-        print(f'Series : {location_time_series.values}')
+    if csv:
+        # export_statistics_to_csv(
+        #     data_array=location_time_series,
+        #     filename=csv,
+        # )
+        to_csv(
+            x=location_time_series,
+            path=csv,
+        )
 
 
 @app.command(
