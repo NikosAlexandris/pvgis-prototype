@@ -502,7 +502,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the diffuse irradiance incident on a solar surface
