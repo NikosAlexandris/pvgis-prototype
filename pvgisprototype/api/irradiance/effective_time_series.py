@@ -42,9 +42,7 @@ from pvgisprototype.api.irradiance.reflected_time_series import calculate_ground
 from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
-from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -192,7 +190,7 @@ def calculate_effective_irradiance_time_series(
     efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     solar_altitude_series = model_solar_altitude_time_series(
@@ -440,20 +438,12 @@ def calculate_effective_irradiance_time_series(
         rounding_places=rounding_places,
         verbose=verbose,
     )
-
-    import xarray as xr
-    effective_irradiance_data_array = xr.DataArray(
-        effective_irradiance_series,
-        coords=[('time', timestamps)],
-        name='Effective irradiance series'
-    )
-    effective_irradiance_data_array.attrs['units'] = 'W/m^2'
-    effective_irradiance_data_array.attrs['long_name'] = 'Effective Solar Irradiance'
-
     if statistics:
-        data_statistics = calculate_series_statistics(effective_irradiance_data_array)
-        print_series_statistics(data_statistics)
-
+        print_series_statistics(
+            data_array=effective_irradiance_series,
+            timestamps=timestamps,
+            title="Effective irradiance",
+        )
     if csv:
         write_irradiance_csv(
             longitude=longitude,

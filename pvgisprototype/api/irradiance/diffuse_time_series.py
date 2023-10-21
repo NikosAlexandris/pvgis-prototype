@@ -18,9 +18,8 @@ from rich.console import Console
 from rich import print
 from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.api.series.statistics import export_statistics_to_csv
+from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.api.geometry.models import SolarPositionModels
@@ -36,8 +35,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer_parameters import typer_option_statistics
-from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_term_n_series
 from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
@@ -59,6 +56,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+from pvgisprototype.cli.typer_parameters import typer_option_statistics
+from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_horizontal_irradiance_time_series
@@ -135,7 +134,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
@@ -226,14 +225,20 @@ def calculate_diffuse_horizontal_component_from_sarah(
         rounding_places=rounding_places,
         verbose=verbose,
     )
-
-    if statistics:  # after echoing series which might be Long!
-        data_statistics = calculate_series_statistics(diffuse_horizontal_irradiance_series)
+    if statistics:
         print_series_statistics(
-            data_statistics, title="Diffuse horizontal irradiance from SARAH"
+            data_array=diffuse_horizontal_irradiance_series,
+            timestamps=timestamps,
+            title="Diffuse horizontal irradiance",
         )
-        if csv:
-            export_statistics_to_csv(data_statistics, "diffuse_horizontal_irradiance")
+    if csv:
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            filename=csv,
+        )
 
     return diffuse_horizontal_irradiance_series
 
@@ -812,12 +817,19 @@ def calculate_diffuse_inclined_irradiance_time_series(
         rounding_places=rounding_places,
         verbose=verbose,
     )
-
-    # if statistics:
-    #     data_statistics = calculate_series_statistics(diffuse_irradiance)
-    #     print_series_statistics(data_statistics, title='Diffuse horizontal irradiance from SARAH')
-    #     if csv:
-    #         export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance_series')
-
+    if statistics:
+        print_series_statistics(
+            data_array=diffuse_inclined_irradiance_series,
+            timestamps=timestamps,
+            title="Diffuse inclined irradiance",
+        )
+    if csv:
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            filename=csv,
+        )
 
     return diffuse_inclined_irradiance_series

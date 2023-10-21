@@ -8,27 +8,35 @@ from rich import box
 import csv
 
 
-def calculate_series_statistics(data_array):
-    data_array.load()
+def calculate_series_statistics(data_array, timestamps):
+    import xarray as xr
+    data_xarray = xr.DataArray(
+        data_array,
+        coords=[('time', timestamps)],
+        name='Effective irradiance series'
+    )
+    data_xarray.attrs['units'] = 'W/m^2'
+    data_xarray.attrs['long_name'] = 'Effective Solar Irradiance'
+    data_xarray.load()
     statistics = {
-        'Start': data_array.time.values[0],
-        'End': data_array.time.values[-1],
-        'Count': data_array.count().values,
-        'Min': data_array.min().values,
-        '25th Percentile': np.percentile(data_array, 25),
-        'Mean': data_array.mean().values,
-        'Median': data_array.median().values,
-        'Mode': mode(data_array.values.flatten())[0],
-        'Max': data_array.max().values,
-        'Sum': data_array.sum().values,
-        'Variance': data_array.var().values,
-        'Standard deviation': data_array.std().values,
-        'Time of Min': data_array.idxmin('time').values,
-        'Index of Min': data_array.argmin().values,
-        'Time of Max': data_array.idxmax('time').values,
-        'Index of Max': data_array.argmax().values,
-        # 'Longitude of Max': data_array.argmax('lon').values,
-        # 'Latitude of Max': data_array.argmax('lat').values,
+        'Start': data_xarray.time.values[0],
+        'End': data_xarray.time.values[-1],
+        'Count': data_xarray.count().values,
+        'Min': data_xarray.min().values,
+        '25th Percentile': np.percentile(data_xarray, 25),
+        'Mean': data_xarray.mean().values,
+        'Median': data_xarray.median().values,
+        'Mode': mode(data_xarray.values.flatten())[0],
+        'Max': data_xarray.max().values,
+        'Sum': data_xarray.sum().values,
+        'Variance': data_xarray.var().values,
+        'Standard deviation': data_xarray.std().values,
+        'Time of Min': data_xarray.idxmin('time').values,
+        'Index of Min': data_xarray.argmin().values,
+        'Time of Max': data_xarray.idxmax('time').values,
+        'Index of Max': data_xarray.argmax().values,
+        # 'Longitude of Max': data_xarray.argmax('lon').values,
+        # 'Latitude of Max': data_xarray.argmax('lat').values,
     }
     return statistics
 
@@ -45,10 +53,10 @@ def calculate_series_statistics(data_array):
 #     console.print(table)
 
 
-def print_series_statistics(data_array, title='Time series'):
+def print_series_statistics(data_array, timestamps, title='Time series'):
     """
     """
-    statistics = calculate_series_statistics(data_array)
+    statistics = calculate_series_statistics(data_array, timestamps)
     table = Table(
         title=title,
         show_header=True,

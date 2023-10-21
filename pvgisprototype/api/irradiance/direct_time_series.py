@@ -31,6 +31,8 @@ from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_ti
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from rich import print
+from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
@@ -66,6 +68,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
@@ -442,6 +445,8 @@ def calculate_direct_horizontal_irradiance_time_series(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> np.ndarray:
     """ """
@@ -540,6 +545,20 @@ def calculate_direct_horizontal_irradiance_time_series(
         rounding_places=rounding_places,
         verbose=verbose,
     )
+    if statistics:
+        print_series_statistics(
+            data_array=direct_horizontal_irradiance_series,
+            timestamps=timestamps,
+            title="Direct horizontal irradiance",
+        )
+    if csv:
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            filename=csv,
+        )
 
     return direct_horizontal_irradiance_series
 
@@ -578,6 +597,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the direct irradiance incident on a tilted surface [W*m-2] 
@@ -783,5 +804,19 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         rounding_places=rounding_places,
         verbose=verbose,
     )
+    if statistics:
+        print_series_statistics(
+            data_array=direct_inclined_irradiance_series,
+            timestamps=timestamps,
+            title="Direct inclined irradiance",
+        )
+    if csv:
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            filename=csv,
+        )
 
     return direct_inclined_irradiance_series
