@@ -350,14 +350,14 @@ def calculate_effective_irradiance_time_series(
 
     if not efficiency_model:
         if not efficiency:
-            print(f'Using preset system efficiency {system_efficiency}')
+            # print(f'Using preset system efficiency {system_efficiency}')
             efficiency_coefficient_series = system_efficiency
         else:
-            print(f'Efficiency set to {efficiency}')
+            # print(f'Efficiency set to {efficiency}')
             efficiency_coefficient_series = efficiency
     else:
         if not efficiency:
-            print(f'Using PV module efficiency algorithm {efficiency_model}')
+            # print(f'Using PV module efficiency algorithm {efficiency_model}')
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
                 irradiance_series=global_irradiance_series,
                 temperature_series=temperature_series,
@@ -396,31 +396,39 @@ def calculate_effective_irradiance_time_series(
             "Direct": direct_irradiance_series,
             "Diffuse": diffuse_irradiance_series,
             "Reflected": reflected_irradiance_series,
-            "Temperature": temperature_series,
-            "Wind speed": wind_speed_series,
-            "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
-            "Orientation": convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
-            # "Above": mask_above_horizon,
-            # "Low": mask_low_angle,
-            # "Below": mask_below_horizon,
-            "Shade": in_shade,
         }
         results = results | extended_results
         title += ' & in-plane components'
 
     if verbose > 3:
         even_more_extended_results = {
+            "Temperature": temperature_series,
+            "Wind speed": wind_speed_series,
+        }
+        results = results | even_more_extended_results
+
+    if verbose > 4:
+        and_even_more_extended_results = {
+            "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            "Orientation": convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             "Above horizon": mask_above_horizon,
             "Low angle": mask_low_angle,
             "Below horizon": mask_below_horizon,
-            # "Shade": in_shade,
+            "Shade": in_shade,
         }
-        results = results | even_more_extended_results
+        results = results | and_even_more_extended_results
+
+    if verbose == 7:
+        results = {
+            "Effective": effective_irradiance_series,
+        }
+        title = 'Effective'
+        longitude = latitude = None
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
-    if verbose == 5:
+    if verbose > 5:
         debug(locals())
 
     print_irradiance_table_2(
