@@ -315,7 +315,7 @@ def rayleigh_optical_thickness_time_series(
 
 @app.command('normal-series', no_args_is_help=True)
 def calculate_direct_normal_irradiance_time_series(
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
+    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT],
@@ -325,6 +325,7 @@ def calculate_direct_normal_irradiance_time_series(
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -368,6 +369,13 @@ def calculate_direct_normal_irradiance_time_series(
             * rayleigh_optical_thickness_series_array
         )
     )
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+    out_of_range_indices = np.where(
+        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    )
 
     # Reporting =============================================================
 
@@ -396,6 +404,12 @@ def calculate_direct_normal_irradiance_time_series(
         rounding_places=rounding_places,
         verbose=verbose,
     )
+    if statistics:
+        print_series_statistics(
+            data_array=direct_normal_irradiance_series,
+            timestamps=timestamps,
+            title="Direct inclined irradiance",
+        )
     if csv:
         write_irradiance_csv(
             longitude=None,
@@ -413,9 +427,11 @@ def calculate_direct_normal_irradiance_time_series(
         | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     )
     if out_of_range_indices[0].size > 0:
+        print()
         print(
                 f"[red on white]{WARNING_OUT_OF_RANGE_VALUES} in `direct_normal_irradiance_series` : {out_of_range_indices[0]}![/red on white]"
         )
+        print()
 
     return direct_normal_irradiance_series
 
@@ -786,7 +802,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             # "Shade": in_shade,
         }
         results = results | even_more_extended_results
-
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
