@@ -59,7 +59,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
-from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
@@ -757,7 +757,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     )
     if out_of_range_indices[0].size > 0:
         print(
-            f"[blink red on white]{WARNING_NEGATIVE_VALUES} in `diffuse_inclined_irradiance_series`![/blink red on white]"
+            f"[blink red on white]{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`![/blink red on white]"
         )
 
     # Reporting ==============================================================
