@@ -45,7 +45,7 @@ from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pvgisprototype.cli.csv import write_irradiance_csv
-from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -341,9 +341,18 @@ def calculate_global_irradiance_time_series(
         + diffuse_irradiance_series
         + reflected_irradiance_series
     )
-
-    if np.any(global_irradiance_series < -4):
-        print("[red on white]{WARNING_NEGATIVE_VALUES} in `direct_normal_irradiance_series`![/red on white]")
+    # Warning
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+    out_of_range_indices = np.where(
+        (global_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (global_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    )
+    if out_of_range_indices[0].size > 0:
+        print(
+                f"[red on white]{WARNING_OUT_OF_RANGE_VALUES} in `global_irradiance_series` : {out_of_range_indices[0]}![/red on white]"
+        )
 
     # Reporting =============================================================
 

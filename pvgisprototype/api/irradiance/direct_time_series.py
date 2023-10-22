@@ -71,7 +71,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
-from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -413,7 +413,7 @@ def calculate_direct_normal_irradiance_time_series(
     )
     if out_of_range_indices[0].size > 0:
         print(
-                f"[red on white]{WARNING_NEGATIVE_VALUES} in `direct_normal_irradiance_series` : {out_of_range_indices[0]}![/red on white]"
+                f"[red on white]{WARNING_OUT_OF_RANGE_VALUES} in `direct_normal_irradiance_series` : {out_of_range_indices[0]}![/red on white]"
         )
 
     return direct_normal_irradiance_series
