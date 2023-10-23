@@ -96,6 +96,7 @@ from pvgisprototype.constants import (
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_radians_if_requested
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAltitude
@@ -787,8 +788,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if verbose > 2:
         more_extended_results = {
             "Horizontal": direct_horizontal_irradiance_series,
-            'Incidence': convert_series_to_degrees_if_requested(solar_incidence_series_array, angle_output_units),
-            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+            'Incidence': convert_series_to_degrees_arrays_if_requested(solar_incidence_series, angle_output_units),
+            'Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
         }
         results = results | more_extended_results
         title += ' & relevant components'
