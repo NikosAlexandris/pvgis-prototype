@@ -544,7 +544,7 @@ def calculate_direct_horizontal_irradiance_time_series(
             "Linke": np.array([linke_turbidity.value for linke_turbidity in linke_turbidity_factor_series]),
             "Air mass": np.array([air_mass.value for air_mass in optical_air_mass_series]),
             "Refracted alt.": np.array( [refracted_altitude.value for refracted_altitude in refracted_solar_altitude_series]) if apply_atmospheric_refraction else np.array(["-"]),
-            "Altitude": solar_altitude_series_array,
+            'Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
         }
         results = results | extended_results
         title += ' & relevant components'
