@@ -93,6 +93,33 @@ def convert_series_to_degrees_if_requested(
     return copy_of_data_class_series
 
 
+def convert_series_to_degrees_arrays_if_requested(
+    data_class_series: List[Any],
+    angle_output_units: str,
+) -> List[Any]:
+    """
+    Vectorized conversion of a series of angle data from radians to degrees if requested.
+
+    Parameters
+    ----------
+    data_class_series : List[Any]
+        A list of data classes containing the angle value and unit.
+    angle_output_units : str
+        The desired output unit ('degrees' or 'radians').
+
+    Returns
+    -------
+    List[Any]
+        A list of converted data classes.
+    """
+    converted_series = convert_series_to_degrees_if_requested(
+        data_class_series, angle_output_units
+    )
+    # an array of values is friendly (currently) for print_irradiance_table_2()
+    array = np.array([x.value for x in converted_series])
+    return array
+
+
 def convert_float_to_radians_if_requested(angle: float, output_units: str) -> float:
     """Convert angle from radians to radians if requested"""
     return radians(angle) if output_units == 'radians' else angle

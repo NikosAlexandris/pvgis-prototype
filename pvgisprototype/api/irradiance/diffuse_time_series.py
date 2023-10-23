@@ -68,6 +68,7 @@ from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
 from pvgisprototype.api.geometry.solar_azimuth_time_series import model_solar_azimuth_time_series
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
@@ -789,7 +790,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             'Tilt': surface_tilt,
             'Azimuth difference': azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',
             '⦬ Azimuth': solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
-            '⦩ Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+            '⦩ Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series_array, angle_output_units),
         }
         results = results | even_more_extended_results
 
@@ -800,7 +801,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             'Extra. horizontal': extraterrestrial_horizontal_irradiance_series,
             "Extra. normal": extraterrestrial_normal_irradiance_series,
             'Linke': linke_turbidity_factor_series_array,
-            'Incidence': convert_series_to_degrees_if_requested(solar_incidence_series_array, angle_output_units),
+            'Incidence': convert_series_to_degrees_arrays_if_requested(solar_incidence_series_array, angle_output_units),
             'Out-of-range': out_of_range_indices,
         }
         results = results | plus_even_more_extended_results
