@@ -1,7 +1,7 @@
 from devtools import debug
 from datetime import datetime
-from ..api.utilities.conversions import convert_to_degrees_if_requested
-from ..api.utilities.conversions import round_float_values
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import round_float_values
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -363,7 +363,7 @@ def print_irradiance_table_2(
     timestamps: datetime = [datetime.now()],
     dictionary: dict = dict(),
     title: str ='Irradiance series',
-    rounding_places: int = 5,
+    rounding_places: int = ROUNDING_PLACES_DEFAULT,
     verbose=1,
 ):
     console = Console()
