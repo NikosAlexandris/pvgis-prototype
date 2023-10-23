@@ -7,7 +7,7 @@ from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
-from ..utilities.conversions import convert_to_radians
+from pvgisprototype.utilities.conversions import convert_to_radians
 from datetime import datetime
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
