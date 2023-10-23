@@ -319,9 +319,10 @@ def rayleigh_optical_thickness_time_series(
 def calculate_direct_normal_irradiance_time_series(
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT],
-    optical_air_mass_series: Annotated[List[float], typer_option_optical_air_mass_series] = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT],
+    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
+    optical_air_mass_series: Annotated[List[float], typer_option_optical_air_mass_series] = None, # [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -357,7 +358,6 @@ def calculate_direct_normal_irradiance_time_series(
     )
 
     # Unpack custom objects into NumPy arrays
-    linke_turbidity_factor_series_array = np.array([lt.value for lt in linke_turbidity_factor_series])
     corrected_linke_turbidity_factor_series_array = np.array([clt.value for clt in corrected_linke_turbidity_factor_series])
     optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
     rayleigh_optical_thickness_series_array = np.array([rt.value for rt in rayleigh_optical_thickness_series])
@@ -390,9 +390,9 @@ def calculate_direct_normal_irradiance_time_series(
         extended_results = {
             "Extra. normal": extraterrestrial_normal_irradiance_series,
             "Linke Adjusted": corrected_linke_turbidity_factor_series_array,
-            "Linke": linke_turbidity_factor_series_array,
+            "Linke": np.array([lt.value for lt in linke_turbidity_factor_series]),
             "Rayleigh": rayleigh_optical_thickness_series_array,
-            "Air mass": np.array([x.value for x in optical_air_mass_series]),
+            "Air mass": optical_air_mass_series_array,
         }
         results = results | extended_results
 
@@ -410,7 +410,7 @@ def calculate_direct_normal_irradiance_time_series(
         print_series_statistics(
             data_array=direct_normal_irradiance_series,
             timestamps=timestamps,
-            title="Direct inclined irradiance",
+            title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
         )
     if csv:
         write_irradiance_csv(
@@ -443,7 +443,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps],
+    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
@@ -452,7 +452,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT],
+    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
@@ -540,8 +540,9 @@ def calculate_direct_horizontal_irradiance_time_series(
     if verbose > 1:
         extended_results = {
             'Normal': direct_normal_irradiance_series,
-            "Air mass": np.array([x.value for x in optical_air_mass_series]),
-            "Refracted alt.": np.array( [x.value for x in refracted_solar_altitude_series]) if apply_atmospheric_refraction else np.array(["-"]),
+            "Linke": np.array([linke_turbidity.value for linke_turbidity in linke_turbidity_factor_series]),
+            "Air mass": np.array([air_mass.value for air_mass in optical_air_mass_series]),
+            "Refracted alt.": np.array( [refracted_altitude.value for refracted_altitude in refracted_solar_altitude_series]) if apply_atmospheric_refraction else np.array(["-"]),
             "Altitude": solar_altitude_series_array,
         }
         results = results | extended_results
