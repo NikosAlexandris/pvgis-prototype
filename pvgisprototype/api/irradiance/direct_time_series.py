@@ -89,6 +89,7 @@ from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_ALGORITHM_HOFIERKA_2002
 from pvgisprototype.constants import (
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
@@ -544,7 +545,24 @@ def calculate_direct_horizontal_irradiance_time_series(
             "Altitude": solar_altitude_series_array,
         }
         results = results | extended_results
-        title += ' & components'
+        title += ' & relevant components'
+
+    if verbose > 2:
+        more_extended_results = {
+            'Solar constant': solar_constant,
+            'Perigee': perigee_offset,
+            'Eccentricity': eccentricity_correction_factor,
+        }
+        results = results | more_extended_results
+
+    if verbose > 3:
+        even_more_extended_results = {
+            'Irradiance source': IRRADIANCE_ALGORITHM_HOFIERKA_2002,
+            'Positioning': solar_position_model.value,
+            'Timing': solar_time_model.value,
+            # "Shade": in_shade,
+        }
+        results = results | even_more_extended_results
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -796,7 +814,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     if verbose > 3:
         even_more_extended_results = {
-            'Irradiance source': 'External data' if direct_horizontal_component else 'Model (Hofierka, 2002)',
+            'Irradiance source': 'External data' if direct_horizontal_component else IRRADIANCE_ALGORITHM_HOFIERKA_2002,
             'Incidence algorithm': solar_incidence_model.value,
             'Positioning': solar_position_model.value,
             'Timing': solar_time_model.value,
