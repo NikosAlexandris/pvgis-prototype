@@ -374,6 +374,7 @@ def calculate_direct_normal_irradiance_time_series(
     results = {
         "Normal": direct_normal_irradiance_series,
     }
+    title="Direct"
 
     if verbose > 1:
         extended_results = {
@@ -391,7 +392,7 @@ def calculate_direct_normal_irradiance_time_series(
     print_irradiance_table_2(
         timestamps=timestamps,
         dictionary=results,
-        title="Direct normal irradiance series",
+        title=title + f" normal irradiance series {IRRADIANCE_UNITS}",
         rounding_places=rounding_places,
         verbose=verbose,
     )
