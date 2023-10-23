@@ -6,6 +6,8 @@ from scipy.stats import mode
 from rich.table import Table
 from rich import box
 import csv
+from pvgisprototype.api.utilities.conversions import round_float_values
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 
 
 def calculate_series_statistics(data_array, timestamps):
@@ -53,18 +55,26 @@ def calculate_series_statistics(data_array, timestamps):
 #     console.print(table)
 
 
-def print_series_statistics(data_array, timestamps, title='Time series'):
+def print_series_statistics(
+    data_array,
+    timestamps,
+    title='Time series',
+    rounding_places: int = None,
+):
     """
     """
     statistics = calculate_series_statistics(data_array, timestamps)
     table = Table(
         title=title,
+        caption='Caption text',
         show_header=True,
         header_style="bold magenta",
+        row_styles=['none', 'dim'],
         box=box.SIMPLE_HEAD,
+        highlight=True,
     )
-    table.add_column("Statistic", justify="right", style="cyan", no_wrap=True)
-    table.add_column("Value", style="magenta")
+    table.add_column("Statistic", justify="right", style="magenta", no_wrap=True)
+    table.add_column("Value", style="cyan")
 
     # Basic metadata
     basic_metadata = ["Start", "End", "Count"]
@@ -86,6 +96,7 @@ def print_series_statistics(data_array, timestamps, title='Time series'):
     # Add statistics
     for key, value in statistics.items():
         if key not in basic_metadata and key not in index_metadata:
+            # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
 
     # Separate!
@@ -94,6 +105,7 @@ def print_series_statistics(data_array, timestamps, title='Time series'):
     # Index of
     for key, value in statistics.items():
         if key in index_metadata:
+            # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
 
     console = Console()

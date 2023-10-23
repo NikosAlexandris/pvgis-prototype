@@ -411,6 +411,7 @@ def calculate_direct_normal_irradiance_time_series(
             data_array=direct_normal_irradiance_series,
             timestamps=timestamps,
             title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
+            rounding_places=rounding_places,
         )
     if csv:
         write_irradiance_csv(
@@ -585,6 +586,7 @@ def calculate_direct_horizontal_irradiance_time_series(
             data_array=direct_horizontal_irradiance_series,
             timestamps=timestamps,
             title="Direct horizontal irradiance",
+            rounding_places=rounding_places,
         )
     if csv:
         write_irradiance_csv(
