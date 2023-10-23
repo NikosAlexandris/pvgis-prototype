@@ -7,29 +7,26 @@ from typing import List
 # from typing import Path
 from datetime import datetime
 from pathlib import Path
-from ..api.utilities.conversions import convert_to_radians
-from ..api.utilities.timestamp import now_utc_datetimezone
-from ..api.utilities.timestamp import ctx_attach_requested_timezone
-from ..api.utilities.timestamp import ctx_convert_to_timezone
-from ..api.utilities.timestamp import now_local_datetimezone
-from ..api.utilities.timestamp import convert_hours_to_datetime_time
-from ..api.utilities.timestamp import callback_generate_datetime_series
-from ..api.utilities.timestamp import parse_timestamp_series
-from .rich_help_panel_names import rich_help_panel_advanced_options
-# from .rich_help_panel_names import rich_help_panel_geometry_time
-# from .rich_help_panel_names import rich_help_panel_geometry_position
-# from .rich_help_panel_names import rich_help_panel_geometry_refraction
-from .rich_help_panel_names import rich_help_panel_geometry_surface
-from .rich_help_panel_names import rich_help_panel_solar_position
-from .rich_help_panel_names import rich_help_panel_solar_time
-from .rich_help_panel_names import rich_help_panel_earth_orbit
-from .rich_help_panel_names import rich_help_panel_atmospheric_properties
-from .rich_help_panel_names import rich_help_panel_output
-from .rich_help_panel_names import rich_help_panel_time_series
-from .rich_help_panel_names import rich_help_panel_time_series_selection
-from .rich_help_panel_names import rich_help_panel_plotting
-from .rich_help_panel_names import rich_help_panel_efficiency
-from .rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import now_local_datetimezone
+from pvgisprototype.api.utilities.timestamp import convert_hours_to_datetime_time
+from pvgisprototype.api.utilities.timestamp import callback_generate_datetime_series
+from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series_selection
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_plotting
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.constants import LATITUDE_MINIMUM
 from pvgisprototype.constants import LATITUDE_MAXIMUM
@@ -46,7 +43,6 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_MINIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_MAXIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT_MINIMUM
-# from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -56,10 +52,7 @@ from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
-# from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-# from pvgisprototype.constants import MEAN_GROUND_ALBEDO_DEFAULT
-# from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import OpticalAirMass
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
@@ -206,10 +199,6 @@ typer_option_random_days = typer.Option(
     help='Generate random days to demonstrate calculation',
     # default_factory=RANDOM_DAY_FLAG_DEFAULT,
 )
-# day_of_year: Annotated[float, typer.Argument(
-#     min=1,
-#     max=366,
-#     help='Day of year')] = None,
 
 # Time series
 
@@ -229,14 +218,6 @@ typer_option_mask_and_scale = typer.Option(
     rich_help_panel=rich_help_panel_time_series,
     # default_factory=False,
 )
-# Rename to nearest_neighbor_method ?
-# typer_option_nearest_neighbor_lookup = typer.Option(
-#     help='Enable nearest neighbor (inexact) lookups by use of the methods `pad`, `backfill` or `nearest`',
-#     show_default=True,
-#     show_choices=True,
-#     rich_help_panel=rich_help_panel_time_series,
-#     # default_factory=False,
-# )
 typer_option_nearest_neighbor_lookup = typer.Option(
     help='Enable nearest neighbor (inexact) lookups. Read Xarray manual on [underline]nearest-neighbor-lookups[/underline]',
     show_default=True,

@@ -6,8 +6,8 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import suncalc
 import pysolar
-from ..utilities.conversions import convert_south_to_north_radians_convention
-from ..utilities.timestamp import attach_timezone
+from pvgisprototype.utilities.conversions import convert_south_to_north_radians_convention
+from pvgisprototype.utilities.timestamp import attach_timezone
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype import Latitude
