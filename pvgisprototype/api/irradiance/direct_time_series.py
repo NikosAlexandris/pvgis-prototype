@@ -495,7 +495,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     expected_solar_altitude_units = "degrees"
     solar_altitude_series_in_degrees = convert_series_to_degrees_if_requested(
         solar_altitude_series,
-        angle_output_units=expected_solar_altitude_units,  # Here!
+        angle_output_units=expected_solar_altitude_units,  # Here! ------- <<<
     )
 
     # refracted_solar_altitude, refracted_solar_altitude_units = calculate_refracted_solar_altitude(
@@ -768,8 +768,10 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         )
 
         # additional check! Is it required here? -----------------------------
-        if len(timestamps) != len(direct_inclined_irradiance_series): raise
-        ValueError( "The number of timestamps {len(timestamps)} and irradiance values {len(direct_inclined_irradiance_series)} differ!")
+        if len(timestamps) != len(direct_inclined_irradiance_series):
+            raise ValueError(
+                "The number of timestamps {len(timestamps)} and irradiance values {len(direct_inclined_irradiance_series)} differ!"
+            )
        # --------------------------------------------------------------------
 
     except ZeroDivisionError:
