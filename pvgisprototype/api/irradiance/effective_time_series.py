@@ -124,9 +124,6 @@ def calculate_effective_irradiance_time_series(
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
     efficiency_model: PVModuleEfficiencyAlgorithms = None,
     efficiency: Optional[float] = None,
-    rounding_places: Optional[int] = 5,
-    statistics: bool = False,
-    csv: Path = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     solar_altitude_series = model_solar_altitude_time_series(
