@@ -1,4 +1,3 @@
-from devtools import debug
 from datetime import datetime
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import round_float_values

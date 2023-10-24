@@ -63,7 +63,7 @@ def open_data_array(
     #         raise typer.Exit(code=33)
     if in_memory:
         if verbose > 0:
-            print("In memory")
+            print("Reading data in memory...")
         return load_or_open_dataarray(
             function=xr.load_dataarray,
             filename_or_object=netcdf,
@@ -220,10 +220,12 @@ def select_location_time_series(
     )
     try:
         location_time_series = data_array.sel(
-                **indexers,
-                method=neighbor_lookup,
-                tolerance=tolerance,)
-        # location_time_series.load()  # load into memory for fast processing
+            **indexers,
+            method=neighbor_lookup,
+            tolerance=tolerance,
+        )
+        location_time_series.load()  # load into memory for fast processing
+
     except Exception as exception:
         print(f"{ERROR_IN_SELECTING_DATA} : {exception}")
         raise SystemExit(33)

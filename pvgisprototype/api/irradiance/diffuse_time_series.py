@@ -435,8 +435,10 @@ def diffuse_solar_altitude_coefficients_time_series(
 
     if verbose == 5:
         debug(locals())
+
     if is_scalar:
         return a1_series[0], a2_series[0], a3_series[0]
+
     else:
         return a1_series, a2_series, a3_series
 
