@@ -238,6 +238,7 @@ def calculate_effective_irradiance_time_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            neighbor_lookup=neighbor_lookup,
             verbose=0,  # no verbosity here by choice!
         )[
             mask_above_horizon
