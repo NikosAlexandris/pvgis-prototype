@@ -112,8 +112,10 @@ def select(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    time_series_2: Annotated[Path, typer_option_time_series] = None,
     timestamps: Annotated[Optional[Any], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Optional[str] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
@@ -134,6 +136,22 @@ def select(
 
     location_time_series = select_time_series(
         time_series=time_series,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        # inexact_matches_method=inexact_matches_method,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        variable_name_as_suffix=variable_name_as_suffix,
+        verbose=verbose,
+    )
+    location_time_series_2 = select_time_series(
+        time_series=time_series_2,
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -172,8 +190,14 @@ def select(
     #     # print(f'Series : {location_time_series.values}')
 
     results = {
-        "Series": location_time_series.to_numpy(),
+        location_time_series.name: location_time_series.to_numpy(),
     }
+    if location_time_series_2 is not None:
+        more_results = {
+        location_time_series_2.name: location_time_series_2.to_numpy() if location_time_series_2 is not None else None
+        }
+        results = results | more_results
+
     title = 'Location time series'
     
     # special case!
