@@ -125,7 +125,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
