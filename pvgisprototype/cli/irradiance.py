@@ -302,10 +302,11 @@ def calculate_effective_irradiance(
             dictionary=results,
             filename=csv,
         )
-    if not verbose:
-        flat_list = effective_irradiance_series.flatten().astype(str)
-        csv_str = ','.join(flat_list)
-        print(csv_str)
+    # if not verbose and not csv:
+    #     flat_list = effective_irradiance_series.flatten().astype(str)
+    #     csv_str = ','.join(flat_list)
+    #     print(csv_str)
+    #     print(f'CSV ? {csv}')
 
 
 app.add_typer(
