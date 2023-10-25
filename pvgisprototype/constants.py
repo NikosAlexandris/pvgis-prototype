@@ -87,12 +87,15 @@ PERIGEE_OFFSET = 0.048869
 ECCENTRICITY_CORRECTION_FACTOR = 0.03344  # 0.01672
 
 TERM_N_IN_SHADE = 0.25227
+TERM_N_COLUMN_NAME = 'term N'
+KB_RATIO_COLUMN_NAME = 'Kb'
 
 LINKE_TURBIDITY_MINIMUM = 0
 LINKE_TURBIDITY_MAXIMUM = 8
 LINKE_TURBIDITY_DEFAULT = 2  # to get going for now
 LINKE_TURBIDITY_TIME_SERIES_DEFAULT = LINKE_TURBIDITY_DEFAULT  # to get going for now
 LINKE_TURBIDITY_UNIT = UNITLESS
+LINKE_TURBIDITY_COLUMN_NAME = 'Linke'
 OPTICAL_AIR_MASS_DEFAULT = 2
 OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT = OPTICAL_AIR_MASS_DEFAULT
 OPTICAL_AIR_MASS_UNIT = UNITLESS
@@ -130,7 +133,19 @@ SOLAR_TIME_NAME = 'Solar Time'
 UNITS_NAME = 'Units'
 UNITLESSS_NAME = 'Unitless'
 
-SURFACE_TILT_COLUMN_NAME = 'Tilt'
+# ⊾ ∢ ⦠ ∡ ⦛ ⦜ ⦣ ⦤ ⦥
+# ⦨ ⦩ # from horizontal upwards
+# ⦪ ⦫ # from horizontal downwards
+# ⦮ ⦯ # from vertical upwards
+# ⦬ ⦭ # from vertical downwards
+# ⭍
+# ☀ ☼ 🌣 # sun
+# 🗤 # rays spreading
+# ⌇ # wavy line
+# 🌬 # wind
+# ⌖ ⯐ # position
+
+SURFACE_TILT_COLUMN_NAME = '∡ Tilt'
 TIME_ALGORITHM_COLUMN_NAME = 'Timing'  # Algorithm
 DECLINATION_COLUMN_NAME = '∢ Declination'
 HOUR_ANGLE_COLUMN_NAME = f':clock12: Hour Angle'
