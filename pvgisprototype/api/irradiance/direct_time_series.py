@@ -90,10 +90,18 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import IRRADIANCE_ALGORITHM_HOFIERKA_2002
-from pvgisprototype.constants import (
-    LONGITUDE_COLUMN_NAME,
-    LATITUDE_COLUMN_NAME,
-)
+from pvgisprototype.constants import LONGITUDE_COLUMN_NAME
+from pvgisprototype.constants import LATITUDE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import LOSS_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
+from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
@@ -333,52 +341,58 @@ def calculate_direct_normal_irradiance_time_series(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
 ):
-    """Calculate the direct normal irradiance (SID)
+    """Calculate the direct normal irradiance (SID) [W*m-2]
 
     The direct normal irradiance represents the amount of solar radiation
     received per unit area by a surface that is perpendicular (normal) to the
     rays that come in a straight line from the direction of the sun at its
     current position in the sky.
+
+    This function implements the algorithm described by Hofierka [1]_.
+
+    References
+    ----------
+    .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
     """
-    extraterrestrial_normal_irradiance_series = (
-        calculate_extraterrestrial_normal_irradiance_time_series(
-            timestamps=timestamps,
-            solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            random_days=random_days,
+    with progress:
+        extraterrestrial_normal_irradiance_series = (
+            calculate_extraterrestrial_normal_irradiance_time_series(
+                timestamps=timestamps,
+                solar_constant=solar_constant,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
+                random_days=random_days,
+            )
         )
-    )
-    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
-        linke_turbidity_factor_series,
-        verbose=verbose,
-    )
-    rayleigh_optical_thickness_series = rayleigh_optical_thickness_time_series(
-        optical_air_mass_series,
-        verbose=verbose,
-    )
-
-    # Unpack custom objects into NumPy arrays
-    corrected_linke_turbidity_factor_series_array = np.array([clt.value for clt in corrected_linke_turbidity_factor_series])
-    optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
-    rayleigh_optical_thickness_series_array = np.array([rt.value for rt in rayleigh_optical_thickness_series])
-
-    # Calculate
-    direct_normal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series
-        * np.exp(
-            corrected_linke_turbidity_factor_series_array
-            * optical_air_mass_series_array
-            * rayleigh_optical_thickness_series_array
+        corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
+            linke_turbidity_factor_series,
+            verbose=verbose,
         )
-    )
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
-    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
-    out_of_range_indices = np.where(
-        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
-        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    )
+        rayleigh_optical_thickness_series = rayleigh_optical_thickness_time_series(
+            optical_air_mass_series,
+            verbose=verbose,
+        )
+        # Unpack custom objects into NumPy arrays
+        corrected_linke_turbidity_factor_series_array = np.array([clt.value for clt in corrected_linke_turbidity_factor_series])
+        rayleigh_optical_thickness_series_array = np.array([rt.value for rt in rayleigh_optical_thickness_series])
+        optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
+
+        # Calculate
+        direct_normal_irradiance_series = (
+            extraterrestrial_normal_irradiance_series
+            * np.exp(
+                corrected_linke_turbidity_factor_series_array
+                * optical_air_mass_series_array
+                * rayleigh_optical_thickness_series_array
+            )
+        )
+        LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+        UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+        # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+        out_of_range_indices = np.where(
+            (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+            | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+        )
 
     # Reporting =============================================================
 
@@ -470,7 +484,14 @@ def calculate_direct_horizontal_irradiance_time_series(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
 ) -> np.ndarray:
-    """ """
+    """Calculate the direct horizontal irradiance (SID) [W*m-2]
+
+    This function implements the algorithm described by Hofierka [1]_.
+
+    References
+    ----------
+    .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
+    """
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -547,7 +568,7 @@ def calculate_direct_horizontal_irradiance_time_series(
             "Linke": np.array([linke_turbidity.value for linke_turbidity in linke_turbidity_factor_series]),
             "Air mass": np.array([air_mass.value for air_mass in optical_air_mass_series]),
             "Refracted alt.": np.array( [refracted_altitude.value for refracted_altitude in refracted_solar_altitude_series]) if apply_atmospheric_refraction else np.array(["-"]),
-            'Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
+            ALTITUDE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
         }
         results = results | extended_results
         title += ' & relevant components'
@@ -643,10 +664,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
 ):
-    """Calculate the direct irradiance incident on a tilted surface [W*m-2] 
+    """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
-    This function implements the algorithm described by Hofierka
-    :cite:`p:hofierka2002`.
+    This function implements the algorithm described by Hofierka [1]_.
 
     Notes
     -----
@@ -655,6 +675,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         B   = ────────────────     in  ⎜───⎟
          ic       sin ⎛h ⎞             ⎜ -2⎟           
                       ⎝ 0⎠             ⎝m  ⎠           
+    References
+    ----------
+    .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
     """
     solar_incidence_series = model_solar_incidence_time_series(
         longitude=longitude,
@@ -801,23 +824,23 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         print("[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
 
     results = {
-        "Direct": direct_inclined_irradiance_series,
+        DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
     }
     title = 'Direct'
 
     if verbose > 1 :
         extended_results = {
-            "Loss": 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
-            'Tilt': convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
-            'Orientation': convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+            LOSS_COLUMN_NAME: 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
         }
         results = results | extended_results
 
     if verbose > 2:
         more_extended_results = {
-            "Horizontal": direct_horizontal_irradiance_series,
-            'Incidence': convert_series_to_degrees_arrays_if_requested(solar_incidence_series, angle_output_units),
-            'Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+            INCIDENCE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_incidence_series, angle_output_units),
+            ALTITUDE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
         }
         results = results | more_extended_results
         title += ' & relevant components'
@@ -825,9 +848,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if verbose > 3:
         even_more_extended_results = {
             'Irradiance source': 'External data' if direct_horizontal_component else IRRADIANCE_ALGORITHM_HOFIERKA_2002,
-            'Incidence algorithm': solar_incidence_model.value,
-            'Positioning': solar_position_model.value,
-            'Timing': solar_time_model.value,
+            INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
+            POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
+            TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
             # "Shade": in_shade,
         }
         results = results | even_more_extended_results

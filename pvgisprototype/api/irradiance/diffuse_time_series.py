@@ -104,6 +104,23 @@ import numpy as np
 from math import cos
 from math import sin
 from math import pi
+from pvgisprototype.constants import LOSS_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
+from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
+from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
+from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
+from pvgisprototype.constants import OUT_OF_RANGE_INDICES_COLUMN_NAME
+from pvgisprototype.constants import TERM_N_COLUMN_NAME
+from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
+from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 
 
 app = typer.Typer(
@@ -770,45 +787,45 @@ def calculate_diffuse_inclined_irradiance_time_series(
     # Reporting ==============================================================
 
     results = {
-        "Diffuse": diffuse_inclined_irradiance_series,
+        DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
     }
-    title = 'Diffuse'
+    title = DIFFUSE_INCLINED_IRRADIANCE
 
     if verbose > 1 :
         extended_results = {
-            "Loss": 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
-            "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
         }
         results = results | extended_results
 
     if verbose > 2:
         more_extended_results = {
-            'Diffuse horizontal': diffuse_horizontal_irradiance_series,
-            'Diffuse clear-sky': diffuse_sky_irradiance_series,
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_sky_irradiance_series,
         }
         results = results | more_extended_results
         title += ' & relevant components'
 
     if verbose > 3:
         even_more_extended_results = {
-            'term N': n_series,
-            'Kb': kb_series,
-            'Tilt': surface_tilt,
-            'Azimuth difference': azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',
-            '⦬ Azimuth': solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
-            '⦩ Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series_array, angle_output_units),
+            TERM_N_COLUMN_NAME: n_series,
+            KB_RATIO_COLUMN_NAME: kb_series,
+            SURFACE_TILT_COLUMN_NAME: surface_tilt,
+            AZIMUTH_DIFFERENCE_COLUMN_NAME: azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',
+            AZIMUTH_COLUMN_NAME: solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
+            ALTITUDE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
         }
         results = results | even_more_extended_results
 
     if verbose > 4:
         linke_turbidity_factor_series_array = np.array([x.value for x in linke_turbidity_factor_series])
         plus_even_more_extended_results = {
-            "Direct horizontal": direct_horizontal_irradiance_series,
-            'Extra. horizontal': extraterrestrial_horizontal_irradiance_series,
-            "Extra. normal": extraterrestrial_normal_irradiance_series,
-            'Linke': linke_turbidity_factor_series_array,
-            'Incidence': convert_series_to_degrees_arrays_if_requested(solar_incidence_series_array, angle_output_units),
-            'Out-of-range': out_of_range_indices,
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+            EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_horizontal_irradiance_series,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series_array,
+            INCIDENCE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_incidence_series, angle_output_units),
+            OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range_indices,
         }
         results = results | plus_even_more_extended_results
 
