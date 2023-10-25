@@ -651,7 +651,15 @@ typer_option_verbose = typer.Option(
     rich_help_panel=rich_help_panel_output,
     # default_factory=0,
 )
-
+typer_option_index = typer.Option(
+    '--index',
+    '-idx',
+    help="Index rows in output table",
+    show_default=True,
+    show_choices=True,
+    rich_help_panel=rich_help_panel_output,
+    # default_factory=False,
+)
 typer_option_rounding_places = typer.Option(
     '--rounding-places',
     '-r',

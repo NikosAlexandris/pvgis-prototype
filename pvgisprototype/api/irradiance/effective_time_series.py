@@ -53,7 +53,6 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
-
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT

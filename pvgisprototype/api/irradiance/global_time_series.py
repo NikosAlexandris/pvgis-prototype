@@ -108,6 +108,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 
@@ -183,6 +184,7 @@ def calculate_global_irradiance_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = False,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the global horizontal irradiance (GHI)
 
@@ -405,6 +407,7 @@ def calculate_global_irradiance_time_series(
         dictionary=results,
         title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
 
