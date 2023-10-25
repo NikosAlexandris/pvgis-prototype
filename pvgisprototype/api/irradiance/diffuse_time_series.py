@@ -60,6 +60,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
@@ -137,6 +138,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
     time series.
@@ -224,6 +226,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         dictionary=results,
         title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:
@@ -503,6 +506,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface
 
@@ -816,6 +820,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         dictionary=results,
         title=title + f" in-plane irradiance series {IRRADIANCE_UNITS}",
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:

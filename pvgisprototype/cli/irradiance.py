@@ -103,6 +103,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -226,6 +227,7 @@ def calculate_effective_irradiance(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     effective_irradiance_series, results, title = calculate_effective_irradiance_time_series(
         longitude=longitude,
@@ -283,6 +285,7 @@ def calculate_effective_irradiance(
         dictionary=results,
         title=title + f' irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:

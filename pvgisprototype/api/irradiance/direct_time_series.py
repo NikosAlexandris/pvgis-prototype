@@ -72,7 +72,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -331,6 +331,7 @@ def calculate_direct_normal_irradiance_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the direct normal irradiance (SID)
 
@@ -404,6 +405,7 @@ def calculate_direct_normal_irradiance_time_series(
         dictionary=results,
         title=title + f" normal irradiance series {IRRADIANCE_UNITS}",
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:
@@ -466,6 +468,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ) -> np.ndarray:
     """ """
     solar_altitude_series = model_solar_altitude_time_series(
@@ -579,6 +582,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         dictionary=results,
         title=title + f" horizontal irradiance series {IRRADIANCE_UNITS}",
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:
@@ -637,6 +641,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the direct irradiance incident on a tilted surface [W*m-2] 
 
@@ -838,6 +843,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         dictionary=results,
         title=f'Direct inclined irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:
