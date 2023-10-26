@@ -130,6 +130,28 @@ app = typer.Typer(
 )
 
 
+def compare_temporal_resolution(timestamps, array):
+    """
+    Check if the frequency of `timestamps` matches the temporal resolution of the `array`.
+    
+    Parameters
+    ----------
+    timestamps:
+        An array of generated timestamps.
+    array:
+        An array of data corresponding to some time series.
+    
+    Raises
+    ------
+        ValueError: If the lengths of the timestamps and data_series don't match.
+    """
+    if len(timestamps) != len(array):
+        raise ValueError(
+            f"The frequency of `timestamps` ({len(timestamps)}) does not match the temporal resolution of the `array` ({len(array)}). Please ensure they have the same temporal resolution."
+        )
+
+
+@track_progress(task_correct_linke_turbidity_factor)
 def correct_linke_turbidity_factor_time_series(
     linke_turbidity_factor_series: Union[ List[LinkeTurbidityFactor], LinkeTurbidityFactor] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -784,18 +806,12 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         ).to_numpy()
 
     try:
+        compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
             * np.sin(solar_incidence_series_array)
             / np.sin(solar_altitude_series_array)
         )
-
-        # additional check! Is it required here? -----------------------------
-        if len(timestamps) != len(direct_inclined_irradiance_series):
-            raise ValueError(
-                "The number of timestamps {len(timestamps)} and irradiance values {len(direct_inclined_irradiance_series)} differ!"
-            )
-       # --------------------------------------------------------------------
 
     except ZeroDivisionError:
         logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
