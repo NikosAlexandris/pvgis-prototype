@@ -67,8 +67,18 @@ from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
+from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import TEMPERATURE_COLUMN_NAME
+from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
+from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
+from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
+from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
+from pvgisprototype.constants import SHADE_COLUMN_NAME
+
+
 
 
 def is_surface_in_shade_time_series(input_array, threshold=10):
@@ -356,7 +366,7 @@ def calculate_effective_irradiance_time_series(
             ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
             LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
-            SHADE: in_shade,
+            SHADE_COLUMN_NAME: in_shade,
         }
         results = results | and_even_more_extended_results
 
