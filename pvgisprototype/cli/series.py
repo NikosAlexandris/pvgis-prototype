@@ -14,8 +14,10 @@ from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degr
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
 from pvgisprototype.cli.typer_parameters import typer_argument_time_series
+from pvgisprototype.cli.typer_parameters import typer_option_time_series
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
+from pvgisprototype.cli.typer_parameters import typer_option_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_convert_longitude_360
@@ -24,7 +26,11 @@ from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lo
 from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_lines
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_title
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_unit
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
+from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_output_filename
 from pvgisprototype.cli.typer_parameters import typer_option_variable_name_as_suffix
@@ -33,12 +39,14 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.cli.print import print_irradiance_table_2
 from rich import print
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
 import xarray as xr
 import xarray_extras
+from pvgisprototype.api.series.csv import to_csv
 import numpy as np
 from distributed import LocalCluster, Client
 import dask
@@ -63,6 +71,8 @@ from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.series.statistics import export_statistics_to_csv
 
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
+from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype import Longitude
 from pvgisprototype.constants import UNITS_NAME
@@ -102,19 +112,21 @@ def select(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[Any], typer_argument_timestamps],
+    time_series_2: Annotated[Path, typer_option_time_series] = None,
+    timestamps: Annotated[Optional[Any], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Optional[str] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = 'series.csv',
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Select location series"""
@@ -131,13 +143,33 @@ def select(
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
         mask_and_scale=mask_and_scale,
-        nearest_neighbor_lookup=nearest_neighbor_lookup,
-        inexact_matches_method=inexact_matches_method,
+        neighbor_lookup=neighbor_lookup,
+        # inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
     )
+    location_time_series_2 = select_time_series(
+        time_series=time_series_2,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        # inexact_matches_method=inexact_matches_method,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        variable_name_as_suffix=variable_name_as_suffix,
+        verbose=verbose,
+    )
+
+    if verbose == 5:
+        debug(locals())
+
     # if output_filename:
     #     output_filename = Path(output_filename)
     #     extension = output_filename.suffix.lower()
@@ -151,21 +183,54 @@ def select(
     #     else:
     #         raise ValueError(f'Unsupported file extension: {extension}')
 
-    if verbose == 5:
-        debug(locals())
+    # if isinstance(location_time_series, float):
+    #     print(float)
+
+    # if isinstance(location_time_series, xr.DataArray):
+    #     # print(f'Series : {location_time_series.values}')
+
+    results = {
+        location_time_series.name: location_time_series.to_numpy(),
+    }
+    if location_time_series_2 is not None:
+        more_results = {
+        location_time_series_2.name: location_time_series_2.to_numpy() if location_time_series_2 is not None else None
+        }
+        results = results | more_results
+
+    title = 'Location time series'
+    
+    # special case!
+    if location_time_series is not None and timestamps is None:
+        timestamps = location_time_series.time.to_numpy()
+
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title=title,
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
 
     # statistics after echoing series which might be Long!
+
     if statistics:
-        data_statistics = calculate_series_statistics(location_time_series)
-        print_series_statistics(data_statistics)
-        if csv:
-            export_statistics_to_csv(data_statistics, 'location_time_series_statistics')
+        print_series_statistics(
+            data_array=location_time_series,
+            title='Selected series',
+        )
 
-    if isinstance(location_time_series, float):
-        print(float)
-
-    if isinstance(location_time_series, xr.DataArray):
-        print(f'Series : {location_time_series.values}')
+    if csv:
+        # export_statistics_to_csv(
+        #     data_array=location_time_series,
+        #     filename=csv,
+        # )
+        to_csv(
+            x=location_time_series,
+            path=csv,
+        )
 
 
 @app.command(
@@ -203,13 +268,12 @@ def plot(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
@@ -226,8 +290,7 @@ def plot(
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
         mask_and_scale=mask_and_scale,
-        nearest_neighbor_lookup=nearest_neighbor_lookup,
-        inexact_matches_method=inexact_matches_method,
+        neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         # in_memory=in_memory,
         verbose=verbose,
@@ -241,8 +304,8 @@ def plot(
             variable_name_as_suffix=variable_name_as_suffix,
             tufte_style=tufte_style,
         )
-    except Exception as exc:
-        typer.echo(f"Something went wrong in plotting the data: {str(exc)}")
+    except Exception as exception:
+        print(f"{ERROR_IN_PLOTTING_DATA} : {exception}")
         raise SystemExit(33)
 
 
@@ -253,17 +316,17 @@ def uniplot(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    time_series_2: Annotated[Path, typer_option_time_series] = None,
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
-    lines: bool = True,
-    title: str = 'Uniplot',
-    unit: str = UNITS_NAME,  #" °C")
+    lines: Annotated[bool, typer_option_uniplot_lines] = True,
+    title: Annotated[str, typer_option_uniplot_title] = None,
+    unit: Annotated[str, typer_option_uniplot_unit] = UNITS_NAME,  #" °C")
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot time series in the terminal"""
@@ -277,8 +340,21 @@ def uniplot(
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
         mask_and_scale=mask_and_scale,
-        nearest_neighbor_lookup=nearest_neighbor_lookup,
-        inexact_matches_method=inexact_matches_method,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        # in_memory=in_memory,
+        verbose=verbose,
+    )
+    data_array_2 = select_time_series(
+        time_series=time_series_2,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         # in_memory=in_memory,
         verbose=verbose,
@@ -289,13 +365,16 @@ def uniplot(
 
     if isinstance(data_array, xr.DataArray):
         supertitle = f'{data_array.long_name}'
+        label = f'{data_array.name}'
+        label_2 = f'{data_array_2.name}' if data_array_2 is not None else None
         unit = data_array.units
         plot(
             # x=data_array,
             # xs=data_array,
-            ys=data_array,
+            ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
+            legend_labels = [label, label_2],
             lines=lines,
-            title=supertitle,
+            title=supertitle if not title else title,
             y_unit=' ' + unit,
         )
 

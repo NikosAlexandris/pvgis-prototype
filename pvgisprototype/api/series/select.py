@@ -27,14 +27,15 @@ def select_time_series(
     end_time: Optional[datetime] = None,
     # convert_longitude_360: bool = False,
     mask_and_scale: bool = False,
-    nearest_neighbor_lookup: bool = False,
-    inexact_matches_method: MethodsForInexactMatches = MethodsForInexactMatches.nearest,
+    neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = 0.1, # Customize default if needed
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Select location series"""
+    if time_series is None:
+        return None
 
     # if convert_longitude_360:
     #     longitude = longitude % 360
@@ -60,7 +61,7 @@ def select_time_series(
         time_series=time_series,
         longitude=longitude,
         latitude=latitude,
-        inexact_matches_method=inexact_matches_method,
+        neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         verbose=verbose,
@@ -71,42 +72,32 @@ def select_time_series(
 
         if start_time and not end_time:  # set `end_time` to end of series
             end_time = location_time_series.time.values[-1]
-            # end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
 
         elif end_time and not start_time:  # set `start_time` to beginning of series
             start_time = location_time_series.time.values[0]
-            # start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
 
         else:  # Convert `start_time` & `end_time` to the correct string format
-            # if isinstance(start_time, datetime):
             start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-            # if isinstance(end_time, datetime):
             end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
     
         location_time_series = (
             location_time_series.sel(time=slice(start_time, end_time))
         )
 
-    
-    # if 'timestamps' is a single datetime object, parse it
-    if isinstance(timestamps, datetime):
-        timestamps = parse_timestamp_series(timestamps)
+    # # if 'timestamps' is a single datetime object, parse it
+    # if isinstance(timestamps, datetime):
+    #     timestamps = parse_timestamp_series(timestamps)
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
             start_time = end_time = timestamps[0]
         
-        if not nearest_neighbor_lookup:
-            inexact_matches_method = None
         try:
             location_time_series = (
-                location_time_series.sel(time=timestamps, method=inexact_matches_method)
-                # location_time_series.sel(
-                #     time=slice(start_time, end_time), method=inexact_matches_method
-                # )
+                location_time_series.sel(time=timestamps, method=neighbor_lookup)
             )
         except KeyError:
-            print("No data found for one or more of the given timestamps.")
+            print(f"No data found for one or more of the given {timestamps}.")
 
     if location_time_series.size == 1:
         single_value = float(location_time_series.values)
@@ -128,26 +119,9 @@ def select_time_series(
         if verbose == 3:
             debug(locals())
 
-        return single_value
-
-    # if output_filename:
-    #     output_filename = Path(output_filename)
-    #     extension = output_filename.suffix.lower()
-
-    #     if extension.lower() == '.nc':
-    #         location_time_series.to_time_series(output_filename)
-
-    #     elif extension.lower() == '.csv':
-    #         location_time_series.to_pandas().to_csv(output_filename)
-
-    #     else:
-    #         raise ValueError(f'Unsupported file extension: {extension}')
+        # return single_value
 
     if verbose > 5:
         debug(locals())
 
-    if verbose > 0:
-        print(f'Series : {location_time_series.values}')
-
     return location_time_series
-

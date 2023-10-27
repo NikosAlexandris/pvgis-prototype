@@ -1,7 +1,7 @@
 from devtools import debug
 from datetime import datetime
-from ..api.utilities.conversions import convert_to_degrees_if_requested
-from ..api.utilities.conversions import round_float_values
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import round_float_values
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -363,12 +363,16 @@ def print_irradiance_table_2(
     timestamps: datetime = [datetime.now()],
     dictionary: dict = dict(),
     title: str ='Irradiance series',
-    rounding_places: int = 5,
+    rounding_places: int = ROUNDING_PLACES_DEFAULT,
     verbose=1,
+    index: bool = False,
 ):
     console = Console()
     table = Table(title=title, box=box.SIMPLE_HEAD)
     
+    if index:
+        table.add_column("Index")
+
     # base columns
     if verbose > 0:
         if longitude:
@@ -393,14 +397,20 @@ def print_irradiance_table_2(
     zipped_series = zip(*dictionary.values())
     zipped_data = zip(timestamps, zipped_series)
     
+
     # Populate table
+    index_counter = 1
     for timestamp, values in zipped_data:
         row = []
+
+        if index:
+            row.append(str(index_counter))
+            index_counter += 1
+
         if verbose > 0 and longitude and latitude:
-            row = [
-                round_float_values(longitude, rounding_places),
-                round_float_values(latitude, rounding_places),
-            ]
+            row.append(round_float_values(longitude, rounding_places))
+            row.append(round_float_values(latitude, rounding_places))
+
         from pandas import to_datetime
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
         for value in values:

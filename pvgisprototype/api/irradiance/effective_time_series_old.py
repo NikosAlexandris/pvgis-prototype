@@ -6,8 +6,11 @@ from typing import List
 from typing import Optional
 import math
 import numpy as np
+import typer
 from enum import Enum
 from rich import print
+
+
 from datetime import datetime
 from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
@@ -33,43 +36,88 @@ from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_a
 from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_elevation
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
+from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_frequency
+from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_temperature_time_series
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_time_series
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
+from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
+from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_albedo
 from pvgisprototype.constants import ALBEDO_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_angle_units
+from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
+from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_efficiency
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_pv_module_efficiency_algorithm
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_statistics
+from pvgisprototype.cli.typer_parameters import typer_option_csv
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.efficiency_time_series import calculate_pv_efficiency_time_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import EFFECTIVE_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
-from pvgisprototype.constants import ALGORITHM_COLUMN_NAME
-from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
-from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
+
+
+# app = typer.Typer(
+#     cls=OrderCommands,
+#     add_completion=True,
+#     add_help_option=True,
+#     rich_markup_mode="rich",
+#     help=f"Estimate the effective irradiance incident on a surface over a time series ",
+# )
 
 
 def is_surface_in_shade_time_series(input_array, threshold=10):
@@ -87,54 +135,57 @@ def is_surface_in_shade_time_series(input_array, threshold=10):
     return np.full(input_array.size, False)
 
 
-# @app.callback(
-#     'effective-time-series',
-#    invoke_without_command=True,
-#    no_args_is_help=True,
-#    # context_settings={"ignore_unknown_options": True},
-#    help=f'Calculate the clear-sky ground reflected irradiance',
-# )
+@app.callback(
+    'effective-time-series',
+   invoke_without_command=True,
+   no_args_is_help=True,
+   # context_settings={"ignore_unknown_options": True},
+   help=f'Calculate the clear-sky ground reflected irradiance',
+)
 def calculate_effective_irradiance_time_series(
-    longitude: float,
-    latitude: float,
-    elevation: float,
-    timestamps: Optional[datetime] = None,
-    start_time: Optional[datetime] = None,
-    frequency: Optional[str] = None,
-    end_time: Optional[datetime] = None,
-    timezone: Optional[str] = None,
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_time_series: bool = False,
-    global_horizontal_component: Optional[Path] = None,
-    direct_horizontal_component: Optional[Path] = None,
-    temperature_series: float = 25,
-    wind_speed_series: float = 0,
-    mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
-    in_memory: bool = False,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: List[float] = None,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Optional[bool] = True,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = 2,
-    apply_angular_loss_factor: Optional[bool] = True,
-    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
-    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
-    solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = 'minutes',
-    angle_units: str = RADIANS,
-    angle_output_units: str = RADIANS,
-    # horizon_heights: List[float] = None,
-    system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
-    efficiency_model: PVModuleEfficiencyAlgorithms = None,
-    efficiency: Optional[float] = None,
-    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    global_horizontal_component: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
+    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    temperature_series: Annotated[float, typer_argument_temperature_time_series] = 25,
+    wind_speed_series: Annotated[float, typer_argument_wind_speed_time_series] = 0,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: Annotated[Optional[float], typer_option_albedo] = 2,
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
+    system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
+    efficiency_model: Annotated[PVModuleEfficiencyAlgorithms, typer_option_pv_module_efficiency_algorithm] = None,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = None,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
@@ -245,7 +296,6 @@ def calculate_effective_irradiance_time_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-            neighbor_lookup=neighbor_lookup,
             verbose=0,  # no verbosity here by choice!
         )[
             mask_above_horizon
@@ -315,60 +365,86 @@ def calculate_effective_irradiance_time_series(
     )
 
     # Reporting --------------------------------------------------------------
-
     results = {
-        EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
+        "Effective": effective_irradiance_series,
     }
     title = 'Effective'
     
     if verbose > 2:
         more_extended_results = {
             # "Global*": global_irradiance_series * efficiency_coefficient_series,
-            EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_irradiance_series * efficiency_coefficient_series,
-            EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series * efficiency_coefficient_series,
-            EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series * efficiency_coefficient_series,
+            "Direct*": direct_irradiance_series * efficiency_coefficient_series,
+            "Diffuse*": diffuse_irradiance_series * efficiency_coefficient_series,
+            "Reflected*": reflected_irradiance_series * efficiency_coefficient_series,
             # "Shade": in_shade,
         }
         results = results | more_extended_results
 
     if verbose > 1:
         extended_results = {
-            EFFICIENCY_COLUMN_NAME: efficiency_coefficient_series,
-            ALGORITHM_COLUMN_NAME: efficiency_model.value if efficiency_model else NOT_AVAILABLE,
-            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
-            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,
-            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
+            "Efficiency": efficiency_coefficient_series,
+            "Algorithm": efficiency_model.value if efficiency_model else NOT_AVAILABLE,
+            "Global": global_irradiance_series,
+            "Direct": direct_irradiance_series,
+            "Diffuse": diffuse_irradiance_series,
+            "Reflected": reflected_irradiance_series,
         }
         results = results | extended_results
         title += ' & in-plane components'
 
     if verbose > 3:
         even_more_extended_results = {
-            TEMPERATURE_COLUMN_NAME: temperature_series,
-            WIND_SPEED_COLUMN_NAME: wind_speed_series,
+            "Temperature": temperature_series,
+            "Wind speed": wind_speed_series,
         }
         results = results | even_more_extended_results
 
     if verbose > 4:
         and_even_more_extended_results = {
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
-            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
-            ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
-            LOW_ANGLE_COLUMN_NAME: mask_low_angle,
-            BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
-            SHADE: in_shade,
+            "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            "🧭 Orientation": convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+            "Above horizon": mask_above_horizon,
+            "Low angle": mask_low_angle,
+            "Below horizon": mask_below_horizon,
+            "Shade": in_shade,
         }
         results = results | and_even_more_extended_results
 
-    if verbose == 6:
+    if verbose == 7:
         results = {
-            EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
+            "Effective": effective_irradiance_series,
         }
         title = 'Effective'
         longitude = latitude = None
 
-    if verbose > 6:
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+
+    if verbose > 5:
         debug(locals())
 
-    return effective_irradiance_series, results, title
+    print_irradiance_table_2(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        dictionary=results,
+        title=title + f' irradiance series {IRRADIANCE_UNITS}',
+        rounding_places=rounding_places,
+        verbose=verbose,
+    )
+    if statistics:
+        print_series_statistics(
+            data_array=effective_irradiance_series,
+            timestamps=timestamps,
+            title="Effective irradiance",
+        )
+    if csv:
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            filename=csv,
+        )
+
+    return results
