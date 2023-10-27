@@ -45,6 +45,8 @@ from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
@@ -106,6 +108,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import RADIANS
@@ -136,7 +139,7 @@ def is_surface_in_shade_time_series(input_array, threshold=10):
 
 
 @app.callback(
-    'global-time-series',
+   'global-time-series',
    invoke_without_command=True,
    no_args_is_help=True,
    # context_settings={"ignore_unknown_options": True},
@@ -156,15 +159,14 @@ def calculate_global_irradiance_time_series(
     temperature_series: Annotated[float, typer_argument_temperature_time_series] = 25,
     wind_speed_series: Annotated[float, typer_argument_wind_speed_time_series] = 0,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
-    nearest_neighbor_lookup: Annotated[bool, typer_option_nearest_neighbor_lookup] = False,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
     linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = 1.5853349194640094,  # radians
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
@@ -173,8 +175,8 @@ def calculate_global_irradiance_time_series(
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
     hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
@@ -183,7 +185,14 @@ def calculate_global_irradiance_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = False,
+    index: Annotated[bool, typer_option_index] = False,
 ):
+    """Calculate the global horizontal irradiance (GHI)
+
+    The global horizontal irradiance represents the total amount of shortwave
+    radiation received from above by a surface horizontal to the ground. It
+    includes both the direct and the diffuse solar radiation.
+    """
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -239,8 +248,7 @@ def calculate_global_irradiance_time_series(
                 random_time_series=random_time_series,
                 direct_horizontal_component=direct_horizontal_irradiance,
                 mask_and_scale=mask_and_scale,
-                nearest_neighbor_lookup=nearest_neighbor_lookup,
-                inexact_matches_method=inexact_matches_method,
+                neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
                 in_memory=in_memory,
                 surface_tilt=surface_tilt,
@@ -336,11 +344,21 @@ def calculate_global_irradiance_time_series(
         + diffuse_irradiance_series
         + reflected_irradiance_series
     )
+    # Warning
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+    out_of_range_indices = np.where(
+        (global_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (global_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    )
+    if out_of_range_indices[0].size > 0:
+        print(
+                f"[red on white]{WARNING_OUT_OF_RANGE_VALUES} in `global_irradiance_series` : {out_of_range_indices[0]}![/red on white]"
+        )
 
-    if np.any(global_irradiance_series < -4):
-        print("[red]Warning: I found some values out of the expected range [-4, ] in `direct_normal_irradiance_series`![/red]")
+    # Reporting =============================================================
 
-    # Reporting --------------------------------------------------------------
     results = {
             "Global": global_irradiance_series,
     }
@@ -390,6 +408,7 @@ def calculate_global_irradiance_time_series(
         dictionary=results,
         title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
 
@@ -403,9 +422,11 @@ def calculate_global_irradiance_time_series(
     global_irradiance_data_array.attrs['long_name'] = 'Effective Solar Irradiance'
 
     if statistics:
-        data_statistics = calculate_series_statistics(global_irradiance_data_array)
-        print_series_statistics(data_statistics)
-
+        print_series_statistics(
+            data_array=global_irradiance_data_array,
+            timestamps=timestamps,
+            title="Global irradiance",
+        )
     if csv:
         write_irradiance_csv(
             longitude=longitude,

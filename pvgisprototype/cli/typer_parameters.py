@@ -7,27 +7,26 @@ from typing import List
 # from typing import Path
 from datetime import datetime
 from pathlib import Path
-from ..api.utilities.conversions import convert_to_radians
-from ..api.utilities.timestamp import now_utc_datetimezone
-from ..api.utilities.timestamp import ctx_attach_requested_timezone
-from ..api.utilities.timestamp import ctx_convert_to_timezone
-from ..api.utilities.timestamp import now_local_datetimezone
-from ..api.utilities.timestamp import convert_hours_to_datetime_time
-from ..api.utilities.timestamp import callback_generate_datetime_series
-from ..api.utilities.timestamp import parse_timestamp_series
-from .rich_help_panel_names import rich_help_panel_advanced_options
-# from .rich_help_panel_names import rich_help_panel_geometry_time
-# from .rich_help_panel_names import rich_help_panel_geometry_position
-# from .rich_help_panel_names import rich_help_panel_geometry_refraction
-from .rich_help_panel_names import rich_help_panel_geometry_surface
-from .rich_help_panel_names import rich_help_panel_solar_position
-from .rich_help_panel_names import rich_help_panel_solar_time
-from .rich_help_panel_names import rich_help_panel_earth_orbit
-from .rich_help_panel_names import rich_help_panel_atmospheric_properties
-from .rich_help_panel_names import rich_help_panel_output
-from .rich_help_panel_names import rich_help_panel_time_series
-from .rich_help_panel_names import rich_help_panel_efficiency
-from .rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
+from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.api.utilities.timestamp import now_local_datetimezone
+from pvgisprototype.api.utilities.timestamp import convert_hours_to_datetime_time
+from pvgisprototype.api.utilities.timestamp import callback_generate_datetime_series
+from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series_selection
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_plotting
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.constants import LATITUDE_MINIMUM
 from pvgisprototype.constants import LATITUDE_MAXIMUM
@@ -44,7 +43,6 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_MINIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_MAXIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT_MINIMUM
-# from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -54,10 +52,7 @@ from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
-# from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-# from pvgisprototype.constants import MEAN_GROUND_ALBEDO_DEFAULT
-# from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import OpticalAirMass
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
@@ -142,14 +137,16 @@ typer_argument_area = typer.Argument(
 
 # When?
 
+timestamp_typer_help = "Quoted date-time string of data to extract from series, example: [yellow]'2112-12-21 21:12:12'[/yellow]'"
 typer_argument_timestamp = typer.Argument(
-    help='Timestamp of data to extract from series. [yellow]Use quotes for a date-time string![/yellow]',
+    help=timestamp_typer_help,
     callback=ctx_attach_requested_timezone,
     # rich_help_panel=rich_help_panel_time_series,
     default_factory=now_utc_datetimezone,
 )
+timestamps_typer_help = "Quoted date-time strings of data to extract from series, example: [yellow]'2112-12-21, 2112-12-21 12:21:21, 2112-12-21 21:12:12'[/yellow]'"
 typer_argument_timestamps = typer.Argument(
-    help='Timestamps',
+    help=timestamps_typer_help,
     parser=parse_timestamp_series,
     callback=callback_generate_datetime_series,
 #     default_factory=now_utc_datetimezone_series,
@@ -202,47 +199,45 @@ typer_option_random_days = typer.Option(
     help='Generate random days to demonstrate calculation',
     # default_factory=RANDOM_DAY_FLAG_DEFAULT,
 )
-# day_of_year: Annotated[float, typer.Argument(
-#     min=1,
-#     max=366,
-#     help='Day of year')] = None,
 
 # Time series
 
+time_series_typer_help='A time series dataset (any format supported by Xarray)'
 typer_argument_time_series = typer.Argument(
     show_default=False,
-    help='Input time series data file (any format supported by Xarray)',
+    help=time_series_typer_help,
+    # rich_help_panel=rich_help_panel_time_series,
+)
+typer_option_time_series = typer.Option(
+    show_default=False,
+    help=time_series_typer_help,
     rich_help_panel=rich_help_panel_time_series,
-        )
+)
 typer_option_mask_and_scale = typer.Option(
     help="Mask and scale the series",
     rich_help_panel=rich_help_panel_time_series,
     # default_factory=False,
 )
-# Rename to nearest_neighbor_method ?
 typer_option_nearest_neighbor_lookup = typer.Option(
-    '--nearest_neighbor_lookup',
-    help='Enable nearest neighbor (inexact) lookups by use of the methods `pad`, `backfill` or `nearest`',
-    show_default=True,
-    show_choices=True,
-    rich_help_panel=rich_help_panel_time_series,
-    # default_factory=False,
-)
-typer_option_inexact_matches_method = typer.Option(
-    '--method-for-inexact-matches',
-    '-m',
-    help='Method for nearest neighbor (inexact) lookups',
+    help='Enable nearest neighbor (inexact) lookups. Read Xarray manual on [underline]nearest-neighbor-lookups[/underline]',
     show_default=True,
     show_choices=True,
     case_sensitive=False,
-    rich_help_panel=rich_help_panel_time_series,
+    rich_help_panel=rich_help_panel_time_series_selection,
+    # default_factory=None, # default_factory=MethodsForInexactMatches.nearest,
+)
+typer_option_inexact_matches_method = typer.Option(
+    help='Method for nearest neighbor (inexact) lookups. Read Xarray manual on [underline]nearest-neighbor-lookups[/underline]',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_time_series_selection,
     # default_factory=MethodsForInexactMatches.nearest,
 )
 typer_option_tolerance = typer.Option(
-    # help=f'Maximum distance between original and new labels for inexact matches. See nearest-neighbor-lookups Xarray documentation',
-    # help=f'Maximum distance between original and new labels for inexact matches. See [nearest-neighbor-lookups](https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups) @ Xarray documentation',
-    help=f'Maximum distance between original & new labels for inexact matches. See https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups',
-    rich_help_panel=rich_help_panel_time_series,
+    help=f'Maximum distance between original & new labels for inexact matches. Read Xarray manual on [underline]nearest-neighbor-lookups[/underline]',
+    #  https://docs.xarray.dev/en/stable/user-guide/indexing.html#nearest-neighbor-lookups',
+    rich_help_panel=rich_help_panel_time_series_selection,
     # default_factory=0.1,
 )
 
@@ -272,7 +267,7 @@ typer_option_solar_declination_model = typer.Option(
     rich_help_panel=rich_help_panel_solar_position,
 )
 
-solar_constant_typer_help='Top-of-Atmosphere mean solar electromagnetic radiation (W/m2) 1 au (astronomical unit) away from the Sun.'  #  (~1360.8 W/m2)
+solar_constant_typer_help='Top-of-Atmosphere mean solar electromagnetic radiation (W/m-2) 1 au (astronomical unit) away from the Sun.'  #  (~1360.8 W/m2)
 typer_argument_solar_constant = typer.Argument(
     help=solar_constant_typer_help,
     min=SOLAR_CONSTANT_MINIMUM,
@@ -474,7 +469,6 @@ typer_option_linke_turbidity_factor = typer.Option(
 
 
 def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):
-    print(f'Value for Linke Turbidity : {linke_turbidity_factor_input}')
     if isinstance(linke_turbidity_factor_input, str):
         linke_turbidity_factor_strings = linke_turbidity_factor_input.split(',')
         return linke_turbidity_factor_strings
@@ -508,7 +502,6 @@ typer_option_linke_turbidity_factor_series = typer.Option(
 ## Optical air mass
 
 def parse_optical_air_mass(optical_air_mass_input: str):
-    print(f'Value for Optical Air Mass : {optical_air_mass_input}')
     if isinstance(optical_air_mass_input, str):
         optical_air_mass_strings = optical_air_mass_input.split(',')
         return optical_air_mass_strings
@@ -543,7 +536,6 @@ def parse_optical_air_mass_series(optical_air_mass_factor_input: str) -> List[fl
 
 def optical_air_mass_series_callback(value: str, ctx: Context):
     """Callback to handle the optical air mass series input or provide a default series."""
-    print(f'Input value for Optical Air Mass : {value}')
     if value:
         parsed_values = parse_optical_air_mass_series(value)
         return [OpticalAirMass(value=lt, unit=OPTICAL_AIR_MASS_UNIT) for lt in parsed_values]
@@ -580,8 +572,15 @@ typer_option_albedo = typer.Option(
 
 # Solar irradiance
 
-typer_argument_shortwave_irradiance = typer.Argument(
-    help='Global horizontal irradiance (Surface Incoming Shortwave Irradiance (SIS), `ssrd`',
+global_horizontal_irradiance_typer_help='Global horizontal irradiance (Surface Incoming Shortwave Irradiance (SIS), `ssrd`'
+typer_argument_global_horizontal_irradiance = typer.Argument(
+    help=global_horizontal_irradiance_typer_help,
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
+typer_option_global_horizontal_irradiance = typer.Option(
+    # help=global_horizontal_irradiance_typer_help,
+    rich_help_panel=rich_help_panel_series_irradiance,
+    # default_factory = Path(),
 )
 direct_horizontal_irradiance_typer_help='Direct (or beam) horizontal irradiance (Surface Incoming Direct radiation (SID), `fdir`'
 typer_argument_direct_horizontal_irradiance = typer.Argument(
@@ -652,7 +651,15 @@ typer_option_verbose = typer.Option(
     rich_help_panel=rich_help_panel_output,
     # default_factory=0,
 )
-
+typer_option_index = typer.Option(
+    '--index',
+    '-idx',
+    help="Index rows in output table",
+    show_default=True,
+    show_choices=True,
+    rich_help_panel=rich_help_panel_output,
+    # default_factory=False,
+)
 typer_option_rounding_places = typer.Option(
     '--rounding-places',
     '-r',
@@ -742,6 +749,20 @@ typer_option_in_memory = typer.Option(
     # default_factory=False
 )
 
+# Plotting
+
+typer_option_uniplot_lines = typer.Option(
+    help='Symbol for plotting data points with uniplot',
+    rich_help_panel=rich_help_panel_plotting,
+)
+typer_option_uniplot_title = typer.Option(
+    help='Title for the Uniplot',
+    rich_help_panel=rich_help_panel_plotting,
+)
+typer_option_uniplot_unit = typer.Option(
+    help='Unit for the Uniplot',
+    rich_help_panel=rich_help_panel_plotting,
+)
 typer_option_tufte_style = typer.Option(
     help='Use Tufte-style in the output',  # You may need to customize the help text
     # default_factory=False

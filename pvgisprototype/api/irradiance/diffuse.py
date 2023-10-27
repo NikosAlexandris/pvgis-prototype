@@ -20,9 +20,9 @@ from rich import print
 from rich.console import Console
 from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
-from ..series.statistics import calculate_series_statistics
-from ..series.statistics import print_series_statistics
-from ..series.statistics import export_statistics_to_csv
+from pvgisprototype.api.series.statistics import calculate_series_statistics
+from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.api.series.statistics import export_statistics_to_csv
 from pathlib import Path
 import numpy as np
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
@@ -46,7 +46,7 @@ from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_time_series
-from pvgisprototype.cli.typer_parameters import typer_argument_shortwave_irradiance
+from pvgisprototype.cli.typer_parameters import typer_argument_global_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degrees
@@ -108,7 +108,7 @@ console = Console()
     rich_help_panel=rich_help_panel_series_irradiance,
 )
 def calculate_diffuse_horizontal_component_from_sarah(
-    shortwave: Annotated[Path, typer_argument_shortwave_irradiance],
+    shortwave: Annotated[Path, typer_argument_global_horizontal_irradiance],
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
@@ -137,68 +137,67 @@ def calculate_diffuse_horizontal_component_from_sarah(
     -------
     diffuse_irradiance: float
         The diffuse radiant flux incident on a surface per unit area in W/m².
-
-    Notes
-    -----
-
-    Some of the input arguments to ... in PVGIS' C code:
-
-        # daily_prefix,
-        # database_prefix,
-        # num_vals_to_read,
-        # elevation_file_number_ns,
-        # elevation_file_number_ew,
     """
-#     global_data_array = xr.open_dataarray(shortwave)  # global is a reserved word!
-    global_irradiance_location_time_series = select_location_time_series(
-        shortwave, longitude, latitude
+    global_horizontal_irradiance_location_time_series = select_location_time_series(
+        shortwave, longitude, latitude  # global is a reserved word!
     )
-    global_irradiance_location_time_series.load()  # load into memory for fast processing
-    direct_irradiance_location_time_series = select_location_time_series(
+    global_horizontal_irradiance_location_time_series.load()  # load into memory for fast processing
+    direct_horizontal_irradiance_location_time_series = select_location_time_series(
         direct, longitude, latitude
     )
-    direct_irradiance_location_time_series.load()
+    direct_horizontal_irradiance_location_time_series.load()
 
     # ------------------------------------------------------------------------
     if start_time or end_time:
         timestamp = None  # we don't need a timestamp anymore!
 
         if start_time and not end_time:  # set `end_time` to end of series
-            end_time = direct_irradiance_location_time_series.time.values[-1]
-            # end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
+            end_time = direct_horizontal_irradiance_location_time_series.time.values[
+                -1
+            ]  #
+            # assuming it'd be identical reading global_horizontal_irradiance_location_time_series
 
         elif end_time and not start_time:  # set `start_time` to beginning of series
-            start_time = direct_irradiance_location_time_series.time.values[0]
-            # start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
+            start_time = direct_horizontal_irradiance_location_time_series.time.values[
+                0
+            ]
+            # assuming it'd be identical reading global_horizontal_irradiance_location_time_series
 
         else:  # Convert `start_time` & `end_time` to the correct string format
-            # if isinstance(start_time, datetime):
-            start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-            # if isinstance(end_time, datetime):
-            end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
-    
-        global_irradiance_location_time_series = (
-            global_irradiance_location_time_series.sel(time=slice(start_time, end_time))
+            start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
+            end_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        global_horizontal_irradiance_location_time_series = (
+            global_horizontal_irradiance_location_time_series.sel(
+                time=slice(start_time, end_time)
+            )
         )
-        direct_irradiance_location_time_series = (
-            direct_irradiance_location_time_series.sel(time=slice(start_time, end_time))
+        direct_horizontal_irradiance_location_time_series = (
+            direct_horizontal_irradiance_location_time_series.sel(
+                time=slice(start_time, end_time)
+            )
         )
 
     if timestamp and not start_time and not end_time:
         # convert timestamp to ISO format string without fractional seconds
-        time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        time = timestamp.strftime("%Y-%m-%d %H:%M:%S")
         if not nearest_neighbor_lookup:
             inexact_matches_method = None
-        global_irradiance_location_time_series = (
-            global_irradiance_location_time_series.sel(time=time, method=inexact_matches_method)
+        global_horizontal_irradiance_location_time_series = (
+            global_horizontal_irradiance_location_time_series.sel(
+                time=time, method=inexact_matches_method
+            )
         )
-        direct_irradiance_location_time_series = (
-            direct_irradiance_location_time_series.sel(time=time, method=inexact_matches_method)
+        direct_horizontal_irradiance_location_time_series = (
+            direct_horizontal_irradiance_location_time_series.sel(
+                time=time, method=inexact_matches_method
+            )
         )
     # ------------------------------------------------------------------------
 
     diffuse_horizontal_irradiance = (
-        global_irradiance_location_time_series - direct_irradiance_location_time_series
+        global_horizontal_irradiance_location_time_series
+        - direct_horizontal_irradiance_location_time_series
     )
 
     if diffuse_horizontal_irradiance.size == 1:
@@ -211,7 +210,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
             + Fore.YELLOW
             + f" matches the single value "
             + Fore.GREEN
-            + f'{single_value}'
+            + f"{single_value}"
             + Style.RESET_ALL
         )
         logging.warning(warning)
@@ -229,14 +228,17 @@ def calculate_diffuse_horizontal_component_from_sarah(
     # statistics after echoing series which might be Long!
     if statistics:
         data_statistics = calculate_series_statistics(diffuse_horizontal_irradiance)
-        print_series_statistics(data_statistics, title='Diffuse horizontal irradiance from SARAH')
+        print_series_statistics(
+            data_statistics, title="Diffuse horizontal irradiance from SARAH"
+        )
         if csv:
-            export_statistics_to_csv(data_statistics, 'diffuse_horizontal_irradiance')
+            export_statistics_to_csv(data_statistics, "diffuse_horizontal_irradiance")
 
     if verbose == 3:
         debug(locals())
+
     if verbose > 0:
-        print(f'Series : {location_time_series.values}')
+        print(f"Series : {diffuse_horizontal_irradiance.values}")
 
     return diffuse_horizontal_irradiance
 
@@ -269,15 +271,15 @@ def calculate_term_n(
     
 
 @app.command(
-        'sky-irradiance',
-        no_args_is_help=True,
-        help=f'⇊ Calculate the diffuse sky irradiance',
-        rich_help_panel=rich_help_panel_series_irradiance,
-        )
+    "sky-irradiance",
+    no_args_is_help=True,
+    help=f"⇊ Calculate the diffuse sky irradiance",
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
 def calculate_diffuse_sky_irradiance(
-        n: Annotated[float, typer_argument_term_n],
-        surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
-        ):
+    n: Annotated[float, typer_argument_term_n],
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
+):
     """Calculate the diffuse sky irradiance
 
     The diffuse sky irradiance function F(γN) depends on the surface tilt `γN`
@@ -304,10 +306,8 @@ def calculate_diffuse_sky_irradiance(
     diffuse_sky_irradiance = sky_view_fraction
     +(
         sin(surface_tilt)
-        - surface_tilt
-        * cos(surface_tilt)
-        - pi
-        * sin(surface_tilt / 2) ** 2
+        - surface_tilt * cos(surface_tilt)
+        - pi * sin(surface_tilt / 2) ** 2
     ) * n
 
     return diffuse_sky_irradiance
