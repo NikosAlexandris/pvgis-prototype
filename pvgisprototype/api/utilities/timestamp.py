@@ -61,17 +61,17 @@ from rich import print
 import numpy as np
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 import time
+from functools import wraps
 
 
-# Timing
-
-def time_function(func):
+def timer(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print(f"'{func.__name__}' executed in {elapsed_time:.6f} seconds")
+        print(f"'{func.__name__}' executed in {elapsed_time:.6f} seconds (or {elapsed_time:.2f} seconds).")
         return result
     return wrapper
 
