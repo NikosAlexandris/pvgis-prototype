@@ -84,3 +84,8 @@ class SolarZenithSeriesModel(BaseModel):  # merge above here-in
     # solar_zenith_series: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
     solar_zenith_series: SolarZenith
 
+    @field_validator('solar_zenith_series')
+    def solar_zenith_range(cls, v):
+        if not np.all((0 <= v.radians) & (v.radians <= np.pi)):  # Adjust the condition to work with an array
+            raise ValueError("The solar zenith angle must be between 0 and pi radians.")
+        return v
