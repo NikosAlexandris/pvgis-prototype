@@ -4,8 +4,9 @@ from devtools import debug
 from pathlib import Path
 from pvgisprototype.constants import PARAMETERS_YAML_FILE
 import numpy as np
+from numpy import ndarray
 from pvgisprototype.constants import RADIANS, DEGREES
-from typing import Optional
+from typing import Union
 from datetime import timedelta
 from datetime import datetime
 from datetime import time
@@ -178,7 +179,7 @@ def generate_dataclass_models(yaml_file: str):
                 'timestamp': timestamp_property,
                 'as_hours': as_hours_property,
                 **default_values,
-            }
+            arbitrary_types_allowed=True,
         )
         globals()[model_name] = model_class
 
