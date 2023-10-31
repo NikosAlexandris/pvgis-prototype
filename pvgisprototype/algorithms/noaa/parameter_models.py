@@ -81,5 +81,5 @@ class SolarZenithModel(BaseModel):
 
 class SolarZenithSeriesModel(BaseModel):  # merge above here-in
     # solar_zenith_series: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
-    solar_zenith_series: Union[SolarZenith, Sequence[SolarZenith]]
+    solar_zenith_series: SolarZenith
 
