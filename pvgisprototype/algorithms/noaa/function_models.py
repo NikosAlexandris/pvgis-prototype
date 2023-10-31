@@ -98,18 +98,7 @@ class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
     SolarZenithSeriesModel,
     VerbosityModel,
 ):
-    # @field_validator('solar_zenith_series')
-    # def solar_zenith_range(cls, v):
-    #     v_array = np.atleast_1d(v)  # Ensure v is treated as an array
-    #     if not np.all((0 <= v_array) & (v_array <= np.pi)):  # Adjust the condition to work with an array
-    #         raise ValueError('solar_zenith must range within [0, π]')
-    #     return v  # Return the original value or array
-    @field_validator('solar_zenith_series')
-    def solar_zenith_range(cls, v):
-        v_values = np.array([zenith.value for zenith in np.atleast_1d(v)])  # Extract numerical values
-        if not np.all((0 <= v_values) & (v_values <= np.pi)):  # Adjust the condition to work with an array
-            raise ValueError("The solar zenith angle must be between 0 and pi radians.")
-        return v
+    pass
 
 
 class CalculateSolarZenithNOAAInput(
