@@ -229,7 +229,7 @@ def select(
         # )
         to_csv(
             x=location_time_series,
-            path=csv,
+            path=str(csv),
         )
 
 
