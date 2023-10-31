@@ -7,6 +7,7 @@ from typing import List
 # from typing import Path
 from datetime import datetime
 from pathlib import Path
+import numpy as np
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone

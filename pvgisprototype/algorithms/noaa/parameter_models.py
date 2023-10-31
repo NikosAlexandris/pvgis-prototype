@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from pydantic import confloat
 from pvgisprototype import SolarZenith
 from pvgisprototype.constants import RADIANS, DEGREES
+import numpy as np
 
 
 class BaseTimeEventModel(BaseModel):

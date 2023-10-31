@@ -1,4 +1,5 @@
 from devtools import debug
+from pandas import to_datetime
 from datetime import datetime
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import round_float_values
@@ -411,7 +412,6 @@ def print_irradiance_table_2(
             row.append(round_float_values(longitude, rounding_places))
             row.append(round_float_values(latitude, rounding_places))
 
-        from pandas import to_datetime
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
         for value in values:
             if not isinstance(value, str):
