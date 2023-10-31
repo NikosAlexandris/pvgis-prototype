@@ -43,8 +43,7 @@ def model_solar_incidence_time_series(
     time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-) -> List[SolarIncidence]:
-    pass
+) -> SolarIncidence:
 
     if solar_incidence_model.value == SolarIncidenceModels.jenco:
 
