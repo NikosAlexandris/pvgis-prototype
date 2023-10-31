@@ -313,11 +313,12 @@ class SolarHourAngleSeriesModel(BaseModel):
     def validate_solar_hour_angle(
         cls, input
     ) -> Union[SolarHourAngle, ndarray]:
+        if isinstance(input, SolarHourAngle):
             return input
-        elif isinstance(input, ndarray) and all(
-            isinstance(item, SolarHourAngle) for item in input
-        ):
-            return input
+        # elif isinstance(input, ndarray) and all(                          # FIXME: What else could be?
+        #     isinstance(item, SolarHourAngle) for item in input
+        # ):
+        #     return input
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_hour_angle_series`")
 
