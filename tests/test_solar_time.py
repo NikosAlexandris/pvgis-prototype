@@ -8,10 +8,10 @@ from datetime import timezone
 from zoneinfo import ZoneInfo
 from math import radians
 
-from pvgisprototype.api.geometry.solar_time import calculate_solar_time
-from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle
+from pvgisprototype.api.geometry.time import calculate_solar_time
+from pvgisprototype.api.geometry.hour_angle import calculate_solar_hour_angle
 from pvgisprototype import SolarHourAngle
-from pvgisprototype.api.geometry.solar_hour_angle import calculate_hour_angle_sunrise
+from pvgisprototype.api.geometry.hour_angle import calculate_event_hour_angle
 
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
@@ -304,10 +304,10 @@ tolerances = [
 @pytest.mark.parametrize("solar_time, expected", cases)
 @pytest.mark.parametrize("angle_output_units", units)
 @pytest.mark.parametrize("tolerance", tolerances)
-def test_calculate_hour_angle(solar_time, angle_output_units, expected, tolerance):
+def test_calculate_solar_hour_angle(solar_time, angle_output_units, expected, tolerance):
     # expected is a `time` object
     solar_time = time(hour=solar_time, minute=0, second=0) 
-    calculated = calculate_hour_angle(solar_time)
+    calculated = calculate_solar_hour_angle(solar_time)
     assert isinstance(calculated, SolarHourAngle)
     assert pytest.approx(expected, tolerance) == calculated.value
     assert angle_output_units == calculated.unit
@@ -315,13 +315,13 @@ def test_calculate_hour_angle(solar_time, angle_output_units, expected, toleranc
 
 @pytest.mark.mpl_image_compare
 @pytest.mark.parametrize("angle_output_units", units)
-def test_calculate_hour_angle_plot(angle_output_units):
+def test_calculate_solar_hour_angle_plot(angle_output_units):
     calculated_hour_angles = []
     expected_hour_angles = []
     for solar_time, expected_hour_angle in cases:
         # convert `solar_time` to seconds as expected
         solar_time_in_seconds = solar_time * 3600
-        calculated_hour_angle = calculate_hour_angle(
+        calculated_hour_angle = calculate_solar_hour_angle(
             solar_time=solar_time_in_seconds,
         )
         calculated_hour_angles.append(calculated_hour_angle.value)

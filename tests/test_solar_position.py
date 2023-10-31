@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
+from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
 from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
