@@ -68,8 +68,16 @@ from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
+from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
+from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
+from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
+# from pvgisprototype.constants import TEMPERATURE_COLUMN_NAME
+# from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
+# from pvgisprototype.constants import SHADE
 
 
 def is_surface_in_shade_time_series(input_array, threshold=10):
@@ -154,20 +162,18 @@ def calculate_effective_irradiance_time_series(
         # angle_output_units=angle_output_units,
         verbose=0,
     )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
-
     # Masks based on the solar altitude series
-    mask_above_horizon = solar_altitude_series_array > 0
-    mask_low_angle = (solar_altitude_series_array >= 0) & (solar_altitude_series_array < 0.04)
-    mask_below_horizon = solar_altitude_series_array < 0
-    in_shade = is_surface_in_shade_time_series(solar_altitude_series_array)
+    mask_above_horizon = solar_altitude_series.value > 0
+    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)      # FIXME: Is this in radians or degrees ?
+    mask_below_horizon = solar_altitude_series.value < 0
+    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
+    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
@@ -345,8 +351,8 @@ def calculate_effective_irradiance_time_series(
 
     if verbose > 3:
         even_more_extended_results = {
-            TEMPERATURE_COLUMN_NAME: temperature_series,
-            WIND_SPEED_COLUMN_NAME: wind_speed_series,
+            # TEMPERATURE_COLUMN_NAME: temperature_series,          # FIXME: Not defined
+            # WIND_SPEED_COLUMN_NAME: wind_speed_series,          # FIXME: Not defined
         }
         results = results | even_more_extended_results
 
@@ -357,7 +363,7 @@ def calculate_effective_irradiance_time_series(
             ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
             LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
-            SHADE: in_shade,
+            # SHADE: in_shade,                               # FIXME: Not defined
         }
         results = results | and_even_more_extended_results
 

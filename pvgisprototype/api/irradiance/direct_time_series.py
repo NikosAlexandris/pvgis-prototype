@@ -124,9 +124,9 @@ app = typer.Typer(
 
 
 def correct_linke_turbidity_factor_time_series(
-    linke_turbidity_factor_series: Union[ List[LinkeTurbidityFactor], LinkeTurbidityFactor] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-) -> Union[List[LinkeTurbidityFactor], LinkeTurbidityFactor]:
+) -> LinkeTurbidityFactor:
     """
     Vectorized function to calculate the air mass 2 Linke atmospheric turbidity factor for a time series.
 
@@ -138,86 +138,49 @@ def correct_linke_turbidity_factor_time_series(
     - List[LinkeTurbidityFactor] or LinkeTurbidityFactor: 
       The corrected Linke turbidity factors as a list of LinkeTurbidityFactor objects or a single object.
     """
-    is_scalar = False
-    if isinstance(linke_turbidity_factor_series, LinkeTurbidityFactor):
-        is_scalar = True
-        linke_turbidity_factor_series = [linke_turbidity_factor_series.value]
-    else:
-        linke_turbidity_factor_series = [factor.value for factor in linke_turbidity_factor_series]
-
-    # Convert to NumPy array
-    linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
-
     # Perform calculations
-    corrected_linke_turbidity_factors_array = -0.8662 * linke_turbidity_factor_series_array
+    corrected_linke_turbidity_factors_array = -0.8662 * linke_turbidity_factor_series.value
 
     if verbose > 5:
         debug(locals())
 
-    # Convert back to custom data class objects
-    if is_scalar:
-        return LinkeTurbidityFactor(value=corrected_linke_turbidity_factors_array[0], unit=LINKE_TURBIDITY_UNIT)
-    else:
-        return [LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_UNIT) for value in corrected_linke_turbidity_factors_array]
+    corrected_linke_turbidity_factors = LinkeTurbidityFactor(
+        value=corrected_linke_turbidity_factors_array,
+        unit=LINKE_TURBIDITY_UNIT,
+    )
+    return corrected_linke_turbidity_factors
 
 
 def calculate_refracted_solar_altitude_time_series(
-    solar_altitude_series,#: np.ndarray,
-    angle_input_units: str = DEGREES,
-    angle_output_units: str = RADIANS,
+    solar_altitude_series:SolarAltitude,
     verbose: int = 0,
-):
+) -> RefractedSolarAltitude:
     """Adjust the solar altitude angle for atmospheric refraction for a time series.
     
     Note
     ----
     This function is vectorized to handle arrays of solar altitudes.
     """
-    if angle_input_units != DEGREES:
-        raise ValueError("Only degrees are supported for angle_input_units.")
-
-    is_scalar = False
-    if isinstance(solar_altitude_series, SolarAltitude):
-        is_scalar = True
-        solar_altitude_series = [solar_altitude_series.degrees]
-    else:
-        solar_altitude_series = [altitude.degrees for altitude in solar_altitude_series]
-
-    # Unpack SolarAltitude objects to NumPy Arrays ----------------------- vvv
-    solar_altitude_series_array = np.array(solar_altitude_series)
-    # ------------------------------------------------------------------------
-
     atmospheric_refraction = (
         0.061359
         * (
             0.1594
-            + 1.123 * solar_altitude_series_array
-            + 0.065656 * np.power(solar_altitude_series_array, 2)
+            + 1.123 * solar_altitude_series.degrees
+            + 0.065656 * np.power(solar_altitude_series.degrees, 2)
         )
         / (
             1
-            + 28.9344 * solar_altitude_series_array
-            + 277.3971 * np.power(solar_altitude_series_array, 2)
+            + 28.9344 * solar_altitude_series.degrees
+            + 277.3971 * np.power(solar_altitude_series.degrees, 2)
         )
     )
     refracted_solar_altitude_series_array = (
-        solar_altitude_series_array + atmospheric_refraction
+        solar_altitude_series.degrees + atmospheric_refraction
     )
 
-    # Pack results back to SolarAltitude objects -----------------------------
-    if not is_scalar:
-        refracted_solar_altitude_series = [
-            RefractedSolarAltitude(value=value, unit=DEGREES)
-            for value in refracted_solar_altitude_series_array
-        ]
-    else:
-        refracted_solar_altitude_series = RefractedSolarAltitude(
-            value=refracted_solar_altitude_series_array[0], unit=DEGREES
-        )
-    # -------------------------------------------------------------------- ^^^
-    
-    refracted_solar_altitude_series = convert_series_to_radians_if_requested(
-        refracted_solar_altitude_series, angle_output_units
+    refracted_solar_altitude_series = RefractedSolarAltitude(
+        value=refracted_solar_altitude_series_array,
+        unit=DEGREES,
     )
 
     if verbose > 5:
@@ -229,31 +192,21 @@ def calculate_refracted_solar_altitude_time_series(
 @validate_with_pydantic(CalculateOpticalAirMassTimeSeriesInputModel)
 def calculate_optical_air_mass_time_series(
     elevation: Annotated[float, typer_argument_elevation],
-    refracted_solar_altitude_series: Union[RefractedSolarAltitude, Sequence[RefractedSolarAltitude]],
+    refracted_solar_altitude_series: RefractedSolarAltitude,
     verbose: Annotated[int, typer_option_verbose] = 0,
-)->List[OpticalAirMass]:
+) -> OpticalAirMass:
     """Vectorized function to approximate the relative optical air mass for a time series."""
-    is_scalar = False
-    if isinstance(refracted_solar_altitude_series, RefractedSolarAltitude):
-        is_scalar = True
-        refracted_solar_altitude_series = [refracted_solar_altitude_series.radians]
-    else:
-        refracted_solar_altitude_series = [altitude.radians for altitude in refracted_solar_altitude_series]
-    
-    # Unpack RefractedSolarAltitude objects to a NumPy array
-    refracted_solar_altitude_series_array = np.array(refracted_solar_altitude_series)
     adjusted_elevation = adjust_elevation(elevation.value)
     optical_air_mass_series = adjusted_elevation.value / (
-        np.sin(refracted_solar_altitude_series_array)
+        np.sin(refracted_solar_altitude_series.radians)
         + 0.50572
-        * np.power((refracted_solar_altitude_series_array + 6.07995), -1.6364)
+        * np.power((refracted_solar_altitude_series.radians + 6.07995), -1.6364)
     )
-    
-    # Repack results back into custom objects
-    if not is_scalar:
-        optical_air_mass_series = [OpticalAirMass(value=value, unit=OPTICAL_AIR_MASS_UNIT) for value in optical_air_mass_series]
-    else:
-        optical_air_mass_series = OpticalAirMass(value=optical_air_mass_series[0], unit=OPTICAL_AIR_MASS_UNIT)
+
+    optical_air_mass_series = OpticalAirMass(
+        value=optical_air_mass_series,
+        unit=OPTICAL_AIR_MASS_UNIT,
+    )
 
     if verbose > 5:
         debug(locals())
@@ -265,47 +218,29 @@ def calculate_optical_air_mass_time_series(
 
 
 def rayleigh_optical_thickness_time_series(
-    optical_air_mass_series: Union[List[OpticalAirMass], OpticalAirMass] = OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
+    optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-) -> List[RayleighThickness]:
+) -> RayleighThickness:
     """Vectorized function to calculate Rayleigh optical thickness for a time series."""
-    # Check if input is scalar or array-like
-    is_scalar = False
-    if isinstance(optical_air_mass_series, OpticalAirMass):
-        is_scalar = True
-        optical_air_mass_series = [optical_air_mass_series.value]
-    else:
-        optical_air_mass_series = [air_mass.value for air_mass in optical_air_mass_series]
-    
-    # Unpack OpticalAirMass objects to a NumPy array
-    optical_air_mass_series_array = np.array(optical_air_mass_series)
-    
     # Perform calculations
-    rayleigh_thickness_series_array = np.zeros_like(optical_air_mass_series_array)
-    smaller_than_20 = optical_air_mass_series_array <= 20
-    larger_than_20 = optical_air_mass_series_array > 20
+    rayleigh_thickness_series_array = np.zeros_like(optical_air_mass_series.value)
+    smaller_than_20 = optical_air_mass_series.value <= 20
+    larger_than_20 = optical_air_mass_series.value > 20
     rayleigh_thickness_series_array[smaller_than_20] = 1 / (
         6.6296
-        + 1.7513 * optical_air_mass_series_array[smaller_than_20]
-        - 0.1202 * np.power(optical_air_mass_series_array[smaller_than_20], 2)
-        + 0.0065 * np.power(optical_air_mass_series_array[smaller_than_20], 3)
-        - 0.00013 * np.power(optical_air_mass_series_array[smaller_than_20], 4)
+        + 1.7513 * optical_air_mass_series.value[smaller_than_20]
+        - 0.1202 * np.power(optical_air_mass_series.value[smaller_than_20], 2)
+        + 0.0065 * np.power(optical_air_mass_series.value[smaller_than_20], 3)
+        - 0.00013 * np.power(optical_air_mass_series.value[smaller_than_20], 4)
     )
     rayleigh_thickness_series_array[larger_than_20] = 1 / (
-        10.4 + 0.718 * optical_air_mass_series_array[larger_than_20]
+        10.4 + 0.718 * optical_air_mass_series.value[larger_than_20]
     )
-    
-    # Repack results back into custom objects
-    if not is_scalar:
-        rayleigh_thickness_series = [
-            RayleighThickness(value=value, unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT)
-            for value in rayleigh_thickness_series_array
-        ]
-    else:
-        rayleigh_thickness_series = RayleighThickness(
-            value=rayleigh_thickness_series_array[0],
-            unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
-        )
+
+    rayleigh_thickness_series = RayleighThickness(
+        value=rayleigh_thickness_series_array,
+        unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
+    )
 
     if verbose > 5:
         debug(locals())
@@ -333,7 +268,7 @@ def calculate_direct_normal_irradiance_time_series(
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
-):
+) -> np.array:
     """Calculate the direct normal irradiance (SID)
 
     The direct normal irradiance represents the amount of solar radiation
@@ -359,18 +294,13 @@ def calculate_direct_normal_irradiance_time_series(
         verbose=verbose,
     )
 
-    # Unpack custom objects into NumPy arrays
-    corrected_linke_turbidity_factor_series_array = np.array([clt.value for clt in corrected_linke_turbidity_factor_series])
-    optical_air_mass_series_array = np.array([oam.value for oam in optical_air_mass_series])
-    rayleigh_optical_thickness_series_array = np.array([rt.value for rt in rayleigh_optical_thickness_series])
-
     # Calculate
     direct_normal_irradiance_series = (
         extraterrestrial_normal_irradiance_series
         * np.exp(
-            corrected_linke_turbidity_factor_series_array
-            * optical_air_mass_series_array
-            * rayleigh_optical_thickness_series_array
+            corrected_linke_turbidity_factor_series.value
+            * optical_air_mass_series.value
+            * rayleigh_optical_thickness_series.value
         )
     )
     LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
@@ -391,10 +321,10 @@ def calculate_direct_normal_irradiance_time_series(
     if verbose > 1:
         extended_results = {
             "Extra. normal": extraterrestrial_normal_irradiance_series,
-            "Linke Adjusted": corrected_linke_turbidity_factor_series_array,
-            "Linke": np.array([lt.value for lt in linke_turbidity_factor_series]),
-            "Rayleigh": rayleigh_optical_thickness_series_array,
-            "Air mass": optical_air_mass_series_array,
+            "Linke Adjusted": corrected_linke_turbidity_factor_series.value,
+            "Linke": linke_turbidity_factor_series.value,
+            "Rayleigh": rayleigh_optical_thickness_series.value,
+            "Air mass": optical_air_mass_series.value,
         }
         results = results | extended_results
 
@@ -490,20 +420,13 @@ def calculate_direct_horizontal_irradiance_time_series(
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
     
     # expects solar altitude in degrees! ----------------------------------vvv
-    expected_solar_altitude_units = DEGREES
-    solar_altitude_series_in_degrees = convert_series_to_degrees_if_requested(
-        solar_altitude_series,
-        angle_output_units=expected_solar_altitude_units,  # Here!
-    )
 
     # refracted_solar_altitude, refracted_solar_altitude_units = calculate_refracted_solar_altitude(
     refracted_solar_altitude_series = calculate_refracted_solar_altitude_time_series(
-        solar_altitude_series=solar_altitude_series_in_degrees,
-        angle_input_units=expected_solar_altitude_units,
-        angle_output_units=RADIANS,  # Here in radians!
+        solar_altitude_series=solar_altitude_series,   # expects solar altitude in degrees!
+        # angle_output_units=RADIANS,  # Here in radians!
         verbose=verbose,
     )
     optical_air_mass_series = calculate_optical_air_mass_time_series(
@@ -523,16 +446,16 @@ def calculate_direct_horizontal_irradiance_time_series(
     )
 
     # Mask conditions -------------------------------------------------------
-    mask_solar_altitude_positive = solar_altitude_series_array > 0
-    mask_not_in_shade = np.full_like(solar_altitude_series_array, True)  # Stub, replace with actual condition
+    mask_solar_altitude_positive = solar_altitude_series.radians > 0
+    mask_not_in_shade = np.full_like(solar_altitude_series.radians, True)  # Stub, replace with actual condition
     mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
 
     # Initialize the direct irradiance series to zeros
-    direct_horizontal_irradiance_series = np.zeros_like(solar_altitude_series_array)
+    direct_horizontal_irradiance_series = np.zeros_like(solar_altitude_series.radians)
     if np.any(mask):
         # direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
         direct_horizontal_irradiance_series[mask] = (
-            direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
+            direct_normal_irradiance_series * np.sin(solar_altitude_series.radians)
         )[mask]
 
     # Reporting =============================================================
@@ -545,10 +468,10 @@ def calculate_direct_horizontal_irradiance_time_series(
     if verbose > 1:
         extended_results = {
             'Normal': direct_normal_irradiance_series,
-            "Linke": np.array([linke_turbidity.value for linke_turbidity in linke_turbidity_factor_series]),
-            "Air mass": np.array([air_mass.value for air_mass in optical_air_mass_series]),
-            "Refracted alt.": np.array( [refracted_altitude.value for refracted_altitude in refracted_solar_altitude_series]) if apply_atmospheric_refraction else np.array(["-"]),
-            'Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
+            "Linke": linke_turbidity_factor_series.value,
+            "Air mass": optical_air_mass_series.value,
+            "Refracted alt.": refracted_solar_altitude_series.value if apply_atmospheric_refraction else np.full_like(refracted_solar_altitude_series.value, np.nan),
+            'Altitude': getattr(solar_altitude_series, angle_output_units),
         }
         results = results | extended_results
         title += ' & relevant components'
@@ -559,7 +482,7 @@ def calculate_direct_horizontal_irradiance_time_series(
             'Perigee': perigee_offset,
             'Eccentricity': eccentricity_correction_factor,
         }
-        results = results | more_extended_results
+        results = results | more_extended_results               # FIXME: Only the first raw is printed because of this line. But verbosity is 0 by choice
 
     if verbose > 3:
         even_more_extended_results = {
@@ -643,7 +566,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
-):
+) -> np.array:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2] 
 
     This function implements the algorithm described by Hofierka
@@ -673,7 +596,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         angle_output_units=angle_output_units,
         verbose=0,
     )
-    solar_incidence_series_array = np.array([x.value for x in solar_incidence_series])
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -692,7 +614,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         angle_output_units=angle_output_units,
         verbose=0,
     )
-    solar_altitude_series_array = np.array([solar_altitude.radians for solar_altitude in solar_altitude_series])
 
     # ========================================================================
     # Essentially, perform calculations for when:
@@ -701,10 +622,10 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     # - solar incidence > 0
     #
     # To add : ---------------------------------------------------------------
-    mask_solar_altitude_positive = solar_altitude_series_array > 0
-    mask_solar_incidence_positive = solar_incidence_series_array > 0
+    mask_solar_altitude_positive = solar_altitude_series.radians > 0
+    mask_solar_incidence_positive = solar_incidence_series.radians > 0
     mask_not_in_shade = np.full_like(
-        solar_altitude_series_array, True
+        solar_altitude_series.radians, True
     )  # Stub, replace with actual condition
     mask = np.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
@@ -764,8 +685,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     try:
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
-            * np.sin(solar_incidence_series_array)
-            / np.sin(solar_altitude_series_array)
+            * np.sin(solar_incidence_series.radians)
+            / np.sin(solar_altitude_series.radians)
         )
 
         # additional check! Is it required here? -----------------------------
@@ -784,7 +705,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         try:
             angular_loss_factor_series = (
                 calculate_angular_loss_factor_for_direct_irradiance_time_series(
-                    solar_incidence_series=solar_incidence_series_array,
+                    solar_incidence_series=solar_incidence_series.radians,
                     verbose=verbose,
                 )
             )
@@ -815,8 +736,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if verbose > 2:
         more_extended_results = {
             "Horizontal": direct_horizontal_irradiance_series,
-            'Incidence': convert_series_to_degrees_arrays_if_requested(solar_incidence_series, angle_output_units),
-            'Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
+            'Incidence': getattr(solar_incidence_series, angle_output_units),
+            'Altitude': getattr(solar_altitude_series, angle_output_units),
         }
         results = results | more_extended_results
         title += ' & relevant components'

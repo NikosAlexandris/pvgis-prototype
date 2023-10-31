@@ -231,7 +231,6 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     title = 'Reflected'
 
     if verbose > 1 :
-        solar_altitude_series_array = np.array([solar_altitude.radians for solar_altitude in solar_altitude_series])
         extended_results = {
             "Albedo": albedo,
             "Global": global_horizontal_irradiance_series,
@@ -251,7 +250,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     if verbose > 3:
         even_more_extended_results = {
             "Extraterrestrial normal": extraterrestrial_normal_irradiance_series,
-            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+            'Altitude': getattr(solar_altitude_series, angle_output_units),
         }
         results = results | even_more_extended_results
 

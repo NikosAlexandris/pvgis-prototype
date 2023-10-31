@@ -211,20 +211,18 @@ def calculate_global_irradiance_time_series(
         # angle_output_units=angle_output_units,
         verbose=verbose,
         )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
-
     # Masks based on the solar altitude series
-    mask_above_horizon = solar_altitude_series_array > 0
-    mask_low_angle = (solar_altitude_series_array >= 0) & (solar_altitude_series_array < 0.04)
-    mask_below_horizon = solar_altitude_series_array < 0
-    in_shade = is_surface_in_shade_time_series(solar_altitude_series_array)
+    mask_above_horizon = solar_altitude_series.value > 0
+    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)
+    mask_below_horizon = solar_altitude_series.value < 0
+    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
+    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
