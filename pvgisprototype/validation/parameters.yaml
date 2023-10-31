@@ -2,10 +2,10 @@
 
 Longitude:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
   symbol:
     type: str
@@ -18,10 +18,10 @@ Longitude:
 
 Latitude:
   value:
-    type: Optional[float]
+    type: float
     initial: 
   unit:
-    type: Optional[str]
+    type: str
     initial:
   symbol:
     type: str
@@ -34,7 +34,7 @@ Latitude:
 
 Elevation:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
     type: str
@@ -52,10 +52,10 @@ Elevation:
 
 AtmosphericRefraction:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
 
 # Earth orbit
@@ -80,7 +80,7 @@ EccentricityCorrectionFactor:
 
 EquationOfTime:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
     type: str
@@ -88,16 +88,16 @@ EquationOfTime:
 
 SolarHourAngle:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
   position_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   timing_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   min_degrees:
     type: float
@@ -108,42 +108,48 @@ SolarHourAngle:
 
 EventHourAngle:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
 
 HourAngleSunrise:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
 
 # Solar position
 
 FractionalYear:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
+  min_degrees:
+    type: float
+    initial: 0
+  max_degrees:
+    type: float
+    initial: 360
 
 SolarDeclination:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
   position_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   timing_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   min_degrees:
     type: float
@@ -154,16 +160,16 @@ SolarDeclination:
 
 SolarZenith:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
   position_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   timing_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   min_degrees:
     type: float
@@ -182,16 +188,16 @@ RefractedSolarZenith:
 
 SolarAltitude:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
   position_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   timing_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   min_radians:
     type: float
@@ -208,7 +214,7 @@ SolarAltitude:
     
 RefractedSolarAltitude:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -216,7 +222,7 @@ RefractedSolarAltitude:
 
 LinkeTurbidityFactor:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -224,7 +230,7 @@ LinkeTurbidityFactor:
 
 OpticalAirMass:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -232,7 +238,7 @@ OpticalAirMass:
 
 RayleighThickness:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -240,16 +246,16 @@ RayleighThickness:
 
 SolarAzimuth:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
   position_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   timing_algorithm:
-    type: Optional[str]
+    type: str
     initial:
   min_degrees:
     type: float
@@ -260,41 +266,47 @@ SolarAzimuth:
 
 CompassSolarAzimuth:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
 
 SolarPosition:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
 
 SolarIncidence:
   value:
-    type: Optional[float]
+    type: Union[ndarray, float]
     initial:
   unit:
-    type: Optional[str]
+    type: str
+    initial:
+  position_algorithm:
+    type: str
+    initial:
+  timing_algorithm:
+    type: str
     initial:
 
 # How?
 
 RelativeLongitude:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
 
 TimeOffset:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
     type: str
@@ -302,10 +314,10 @@ TimeOffset:
 
 HorizonHeight:
   value:
-    type: Optional[float]
+    type: float
     initial:
   unit:
-    type: Optional[str]
+    type: str
     initial:
 
 # Surface
