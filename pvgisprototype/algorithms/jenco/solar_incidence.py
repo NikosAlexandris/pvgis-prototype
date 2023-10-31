@@ -318,9 +318,7 @@ def calculate_solar_incidence_time_series_jenco(
     time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-) -> np.array:
-    solar_incidence_angle_series = np.empty_like(timestamps, dtype=float)
-
+) -> SolarIncidence:
     sine_relative_inclined_latitude = -(
         cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
         + sin(latitude.radians) * cos(surface_tilt.radians)
@@ -330,12 +328,11 @@ def calculate_solar_incidence_time_series_jenco(
         timestamps=timestamps,
         angle_output_units=angle_output_units,
     )
-    solar_declination_series = np.array([item.radians for item in solar_declination_series])
     c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
-        solar_declination_series
+        solar_declination_series.radians
     )
     c_inclined_33_series = sin(relative_inclined_latitude) * np.sin(
-        solar_declination_series
+        solar_declination_series.radians
     )
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
@@ -344,22 +341,26 @@ def calculate_solar_incidence_time_series_jenco(
         time_output_units=time_output_units,
         angle_output_units=angle_output_units,
     )
-    solar_hour_angle_series = np.array([item.radians for item in solar_hour_angle_series])
     relative_longitude = calculate_relative_longitude(
         latitude=latitude,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
     )
     sine_solar_incidence_series = (
-        c_inclined_31_series * np.cos(solar_hour_angle_series - relative_longitude.radians)
+        c_inclined_31_series * np.cos(solar_hour_angle_series.radians - relative_longitude.radians)
         + c_inclined_33_series
     )
     solar_incidence_series = np.arcsin(sine_solar_incidence_series)
     solar_incidence_series[solar_incidence_series < 0] = NO_SOLAR_INCIDENCE
-    solar_incidence_series = [
-        SolarIncidence(value=value, unit=RADIANS) for value in solar_incidence_series
-    ]
+
+    solar_incidence_series = SolarIncidence(
+        value=solar_incidence_series,
+        unit=RADIANS,
+        position_algorithm='Jenco',
+        timing_algorithm='Jenco',
+    )
+
     if verbose > 5:
         debug(locals())
 
-    return np.array(solar_incidence_series, dtype=object)
+    return solar_incidence_series
