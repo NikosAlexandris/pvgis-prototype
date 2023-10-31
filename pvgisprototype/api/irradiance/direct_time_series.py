@@ -151,7 +151,6 @@ def compare_temporal_resolution(timestamps, array):
         )
 
 
-@track_progress(task_correct_linke_turbidity_factor)
 def correct_linke_turbidity_factor_time_series(
     linke_turbidity_factor_series: Union[ List[LinkeTurbidityFactor], LinkeTurbidityFactor] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
