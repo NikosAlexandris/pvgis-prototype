@@ -39,20 +39,28 @@ def calculate_fractional_year_noaa(
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
-    ):
+    ) -> FractionalYear:
     """ """
-    is_scalar_input = isinstance(timestamps, datetime)
     timestamps = np.atleast_1d(np.array(timestamps, dtype=datetime))
     days_in_year_series = np.array([get_days_in_year(ts.year) for ts in timestamps])
     days_of_year_series = np.array([ts.timetuple().tm_yday for ts in timestamps])
     hours = np.array([ts.hour for ts in timestamps])
     fractional_year_series = 2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24)
     fractional_year_series[fractional_year_series < 0] = 0
+    
     if not np.all((0 <= fractional_year_series) & (fractional_year_series < 2 * np.pi)):
         raise ValueError(f'The calculated fractional years are outside the expected range [0, {2*pi}] radians')
 
-    fractional_year_series = [
-        FractionalYear(value=value, unit=RADIANS) for value in fractional_year_series
-    ]
+    fractional_year_series = FractionalYear(
+        value=fractional_year_series,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
 
-    return np.array(fractional_year_series, dtype=object)
+    if not np.all((fractional_year_series.min_degrees <= fractional_year_series.degrees) & (fractional_year_series.degrees <= fractional_year_series.max_degrees)):
+        wrong_values_index = np.where(fractional_year_series.min_degrees <= np.all(fractional_year_series.degrees) <= fractional_year_series.max_degrees)
+        wrong_values = fractional_year_series.degrees[wrong_values_index]
+        raise ValueError(f"The calculated fractional year `{wrong_values}` is out of the expected range [{fractional_year_series.min_degrees}, {fractional_year_series.max_degrees}] degrees!')")
+
+    return fractional_year_series

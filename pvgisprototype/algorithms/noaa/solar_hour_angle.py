@@ -114,7 +114,7 @@ def calculate_solar_hour_angle_time_series_noaa(
     timezone: Optional[str] = None, 
     angle_output_units: Optional[str] = RADIANS,
     verbose: int = 0,
-):
+) -> SolarHourAngle:
     """Calculate the solar hour angle in radians for a time series."""
     solar_hour_angle_series = []
     
@@ -131,13 +131,16 @@ def calculate_solar_hour_angle_time_series_noaa(
         if angle_output_units == RADIANS and not -pi <= solar_hour_angle <= pi:
             raise ValueError("The hour angle in radians must range within [-π, π]")
 
-        solar_hour_angle_obj = SolarHourAngle(
-            value=solar_hour_angle,
-            unit=RADIANS,
-        )
+        solar_hour_angle_series.append(solar_hour_angle)
 
-        solar_hour_angle_series.append(solar_hour_angle_obj)
+    solar_hour_angle_series = SolarHourAngle(
+        value=np.array(solar_hour_angle_series),
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
 
     if verbose == 3:
         debug(locals())
-    return np.array(solar_hour_angle_series, dtype=object)
+
+    return solar_hour_angle_series
