@@ -78,6 +78,7 @@ from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 # from pvgisprototype.constants import TEMPERATURE_COLUMN_NAME
 # from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
 # from pvgisprototype.constants import SHADE
+from pvgisprototype import LinkeTurbidityFactor
 
 
 def is_surface_in_shade_time_series(input_array, threshold=10):
@@ -122,7 +123,7 @@ def calculate_effective_irradiance_time_series(
     in_memory: bool = False,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: List[float] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = 2,
