@@ -15,8 +15,8 @@ from bokeh.plotting import show
 
 from datetime import datetime, timedelta
 # from .api.geometry.solar_time import SolarTimeModels
-from pvgisprototype.api.geometry.solar_time import SolarTimeModels
-from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.time import model_solar_time
 # from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 
 import numpy as np
