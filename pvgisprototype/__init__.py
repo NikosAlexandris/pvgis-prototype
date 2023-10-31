@@ -43,7 +43,77 @@ def _timestamp_to_minutes(timestamp):
     return total_seconds / 60
 
 
-@property
+def minutes_property(self):
+    if self.unit == 'minutes':
+        return self.value
+    else:
+        return None
+
+
+def timedelta_property(self):
+    """Instance property to convert to timedelta"""
+    if self.unit == RADIANS:
+        return _radians_to_timedelta(self.value)
+    elif self.unit == DEGREES:
+        return _degrees_to_timedelta(self.value)
+    elif self.unit == 'timedelta':
+        return self.value
+    else:
+        return None
+
+
+def as_minutes_property(self):
+    """Instance property to convert to minutes"""
+    if self.unit == 'timedelta':
+        value = self.value.total_seconds() / 60
+    elif self.unit == 'datetime':
+        value = (self.value.hour * 3600 + self.value.minute * 60 + self.value.second) / 60
+    elif self.unit == RADIANS:
+        value = _radians_to_minutes(self.value)
+    elif self.unit == DEGREES:
+        value = _degrees_to_minutes(self.value)
+    elif self.unit == 'timestamp':
+        value = _timestamp_to_minutes(self.value)
+    elif self.unit == 'as_minutes':
+        value = self.value
+    else:
+        value = None
+    return value
+
+
+def datetime_property(self):
+    """Instance property to convert to datetime"""
+    if self.unit == 'datetime':
+        return self.value
+    else:
+        return None
+
+
+def timestamp_property(self):
+    """Instance property to convert to time (timestamp)"""
+    if self.unit == 'timestamp':
+        return self.value
+    else:
+        return None
+
+
+def as_hours_property(self):
+    """Instance property to convert to hours"""
+    if self.unit == 'hours':
+        return self.value
+    elif self.unit == 'timestamp':
+        return _timestamp_to_hours(self.value)
+    else:
+        return None
+
+
+def minutes_property(self):
+    if self.unit == 'minutes':
+        return self.value
+    else:
+        return None
+
+
 def degrees_property(self):
     """Instance property to convert to degrees"""
     if self.value is not None:
@@ -57,7 +127,6 @@ def degrees_property(self):
         return None
 
 
-@property
 def radians_property(self):
     """Instance property to convert to radians"""
     if self.value is not None:
@@ -71,82 +140,39 @@ def radians_property(self):
         return None
 
 
-@property
-def minutes_property(self):
-    if self.unit == 'minutes':
-        return self.value
-    else:
-        return None
-
-
-@property
-def timedelta_property(self):
-    """Instance property to convert to timedelta"""
-    if self.unit == RADIANS:
-        return _radians_to_timedelta(self.value)
-    elif self.unit == DEGREES:
-        return _degrees_to_timedelta(self.value)
-    elif self.unit == 'timedelta':
-        return self.value
-    else:
-        return None
-
-
-@property
-def as_minutes_property(self):
-    """Instance property to convert to minutes"""
-    if self.unit == 'timedelta':
-        return self.value.total_seconds() / 60
-    elif self.unit == 'datetime':
-        return (self.value.hour * 3600 + self.value.minute * 60 + self.value.second) / 60
-    elif self.unit == RADIANS:
-        return _radians_to_minutes(self.value)
-    elif self.unit == DEGREES:
-        return _degrees_to_minutes(self.value)
-    elif self.unit == 'timestamp':
-        return _timestamp_to_minutes(self.value)
-    else:
-        return None
-
-
-@property
-def datetime_property(self):
-    """Instance property to convert to datetime"""
-    if self.unit == 'datetime':
-        return self.value
-    else:
-        return None
-
-
-@property
-def timestamp_property(self):
-    """Instance property to convert to time (timestamp)"""
-    if self.unit == 'timestamp':
-        return self.value
-    else:
-        return None
-
-
-@property
-def as_hours_property(self):
-    """Instance property to convert to hours"""
-    if self.unit == 'hours':
-        return self.value
-    elif self.unit == 'timestamp':
-        return _timestamp_to_hours(self.value)
-    else:
-        return None
-
-
-@property
-def minutes_property(self):
-    if self.unit == 'minutes':
-        return self.value
-    else:
-        return None
-
-
 def generate_dataclass_models(yaml_file: str):
+
+    def custom_getattr(self, attr_name):
+        if attr_name == 'radians':
+            value = radians_property(self)
+        elif attr_name == 'degrees':
+            value = degrees_property(self)
+        elif attr_name == 'minutes':
+            value = minutes_property(self)
+        elif attr_name == 'timedelta':
+            value = timedelta_property(self)
+        elif attr_name == 'as_minutes':
+            value = as_minutes_property(self)
+        elif attr_name == 'datetime':
+            value = datetime_property(self)
+        elif attr_name == 'timestamp':
+            value = timestamp_property(self)
+        elif attr_name == 'as_hours':
+            value = as_hours_property(self)
+        else:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr_name}'")
+        
+        try:
+            if value is None:
+                raise AttributeError(f"'{self.__class__.__name__}' object can't have attribute '{attr_name}'")
+        except ValueError:
+            if not np.any(value):
+                raise AttributeError(f"'{self.__class__.__name__}' object can't have attribute '{attr_name}'")
+            
+        # self.__dict__[name] = value
+        # self.__dict__['value'] = value
+        # self.__dict__['unit'] = attr_name
+        return value
 
     with open(yaml_file, 'r') as f:
         parameters = yaml.safe_load(f)
@@ -154,7 +180,6 @@ def generate_dataclass_models(yaml_file: str):
     for model_name, fields in parameters.items():
         annotations = {}
         default_values = {}
-
 
         for field_name, field_data in fields.items():
             annotations[field_name] = eval(field_data['type'])
@@ -165,24 +190,16 @@ def generate_dataclass_models(yaml_file: str):
             model_name,
             (BaseModel,),
             {
-                **annotations,
+                '__getattr__': custom_getattr,
                 '__annotations__': annotations,
                 '__module__': __name__,
                 '__qualname__': model_name,
                 '__hash__': model_hash,
-                DEGREES: degrees_property,
-                RADIANS: radians_property,
-                'minutes': minutes_property,
-                'timedelta': timedelta_property,
-                'as_minutes': as_minutes_property,
-                'datetime': datetime_property,
-                'timestamp': timestamp_property,
-                'as_hours': as_hours_property,
                 **default_values,
+            },
             arbitrary_types_allowed=True,
         )
         globals()[model_name] = model_class
-
 
 
 package_root = Path(__file__).resolve().parent
