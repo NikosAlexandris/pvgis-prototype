@@ -83,8 +83,7 @@ def calculate_solar_altitude_time_series_noaa(
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
-):
-    """Calculate the solar altitude angle for a location over a time series"""
+) -> SolarAltitude:
     """Calculate the solar altitude angle for a location over a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
@@ -97,19 +96,22 @@ def calculate_solar_altitude_time_series_noaa(
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
-    solar_altitude_series = np.pi / 2 - np.array(
-        [zenith.radians for zenith in solar_zenith_series]
-    )
+    solar_altitude_series = np.pi / 2 - solar_zenith_series.radians
     if not np.all(np.isfinite(solar_altitude_series)) or not np.all(
         (-np.pi / 2 <= solar_altitude_series) & (solar_altitude_series <= np.pi / 2)
     ):
         raise ValueError(
             f"The `solar_altitude` should be a finite number ranging in [{-np.pi/2}, {np.pi/2}] radians"
         )
-    solar_altitude_series = [
-        SolarAltitude(value=altitude, unit=RADIANS) for altitude in solar_altitude_series
-    ]
+
+    solar_altitude_series = SolarAltitude(
+        value=solar_altitude_series,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
+
     if verbose > 5:
         debug(locals())
 
-    return np.array(solar_altitude_series, dtype=object)
+    return solar_altitude_series

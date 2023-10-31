@@ -54,15 +54,14 @@ def calculate_solar_declination_noaa(
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)
 def calculate_solar_declination_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
-        angle_output_units: str = RADIANS
-):# -> Union[SolarDeclination, np.ndarray]:
+) -> SolarDeclination:
 
     # timestamps = np.atleast_1d(timestamps)  # timestamps as array
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
         angle_output_units=RADIANS,
     )
-    fractional_year_series_array = np.array([fy.radians for fy in fractional_year_series])
+    # fractional_year_series_array = np.array([fy.radians for fy in fractional_year_series])
     # fractional_year_series_array = np.array(
     #     [
     #         fy.radians
@@ -75,22 +74,19 @@ def calculate_solar_declination_time_series_noaa(
     # )
     declination_series = (
         0.006918
-        - 0.399912 * np.cos(fractional_year_series_array)
-        + 0.070257 * np.sin(fractional_year_series_array)
-        - 0.006758 * np.cos(2 * fractional_year_series_array)
-        + 0.000907 * np.sin(2 * fractional_year_series_array)
-        - 0.002697 * np.cos(3 * fractional_year_series_array)
-        + 0.00148 * np.sin(3 * fractional_year_series_array)
+        - 0.399912 * np.cos(fractional_year_series.radians)
+        + 0.070257 * np.sin(fractional_year_series.radians)
+        - 0.006758 * np.cos(2 * fractional_year_series.radians)
+        + 0.000907 * np.sin(2 * fractional_year_series.radians)
+        - 0.002697 * np.cos(3 * fractional_year_series.radians)
+        + 0.00148 * np.sin(3 * fractional_year_series.radians)
     )
-    declination_series = [
-        SolarDeclination(value=declination, unit=RADIANS)
-        for declination in declination_series
-    ]
 
-    #if angle_output_units == DEGREES:
-    #    declination_series = convert_series_to_degrees_if_requested(declination_series, angle_output_units)
+    declination_series = SolarDeclination(
+        value=declination_series,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
 
-    if np.isscalar(timestamps):
-        return declination_series[0]
-    else:
-        return np.array(declination_series, dtype=object)
+    return declination_series
