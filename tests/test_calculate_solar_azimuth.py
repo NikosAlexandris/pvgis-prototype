@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.geometry.solar_azimuth import calculate_solar_azimuth
+from pvgisprototype.api.geometry.azimuth import calculate_solar_azimuth
 from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import AZIMUTH_NAME, TIME_ALGORITHM_NAME, POSITION_ALGORITHM_NAME, UNITS_NAME
