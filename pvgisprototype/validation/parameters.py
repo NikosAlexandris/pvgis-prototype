@@ -303,7 +303,7 @@ class SolarHourAngleModel(BaseModel):
 
 
 class SolarHourAngleSeriesModel(BaseModel):
-    solar_hour_angle_series: Union[Sequence[SolarHourAngle], ndarray]
+    solar_hour_angle_series: Union[SolarHourAngle, ndarray]
     model_config = ConfigDict(
         description="Solar hour angle series.",
         arbitrary_types_allowed=True,
@@ -312,10 +312,7 @@ class SolarHourAngleSeriesModel(BaseModel):
     @field_validator("solar_hour_angle_series")
     def validate_solar_hour_angle(
         cls, input
-    ) -> Union[Sequence[SolarHourAngle], ndarray]:
-        if isinstance(input, list) and all(
-            isinstance(item, SolarHourAngle) for item in input
-        ):
+    ) -> Union[SolarHourAngle, ndarray]:
             return input
         elif isinstance(input, ndarray) and all(
             isinstance(item, SolarHourAngle) for item in input
@@ -343,7 +340,7 @@ class RefractedSolarAltitudeModel(BaseModel):
 
 
 class RefractedSolarAltitudeSeriesModel(BaseModel):
-    refracted_solar_altitude_series: Union[RefractedSolarAltitude, Sequence[RefractedSolarAltitude]]
+    refracted_solar_altitude_series: RefractedSolarAltitude
 
     # @field_validator("refracted_solar_altitude")
     # def validate_refracted_solar_altitude(cls, input) -> RefractedSolarAltitude:
