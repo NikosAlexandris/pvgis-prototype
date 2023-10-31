@@ -93,6 +93,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency
 from pvgisprototype.constants import RADIANS, DEGREES
+from pvgisprototype import LinkeTurbidityFactor
 
 
 AOIConstants = []
@@ -149,7 +150,7 @@ def calculate_effective_irradiance(
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = LINKE_TURBIDITY_DEFAULT,
+    linke_turbidity_factor: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor] = None, # [LINKE_TURBIDITY_DEFAULT] LINKE_TURBIDITY_TIME_SERIES_DEFAULT
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,

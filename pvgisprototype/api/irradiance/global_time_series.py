@@ -112,6 +112,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import RADIANS
+from pvgisprototype import LinkeTurbidityFactor
 
 
 app = typer.Typer(
@@ -164,7 +165,7 @@ def calculate_global_irradiance_time_series(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
