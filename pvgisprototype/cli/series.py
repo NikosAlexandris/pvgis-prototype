@@ -167,7 +167,7 @@ def select(
         verbose=verbose,
     )
 
-    if verbose == 5:
+    if verbose > 7:
         debug(locals())
 
     # if output_filename:

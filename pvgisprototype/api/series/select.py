@@ -114,14 +114,11 @@ def select_time_series(
             + Style.RESET_ALL
         )
         logger.warning(warning)
+
         if verbose > 0:
             print(Fore.YELLOW + warning)
-        if verbose == 3:
-            debug(locals())
 
-        # return single_value
-
-    if verbose > 5:
+    if verbose >7:
         debug(locals())
 
     return location_time_series
