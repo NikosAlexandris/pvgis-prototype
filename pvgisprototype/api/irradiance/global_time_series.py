@@ -353,7 +353,7 @@ def calculate_global_irradiance_time_series(
     )
     if out_of_range_indices[0].size > 0:
         print(
-                f"[red on white]{WARNING_OUT_OF_RANGE_VALUES} in `global_irradiance_series` : {out_of_range_indices[0]}![/red on white]"
+                f"{WARNING_OUT_OF_RANGE_VALUES} in `global_irradiance_series` : {out_of_range_indices[0]}!"
         )
 
     # Reporting =============================================================

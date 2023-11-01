@@ -726,7 +726,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     )
     if out_of_range_indices[0].size > 0:
         print(
-            f"[blink red on white]{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`![/blink red on white]"
+            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
         )
 
     # Reporting ==============================================================
