@@ -135,7 +135,7 @@ def attach_requested_timezone(
 
     print(f'[green]i[/green] Callback function attach_requested_timezone()')
 
-    if timestamp.tzinfo is not None:
+    if timestamp.tzinfo is not None:  # time zone already set
         print("  [yellow]>[/yellow] The provided timestamp already has a timezone.")  
         print("  [yellow]>[/yellow] Ensure the timestamp is provided as a [yellow]naive[/yellow] datetime object.")
         return timestamp
@@ -146,7 +146,7 @@ def attach_requested_timezone(
 
     else:
         try:
-            print(f'[yellow]i[/yellow] Attaching the {timezone} to the {timestamp}')  
+            print(f'[yellow]i[/yellow] Attaching the requested zone [bold]{timezone}[/bold] to {timestamp}')  
             timezone_aware_timestamp = timestamp.replace(tzinfo=timezone)
 
         except Exception as e:
@@ -168,8 +168,8 @@ def ctx_attach_requested_timezone(
     print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
     print(f'  [yellow]>[/yellow] Executing ctx_attach_requested_timezone()')
     timezone = ctx.params.get('timezone')
-    print(f'  [yellow]>[/yellow] User defined input parameter `timezone` = {timezone}')
-    print(f'  [green]>[/green] Callback function sets : {attach_requested_timezone(timestamp, timezone)}')
+    print(f'  [yellow]>[/yellow] User requested input parameter [code]timezone[/code] = [bold]{timezone}[/bold]')
+    print(f'  [green]>[/green] Callback function returns : {attach_requested_timezone(timestamp, timezone)}')
     return attach_requested_timezone(timestamp, timezone)
 
 
@@ -337,7 +337,7 @@ def parse_timestamp_series(
     # print(f"[yellow]i[/yellow] Context: {ctx}")
     # print(f"[yellow]i[/yellow] Context: {ctx.params}")
     # print(f"[yellow]i[/yellow] typer.CallbackParam: {param}")
-    print(f"[yellow]i[/yellow] Runnning the parse_timestamp_series() function!")
+    print(f"[yellow]i[/yellow] Executing parse_timestamp_series()")
     # print(f"  Input [yellow]timestamps[/yellow] : {timestamps}")
     # print(f"  Type : {type(timestamps)}")
 
@@ -399,9 +399,9 @@ def callback_generate_datetime_series(
     # value: Union[str, datetime, List[datetime]],
     param: typer.CallbackParam,
 ):
-    print("[yellow]i[/yellow] Runnning the callback_generate_datetime_series() function!")
     print(f'[yellow]i[/yellow] Context: {ctx.params}')
     # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
+    print("[yellow]i[/yellow] Executing callback_generate_datetime_series()")
     # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
     start_time = ctx.params.get('start_time')
     end_time = ctx.params.get('end_time')

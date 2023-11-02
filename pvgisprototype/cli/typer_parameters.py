@@ -530,7 +530,7 @@ def parse_optical_air_mass_series(optical_air_mass_factor_input: str) -> List[fl
     """Parse a string of optical air mass values separated by commas into a list of floats."""
     if isinstance(optical_air_mass_factor_input, str):
         optical_air_mass_factor_strings = optical_air_mass_factor_input.split(',')
-        optical_air_mass_factor_series = [lt for lt in optical_air_mass_factor_strings]
+        optical_air_mass_factor_series = [optical_air_mass_factor for optical_air_mass_factor in optical_air_mass_factor_strings]
         return optical_air_mass_factor_series
     else:
         return optical_air_mass_factor_input
