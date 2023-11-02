@@ -152,7 +152,8 @@ def attach_requested_timezone(
         except Exception as e:
             print(f'[red]x[/red] Failed to attach the requested timezone \'{timezone}\' to the timestamp: {e}!')
             print("[red]Defaulting to UTC timezone.[/red]")
-            timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+            # timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+            timezone_aware_timestamp = timestamp.astimezone(tzinfo=ZoneInfo('UTC'))
 
     return timezone_aware_timestamp
 
@@ -343,18 +344,17 @@ def parse_timestamp_series(
 
     if isinstance(timestamps, str):
         datetime_strings = timestamps.strip().split(",")
-        # print(f"  Returning : {datetime_strings}")
-        return datetime_strings  # List of strings
+        return [datetime.fromisoformat(timestamp.strip()) for timestamp in datetime_strings]
 
-    if isinstance(timestamps, datetime):
-        return_value = [timestamps]
-        # print(f"  Returning : {return_value}")
-        return [timestamps]  # return a list in case of a single datetime object
+    elif isinstance(timestamps, datetime):
+        return [timestamps]  # return a single datetime as a list
 
-    if isinstance(timestamps, list):
-        datetime_strings = [string.strip() for string in timestamps]
-        # print(f"Returning: {datetime_strings}")
-        return datetime_strings
+    elif isinstance(timestamps, list):
+        datetime_strings = [string.strip() for string in timestamps]  # convert strings to naive datetime
+        return [datetime.fromisoformat(timestamp) for timestamp in datetime_strings]
+
+    else:
+        raise ValueError("Timestamps input must be a string, datetime, or list of datetimes")
 
 
 def generate_timestamps_for_a_year(year, frequency_minutes=60):
@@ -406,11 +406,13 @@ def callback_generate_datetime_series(
     start_time = ctx.params.get('start_time')
     end_time = ctx.params.get('end_time')
     frequency = ctx.params.get('frequency', 'h')
+    timezone = ctx.params.get('timezone')
 
     if start_time is not None and end_time is not None:
         timestamps = generate_datetime_series(start_time, end_time, frequency)
-        return timestamps
 
-    else:
-        from pandas import to_datetime
-        return to_datetime(timestamps, format='mixed')
+    timezone_aware_timestamps = [
+        attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
+    ]
+    from pandas import to_datetime
+    return to_datetime(timezone_aware_timestamps, format="mixed")
