@@ -169,9 +169,9 @@ def print_solar_position_series_table(
     timestamps,
     timezone,
     table,
+    timing=None,
     declination=None,
     hour_angle=None,
-    timing=None,
     zenith=None,
     altitude=None,
     azimuth=None,
@@ -179,6 +179,7 @@ def print_solar_position_series_table(
     user_requested_timestamps=None,
     user_requested_timezone=None,
     rounding_places=ROUNDING_PLACES_DEFAULT,
+    group_models=False,
 ):
     # Round the longitude and latitude if not None
     longitude = round_float_values(longitude, rounding_places)
@@ -228,14 +229,14 @@ def print_solar_position_series_table(
     # Iterate over each timestamp and its corresponding result
     for model_result in rounded_table:
         for index, timestamp in enumerate(timestamps):
-            declination_value = safe_get_value(model_result, DECLINATION_NAME, NOT_AVAILABLE, index) if declination else None
-            hour_angle_value = safe_get_value(model_result, HOUR_ANGLE_NAME, NOT_AVAILABLE, index) if hour_angle else None
+            declination_value = safe_get_value(model_result, DECLINATION_NAME, index) if declination else None
+            hour_angle_value = safe_get_value(model_result, HOUR_ANGLE_NAME, index) if hour_angle else None
             timing_algorithm = safe_get_value(model_result, TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
             position_algorithm = safe_get_value(model_result, POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
-            zenith_value = safe_get_value(model_result, ZENITH_NAME, NOT_AVAILABLE, index) if zenith else None
-            altitude_value = safe_get_value(model_result, ALTITUDE_NAME, NOT_AVAILABLE, index) if altitude else None
-            azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, NOT_AVAILABLE, index) if azimuth else None
-            incidence_value = safe_get_value(model_result, INCIDENCE_NAME, NOT_AVAILABLE, index) if incidence else None
+            zenith_value = safe_get_value(model_result, ZENITH_NAME, index) if zenith else None
+            altitude_value = safe_get_value(model_result, ALTITUDE_NAME, index) if altitude else None
+            azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, index) if azimuth else None
+            incidence_value = safe_get_value(model_result, INCIDENCE_NAME, index) if incidence else None
             units = safe_get_value(model_result, UNITS_NAME, UNITLESS)
 
             row = []
@@ -287,6 +288,8 @@ def print_solar_position_series_table(
             }
             style = style_map.get(position_algorithm.lower(), None)
             table.add_row(*row, style=style)
+        if group_models:
+            table.add_row()
 
     console = Console()
     console.print(table)

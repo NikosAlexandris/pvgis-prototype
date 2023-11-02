@@ -28,6 +28,7 @@ from pvgisprototype.constants import AZIMUTH_NAME
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import NOT_AVAILABLE
 
 
 @validate_with_pydantic(ModelSolarAltitudeTimeSeriesInputModel)
@@ -154,13 +155,13 @@ def calculate_solar_geometry_overview_time_series(
                 verbose=verbose,
             )
             results.append({
-                TIME_ALGORITHM_NAME: solar_azimuth_series.timing_algorithm if solar_altitude_series.timing_algorithm == solar_azimuth_series.timing_algorithm else None,
-                DECLINATION_NAME: getattr(solar_declination_series, angle_output_units) if solar_declination_series else None,
-                HOUR_ANGLE_NAME: getattr(solar_hour_angle_series, angle_output_units) if solar_hour_angle_series else None,
+                TIME_ALGORITHM_NAME: solar_azimuth_series.timing_algorithm if solar_azimuth_series else NOT_AVAILABLE,
+                DECLINATION_NAME: getattr(solar_declination_series, angle_output_units, NOT_AVAILABLE) if solar_declination_series else NOT_AVAILABLE,
+                HOUR_ANGLE_NAME: getattr(solar_hour_angle_series, angle_output_units, NOT_AVAILABLE) if solar_hour_angle_series else NOT_AVAILABLE,
                 POSITION_ALGORITHM_NAME: solar_position_model.value,
-                ZENITH_NAME: getattr(solar_zenith_series, angle_output_units) if solar_zenith_series else None,
-                ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, None) if solar_altitude_series else None,
-                AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units) if solar_azimuth_series else None,
+                ZENITH_NAME: getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE) if solar_zenith_series else NOT_AVAILABLE,
+                ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
+                AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
                 UNITS_NAME: angle_output_units,
             })
 
