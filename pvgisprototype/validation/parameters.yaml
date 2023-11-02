@@ -246,7 +246,7 @@ RayleighThickness:
 
 SolarAzimuth:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
