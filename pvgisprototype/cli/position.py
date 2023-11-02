@@ -303,7 +303,7 @@ def overview_series(
     #     return
 
     # Initialize with None ---------------------------------------------------
-    user_requested_timestamp = None
+    user_requested_timestamps = None
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
     
@@ -311,7 +311,7 @@ def overview_series(
     if timestamps.tzinfo != utc_zoneinfo:
 
         # Note the input timestamp and timezone
-        user_requested_timestamp = timestamps
+        user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
         timestamps = timestamps.tz_convert(utc_zoneinfo)
@@ -342,23 +342,23 @@ def overview_series(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    print(solar_position_series)
-    # print_solar_position_table(
-    #     longitude=longitude,
-    #     latitude=latitude,
-    #     timestamp=timestamp,
-    #     timezone=timezone,
-    #     table=solar_position,
-    #     rounding_places=rounding_places,
-    #     timing=True,
-    #     declination=True,
-    #     hour_angle=True,
-    #     zenith=True,
-    #     altitude=True,
-    #     azimuth=True,
-    #     user_requested_timestamp=user_requested_timestamp, 
-    #     user_requested_timezone=user_requested_timezone
-    # )
+    from pvgisprototype.cli.print import print_solar_position_series_table
+    print_solar_position_series_table(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone='UTC',
+        table=solar_position_series,
+        rounding_places=rounding_places,
+        timing=True,
+        declination=True,
+        hour_angle=True,
+        zenith=True,
+        altitude=True,
+        azimuth=True,
+        user_requested_timestamps=user_requested_timestamps, 
+        user_requested_timezone=user_requested_timezone
+    )
 
 
 @app.command('declination', no_args_is_help=True, help='∢ Calculate the solar declination')
