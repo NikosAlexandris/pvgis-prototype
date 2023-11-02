@@ -215,6 +215,8 @@ def round_float_values(obj, decimal_places=3):
                 for key, value in v.items():
                     if isinstance(value, float):
                         v[key] = f"{round(value, decimal_places):.{decimal_places}f}"
+                    elif isinstance(value, np.ndarray):
+                        v[key] = np.around(value, decimals=decimal_places).astype(str)
             elif isinstance(v, float):
                 obj[i] = f"{round(v, decimal_places):.{decimal_places}f}"
         return obj
