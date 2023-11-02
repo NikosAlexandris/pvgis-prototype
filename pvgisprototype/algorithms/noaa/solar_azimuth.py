@@ -140,7 +140,7 @@ def calculate_solar_azimuth_noaa(
 def calculate_solar_azimuth_time_series_noaa(
     longitude: Longitude,   # radians
     latitude: Latitude,     # radians
-    timestamps: Union[float, Sequence[float]],
+    timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,

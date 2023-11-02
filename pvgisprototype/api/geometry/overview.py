@@ -316,7 +316,13 @@ def calculate_solar_geometry_overview(
     results = []
     for solar_position_model in solar_position_models:
         if solar_position_model != SolarPositionModels.all:  # ignore 'all' in the enumeration
-            solar_declination, solar_hour_angle, solar_zenith, solar_altitude, solar_azimuth = model_solar_geometry_overview(
+            (
+                solar_declination,
+                solar_hour_angle,
+                solar_zenith,
+                solar_altitude,
+                solar_azimuth,
+            ) = model_solar_geometry_overview(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
@@ -330,12 +336,12 @@ def calculate_solar_geometry_overview(
             )
             results.append({
                 TIME_ALGORITHM_NAME: solar_azimuth.timing_algorithm if solar_altitude.timing_algorithm == solar_azimuth.timing_algorithm else None,
-                DECLINATION_NAME if solar_declination else None: getattr(solar_declination, angle_output_units) if solar_declination else None,
-                HOUR_ANGLE_NAME if solar_hour_angle else None: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle else None,
+                DECLINATION_NAME: getattr(solar_declination, angle_output_units) if solar_declination else None,
+                HOUR_ANGLE_NAME: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle else None,
                 POSITION_ALGORITHM_NAME: solar_position_model.value,
-                ZENITH_NAME if solar_zenith else None: getattr(solar_zenith, angle_output_units) if solar_zenith else None,
-                ALTITUDE_NAME if solar_altitude else None: getattr(solar_altitude, angle_output_units) if solar_altitude else None,
-                AZIMUTH_NAME if solar_azimuth else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
+                ZENITH_NAME: getattr(solar_zenith, angle_output_units) if solar_zenith else None,
+                ALTITUDE_NAME: getattr(solar_altitude, angle_output_units) if solar_altitude else None,
+                AZIMUTH_NAME: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
                 UNITS_NAME: angle_output_units,
             })
 

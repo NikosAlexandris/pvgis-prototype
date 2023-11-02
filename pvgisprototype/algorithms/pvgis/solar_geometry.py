@@ -251,30 +251,16 @@ def calculate_solar_geometry_pvgis_variables(
 def parse_solar_geometry_constants_class(dict):
     return SolarGeometryDayConstants(dict)
 
-
 def calculate_solar_position_pvgis(
-        solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, typer.Argument(parser=parse_solar_geometry_constants_class)],
-        timestamp: Annotated[Optional[datetime.datetime], typer.Argument(
-            help='Timestamp',
-            default_factory=now_utc_datetimezone)],
-        timezone: Annotated[Optional[str], typer.Option(
-            help='Specify timezone (e.g., "Europe/Athens"). Use "local" to use the system\'s time zone',
-            callback=ctx_convert_to_timezone)] = None,
-        days_in_a_year: Annotated[float, typer.Option(
-            help='Days in a year')] = 365.25,
-        perigee_offset: Annotated[float, typer.Option(
-            help='Perigee offset')] = 0.048869,
-        eccentricity_correction_factor: Annotated[float, typer.Option(
-            help='Eccentricity')] = 0.01672,
-        hour_offset: Annotated[float, typer.Option(
-            help='Hour offset')] = 0,
-        output_units: Annotated[str, typer.Option(
-            '-o',
-            '--output-units',
-            show_default=True,
-            case_sensitive=False,
-            help="Output units for solar geometry variables (degrees or radians)")] = RADIANS,
-        ) -> SolarGeometryDayVariables:
+    solar_geometry_day_constants: Annotated[SolarGeometryDayConstants, "Solar geometry constants required for calculation"], # typer.Argument(parser=parse_solar_geometry_constants_class)],
+    timestamp: Annotated[Optional[datetime], "Timestamp for which to calculate solar position"] = None,
+    timezone: Annotated[Optional[str], "Timezone of the location"] = None,
+    days_in_a_year: Annotated[float, "Number of days in a year for calculations"] = 365.25,
+    perigee_offset: Annotated[float, "Perigee offset value"] = 0.048869,
+    eccentricity_correction_factor: Annotated[float, "Eccentricity correction factor for Earth's orbit"] = 0.01672,
+    hour_offset: Annotated[float, "Hour offset for timezone adjustments"] = 0,
+    output_units: Annotated[str, "Output units for solar geometry (degrees or radians)"] = 'radians',
+) -> SolarGeometryDayVariables:
     """Calculate solar altitude, azimuth and sun azimuth angles based on PVGIS'
     implementation in C.
 

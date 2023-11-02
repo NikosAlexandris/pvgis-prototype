@@ -23,7 +23,7 @@ def calculate_solar_azimuth_jenco(
     eccentricity_correction_factor: float,
     time_offset_global: int,
     hour_offset: int,
-    solar_time_model: SolarTimeModels,
+    solar_time_model: SolarTimeModels.pvis,
 ) -> SolarAzimuth:
     """Compute various solar geometry variables.
 
@@ -38,6 +38,8 @@ def calculate_solar_azimuth_jenco(
     """
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
     )
     C11 = sin(latitude.radians) * cos(solar_declination.radians)
     C13 = cos(latitude.radians) * sin(solar_declination.radians)
@@ -47,7 +49,7 @@ def calculate_solar_azimuth_jenco(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        model=solar_time_model,  # returns datetime.time object
+        model=SolarTimeModels.pvis,  # use same timing algorithm as for the declination
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
