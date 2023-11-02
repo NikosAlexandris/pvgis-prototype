@@ -280,6 +280,7 @@ def overview_series(
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -347,17 +348,19 @@ def overview_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
-        timezone='UTC',
+        timezone=timezone,
         table=solar_position_series,
-        rounding_places=rounding_places,
         timing=True,
         declination=True,
         hour_angle=True,
         zenith=True,
         altitude=True,
         azimuth=True,
+        incidence=True,
         user_requested_timestamps=user_requested_timestamps, 
-        user_requested_timezone=user_requested_timezone
+        user_requested_timezone=user_requested_timezone,
+        rounding_places=rounding_places,
+        group_models=group_models,
     )
 
 
