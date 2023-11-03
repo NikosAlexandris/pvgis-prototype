@@ -7,6 +7,8 @@ from pydantic import field_validator
 from pydantic import BaseModel
 from pydantic import confloat
 from pvgisprototype import SolarZenith
+from pvgisprototype.constants import RADIANS, DEGREES
+import numpy as np
 
 
 class BaseTimeEventModel(BaseModel):
@@ -39,19 +41,19 @@ class BaseAngleUnitsModel(BaseModel):
     @field_validator('angle_units')
     @classmethod
     def validate_angle_units(cls, v):
-        valid_units = ['radians', 'degrees']
+        valid_units = [RADIANS, DEGREES]
         if v not in valid_units:
             raise ValueError(f"angle_units must be one of {valid_units}")
         return v
 
 
 class BaseAngleOutputUnitsModel(BaseModel):
-    angle_output_units: Optional[str] = "radians"
+    angle_output_units: Optional[str] = RADIANS
 
     @field_validator('angle_output_units')
     @classmethod
     def validate_angle_output_units(cls, v):
-        valid_units = ['radians', 'degrees']
+        valid_units = [RADIANS, DEGREES]
         if v not in valid_units:
             raise ValueError(f"angle_output_units must be one of {valid_units}")
         return v
@@ -63,12 +65,12 @@ class AngleInRadiansOutputUnitsModel(BaseModel):
     returned value. This is not a real test. Hopefully, and however, it helps
     for clarity and understanding of what the function should return.
     """
-    angle_output_units: str = "radians"
+    angle_output_units: str = RADIANS
 
     @field_validator('angle_output_units')
     @classmethod
     def validate_angle_output_units(cls, v):
-        valid_units = ['radians']
+        valid_units = [RADIANS]
         if v not in valid_units:
             raise ValueError(f"angle_output_units must be one of {valid_units}")
         return v
@@ -80,5 +82,10 @@ class SolarZenithModel(BaseModel):
 
 class SolarZenithSeriesModel(BaseModel):  # merge above here-in
     # solar_zenith_series: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
-    solar_zenith_series: Union[SolarZenith, Sequence[SolarZenith]]
+    solar_zenith_series: SolarZenith
 
+    @field_validator('solar_zenith_series')
+    def solar_zenith_range(cls, v):
+        if not np.all((0 <= v.radians) & (v.radians <= np.pi)):  # Adjust the condition to work with an array
+            raise ValueError("The solar zenith angle must be between 0 and pi radians.")
+        return v

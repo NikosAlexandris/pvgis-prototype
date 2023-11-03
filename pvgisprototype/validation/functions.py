@@ -25,7 +25,6 @@ from pvgisprototype.validation.parameters import SolarTimeModel
 from pvgisprototype.validation.parameters import TimeOffsetModel
 from pvgisprototype.validation.parameters import HourOffsetModel
 from pvgisprototype.validation.parameters import BaseTimeOutputUnitsModel
-from pvgisprototype.validation.parameters import RandomTimeModel
 from pvgisprototype.validation.parameters import RandomTimeSeriesModel
 
 # Solar geometry
@@ -94,7 +93,6 @@ class CalculateSolarDeclinationPVISInputModel(
 
 class CalculateSolarDeclinationHargreavesInputModel(
     BaseTimestampModel,
-    # DaysInAYearModel,
 ):
     pass
 
@@ -108,7 +106,6 @@ class CalculateSolarDeclinationNOAAInput(
 class ModelSolarDeclinationInputModel(
     BaseTimeModel,
     EarthOrbitModel,
-    # DaysInAYearModel,
     VerbosityModel,
 ):
     pass
@@ -236,6 +233,13 @@ class SolarHourAngleSkyfieldInput(
     pass
 
 
+class SolarHourAngleSkyfieldInput(
+    BaseCoordinatesModel,
+    BaseTimestampModel,
+):
+    pass
+
+
 # Solar geometry
 
 class CalculateSolarAltitudePVISInputModel(
@@ -281,6 +285,17 @@ class CalculateSolarDeclinationPVLIBInput(
 ):
     pass
 
+
+class CalculateSolarDeclinationSkyfieldInput(
+    BaseTimestampModel,
+    BaseAngleOutputUnitsModel,
+):
+    pass
+
+class CalculateSolarDeclinationSkyfieldInput(
+    BaseTimestampModel,
+):
+    pass
 
 class CalculateSolarZenithPVLIBInputModel(
     CalculateSolarAltitudePVLIBInputModel
@@ -398,6 +413,24 @@ class CalculateSolarIncidenceTimeSeriesJencoInputModel(
 ):
     pass
 
+
+class ModelSolarIncidenceInputModel(
+    BaseCoordinatesModel,
+    BaseTimeModel,
+    SolarTimeModelModel,
+    SolarIncidenceModel,
+    SurfaceTiltModel,
+    SurfaceOrientationModel,
+    ApplyAtmosphericRefractionModel,
+    RefractedSolarZenithModel,
+    EarthOrbitModel,
+    TimeOffsetModel,
+    HourOffsetModel,
+    VerbosityModel,
+):
+    pass
+
+
 class ModelSolarIncidenceTimeSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
@@ -430,7 +463,7 @@ class CalculateOpticalAirMassInputModel(
     # @field_validator("angle_units")
     # @classmethod
     # def validate_angle_output_units(cls, v):
-    #     valid_units = "degrees"
+    #     valid_units = DEGREES
     #     if not v == valid_units:
     #         raise ValueError(f"angle_units must be {valid_units}")
     #     return v

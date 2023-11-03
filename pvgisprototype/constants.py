@@ -43,6 +43,7 @@ ROUNDING_PLACES_DEFAULT = 5
 TOLERANCE_DEFAULT = 0.1  # Is this a sane default ?
 UNITLESS = 'unitless'
 RADIANS = 'radians'
+DEGREES = 'degrees'
 ANGLE_OUTPUT_UNITS_DEFAULT = RADIANS
 MINUTES = 'minutes'
 TIME_OUTPUT_UNITS_DEFAULT = MINUTES
@@ -112,6 +113,7 @@ NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 TEMPERATURE_DEFAULT = 25  # Cell temperature under standard test conditions, degrees Celsius.
 TEMPERATURE_COLUMN_NAME = 'Temperature'
+TEMPERATURE_DEFAULT = 25  # Cell temperature under standard test conditions, degrees Celsius.
 WIND_SPEED_DEFAULT = 0
 WIND_SPEED_COLUMN_NAME = '🌬 Wind speed'
 ALBEDO_DEFAULT = 0.2

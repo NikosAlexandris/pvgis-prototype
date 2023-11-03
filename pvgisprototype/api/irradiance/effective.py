@@ -18,19 +18,11 @@ from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 
 from pvgisprototype.api.irradiance.diffuse import  calculate_diffuse_inclined_irradiance
 from pvgisprototype.api.irradiance.reflected import  calculate_ground_reflected_inclined_irradiance
-from pvgisprototype.api.geometry.incidence import model_solar_incidence
+from pvgisprototype.api.geometry.declination import model_solar_declination
 from pvgisprototype.api.geometry.altitude import model_solar_altitude
 from pvgisprototype.api.geometry.time import model_solar_time
 from .direct import calculate_direct_horizontal_irradiance
@@ -43,7 +35,6 @@ from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
-# from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_temperature_time_series
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -101,6 +92,8 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency
+from pvgisprototype.constants import RADIANS, DEGREES
+from pvgisprototype import LinkeTurbidityFactor
 
 
 AOIConstants = []
@@ -157,7 +150,7 @@ def calculate_effective_irradiance(
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor: Annotated[Optional[float], typer_option_linke_turbidity_factor] = LINKE_TURBIDITY_DEFAULT,
+    linke_turbidity_factor: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor] = None, # [LINKE_TURBIDITY_DEFAULT] LINKE_TURBIDITY_TIME_SERIES_DEFAULT
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
@@ -172,7 +165,7 @@ def calculate_effective_irradiance(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     horizon_heights: Annotated[List[float], typer_argument_horizon_heights] = None,
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
@@ -297,13 +290,11 @@ def calculate_effective_irradiance(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
+        solar_position_model=solar_position_model,
+        solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        solar_time_model=solar_time_model,
         verbose=verbose,
     )
 
@@ -422,8 +413,8 @@ def calculate_effective_irradiance(
 
     if verbose > 1:
         print(f'Hourly irradiance components incident on a surface on {timestamp}')
-        surface_tilt = convert_float_to_degrees_if_requested(surface_tilt, 'degrees')
-        surface_orientation = convert_float_to_degrees_if_requested(surface_orientation, 'degrees')
+        surface_tilt = convert_float_to_degrees_if_requested(surface_tilt, DEGREES)
+        surface_orientation = convert_float_to_degrees_if_requested(surface_orientation, DEGREES)
         print(f'Surface tilted at {surface_tilt} oriented at {surface_orientation}')
         print(f'Direct, Diffuse, Reflected : {direct_irradiance}, {diffuse_irradiance}, {reflected_irradiance}')
         print(f'Efficiency factor : {efficiency_coefficient}')

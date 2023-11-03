@@ -5,7 +5,7 @@ from pvgisprototype import SolarZenith
 # from pvgisprototype.algorithms.noaa.solar_zenith import adjust_solar_zenith_for_atmospheric_refraction_time_series
 # from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import ZENITH_NAME, HOUR_ANGLE_NAME
+from pvgisprototype.constants import ZENITH_NAME, HOUR_ANGLE_NAME, DEGREES
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -13,7 +13,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     latitude='latitude',
     timestamp='timestamp',
     hour_angle=HOUR_ANGLE_NAME,
@@ -65,7 +65,7 @@ def test_calculate_solar_zenith_noaa(
 # def test_calculate_solar_zenith_noaa(refraction_flag):
 #     latitude = Latitude(value=0.5, unit='radians')
 #     timestamp = datetime(year=2023, month=8, day=25)
-#     solar_hour_angle = SolarHourAngle(value=0.2, unit="radians")
+#     solar_hour_angle = SolarHourAngle(value=0.2, unit=RADIANS)
 #     result = calculate_solar_zenith_noaa(
 #         latitude,
 #         timestamp,
@@ -128,11 +128,11 @@ def test_calculate_solar_zenith_noaa(
 # ]
 # @pytest.mark.parametrize('refraction_flag', refraction_flags)
 # def test_calculate_solar_zenith_time_series_noaa(refraction_flag):
-#     latitude = Latitude(value=0.5, unit="radians")
+#     latitude = Latitude(value=0.5, unit=RADIANS)
 #     timestamps = [datetime(2023, 8, 25), datetime(2023, 8, 26)]
 #     solar_hour_angle_series = [
-#         SolarHourAngle(value=0.2, unit="radians"),
-#         SolarHourAngle(value=0.3, unit="radians"),
+#         SolarHourAngle(value=0.2, unit=RADIANS),
+#         SolarHourAngle(value=0.3, unit=RADIANS),
 #     ]
 #     result = calculate_solar_zenith_time_series_noaa(
 #         latitude=latitude,
@@ -145,11 +145,11 @@ def test_calculate_solar_zenith_noaa(
 
 # def test_calculate_solar_zenith_time_series_noaa_invalid_input():
 #     # Test with invalid input values
-#     latitude = Latitude(value=10, unit="radians")  # out-of-range latitude
+#     latitude = Latitude(value=10, unit=RADIANS)  # out-of-range latitude
 #     timestamps = [datetime(2023, 8, 25), datetime(2023, 8, 26)]
 #     solar_hour_angle_series = [
-#         SolarHourAngle(value=0.2, unit="radians"),
-#         SolarHourAngle(value=0.3, unit="radians"),
+#         SolarHourAngle(value=0.2, unit=RADIANS),
+#         SolarHourAngle(value=0.3, unit=RADIANS),
 #     ]
 #     with pytest.raises(ValueError):
 #         calculate_solar_zenith_time_series_noaa(

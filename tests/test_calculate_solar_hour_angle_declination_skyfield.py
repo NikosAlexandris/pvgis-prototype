@@ -2,7 +2,7 @@ import pytest
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_hour_angle_declination_skyfield
 from pvgisprototype import SolarHourAngle, SolarDeclination
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import HOUR_ANGLE_NAME, DECLINATION_NAME
+from pvgisprototype.constants import HOUR_ANGLE_NAME, DECLINATION_NAME, RADIANS
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -10,7 +10,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='radians',
+    against_unit=RADIANS,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',

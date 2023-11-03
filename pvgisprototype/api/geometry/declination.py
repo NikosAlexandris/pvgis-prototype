@@ -22,6 +22,7 @@ from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import DECLINATION_NAME
 from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import RADIANS
 
 
 @validate_with_pydantic(ModelSolarDeclinationInputModel)
@@ -70,7 +71,7 @@ def calculate_solar_declination(
     declination_models: List[SolarDeclinationModels] = [SolarDeclinationModels.pvis],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = 'radians',
+    angle_output_units: str = RADIANS,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """Calculate the solar declination angle

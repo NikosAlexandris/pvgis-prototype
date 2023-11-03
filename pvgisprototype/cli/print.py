@@ -1,3 +1,4 @@
+from pandas import to_datetime
 from datetime import datetime
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import round_float_values
@@ -31,9 +32,9 @@ from pvgisprototype.constants import (
     UNITS_COLUMN_NAME,
     UNITLESS,
     UNITS_NAME,
-    NOT_AVAILABLE_COLUMN_NAME,
     NOT_AVAILABLE,
-    ROUNDING_PLACES_DEFAULT
+    ROUNDING_PLACES_DEFAULT,
+    RADIANS,
 )
 
 
@@ -132,7 +133,7 @@ def print_solar_position_table(
             row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        #=====================================================================
 
-        if timing_algorithm:
+        if timing is not None:
             row.append(timing_algorithm)
         if declination_value is not None:
             row.append(str(declination_value))
@@ -156,6 +157,142 @@ def print_solar_position_table(
         }
         style = style_map.get(position_algorithm.lower(), None)
         table.add_row(*row, style=style)
+
+    console = Console()
+    console.print(table)
+
+
+def print_solar_position_series_table(
+    longitude,
+    latitude,
+    timestamps,
+    timezone,
+    table,
+    index: bool = False,
+    timing=None,
+    declination=None,
+    hour_angle=None,
+    zenith=None,
+    altitude=None,
+    azimuth=None,
+    incidence=None,
+    user_requested_timestamps=None,
+    user_requested_timezone=None,
+    rounding_places=ROUNDING_PLACES_DEFAULT,
+    group_models=False,
+):
+    # Round values
+    longitude = round_float_values(longitude, rounding_places)
+    latitude = round_float_values(latitude, rounding_places)
+    rounded_table = round_float_values(table, rounding_places)
+
+    quantities = [declination, zenith, altitude, azimuth, incidence]
+
+    columns = []
+    if index:
+        columns.append("Index")
+    if longitude is not None:
+        columns.append(LONGITUDE_COLUMN_NAME)
+    if latitude is not None:
+        columns.append(LATITUDE_COLUMN_NAME)
+    if timestamps is not None:
+        columns.append('Time')
+    if timezone is not None:
+        columns.append('Zone')
+    if user_requested_timestamps is not None and user_requested_timezone is not None:
+        columns.extend(["Local Time", "Local Zone"])
+    if timing is not None:
+        columns.append(TIME_ALGORITHM_COLUMN_NAME)
+    if declination is not None:
+        columns.append(DECLINATION_COLUMN_NAME)
+    if hour_angle is not None:
+        columns.append(HOUR_ANGLE_COLUMN_NAME)
+    if any(quantity is not None for quantity in quantities):
+        columns.append(POSITION_ALGORITHM_COLUMN_NAME)
+    if zenith is not None:
+        columns.append(ZENITH_COLUMN_NAME)
+    if altitude is not None:
+        columns.append(ALTITUDE_COLUMN_NAME)
+    if azimuth is not None:
+        columns.append(AZIMUTH_COLUMN_NAME)
+    if incidence is not None:
+        columns.append(INCIDENCE_COLUMN_NAME)
+    columns.append(UNITS_COLUMN_NAME)
+
+    table = Table(*columns, box=box.SIMPLE_HEAD)
+
+    def safe_get_value(d, key, index, default='NA'):
+        value = d.get(key, default)
+        if isinstance(value, (list, np.ndarray)) and len(value) > index:
+            return value[index]
+        return value
+
+    # Iterate over each timestamp and its corresponding result
+    for model_result in rounded_table:
+        for _index, timestamp in enumerate(timestamps):
+            timing_algorithm = safe_get_value(model_result, TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
+            declination_value = safe_get_value(model_result, DECLINATION_NAME, _index) if declination else None
+            hour_angle_value = safe_get_value(model_result, HOUR_ANGLE_NAME, _index) if hour_angle else None
+            position_algorithm = safe_get_value(model_result, POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
+            zenith_value = safe_get_value(model_result, ZENITH_NAME, _index) if zenith else None
+            altitude_value = safe_get_value(model_result, ALTITUDE_NAME, _index) if altitude else None
+            azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, _index) if azimuth else None
+            incidence_value = safe_get_value(model_result, INCIDENCE_NAME, _index) if incidence else None
+            units = safe_get_value(model_result, UNITS_NAME, UNITLESS)
+
+            row = []
+            if index:
+                row.append(str(_index))
+            if longitude:
+                row.append(str(longitude))
+            if latitude:
+                row.append(str(latitude))
+            row.extend([str(timestamp), str(timezone)])
+            
+           # ---------------------------------------------------- Implement-Me---
+           # Convert the result back to the user's time zone
+           # output_timestamp = output_timestamp.astimezone(user_timezone)
+           # --------------------------------------------------------------------
+
+           # Redesign Me! =======================================================
+            if (
+                user_requested_timestamps is not None
+                and user_requested_timezone is not None
+            ):
+                row.extend(
+                    [
+                        str(user_requested_timestamps.get_loc(timestamp)),
+                        str(user_requested_timezone),
+                    ]
+                )
+           #=====================================================================
+
+            if timing is not None:
+                row.append(timing_algorithm)
+            if declination_value is not None:
+                row.append(str(declination_value))
+            if hour_angle_value is not None:
+                row.append(str(hour_angle_value))
+            if position_algorithm is not None:
+                row.append(position_algorithm)
+            if zenith_value is not None:
+                row.append(str(zenith_value))
+            if altitude_value is not None:
+                row.append(str(altitude_value))
+            if azimuth_value is not None:
+                row.append(str(azimuth_value))
+            if incidence_value is not None:
+                row.append(str(incidence_value))
+            row.append(str(units))
+
+            style_map = {
+                "pvis": "red",  # red because PVIS is incomplete!
+                "pvlib": "bold",
+            }
+            style = style_map.get(position_algorithm.lower(), None)
+            table.add_row(*row, style=style)
+        if group_models:
+            table.add_row()
 
     console = Console()
     console.print(table)
@@ -252,7 +389,7 @@ def print_noaa_solar_position_table(
     rounding_places: int = 5,
     user_requested_timestamp: datetime = None, 
     user_requested_timezone: str = None,
-    angle_output_units: str = 'radians',
+    angle_output_units: str = RADIANS,
     verbose: bool = False,  # New verbose argument
 ):
     console = Console()
@@ -410,7 +547,6 @@ def print_irradiance_table_2(
             row.append(round_float_values(longitude, rounding_places))
             row.append(round_float_values(latitude, rounding_places))
 
-        from pandas import to_datetime
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
         for value in values:
             if not isinstance(value, str):

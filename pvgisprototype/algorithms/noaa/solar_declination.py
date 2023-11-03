@@ -4,11 +4,13 @@ from typing import Sequence
 from datetime import datetime
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationNOAAInput
+from pvgisprototype.validation.functions import CalculateSolarDeclinationNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarDeclinationTimeSeriesNOAAInput
 from .fractional_year import calculate_fractional_year_noaa 
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa
 from math import sin
 from math import cos
+from math import isfinite
 import numpy as np
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import RADIANS
@@ -31,24 +33,35 @@ def calculate_solar_declination_noaa(
         + 0.000907 * sin(2 * fractional_year.radians)
         - 0.002697 * cos(3 * fractional_year.radians)
         + 0.00148 * sin(3 * fractional_year.radians)
+        )
+    solar_declination = SolarDeclination(
+        value=declination,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA'
     )
-    declination = SolarDeclination(value=declination, unit=RADIANS)
-
-    return declination
+    if (
+        not isfinite(solar_declination.degrees)
+        or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
+            [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
+        )
+    return solar_declination
 
 
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)
 def calculate_solar_declination_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
-        angle_output_units: str = "radians"
-):# -> Union[SolarDeclination, np.ndarray]:
+) -> SolarDeclination:
 
     # timestamps = np.atleast_1d(timestamps)  # timestamps as array
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
-        angle_output_units="radians",
+        angle_output_units=RADIANS,
     )
-    fractional_year_series_array = np.array([fy.radians for fy in fractional_year_series])
+    # fractional_year_series_array = np.array([fy.radians for fy in fractional_year_series])
     # fractional_year_series_array = np.array(
     #     [
     #         fy.radians
@@ -61,22 +74,19 @@ def calculate_solar_declination_time_series_noaa(
     # )
     declination_series = (
         0.006918
-        - 0.399912 * np.cos(fractional_year_series_array)
-        + 0.070257 * np.sin(fractional_year_series_array)
-        - 0.006758 * np.cos(2 * fractional_year_series_array)
-        + 0.000907 * np.sin(2 * fractional_year_series_array)
-        - 0.002697 * np.cos(3 * fractional_year_series_array)
-        + 0.00148 * np.sin(3 * fractional_year_series_array)
+        - 0.399912 * np.cos(fractional_year_series.radians)
+        + 0.070257 * np.sin(fractional_year_series.radians)
+        - 0.006758 * np.cos(2 * fractional_year_series.radians)
+        + 0.000907 * np.sin(2 * fractional_year_series.radians)
+        - 0.002697 * np.cos(3 * fractional_year_series.radians)
+        + 0.00148 * np.sin(3 * fractional_year_series.radians)
     )
-    declination_series = [
-        SolarDeclination(value=declination, unit="radians")
-        for declination in declination_series
-    ]
 
-    #if angle_output_units == "degrees":
-    #    declination_series = convert_series_to_degrees_if_requested(declination_series, angle_output_units)
+    declination_series = SolarDeclination(
+        value=declination_series,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
 
-    if np.isscalar(timestamps):
-        return declination_series[0]
-    else:
-        return np.array(declination_series, dtype=object)
+    return declination_series

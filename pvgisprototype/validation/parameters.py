@@ -7,6 +7,7 @@ from typing import Optional
 from typing import Sequence
 from zoneinfo import ZoneInfo
 from datetime import datetime
+from datetime import time
 from pandas import DatetimeIndex
 from math import pi
 from pydantic import validator
@@ -27,7 +28,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
@@ -53,7 +54,7 @@ class LongitudeModel(BaseModel):
         if isinstance(input, Longitude):
             return input
         elif isinstance(input, float):
-            return Longitude(value=input, unit="radians")
+            return Longitude(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `longitude`")
 
@@ -67,7 +68,7 @@ class LatitudeModel(BaseModel):
         if isinstance(input, Latitude):
             return input
         elif isinstance(input, float):
-            return Latitude(value=input, unit="radians")
+            return Latitude(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `latitude`")
 
@@ -165,14 +166,14 @@ class BaseAngleUnitsModel(BaseModel):
     @field_validator("angle_units")
     @classmethod
     def validate_angle_units(cls, v):
-        valid_units = ["radians", "degrees"]
+        valid_units = [RADIANS, DEGREES]
         if v not in valid_units:
             raise ValueError(f"angle_units must be one of {valid_units}")
         return v
 
 
 class BaseAngleInternalUnitsModel(BaseModel):  # NOTE: Maybe deprecate
-    angle_units: str = "radians"
+    angle_units: str = RADIANS
     model_config = ConfigDict(
         description="""Angular units for internal calculations (degrees).""",
     )
@@ -180,7 +181,7 @@ class BaseAngleInternalUnitsModel(BaseModel):  # NOTE: Maybe deprecate
     @field_validator("angle_units")
     @classmethod
     def validate_angle_units(cls, v):
-        valid_units = ["radians"]
+        valid_units = [RADIANS]
         if v not in valid_units:
             raise ValueError(f"angle_units must be {valid_units}")
         return v
@@ -195,7 +196,7 @@ class BaseAngleOutputUnitsModel(BaseModel):
     @field_validator("angle_output_units")
     @classmethod
     def validate_angle_output_units(cls, v):
-        valid_units = ["radians", "degrees"]
+        valid_units = [RADIANS, DEGREES]
         if v not in valid_units:
             raise ValueError(f"angle_output_units must be one of {valid_units}")
         return v
@@ -215,7 +216,7 @@ class SolarDeclinationModel(BaseModel):
         if isinstance(input, SolarDeclination):
             return input
         elif isinstance(input, float):
-            return SolarDeclination(value=input, unit="radians")
+            return SolarDeclination(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_declination`")
 
@@ -237,8 +238,12 @@ class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
     solar_time_model: SolarTimeModels = SolarTimeModels.skyfield
 
 
+'''
+FIXME: Decide if datetime.datetime or datetime.time, and also change the
+callback function convert_hours_to_datetime_time() in typer_argument_true_solar_time()
+'''
 class SolarTimeModel(BaseModel):
-    solar_time: datetime
+    solar_time: Union[datetime, time]             # FIXME: Temporal solution for datetime.datetime AND datetime.time                                       
     model_config = ConfigDict(
         description="""The solar time (ST) is a calculation of the passage of time based
         on the position of the Sun in the sky. It is expected to be decimal hours in a
@@ -260,7 +265,7 @@ class SurfaceTiltModel(BaseModel):
         if isinstance(input, SurfaceTilt):
             return input
         elif isinstance(input, float):
-            return SurfaceTilt(value=input, unit="radians")
+            return SurfaceTilt(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_tilt`")
 
@@ -276,7 +281,7 @@ class SurfaceOrientationModel(BaseModel):
         if isinstance(input, SurfaceOrientation):
             return input
         elif isinstance(input, float):
-            return SurfaceOrientation(value=input, unit="radians")
+            return SurfaceOrientation(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_orientation`")
 
@@ -292,13 +297,13 @@ class SolarHourAngleModel(BaseModel):
         if isinstance(input, SolarHourAngle):
             return input
         elif isinstance(input, float):
-            return SolarHourAngle(value=input, unit="radians")
+            return SolarHourAngle(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_hour_angle`")
 
 
 class SolarHourAngleSeriesModel(BaseModel):
-    solar_hour_angle_series: Union[Sequence[SolarHourAngle], ndarray]
+    solar_hour_angle_series: Union[SolarHourAngle, ndarray]
     model_config = ConfigDict(
         description="Solar hour angle series.",
         arbitrary_types_allowed=True,
@@ -307,15 +312,13 @@ class SolarHourAngleSeriesModel(BaseModel):
     @field_validator("solar_hour_angle_series")
     def validate_solar_hour_angle(
         cls, input
-    ) -> Union[Sequence[SolarHourAngle], ndarray]:
-        if isinstance(input, list) and all(
-            isinstance(item, SolarHourAngle) for item in input
-        ):
+    ) -> Union[SolarHourAngle, ndarray]:
+        if isinstance(input, SolarHourAngle):
             return input
-        elif isinstance(input, ndarray) and all(
-            isinstance(item, SolarHourAngle) for item in input
-        ):
-            return input
+        # elif isinstance(input, ndarray) and all(                          # FIXME: What else could be?
+        #     isinstance(item, SolarHourAngle) for item in input
+        # ):
+        #     return input
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_hour_angle_series`")
 
@@ -332,20 +335,20 @@ class RefractedSolarAltitudeModel(BaseModel):
         if isinstance(input, RefractedSolarAltitude):
             return input
         elif isinstance(input, float):
-            return RefractedSolarAltitude(value=input, unit="radians")
+            return RefractedSolarAltitude(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_altitude`")
 
 
 class RefractedSolarAltitudeSeriesModel(BaseModel):
-    refracted_solar_altitude_series: Union[RefractedSolarAltitude, Sequence[RefractedSolarAltitude]]
+    refracted_solar_altitude_series: RefractedSolarAltitude
 
     # @field_validator("refracted_solar_altitude")
     # def validate_refracted_solar_altitude(cls, input) -> RefractedSolarAltitude:
     #     if isinstance(input, RefractedSolarAltitude):
     #         return input
     #     elif isinstance(input, float):
-    #         return RefractedSolarAltitude(value=input, unit="radians")
+    #         return RefractedSolarAltitude(value=input, unit=RADIANS)
     #     else:
     #         raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_altitude`")
 
@@ -358,7 +361,7 @@ class RefractedSolarZenithModel(BaseModel):
         if isinstance(input, RefractedSolarZenith):
             return input
         elif isinstance(input, float):
-            return RefractedSolarZenith(value=input, unit="radians")
+            return RefractedSolarZenith(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_zenith`")
 

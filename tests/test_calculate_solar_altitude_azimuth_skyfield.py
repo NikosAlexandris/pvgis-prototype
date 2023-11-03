@@ -2,7 +2,7 @@ import pytest
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 from pvgisprototype import SolarAltitude, SolarAzimuth
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import ALTITUDE_NAME, AZIMUTH_NAME
+from pvgisprototype.constants import ALTITUDE_NAME, AZIMUTH_NAME, RADIANS
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -10,7 +10,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='radians',
+    against_unit=RADIANS,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',
@@ -39,7 +39,6 @@ def test_calculate_solar_altitude_azimuth_skyfield(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
-        timezone=timezone,
     )
 
     # Check types
