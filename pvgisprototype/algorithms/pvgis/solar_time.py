@@ -10,6 +10,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimePVGISInputModel
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 
 
 @validate_with_pydantic(CalculateSolarTimePVGISInputModel)
@@ -66,6 +67,7 @@ def calculate_solar_time_pvgis(
     image_offset = get_image_offset(longitude, latitude)  # for `hour_offset`
 
     # adding longitude to UTC produces mean solar time!
+    hour_offset = time_offset_global + longitude.degrees / 15 + image_offset  # for `solar_time`
     hour_offset = time_offset_global + longitude.degrees / 15 + image_offset  # for `solar_time`
     time_correction_factor_hours = hour_of_day + time_offset + hour_offset
     solar_time = timestamp + timedelta(hours=time_correction_factor_hours)

@@ -1,4 +1,3 @@
-from math import pi
 from datetime import time
 from datetime import timedelta
 from pvgisprototype.validation.functions import validate_with_pydantic

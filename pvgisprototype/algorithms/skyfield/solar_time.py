@@ -44,7 +44,12 @@ def calculate_solar_time_skyfield(
         location = wgs84.latlon(latitude.degrees * N, longitude.degrees * E)
     if longitude.degrees < 0:
         location = wgs84.latlon(latitude.degrees * N, longitude.degrees * W)  # Correct ?
+    if longitude.degrees > 0:
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees * E)
+    if longitude.degrees < 0:
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees * W)  # Correct ?
     else:
+        location = wgs84.latlon(latitude.degrees * N, longitude.degrees)  # Correct ?
         location = wgs84.latlon(latitude.degrees * N, longitude.degrees)  # Correct ?
 
     f = almanac.meridian_transits(planets, sun, location)

@@ -10,11 +10,8 @@ from math import radians
 from math import degrees
 from math import sin
 from math import cos
-import numpy as np
+from zoneinfo import ZoneInfo
 
-from pvgisprototype.api.utilities.conversions import convert_to_radians
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype import Longitude
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimeMilne1921InputModel

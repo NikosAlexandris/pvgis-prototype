@@ -2,7 +2,7 @@ import pytest
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
 from pvgisprototype import SolarDeclination
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import DECLINATION_NAME
+from pvgisprototype.constants import DECLINATION_NAME, RADIANS
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -10,7 +10,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='radians',
+    against_unit=RADIANS,
     timestamp='timestamp',
     declination=DECLINATION_NAME,
 )

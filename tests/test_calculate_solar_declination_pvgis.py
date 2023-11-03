@@ -2,7 +2,7 @@ import pytest
 from pvgisprototype.algorithms.pvgis.solar_declination import calculate_solar_declination_pvgis
 from pvgisprototype import SolarDeclination
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import DECLINATION_NAME
+from pvgisprototype.constants import DECLINATION_NAME, DEGREES
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -10,7 +10,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     timestamp='timestamp',
     timezone='timezone',
     declination=DECLINATION_NAME,

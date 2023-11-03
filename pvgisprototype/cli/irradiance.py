@@ -138,6 +138,7 @@ from typing_extensions import Annotated
 import math
 import numpy as np
 import typer
+from pvgisprototype import LinkeTurbidityFactor
 
 
 app = typer.Typer(
@@ -203,7 +204,7 @@ def calculate_effective_irradiance(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
@@ -302,11 +303,10 @@ def calculate_effective_irradiance(
             dictionary=results,
             filename=csv,
         )
-    # if not verbose and not csv:
-    #     flat_list = effective_irradiance_series.flatten().astype(str)
-    #     csv_str = ','.join(flat_list)
-    #     print(csv_str)
-    #     print(f'CSV ? {csv}')
+    if not verbose and not csv:
+        flat_list = effective_irradiance_series.flatten().astype(str)
+        csv_str = ','.join(flat_list)
+        print(csv_str)
 
 
 app.add_typer(

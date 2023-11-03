@@ -20,6 +20,7 @@ from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_dec
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
 from pvgisprototype.algorithms.pvgis.solar_declination import calculate_solar_declination_pvgis
 from pvgisprototype.constants import DECLINATION_NAME
+from pvgisprototype.constants import RADIANS
 
 
 def generate_timestamps(start_date: datetime, end_date: datetime):
@@ -27,7 +28,7 @@ def generate_timestamps(start_date: datetime, end_date: datetime):
 
 
 def calculate_declinations(
-    timestamps: List, timezone: ZoneInfo = None, output_units="radians"
+    timestamps: List, timezone: ZoneInfo = None, output_units=RADIANS
 ):
     solar_declinations = np.vectorize(calculate_solar_declination)(
         timestamp=timestamps,
@@ -67,7 +68,7 @@ def plot_solar_declination(
     end_date: datetime = None,
     year: int = None,
     title: str = "Variation of Solar Declination",
-    output_units: str = "radians",
+    output_units: str = RADIANS,
 ):
     if year is not None:
         start_date = datetime(year, 1, 1)
@@ -135,7 +136,7 @@ def plot_solar_declination(
 def plot_solar_declination_five_years(
     start_year: int,
     title: str = "Five-Year Variation of Solar Declination",
-    output_units: str = "radians",
+    output_units: str = RADIANS,
 ):
     start_date = datetime(start_year, 1, 1)
     end_date = datetime(start_year + 5, 1, 1)
@@ -149,7 +150,7 @@ def plot_solar_declination_five_years(
 def plot_solar_declination_one_year_bokeh(
         year: int,
         title: str = 'Annual Variation of Solar Declination',
-        angle_output_units: str = 'radians',
+        angle_output_units: str = RADIANS,
         ):
     timestamps = [datetime(year, 1, 1) + timedelta(days=i) for i in range((datetime(year+1, 1, 1) - datetime(year, 1, 1)).days)]
     timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime

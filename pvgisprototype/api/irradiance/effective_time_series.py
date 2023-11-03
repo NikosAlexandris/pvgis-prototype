@@ -59,6 +59,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.efficiency_time_series import calculate_pv_efficiency_time_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
+from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import EFFECTIVE_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
@@ -77,8 +78,7 @@ from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import SHADE_COLUMN_NAME
-
-
+from pvgisprototype import LinkeTurbidityFactor
 
 
 def is_surface_in_shade_time_series(input_array, threshold=10):
@@ -123,7 +123,7 @@ def calculate_effective_irradiance_time_series(
     in_memory: bool = False,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: List[float] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = 2,
@@ -137,8 +137,8 @@ def calculate_effective_irradiance_time_series(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    angle_units: str = RADIANS,
+    angle_output_units: str = RADIANS,
     # horizon_heights: List[float] = None,
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
     efficiency_model: PVModuleEfficiencyAlgorithms = None,
@@ -163,20 +163,18 @@ def calculate_effective_irradiance_time_series(
         # angle_output_units=angle_output_units,
         verbose=0,
     )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
-
     # Masks based on the solar altitude series
-    mask_above_horizon = solar_altitude_series_array > 0
-    mask_low_angle = (solar_altitude_series_array >= 0) & (solar_altitude_series_array < 0.04)
-    mask_below_horizon = solar_altitude_series_array < 0
-    in_shade = is_surface_in_shade_time_series(solar_altitude_series_array)
+    mask_above_horizon = solar_altitude_series.value > 0
+    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)      # FIXME: Is this in radians or degrees ?
+    mask_below_horizon = solar_altitude_series.value < 0
+    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
+    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
@@ -354,8 +352,8 @@ def calculate_effective_irradiance_time_series(
 
     if verbose > 3:
         even_more_extended_results = {
-            TEMPERATURE_COLUMN_NAME: temperature_series,
-            WIND_SPEED_COLUMN_NAME: wind_speed_series,
+            # TEMPERATURE_COLUMN_NAME: temperature_series,          # FIXME: Not defined
+            # WIND_SPEED_COLUMN_NAME: wind_speed_series,          # FIXME: Not defined
         }
         results = results | even_more_extended_results
 
