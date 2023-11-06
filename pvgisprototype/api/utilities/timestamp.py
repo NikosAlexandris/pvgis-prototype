@@ -425,8 +425,10 @@ def callback_generate_datetime_series(
     if start_time is not None and end_time is not None:
         timestamps = generate_datetime_series(start_time, end_time, frequency)
 
-    timezone_aware_timestamps = [
-        attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
-    ]
+    # If we do the following, we need to take care of external naive time series!
+    # timezone_aware_timestamps = [
+    #     attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
+    # ]
     from pandas import to_datetime
-    return to_datetime(timezone_aware_timestamps, format="mixed")
+    # return to_datetime(timezone_aware_timestamps, format="mixed")
+    return timestamps
