@@ -548,12 +548,17 @@ def print_irradiance_table_2(
             row.append(round_float_values(latitude, rounding_places))
 
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
-        for value in values:
-            if not isinstance(value, str):
-                row.append(str(round_float_values(value, rounding_places)))
+        for idx, value in enumerate(values):
+            if idx == 0:  # Assuming after 'Time' is the value of main interest
+                from rich.text import Text
+                bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
+                row.append(bold_value)
             else:
-                row.append(value)
+                if not isinstance(value, str):
+                    row.append(str(round_float_values(value, rounding_places)))
+                else:
+                    row.append(value)
         table.add_row(*row)
-    
+
     if verbose:
         console.print(table)
