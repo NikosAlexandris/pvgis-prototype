@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.geometry.solar_altitude import model_solar_altitude
+from pvgisprototype.api.geometry.altitude import model_solar_altitude
 from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import ALTITUDE_NAME, DEGREES
@@ -62,10 +62,10 @@ def test_model_solar_altitude(
         timezone=timezone,
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        verbose=verbose,
+        # apply_atmospheric_refraction=apply_atmospheric_refraction,
+        # perigee_offset=perigee_offset,
+        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # verbose=verbose,
     )
 
     # Check types
