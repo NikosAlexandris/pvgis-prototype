@@ -339,11 +339,11 @@ def diffuse_solar_altitude_coefficients(
 ):
     """ """
     # calculate common terms only once
-    linke_turbidity_factor_squared = linke_turbidity_factor**2
-    diffuse_transmission = diffuse_transmission_function(linke_turbidity_factor)
+    linke_turbidity_factor_squared = linke_turbidity_factor.value**2
+    diffuse_transmission = diffuse_transmission_function(linke_turbidity_factor.value)
     a1_prime = (
         0.26463
-        - 0.061581 * linke_turbidity_factor
+        - 0.061581 * linke_turbidity_factor.value
         + 0.0031408 * linke_turbidity_factor_squared
     )
     if a1_prime * diffuse_transmission < 0.0022:
@@ -352,12 +352,12 @@ def diffuse_solar_altitude_coefficients(
         a1 = a1_prime
     a2 = (
         2.04020
-        + 0.018945 * linke_turbidity_factor
+        + 0.018945 * linke_turbidity_factor.value
         - 0.011161 * linke_turbidity_factor_squared
     )
     a3 = (
         -1.3025
-        + 0.039231 * linke_turbidity_factor
+        + 0.039231 * linke_turbidity_factor.value
         + 0.0085079 * linke_turbidity_factor_squared
     )
 
