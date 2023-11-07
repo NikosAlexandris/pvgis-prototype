@@ -291,10 +291,8 @@ def calculate_solar_zenith_time_series_noaa(
     solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
             )
-
-    if isinstance(timestamps, datetime):
-        timestamps = [timestamps]
-
+    # if isinstance(timestamps, datetime):
+    #     timestamps = [timestamps]
     cosine_solar_zenith = (
         np.sin(latitude.radians) * np.sin(solar_declination_series.radians)
         + np.cos(latitude.radians) * np.cos(solar_declination_series.radians) * np.cos(solar_hour_angle_series.radians)
