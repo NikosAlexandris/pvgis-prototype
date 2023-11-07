@@ -185,7 +185,7 @@ def correct_linke_turbidity_factor(
 	opticalAirMass = elevationCorr / (sin(h0refract) + 0.50572 * pow(h0refract * rad2deg + 6.07995, -1.6364));
 	airMass2Linke = 0.8662 * sunRadVar->linke;
     """
-    corrected_linke_turbidity_factor = -0.8662 * linke_turbidity_factor
+    corrected_linke_turbidity_factor = -0.8662 * linke_turbidity_factor.value
     return corrected_linke_turbidity_factor
 
 

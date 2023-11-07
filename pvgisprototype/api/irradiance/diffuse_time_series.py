@@ -698,13 +698,12 @@ def calculate_diffuse_inclined_irradiance_time_series(
                     eccentricity_correction_factor=eccentricity_correction_factor,
                     verbose=verbose,
                 )
-                solar_azimuth_series_array = np.array([x.value for x in solar_azimuth_series])
                 # Normalize the azimuth difference to be within the range -pi to pi
                 # A0 : solar azimuth _measured from East_ in radians
                 # ALN : angle between the vertical surface containing the normal to the
                 #   surface and vertical surface passing through the centre of the solar
                 #   disc [rad]
-                azimuth_difference_series_array = solar_azimuth_series_array - surface_orientation
+                azimuth_difference_series_array = solar_azimuth_series.value - surface_orientation
                 azimuth_difference_series_array = np.arctan2(np.sin(azimuth_difference_series_array), np.cos(azimuth_difference_series_array))
                 diffuse_inclined_irradiance_series = (
                     diffuse_inclined_irradiance_series_before_angular_loss
