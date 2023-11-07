@@ -25,7 +25,7 @@ def calculate_solar_hour_angle_pvlib(
         equation_of_time=equation_of_time
         )
     solar_hour_angle = SolarHourAngle(
-        value=solar_hour_angle,
+        value=solar_hour_angle[0],
         unit=DEGREES,
         position_algorithm='PVLIB',
         timing_algorithm='PVLIB',

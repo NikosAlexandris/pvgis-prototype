@@ -80,7 +80,7 @@ EccentricityCorrectionFactor:
 
 EquationOfTime:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -108,7 +108,7 @@ SolarHourAngle:
 
 EventHourAngle:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -223,7 +223,7 @@ RefractedSolarAltitude:
 LinkeTurbidityFactor:
   value:
     type: Union[ndarray, float]
-    initial:
+    initial: [2]
   unit:
     type: str
     initial: unitless
@@ -246,7 +246,7 @@ RayleighThickness:
 
 SolarAzimuth:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -306,7 +306,7 @@ RelativeLongitude:
 
 TimeOffset:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str

@@ -63,7 +63,7 @@ def calculate_equation_of_time_time_series_noaa(
     
     return EquationOfTime(
         value=equation_of_time_series,
-        unit=RADIANS,
+        unit='minutes',
         position_algorithm='NOAA',
         timing_algorithm='NOAA',
     )

@@ -10,6 +10,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationHargreavesInputModel
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import DEGREES
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 
 
 @validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)
