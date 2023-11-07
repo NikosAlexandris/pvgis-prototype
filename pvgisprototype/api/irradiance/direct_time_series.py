@@ -229,7 +229,25 @@ def calculate_optical_air_mass_time_series(
     refracted_solar_altitude_series: RefractedSolarAltitude,
     verbose: Annotated[int, typer_option_verbose] = 0,
 ) -> OpticalAirMass:
-    """Vectorized function to approximate the relative optical air mass for a time series."""
+    """Vectorized function to approximate the relative optical air mass for a time series.
+    This function implements the algorithm described by Minzer et al. [1]_ 
+    and Hofierka [2]_ in which the relative optical air mass (unitless) is
+    defined as follows :
+
+        m = (p / p0) / (sin h0_ref + 0.50572 (h0_ref + 6.07995) - 1.6364)
+    
+        where :
+
+        - h0_ref is the corrected solar altitude h0 in degrees by the
+          atmospheric refraction component ∆h0_ref:
+
+    References
+    ----------
+    .. [1] Minzer, A., Champion, K. S. W., & Pond, H. L. (1959). 
+           The ARDC Model Atmosphere. Air Force Surveys in Geophysics, 115. AFCRL.
+
+    .. [2] Hofierka, 2002
+    """
     adjusted_elevation = adjust_elevation(elevation.value)
     optical_air_mass_series = adjusted_elevation.value / (
         np.sin(refracted_solar_altitude_series.radians)
