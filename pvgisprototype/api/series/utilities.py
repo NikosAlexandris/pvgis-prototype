@@ -3,8 +3,6 @@ from rich import print
 import warnings
 import typer
 import netCDF4
-from colorama import Fore
-from colorama import Style
 from .log import logger
 import xarray as xr
 
@@ -127,21 +125,21 @@ def set_location_indexers(
         logger.info(f'Dimensions  : {x}, {y}')
 
     if not (longitude and latitude):
-        warning = Fore.YELLOW + f'{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates.' + Style.RESET_ALL
+        warning = f'{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates.'
         logger.warning(warning)
-        typer.echo(Fore.YELLOW + warning)
+        typer.echo(warning)
 
         center_longitude = float(data_array[x][len(data_array[x])//2])
         center_latitude = float(data_array[y][len(data_array[y])//2])
         indexers[x] = center_longitude
         indexers[y] = center_latitude
 
-        text_coordinates = Fore.GREEN + f'{check_mark} Center coordinates (longitude, latitude) : {center_longitude}, {center_latitude}.' + Style.RESET_ALL
+        text_coordinates = f'{check_mark} Center coordinates (longitude, latitude) : {center_longitude}, {center_latitude}.'
 
     else:
         indexers[x] = longitude
         indexers[y] = latitude
-        text_coordinates = Fore.GREEN + f'{check_mark} Coordinates : {longitude}, {latitude}.' + Style.RESET_ALL
+        text_coordinates = f'{check_mark} Coordinates : {longitude}, {latitude}.'
 
     logger.info(text_coordinates)
     if verbose > 0:

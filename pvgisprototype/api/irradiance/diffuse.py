@@ -3,22 +3,16 @@ from devtools import debug
 Diffuse irradiance
 """
 
-import logging
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler('error.log'),  # Save log to a file
-        logging.StreamHandler()  # Print log to the console
-    ]
-)
+from rich.logging import RichHandler
+from loguru import logger
+logger.remove()  # the default handler
+logger.add(RichHandler())
 import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
 from rich import print
 from rich.console import Console
-from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
@@ -203,21 +197,17 @@ def calculate_diffuse_horizontal_component_from_sarah(
     if diffuse_horizontal_irradiance.size == 1:
         single_value = float(diffuse_horizontal_irradiance.values)
         warning = (
-            Fore.YELLOW
-            + f"{exclamation_mark} The selected timestamp "
-            + Fore.GREEN
+            f"{exclamation_mark} The selected timestamp "
             + f"{diffuse_horizontal_irradiance[diffuse_horizontal_irradiance.indexes].time.values}"
-            + Fore.YELLOW
             + f" matches the single value "
-            + Fore.GREEN
             + f"{single_value}"
-            + Style.RESET_ALL
         )
-        logging.warning(warning)
+        logger.warning(warning)
         if verbose == 3:
             debug(locals())
+
         if verbose > 0:
-            print(Fore.YELLOW + warning)
+            print(f'{warning}')
 
         return single_value
 
