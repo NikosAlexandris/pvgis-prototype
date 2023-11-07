@@ -1,13 +1,5 @@
 from devtools import debug
-import logging
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler('error.log'),  # Save log to a file
-        logging.StreamHandler()  # Print log to the console
-    ]
-)
+from loguru import logger
 from datetime import datetime
 import typer
 from pathlib import Path
@@ -205,7 +197,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
             + f" matches the single value "
             + f"{single_value}"
         )
-        logging.warning(warning)
+        logger.warning(warning)
 
         if verbose > 5:
             debug(locals())
