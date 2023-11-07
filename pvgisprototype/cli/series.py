@@ -41,7 +41,6 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_op
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 from pvgisprototype.cli.print import print_irradiance_table_2
 from rich import print
-from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
 import xarray as xr
@@ -95,12 +94,12 @@ def warn_for_negative_longitude(
     Maybe the input dataset ranges in [0, 360] degrees ?
     """
     if longitude < 0:
-        warning = Fore.YELLOW + f'{exclamation_mark} '
-        warning += f'The longitude ' + Style.RESET_ALL
-        warning += f'{longitude} ' + Fore.RED + f'is negative. ' + Style.RESET_ALL
-        warning += Fore.YELLOW + f'If the input dataset\'s longitude values range in [0, 360], consider using `--convert-longitude-360`!' + Style.RESET_ALL
+        warning = f'{exclamation_mark} '
+        warning += f'The longitude '
+        warning += f'{longitude} ' + f'is negative. '
+        warning += f'If the input dataset\'s longitude values range in [0, 360], consider using `--convert-longitude-360`!'
         # logger.warning(warning)
-        typer.echo(Fore.YELLOW + warning)
+        print(warning)
 
 
 @app.command(

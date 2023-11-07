@@ -16,7 +16,6 @@ from typing import Optional
 from typing import List
 from rich.console import Console
 from rich import print
-from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.csv import write_irradiance_csv
@@ -201,15 +200,10 @@ def calculate_diffuse_horizontal_component_from_sarah(
     if diffuse_horizontal_irradiance_series.size == 1:
         single_value = float(diffuse_horizontal_irradiance_series.values)
         warning = (
-            Fore.YELLOW
-            + f"{exclamation_mark} The selected timestamp "
-            + Fore.GREEN
+            f"{exclamation_mark} The selected timestamp "
             + f"{diffuse_horizontal_irradiance_series.time.values}"
-            + Fore.YELLOW
             + f" matches the single value "
-            + Fore.GREEN
             + f"{single_value}"
-            + Style.RESET_ALL
         )
         logging.warning(warning)
 
@@ -217,7 +211,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
             debug(locals())
 
         if verbose > 0:
-            print(Fore.YELLOW + warning)
+            print(warning)
 
     results = {
         "Diffuse": diffuse_horizontal_irradiance_series.to_numpy(),

@@ -6,7 +6,6 @@ import matplotlib.ticker as ticker
 import matplotlib.dates as mdates
 from pathlib import Path
 import numpy as np
-from colorama import Fore, Style
 import xarray as xr
 from rich import print
 from pvgisprototype.api.series.hardcodings import exclamation_mark
