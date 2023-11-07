@@ -234,7 +234,7 @@ def calculate_optical_air_mass_time_series(
     optical_air_mass_series = adjusted_elevation.value / (
         np.sin(refracted_solar_altitude_series.radians)
         + 0.50572
-        * np.power((refracted_solar_altitude_series.radians + 6.07995), -1.6364)
+        * np.power((refracted_solar_altitude_series.degrees + 6.07995), -1.6364)
     )
 
     optical_air_mass_series = OpticalAirMass(
