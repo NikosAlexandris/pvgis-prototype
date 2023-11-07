@@ -119,17 +119,34 @@ app.add_typer(
 )
 
 
+def setup_logging(logfile: Optional[Path] = None):
+    """
+    Configure logging to either stderr or a file based on the logfile argument.
+    """
+    from loguru import logger
+    logger.remove()  # Remove default handler
+
+    if logfile:
+        logger.add(logfile, enqueue=True, backtrace=True, diagnose=True)
+    
+    # else:
+    #     import sys
+    #     logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
+
+
 @app.callback(no_args_is_help=True)
 def main(
-    verbose: Annotated[int, typer_option_verbose] = 0,
     version: Annotated[Optional[bool], typer_option_version] = None,
+    verbose: Annotated[int, typer_option_verbose] = 0,
+    log: Annotated[Optional[Path], typer.Option("--log", "-l", help="Specify a log file to write logs to, or omit for stderr.")] = None,
 ) -> None:
     """
-    callback() : PVIS prototype
+    The main entry point for PVIS prototype
     """
     if verbose:
         print("Will write verbose output")
         state["verbose"] = True
+    setup_logging(log)
     return
 
 
