@@ -138,7 +138,7 @@ def calculate_time_offset_time_series_noaa(
 ) -> TimeOffset:
     """ """
     # 1
-    longitude_in_minutes = radians_to_time_minutes(longitude.radians)  # time
+    # longitude_in_minutes = radians_to_time_minutes(longitude.radians)  # time
 
     # 2
     timestamps = [timestamp.astimezone(timezone) for timestamp in timestamps]
@@ -151,7 +151,7 @@ def calculate_time_offset_time_series_noaa(
         timestamps,
     )
     # equation_of_time_series = np.array([eot.minutes if isinstance(item, EquationOfTime) else eot for eot in equation_of_time_series])
-    time_offset_series = longitude_in_minutes - timezone_offset_minutes_series + equation_of_time_series
+    time_offset_series = longitude.as_minutes - timezone_offset_minutes_series + equation_of_time_series.minutes
 
     if not np.all((-790 <= time_offset_series) & (time_offset_series <= 790)):
         raise ValueError("At leasr one calculated time offset is out of the expected range [-790, 790] minutes!")

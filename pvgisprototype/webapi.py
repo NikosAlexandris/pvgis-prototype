@@ -19,14 +19,15 @@ from bokeh.embed import components
 from bokeh.resources import INLINE
 from bokeh.resources import CDN
 
-from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import convert_to_timezone
+# from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+# from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 
 from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_noaa_solar_position
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
+from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_noaa_timeseries_solar_position
 
-from pvgisprototype.plot.plot import plot_line
+# from pvgisprototype.plot.plot import plot_line
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
 from pvgisprototype.web_api.plot.plot_example import graph_example
@@ -67,6 +68,7 @@ class SolarTimeResult(BaseModel):
 
 app.get("/calculate/geometry/solar_time/")(get_calculate_solar_time)
 app.get("/calculate/geometry/noaa/solar_position")(get_calculate_noaa_solar_position)
+app.get("/calculate/geometry/noaa/solar_position_timeseries")(get_calculate_noaa_timeseries_solar_position)
 
 app.get("/plot/example", response_class=HTMLResponse)(plot_example)
 app.get("/plot/graph", response_class=HTMLResponse)(graph_example)
