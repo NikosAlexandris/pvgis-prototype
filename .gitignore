@@ -2,11 +2,15 @@ version.py
 gitignore/
 *.orig
 
+# mprof dat files
+
+*.dat
+
 # Created by https://www.toptal.com/developers/gitignore/api/linux,direnv,venv,vim,python,pytest
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,direnv,venv,vim,python,pytest
 
 ### direnv ###
-.pvgis-prototype_virtual_environment
+.pvis-be-prototype_virtual_environment
 .direnv
 .envrc
 .vscode
