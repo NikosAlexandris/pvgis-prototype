@@ -251,15 +251,6 @@ def calculate_noaa_timeseries_solar_position(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
 
-    fractional_year.value = fractional_year.value.tolist()  # FIXME: PydanticSerializationError: Unable to serialize unknown type <class 'numpy.ndarray'>
-    equation_of_time.value = equation_of_time.value.tolist()
-    solar_declination.value = solar_declination.value.tolist()
-    time_offset.value = time_offset.value.tolist()
-    solar_hour_angle.value = solar_hour_angle.value.tolist()
-    solar_zenith.value = solar_zenith.value.tolist()
-    solar_altitude.value = solar_altitude.value.tolist()
-    solar_azimuth.value = solar_azimuth.value.tolist()
-
     result["fractional_year"] = fractional_year
     result["equation_of_time"] = equation_of_time
     result["solar_declination"] = solar_declination
