@@ -431,4 +431,5 @@ def callback_generate_datetime_series(
     # ]
     from pandas import to_datetime
     # return to_datetime(timezone_aware_timestamps, format="mixed")
+    return to_datetime(timestamps, format="mixed")
     return timestamps
