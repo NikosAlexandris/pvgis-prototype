@@ -165,9 +165,27 @@ class CalculateEventHourAngleNOAAInput(
         return v
 
 
+class CalculateEventHourAngleTimeSeriesNOAAInput(
+    LatitudeModel,
+    BaseTimestampSeriesModel,
+    RefractedSolarZenithModel,
+):
+    pass
+
+
 class CalculateEventTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
+    BaseTimeEventModel,
+    ApplyAtmosphericRefractionModel,
+):
+    pass
+
+
+class CalculateEventTimeTimeSeriesNOAAInput(
+    BaseCoordinatesModel,
+    BaseTimestampSeriesModel,
     RefractedSolarZenithModel,
     BaseTimeEventModel,
     ApplyAtmosphericRefractionModel,
@@ -200,4 +218,13 @@ class CalculateSolarPositionNOAAInput(
                 f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
         return v
+    pass
+
+
+class CalculateTimeserieSolarPositionNOAAInput(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    RefractedSolarZenithModel,
+    ApplyAtmosphericRefractionModel,
+):
     pass

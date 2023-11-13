@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 # from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_time import calculate_apparent_solar_time_noaa
+from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_noaa
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import SOLAR_TIME_NAME
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
@@ -35,7 +35,7 @@ def test_calculate_apparent_solar_time_noaa(
     tolerance,
 ):
     assert against_unit == expected_solar_time[1] == 'minutes'
-    calculated_solar_time = calculate_apparent_solar_time_noaa(
+    calculated_solar_time = calculate_true_solar_time_noaa(
         longitude=longitude,
         timestamp=timestamp,
         timezone=timezone,

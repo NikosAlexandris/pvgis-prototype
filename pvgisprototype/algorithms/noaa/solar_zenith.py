@@ -224,7 +224,12 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     if not np.all(np.isfinite(adjusted_solar_zenith_series_array)) or not np.all((0 <= adjusted_solar_zenith_series_array) & (adjusted_solar_zenith_series_array <= np.pi + 0.0146)):
         raise ValueError(f'The `adjusted_solar_zenith` should be a finite number ranging in [0, {np.pi + 0.0146}] radians')
 
-    adjusted_solar_zenith_series = SolarZenith(value=adjusted_solar_zenith_series_array, unit=RADIANS)
+    adjusted_solar_zenith_series = SolarZenith(
+        value=adjusted_solar_zenith_series_array,
+        unit=RADIANS,
+        position_algorithm=solar_zenith_series.position_algorithm,
+        timing_algorithm=solar_zenith_series.timing_algorithm
+    )
 
     if verbose > 5:
         debug(locals())
