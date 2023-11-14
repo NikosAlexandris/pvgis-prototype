@@ -80,7 +80,7 @@ EccentricityCorrectionFactor:
 
 EquationOfTime:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -108,7 +108,7 @@ SolarHourAngle:
 
 EventHourAngle:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -306,7 +306,7 @@ RelativeLongitude:
 
 TimeOffset:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str

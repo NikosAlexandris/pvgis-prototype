@@ -1,8 +1,8 @@
 import pytest
-from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
+from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype import RefractedSolarZenith
+# from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.constants import (
     POSITION_ALGORITHM_NAME,
     TIME_ALGORITHM_NAME,

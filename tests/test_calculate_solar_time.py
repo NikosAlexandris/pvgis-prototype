@@ -1,7 +1,7 @@
 
 
 import pytest
-from pvgisprototype.api.geometry.solar_time import calculate_solar_time
+from pvgisprototype.api.geometry.time import calculate_solar_time
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import SOLAR_TIME_NAME, TIME_ALGORITHM_NAME, UNITS_NAME
