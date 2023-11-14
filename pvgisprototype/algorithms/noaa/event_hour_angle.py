@@ -70,7 +70,7 @@ def calculate_event_hour_angle_noaa(
     cosine_event_hour_angle = np.cos(refracted_solar_zenith.radians) / (
         np.cos(latitude.radians) * np.cos(solar_declination.radians)
     ) - np.tan(latitude.radians) * np.tan(solar_declination.radians)
-    event_hour_angle = np.acos(cosine_event_hour_angle)  # radians
+    event_hour_angle = np.arccos(cosine_event_hour_angle)  # radians
     event_hour_angle = EventHourAngle(value=event_hour_angle, unit=RADIANS)
 
     return event_hour_angle

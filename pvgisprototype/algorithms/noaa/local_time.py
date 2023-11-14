@@ -91,7 +91,7 @@ def calculate_local_solar_time_noaa(
     # local_solar_timestamp = time(hour=hours, minute=minutes, second=seconds)
 
     if verbose:
-        typer.echo(f'Local solar time: {local_solar_timestamp}')
+        print(f'Local solar time: {local_solar_timestamp}')
 
     local_solar_time = timestamp + timedelta(seconds=total_seconds)
 
