@@ -1,13 +1,17 @@
 from datetime import time
 from datetime import timedelta
+from typing import Optional, List
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventTimeNOAAInput
+from pvgisprototype.algorithms.noaa.function_models import CalculateEventTimeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from datetime import datetime
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.algorithms.noaa.event_hour_angle import calculate_event_hour_angle_noaa
+from pvgisprototype.algorithms.noaa.event_hour_angle import calculate_event_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_noaa
+from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
 from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
 
 
@@ -65,12 +69,50 @@ def calculate_event_time_noaa(
     #   from a range of [0, 2 * pi] which is a full circle
     #   to a range of [0, 1440] which is a full day in minutes
     event_calculations = {
-        'sunrise': 720 - (longitude.minutes + event_hour_angle.minutes) - equation_of_time.minutes,
-        'noon': 720 - longitude.minutes - equation_of_time.minutes,
-        'sunset': 720 - (longitude.minutes - event_hour_angle.minutes) - equation_of_time.minutes,
+        'sunrise': 720 - (longitude.as_minutes + event_hour_angle.as_minutes) - equation_of_time.minutes,
+        'noon': 720 - longitude.as_minutes - equation_of_time.minutes,
+        'sunset': 720 - (longitude.as_minutes - event_hour_angle.as_minutes) - equation_of_time.minutes,
     }
     event_time = event_calculations.get(event.lower())
     event_datetime = datetime.combine(timestamp.date(), time(0)) + timedelta(minutes=event_time)
     event_datetime_utc = attach_requested_timezone(event_datetime)  # assign UTC
+
+    return event_datetime_utc
+
+
+@validate_with_pydantic(CalculateEventTimeTimeSeriesNOAAInput)
+def calculate_event_time_time_series_noaa(
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamps: datetime,
+    # timezone: str,
+    event: str,
+    refracted_solar_zenith: RefractedSolarZenith,
+    apply_atmospheric_refraction: bool = False,
+)-> List[datetime]:
+    event_hour_angle = calculate_event_hour_angle_time_series_noaa(
+        latitude=latitude,
+        timestamps=timestamps,
+        refracted_solar_zenith=refracted_solar_zenith,
+    )
+    equation_of_time = calculate_equation_of_time_time_series_noaa(
+        timestamps=timestamps,
+    )
+    # 2 * pi radians equals a circle, 360 degrees or 24 hours
+    # 60 minutes * 24 hours = 1440 minutes (in 24 hours or a day)
+    # The calculation `(1440 / (2 * pi)) * value_in_radians`
+    #   maps a  'value in radians'
+    #   from a range of [0, 2 * pi] which is a full circle
+    #   to a range of [0, 1440] which is a full day in minutes
+    event_calculations = {
+        'sunrise': 720 - (longitude.as_minutes + event_hour_angle.as_minutes) - equation_of_time.minutes,
+        'noon': 720 - longitude.as_minutes - equation_of_time.minutes,
+        'sunset': 720 - (longitude.as_minutes - event_hour_angle.as_minutes) - equation_of_time.minutes,
+    }
+    event_time = event_calculations.get(event.lower())
+    # event_datetime = datetime.combine(timestamps.date(), time(0)) + timedelta(minutes=event_time)
+    event_datetimes = [datetime.combine(ts.date(), time(0)) + timedelta(minutes=et) for ts, et in zip(timestamps, event_time)]
+
+    event_datetime_utc = [attach_requested_timezone(ed) for ed in event_datetimes]  # assign UTC
 
     return event_datetime_utc

@@ -1,7 +1,7 @@
 from devtools import debug
 import pytest
 # import matplotlib.pyplot as plt
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
+from pvgisprototype.api.geometry.declination import calculate_solar_declination
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_five_years
 from pvgisprototype.api.geometry.models import SolarDeclinationModels

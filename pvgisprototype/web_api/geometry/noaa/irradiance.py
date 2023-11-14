@@ -1,0 +1,132 @@
+import numpy as np
+from typing import Optional
+from typing import List
+from fastapi import Query
+from fastapi import Depends
+from datetime import datetime
+from pathlib import Path
+from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
+from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
+from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
+from pvgisprototype.constants import RADIANS
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.web_api.dependencies import process_timestamp_input
+from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
+from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+
+
+async def get_calculate_effective_irradiance_time_series(
+    longitude: float = Query(..., ge=-180, le=180),
+    latitude: float = Query(..., ge=-90, le=90),
+    elevation: float = Query(...),
+    timestamps: Optional[List[datetime]] = Depends(process_timestamp_input),
+    start_time: Optional[datetime] = Query(None),
+    frequency: Optional[str] = Query('h'),
+    end_time: Optional[datetime] = Query(None),
+    timezone: Optional[str] = Query(None),
+    random_time_series: bool = Query(False),
+    global_horizontal_component: Optional[Path] = Query(None),
+    direct_horizontal_component: Optional[Path] = Query(None),
+    temperature_series: float = Query(25),
+    wind_speed_series: float = Query(0),
+    mask_and_scale: bool = Query(False),
+    neighbor_lookup: MethodsForInexactMatches = Query(None),
+    tolerance: Optional[float] = Query(TOLERANCE_DEFAULT),
+    in_memory: bool = Query(False),
+    surface_tilt: Optional[float] = Query(SURFACE_TILT_DEFAULT),
+    surface_orientation: Optional[float] = Query(SURFACE_ORIENTATION_DEFAULT),
+    linke_turbidity_factor_series: float = Query(LINKE_TURBIDITY_DEFAULT),
+    apply_atmospheric_refraction: Optional[bool] =  Query(True),
+    refracted_solar_zenith: float = Query(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
+    albedo: Optional[float] = Query(2),
+    apply_angular_loss_factor: Optional[bool] = Query(True),
+    solar_position_model: SolarPositionModels = Query(SOLAR_POSITION_ALGORITHM_DEFAULT),
+    solar_incidence_model: SolarIncidenceModels = Query(SolarIncidenceModels.jenco),
+    solar_time_model: SolarTimeModels = Query(SOLAR_TIME_ALGORITHM_DEFAULT),
+    time_offset_global: float = Query(0),
+    hour_offset: float = Query(0),
+    solar_constant: float = Query(SOLAR_CONSTANT),
+    perigee_offset: float = Query(PERIGEE_OFFSET),
+    eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
+    system_efficiency: Optional[float] = Query(SYSTEM_EFFICIENCY_DEFAULT),
+    efficiency_model: PVModuleEfficiencyAlgorithms = Query(None),
+    efficiency: Optional[float] = Query(None),
+    rounding_places: Optional[int] = Query(5),
+    verbose: int = Query(VERBOSE_LEVEL_DEFAULT),
+):
+
+    
+    longitude = convert_to_radians_fastapi(longitude)
+    latitude = convert_to_radians_fastapi(latitude)
+    surface_tilt = np.radians(surface_tilt)
+    surface_orientation = np.radians(surface_orientation)
+
+    from devtools import debug
+    debug(locals())
+
+    effective_irradiance_series, results, title = calculate_effective_irradiance_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        frequency=frequency,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        global_horizontal_component=global_horizontal_component,
+        direct_horizontal_component=direct_horizontal_component,
+        temperature_series=temperature_series,
+        wind_speed_series=wind_speed_series,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        linke_turbidity_factor_series=LinkeTurbidityFactor(value=linke_turbidity_factor_series),
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        albedo=albedo,
+        apply_angular_loss_factor=apply_angular_loss_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        system_efficiency=system_efficiency,
+        efficiency_model=efficiency_model,
+        efficiency=efficiency,
+        verbose=verbose,
+    )
+    debug(locals())
+
+    return effective_irradiance_series.tolist()
+
+    # effective_irradiance_series = effective_irradiance_series.tolist()
+    # effective_irradiance_series = [round(value, rounding_places) for value in effective_irradiance_series]
+
+    # return  {
+    #     "effective_irradiance_table":{
+    #         "effective_irradiance":effective_irradiance_series,
+    #         "datetime":timestamps
+    #     }
+    # }

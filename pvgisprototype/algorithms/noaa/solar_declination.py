@@ -59,7 +59,7 @@ def calculate_solar_declination_time_series_noaa(
     # timestamps = np.atleast_1d(timestamps)  # timestamps as array
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
-        angle_output_units=RADIANS,
+        # angle_output_units=RADIANS,
     )
     # fractional_year_series_array = np.array([fy.radians for fy in fractional_year_series])
     # fractional_year_series_array = np.array(
@@ -88,5 +88,10 @@ def calculate_solar_declination_time_series_noaa(
         position_algorithm='NOAA',
         timing_algorithm='NOAA',
     )
+
+    # if not np.all((declination_series.min_degrees <= declination_series.degrees) & (declination_series.degrees <= declination_series.max_degrees)):           # FIXME: Comparison between floats
+    #     wrong_values_index = np.where((declination_series.degrees < declination_series.min_degrees) | (declination_series.degrees > declination_series.max_degrees))
+    #     wrong_values = declination_series.degrees[wrong_values_index]
+    #     raise ValueError(f"The calculated solar declination `{wrong_values}` is out of the expected range [{declination_series.min_degrees}, {declination_series.max_degrees}] degrees!")
 
     return declination_series
