@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.geometry.solar_position import model_solar_geometry_overview
+from pvgisprototype.api.geometry.overview import model_solar_geometry_overview
 from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype import SolarDeclination

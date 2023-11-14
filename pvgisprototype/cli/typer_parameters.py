@@ -461,7 +461,7 @@ def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):     
         return linke_turbidity_factor_input
 
 
-def linke_turbidity_callback(ctx: Context, value:np.array):
+def linke_turbidity_callback(ctx: Context, value: np.array):
     if np.any(value):
         return LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_UNIT)
 

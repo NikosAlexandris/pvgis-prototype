@@ -4,6 +4,7 @@ from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from typing import Optional
 from typing import List
+from typing import Union
 from zoneinfo import ZoneInfo
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SurfaceOrientation
@@ -36,7 +37,7 @@ def model_solar_incidence_time_series(
     timezone: Optional[ZoneInfo] = None,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
-    surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
+    surface_tilt: Union[float, SurfaceTilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
