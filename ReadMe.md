@@ -4,7 +4,7 @@
 
 ### CLI
 
-> Too long to document here!  Update-Me!
+> Too long to document here !
 
 
 ### API 

@@ -224,7 +224,12 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     if not np.all(np.isfinite(adjusted_solar_zenith_series_array)) or not np.all((0 <= adjusted_solar_zenith_series_array) & (adjusted_solar_zenith_series_array <= np.pi + 0.0146)):
         raise ValueError(f'The `adjusted_solar_zenith` should be a finite number ranging in [0, {np.pi + 0.0146}] radians')
 
-    adjusted_solar_zenith_series = SolarZenith(value=adjusted_solar_zenith_series_array, unit=RADIANS)
+    adjusted_solar_zenith_series = SolarZenith(
+        value=adjusted_solar_zenith_series_array,
+        unit=RADIANS,
+        position_algorithm=solar_zenith_series.position_algorithm,
+        timing_algorithm=solar_zenith_series.timing_algorithm
+    )
 
     if verbose > 5:
         debug(locals())
@@ -291,10 +296,8 @@ def calculate_solar_zenith_time_series_noaa(
     solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
             )
-
-    if isinstance(timestamps, datetime):
-        timestamps = [timestamps]
-
+    # if isinstance(timestamps, datetime):
+    #     timestamps = [timestamps]
     cosine_solar_zenith = (
         np.sin(latitude.radians) * np.sin(solar_declination_series.radians)
         + np.cos(latitude.radians) * np.cos(solar_declination_series.radians) * np.cos(solar_hour_angle_series.radians)

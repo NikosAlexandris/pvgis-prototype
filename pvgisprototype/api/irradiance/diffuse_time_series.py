@@ -284,7 +284,7 @@ def calculate_term_n_time_series(
         )
 def calculate_diffuse_sky_irradiance_time_series(
         n_series: Annotated[List[float], typer_argument_term_n_series],
-        surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
+        surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = np.radians(45),
         ):
     """Calculate the diffuse sky irradiance
 

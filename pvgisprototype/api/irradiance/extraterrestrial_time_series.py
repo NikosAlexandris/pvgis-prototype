@@ -23,7 +23,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 import numpy as np
 from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.api.utilities.timestamp import get_days_in_year
+# from pvgisprototype.api.utilities.timestamp import get_days_in_year
 
 
 app = typer.Typer(

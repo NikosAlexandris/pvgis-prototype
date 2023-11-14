@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.geometry.hour_angle import calculate_hour_angle
+from pvgisprototype.api.geometry.hour_angle import calculate_solar_hour_angle
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import SOLAR_TIME_NAME, HOUR_ANGLE_NAME, DEGREES
 from pvgisprototype import SolarHourAngle
@@ -22,7 +22,7 @@ tolerances = [0.1]
     "date, true_solar_time_in_minutes, expected_hour_angle, against_unit", test_cases,
 )
 @pytest.mark.parametrize('tolerance', tolerances)
-def test_calculate_hour_angle(
+def test_calculate_solar_hour_angle(
     date,
     true_solar_time_in_minutes,
     expected_hour_angle,
@@ -42,7 +42,7 @@ def test_calculate_hour_angle(
         second=int(seconds),
         )
     
-    calculated_hour_angle = calculate_hour_angle(
+    calculated_hour_angle = calculate_solar_hour_angle(
         solar_time=true_solar_time_as_datetime
     )
 

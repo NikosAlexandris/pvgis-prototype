@@ -77,6 +77,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correc
 from pvgisprototype.cli.typer_parameters import typer_option_efficiency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_frequency
+from pvgisprototype.cli.typer_parameters import typer_option_groupby
 from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
@@ -226,6 +227,7 @@ def calculate_effective_irradiance(
     efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
+    groupby: Annotated[Optional[str], typer_option_groupby] = None,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
@@ -293,6 +295,7 @@ def calculate_effective_irradiance(
         print_series_statistics(
             data_array=effective_irradiance_series,
             timestamps=timestamps,
+            groupby=groupby,
             title="Effective irradiance",
         )
     if csv:
@@ -303,7 +306,7 @@ def calculate_effective_irradiance(
             dictionary=results,
             filename=csv,
         )
-    if not verbose and not csv:
+    if not verbose and not csv and not statistics:
         flat_list = effective_irradiance_series.flatten().astype(str)
         csv_str = ','.join(flat_list)
         print(csv_str)
