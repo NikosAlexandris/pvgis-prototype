@@ -45,17 +45,24 @@ def calculate_series_statistics(
         # 'Longitude of Max': data_xarray.argmax('lon').values,
         # 'Latitude of Max': data_xarray.argmax('lat').values,
     }
-    # Aggregate statistics based on frequency
-    if groupby == 'Y':
-        statistics['Yearly means'] = data_xarray.groupby('time.year').mean().values
-    if groupby == 'M':
-        statistics['Monthly means'] = data_xarray.groupby('time.month').mean().values
-    elif groupby == 'D':
-        statistics['Daily means'] = data_xarray.groupby('time.day').mean().values
-    if groupby == 'W':
-        statistics['Weekly means'] = data_xarray.resample(time='1W').mean().values
-    if groupby == 'S':
-        statistics['Seasonal means'] = data_xarray.groupby('time.season').mean().values
+    time_groupings = {
+        'Y': ('year', 'Yearly means'),
+        'S': ('season', 'Seasonal means'),
+        'M': ('month', 'Monthly means'),
+        'W': ('1W', 'Weekly means'),
+        'D': ('1D', 'Daily means'),
+        'H': ('1H', 'Hourly means'),
+    }
+    if groupby in time_groupings:
+        freq, label = time_groupings[groupby]
+        if groupby in ['Y', 'M', 'S']:
+            statistics[label] = data_xarray.groupby(f'time.{freq}').mean().values
+        else:
+            statistics[label] = data_xarray.resample(time=freq).mean().values
+
+    elif groupby:  # custom frequencies like '3H', '2W', etc.
+        custom_label = f'{groupby} means'
+        statistics[custom_label] = data_xarray.resample(time=groupby).mean().values
 
     return statistics
 
@@ -104,11 +111,13 @@ def print_series_statistics(
     table.add_row("", "")
 
     # Groups by
-    groups = [
-        'Monthly means',
-        'Daily means',
-        'Weekly means',
+    time_groupings = [
+        'Yearly means',
         'Seasonal means',
+        'Monthly means',
+        'Weekly means',
+        'Daily means',
+        'Hourly means',
         ]
 
     # Index of items
@@ -121,7 +130,7 @@ def print_series_statistics(
 
     # Add statistics
     for key, value in statistics.items():
-        if key not in basic_metadata and key not in groups and key not in index_metadata:
+        if key not in basic_metadata and key not in time_groupings and key not in index_metadata:
             # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
 
@@ -129,8 +138,9 @@ def print_series_statistics(
     table.add_row("", "")
 
     # Groups
+    custom_freq_label = f'{groupby} means' if groupby and groupby not in time_groupings else None
     for key, value in statistics.items():
-        if key in groups:
+        if key in time_groupings:
 
             if key == 'Monthly means':
                 import calendar
@@ -138,25 +148,34 @@ def print_series_statistics(
                     month_name = calendar.month_name[idx]  # Get month name
                     # table.add_row(key, str(round_float_values(value, rounding_places)))
                     table.add_row(month_name, str(value))
+
+            elif key == 'Seasonal means':
+                seasons = ['DJF', 'MAM', 'JJA', 'SON']  # Define the seasons
+                for season, value in zip(seasons, statistics[key]):
+                    table.add_row(season, str(value))
                 table.add_row("", "")
 
-            if key == 'Daily means':  # REVIEW-ME : We want Day-of-Year, not of-Month!
-                for idx, value in enumerate(statistics[key]):
-                    day_of_year = idx + 1  # Convert index to day of the year
-                    table.add_row(f"Day {day_of_year}", str(value))
-                table.add_row("", "")
-
-            if key == 'Weekly means':
+            elif key == 'Weekly means':
                 for idx, value in enumerate(statistics[key]):
                     week_number = idx + 1  # Week number
                     table.add_row(f"Week {week_number}", str(value))
                 table.add_row("", "")
 
-            if key == 'Seasonal means':
-                seasons = ['DJF', 'MAM', 'JJA', 'SON']  # Define the seasons
-                for season, value in zip(seasons, statistics[key]):
-                    table.add_row(season, str(value))
+            elif key == 'Daily means':  # REVIEW-ME : We want Day-of-Year, not of-Month!
+                for idx, value in enumerate(statistics[key]):
+                    day_of_year = idx + 1  # Convert index to day of the year
+                    table.add_row(f"Day {day_of_year}", str(value))
                 table.add_row("", "")
+
+    if custom_freq_label and custom_freq_label in statistics:
+        custom_freq_data = statistics[custom_freq_label]
+        period_count = 1
+        for value in custom_freq_data:
+            label = f"{groupby} Period {period_count}"
+            table.add_row(label, str(value))
+            period_count += 1
+        table.add_row("", "")
+
 
     # Index of
     for key, value in statistics.items():
