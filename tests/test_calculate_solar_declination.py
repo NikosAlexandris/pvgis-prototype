@@ -1,12 +1,12 @@
 from devtools import debug
 import pytest
 # import matplotlib.pyplot as plt
-from pvgisprototype.api.geometry.solar_declination import calculate_solar_declination
+from pvgisprototype.api.geometry.declination import calculate_solar_declination
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_five_years
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import DECLINATION_NAME
+from pvgisprototype.constants import DECLINATION_NAME, DEGREES
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -14,7 +14,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     timestamp='timestamp',
     timezone='timezone',
     declination=DECLINATION_NAME,
@@ -80,17 +80,17 @@ def test_calculate_solar_declination(
 
 
 # test_cases = [
-#     (datetime.datetime(2023, 1, 1), -23.38044, 'degrees'),  # Around vernal equinox
-#     (datetime.datetime(2023, 3, 20), 0, 'degrees'),  # Around vernal equinox
-#     (datetime.datetime(2023, 3, 21), 0, 'degrees'),  # Around vernal equinox
-#     (datetime.datetime(2023, 6, 20), 23.44, 'degrees'),  # Around summer solstice
-#     (datetime.datetime(2023, 6, 21), 23.44, 'degrees'),  # Around summer solstice
-#     (datetime.datetime(2023, 9, 22), 0, 'degrees'),  # Around autumnal equinox
-#     (datetime.datetime(2023, 9, 23), 0, 'degrees'),  # Around autumnal equinox
-#     (datetime.datetime(2023, 12, 21), -23.44, 'degrees'),  # Around winter solstice
-#     (datetime.datetime(2023, 12, 22), -23.44, 'degrees'),  # Around winter solstice
-#     # (datetime.datetime(2023, 12, 30), -16.428456, 'degrees'),  # Around winter solstice
-#     (datetime.datetime(2023, 12, 30), -23.44, 'degrees'),  # Around winter solstice
+#     (datetime.datetime(2023, 1, 1), -23.38044, DEGREES),  # Around vernal equinox
+#     (datetime.datetime(2023, 3, 20), 0, DEGREES),  # Around vernal equinox
+#     (datetime.datetime(2023, 3, 21), 0, DEGREES),  # Around vernal equinox
+#     (datetime.datetime(2023, 6, 20), 23.44, DEGREES),  # Around summer solstice
+#     (datetime.datetime(2023, 6, 21), 23.44, DEGREES),  # Around summer solstice
+#     (datetime.datetime(2023, 9, 22), 0, DEGREES),  # Around autumnal equinox
+#     (datetime.datetime(2023, 9, 23), 0, DEGREES),  # Around autumnal equinox
+#     (datetime.datetime(2023, 12, 21), -23.44, DEGREES),  # Around winter solstice
+#     (datetime.datetime(2023, 12, 22), -23.44, DEGREES),  # Around winter solstice
+#     # (datetime.datetime(2023, 12, 30), -16.428456, DEGREES),  # Around winter solstice
+#     (datetime.datetime(2023, 12, 30), -23.44, DEGREES),  # Around winter solstice
 # ]
 # models = [
 #     SolarDeclinationModels.pvis,
@@ -111,7 +111,7 @@ def test_calculate_solar_declination(
 #         timestamp=timestamp,
 #         timezone=None,
 #         models=[model],  # pass as a list!
-#         angle_output_units="degrees",
+#         angle_output_units=DEGREES,
 #     )
 #     model_result = calculated[0]
 #     model_name = model_result.get("Model", "")
@@ -131,7 +131,7 @@ def test_calculate_solar_declination(
 #             # end_date,
 #             year=random_year,
 #             title=f'Solar Declination {random_year}',
-#             output_units='degrees',
+#             output_units=DEGREES,
 #             )
 
 

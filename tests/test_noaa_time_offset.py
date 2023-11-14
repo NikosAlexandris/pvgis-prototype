@@ -9,13 +9,14 @@ from math import pi
 from math import radians
 from zoneinfo import ZoneInfo
 import numpy as np
+from pvgisprototype.constants import RADIANS
 
 
 test_cases = [
-    (  0.0, datetime(2023, 7, 25, 12),  ZoneInfo('UTC'), "minutes", "radians",    0.0, 'minutes'),
-    ( 90.0, datetime(2023, 12, 21, 12), ZoneInfo('UTC'), "minutes", "radians",  360.0, 'minutes'),
-    (-90.0, datetime(2023, 1, 1, 12),   ZoneInfo('UTC'), "minutes", "radians", -360.0, 'minutes'),
-    (  0.0, datetime(2023, 6, 21, 12),  ZoneInfo('UTC'), "minutes", "radians", -120.0, 'minutes'),
+    (  0.0, datetime(2023, 7, 25, 12),  ZoneInfo('UTC'), "minutes", RADIANS,    0.0, 'minutes'),
+    ( 90.0, datetime(2023, 12, 21, 12), ZoneInfo('UTC'), "minutes", RADIANS,  360.0, 'minutes'),
+    (-90.0, datetime(2023, 1, 1, 12),   ZoneInfo('UTC'), "minutes", RADIANS, -360.0, 'minutes'),
+    (  0.0, datetime(2023, 6, 21, 12),  ZoneInfo('UTC'), "minutes", RADIANS, -120.0, 'minutes'),
 ]
 tolerances = [10, 5, 1, 0.1]
 

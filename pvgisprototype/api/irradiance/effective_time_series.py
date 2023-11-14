@@ -53,13 +53,32 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
-
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.efficiency_time_series import calculate_pv_efficiency_time_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import EFFECTIVE_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
+from pvgisprototype.constants import ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import TEMPERATURE_COLUMN_NAME
+from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
+from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
+from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
+from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
+from pvgisprototype.constants import SHADE_COLUMN_NAME
+from pvgisprototype import LinkeTurbidityFactor
 
 
 def is_surface_in_shade_time_series(input_array, threshold=10):
@@ -104,7 +123,7 @@ def calculate_effective_irradiance_time_series(
     in_memory: bool = False,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: List[float] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = 2,
@@ -118,15 +137,12 @@ def calculate_effective_irradiance_time_series(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = 'minutes',
-    angle_units: str = 'radians',
-    angle_output_units: str = 'radians',
+    angle_units: str = RADIANS,
+    angle_output_units: str = RADIANS,
     # horizon_heights: List[float] = None,
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
     efficiency_model: PVModuleEfficiencyAlgorithms = None,
     efficiency: Optional[float] = None,
-    rounding_places: Optional[int] = 5,
-    statistics: bool = False,
-    csv: Path = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     solar_altitude_series = model_solar_altitude_time_series(
@@ -147,20 +163,18 @@ def calculate_effective_irradiance_time_series(
         # angle_output_units=angle_output_units,
         verbose=0,
     )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
-
     # Masks based on the solar altitude series
-    mask_above_horizon = solar_altitude_series_array > 0
-    mask_low_angle = (solar_altitude_series_array >= 0) & (solar_altitude_series_array < 0.04)
-    mask_below_horizon = solar_altitude_series_array < 0
-    in_shade = is_surface_in_shade_time_series(solar_altitude_series_array)
+    mask_above_horizon = solar_altitude_series.value > 0
+    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)      # FIXME: Is this in radians or degrees ?
+    mask_below_horizon = solar_altitude_series.value < 0
+    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
+    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
@@ -238,6 +252,7 @@ def calculate_effective_irradiance_time_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            neighbor_lookup=neighbor_lookup,
             verbose=0,  # no verbosity here by choice!
         )[
             mask_above_horizon
@@ -309,53 +324,53 @@ def calculate_effective_irradiance_time_series(
     # Reporting --------------------------------------------------------------
 
     results = {
-        "Effective": effective_irradiance_series,
+        EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
     }
     title = 'Effective'
     
     if verbose > 2:
         more_extended_results = {
             # "Global*": global_irradiance_series * efficiency_coefficient_series,
-            "Direct*": direct_irradiance_series * efficiency_coefficient_series,
-            "Diffuse*": diffuse_irradiance_series * efficiency_coefficient_series,
-            "Reflected*": reflected_irradiance_series * efficiency_coefficient_series,
+            EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_irradiance_series * efficiency_coefficient_series,
+            EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series * efficiency_coefficient_series,
+            EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series * efficiency_coefficient_series,
             # "Shade": in_shade,
         }
         results = results | more_extended_results
 
     if verbose > 1:
         extended_results = {
-            "Efficiency": efficiency_coefficient_series,
-            "Algorithm": efficiency_model.value if efficiency_model else NOT_AVAILABLE,
-            "Global": global_irradiance_series,
-            "Direct": direct_irradiance_series,
-            "Diffuse": diffuse_irradiance_series,
-            "Reflected": reflected_irradiance_series,
+            EFFICIENCY_COLUMN_NAME: efficiency_coefficient_series,
+            ALGORITHM_COLUMN_NAME: efficiency_model.value if efficiency_model else NOT_AVAILABLE,
+            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
+            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
+            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,
+            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
         }
         results = results | extended_results
         title += ' & in-plane components'
 
     if verbose > 3:
         even_more_extended_results = {
-            "Temperature": temperature_series,
-            "Wind speed": wind_speed_series,
+            # TEMPERATURE_COLUMN_NAME: temperature_series,          # FIXME: Not defined
+            # WIND_SPEED_COLUMN_NAME: wind_speed_series,          # FIXME: Not defined
         }
         results = results | even_more_extended_results
 
     if verbose > 4:
         and_even_more_extended_results = {
-            "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
-            "🧭 Orientation": convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
-            "Above horizon": mask_above_horizon,
-            "Low angle": mask_low_angle,
-            "Below horizon": mask_below_horizon,
-            "Shade": in_shade,
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+            ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
+            LOW_ANGLE_COLUMN_NAME: mask_low_angle,
+            BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
+            SHADE_COLUMN_NAME: in_shade,
         }
         results = results | and_even_more_extended_results
 
     if verbose == 6:
         results = {
-            "Effective": effective_irradiance_series,
+            EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
         }
         title = 'Effective'
         longitude = latitude = None

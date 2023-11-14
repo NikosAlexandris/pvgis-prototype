@@ -6,13 +6,10 @@ from pvgisprototype import Latitude
 from datetime import datetime
 from pathlib import Path
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-import logging
 from pvgisprototype.api.series.log import logger
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.series.utilities import get_scale_and_offset
-from colorama import Fore
-from colorama import Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.hardcodings import check_mark
 from pvgisprototype.api.series.hardcodings import x_mark
@@ -41,13 +38,13 @@ def select_time_series(
     #     longitude = longitude % 360
     # warn_for_negative_longitude(longitude)
 
-    logger.handlers = []  # Remove any existing handlers
+    # logger.handlers = []  # Remove any existing handlers
     # file_handler = logging.FileHandler(f'{output_filename}_{time_series.name}.log')
-    file_handler = logging.FileHandler(f'{time_series.name}.log')
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s, %(msecs)d; %(levelname)-8s; %(lineno)4d: %(message)s", datefmt="%I:%M:%S")
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    # file_handler = logging.FileHandler(f'{time_series.name}.log')
+    # file_handler.setLevel(logging.INFO)
+    # formatter = logging.Formatter("%(asctime)s, %(msecs)d; %(levelname)-8s; %(lineno)4d: %(message)s", datefmt="%I:%M:%S")
+    # file_handler.setFormatter(formatter)
+    # logger.addHandler(file_handler)
     logger.info(f'Dataset : {time_series.name}')
     logger.info(f'Path to : {time_series.parent.absolute()}')
     scale_factor, add_offset = get_scale_and_offset(time_series)
@@ -102,26 +99,17 @@ def select_time_series(
     if location_time_series.size == 1:
         single_value = float(location_time_series.values)
         warning = (
-            Fore.YELLOW
-            + f"{exclamation_mark} The selected timestamp "
-            + Fore.GREEN
-            # + f"{location_time_series[location_time_series.indexes].time.values}"
+            f"{exclamation_mark} The selected timestamp "
             + f"{location_time_series.time.values}"
-            + Fore.YELLOW
             + f" matches the single value "
-            + Fore.GREEN
             + f'{single_value}'
-            + Style.RESET_ALL
         )
         logger.warning(warning)
+
         if verbose > 0:
-            print(Fore.YELLOW + warning)
-        if verbose == 3:
-            debug(locals())
+            print(warning)
 
-        # return single_value
-
-    if verbose > 5:
+    if verbose >7:
         debug(locals())
 
     return location_time_series

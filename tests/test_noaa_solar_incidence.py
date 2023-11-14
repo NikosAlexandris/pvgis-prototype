@@ -5,16 +5,17 @@ from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_inci
 from pvgisprototype.api.utilities.timestamp import generate_timestamps_for_a_year
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype.constants import RADIANS
 
 
 test_cases = [
     (
-        Longitude(value=0.5, unit='radians'),
-        Latitude(value=0.5, unit='radians'),
+        Longitude(value=0.5, unit=RADIANS),
+        Latitude(value=0.5, unit=RADIANS),
         0.5,
         0.5,
         'minutes',
-        'radians',
+        RADIANS,
     ),
     # Add more test cases here
 ]

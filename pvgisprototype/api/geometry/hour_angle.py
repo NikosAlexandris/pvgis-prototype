@@ -2,6 +2,7 @@ from devtools import debug
 from math import radians
 from math import acos
 from math import tan
+from math import isfinite
 from datetime import datetime
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
@@ -136,7 +137,14 @@ def calculate_solar_hour_angle(
     solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
     hour_angle = (solar_time_decimal_hours - 12) * radians(15)
     hour_angle = SolarHourAngle(value=hour_angle, unit=RADIANS)
-
+    if (
+        not isfinite(hour_angle.degrees)
+        or not hour_angle.min_degrees <= hour_angle.degrees <= hour_angle.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar hour angle {hour_angle.degrees} is out of the expected range\
+            [{hour_angle.min_degrees}, {hour_angle.max_degrees}] degrees"
+        )
     return hour_angle
 
 

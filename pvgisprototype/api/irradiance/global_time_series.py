@@ -108,8 +108,11 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import RADIANS
+from pvgisprototype import LinkeTurbidityFactor
 
 
 app = typer.Typer(
@@ -162,7 +165,7 @@ def calculate_global_irradiance_time_series(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
@@ -176,13 +179,14 @@ def calculate_global_irradiance_time_series(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = False,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the global horizontal irradiance (GHI)
 
@@ -208,20 +212,18 @@ def calculate_global_irradiance_time_series(
         # angle_output_units=angle_output_units,
         verbose=verbose,
         )
-    solar_altitude_series_array = np.array([x.value for x in solar_altitude_series])
-
     # Masks based on the solar altitude series
-    mask_above_horizon = solar_altitude_series_array > 0
-    mask_low_angle = (solar_altitude_series_array >= 0) & (solar_altitude_series_array < 0.04)
-    mask_below_horizon = solar_altitude_series_array < 0
-    in_shade = is_surface_in_shade_time_series(solar_altitude_series_array)
+    mask_above_horizon = solar_altitude_series.value > 0
+    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)
+    mask_below_horizon = solar_altitude_series.value < 0
+    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
+    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
@@ -351,7 +353,7 @@ def calculate_global_irradiance_time_series(
     )
     if out_of_range_indices[0].size > 0:
         print(
-                f"[red on white]{WARNING_OUT_OF_RANGE_VALUES} in `global_irradiance_series` : {out_of_range_indices[0]}![/red on white]"
+                f"{WARNING_OUT_OF_RANGE_VALUES} in `global_irradiance_series` : {out_of_range_indices[0]}!"
         )
 
     # Reporting =============================================================
@@ -405,6 +407,7 @@ def calculate_global_irradiance_time_series(
         dictionary=results,
         title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
 

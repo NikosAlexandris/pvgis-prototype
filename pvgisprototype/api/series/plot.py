@@ -6,7 +6,6 @@ import matplotlib.ticker as ticker
 import matplotlib.dates as mdates
 from pathlib import Path
 import numpy as np
-from colorama import Fore, Style
 import xarray as xr
 from rich import print
 from pvgisprototype.api.series.hardcodings import exclamation_mark
@@ -225,7 +224,7 @@ def plot_series(
 
     # Report
     number_of_values = int(data_array.count())
-    logger.info(Fore.GREEN + f'{check_mark} Time series plot of {number_of_values} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!' + Style.RESET_ALL)
+    logger.info(f'{check_mark} Time series plot of {number_of_values} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!')
     print(f'[green]{check_mark}[/green] Time series plot of {number_of_values} values over ({float(data_array[x])}, {float(data_array[y])}) exported in \'{output_filename}\'')
 
     return output_filename
@@ -308,6 +307,6 @@ def plot_outliers(
     plt.savefig(f'{output_filename}')
 
     number_of_outliers = len(outliers_values)
-    logger.info(Fore.GREEN + f'{check_mark} Time series plot of {number_of_outliers} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!' + Style.RESET_ALL)
-    typer.echo(Fore.GREEN + check_mark + f' Time series plot of {number_of_outliers} value sover ({float(data_array[x])}, {float(data_array[y])}) exported in \'{output_filename}\'')
+    logger.info(f'{check_mark} Time series plot of {number_of_outliers} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!')
+    print(f'{check_mark} Time series plot of {number_of_outliers} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!')
     return output_filename

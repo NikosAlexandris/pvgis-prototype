@@ -1,13 +1,5 @@
 from devtools import debug
-import logging
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler('error.log'),  # Save log to a file
-        logging.StreamHandler()  # Print log to the console
-    ]
-)
+from loguru import logger
 from datetime import datetime
 import typer
 from pathlib import Path
@@ -16,14 +8,12 @@ from typing import Optional
 from typing import List
 from rich.console import Console
 from rich import print
-from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -60,12 +50,11 @@ from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
@@ -86,6 +75,7 @@ from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import TERM_N_IN_SHADE
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
+from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.cli.typer_parameters import typer_argument_global_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degrees
@@ -103,6 +93,23 @@ import numpy as np
 from math import cos
 from math import sin
 from math import pi
+from pvgisprototype.constants import LOSS_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
+from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
+from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
+from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
+from pvgisprototype.constants import OUT_OF_RANGE_INDICES_COLUMN_NAME
+from pvgisprototype.constants import TERM_N_COLUMN_NAME
+from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
+from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 
 
 app = typer.Typer(
@@ -125,7 +132,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
@@ -137,6 +144,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
     time series.
@@ -184,23 +192,18 @@ def calculate_diffuse_horizontal_component_from_sarah(
     if diffuse_horizontal_irradiance_series.size == 1:
         single_value = float(diffuse_horizontal_irradiance_series.values)
         warning = (
-            Fore.YELLOW
-            + f"{exclamation_mark} The selected timestamp "
-            + Fore.GREEN
+            f"{exclamation_mark} The selected timestamp "
             + f"{diffuse_horizontal_irradiance_series.time.values}"
-            + Fore.YELLOW
             + f" matches the single value "
-            + Fore.GREEN
             + f"{single_value}"
-            + Style.RESET_ALL
         )
-        logging.warning(warning)
+        logger.warning(warning)
 
         if verbose > 5:
             debug(locals())
 
         if verbose > 0:
-            print(Fore.YELLOW + warning)
+            print(warning)
 
     results = {
         "Diffuse": diffuse_horizontal_irradiance_series.to_numpy(),
@@ -224,6 +227,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         dictionary=results,
         title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:
@@ -280,7 +284,7 @@ def calculate_term_n_time_series(
         )
 def calculate_diffuse_sky_irradiance_time_series(
         n_series: Annotated[List[float], typer_argument_term_n_series],
-        surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
+        surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = np.radians(45),
         ):
     """Calculate the diffuse sky irradiance
 
@@ -337,39 +341,22 @@ def calculate_diffuse_sky_irradiance_time_series(
 def diffuse_transmission_function_time_series(
     linke_turbidity_factor_series,
     verbose: int = 0,
-):
+) -> np.array:
     """ Diffuse transmission function over a period of time """
-    is_scalar = False
-    
-    if isinstance(linke_turbidity_factor_series, LinkeTurbidityFactor):
-        is_scalar = True
-        linke_turbidity_factor_series = [linke_turbidity_factor_series]
-    elif isinstance(linke_turbidity_factor_series, np.ndarray):
-        # If the input is a numpy array, convert it to a list for the following processing
-        linke_turbidity_factor_series = linke_turbidity_factor_series.tolist()
-    
-    # Check if the elements in the series are LinkeTurbidityFactor objects and extract the value attribute if true
-    if all(isinstance(factor, LinkeTurbidityFactor) for factor in linke_turbidity_factor_series):
-        linke_turbidity_factor_series = [factor.value for factor in linke_turbidity_factor_series]
-    
-    linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
-    linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series_array, 2)
+    linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series.value, 2)
 
     # From r.pv's source code:
     # tn = -0.015843 + locLinke * (0.030543 + 0.0003797 * locLinke);
     diffuse_transmission_series = (
         -0.015843
-        + 0.030543 * linke_turbidity_factor_series_array
+        + 0.030543 * linke_turbidity_factor_series.value
         + 0.0003797 * linke_turbidity_factor_series_squared_array
     )
 
     if verbose > 5:
         debug(locals())
 
-    if is_scalar:
-        return diffuse_transmission_series[0]
-    else:
-        return diffuse_transmission_series.tolist()
+    return diffuse_transmission_series
 
 
 @app.command(
@@ -379,9 +366,6 @@ def diffuse_transmission_function_time_series(
         rich_help_panel=rich_help_panel_toolbox,
         )
 def diffuse_solar_altitude_coefficients_time_series(
-    # linke_turbidity_factor_series: Union[
-    #     List[LinkeTurbidityFactor], LinkeTurbidityFactor
-    # ],
     linke_turbidity_factor_series,
     verbose: int = 0,
 ):
@@ -396,22 +380,14 @@ def diffuse_solar_altitude_coefficients_time_series(
     Returns
     -------
     """
-    is_scalar = False
-    if isinstance(linke_turbidity_factor_series, LinkeTurbidityFactor):
-        is_scalar = True
-        linke_turbidity_factor_series = [linke_turbidity_factor_series]
-
-    # Convert to NumPy array for vectorized operations
-    linke_turbidity_factor_series = [factor.value for factor in linke_turbidity_factor_series]
-    linke_turbidity_factor_series_array = np.array(linke_turbidity_factor_series)
 
     # Calculate common terms only once
-    linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series_array, 2)
+    linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series.value, 2)
     diffuse_transmission_series = diffuse_transmission_function_time_series(linke_turbidity_factor_series)
     diffuse_transmission_series_array = np.array(diffuse_transmission_series)
     a1_prime_series = (
         0.26463
-        - 0.061581 * linke_turbidity_factor_series_array
+        - 0.061581 * linke_turbidity_factor_series.value
         + 0.0031408 * linke_turbidity_factor_series_squared_array
     )
     a1_series = np.where(
@@ -421,21 +397,19 @@ def diffuse_solar_altitude_coefficients_time_series(
     )
     a2_series = (
         2.04020
-        + 0.018945 * linke_turbidity_factor_series_array
+        + 0.018945 * linke_turbidity_factor_series.value
         - 0.011161 * linke_turbidity_factor_series_squared_array
     )
     a3_series = (
         -1.3025
-        + 0.039231 * linke_turbidity_factor_series_array
+        + 0.039231 * linke_turbidity_factor_series.value
         + 0.0085079 * linke_turbidity_factor_series_squared_array
     )
 
     if verbose == 5:
         debug(locals())
-    if is_scalar:
-        return a1_series[0], a2_series[0], a3_series[0]
-    else:
-        return a1_series, a2_series, a3_series
+
+    return a1_series, a2_series, a3_series
 
 
 @app.command(
@@ -446,18 +420,17 @@ def diffuse_solar_altitude_coefficients_time_series(
 )
 def diffuse_solar_altitude_function_time_series(
     solar_altitude_series: Annotated[List[float], typer_argument_solar_altitude_series],
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series],#: np.ndarray,
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series],#: np.ndarray,
     verbose: int = 0,
 ):
     """Diffuse solar altitude function Fd"""
     a1_series, a2_series, a3_series = diffuse_solar_altitude_coefficients_time_series(
         linke_turbidity_factor_series
     )
-    solar_altitude_series_array = np.array([altitude.radians for altitude in solar_altitude_series])
     return (
         a1_series
-        + a2_series * np.sin(solar_altitude_series_array)
-        + a3_series * np.power(np.sin(solar_altitude_series_array), 2)
+        + a2_series * np.sin(solar_altitude_series.radians)
+        + a3_series * np.power(np.sin(solar_altitude_series.radians), 2)
     )
 
 
@@ -480,7 +453,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
@@ -493,8 +466,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
@@ -503,7 +476,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-):
+    index: Annotated[bool, typer_option_index] = False,
+) -> np.array:
     """Calculate the diffuse irradiance incident on a solar surface
 
     Notes
@@ -540,8 +514,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     if direct_horizontal_component:  # read from external dataset
         direct_horizontal_irradiance_series = select_time_series(
             time_series=direct_horizontal_component,
-            longitude=convert_float_to_degrees_if_requested(longitude, "degrees"),
-            latitude=convert_float_to_degrees_if_requested(latitude, "degrees"),
+            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
             timestamps=timestamps,
             mask_and_scale=mask_and_scale,
             neighbor_lookup=neighbor_lookup,
@@ -599,11 +573,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
         angle_output_units=angle_output_units,
         verbose=verbose,
         )
-    solar_altitude_series_array = np.array([x.radians for x in solar_altitude_series])
     # on a horizontal surface : G0h = G0 sin(h0)
     extraterrestrial_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series
-        * np.sin(solar_altitude_series_array)
+        * np.sin(solar_altitude_series.radians)
     )
 
     # calculate from external data
@@ -612,8 +585,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
             calculate_diffuse_horizontal_component_from_sarah(
                 shortwave=global_horizontal_component,
                 direct=direct_horizontal_component,
-                longitude=convert_float_to_degrees_if_requested(longitude, "degrees"),
-                latitude=convert_float_to_degrees_if_requested(latitude, "degrees"),
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
                 timestamps=timestamps,
                 start_time=start_time,
                 end_time=end_time,
@@ -668,10 +641,9 @@ def calculate_diffuse_inclined_irradiance_time_series(
             angle_output_units=angle_output_units,
             verbose=verbose,
         )
-        solar_incidence_series_array = np.array([x.value for x in solar_incidence_series])
 
         # mask surfaces in shade, yet there is ambient light
-        mask = np.logical_and(np.sin(solar_incidence_series_array) < 0, solar_altitude_series_array >= 0)
+        mask = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
         if np.any(mask):
 
             # F(γN)
@@ -689,16 +661,16 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
         else:  # sunlit surface and non-overcast sky
             # extract float values from the SolarAltitude objects
-            solar_altitude_series_array = np.array([altitude.radians for altitude in solar_altitude_series])
+            # solar_altitude_series_array = np.array([altitude.radians for altitude in solar_altitude_series])
             # ----------------------------------------------------------------
             azimuth_difference_series_array = None  # Avoid UnboundLocalError!
             solar_azimuth_series_array = None
             # ----------------------------------------------------------------
 
-            if np.any(solar_altitude_series_array >= 0.1):  # radians or 5.7 degrees
+            if np.any(solar_altitude_series.radians >= 0.1):  # radians or 5.7 degrees
                 diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series * (
                     diffuse_sky_irradiance_series * (1 - kb_series)
-                    + kb_series * np.sin(solar_incidence_series_array) / np.sin(solar_altitude_series_array)
+                    + kb_series * np.sin(solar_incidence_series.radians) / np.sin(solar_altitude_series.radians)
                 )
 
             else:  # if solar_altitude.value < 0.1:
@@ -718,13 +690,12 @@ def calculate_diffuse_inclined_irradiance_time_series(
                     eccentricity_correction_factor=eccentricity_correction_factor,
                     verbose=verbose,
                 )
-                solar_azimuth_series_array = np.array([x.value for x in solar_azimuth_series])
                 # Normalize the azimuth difference to be within the range -pi to pi
                 # A0 : solar azimuth _measured from East_ in radians
                 # ALN : angle between the vertical surface containing the normal to the
                 #   surface and vertical surface passing through the centre of the solar
                 #   disc [rad]
-                azimuth_difference_series_array = solar_azimuth_series_array - surface_orientation
+                azimuth_difference_series_array = solar_azimuth_series.value - surface_orientation
                 azimuth_difference_series_array = np.arctan2(np.sin(azimuth_difference_series_array), np.cos(azimuth_difference_series_array))
                 diffuse_inclined_irradiance_series = (
                     diffuse_inclined_irradiance_series_before_angular_loss
@@ -733,7 +704,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
                     + kb_series
                     * sin(surface_tilt)
                     * np.cos(azimuth_difference_series_array)
-                    / (0.1 - 0.008 * solar_altitude_series_array)
+                    / (0.1 - 0.008 * solar_altitude_series.radians)
                 )
 
     # one more thing
@@ -758,51 +729,50 @@ def calculate_diffuse_inclined_irradiance_time_series(
     )
     if out_of_range_indices[0].size > 0:
         print(
-            f"[blink red on white]{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`![/blink red on white]"
+            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
         )
 
     # Reporting ==============================================================
 
     results = {
-        "Diffuse": diffuse_inclined_irradiance_series,
+        DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
     }
-    title = 'Diffuse'
+    title = DIFFUSE_INCLINED_IRRADIANCE
 
     if verbose > 1 :
         extended_results = {
-            "Loss": 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
-            "Tilt": convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
         }
         results = results | extended_results
 
     if verbose > 2:
         more_extended_results = {
-            'Diffuse horizontal': diffuse_horizontal_irradiance_series,
-            'Diffuse clear-sky': diffuse_sky_irradiance_series,
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_sky_irradiance_series,
         }
         results = results | more_extended_results
         title += ' & relevant components'
 
     if verbose > 3:
         even_more_extended_results = {
-            'term N': n_series,
-            'Kb': kb_series,
-            'Tilt': surface_tilt,
-            'Azimuth difference': azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',
-            '⦬ Azimuth': solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
-            '⦩ Altitude': convert_series_to_degrees_arrays_if_requested(solar_altitude_series_array, angle_output_units),
+            TERM_N_COLUMN_NAME: n_series,
+            KB_RATIO_COLUMN_NAME: kb_series,
+            SURFACE_TILT_COLUMN_NAME: surface_tilt,
+            AZIMUTH_DIFFERENCE_COLUMN_NAME: azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',
+            AZIMUTH_COLUMN_NAME: solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
+            ALTITUDE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
         }
         results = results | even_more_extended_results
 
     if verbose > 4:
-        linke_turbidity_factor_series_array = np.array([x.value for x in linke_turbidity_factor_series])
         plus_even_more_extended_results = {
-            "Direct horizontal": direct_horizontal_irradiance_series,
-            'Extra. horizontal': extraterrestrial_horizontal_irradiance_series,
-            "Extra. normal": extraterrestrial_normal_irradiance_series,
-            'Linke': linke_turbidity_factor_series_array,
-            'Incidence': convert_series_to_degrees_arrays_if_requested(solar_incidence_series_array, angle_output_units),
-            'Out-of-range': out_of_range_indices,
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+            EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_horizontal_irradiance_series,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series,
+            INCIDENCE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_incidence_series, angle_output_units),
+            OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range_indices,
         }
         results = results | plus_even_more_extended_results
 
@@ -816,6 +786,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         dictionary=results,
         title=title + f" in-plane irradiance series {IRRADIANCE_UNITS}",
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:

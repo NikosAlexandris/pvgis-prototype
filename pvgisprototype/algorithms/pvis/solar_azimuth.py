@@ -5,6 +5,7 @@ from math import pi
 from math import sin
 from math import cos
 from math import acos
+from math import isfinite
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAzimuthPVISInputModel
 from pvgisprototype import Longitude
@@ -30,6 +31,11 @@ def calculate_solar_azimuth_pvis(
     solar_time_model: SolarTimeModels,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth angle
+
+    Returns
+    -------
+    solar_azimuth: float
+
 
     Returns
     -------
@@ -71,5 +77,13 @@ def calculate_solar_azimuth_pvis(
         unit=RADIANS,
         position_algorithm='PVIS',
         timing_algorithm=solar_time_model.value,
-    ) # zero_direction = 'East'
+    ) # zero_direction='East'
+    if (
+        not isfinite(solar_azimuth.degrees)
+        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
+            [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+        )
     return solar_azimuth

@@ -60,6 +60,20 @@ from zoneinfo import ZoneInfo
 from rich import print
 import numpy as np
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
+import time
+from functools import wraps
+
+
+def timer(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"'{func.__name__}' executed in {elapsed_time:.6f} seconds (or {elapsed_time:.2f} seconds).")
+        return result
+    return wrapper
 
 
 # Random time
@@ -135,7 +149,7 @@ def attach_requested_timezone(
 
     print(f'[green]i[/green] Callback function attach_requested_timezone()')
 
-    if timestamp.tzinfo is not None:
+    if timestamp.tzinfo is not None:  # time zone already set
         print("  [yellow]>[/yellow] The provided timestamp already has a timezone.")  
         print("  [yellow]>[/yellow] Ensure the timestamp is provided as a [yellow]naive[/yellow] datetime object.")
         return timestamp
@@ -146,13 +160,14 @@ def attach_requested_timezone(
 
     else:
         try:
-            print(f'[yellow]i[/yellow] Attaching the {timezone} to the {timestamp}')  
+            print(f'[yellow]i[/yellow] Attaching the requested zone [bold]{timezone}[/bold] to {timestamp}')  
             timezone_aware_timestamp = timestamp.replace(tzinfo=timezone)
 
         except Exception as e:
             print(f'[red]x[/red] Failed to attach the requested timezone \'{timezone}\' to the timestamp: {e}!')
             print("[red]Defaulting to UTC timezone.[/red]")
-            timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+            # timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
+            timezone_aware_timestamp = timestamp.astimezone(tzinfo=ZoneInfo('UTC'))
 
     return timezone_aware_timestamp
 
@@ -168,8 +183,8 @@ def ctx_attach_requested_timezone(
     print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
     print(f'  [yellow]>[/yellow] Executing ctx_attach_requested_timezone()')
     timezone = ctx.params.get('timezone')
-    print(f'  [yellow]>[/yellow] User defined input parameter `timezone` = {timezone}')
-    print(f'  [green]>[/green] Callback function sets : {attach_requested_timezone(timestamp, timezone)}')
+    print(f'  [yellow]>[/yellow] User requested input parameter [code]timezone[/code] = [bold]{timezone}[/bold]')
+    print(f'  [green]>[/green] Callback function returns : {attach_requested_timezone(timestamp, timezone)}')
     return attach_requested_timezone(timestamp, timezone)
 
 
@@ -337,24 +352,23 @@ def parse_timestamp_series(
     # print(f"[yellow]i[/yellow] Context: {ctx}")
     # print(f"[yellow]i[/yellow] Context: {ctx.params}")
     # print(f"[yellow]i[/yellow] typer.CallbackParam: {param}")
-    print(f"[yellow]i[/yellow] Runnning the parse_timestamp_series() function!")
+    print(f"[yellow]i[/yellow] Executing parse_timestamp_series()")
     # print(f"  Input [yellow]timestamps[/yellow] : {timestamps}")
     # print(f"  Type : {type(timestamps)}")
 
     if isinstance(timestamps, str):
         datetime_strings = timestamps.strip().split(",")
-        # print(f"  Returning : {datetime_strings}")
-        return datetime_strings  # List of strings
+        return [datetime.fromisoformat(timestamp.strip()) for timestamp in datetime_strings]
 
-    if isinstance(timestamps, datetime):
-        return_value = [timestamps]
-        # print(f"  Returning : {return_value}")
-        return [timestamps]  # return a list in case of a single datetime object
+    elif isinstance(timestamps, datetime):
+        return [timestamps]  # return a single datetime as a list
 
-    if isinstance(timestamps, list):
-        datetime_strings = [string.strip() for string in timestamps]
-        # print(f"Returning: {datetime_strings}")
-        return datetime_strings
+    elif isinstance(timestamps, list):
+        datetime_strings = [string.strip() for string in timestamps]  # convert strings to naive datetime
+        return [datetime.fromisoformat(timestamp) for timestamp in datetime_strings]
+
+    else:
+        raise ValueError("Timestamps input must be a string, datetime, or list of datetimes")
 
 
 def generate_timestamps_for_a_year(year, frequency_minutes=60):
@@ -399,18 +413,23 @@ def callback_generate_datetime_series(
     # value: Union[str, datetime, List[datetime]],
     param: typer.CallbackParam,
 ):
-    print("[yellow]i[/yellow] Runnning the callback_generate_datetime_series() function!")
     print(f'[yellow]i[/yellow] Context: {ctx.params}')
     # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
+    print("[yellow]i[/yellow] Executing callback_generate_datetime_series()")
     # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
     start_time = ctx.params.get('start_time')
     end_time = ctx.params.get('end_time')
     frequency = ctx.params.get('frequency', 'h')
+    timezone = ctx.params.get('timezone')
 
     if start_time is not None and end_time is not None:
         timestamps = generate_datetime_series(start_time, end_time, frequency)
-        return timestamps
 
-    else:
-        from pandas import to_datetime
-        return to_datetime(timestamps, format='mixed')
+    # If we do the following, we need to take care of external naive time series!
+    # timezone_aware_timestamps = [
+    #     attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
+    # ]
+    from pandas import to_datetime
+    # return to_datetime(timezone_aware_timestamps, format="mixed")
+    return to_datetime(timestamps, format="mixed")
+    return timestamps

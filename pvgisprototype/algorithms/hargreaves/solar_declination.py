@@ -1,16 +1,16 @@
 from devtools import debug
-import typer
-from typing import Annotated
 from functools import partial
 from datetime import datetime
 from datetime import timezone
 from math import sin
 from math import cos
 from math import radians
-from pvgisprototype.api.utilities.conversions import convert_to_radians_if_requested
+from math import isfinite
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationHargreavesInputModel
 from pvgisprototype import SolarDeclination
+from pvgisprototype.constants import DEGREES
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
 
 
 @validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)
@@ -58,6 +58,18 @@ def calculate_solar_declination_hargreaves(
             )
         )
     )
-    declination = SolarDeclination(value=declination_value_in_degrees, unit='degrees')
-
-    return declination
+    solar_declination = SolarDeclination(
+        value=declination_value_in_degrees,
+        unit=DEGREES,
+        position_algorithm='Hargreaves',
+        timing_algorithm='Hargreaves'
+    )
+    if (
+        not isfinite(solar_declination.degrees)
+        or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
+            [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
+        )
+    return solar_declination

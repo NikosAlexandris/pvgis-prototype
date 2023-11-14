@@ -1,6 +1,7 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateTrueSolarTimeNOAAInput
+from pvgisprototype.validation.functions import CalculateTrueSolarTimeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
 from typing import Optional
@@ -11,6 +12,7 @@ from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import RADIANS
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
@@ -85,6 +87,7 @@ def calculate_true_solar_time_noaa(
         timezone=timezone,
         )  # in minutes
     time_offset_timedelta = timedelta(minutes=time_offset.minutes)
+    time_offset_timedelta = timedelta(minutes=time_offset.minutes)
     true_solar_time = timestamp + time_offset_timedelta
     true_solar_time_minutes = (
         true_solar_time.hour * 60
@@ -104,7 +107,7 @@ def calculate_true_solar_time_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]], 
         timezone: Optional[ZoneInfo],
         time_output_units: str = 'minutes',
-        angle_units: str = 'radians',
+        angle_units: str = RADIANS,
         verbose: int = VERBOSE_LEVEL_DEFAULT,
     ) -> Sequence[datetime]:
     true_solar_time_series = []

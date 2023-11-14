@@ -1,6 +1,7 @@
 from typing import Literal
 import pandas as pd
 from zoneinfo import ZoneInfo
+from timezonefinder import TimezoneFinder
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import SolarDeclination
@@ -17,11 +18,9 @@ from pvgisprototype.constants import (
     SOLAR_TIME_NAME,
     HOUR_ANGLE_NAME,
     ZENITH_NAME,
+    RADIANS,
+    DEGREES,
 )
-import sys
-import os
-from timezonefinder import TimezoneFinder
-
 
 
 def read_noaa_spreadsheet(
@@ -52,7 +51,7 @@ def read_noaa_spreadsheet(
 
 def test_cases_from_data(
         test_cases_data:pd.DataFrame,
-        against_unit:Literal['radians', 'degrees'] = 'radians',
+        against_unit:Literal['radians', 'degrees'] = RADIANS,
         **kwargs,
     ) -> list:
     """Returns test cases (expected values for certain location and datetime) for the
@@ -84,8 +83,8 @@ def test_cases_from_data(
     )
     """
 
-    if against_unit not in ['radians', 'degrees', 'minutes']:
-        raise ValueError("Invalid value for against_unit. Must be 'radians', 'degrees' or 'minutes'")
+    if against_unit not in [RADIANS, DEGREES, 'minutes']:
+        raise ValueError(f"Invalid value for against_unit. Must be {RADIANS}, {DEGREES} or 'minutes'")
 
     map_field_name = {
         'latitude':'Latitude (+ to N)',
@@ -150,11 +149,11 @@ def test_cases_from_data(
         for expected_value in list(kwargs.values()):
             if expected_value == 'longitude':
                 single_case.append(
-                    Longitude(value=row[map_field_name['longitude']], unit='degrees'),
+                    Longitude(value=row[map_field_name['longitude']], unit=DEGREES),
                 )
             elif expected_value == 'latitude':
                 single_case.append(
-                    Latitude(value=row[map_field_name['latitude']], unit='degrees'),
+                    Latitude(value=row[map_field_name['latitude']], unit=DEGREES),
                 )
             elif expected_value == 'timestamp':
                 single_case.append(
@@ -166,23 +165,23 @@ def test_cases_from_data(
                 )
             elif expected_value == DECLINATION_NAME:
                 single_case.append(
-                    SolarDeclination(value=row[map_field_name[DECLINATION_NAME]], unit='degrees')
+                    SolarDeclination(value=row[map_field_name[DECLINATION_NAME]], unit=DEGREES)
                 )
             elif expected_value == HOUR_ANGLE_NAME:
                 single_case.append(
-                    SolarHourAngle(value=row[map_field_name[HOUR_ANGLE_NAME]], unit='degrees')
+                    SolarHourAngle(value=row[map_field_name[HOUR_ANGLE_NAME]], unit=DEGREES)
                 )
             elif expected_value == ZENITH_NAME:
                 single_case.append(
-                    SolarZenith(value=row[map_field_name[ZENITH_NAME]], unit='degrees')
+                    SolarZenith(value=row[map_field_name[ZENITH_NAME]], unit=DEGREES)
                 )
             elif expected_value == ALTITUDE_NAME:
                 single_case.append(
-                    SolarAltitude(value=row[map_field_name[ALTITUDE_NAME]], unit='degrees')
+                    SolarAltitude(value=row[map_field_name[ALTITUDE_NAME]], unit=DEGREES)
                 )
             elif expected_value == AZIMUTH_NAME:
                 single_case.append(
-                    SolarAzimuth(value=row[map_field_name[AZIMUTH_NAME]], unit='degrees')
+                    SolarAzimuth(value=row[map_field_name[AZIMUTH_NAME]], unit=DEGREES)
                 )
             elif expected_value == SOLAR_TIME_NAME:
                 single_case.append(

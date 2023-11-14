@@ -103,6 +103,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -137,6 +138,7 @@ from typing_extensions import Annotated
 import math
 import numpy as np
 import typer
+from pvgisprototype import LinkeTurbidityFactor
 
 
 app = typer.Typer(
@@ -202,7 +204,7 @@ def calculate_effective_irradiance(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
@@ -226,51 +228,49 @@ def calculate_effective_irradiance(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     effective_irradiance_series, results, title = calculate_effective_irradiance_time_series(
-        longitude,
-        latitude,
-        elevation,
-        timestamps,
-        start_time,
-        frequency,
-        end_time,
-        timezone,
-        random_time_series,
-        global_horizontal_component,
-        direct_horizontal_component,
-        temperature_series,
-        wind_speed_series,
-        mask_and_scale,
-        neighbor_lookup,
-        tolerance,
-        in_memory,
-        surface_tilt,
-        surface_orientation,
-        linke_turbidity_factor_series,
-        apply_atmospheric_refraction,
-        refracted_solar_zenith,
-        albedo,
-        apply_angular_loss_factor,
-        solar_position_model,
-        solar_incidence_model,
-        solar_time_model,
-        time_offset_global,
-        hour_offset,
-        solar_constant,
-        perigee_offset,
-        eccentricity_correction_factor,
-        time_output_units,
-        angle_units,
-        angle_output_units,
-        # horizon_heights,
-        system_efficiency,
-        efficiency_model,
-        efficiency,
-        rounding_places,
-        statistics,
-        csv,
-        verbose,
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        timestamps=timestamps,
+        start_time=start_time,
+        frequency=frequency,
+        end_time=end_time,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        global_horizontal_component=global_horizontal_component,
+        direct_horizontal_component=direct_horizontal_component,
+        temperature_series=temperature_series,
+        wind_speed_series=wind_speed_series,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        albedo=albedo,
+        apply_angular_loss_factor=apply_angular_loss_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        # horizon_heights=horizon_heights,
+        system_efficiency=system_efficiency,
+        efficiency_model=efficiency_model,
+        efficiency=efficiency,
+        verbose=verbose,
     )
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
@@ -286,6 +286,7 @@ def calculate_effective_irradiance(
         dictionary=results,
         title=title + f' irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:
@@ -302,6 +303,12 @@ def calculate_effective_irradiance(
             dictionary=results,
             filename=csv,
         )
+    if not verbose and not csv:
+        flat_list = effective_irradiance_series.flatten().astype(str)
+        csv_str = ','.join(flat_list)
+        print(csv_str)
+
+
 app.add_typer(
     global_irradiance,
     name="global-single",

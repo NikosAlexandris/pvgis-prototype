@@ -7,6 +7,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from datetime import datetime
+from pvgisprototype.constants import RADIANS
 
 
 async def get_calculate_solar_time(
@@ -18,8 +19,8 @@ async def get_calculate_solar_time(
     refracted_solar_zenith: float = Query(1.5853349194640094, description='The solar zenith angle defaults to 1.5853349194640094 radians at sunrise or sunset, adjusted for the approximate correction for atmospheric refraction at those times, and the size of the solar disk.'),
     apply_atmospheric_refraction: bool = False,
     time_output_units: Optional[str] = 'minutes',
-    angle_units: Optional[str] = 'radians',
-    angle_output_units: Optional[str] = 'radians',
+    angle_units: Optional[str] = RADIANS,
+    angle_output_units: Optional[str] = RADIANS,
     perigee_offset: float = Query(0.048869, description="Perigee offset"),
     eccentricity_correction_factor: float = Query(0.01672, description="Eccentricity"),
     time_offset_global: float = Query(0, description="Global time offset"),
@@ -43,15 +44,10 @@ async def get_calculate_solar_time(
             timestamp=timestamp,
             timezone=timezone,
             solar_time_models=model,
-            refracted_solar_zenith=refracted_solar_zenith,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
             time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
             )
     # debug(locals())
     return {"Local solar time": solar_time}

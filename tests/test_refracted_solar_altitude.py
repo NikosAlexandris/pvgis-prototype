@@ -2,6 +2,7 @@ import pytest
 from pvgisprototype.api.irradiance.direct_time_series import calculate_refracted_solar_altitude_time_series
 from pvgisprototype import SolarAltitude
 import numpy as np
+from pvgisprototype.constants import RADIANS, DEGREES
 
 
 tolerances = [1, 0, 0.5, 0.1, 0.01, 0.001, 0.0001]
@@ -11,8 +12,8 @@ tolerances = [1, 0, 0.5, 0.1, 0.01, 0.001, 0.0001]
         (
             [30.0, 40.0, 50.0],
             [30.1, 40.1, 50.1],
-            "degrees",
-            "radians",
+            DEGREES,
+            RADIANS,
         ),  # Add more test cases as needed
     ],
 )

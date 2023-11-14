@@ -3,22 +3,16 @@ from devtools import debug
 Diffuse irradiance
 """
 
-import logging
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler('error.log'),  # Save log to a file
-        logging.StreamHandler()  # Print log to the console
-    ]
-)
+from rich.logging import RichHandler
+from loguru import logger
+logger.remove()  # the default handler
+logger.add(RichHandler())
 import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
 from rich import print
 from rich.console import Console
-from colorama import Fore, Style
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.statistics import calculate_series_statistics
 from pvgisprototype.api.series.statistics import print_series_statistics
@@ -89,6 +83,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TERM_N_IN_SHADE
+from pvgisprototype.constants import RADIANS
 
 
 app = typer.Typer(
@@ -202,21 +197,17 @@ def calculate_diffuse_horizontal_component_from_sarah(
     if diffuse_horizontal_irradiance.size == 1:
         single_value = float(diffuse_horizontal_irradiance.values)
         warning = (
-            Fore.YELLOW
-            + f"{exclamation_mark} The selected timestamp "
-            + Fore.GREEN
+            f"{exclamation_mark} The selected timestamp "
             + f"{diffuse_horizontal_irradiance[diffuse_horizontal_irradiance.indexes].time.values}"
-            + Fore.YELLOW
             + f" matches the single value "
-            + Fore.GREEN
             + f"{single_value}"
-            + Style.RESET_ALL
         )
-        logging.warning(warning)
+        logger.warning(warning)
         if verbose == 3:
             debug(locals())
+
         if verbose > 0:
-            print(Fore.YELLOW + warning)
+            print(f'{warning}')
 
         return single_value
 
@@ -348,11 +339,11 @@ def diffuse_solar_altitude_coefficients(
 ):
     """ """
     # calculate common terms only once
-    linke_turbidity_factor_squared = linke_turbidity_factor**2
-    diffuse_transmission = diffuse_transmission_function(linke_turbidity_factor)
+    linke_turbidity_factor_squared = linke_turbidity_factor.value**2
+    diffuse_transmission = diffuse_transmission_function(linke_turbidity_factor.value)
     a1_prime = (
         0.26463
-        - 0.061581 * linke_turbidity_factor
+        - 0.061581 * linke_turbidity_factor.value
         + 0.0031408 * linke_turbidity_factor_squared
     )
     if a1_prime * diffuse_transmission < 0.0022:
@@ -361,12 +352,12 @@ def diffuse_solar_altitude_coefficients(
         a1 = a1_prime
     a2 = (
         2.04020
-        + 0.018945 * linke_turbidity_factor
+        + 0.018945 * linke_turbidity_factor.value
         - 0.011161 * linke_turbidity_factor_squared
     )
     a3 = (
         -1.3025
-        + 0.039231 * linke_turbidity_factor
+        + 0.039231 * linke_turbidity_factor.value
         + 0.0085079 * linke_turbidity_factor_squared
     )
 
@@ -419,8 +410,8 @@ def calculate_diffuse_inclined_irradiance(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
@@ -491,10 +482,10 @@ def calculate_diffuse_inclined_irradiance(
             timestamp=timestamp,
             timezone=timezone,
             solar_position_model=solar_position_model,
+            solar_time_model=solar_time_model,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            solar_time_model=solar_time_model,
             verbose=0,
         )
 
@@ -522,15 +513,17 @@ def calculate_diffuse_inclined_irradiance(
 
         # surface in shade, requires solar incidence
         solar_time = model_solar_time(
-                longitude=longitude,
-                latitude=latitude,
-                timestamp=timestamp,
-                timezone=timezone,
-                solar_time_model=solar_time_model,
-                refracted_solar_zenith=refracted_solar_zenith,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            model=solar_time_model,
+            refracted_solar_zenith=refracted_solar_zenith,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            time_offset_global=time_offset_global,
+            hour_offset=hour_offset,
         )
         solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
         hour_angle = np.radians(15) * (solar_time_decimal_hours - 12)
@@ -587,6 +580,7 @@ def calculate_diffuse_inclined_irradiance(
                     + kb
                     * sin(surface_tilt)
                     * cos(azimuth_difference)
+                    / (0.1 - 0.008 * solar_altitude.radians)
                     / (0.1 - 0.008 * solar_altitude.radians)
                 )
         # finally, we need to set

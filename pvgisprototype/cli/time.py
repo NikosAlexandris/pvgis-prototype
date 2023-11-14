@@ -12,14 +12,6 @@ from rich import box
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
-
-from pvgisprototype.api.utilities.timestamp import attach_timezone
-from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import random_datetimezone
-from pvgisprototype.api.utilities.conversions import convert_to_radians
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.time import calculate_solar_time
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -32,11 +24,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
 from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
-from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_angle_units
-from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
@@ -134,7 +121,6 @@ def solar_time(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         verbose=verbose,
     ) 
     solar_time_table = Table(

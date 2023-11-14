@@ -5,15 +5,15 @@ from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitu
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.constants import ALTITUDE_NAME
 from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR, DEGREES
 
 
 test_cases_data = read_noaa_spreadsheet(
-    './tests/data/test_cases_noaa_spreadsheet.xlsx'
+    './tests/cases/noaa.xlsx'
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',

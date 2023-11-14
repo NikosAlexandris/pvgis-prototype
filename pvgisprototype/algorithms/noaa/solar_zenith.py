@@ -14,6 +14,7 @@ from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype import AtmosphericRefraction
 from pvgisprototype.validation.functions import CalculateSolarZenithNOAAInput
+from pvgisprototype.validation.functions import CalculateSolarZenithNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarZenithTimeSeriesNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput
@@ -25,6 +26,7 @@ from pvgisprototype import SolarHourAngle
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 import numpy as np
+from pvgisprototype.constants import RADIANS
 
 
 def atmospheric_refraction_for_high_solar_altitude(
@@ -50,7 +52,7 @@ def atmospheric_refraction_for_high_solar_altitude(
     if verbose == 3:
         debug(locals())
 
-    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
+    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
 
 
 def atmospheric_refraction_for_near_horizon(
@@ -80,7 +82,7 @@ def atmospheric_refraction_for_near_horizon(
     if verbose == 3:
         debug(locals())
 
-    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
+    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
 
 
 def atmospheric_refraction_for_below_horizon(
@@ -104,7 +106,7 @@ def atmospheric_refraction_for_below_horizon(
     if verbose == 3:
         debug(locals())
 
-    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit='radians')
+    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
 
 
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
@@ -154,7 +156,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
 
     solar_zenith = SolarZenith(
         value=adjusted_solar_zenith,
-        unit='radians',
+        unit=RADIANS,
     )
 
     # Reasonably increase the upper limit for the solar zenith
@@ -162,8 +164,14 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     # i.e. at 90.833 degrees or about π/2 + 0.0146 radians
     # which is the solar zenith angle when the center of the sun is at the horizon,
     # considering both its apparent size and atmospheric refraction.
-    if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi + 0.0146:
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi + 0.0146}] radians')
+    if (
+        not isfinite(solar_zenith.degrees)
+        or not solar_zenith.min_degrees <= solar_zenith.degrees <= solar_zenith.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar zenith angle {solar_zenith.degrees} is out of the expected range\
+            [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
+        )
 
     if verbose > 5:
         debug(locals())
@@ -173,27 +181,19 @@ def adjust_solar_zenith_for_atmospheric_refraction(
 
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction_time_series(
-        solar_zenith_series: SolarZenithSeriesModel,#: np.ndarray,  # radians
-        angle_output_units: str = 'radians',
+        solar_zenith_series: SolarZenith,
         verbose: int = 0,
-    ):
+    ) -> SolarZenith:
     """Adjust solar zenith for atmospheric refraction for a time series of solar zenith angles"""
-    is_scalar = False
-    if isinstance(solar_zenith_series, SolarZenith):
-        is_scalar=True
-        solar_zenith_series = [solar_zenith_series.radians]
-    else:
-        solar_zenith_series = [zenith.radians for zenith in solar_zenith_series]
 
-    atmospheric_refraction_functions = {
-        'high_solar_altitude': np.vectorize(atmospheric_refraction_for_high_solar_altitude),
-        'near_horizon': np.vectorize(atmospheric_refraction_for_near_horizon),
-        'below_horizon': np.vectorize(atmospheric_refraction_for_below_horizon)
-    }
+    # atmospheric_refraction_functions = {
+    #     'high_solar_altitude': np.vectorize(atmospheric_refraction_for_high_solar_altitude),
+    #     'near_horizon': np.vectorize(atmospheric_refraction_for_near_horizon),
+    #     'below_horizon': np.vectorize(atmospheric_refraction_for_below_horizon)
+    # }
 
-    solar_zenith_series_array = np.array(solar_zenith_series)
-    solar_altitude_series_array = np.radians(90) - np.array(solar_zenith_series_array)  # in radians
-    adjusted_solar_zenith_series_array = np.copy(solar_zenith_series_array)
+    solar_altitude_series_array = np.radians(90) - solar_zenith_series.radians  # in radians
+    adjusted_solar_zenith_series_array = np.copy(solar_zenith_series.radians)
 
     # mask for different altitude levels
     mask_high = solar_altitude_series_array > np.radians(5)
@@ -204,6 +204,9 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).value)
     function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).value)
     function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).value)
+    # function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).radians)
+    # function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).radians)
+    # function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).radians)
     # function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).radians)
     # function_near = np.vectorize(lambda x: atmospheric_refraction_for_near_horizon(x).radians)
     # function_below = np.vectorize(lambda x: atmospheric_refraction_for_below_horizon(x).radians)
@@ -221,13 +224,12 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     if not np.all(np.isfinite(adjusted_solar_zenith_series_array)) or not np.all((0 <= adjusted_solar_zenith_series_array) & (adjusted_solar_zenith_series_array <= np.pi + 0.0146)):
         raise ValueError(f'The `adjusted_solar_zenith` should be a finite number ranging in [0, {np.pi + 0.0146}] radians')
 
-    if not is_scalar:
-        adjusted_solar_zenith_series = [SolarZenith(value=value, unit='radians') for value in adjusted_solar_zenith_series_array]
-    else:
-        adjusted_solar_zenith_series = SolarZenith(value=adjusted_solar_zenith_series_array[0], unit='radians')
-    
-    if angle_output_units == 'degrees':
-        adjusted_solar_zenith_series = convert_series_to_degrees_if_requested(adjusted_solar_zenith_series, angle_output_units)
+    adjusted_solar_zenith_series = SolarZenith(
+        value=adjusted_solar_zenith_series_array,
+        unit=RADIANS,
+        position_algorithm=solar_zenith_series.position_algorithm,
+        timing_algorithm=solar_zenith_series.timing_algorithm
+    )
 
     if verbose > 5:
         debug(locals())
@@ -247,6 +249,7 @@ def calculate_solar_zenith_noaa(
     if verbose == 3:
         debug(locals())
 
+
     solar_declination = calculate_solar_declination_noaa(
         timestamp=timestamp,
     )
@@ -256,7 +259,7 @@ def calculate_solar_zenith_noaa(
     solar_zenith = acos(cosine_solar_zenith)
     solar_zenith = SolarZenith(
         value=solar_zenith,
-        unit='radians',
+        unit=RADIANS,
         position_algorithm='NOAA',
         timing_algorithm='NOAA',
     )
@@ -265,9 +268,14 @@ def calculate_solar_zenith_noaa(
         solar_zenith = adjust_solar_zenith_for_atmospheric_refraction(
             solar_zenith,
         )  # always in radians!
-    
-    if not isfinite(solar_zenith.radians) or not 0 <= solar_zenith.radians <= pi/2 + 0.0146:
-        raise ValueError(f'The `solar_zenith` should be a finite number ranging in [0, {pi/2 + 0.0146}] radians')
+    if (
+        not isfinite(solar_zenith.degrees)
+        or not solar_zenith.min_degrees <= solar_zenith.degrees <= solar_zenith.max_degrees
+    ):
+        raise ValueError(
+            f"The calculated solar zenith angle {solar_zenith.degrees} is out of the expected range\
+            [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
+        )
 
     if verbose == 3:
         debug(locals())
@@ -279,53 +287,38 @@ def calculate_solar_zenith_noaa(
 def calculate_solar_zenith_time_series_noaa(
         latitude: Latitude,  # radians
         timestamps: Union[datetime, Sequence[datetime]],
-        solar_hour_angle_series: Union[SolarHourAngle, Sequence[SolarHourAngle]],
+        solar_hour_angle_series: SolarHourAngle,
         apply_atmospheric_refraction: bool = False,
-        angle_output_units: str = 'radians',
         verbose: int = 0,
-):
+    ) -> SolarZenith:
     """ """
     # Handle single datetime or SolarHourAngle inputs
     solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
-            angle_output_units='radians',
             )
-    solar_declination_series = np.array([item.radians for item in solar_declination_series])
-
-    if isinstance(timestamps, datetime):
-        timestamps = [timestamps]
-
-    if isinstance(solar_hour_angle_series, SolarHourAngle):  # single SolarHourAngle
-        solar_hour_angle_series = [solar_hour_angle_series]  # one-element list
-
-    # convert to a NumPy array
-    solar_hour_angle_series = np.array([hour_angle.radians for hour_angle in solar_hour_angle_series])
+    # if isinstance(timestamps, datetime):
+    #     timestamps = [timestamps]
     cosine_solar_zenith = (
-        np.sin(latitude.radians) * np.sin(solar_declination_series)
-        + np.cos(latitude.radians) * np.cos(solar_declination_series) * np.cos(solar_hour_angle_series)
+        np.sin(latitude.radians) * np.sin(solar_declination_series.radians)
+        + np.cos(latitude.radians) * np.cos(solar_declination_series.radians) * np.cos(solar_hour_angle_series.radians)
     )
     solar_zenith_series = np.arccos(cosine_solar_zenith)
-    solar_zenith_series = [SolarZenith(value=value, unit='radians') for value in solar_zenith_series]
+    solar_zenith_series = SolarZenith(
+        value=solar_zenith_series,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
     if apply_atmospheric_refraction:
         solar_zenith_series = adjust_solar_zenith_for_atmospheric_refraction_time_series(
-            solar_zenith_series, angle_output_units="radians"
+            solar_zenith_series
         )
 
-    # Convert SolarZenith objects to a NumPy array of float values
-    solar_zenith_values = np.array([zenith.radians for zenith in solar_zenith_series])
-
     # Validate
-    if not np.all(np.isfinite(solar_zenith_values)) or not np.all((0 <= solar_zenith_values) & (solar_zenith_values <= np.pi + 0.0146)):
+    if not np.all(np.isfinite(solar_zenith_series.radians)) or not np.all((0 <= solar_zenith_series.radians) & (solar_zenith_series.radians <= np.pi + 0.0146)):
         raise ValueError(f'Solar zenith values should be finite numbers and range in [0, {np.pi + 0.0146}] radians')
 
-    # Why !?
-    solar_zenith_series = [SolarZenith(value=value, unit='radians') for value in solar_zenith_values]
-    solar_zenith_series = convert_series_to_degrees_if_requested(solar_zenith_series, angle_output_units)
-    
     if verbose == 3:
         debug(locals())
 
-    if np.isscalar(timestamps):
-        return solar_zenith_series[0]
-    else:
-        return np.array(solar_zenith_series, dtype=object)
+    return solar_zenith_series
