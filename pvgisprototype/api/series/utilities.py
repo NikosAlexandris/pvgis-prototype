@@ -3,8 +3,6 @@ from rich import print
 import warnings
 import typer
 import netCDF4
-from colorama import Fore
-from colorama import Style
 from .log import logger
 import xarray as xr
 
@@ -63,7 +61,7 @@ def open_data_array(
     #         raise typer.Exit(code=33)
     if in_memory:
         if verbose > 0:
-            print("In memory")
+            print("Reading data in memory...")
         return load_or_open_dataarray(
             function=xr.load_dataarray,
             filename_or_object=netcdf,
@@ -127,21 +125,21 @@ def set_location_indexers(
         logger.info(f'Dimensions  : {x}, {y}')
 
     if not (longitude and latitude):
-        warning = Fore.YELLOW + f'{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates.' + Style.RESET_ALL
+        warning = f'{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates.'
         logger.warning(warning)
-        typer.echo(Fore.YELLOW + warning)
+        typer.echo(warning)
 
         center_longitude = float(data_array[x][len(data_array[x])//2])
         center_latitude = float(data_array[y][len(data_array[y])//2])
         indexers[x] = center_longitude
         indexers[y] = center_latitude
 
-        text_coordinates = Fore.GREEN + f'{check_mark} Center coordinates (longitude, latitude) : {center_longitude}, {center_latitude}.' + Style.RESET_ALL
+        text_coordinates = f'{check_mark} Center coordinates (longitude, latitude) : {center_longitude}, {center_latitude}.'
 
     else:
         indexers[x] = longitude
         indexers[y] = latitude
-        text_coordinates = Fore.GREEN + f'{check_mark} Coordinates : {longitude}, {latitude}.' + Style.RESET_ALL
+        text_coordinates = f'{check_mark} Coordinates : {longitude}, {latitude}.'
 
     logger.info(text_coordinates)
     if verbose > 0:
@@ -220,10 +218,12 @@ def select_location_time_series(
     )
     try:
         location_time_series = data_array.sel(
-                **indexers,
-                method=neighbor_lookup,
-                tolerance=tolerance,)
-        # location_time_series.load()  # load into memory for fast processing
+            **indexers,
+            method=neighbor_lookup,
+            tolerance=tolerance,
+        )
+        location_time_series.load()  # load into memory for fast processing
+
     except Exception as exception:
         print(f"{ERROR_IN_SELECTING_DATA} : {exception}")
         raise SystemExit(33)

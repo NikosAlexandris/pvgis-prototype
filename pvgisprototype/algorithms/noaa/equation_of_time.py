@@ -1,5 +1,5 @@
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeNOAAInput
+from pvgisprototype.validation.functions import CalculateEquationOfTimeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
 from datetime import datetime
 from pvgisprototype import EquationOfTime
@@ -11,6 +11,7 @@ from typing import Union
 from typing import Sequence
 import numpy as np
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa 
+from pvgisprototype.constants import RADIANS
 
 EQUATIONOFTIME_MINIMUM = -20
 EQUATIONOFTIME_MAXIMUM = 20
@@ -44,39 +45,25 @@ def calculate_equation_of_time_noaa(
 @validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput) 
 def calculate_equation_of_time_time_series_noaa(
     timestamps: Union[datetime, Sequence[datetime]],
-    time_output_units: str = 'minutes',
-):#-> Union[EquationOfTime, np.ndarray]:
+) -> EquationOfTime:
     """Calculate the equation of time in minutes for a time series"""
-    is_scalar_input = isinstance(timestamps, datetime)
-    # timestamps = np.atleast_1d(np.array(timestamps, dtype=datetime))
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
-        angle_output_units='radians'
+        angle_output_units=RADIANS
     )
-    if is_scalar_input:
-        fractional_year_series = np.array(
-            [fractional_year_series.radians], dtype=np.float64
-        )
-    else:
-        fractional_year_series = np.array(
-            [
-                item.radians if isinstance(item, FractionalYear) else item
-                for item in fractional_year_series
-            ],
-            dtype=np.float64,
-        )
     equation_of_time_series = 229.18 * (
         0.000075
-        + 0.001868 * np.cos(fractional_year_series)
-        - 0.032077 * np.sin(fractional_year_series)
-        - 0.014615 * np.cos(2 * fractional_year_series)
-        - 0.040849 * np.sin(2 * fractional_year_series)
+        + 0.001868 * np.cos(fractional_year_series.radians)
+        - 0.032077 * np.sin(fractional_year_series.radians)
+        - 0.014615 * np.cos(2 * fractional_year_series.radians)
+        - 0.040849 * np.sin(2 * fractional_year_series.radians)
     )
-
     if not np.all((-20 <= equation_of_time_series) & (equation_of_time_series <= 20)):
         raise ValueError("The equation of time must be within the range [-20, 20] minutes for all timestamps.")
-
-    if is_scalar_input:
-        return EquationOfTime(value=equation_of_time_series[0], unit='minutes')
-    else:
-        return np.array([EquationOfTime(value=value, unit='minutes') for value in equation_of_time_series], dtype=object)
+    
+    return EquationOfTime(
+        value=equation_of_time_series,
+        unit='minutes',
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )

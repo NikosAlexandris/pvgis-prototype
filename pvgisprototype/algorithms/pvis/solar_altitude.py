@@ -59,10 +59,11 @@ def calculate_solar_altitude_pvis(
     """
     solar_declination = calculate_solar_declination_pvis(
         timestamp=timestamp,
-        timezone=timezone,
-        eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
     )
+    C31 = cos(latitude.radians) * cos(solar_declination.radians)
+    C33 = sin(latitude.radians) * sin(solar_declination.radians)
     C31 = cos(latitude.radians) * cos(solar_declination.radians)
     C33 = sin(latitude.radians) * sin(solar_declination.radians)
     solar_time = model_solar_time(

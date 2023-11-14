@@ -2,7 +2,7 @@ import pytest
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
 from pvgisprototype import SolarHourAngle
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import SOLAR_TIME_NAME, HOUR_ANGLE_NAME
+from pvgisprototype.constants import SOLAR_TIME_NAME, HOUR_ANGLE_NAME, DEGREES
 from datetime import datetime
 
 
@@ -11,7 +11,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     timestamp='timestamp',
     solar_time=SOLAR_TIME_NAME,
     hour_angle=HOUR_ANGLE_NAME,

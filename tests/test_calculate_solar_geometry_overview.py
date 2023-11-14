@@ -1,8 +1,8 @@
 import pytest
-from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
+from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype import RefractedSolarZenith
+# from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.constants import (
     POSITION_ALGORITHM_NAME,
     TIME_ALGORITHM_NAME,
@@ -12,6 +12,7 @@ from pvgisprototype.constants import (
     HOUR_ANGLE_NAME,
     ZENITH_NAME,
     UNITS_NAME,
+    DEGREES,
 )
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
@@ -21,7 +22,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',

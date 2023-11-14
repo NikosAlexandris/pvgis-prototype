@@ -8,7 +8,6 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pathlib import Path
 from typing import List
 from pvgisprototype import SolarIncidence
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
@@ -20,7 +19,6 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
-from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
@@ -38,9 +36,6 @@ def model_solar_incidence(
     solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
-    # shadow_indicator: Path = None,
-    # horizon_heights: List = None,
-    # horizon_interval: float = None,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -90,10 +85,10 @@ def calculate_solar_incidence(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
+    random_time: bool = RANDOM_DAY_FLAG_DEFAULT,
     solar_incidence_models: List[SolarIncidenceModels] = [SolarIncidenceModels.jenco],
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
-    # shadow_indicator: Path = None,
     horizon_heights: List[float] = None,
     horizon_interval: float = None,
     solar_time_model: SolarTimeModels = SolarTimeModels.milne,
@@ -119,9 +114,6 @@ def calculate_solar_incidence(
                 hour_offset=hour_offset,
                 surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
-                # shadow_indicator=shadow_indicator,
-                # horizon_heights=horizon_heights,
-                # horizon_interval=horizon_interval,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 perigee_offset=perigee_offset,
                 verbose=verbose,

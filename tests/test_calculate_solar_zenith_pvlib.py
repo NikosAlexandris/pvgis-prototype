@@ -3,7 +3,7 @@ from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_
 from pvgisprototype import SolarZenith
 # import matplotlib.pyplot as plt
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import ZENITH_NAME
+from pvgisprototype.constants import ZENITH_NAME, DEGREES
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -11,7 +11,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',

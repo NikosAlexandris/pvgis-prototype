@@ -1,8 +1,8 @@
 import pytest
-from pvgisprototype.api.geometry.solar_azimuth import model_solar_azimuth
+from pvgisprototype.api.geometry.azimuth import model_solar_azimuth
 from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
-from pvgisprototype.constants import AZIMUTH_NAME
+from pvgisprototype.constants import AZIMUTH_NAME, DEGREES
 from pvgisprototype import SolarAzimuth
 
 
@@ -11,7 +11,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='degrees',
+    against_unit=DEGREES,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',

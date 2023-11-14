@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.time import model_solar_time
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes

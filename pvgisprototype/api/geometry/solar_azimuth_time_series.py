@@ -35,9 +35,6 @@ def model_solar_azimuth_time_series(
     hour_offset: float = 0,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    # time_output_units: str = 'minutes',
-    # angle_units: str = 'radians',
-    # angle_output_units: str = 'radians',
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List[SolarAzimuth]:
 

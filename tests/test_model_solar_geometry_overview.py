@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.api.geometry.solar_position import model_solar_geometry_overview
+from pvgisprototype.api.geometry.overview import model_solar_geometry_overview
 from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype import SolarDeclination
@@ -13,6 +13,7 @@ from pvgisprototype.constants import (
     DECLINATION_NAME,
     HOUR_ANGLE_NAME,
     ZENITH_NAME,
+    RADIANS,
 )
 
 
@@ -21,7 +22,7 @@ test_cases_data = read_noaa_spreadsheet(
 )
 test_cases = test_cases_from_data(
     test_cases_data,
-    against_unit='radians',
+    against_unit=RADIANS,
     longitude='longitude',
     latitude='latitude',
     timestamp='timestamp',

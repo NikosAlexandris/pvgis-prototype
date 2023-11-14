@@ -61,6 +61,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
@@ -75,7 +76,8 @@ from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
-
+from pvgisprototype.constants import RADIANS
+from pvgisprototype import LinkeTurbidityFactor
 
 
 AOIConstants = []
@@ -110,7 +112,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: Annotated[List[float], typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = 2,
@@ -125,12 +127,13 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the clear-sky diffuse ground reflected irradiance on an inclined surface (Ri).
 
@@ -229,7 +232,6 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     title = 'Reflected'
 
     if verbose > 1 :
-        solar_altitude_series_array = np.array([solar_altitude.radians for solar_altitude in solar_altitude_series])
         extended_results = {
             "Albedo": albedo,
             "Global": global_horizontal_irradiance_series,
@@ -249,7 +251,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     if verbose > 3:
         even_more_extended_results = {
             "Extraterrestrial normal": extraterrestrial_normal_irradiance_series,
-            'Altitude': convert_series_to_degrees_if_requested(solar_altitude_series_array, angle_output_units),
+            'Altitude': getattr(solar_altitude_series, angle_output_units),
         }
         results = results | even_more_extended_results
 
@@ -266,6 +268,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         dictionary=results,
         title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
         rounding_places=rounding_places,
+        index=index,
         verbose=verbose,
     )
     if statistics:

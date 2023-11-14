@@ -46,15 +46,9 @@ class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
 ):
     pass
 
-class CalculateEquationOfTimeNOAAInput(
-    BaseTimestampModel,
-):
-    pass
-
 
 class CalculateEquationOfTimeTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
-    BaseTimeOutputUnitsModel,
 ):
     pass
 
@@ -62,7 +56,6 @@ class CalculateEquationOfTimeTimeSeriesNOAAInput(
 class CalculateTimeOffsetTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
-    BaseTimeOutputUnitsModel,
 ):
     pass
 
@@ -78,13 +71,13 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
+    BaseAngleOutputUnitsModel,
 ):
     pass
 
 
 class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
     BaseTimestampSeriesModel,  # != BaseTimestampModel
-    BaseAngleOutputUnitsModel,
 ):
     pass
 
@@ -103,21 +96,9 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
 
 class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
     SolarZenithSeriesModel,
-    BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
-    # @field_validator('solar_zenith_series')
-    # def solar_zenith_range(cls, v):
-    #     v_array = np.atleast_1d(v)  # Ensure v is treated as an array
-    #     if not np.all((0 <= v_array) & (v_array <= np.pi)):  # Adjust the condition to work with an array
-    #         raise ValueError('solar_zenith must range within [0, π]')
-    #     return v  # Return the original value or array
-    @field_validator('solar_zenith_series')
-    def solar_zenith_range(cls, v):
-        v_values = np.array([zenith.value for zenith in np.atleast_1d(v)])  # Extract numerical values
-        if not np.all((0 <= v_values) & (v_values <= np.pi)):  # Adjust the condition to work with an array
-            raise ValueError("The solar zenith angle must be between 0 and pi radians.")
-        return v
+    pass
 
 
 class CalculateSolarZenithNOAAInput(
@@ -136,7 +117,6 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     SolarHourAngleSeriesModel,
     ApplyAtmosphericRefractionModel,
-    BaseAngleOutputUnitsModel,
     VerbosityModel,
 ):
     pass
@@ -162,6 +142,7 @@ class CalculateSolarAzimuthNOAAInput(
 class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
+
 ):
     pass
 
@@ -184,9 +165,27 @@ class CalculateEventHourAngleNOAAInput(
         return v
 
 
+class CalculateEventHourAngleTimeSeriesNOAAInput(
+    LatitudeModel,
+    BaseTimestampSeriesModel,
+    RefractedSolarZenithModel,
+):
+    pass
+
+
 class CalculateEventTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
+    RefractedSolarZenithModel,
+    BaseTimeEventModel,
+    ApplyAtmosphericRefractionModel,
+):
+    pass
+
+
+class CalculateEventTimeTimeSeriesNOAAInput(
+    BaseCoordinatesModel,
+    BaseTimestampSeriesModel,
     RefractedSolarZenithModel,
     BaseTimeEventModel,
     ApplyAtmosphericRefractionModel,
@@ -219,4 +218,13 @@ class CalculateSolarPositionNOAAInput(
                 f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
         return v
+    pass
+
+
+class CalculateTimeserieSolarPositionNOAAInput(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    RefractedSolarZenithModel,
+    ApplyAtmosphericRefractionModel,
+):
     pass

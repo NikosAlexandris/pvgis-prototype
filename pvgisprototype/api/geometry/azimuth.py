@@ -28,6 +28,8 @@ from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import AZIMUTH_NAME
 from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import DEGREES
 
 
 @validate_with_pydantic(ModelSolarAzimuthInputModel)
@@ -80,7 +82,6 @@ def model_solar_azimuth(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
-                timezone=timezone,
                 )
 
     if solar_position_model.value == SolarPositionModels.suncalc:
@@ -93,7 +94,12 @@ def model_solar_azimuth(
         solar_azimuth = convert_south_to_north_radians_convention(
             solar_azimuth_south_radians_convention
         )
-        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="radians")
+        solar_azimuth = SolarAzimuth(
+            value=solar_azimuth,
+            unit=RADIANS,
+            position_algorithm='suncalc',
+            timing_algorithm='suncalc',
+        )
 
     if solar_position_model.value == SolarPositionModels.pysolar:
 
@@ -105,7 +111,12 @@ def model_solar_azimuth(
             when=timestamp,
         )  # returns degrees by default
         # required by output function
-        solar_azimuth = SolarAzimuth(value=solar_azimuth, unit="degrees")
+        solar_azimuth = SolarAzimuth(
+            value=solar_azimuth,
+            unit=DEGREES,
+            position_algorithm='pysolar',
+            timing_algorithm='pysolar',
+        )
 
     if solar_position_model.value  == SolarPositionModels.pvis:
 
@@ -167,7 +178,7 @@ def calculate_solar_azimuth(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    angle_output_units: str = 'radians',
+    angle_output_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """
@@ -192,8 +203,8 @@ def calculate_solar_azimuth(
                 verbose=verbose,
             )
             results.append({
-                TIME_ALGORITHM_NAME: solar_time_model.value,
-                POSITION_ALGORITHM_NAME: solar_position_model.value,
+                TIME_ALGORITHM_NAME: solar_azimuth.timing_algorithm,
+                POSITION_ALGORITHM_NAME: solar_azimuth.position_algorithm,
                 AZIMUTH_NAME if solar_azimuth else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
                 UNITS_NAME: angle_output_units,
             })

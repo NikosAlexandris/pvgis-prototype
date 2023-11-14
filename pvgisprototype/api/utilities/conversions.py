@@ -8,6 +8,8 @@ from math import pi
 import numpy as np
 from typing import List
 from typing import Any
+from typing import List
+from pvgisprototype.constants import RADIANS, DEGREES
 
 
 def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
@@ -40,16 +42,16 @@ def convert_to_radians_fastapi(angle: float) -> float:
 
 def convert_float_to_degrees_if_requested(angle: float, output_units: str) -> float:
     """Convert angle from radians to degrees if requested"""
-    return degrees(angle) if output_units == 'degrees' else angle
+    return degrees(angle) if output_units == DEGREES else angle
 
 
 def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
     """Convert angle from radians to degrees if requested"""
     from copy import deepcopy
     copy_of_data_class = deepcopy(data_class)
-    if output_units == 'degrees' and not data_class.unit == 'degrees':
+    if output_units == DEGREES and not data_class.unit == DEGREES:
         copy_of_data_class.value = degrees(data_class.value)
-        copy_of_data_class.unit = 'degrees'
+        copy_of_data_class.unit = DEGREES
     return copy_of_data_class
 
 
@@ -75,20 +77,20 @@ def convert_series_to_degrees_if_requested(
     from copy import deepcopy
     copy_of_data_class_series = deepcopy(data_class_series)
 
-    if angle_output_units == "degrees":
+    if angle_output_units == DEGREES:
         values_to_convert = np.array(
             [
                 data_class.value
                 for data_class in copy_of_data_class_series
-                if data_class.unit != "degrees"
+                if data_class.unit != DEGREES
             ]
         )
         converted_values = np.degrees(values_to_convert)
 
         for i, data_class in enumerate(copy_of_data_class_series):
-            if data_class.unit != "degrees":
+            if data_class.unit != DEGREES:
                 data_class.value = converted_values[i]
-                data_class.unit = "degrees"
+                data_class.unit = DEGREES
 
     return copy_of_data_class_series
 
@@ -122,7 +124,7 @@ def convert_series_to_degrees_arrays_if_requested(
 
 def convert_float_to_radians_if_requested(angle: float, output_units: str) -> float:
     """Convert angle from radians to radians if requested"""
-    return radians(angle) if output_units == 'radians' else angle
+    return radians(angle) if output_units == RADIANS else angle
 
 
 # def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
@@ -132,19 +134,19 @@ def convert_float_to_radians_if_requested(angle: float, output_units: str) -> fl
 
 def convert_to_radians_if_requested(data_input: Any, output_units: str) -> Any:
     """Convert angle from degrees to radians for a single or an array of custom data structures if requested."""
-    if output_units != 'radians':
+    if output_units != RADIANS:
         return data_input
 
     if isinstance(data_input, np.ndarray):
         for data_class in data_input:
-            if data_class.unit != 'radians':
+            if data_class.unit != RADIANS:
                 data_class.value = radians(data_class.value)
-                data_class.unit = 'radians'
+                data_class.unit = RADIANS
     else:
-        if data_input.unit != 'radians':
+        if data_input.unit != RADIANS:
             # data_class = replace(data_class, value=radians(data_class.value), unit='radians')
             data_input.value = radians(data_input.value)
-            data_input.unit = 'radians'
+            data_input.unit = RADIANS
             
     return data_input
 
@@ -172,20 +174,20 @@ def convert_series_to_radians_if_requested(
     from copy import deepcopy
 
     copy_of_data_class_series = deepcopy(data_class_series)
-    if angle_output_units == "radians":
+    if angle_output_units == RADIANS:
         values_to_convert = np.array(
             [
                 data_class.value
                 for data_class in copy_of_data_class_series
-                if data_class.unit != "radians"
+                if data_class.unit != RADIANS
             ]
         )
         converted_values = np.radians(values_to_convert)
 
         for i, data_class in enumerate(copy_of_data_class_series):
-            if data_class.unit != "radians":
+            if data_class.unit != RADIANS:
                 data_class.value = converted_values[i]
-                data_class.unit = "radians"
+                data_class.unit = RADIANS
 
     return copy_of_data_class_series
 
@@ -213,6 +215,8 @@ def round_float_values(obj, decimal_places=3):
                 for key, value in v.items():
                     if isinstance(value, float):
                         v[key] = f"{round(value, decimal_places):.{decimal_places}f}"
+                    elif isinstance(value, np.ndarray):
+                        v[key] = np.around(value, decimals=decimal_places).astype(str)
             elif isinstance(v, float):
                 obj[i] = f"{round(v, decimal_places):.{decimal_places}f}"
         return obj
