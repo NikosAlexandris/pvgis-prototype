@@ -164,7 +164,7 @@ typer_option_start_time = typer.Option(
     default_factory = None,
 )
 typer_option_frequency = typer.Option(
-    help=f'Frequency for the timestamp generation function',
+    help=f"Frequency for timestamp generation, ex. 30m. A number and date/time unit : (D)ay, (M)onth, (Y)ear, (h)ours, (m)inutes, or (s)econds. See NumPy's timedelta64.",
     rich_help_panel=rich_help_panel_time_series,
     # default_factory='h'
 )
@@ -703,7 +703,7 @@ typer_option_statistics = typer.Option(
     # default=False
 )
 typer_option_groupby = typer.Option(
-    help=f"Produce statistics on groups (see Xarray\'s group-by operations)",
+    help=f"Group statistics, ex. M or 3H. A number and date/time unit : (Y)ear, (M)onth, (D)ay, (W)eek, (S)eason. See Xarray\'s group-by operations.",
     rich_help_panel=rich_help_panel_output,
     # default_factory='h'
 )
