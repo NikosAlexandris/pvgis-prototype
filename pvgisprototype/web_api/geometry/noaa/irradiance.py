@@ -25,16 +25,18 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.web_api.dependencies import process_timestamp_input
+from pvgisprototype.web_api.dependencies import process_series_timestamp
 from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+from pvgisprototype.web_api.dependencies import process_longitude
+from pvgisprototype.web_api.dependencies import process_latitude
 
 
 async def get_calculate_effective_irradiance_time_series(
-    longitude: float = Query(..., ge=-180, le=180),
-    latitude: float = Query(..., ge=-90, le=90),
+    longitude: float = Depends(process_longitude),
+    latitude: float = Depends(process_latitude),
     elevation: float = Query(...),
-    timestamps: Optional[List[datetime]] = Depends(process_timestamp_input),
+    timestamps: Optional[List[datetime]] = Depends(process_series_timestamp),
     start_time: Optional[datetime] = Query(None),
     frequency: Optional[str] = Query('h'),
     end_time: Optional[datetime] = Query(None),
@@ -70,14 +72,9 @@ async def get_calculate_effective_irradiance_time_series(
     verbose: int = Query(VERBOSE_LEVEL_DEFAULT),
 ):
 
-    
-    longitude = convert_to_radians_fastapi(longitude)
-    latitude = convert_to_radians_fastapi(latitude)
     surface_tilt = np.radians(surface_tilt)
     surface_orientation = np.radians(surface_orientation)
 
-    from devtools import debug
-    debug(locals())
 
     effective_irradiance_series, results, title = calculate_effective_irradiance_time_series(
         longitude=longitude,
@@ -117,7 +114,6 @@ async def get_calculate_effective_irradiance_time_series(
         efficiency=efficiency,
         verbose=verbose,
     )
-    debug(locals())
 
     return effective_irradiance_series.tolist()
 
