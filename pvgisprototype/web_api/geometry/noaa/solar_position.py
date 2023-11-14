@@ -19,9 +19,9 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 
 
 async def get_calculate_noaa_solar_position(
-    longitude: float = Query(..., ge=-180, le=180),
-    latitude: float = Query(..., ge=-90, le=90),
-    timestamp: Optional[datetime] = Query(None),
+    longitude: float = Depends(process_longitude),
+    latitude: float = Depends(process_latitude),
+    timestamp: Optional[datetime] = Depends(process_single_timestamp),
     timezone: Optional[str] = Query(None),
     refracted_solar_zenith: float = Query(1.5853349194640094),
     apply_atmospheric_refraction: Optional[bool] = Query(True),
@@ -31,28 +31,41 @@ async def get_calculate_noaa_solar_position(
     rounding_places: Optional[int] = Query(5),
     verbose: bool = Query(False)
 ):
-    longitude = convert_to_radians_fastapi(longitude)
-    latitude = convert_to_radians_fastapi(latitude)
-
-    if timestamp is None:
-        timestamp = now_utc_datetimezone()
-
     if timezone:
         timezone = convert_to_timezone(timezone)
         timestamp = timestamp.astimezone(timezone)
 
-
     solar_position_calculations = calculate_noaa_solar_position(
-        longitude,
-        latitude,
-        timestamp,
-        timezone,
-        refracted_solar_zenith,
-        apply_atmospheric_refraction,
-        time_output_units,
-        angle_units,
-        angle_output_units,
+        longitude=longitude,
+        latitude=latitude,
+        timestamp=timestamp,
+        timezone=timezone,
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
     )
+
+    for quantity_name, quantity_object in solar_position_calculations.items():
+        if not isinstance(quantity_object, list):
+            if isinstance(quantity_object, datetime):
+                solar_position_calculations[quantity_name] = quantity_object
+            else:
+                try:
+                    angle_value = getattr(quantity_object, angle_output_units)
+                    if isinstance(angle_value, float):
+                        solar_position_calculations[quantity_name] = angle_value
+                    else:
+                        angle_value_list = angle_value.tolist()
+                        solar_position_calculations[quantity_name] = [round(value, rounding_places) for value in angle_value_list]
+                except AttributeError:
+                    time_value =  getattr(quantity_object, time_output_units)
+                    if isinstance(time_value, float):
+                        solar_position_calculations[quantity_name] = time_value
+                    else:
+                        time_value_list = time_value.tolist()
+                        solar_position_calculations[quantity_name] = [round(value, rounding_places) for value in time_value_list]
 
     return {"solar_position_table": solar_position_calculations}
 
