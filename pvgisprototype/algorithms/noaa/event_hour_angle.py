@@ -1,14 +1,18 @@
 from devtools import debug
 from datetime import datetime
-from math import cos
-from math import tan
-from math import acos
+# from math import cos
+# from math import tan
+# from math import acos
+import numpy as np
+from typing import Union, Sequence
 from pvgisprototype.validation.functions import validate_with_pydantic
-from .function_models import CalculateEventHourAngleNOAAInput
+from pvgisprototype.algorithms.noaa.function_models import CalculateEventHourAngleNOAAInput
+from pvgisprototype.algorithms.noaa.function_models import CalculateEventHourAngleTimeSeriesNOAAInput
 from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import EventHourAngle
-from .solar_declination import calculate_solar_declination_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.constants import RADIANS
 
 
@@ -63,10 +67,28 @@ def calculate_event_hour_angle_noaa(
     solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
             )  # radians
-    cosine_event_hour_angle = cos(refracted_solar_zenith.radians) / (
-        cos(latitude.radians) * cos(solar_declination.radians)
-    ) - tan(latitude.radians) * tan(solar_declination.radians)
-    event_hour_angle = acos(cosine_event_hour_angle)  # radians
+    cosine_event_hour_angle = np.cos(refracted_solar_zenith.radians) / (
+        np.cos(latitude.radians) * np.cos(solar_declination.radians)
+    ) - np.tan(latitude.radians) * np.tan(solar_declination.radians)
+    event_hour_angle = np.arccos(cosine_event_hour_angle)  # radians
+    event_hour_angle = EventHourAngle(value=event_hour_angle, unit=RADIANS)
+
+    return event_hour_angle
+
+
+@validate_with_pydantic(CalculateEventHourAngleTimeSeriesNOAAInput)
+def calculate_event_hour_angle_time_series_noaa(
+        latitude: Latitude, # radians
+        timestamps: Union[float, Sequence[float]],
+        refracted_solar_zenith: RefractedSolarZenith,
+    ) -> EventHourAngle:
+    solar_declination = calculate_solar_declination_time_series_noaa(
+            timestamps=timestamps,
+            )  # radians
+    cosine_event_hour_angle = np.cos(refracted_solar_zenith.radians) / (
+        np.cos(latitude.radians) * np.cos(solar_declination.radians)
+    ) - np.tan(latitude.radians) * np.tan(solar_declination.radians)
+    event_hour_angle = np.arccos(cosine_event_hour_angle)  # radians
     event_hour_angle = EventHourAngle(value=event_hour_angle, unit=RADIANS)
 
     return event_hour_angle
