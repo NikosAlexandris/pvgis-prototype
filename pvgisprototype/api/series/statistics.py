@@ -45,11 +45,17 @@ def calculate_series_statistics(
         # 'Longitude of Max': data_xarray.argmax('lon').values,
         # 'Latitude of Max': data_xarray.argmax('lat').values,
     }
-    # Add aggregated statistics based on frequency
+    # Aggregate statistics based on frequency
+    if groupby == 'Y':
+        statistics['Yearly means'] = data_xarray.groupby('time.year').mean().values
     if groupby == 'M':
         statistics['Monthly means'] = data_xarray.groupby('time.month').mean().values
     elif groupby == 'D':
         statistics['Daily means'] = data_xarray.groupby('time.day').mean().values
+    if groupby == 'W':
+        statistics['Weekly means'] = data_xarray.resample(time='1W').mean().values
+    if groupby == 'S':
+        statistics['Seasonal means'] = data_xarray.groupby('time.season').mean().values
 
     return statistics
 
@@ -101,6 +107,8 @@ def print_series_statistics(
     groups = [
         'Monthly means',
         'Daily means',
+        'Weekly means',
+        'Seasonal means',
         ]
 
     # Index of items
@@ -123,12 +131,32 @@ def print_series_statistics(
     # Groups
     for key, value in statistics.items():
         if key in groups:
+
             if key == 'Monthly means':
                 import calendar
-                for idx, value in enumerate(key, start=1):
+                for idx, value in enumerate(statistics[key], start=1):
                     month_name = calendar.month_name[idx]  # Get month name
                     # table.add_row(key, str(round_float_values(value, rounding_places)))
                     table.add_row(month_name, str(value))
+                table.add_row("", "")
+
+            if key == 'Daily means':  # REVIEW-ME : We want Day-of-Year, not of-Month!
+                for idx, value in enumerate(statistics[key]):
+                    day_of_year = idx + 1  # Convert index to day of the year
+                    table.add_row(f"Day {day_of_year}", str(value))
+                table.add_row("", "")
+
+            if key == 'Weekly means':
+                for idx, value in enumerate(statistics[key]):
+                    week_number = idx + 1  # Week number
+                    table.add_row(f"Week {week_number}", str(value))
+                table.add_row("", "")
+
+            if key == 'Seasonal means':
+                seasons = ['DJF', 'MAM', 'JJA', 'SON']  # Define the seasons
+                for season, value in zip(seasons, statistics[key]):
+                    table.add_row(season, str(value))
+                table.add_row("", "")
 
     # Index of
     for key, value in statistics.items():
