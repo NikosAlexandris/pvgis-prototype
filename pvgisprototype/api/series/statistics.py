@@ -10,7 +10,12 @@ from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 
 
-def calculate_series_statistics(data_array, timestamps):
+def calculate_series_statistics(
+        data_array,
+        timestamps,
+        groupby: str = None,
+):
+    """ """
     import xarray as xr
     data_xarray = xr.DataArray(
         data_array,
@@ -40,6 +45,25 @@ def calculate_series_statistics(data_array, timestamps):
         # 'Longitude of Max': data_xarray.argmax('lon').values,
         # 'Latitude of Max': data_xarray.argmax('lat').values,
     }
+    time_groupings = {
+        'Y': ('year', 'Yearly means'),
+        'S': ('season', 'Seasonal means'),
+        'M': ('month', 'Monthly means'),
+        'W': ('1W', 'Weekly means'),
+        'D': ('1D', 'Daily means'),
+        'H': ('1H', 'Hourly means'),
+    }
+    if groupby in time_groupings:
+        freq, label = time_groupings[groupby]
+        if groupby in ['Y', 'M', 'S']:
+            statistics[label] = data_xarray.groupby(f'time.{freq}').mean().values
+        else:
+            statistics[label] = data_xarray.resample(time=freq).mean().values
+
+    elif groupby:  # custom frequencies like '3H', '2W', etc.
+        custom_label = f'{groupby} means'
+        statistics[custom_label] = data_xarray.resample(time=groupby).mean().values
+
     return statistics
 
 # def print_series_statistics(statistics):
@@ -59,11 +83,12 @@ def print_series_statistics(
     data_array,
     timestamps,
     title='Time series',
+    groupby: str = None,
     rounding_places: int = None,
 ):
     """
     """
-    statistics = calculate_series_statistics(data_array, timestamps)
+    statistics = calculate_series_statistics(data_array, timestamps, groupby)
     table = Table(
         title=title,
         caption='Caption text',
@@ -85,6 +110,16 @@ def print_series_statistics(
     # Separate!
     table.add_row("", "")
 
+    # Groups by
+    time_groupings = [
+        'Yearly means',
+        'Seasonal means',
+        'Monthly means',
+        'Weekly means',
+        'Daily means',
+        'Hourly means',
+        ]
+
     # Index of items
     index_metadata = [
         'Time of Min',
@@ -95,18 +130,59 @@ def print_series_statistics(
 
     # Add statistics
     for key, value in statistics.items():
-        if key not in basic_metadata and key not in index_metadata:
+        if key not in basic_metadata and key not in time_groupings and key not in index_metadata:
             # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
 
     # Separate!
     table.add_row("", "")
 
+    # Groups
+    custom_freq_label = f'{groupby} means' if groupby and groupby not in time_groupings else None
+    for key, value in statistics.items():
+        if key in time_groupings:
+
+            if key == 'Monthly means':
+                import calendar
+                for idx, value in enumerate(statistics[key], start=1):
+                    month_name = calendar.month_name[idx]
+                    table.add_row(month_name, str(value))
+                table.add_row("", "")
+
+            elif key == 'Seasonal means':
+                seasons = ['DJF', 'MAM', 'JJA', 'SON']
+                for season, value in zip(seasons, statistics[key]):
+                    table.add_row(season, str(value))
+                table.add_row("", "")
+
+            elif key == 'Weekly means':
+                for idx, value in enumerate(statistics[key]):
+                    week_number = idx + 1  # Week number
+                    table.add_row(f"Week {week_number}", str(value))
+                table.add_row("", "")
+
+            elif key == 'Daily means':  # REVIEW-ME : We want Day-of-Year, not of-Month!
+                for idx, value in enumerate(statistics[key]):
+                    day_of_year = idx + 1  # index to day of year
+                    table.add_row(f"Day {day_of_year}", str(value))
+                table.add_row("", "")
+
+    if custom_freq_label and custom_freq_label in statistics:
+        custom_freq_data = statistics[custom_freq_label]
+        period_count = 1
+        for value in custom_freq_data:
+            label = f"{groupby} Period {period_count}"
+            table.add_row(label, str(value))
+            period_count += 1
+        table.add_row("", "")
+
+
     # Index of
     for key, value in statistics.items():
         if key in index_metadata:
             # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
+
 
     console = Console()
     console.print(table)
