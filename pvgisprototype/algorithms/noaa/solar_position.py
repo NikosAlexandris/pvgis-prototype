@@ -25,6 +25,7 @@ from .solar_azimuth import calculate_solar_azimuth_noaa
 from .event_time import calculate_event_time_noaa
 from .local_time import calculate_local_solar_time_noaa
 
+
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
