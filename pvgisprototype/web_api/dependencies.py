@@ -2,12 +2,7 @@ from fastapi import Query, HTTPException
 from typing import Optional, List
 from datetime import datetime
 import pandas as pd
-
-
-def generate_datetime_series(start_time: str, end_time: str, frequency: str) -> List[datetime]:
-    generated_timestamps = pd.date_range(start=start_time, end=end_time, freq=frequency)
-    generated_timestamps = [ts.to_pydatetime() for ts in generated_timestamps]
-    return generated_timestamps
+from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 
 
 async def process_timestamp_input(

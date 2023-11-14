@@ -35,10 +35,10 @@ async def get_calculate_effective_irradiance_time_series(
     latitude: float = Query(..., ge=-90, le=90),
     elevation: float = Query(...),
     timestamps: Optional[List[datetime]] = Depends(process_timestamp_input),
-    start_time: Optional[str] = Query(None),
-    end_time: Optional[str] = Query(None),
-    timezone: Optional[str] = Query(None),
+    start_time: Optional[datetime] = Query(None),
     frequency: Optional[str] = Query('h'),
+    end_time: Optional[datetime] = Query(None),
+    timezone: Optional[str] = Query(None),
     random_time_series: bool = Query(False),
     global_horizontal_component: Optional[Path] = Query(None),
     direct_horizontal_component: Optional[Path] = Query(None),
@@ -69,11 +69,15 @@ async def get_calculate_effective_irradiance_time_series(
     rounding_places: Optional[int] = Query(5),
     verbose: int = Query(VERBOSE_LEVEL_DEFAULT),
 ):
+
     
     longitude = convert_to_radians_fastapi(longitude)
     latitude = convert_to_radians_fastapi(latitude)
     surface_tilt = np.radians(surface_tilt)
     surface_orientation = np.radians(surface_orientation)
+
+    from devtools import debug
+    debug(locals())
 
     effective_irradiance_series, results, title = calculate_effective_irradiance_time_series(
         longitude=longitude,
@@ -113,13 +117,16 @@ async def get_calculate_effective_irradiance_time_series(
         efficiency=efficiency,
         verbose=verbose,
     )
+    debug(locals())
 
-    effective_irradiance_series = effective_irradiance_series.tolist()
-    effective_irradiance_series = [round(value, rounding_places) for value in effective_irradiance_series]
+    return effective_irradiance_series.tolist()
 
-    return  {
-        "effective_irradiance_table":{
-            "effective_irradiance":effective_irradiance_series,
-            "datetime":timestamps
-        }
-    }
+    # effective_irradiance_series = effective_irradiance_series.tolist()
+    # effective_irradiance_series = [round(value, rounding_places) for value in effective_irradiance_series]
+
+    # return  {
+    #     "effective_irradiance_table":{
+    #         "effective_irradiance":effective_irradiance_series,
+    #         "datetime":timestamps
+    #     }
+    # }
