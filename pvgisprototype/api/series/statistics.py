@@ -10,7 +10,12 @@ from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 
 
-def calculate_series_statistics(data_array, timestamps):
+def calculate_series_statistics(
+        data_array,
+        timestamps,
+        groupby: str = None,
+):
+    """ """
     import xarray as xr
     data_xarray = xr.DataArray(
         data_array,
@@ -40,6 +45,12 @@ def calculate_series_statistics(data_array, timestamps):
         # 'Longitude of Max': data_xarray.argmax('lon').values,
         # 'Latitude of Max': data_xarray.argmax('lat').values,
     }
+    # Add aggregated statistics based on frequency
+    if groupby == 'M':
+        statistics['Monthly means'] = data_xarray.groupby('time.month').mean().values
+    elif groupby == 'D':
+        statistics['Daily means'] = data_xarray.groupby('time.day').mean().values
+
     return statistics
 
 # def print_series_statistics(statistics):
@@ -59,11 +70,12 @@ def print_series_statistics(
     data_array,
     timestamps,
     title='Time series',
+    groupby: str = None,
     rounding_places: int = None,
 ):
     """
     """
-    statistics = calculate_series_statistics(data_array, timestamps)
+    statistics = calculate_series_statistics(data_array, timestamps, groupby)
     table = Table(
         title=title,
         caption='Caption text',
@@ -85,6 +97,12 @@ def print_series_statistics(
     # Separate!
     table.add_row("", "")
 
+    # Groups by
+    groups = [
+        'Monthly means',
+        'Daily means',
+        ]
+
     # Index of items
     index_metadata = [
         'Time of Min',
@@ -95,18 +113,29 @@ def print_series_statistics(
 
     # Add statistics
     for key, value in statistics.items():
-        if key not in basic_metadata and key not in index_metadata:
+        if key not in basic_metadata and key not in groups and key not in index_metadata:
             # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
 
     # Separate!
     table.add_row("", "")
 
+    # Groups
+    for key, value in statistics.items():
+        if key in groups:
+            if key == 'Monthly means':
+                import calendar
+                for idx, value in enumerate(key, start=1):
+                    month_name = calendar.month_name[idx]  # Get month name
+                    # table.add_row(key, str(round_float_values(value, rounding_places)))
+                    table.add_row(month_name, str(value))
+
     # Index of
     for key, value in statistics.items():
         if key in index_metadata:
             # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
+
 
     console = Console()
     console.print(table)
