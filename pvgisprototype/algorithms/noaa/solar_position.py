@@ -125,14 +125,6 @@ def calculate_noaa_solar_position(
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
-    local_solar_time = calculate_local_solar_time_noaa(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-    )
     sunset_time = calculate_event_time_noaa(
         longitude=longitude,
         latitude=latitude,
@@ -153,7 +145,6 @@ def calculate_noaa_solar_position(
     result["solar_azimuth"] = solar_azimuth
     result["sunrise_time"] = sunrise_time
     result["noon_time"] = solar_noon_time
-    result["local_solar_time"] = local_solar_time
     result["sunset_time"] = sunset_time
 
     return result

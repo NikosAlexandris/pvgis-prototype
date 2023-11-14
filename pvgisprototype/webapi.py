@@ -1,34 +1,33 @@
 from devtools import debug
 
-from typing import Annotated
-from typing import Union
 from typing import Optional
 from typing import List
 from pydantic import BaseModel
 
 from fastapi import FastAPI
+<<<<<<< HEAD
 from fastapi.staticfiles import StaticFiles
 from fastapi import Query
+=======
+>>>>>>> solve_presentation_issues
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from datetime import datetime
-
-from bokeh.plotting import figure
-from bokeh.embed import components
 from bokeh.resources import INLINE
-from bokeh.resources import CDN
 
+<<<<<<< HEAD
 # from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 # from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 # from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 
+=======
+from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_solar_geometry_overview
+>>>>>>> solve_presentation_issues
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_noaa_timeseries_solar_position
 from pvgisprototype.web_api.geometry.noaa.irradiance import get_calculate_effective_irradiance_time_series
 
-# from pvgisprototype.plot.plot import plot_line
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
 from pvgisprototype.web_api.plot.plot_example import graph_example
@@ -135,9 +134,10 @@ class SolarTimeResult(BaseModel):
 
 
 app.get("/calculate/geometry/solar_time/")(get_calculate_solar_time)
-app.get("/calculate/geometry/noaa/solar_position_timeseries")(get_calculate_noaa_timeseries_solar_position)
+app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)
+app.get("/calculate/geometry/overview_series")(get_calculate_noaa_timeseries_solar_position)
 
-app.get("/calculate/irradiance/noaa/effective_timeseries")(get_calculate_effective_irradiance_time_series)
+app.get("/calculate/irradiance/effective")(get_calculate_effective_irradiance_time_series)
 
 app.get("/plot/example", response_class=HTMLResponse)(plot_example)
 app.get("/plot/graph", response_class=HTMLResponse)(graph_example)
