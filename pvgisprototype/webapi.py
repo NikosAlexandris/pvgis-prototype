@@ -71,6 +71,7 @@ app.get("/calculate/geometry/solar_time/")(get_calculate_solar_time)
 
 app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)
 
+app.get("/calculate/geometry/overview_series")(get_calculate_noaa_timeseries_solar_position)
 
 app.get("/calculate/irradiance/effective")(get_calculate_effective_irradiance_time_series)
 

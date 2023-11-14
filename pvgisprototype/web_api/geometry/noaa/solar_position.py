@@ -93,9 +93,9 @@ async def get_calculate_solar_geometry_overview(
 
 
 async def get_calculate_noaa_timeseries_solar_position(
-    longitude: float = Query(..., ge=-180, le=180),
-    latitude: float = Query(..., ge=-90, le=90),
-    timestamps: Optional[List[datetime]] = Depends(process_timestamp_input),
+    longitude: float = Depends(process_longitude),
+    latitude: float = Depends(process_latitude),
+    timestamps: Optional[List[datetime]] = Depends(process_series_timestamp),
     start_time: Optional[str] = Query(None),
     end_time: Optional[str] = Query(None),
     timezone: Optional[str] = Query(None),
@@ -106,9 +106,6 @@ async def get_calculate_noaa_timeseries_solar_position(
     rounding_places: Optional[int] = Query(5),
     verbose: bool = Query(False)
 ):
-    longitude = convert_to_radians_fastapi(longitude)
-    latitude = convert_to_radians_fastapi(latitude)
-
     if timezone:
         timezone = convert_to_timezone(timezone)
         timestamps = [ts.astimezone(timezone) for ts in timestamps]
