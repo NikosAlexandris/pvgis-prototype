@@ -1,34 +1,21 @@
 from devtools import debug
 
-from typing import Annotated
-from typing import Union
 from typing import Optional
 from typing import List
 from pydantic import BaseModel
 
 from fastapi import FastAPI
-from fastapi import Query
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from datetime import datetime
-
-from bokeh.plotting import figure
-from bokeh.embed import components
 from bokeh.resources import INLINE
-from bokeh.resources import CDN
-
-# from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
-# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-# from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 
 from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_solar_geometry_overview
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_noaa_timeseries_solar_position
 from pvgisprototype.web_api.geometry.noaa.irradiance import get_calculate_effective_irradiance_time_series
 
-# from pvgisprototype.plot.plot import plot_line
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
 from pvgisprototype.web_api.plot.plot_example import graph_example
