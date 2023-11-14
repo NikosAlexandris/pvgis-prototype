@@ -65,6 +65,3 @@ async def process_latitude(
     latitude: float = Query(..., ge=-90, le=90),
 ) -> float:
     return convert_to_radians_fastapi(latitude)
-
-
->>>>>>> main

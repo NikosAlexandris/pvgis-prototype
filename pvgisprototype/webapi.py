@@ -5,36 +5,19 @@ from typing import List
 from pydantic import BaseModel
 
 from fastapi import FastAPI
-<<<<<<< HEAD
 from fastapi.staticfiles import StaticFiles
 from fastapi import Query
-=======
->>>>>>> solve_presentation_issues
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from bokeh.resources import INLINE
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> main
-# from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
-# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-# from pvgisprototype.api.utilities.timestamp import convert_to_timezone
-
-=======
 from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_solar_geometry_overview
->>>>>>> solve_presentation_issues
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 from pvgisprototype.web_api.geometry.noaa.solar_position import get_calculate_noaa_timeseries_solar_position
 from pvgisprototype.web_api.geometry.noaa.irradiance import get_calculate_effective_irradiance_time_series
 
-<<<<<<< HEAD
-# from pvgisprototype.plot.plot import plot_line
-=======
->>>>>>> main
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
 from pvgisprototype.web_api.plot.plot_example import graph_example
