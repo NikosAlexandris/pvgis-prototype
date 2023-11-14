@@ -72,7 +72,7 @@ app.get("/calculate/geometry/solar_time/")(get_calculate_solar_time)
 app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)
 
 
-app.get("/calculate/irradiance/noaa/effective_timeseries")(get_calculate_effective_irradiance_time_series)
+app.get("/calculate/irradiance/effective")(get_calculate_effective_irradiance_time_series)
 
 app.get("/plot/example", response_class=HTMLResponse)(plot_example)
 app.get("/plot/graph", response_class=HTMLResponse)(graph_example)
