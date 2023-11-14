@@ -145,12 +145,12 @@ def print_series_statistics(
             if key == 'Monthly means':
                 import calendar
                 for idx, value in enumerate(statistics[key], start=1):
-                    month_name = calendar.month_name[idx]  # Get month name
-                    # table.add_row(key, str(round_float_values(value, rounding_places)))
+                    month_name = calendar.month_name[idx]
                     table.add_row(month_name, str(value))
+                table.add_row("", "")
 
             elif key == 'Seasonal means':
-                seasons = ['DJF', 'MAM', 'JJA', 'SON']  # Define the seasons
+                seasons = ['DJF', 'MAM', 'JJA', 'SON']
                 for season, value in zip(seasons, statistics[key]):
                     table.add_row(season, str(value))
                 table.add_row("", "")
@@ -163,7 +163,7 @@ def print_series_statistics(
 
             elif key == 'Daily means':  # REVIEW-ME : We want Day-of-Year, not of-Month!
                 for idx, value in enumerate(statistics[key]):
-                    day_of_year = idx + 1  # Convert index to day of the year
+                    day_of_year = idx + 1  # index to day of year
                     table.add_row(f"Day {day_of_year}", str(value))
                 table.add_row("", "")
 
