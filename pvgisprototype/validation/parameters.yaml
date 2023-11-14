@@ -223,7 +223,7 @@ RefractedSolarAltitude:
 LinkeTurbidityFactor:
   value:
     type: Union[ndarray, float]
-    initial: [2]
+    initial:
   unit:
     type: str
     initial: unitless
