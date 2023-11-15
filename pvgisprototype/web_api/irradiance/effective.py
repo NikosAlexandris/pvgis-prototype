@@ -38,7 +38,7 @@ async def get_calculate_effective_irradiance_time_series(
     elevation: float = Query(...),
     timestamps: Optional[List[datetime]] = Depends(process_series_timestamp),
     start_time: Optional[datetime] = Query(None),
-    frequency: Optional[str] = Query('h'),
+    frequency: Optional[str] = Query('H'),
     end_time: Optional[datetime] = Query(None),
     timezone: Optional[str] = Query(None),
     random_time_series: bool = Query(False),
