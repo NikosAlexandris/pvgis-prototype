@@ -1,10 +1,12 @@
 from pathlib import Path
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from fastapi import Depends, Query
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_timeseries_solar_position
 from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
+from pvgisprototype.api.geometry.overview_time_series import calculate_solar_geometry_overview_time_series
 from typing import Optional
 from typing import List
 from pvgisprototype.constants import RADIANS
