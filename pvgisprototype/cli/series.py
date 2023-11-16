@@ -199,19 +199,20 @@ def select(
 
     title = 'Location time series'
     
-    # special case!
-    if location_time_series is not None and timestamps is None:
-        timestamps = location_time_series.time.to_numpy()
+    if verbose:
+        # special case!
+        if location_time_series is not None and timestamps is None:
+            timestamps = location_time_series.time.to_numpy()
 
-    print_irradiance_table_2(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        dictionary=results,
-        title=title,
-        rounding_places=rounding_places,
-        verbose=verbose,
-    )
+        print_irradiance_table_2(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            title=title,
+            rounding_places=rounding_places,
+            verbose=verbose,
+        )
 
     # statistics after echoing series which might be Long!
 

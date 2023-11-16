@@ -4,6 +4,8 @@ from zoneinfo import ZoneInfo
 from typing import Optional
 from fastapi import Query, HTTPException
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
+from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
 from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 
@@ -14,6 +16,9 @@ async def process_series_timestamp(
     frequency: Optional[str] = Query('h'),
     end_time: Optional[str] = Query(None),
 ):
+    if timestamps is not None and not start_time and not end_time:
+        timestamps = parse_timestamp_series(timestamps)
+
     if start_time and end_time:
         try:
             generated_timestamps = generate_datetime_series(start_time, end_time, frequency)
@@ -35,12 +40,19 @@ async def process_series_timestamp(
 
 
 async def process_single_timestamp(
-    timestamp: Optional[datetime] = None,
+    timestamp: Optional[str] = None,
     timezone: Optional[str] = None,
 )-> datetime:
     if timestamp is None:
         return now_utc_datetimezone()
     else:
+        from dateutil import parser
+        timestamp = parser.parse(timestamp)
+
+        from pandas import to_datetime
+        timestamp = to_datetime(timestamp, errors='raise')
+
+        timestamp = attach_requested_timezone(timestamp, timezone)
         utc_zoneinfo = ZoneInfo("UTC")
         if timestamp.tzinfo != utc_zoneinfo:
 
@@ -52,7 +64,7 @@ async def process_single_timestamp(
             timezone = utc_zoneinfo
             # print(f'Input timestamp & zone ({user_requested_timestamp} & {user_requested_timezone}) converted to {timestamp} for all internal calculations!')
         
-            return timestamp
+        return timestamp
     
     
 async def process_longitude(
