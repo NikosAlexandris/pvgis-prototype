@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 
 from bokeh.resources import INLINE
 
+from pvgisprototype.web_api.series.select import select
 from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 from pvgisprototype.web_api.geometry.overview_series import get_calculate_noaa_timeseries_solar_position
@@ -122,6 +123,7 @@ class SolarTimeResult(BaseModel):
     Solar_time: float
     Units: str
 
+app.get("/calculate/series/select")(select)
 
 app.get("/calculate/geometry/solar_time/")(get_calculate_solar_time)
 app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)

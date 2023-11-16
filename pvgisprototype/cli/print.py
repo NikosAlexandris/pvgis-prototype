@@ -526,6 +526,7 @@ def print_irradiance_table_2(
     for key, value in dictionary.items():
         if isinstance(value, (float, int)):
             dictionary[key] = np.full(len(timestamps), value)
+
         if isinstance(value, str):
             dictionary[key] = np.full(len(timestamps), str(value))
     
