@@ -32,6 +32,11 @@ from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
 
 
+TRYITOUT_LONGITUDE = 8.622676
+TRYITOUT_LATITUDE = 45.
+TRYITOUT_TIMESTAMP = '2020-02-02 20:00:02'
+
+
 async def get_calculate_effective_irradiance_time_series(
     longitude: float = Depends(process_longitude),
     latitude: float = Depends(process_latitude),
