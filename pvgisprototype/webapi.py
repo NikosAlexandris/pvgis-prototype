@@ -16,21 +16,21 @@ from bokeh.resources import INLINE
 from pvgisprototype.web_api.series.select import select
 from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
-from pvgisprototype.web_api.geometry.overview_series import get_calculate_noaa_timeseries_solar_position
+from pvgisprototype.web_api.geometry.overview_series import overview_series
 from pvgisprototype.web_api.irradiance.effective import get_calculate_effective_irradiance_time_series
 
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
 from pvgisprototype.web_api.plot.plot_example import graph_example
 from pvgisprototype.constants import RADIANS
-
 from pathlib import Path
+
+
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
 
 
 app = FastAPI()
-# app.mount("/static", StaticFiles(directory="pvgisprototype/web_api/assets"), name="static")
 app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 templates = Jinja2Templates(directory="templates")
 
@@ -123,14 +123,19 @@ class SolarTimeResult(BaseModel):
     Solar_time: float
     Units: str
 
+
+# series
 app.get("/calculate/series/select")(select)
 
+# geometry
 app.get("/calculate/geometry/solar_time/")(get_calculate_solar_time)
 app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)
-app.get("/calculate/geometry/overview_series")(get_calculate_noaa_timeseries_solar_position)
+app.get("/calculate/geometry/overview_series")(overview_series)
 
+# irradiance
 app.get("/calculate/irradiance/effective")(get_calculate_effective_irradiance_time_series)
 
+# plot
 app.get("/plot/example", response_class=HTMLResponse)(plot_example)
 app.get("/plot/graph", response_class=HTMLResponse)(graph_example)
 

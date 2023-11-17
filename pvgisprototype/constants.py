@@ -4,15 +4,13 @@ import numpy as np
 
 PARAMETERS_YAML_FILE = 'parameters.yaml'  # definitions
 """
-Name of the YAML file that contains various parameter configurations
-for PVIS functions.
+The _paramaters_ YAML file describes custom data classes required to run pvgis.
+including the type, the initial values, the units, and the description.
 
-This YAML file defines the type, initial values, units, and descriptions for
-each parameter. The file is organized into sections, each corresponding to a
-different 'group' like: 'Where?', 'When?', 'Atmospheric properties', 'Earth
-orbit', etc.
+The file is organized in sections, each corresponding to a different 'group'
+like: 'Where?', 'When?', 'Atmospheric properties', 'Earth orbit', etc.
 
-Each parameter is described with the following keys:
+Each parameter is described by the following keys:
 
     - value: Contains 'type' and 'initial' values.
     - unit: Contains 'type' and 'initial' values.
