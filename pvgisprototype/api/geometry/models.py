@@ -1,4 +1,23 @@
 from enum import Enum
+from typing import Type
+from typing import List
+from typing import Union
+import typer
+
+
+def select_models(enum_type: Type[Enum], models: List[Enum]) -> List[Enum]:
+    """Select models from an enum list."""
+    if enum_type.all in models:
+        return [model for model in enum_type if model != enum_type.all]
+
+    return models
+
+
+def validate_model(enum_type: Type[Enum], model: List[Enum]) -> Enum:
+    """Check that one and only one model from an Enum class is selected"""
+    if model == enum_type.all:  # or len(model) > 1: will not work! -- ReviewMe
+        raise typer.BadParameter(f"You can select only one model for [code]solar_time_model[/code]. Multiple or all are not a meaningful option.")
+    return model
 
 
 class SolarIncidenceModels(str, Enum):
@@ -19,7 +38,7 @@ class SolarDeclinationModels(str, Enum):
 class SolarTimeModels(str, Enum):
     all = 'all'
     ephem = 'ephem'
-    milne = 'Milne (1921)'
+    milne = 'Milne1921'
     noaa = 'NOAA'
     pvgis = 'PVGIS'
     skyfield = 'Skyfield'
@@ -34,18 +53,6 @@ class SolarPositionModels(str, Enum):
     pysolar = 'pysolar'
     skyfield = 'Skyfield'
     suncalc = 'suncalc'
-
-
-from typing import List
-def select_solar_time_model(
-    models: list[SolarTimeModels]
-) -> List[SolarTimeModels]:
-    """Callback function"""
-    # models = [SolarTimeModels(m) for m in model if m in SolarTimeModels.__members__]
-    if SolarTimeModels.all in models:
-        models = [model for model in SolarTimeModels if model != SolarTimeModels.all]
-
-    return models
 
 
 SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModels.jenco

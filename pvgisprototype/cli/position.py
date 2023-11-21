@@ -59,6 +59,7 @@ from pvgisprototype.api.geometry.hour_angle import calculate_solar_hour_angle
 from pvgisprototype.api.geometry.hour_angle import calculate_event_hour_angle
 from pvgisprototype.api.geometry.altitude import calculate_solar_altitude
 from pvgisprototype.api.geometry.azimuth import calculate_solar_azimuth
+from pvgisprototype.api.geometry.models import select_models
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
@@ -218,16 +219,13 @@ def overview(
         timezone = utc_zoneinfo
         typer.echo(f'Input timestamp & zone ({user_requested_timestamp} & {user_requested_timezone}) converted to {timestamp} for all internal calculations!')
     
-    # Why does the callback function `_parse_model` not work? 
-    if SolarPositionModels.all in model:
-        model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-
+    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
     solar_position = calculate_solar_geometry_overview(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position_models=model,  # could be named models!
+        solar_position_models=solar_position_models,  # could be named models!
         solar_time_model=solar_time_model,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
@@ -324,15 +322,13 @@ def overview_series(
         print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
     # Why does the callback function `_parse_model` not work? 
-    if SolarPositionModels.all in model:
-        model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-
+    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        solar_position_models=model,  # could be named models!
+        solar_position_models=solar_position_models,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         # refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
@@ -415,15 +411,11 @@ def declination(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    # Why does the callback function `_parse_model` not work? ----------------
-    if SolarDeclinationModels.all in model:
-        model = [
-            model for model in SolarDeclinationModels if model != SolarDeclinationModels.all
-        ]
+    solar_declination_models = select_models(SolarDeclinationModels, model)  # Using a callback fails!
     solar_declination = calculate_solar_declination(
         timestamp=timestamp,
         timezone=timezone,
-        declination_models=model,
+        declination_models=solar_declination_models,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
         angle_output_units=angle_output_units,
@@ -493,19 +485,13 @@ def zenith(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    # Why does the callback function `_parse_model` not work? ----------------
-    if SolarPositionModels.all in model:
-        model = [
-            model for model in SolarPositionModels if model != SolarPositionModels.all
-        ]
-
-    # Update Me --- Zenith Comes First, Altitude Bases On It ! ---------------
+    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
     solar_altitude = calculate_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position_models=model,
+        solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
@@ -586,17 +572,13 @@ def altitude(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    # Why does the callback function `_parse_model` not work? ----------------
-    if SolarPositionModels.all in model:
-        model = [
-            model for model in SolarPositionModels if model != SolarPositionModels.all
-        ]
+    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
     solar_altitude = calculate_solar_altitude(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position_models=model,
+        solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
@@ -673,17 +655,13 @@ def azimuth(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    # Why does the callback function `_parse_model` not work? ----------------
-    if SolarPositionModels.all in model:
-        model = [
-            model for model in SolarPositionModels if model != SolarPositionModels.all
-        ]
+    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
     solar_azimuth = calculate_solar_azimuth(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_position_models=model,  # could be named models!
+        solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
@@ -841,17 +819,13 @@ def incidence(
         import random
         surface_tilt = random.vonmisesvariate(math.pi, kappa=0)  # radians
 
-    # Why does the callback function `_parse_model` not work? ----------------
-    if SolarIncidenceModels.all in solar_incidence_model:
-        solar_incidence_model = [
-            model for model in SolarIncidenceModels if solar_incidence_model != SolarIncidenceModels.all
-        ]
+    solar_incidence_models = select_models(SolarIncidenceModels, solar_incidence_model)  # Using a callback fails!
     solar_incidence = calculate_solar_incidence(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        solar_incidence_models=solar_incidence_model,
+        solar_incidence_models=solar_incidence_models,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         solar_time_model=solar_time_model,

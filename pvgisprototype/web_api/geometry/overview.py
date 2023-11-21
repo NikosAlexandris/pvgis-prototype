@@ -11,6 +11,7 @@ from pvgisprototype.web_api.dependencies import process_series_timestamp
 from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
 from pvgisprototype.web_api.dependencies import process_single_timestamp
+from pvgisprototype.api.geometry.models import select_models
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -32,10 +33,8 @@ async def get_calculate_solar_geometry_overview(
     rounding_places: Optional[int] = Query(5),
     verbose: int = Query(VERBOSE_LEVEL_DEFAULT),   
 ):
-    
-    if SolarPositionModels.all in solar_position_models:
-        solar_position_models = [model for model in SolarPositionModels if solar_position_models != SolarPositionModels.all]
-
+    """ """
+    solar_position_models = select_models(SolarPositionModels, solar_position_models)  # Using a callback fails!
     results = calculate_solar_geometry_overview(
         longitude=longitude,
         latitude=latitude,
@@ -50,4 +49,3 @@ async def get_calculate_solar_geometry_overview(
         verbose=verbose,
     )
     return results
-

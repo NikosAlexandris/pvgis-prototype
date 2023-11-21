@@ -14,6 +14,7 @@ from bokeh.plotting import save
 from bokeh.plotting import show
 
 from datetime import datetime, timedelta
+from pvgisprototype.api.geometry.models import select_models
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.time import model_solar_time
 
@@ -29,17 +30,17 @@ def plot_solar_time(longitude, latitude, location, timezone, model):
     radii = []
     labels = []
 
-    for model in models:
-        if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
-            solar_time, unit = model_solar_time(
-                longitude,
-                latitude,
-                timestamp,
-                timezone,
-                model,
-            )
-            radii.append(solar_time)
-            labels.append(model.name)
+    solar_time_models = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    for solar_time_model in solar_time_models:
+        solar_time, unit = model_solar_time(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            solar_time_model=solar_time_model,
+        )
+        radii.append(solar_time)
+        labels.append(model.name)
 
     fig = plt.figure(figsize=(10, 6))
     ax = fig.add_subplot(111, polar=True)  # 111 : 1x1 grid, first subplot
@@ -83,26 +84,30 @@ def plot_solar_time_one_year(
     timestamps = [datetime(year, 1, 1, tzinfo=timezone) + timedelta(days=i) for i in range((datetime(year+1, 1, 1, tzinfo=timezone) - datetime(year, 1, 1, tzinfo=timezone)).days)]
 
     results = {}
-    for model in models:
-        if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
-            solar_times = []
-            for timestamp in track(timestamps, description=f'Calculating solar time after {model}'):
-                solar_time, unit = model_solar_time(longitude, latitude, timestamp, timezone, model)
-                solar_times.append(solar_time)
-            results[model.value] = {'location': location, 'timezone': timezone, 'year': year, 'solar_times': solar_times, 'unit': unit}  # Add model solar_times to results
+    solar_time_models = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    for solar_time_model in solar_time_models:
+        solar_times = []
+        for timestamp in track(timestamps, description=f'Calculating solar time after {solar_time_model}'):
+            solar_time, unit = model_solar_time(longitude, latitude, timestamp, timezone, solar_time_model)
+            solar_times.append(solar_time)
+        results[solar_time_model.value] = {'location': location, 'timezone': timezone, 'year': year, 'solar_times': solar_times, 'unit': unit}  # Add model solar_times to results
 
     plt.figure(figsize=(10, 6))
 
     for model, data in track(results.items(), description=f'Plotting data after {model}'):
         solar_times = data['solar_times']
-        plt.plot(timestamps, solar_times, label=model, **styles_for_solar_time_one_year[model])
+        plt.plot(
+                timestamps,
+                solar_times,
+                label=model,
+                **styles_for_solar_time_one_year[model],
+        )
 
     # plt.xlabel('Day of the Year')
     plt.ylabel('decimal hours')
     plt.title(f'Variation of Solar Time at {location} in {year}')
     plt.legend()
     plt.grid(True)
-
     plt.savefig(f'solar_time_at_{location}_{year}.png')
 
 
@@ -113,6 +118,7 @@ styles_for_solar_time_one_year_bokeh_static = {
     'PVGIS':    {'line_color': 'red',     'line_width': 5, 'line_dash': 'dotted' },
     'Skyfield': {'line_color': '#9966CC', 'line_width': 6, 'line_dash': 'dotted' },
 }
+
 
 def plot_solar_time_one_year_bokeh_static(
         longitude,
@@ -134,14 +140,14 @@ def plot_solar_time_one_year_bokeh_static(
 
     # Calculate and collect solar times for each model
     results = {}
-    for model in models:
-        if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
-            solar_times = []
-            for timestamp in track(timestamps, description='Calculating solar time after {model}'):
-                solar_time, unit = model_solar_time(longitude, latitude, timestamp, timezone, model)
-                solar_times.append(solar_time)
-            results[model.value] = {'location': location, 'timezone': timezone, 'year': year, 'solar_times': solar_times, 'unit': unit}  # Add model solar_times to results
-            source_data[model.value] = solar_times  # Add model solar_times to source data
+    solar_time_models = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    for solar_time_model in solar_time_models:
+        solar_times = []
+        for timestamp in track(timestamps, description='Calculating solar time after {solar_time_model}'):
+            solar_time, unit = model_solar_time(longitude, latitude, timestamp, timezone, solar_time_model)
+            solar_times.append(solar_time)
+        results[solar_time_model.value] = {'location': location, 'timezone': timezone, 'year': year, 'solar_times': solar_times, 'unit': unit}  # Add model solar_times to results
+        source_data[solar_time_model.value] = solar_times  # Add model solar_times to source data
 
     # Define the `source`
     source = ColumnDataSource(source_data)
@@ -223,21 +229,19 @@ def plot_solar_time_one_year_bokeh(
     timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime
 
     results = {}
-    for model in models:
-        # print(f'Model : {model}')
-        print(f'Model in class ? : {SolarTimeModels(model)}')
-        if model != SolarTimeModels.all:  # ignore 'all' in the enumeration
-            model_results = []
-            for timestamp in timestamps:
-                solar_time, unit = model_solar_time(
-                    longitude,
-                    latitude,
-                    timestamp,
-                    timezone,
-                    SolarTimeModels(model),
-                )
-                model_results.append(solar_time)
-            results[model.value] = model_results
+    solar_time_models = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    for solar_time_model in solar_time_models:
+        model_results = []
+        for timestamp in timestamps:
+            solar_time, unit = model_solar_time(
+                longitude,
+                latitude,
+                timestamp,
+                timezone,
+                SolarTimeModels(solar_time_model),
+            )
+            model_results.append(solar_time)
+        results[solar_time_model.value] = model_results
 
     title = f'Annual Variation of Solar Time at {location}',
     fig = figure(width=800, height=600, title=title, x_axis_type="datetime")

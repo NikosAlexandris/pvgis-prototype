@@ -129,13 +129,6 @@ app = typer.Typer(
 console = Console()
 
 
-# Forbid using --solar-time-model all wherever it does not make sense?
-# def validate_solar_time_model(value: SolarTimeModels) -> SolarTimeModels:
-#     if value == SolarTimeModels.all:
-#         raise typer.BadParameter("The 'all' option is not allowed.")
-#     return value
-
-
 @validate_with_pydantic(AdjustElevationInputModel)
 def adjust_elevation(
     elevation: Annotated[float, typer_argument_elevation],
@@ -481,7 +474,7 @@ def calculate_direct_horizontal_irradiance(
     elevation: Annotated[float, typer_argument_elevation],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] =SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -511,6 +504,7 @@ def calculate_direct_horizontal_irradiance(
 
         `Bhc = B0c sin(h0)`
     """
+    solar_time_model = validate_solar_time_model(solar_time_model)  # can be only one of!
     solar_altitude = model_solar_altitude(
         longitude=longitude,
         latitude=latitude,
