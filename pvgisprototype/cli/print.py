@@ -517,6 +517,9 @@ def print_irradiance_table_2(
             table.add_column('Latitude')
     table.add_column('Time')
     
+    # remove the 'Title' entry!
+    dictionary.pop('Title', NOT_AVAILABLE)
+
     # additional columns based dictionary keys
     for key in dictionary.keys():
         if dictionary[key] is not None:

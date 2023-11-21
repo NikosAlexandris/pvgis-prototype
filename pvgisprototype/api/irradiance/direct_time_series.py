@@ -9,7 +9,6 @@ import numpy as np
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.api.irradiance.direct import adjust_elevation
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
-import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.api.geometry.models import validate_model
 from pvgisprototype.api.geometry.models import SolarTimeModels
@@ -27,13 +26,8 @@ from typing import Sequence
 from typing import List
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
-from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.utilities.progress import progress
-from pvgisprototype.api.utilities.progress import track_progress
-from pvgisprototype.api.utilities.progress import task_extraterrestrial_irradiance
-from pvgisprototype.api.utilities.progress import task_correct_linke_turbidity_factor
-from pvgisprototype.api.utilities.progress import task_rayleigh_optical_thickness
 from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from rich import print
@@ -95,7 +89,8 @@ from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
-from pvgisprototype.constants import RADIANS, DEGREES
+from pvgisprototype.constants import DEGREES
+from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import IRRADIANCE_ALGORITHM_HOFIERKA_2002
 from pvgisprototype.constants import LONGITUDE_COLUMN_NAME
 from pvgisprototype.constants import LATITUDE_COLUMN_NAME
@@ -126,15 +121,6 @@ from pathlib import Path
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.cli.print import print_irradiance_table_2
-
-
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"Estimate the direct solar radiation for a time series",
-)
 
 
 def compare_temporal_resolution(timestamps, array):
@@ -304,7 +290,6 @@ def rayleigh_optical_thickness_time_series(
     return rayleigh_thickness_series
 
 
-@app.command('normal-series', no_args_is_help=True)
 def calculate_direct_normal_irradiance_time_series(
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
@@ -316,11 +301,7 @@ def calculate_direct_normal_irradiance_time_series(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    index: Annotated[bool, typer_option_index] = False,
 ) -> np.array:
     """Calculate the direct normal irradiance (SID) [W*m-2]
 
@@ -363,21 +344,29 @@ def calculate_direct_normal_irradiance_time_series(
                 * rayleigh_optical_thickness_series.value
             )
         )
+        # Warning
         LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
         UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
         # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
         out_of_range_indices = np.where(
             (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
             | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    )
+        )
+        if out_of_range_indices[0].size > 0:
+            print()
+            print(
+                    f"{WARNING_OUT_OF_RANGE_VALUES} in `direct_normal_irradiance_series` : {out_of_range_indices[0]}!"
+            )
+            print()
 
-    # Reporting =============================================================
+    # Building the output dictionary=========================================
 
-    results = {
-        "Normal": direct_normal_irradiance_series,
-    }
-    title="Direct"
-
+    if verbose > 0:
+        results = {
+            'Title': 'Direct',
+            "Normal": direct_normal_irradiance_series,
+        }
+    
     if verbose > 1:
         extended_results = {
             "Extra. normal": extraterrestrial_normal_irradiance_series,
@@ -388,51 +377,15 @@ def calculate_direct_normal_irradiance_time_series(
         }
         results = results | extended_results
 
-    if verbose > 5:
+    if verbose > 7:
         debug(locals())
 
-    print_irradiance_table_2(
-        timestamps=timestamps,
-        dictionary=results,
-        title=title + f" normal irradiance series {IRRADIANCE_UNITS}",
-        rounding_places=rounding_places,
-        index=index,
-        verbose=verbose,
-    )
-    if statistics:
-        print_series_statistics(
-            data_array=direct_normal_irradiance_series,
-            timestamps=timestamps,
-            title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
-            rounding_places=rounding_places,
-        )
-    if csv:
-        write_irradiance_csv(
-            longitude=None,
-            latitude=None,
-            timestamps=timestamps,
-            dictionary=results,
-            filename=csv,
-        )
-    # Warning
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
-    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
-    out_of_range_indices = np.where(
-        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
-        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    )
-    if out_of_range_indices[0].size > 0:
-        print()
-        print(
-                f"{WARNING_OUT_OF_RANGE_VALUES} in `direct_normal_irradiance_series` : {out_of_range_indices[0]}!"
-        )
-        print()
+    if verbose > 0:
+        return results
 
     return direct_normal_irradiance_series
 
 
-@app.command('horizontal-series', no_args_is_help=True)
 def calculate_direct_horizontal_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -523,12 +476,13 @@ def calculate_direct_horizontal_irradiance_time_series(
             direct_normal_irradiance_series * np.sin(solar_altitude_series.radians)
         )[mask]
 
-    # Reporting =============================================================
+    # Building the output dictionary=========================================
 
-    results = {
-            "Horizontal": direct_horizontal_irradiance_series,
-    }
-    title = 'Direct'
+    if verbose > 0:
+        results = {
+                'Title': 'Direct',
+                "Horizontal": direct_horizontal_irradiance_series,
+        }
 
     if verbose > 1:
         extended_results = {
@@ -539,7 +493,7 @@ def calculate_direct_horizontal_irradiance_time_series(
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
         }
         results = results | extended_results
-        title += ' & relevant components'
+        results['Title'] += ' & relevant components'
 
     if verbose > 2:
         more_extended_results = {
@@ -561,45 +515,22 @@ def calculate_direct_horizontal_irradiance_time_series(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
-    if verbose > 5:
+    if verbose > 7:
         debug(locals())
 
-    print_irradiance_table_2(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        dictionary=results,
-        title=title + f" horizontal irradiance series {IRRADIANCE_UNITS}",
-        rounding_places=rounding_places,
-        index=index,
-        verbose=verbose,
-    )
-    if statistics:
-        print_series_statistics(
-            data_array=direct_horizontal_irradiance_series,
-            timestamps=timestamps,
-            title="Direct horizontal irradiance",
-            rounding_places=rounding_places,
-        )
-    if csv:
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=results,
-            filename=csv,
-        )
+    if verbose > 0:
+        return results
 
     return direct_horizontal_irradiance_series
 
 
-@app.command('inclined-series', no_args_is_help=True)
 def calculate_direct_inclined_irradiance_time_series_pvgis(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
@@ -712,6 +643,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             elevation=elevation,
             timestamps=timestamps,
             start_time=start_time,
+            frequency=frequency,
             end_time=end_time,
             timezone=timezone,
             solar_position_model=solar_position_model,
@@ -783,12 +715,13 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if np.any(direct_inclined_irradiance_series < 0):
         print("[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
 
-    results = {
-        DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
-    }
-    title = 'Direct'
+    if verbose > 0:
+        results = {
+            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
+        }
+        title = 'Direct'
 
-    if verbose > 1 :
+    if verbose > 1:
         extended_results = {
             LOSS_COLUMN_NAME: 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
@@ -815,35 +748,10 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         }
         results = results | even_more_extended_results
 
-    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
-    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-
-    if verbose > 5:
+    if verbose > 7:
         debug(locals())
 
-    print_irradiance_table_2(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        dictionary=results,
-        title=f'Direct inclined irradiance series {IRRADIANCE_UNITS}',
-        rounding_places=rounding_places,
-        index=index,
-        verbose=verbose,
-    )
-    if statistics:
-        print_series_statistics(
-            data_array=direct_inclined_irradiance_series,
-            timestamps=timestamps,
-            title="Direct inclined irradiance",
-        )
-    if csv:
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=results,
-            filename=csv,
-        )
+    if verbose > 0:
+        return results
 
     return direct_inclined_irradiance_series
