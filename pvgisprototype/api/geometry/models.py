@@ -36,6 +36,18 @@ class SolarPositionModels(str, Enum):
     suncalc = 'suncalc'
 
 
+from typing import List
+def select_solar_time_model(
+    models: list[SolarTimeModels]
+) -> List[SolarTimeModels]:
+    """Callback function"""
+    # models = [SolarTimeModels(m) for m in model if m in SolarTimeModels.__members__]
+    if SolarTimeModels.all in models:
+        models = [model for model in SolarTimeModels if model != SolarTimeModels.all]
+
+    return models
+
+
 SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModels.jenco
 SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModels.noaa
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModels.milne
