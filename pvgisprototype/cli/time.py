@@ -13,6 +13,7 @@ from rich import box
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import select_solar_time_model
 from pvgisprototype.api.geometry.time import calculate_solar_time
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -108,9 +109,7 @@ def solar_time(
         timezone = utc_zoneinfo
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
     
-    # Why does the callback function `_parse_model` not work? 
-    if SolarTimeModels.all in solar_time_model:
-        solar_time_model = [model for model in SolarTimeModels if model != SolarTimeModels.all]
+    solar_time_model = select_solar_time_model(solar_time_model)  # callback does not work as expected!
 
     solar_time = calculate_solar_time(
         longitude=longitude,
