@@ -19,10 +19,9 @@ from pvgisprototype.api.irradiance.diffuse_time_series import app as diffuse_irr
 from pvgisprototype.api.irradiance.diffuse_time_series import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.api.irradiance.direct import app as direct_irradiance
-from pvgisprototype.api.irradiance.direct_time_series import app as direct_irradiance_series
+from pvgisprototype.cli.irradiance_direct import app as direct_irradiance_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
-# from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
 from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
 from pvgisprototype.api.irradiance.efficiency import app as pv_efficiency
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
@@ -164,21 +163,6 @@ app = typer.Typer(
 #     no_args_is_help=True,
 #     rich_help_panel=rich_help_panel_series_irradiance,
 # )
-def is_surface_in_shade_time_series(input_array, threshold=10):
-    """
-    Determine if a surface is in shade based on solar altitude for each timestamp.
-
-    Parameters:
-    - solar_altitude_series_array (numpy array): Array of solar altitude angles for each timestamp.
-    - shade_threshold (float): Solar altitude angle below which the surface is considered to be in shade.
-
-    Returns:
-    - numpy array: Boolean array indicating whether the surface is in shade at each timestamp.
-    """
-    # return solar_altitude_series_array < threshold
-    return np.full(input_array.size, False)
-
-
 @app.command(
     'effective',
     no_args_is_help=True,
