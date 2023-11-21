@@ -19,10 +19,9 @@ from pvgisprototype.api.irradiance.diffuse_time_series import app as diffuse_irr
 from pvgisprototype.api.irradiance.diffuse_time_series import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.api.irradiance.direct import app as direct_irradiance
-from pvgisprototype.api.irradiance.direct_time_series import app as direct_irradiance_series
+from pvgisprototype.cli.irradiance_direct import app as direct_irradiance_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
-# from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
 from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
 from pvgisprototype.api.irradiance.efficiency import app as pv_efficiency
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
