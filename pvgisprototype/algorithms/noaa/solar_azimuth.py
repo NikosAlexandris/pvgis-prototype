@@ -146,7 +146,6 @@ def calculate_solar_azimuth_time_series_noaa(
     verbose: int = 0,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth (θ) in radians for a time series"""
-
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
     )
@@ -161,7 +160,6 @@ def calculate_solar_azimuth_time_series_noaa(
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
-
     numerator_series = sin(latitude.radians) * np.cos(solar_zenith_series.radians) - np.sin(solar_declination_series.radians)
     denominator_series = cos(latitude.radians) * np.sin(solar_zenith_series.radians)
     cosine_solar_azimuth_series = -1 * numerator_series / denominator_series

@@ -11,6 +11,7 @@ from pvgisprototype.api.irradiance.direct import adjust_elevation
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.api.geometry.models import validate_model
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
@@ -468,6 +469,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
     """
+    solar_time_model = validate_model(SolarTimeModels, solar_time_model)  # can be only one of!
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,

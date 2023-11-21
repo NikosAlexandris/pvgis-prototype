@@ -6,7 +6,8 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarTimeInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from .models import SolarTimeModels
+from pvgisprototype.api.geometry.models import select_models
+from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
@@ -121,23 +122,23 @@ def calculate_solar_time(
 
     """
     results = []
+    solar_time_models = select_models(SolarTimeModels, solar_time_models)  # Using a callback fails!
     for solar_time_model in solar_time_models:
-        if solar_time_model != SolarTimeModels.all:  # ignore 'all' in the enumeration
-            solar_time = model_solar_time(
-                longitude=longitude,
-                latitude=latitude,
-                timestamp=timestamp,
-                timezone=timezone,
-                solar_time_model=solar_time_model,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                time_offset_global=time_offset_global,
-                verbose=verbose,
-            )
-            results.append({
-                TIME_ALGORITHM_NAME: solar_time_model.value,
-                SOLAR_TIME_NAME: solar_time,
-                UNITS_NAME: time_output_units,  # Don't trust me -- Redesign Me!
-            })
+        solar_time = model_solar_time(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            solar_time_model=solar_time_model,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            time_offset_global=time_offset_global,
+            verbose=verbose,
+        )
+        results.append({
+            TIME_ALGORITHM_NAME: solar_time_model.value,
+            SOLAR_TIME_NAME: solar_time,
+            UNITS_NAME: time_output_units,  # Don't trust me -- Redesign Me!
+        })
 
     return results

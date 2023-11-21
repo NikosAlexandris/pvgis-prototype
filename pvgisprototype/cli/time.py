@@ -13,7 +13,7 @@ from rich import box
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.geometry.models import select_solar_time_model
+from pvgisprototype.api.geometry.models import select_models
 from pvgisprototype.api.geometry.time import calculate_solar_time
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -33,6 +33,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import SOLAR_TIME_COLUMN_NAME
 from pvgisprototype.constants import SOLAR_TIME_NAME
+
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -109,8 +110,7 @@ def solar_time(
         timezone = utc_zoneinfo
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
     
-    solar_time_model = select_solar_time_model(solar_time_model)  # callback does not work as expected!
-
+    solar_time_model = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
     solar_time = calculate_solar_time(
         longitude=longitude,
         latitude=latitude,

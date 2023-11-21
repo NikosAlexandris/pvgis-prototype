@@ -14,6 +14,7 @@ from pvgisprototype.web_api.dependencies import process_series_timestamp
 from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
 from pvgisprototype.web_api.dependencies import process_single_timestamp
+from pvgisprototype.api.geometry.models import select_models
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -81,10 +82,7 @@ async def overview_series(
         timezone = utc_zoneinfo
         print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
-    # Why does the callback function `_parse_model` not work? 
-    if SolarPositionModels.all in model:
-        model = [model for model in SolarPositionModels if model != SolarPositionModels.all]
-
+    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
