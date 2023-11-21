@@ -1,4 +1,5 @@
 from devtools import debug
+from loguru import logger
 from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
 from datetime import datetime
 from math import sin
@@ -77,25 +78,36 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import SOLAR_CONSTANT_COLUMN_NAME
 from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import PERIGEE_OFFSET_COLUMN_NAME
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
+from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
+from pvgisprototype.constants import LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME
 from pvgisprototype.constants import OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
+from pvgisprototype.constants import OPTICAL_AIR_MASS_COLUMN_NAME
 from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
+from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import IRRADIANCE_SOURCE_COLUMN_NAME
 from pvgisprototype.constants import IRRADIANCE_ALGORITHM_HOFIERKA_2002
 from pvgisprototype.constants import LONGITUDE_COLUMN_NAME
 from pvgisprototype.constants import LATITUDE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import LOSS_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
@@ -291,17 +303,17 @@ def rayleigh_optical_thickness_time_series(
 
 
 def calculate_direct_normal_irradiance_time_series(
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
-    optical_air_mass_series: Annotated[OpticalAirMass, typer_option_optical_air_mass_series] = None, # [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
-    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    timestamps: BaseTimestampSeriesModel = None,
+    start_time: Optional[datetime] = None,
+    frequency: Optional[str] = None,
+    end_time: Optional[datetime] = None,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
+    optical_air_mass_series: OpticalAirMass = None, # [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
+    solar_constant: float = SOLAR_CONSTANT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> np.array:
     """Calculate the direct normal irradiance (SID) [W*m-2]
 
@@ -364,16 +376,16 @@ def calculate_direct_normal_irradiance_time_series(
     if verbose > 0:
         results = {
             'Title': 'Direct',
-            "Normal": direct_normal_irradiance_series,
+            DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
         }
     
     if verbose > 1:
         extended_results = {
-            "Extra. normal": extraterrestrial_normal_irradiance_series,
-            "Linke Adjusted": corrected_linke_turbidity_factor_series.value,
-            "Linke": linke_turbidity_factor_series.value,
-            "Rayleigh": rayleigh_optical_thickness_series.value,
-            "Air mass": optical_air_mass_series.value,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+            LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME: corrected_linke_turbidity_factor_series.value,
+            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+            RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME: rayleigh_optical_thickness_series.value,
+            OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
         }
         results = results | extended_results
 
@@ -387,32 +399,32 @@ def calculate_direct_normal_irradiance_time_series(
 
 
 def calculate_direct_horizontal_irradiance_time_series(
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,#Annotated[Optional[ZoneInfo], typer_option_timezone] = None,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = None,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    index: Annotated[bool, typer_option_index] = False,
+    longitude: float,
+    latitude: float,
+    elevation: float,
+    timestamps: BaseTimestampSeriesModel = None,
+    start_time: Optional[datetime] = None,  # reuse callback inside function?
+    frequency: Optional[str] = None,  # reuse callback inside function?
+    end_time: Optional[datetime] = None,  # reuse callback inside function?
+    timezone: Optional[str] = None,#Annotated[Optional[ZoneInfo], typer_option_timezone] = None,
+    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
+    apply_atmospheric_refraction: Optional[bool] = True,
+    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    solar_constant: float = SOLAR_CONSTANT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: str = 'minutes',
+    angle_units: str = RADIANS,
+    angle_output_units: str = RADIANS,
+    rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
+    statistics: bool = False,
+    csv: Path = None,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    index: bool = False,
 ) -> np.ndarray:
     """Calculate the direct horizontal irradiance (SID) [W*m-2]
 
@@ -480,16 +492,16 @@ def calculate_direct_horizontal_irradiance_time_series(
 
     if verbose > 0:
         results = {
-                'Title': 'Direct',
-                "Horizontal": direct_horizontal_irradiance_series,
+            'Title': 'Direct',
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
         }
 
     if verbose > 1:
         extended_results = {
-            'Normal': direct_normal_irradiance_series,
-            "Linke": linke_turbidity_factor_series.value,
-            "Air mass": optical_air_mass_series.value,
-            "Refracted alt.": refracted_solar_altitude_series.value if apply_atmospheric_refraction else np.full_like(refracted_solar_altitude_series.value, np.nan),#else np.array(["-"]),
+            DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
+            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+            OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
+            REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME: refracted_solar_altitude_series.value if apply_atmospheric_refraction else np.full_like(refracted_solar_altitude_series.value, np.nan),#else np.array(["-"]),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
         }
         results = results | extended_results
@@ -497,17 +509,17 @@ def calculate_direct_horizontal_irradiance_time_series(
 
     if verbose > 2:
         more_extended_results = {
-            'Solar constant': solar_constant,
-            'Perigee': perigee_offset,
-            'Eccentricity': eccentricity_correction_factor,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
         }
         results = results | more_extended_results               # FIXME: Only the first raw is printed because of this line. But verbosity is 0 by choice
 
     if verbose > 3:
         even_more_extended_results = {
-            'Irradiance source': IRRADIANCE_ALGORITHM_HOFIERKA_2002,
-            'Positioning': solar_position_model.value,
-            'Timing': solar_time_model.value,
+            IRRADIANCE_SOURCE_COLUMN_NAME: IRRADIANCE_ALGORITHM_HOFIERKA_2002,
+            POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
+            TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
             # "Shade": in_shade,
         }
         results = results | even_more_extended_results
@@ -525,43 +537,43 @@ def calculate_direct_horizontal_irradiance_time_series(
 
 
 def calculate_direct_inclined_irradiance_time_series_pvgis(
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    longitude: float,
+    latitude: float,
+    elevation: float,
+    timestamps: BaseTimestampSeriesModel = None,
+    start_time: Optional[datetime] = None,
+    frequency: Optional[str] = None,
+    end_time: Optional[datetime] = None,
+    convert_longitude_360: bool = False,
+    timezone: Optional[str] = None,
     random_time_series: bool = False,
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
-    in_memory: Annotated[bool, typer_option_in_memory] = False,
-    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
-    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
-    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = None,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    index: Annotated[bool, typer_option_index] = False,
+    direct_horizontal_component: Optional[Path] = None,
+    mask_and_scale: bool = False,
+    neighbor_lookup: MethodsForInexactMatches = None,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    in_memory: bool = False,
+    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
+    apply_atmospheric_refraction: Optional[bool] = True,
+    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_angular_loss_factor: Optional[bool] = True,
+    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: SolarIncidenceModels = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    solar_constant: float = SOLAR_CONSTANT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: str = 'minutes',
+    angle_units: str = RADIANS,
+    angle_output_units: str = RADIANS,
+    rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
+    statistics: bool = False,
+    csv: Path = None,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    index: bool = False,
 ) -> np.array:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
@@ -690,7 +702,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         )
 
     except ZeroDivisionError:
-        logging.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
+        logger.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
         print("Is the solar altitude angle zero?")
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
@@ -709,7 +721,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             )
 
         except ZeroDivisionError as e:
-            logging.error(f"Which Error? {e}")
+            logger.error(f"Which Error? {e}")
             raise ValueError
 
     if np.any(direct_inclined_irradiance_series < 0):
