@@ -52,6 +52,72 @@ template = Template('''<!DOCTYPE html>
 ''')
 
 
+# @app.get("/", response_class=HTMLResponse)
+# async def read_root():
+#     return """
+#     <!DOCTYPE html>
+#     <html>
+#         <head>
+#             <title>PVGIS</title>
+#             <style>
+#                 body {
+#                     text-align: center; /* Centering text for the whole body */
+#                     font-family: Arial, sans-serif; /* Optional: setting a nice default font */
+#                 }
+#                 .title {
+#                     color: #003399;  /* European Commission Blue */
+#                     font-size: 60px; /* Larger Size */
+#                     font-weight: bold; /* Bold Font */
+#                     background-color: yellow; /* Yellow Background */
+#                     display: inline-block;
+#                     padding: 10px;
+#                     margin-top: 20px; /* Space at the top */
+#                 }
+#                 .subtitle {
+#                     font-size: 24px; /* Larger Font Size for Subtitle */
+#                     margin-top: 10px; /* Space between title and subtitle */
+#                 }
+#                 .logo {
+#                     display: block;
+#                     margin: 20px auto; /* Center the logo and add space around it */
+#                 }
+#                 ul.links {
+#                     list-style-type: disc;
+#                     padding-left: 0; /* Align with centered text */
+#                     display: inline-block; /* Aligns the list with center */
+#                     text-align: left; /* Aligns text to the left inside the list */
+#                 }
+#                 ul.links li {
+#                     margin-bottom: 10px;
+#                 }
+#                 ul.links a {
+#                     color: #8A2BE2;
+#                     text-decoration: none;
+#                     font-size: 18px;
+#                 }
+#                 ul.links a:hover {
+#                     text-decoration: underline;
+#                     color: #BA55D3;
+#                 }
+#             </style>
+#         </head>
+#         <body>
+#             <div class="title">PVGIS</div>
+#             <div class="subtitle">Welcome to PVGIS' API</div>
+
+#             <ul class="links">
+#                 <li><a href="/docs">API Documentation</a></li>
+#                 <li><a href="http://pvgis-manual.jrc.it">PVGIS manual</a> The on-line manual is freely accessible from inside the JRC network.</li>
+#                 <li><a href="http://gitlab.com/ec-jrc-c2/pvgis/pvgis-manual">The manual also lives at gitlab.io</a> Access to gitlab.io is granted to members of the private repository.</li>
+#             </ul>
+
+#             <!-- Local image from static files -->
+#             <img class="logo" src="/static/eu_logo.png" alt="European Commission Logo"/>
+#         </body>
+#     </html>
+#     """
+
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     return """
@@ -61,58 +127,98 @@ async def read_root():
             <title>PVGIS</title>
             <style>
                 body {
-                    text-align: center; /* Centering text for the whole body */
-                    font-family: Arial, sans-serif; /* Optional: setting a nice default font */
+                    text-align: center;
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: #f4f4f4; /* Light grey background */
+                }
+                .header {
+                    background-color: #003399; /* EC Blue */
+                    color: white;
+                    padding: 10px 0;
                 }
                 .title {
-                    color: #003399;  /* European Commission Blue */
-                    font-size: 60px; /* Larger Size */
-                    font-weight: bold; /* Bold Font */
-                    background-color: yellow; /* Yellow Background */
-                    display: inline-block;
-                    padding: 10px;
-                    margin-top: 20px; /* Space at the top */
+                    font-size: 70px; /* Increased Size */
+                    margin-bottom: 10px; /* Space after title */
                 }
                 .subtitle {
-                    font-size: 24px; /* Larger Font Size for Subtitle */
-                    margin-top: 10px; /* Space between title and subtitle */
+                    font-size: 30px; /* Increased Size */
+                    margin-bottom: 20px; /* Space after subtitle */
                 }
-                .logo {
-                    display: block;
-                    margin: 20px auto; /* Center the logo and add space around it */
+                .poc-banner {
+                    background-color: #ffcc00; /* EC Yellow */
+                    color: black;
+                    padding: 5px 0;
+                    font-size: 20px;
+                    font-weight: bold;
+                }
+                .content {
+                    padding: 20px;
                 }
                 ul.links {
-                    list-style-type: disc;
-                    padding-left: 0; /* Align with centered text */
-                    display: inline-block; /* Aligns the list with center */
-                    text-align: left; /* Aligns text to the left inside the list */
+                    list-style-type: none;
+                    padding: 0;
                 }
                 ul.links li {
                     margin-bottom: 10px;
                 }
                 ul.links a {
-                    color: #8A2BE2;
+                    color: #003399; /* EC Blue */
                     text-decoration: none;
                     font-size: 18px;
                 }
                 ul.links a:hover {
                     text-decoration: underline;
-                    color: #BA55D3;
+                }
+                .explanation {
+                    font-size: 14px; /* Smaller than main text */
+                    color: #555; /* Subtle color */
+                    font-style: italic; /* Italicize the text */
+                    margin-left: 20px; /* Indent for distinction */
+                    line-height: 1.6; /* Adjust line spacing */
+                }
+                .logo {
+                    margin-top: 20px;
+                }
+                .footer {
+                    background-color: #f4f4f4; /* Light grey background */
+                    color: #333; /* Dark text for readability */
+                    font-size: 14px;
+                    text-align: center;
+                    padding: 20px;
+                    margin-top: 30px; /* Space above the footer */
+                    border-top: 1px solid #ddd; /* A subtle top border */
+                }
+                .footer a {
+                    color: #003399; /* EC Blue */
+                    text-decoration: none;
+                }
+                .footer a:hover {
+                    text-decoration: underline;
                 }
             </style>
         </head>
         <body>
-            <div class="title">PVGIS</div>
-            <div class="subtitle">Welcome to PVGIS' API</div>
-
-            <ul class="links">
-                <li><a href="/docs">API Documentation</a></li>
-                <li><a href="http://pvgis-manual.jrc.it">PVGIS manual</a> The on-line manual is freely accessible from inside the JRC network.</li>
-                <li><a href="http://gitlab.com/ec-jrc-c2/pvgis/pvgis-manual">The manual also lives at gitlab.io</a> Access to gitlab.io is granted to members of the private repository.</li>
-            </ul>
-
-            <!-- Local image from static files -->
-            <img class="logo" src="/static/eu_logo.png" alt="European Commission Logo"/>
+            <div class="header">
+                <div class="title">PVGIS</div>
+                <div class="subtitle">Welcome to PVGIS' interactive resources</div>
+            </div>
+            <div class="poc-banner">Work in Progress</div>
+            <div class="content">
+                <ul class="links">
+                    <li><a href="/docs">API Documentation</a></li>
+                    <li><a href="http://pvgis-manual.jrc.it">PVGIS manual</a></li>
+                    <li><a href="http://pvgis-forum.jrc.it">Question & Answers forum</a></li>
+                    <div class="explanation">These resources are freely accessible from inside the JRC network</div>
+                </ul>
+                <img class="logo" src="/static/eu_logo.png" alt="European Commission Logo"/>
+            </div>
+            <div class="footer">
+                Last updated on Nov 01, 2023 by the PVGIS Team.<br>
+                This work is licensed under a <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.<br>
+                All content © European Union/European Atomic Energy Community 2021 | <a href="https://ec.europa.eu/jrc/en" target="_blank">EU Science Hub</a>
+            </div>
         </body>
     </html>
     """
