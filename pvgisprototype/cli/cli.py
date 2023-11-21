@@ -13,6 +13,7 @@ from typer.core import TyperGroup
 from typing import Annotated
 from typing import Optional
 from rich import print
+from rich.panel import Panel
 
 from .typer_parameters import OrderCommands
 from .typer_parameters import typer_option_verbose
@@ -36,6 +37,7 @@ from . import manual
 state = {"verbose": False}
 
 
+typer.rich_utils.Panel = Panel.fit
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=True,
