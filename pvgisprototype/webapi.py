@@ -183,8 +183,11 @@ async def read_root():
 
             <script>
             const world = Globe()
+              .width(300)
+              .height(300)
               .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
               .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+              .pointOfView({ altitude: 100 })
               .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
               (document.getElementById('globeViz'));
 
