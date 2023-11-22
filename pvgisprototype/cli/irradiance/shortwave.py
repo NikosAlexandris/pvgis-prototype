@@ -1,0 +1,191 @@
+from typing import Annotated
+from typing import Optional
+from pathlib import Path
+from datetime import datetime
+from pvgisprototype.api.irradiance.global_time_series import calculate_global_irradiance_time_series
+import typer
+from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_elevation
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
+from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_frequency
+from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
+# from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
+from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
+from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
+from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
+from pvgisprototype.cli.typer_parameters import typer_option_tolerance
+from pvgisprototype.cli.typer_parameters import typer_option_in_memory
+from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
+from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
+from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer_parameters import typer_option_albedo
+from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
+from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
+from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
+from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
+from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
+from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
+from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
+from pvgisprototype.cli.typer_parameters import typer_option_angle_units
+from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
+from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
+from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+from pvgisprototype.cli.typer_parameters import typer_option_statistics
+from pvgisprototype.cli.typer_parameters import typer_option_csv
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_index
+
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
+from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE
+from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import RADIANS
+from pvgisprototype import LinkeTurbidityFactor
+
+
+app = typer.Typer(
+    cls=OrderCommands,
+    add_completion=True,
+    add_help_option=True,
+    rich_markup_mode="rich",
+    help=f"Estimate the global irradiance incident on a surface over a time series ",
+)
+
+
+@app.callback(
+   'global-time-series',
+   invoke_without_command=True,
+   no_args_is_help=True,
+   # context_settings={"ignore_unknown_options": True},
+   help=f'Calculate the global innclined irradiance',
+)
+def get_global_irradiance_time_series(
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_time_series: bool = False,
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
+    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    albedo: Annotated[Optional[float], typer_option_albedo] = 2,
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.noaa,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
+    # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    verbose: Annotated[int, typer_option_verbose] = False,
+    index: Annotated[bool, typer_option_index] = False,
+):
+    """Calculate the global horizontal irradiance (GHI)
+
+    The global horizontal irradiance represents the total amount of shortwave
+    radiation received from above by a surface horizontal to the ground. It
+    includes both the direct and the diffuse solar radiation.
+    """
+    results = calculate_global_irradiance_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        timestamps=timestamps,
+        start_time=start_time,
+        frequency=frequency,
+        end_time=end_time,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        albedo=albedo,
+        apply_angular_loss_factor=apply_angular_loss_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        verbose=verbose,
+    )
+    if verbose > 0:
+        print_irradiance_table_2(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            title=results['Title'] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
+            rounding_places=rounding_places,
+            index=index,
+            verbose=verbose,
+        )
+        if statistics:
+            print_series_statistics(
+                data_array=results[GLOBAL_INCLINED_IRRADIANCE],
+                timestamps=timestamps,
+                title="Global irradiance",
+                rounding_places=rounding_places,
+            )
+        if csv:
+            write_irradiance_csv(
+                longitude=None,
+                latitude=None,
+                timestamps=timestamps,
+                dictionary=results,
+                filename=csv,
+            )
+    else:
+        print(results)
