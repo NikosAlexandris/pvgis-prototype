@@ -517,8 +517,9 @@ def print_irradiance_table_2(
             table.add_column('Latitude')
     table.add_column('Time')
     
-    # remove the 'Title' entry!
+    # remove the 'Title' entry! ---------------------------------------------
     dictionary.pop('Title', NOT_AVAILABLE)
+    # ------------------------------------------------------------- Important
 
     # additional columns based dictionary keys
     for key in dictionary.keys():
@@ -552,14 +553,21 @@ def print_irradiance_table_2(
             row.append(round_float_values(latitude, rounding_places))
 
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
-        for idx, value in enumerate(values):
+
+        for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
+            # print(f'Index, key : value : {idx}, {key} : {value}')
             if idx == 0:  # Assuming after 'Time' is the value of main interest
                 from rich.text import Text
                 bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
                 row.append(bold_value)
             else:
                 if not isinstance(value, str):
-                    row.append(str(round_float_values(value, rounding_places)))
+                    if column_name == 'Loss':
+                        from rich.text import Text
+                        red_value = Text(str(round_float_values(value, rounding_places)), style="bold red")
+                        row.append(red_value)
+                    else:
+                        row.append(str(round_float_values(value, rounding_places)))
                 else:
                     row.append(value)
         table.add_row(*row)
