@@ -96,13 +96,6 @@ def is_surface_in_shade_time_series(input_array, threshold=10):
     return np.full(input_array.size, False)
 
 
-# @app.callback(
-#     'effective-time-series',
-#    invoke_without_command=True,
-#    no_args_is_help=True,
-#    # context_settings={"ignore_unknown_options": True},
-#    help=f'Calculate the clear-sky ground reflected irradiance',
-# )
 def calculate_effective_irradiance_time_series(
     longitude: float,
     latitude: float,
