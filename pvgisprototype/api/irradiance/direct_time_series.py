@@ -1,3 +1,12 @@
+"""
+_Direct_ or _beam_ irradiance is one of the main components of solar
+irradiance. It comes perpendicular from the Sun and is not scattered before it
+irradiates a surface.
+
+During a cloudy day the sunlight will be partially absorbed and scattered by
+different air molecules. The latter part is defined as the _diffuse_
+irradiance. The remaining part is the _direct_ irradiance.
+"""
 from devtools import debug
 from loguru import logger
 from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND

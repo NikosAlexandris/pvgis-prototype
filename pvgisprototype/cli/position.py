@@ -151,7 +151,7 @@ def intro():
     from rich.panel import Panel
     note_in_a_panel = Panel(
         "[italic]{}[/italic]".format(note),
-        title="[bold cyan]Important Note[/bold cyan]",
+        title="[bold cyan]Note[/bold cyan]",
         width=78,
     )
     from rich.console import Console

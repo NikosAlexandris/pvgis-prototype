@@ -128,6 +128,7 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.cli.documentation import A_PRIMER_ON_SOLAR_IRRADIANCE
 from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from rich import print
 from typer.core import TyperGroup
@@ -149,6 +150,34 @@ app = typer.Typer(
     # help=f":sun_with_face: Estimate the solar irradiance incident on a horizontal or inclined surface",
     help=f":sun_with_face: Estimate the solar irradiance incident on a solar surface",
 )
+@app.command(
+    'intro',
+    no_args_is_help=False,
+    help='A short primer on solar irradiance',
+ )
+# @debug_if_needed(app)
+def intro():
+    """A short introduction on solar geometry"""
+    introduction = """
+    [underline]Solar irradiance[/underline] is ...
+    """
+
+    note = """
+    PVGIS can model solar irradiance components or read selectively
+    [magenta]global[/magenta] or [magenta]direct[/magenta] irradiance time series from external datasets.
+    """
+    from rich.panel import Panel
+    note_in_a_panel = Panel(
+        "[italic]{}[/italic]".format(note),
+        title="[bold cyan]Note[/bold cyan]",
+        width=78,
+    )
+    from rich.console import Console
+    console = Console()
+    # introduction.wrap(console, 30)
+    console.print(introduction)
+    console.print(note_in_a_panel)
+    console.print(A_PRIMER_ON_SOLAR_IRRADIANCE)
 # app.add_typer(
 #     effective_irradiance,
 #     name="effective",
