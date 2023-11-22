@@ -1,12 +1,9 @@
 from devtools import debug
 from loguru import logger
 from datetime import datetime
-import typer
 from pathlib import Path
-from typing import Annotated
 from typing import Optional
 from typing import List
-from rich.console import Console
 from rich import print
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.statistics import print_series_statistics
@@ -16,44 +13,10 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
-from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-from pvgisprototype.cli.typer_parameters import typer_argument_elevation
-from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
-from pvgisprototype.cli.typer_parameters import typer_option_start_time
-from pvgisprototype.cli.typer_parameters import typer_option_end_time
-from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_argument_term_n_series
-from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
-from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
-from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
-from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
-from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude_series
-from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
-from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
-from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
-from pvgisprototype.cli.typer_parameters import typer_argument_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_angle_units
-from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_statistics
-from pvgisprototype.cli.typer_parameters import typer_option_csv
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct_time_series import calculate_extraterrestrial_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
+from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
@@ -75,17 +38,10 @@ from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import TERM_N_IN_SHADE
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
-from pvgisprototype.constants import RADIANS, DEGREES
-from pvgisprototype.cli.typer_parameters import typer_argument_global_horizontal_irradiance
-from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal_irradiance
-from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degrees
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
-from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
-from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
@@ -99,6 +55,7 @@ from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
@@ -112,39 +69,24 @@ from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 
 
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"Calculate the diffuse irradiance incident on a surface",
-)
-console = Console()
-
-
-@app.command(
-    'from-sarah',
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
-)
 def calculate_diffuse_horizontal_component_from_sarah(
-    shortwave: Annotated[Path, typer_argument_global_horizontal_irradiance],
-    direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
-    longitude: Annotated[float, typer_argument_longitude_in_degrees],
-    latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
-    in_memory: Annotated[bool, typer_option_in_memory] = False,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = None,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    index: Annotated[bool, typer_option_index] = False,
+    shortwave: Path,
+    direct: Path,
+    longitude: float,
+    latitude: float,
+    timestamps: Optional[datetime] = None,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
+    timezone: Optional[str] = None,
+    mask_and_scale: bool = False,
+    neighbor_lookup: MethodsForInexactMatches = None,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    in_memory: bool = False,
+    rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
+    statistics: bool = False,
+    csv: Path = None,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    index: bool = False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
     time series.
@@ -206,9 +148,9 @@ def calculate_diffuse_horizontal_component_from_sarah(
             print(warning)
 
     results = {
+        'Title': DIFFUSE_HORIZONTAL_IRRADIANCE,
         "Diffuse": diffuse_horizontal_irradiance_series.to_numpy(),
     }
-    title = 'Diffuse horizontal'
 
     if verbose > 1 :
         extended_results = {
@@ -217,43 +159,15 @@ def calculate_diffuse_horizontal_component_from_sarah(
         }
         results = results | extended_results
 
-    if verbose > 5:
+    if verbose > 7:
         debug(locals())
 
-    print_irradiance_table_2(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        dictionary=results,
-        title=title + f' in-plane irradiance series {IRRADIANCE_UNITS}',
-        rounding_places=rounding_places,
-        index=index,
-        verbose=verbose,
-    )
-    if statistics:
-        print_series_statistics(
-            data_array=diffuse_horizontal_irradiance_series,
-            timestamps=timestamps,
-            title="Diffuse horizontal irradiance",
-        )
-    if csv:
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=results,
-            filename=csv,
-        )
+    if verbose > 0:
+        return results
 
     return diffuse_horizontal_irradiance_series
 
 
-@app.command(
-    'n-term-series',
-    no_args_is_help=True,
-    help=f'N Calculate the N term for the diffuse sky irradiance function for a period of time',
-    rich_help_panel=rich_help_panel_toolbox,
-)
 def calculate_term_n_time_series(
     kb_series: List[float],
     verbose: int = 0,
@@ -276,16 +190,10 @@ def calculate_term_n_time_series(
     return 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2)
 
 
-@app.command(
-        'sky-irradiance-series',
-        no_args_is_help=True,
-        help=f'⇊ Calculate the diffuse sky irradiance for a period of time',
-        rich_help_panel=rich_help_panel_series_irradiance,
-        )
 def calculate_diffuse_sky_irradiance_time_series(
-        n_series: Annotated[List[float], typer_argument_term_n_series],
-        surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = np.radians(45),
-        ):
+    n_series: List[float],
+    surface_tilt: Optional[float] = np.radians(45),
+):
     """Calculate the diffuse sky irradiance
 
     The diffuse sky irradiance function F(γN) depends on the surface tilt `γN`
@@ -332,12 +240,6 @@ def calculate_diffuse_sky_irradiance_time_series(
     return diffuse_sky_irradiance_series * n_series
 
 
-@app.command(
-    'transmission-function-series',
-    no_args_is_help=True,
-    help=f'⇝ Calculate the diffuse transmission function over a series of linke turbidity factors',
-    rich_help_panel=rich_help_panel_toolbox,
-)
 def diffuse_transmission_function_time_series(
     linke_turbidity_factor_series,
     verbose: int = 0,
@@ -359,12 +261,6 @@ def diffuse_transmission_function_time_series(
     return diffuse_transmission_series
 
 
-@app.command(
-        'diffuse-altitude-coefficients-series',
-        no_args_is_help=True,
-        help=f'☀∡ Calculate the diffuse solar altitude coefficients',
-        rich_help_panel=rich_help_panel_toolbox,
-        )
 def diffuse_solar_altitude_coefficients_time_series(
     linke_turbidity_factor_series,
     verbose: int = 0,
@@ -406,21 +302,15 @@ def diffuse_solar_altitude_coefficients_time_series(
         + 0.0085079 * linke_turbidity_factor_series_squared_array
     )
 
-    if verbose == 5:
+    if verbose == 7:
         debug(locals())
 
     return a1_series, a2_series, a3_series
 
 
-@app.command(
-    'diffuse-solar-altitude',
-    no_args_is_help=True,
-    help=f'☀∡ Calculate diffuse solar altitude angle time series',
-    rich_help_panel=rich_help_panel_toolbox,
-)
 def diffuse_solar_altitude_function_time_series(
-    solar_altitude_series: Annotated[List[float], typer_argument_solar_altitude_series],
-    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series],#: np.ndarray,
+    solar_altitude_series: List[float],
+    linke_turbidity_factor_series: LinkeTurbidityFactor,#: np.ndarray,
     verbose: int = 0,
 ):
     """Diffuse solar altitude function Fd"""
@@ -434,49 +324,41 @@ def diffuse_solar_altitude_function_time_series(
     )
 
 
-@app.command(
-    'inclined-series',
-    no_args_is_help=True,
-    help=f'☀∡ Calculate the diffuse irradiance incident on a surface over a period of time',
-    rich_help_panel=rich_help_panel_series_irradiance,
-)
 def calculate_diffuse_inclined_irradiance_time_series(
-    longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    longitude: float,
+    latitude: float,
+    elevation: float,
+    timestamps: BaseTimestampSeriesModel = None,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
+    timezone: Optional[str] = None,
     random_time_series: bool = False,
-    global_horizontal_component: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
-    direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
-    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
-    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
-    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
-    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SolarPositionModels.noaa,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.noaa,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
-    solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    global_horizontal_component: Optional[Path] = None,
+    direct_horizontal_component: Optional[Path] = None,
+    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
+    apply_atmospheric_refraction: Optional[bool] = True,
+    refracted_solar_zenith: Optional[
+        float
+    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_angular_loss_factor: Optional[bool] = True,
+    solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
+    solar_time_model: SolarTimeModels = SolarTimeModels.noaa,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    solar_constant: float = SOLAR_CONSTANT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
-    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
-    in_memory: Annotated[bool, typer_option_in_memory] = False,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = None,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    index: Annotated[bool, typer_option_index] = False,
+    time_output_units: str = "minutes",
+    angle_units: str = RADIANS,
+    angle_output_units: str = RADIANS,
+    mask_and_scale: bool = False,
+    neighbor_lookup: MethodsForInexactMatches = None,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    in_memory: bool = False,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> np.array:
     """Calculate the diffuse irradiance incident on a solar surface
 
@@ -572,7 +454,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
-        )
+    )
     # on a horizontal surface : G0h = G0 sin(h0)
     extraterrestrial_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series
@@ -732,12 +614,13 @@ def calculate_diffuse_inclined_irradiance_time_series(
             f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
         )
 
-    # Reporting ==============================================================
+    # Building the output dictionary=========================================
 
-    results = {
-        DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
-    }
-    title = DIFFUSE_INCLINED_IRRADIANCE
+    if verbose > 0:
+        results = {
+            'Title': DIFFUSE_INCLINED_IRRADIANCE,
+            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
+        }
 
     if verbose > 1 :
         extended_results = {
@@ -752,7 +635,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_sky_irradiance_series,
         }
         results = results | more_extended_results
-        title += ' & relevant components'
+        results['Title'] += ' & relevant components'
 
     if verbose > 3:
         even_more_extended_results = {
@@ -776,32 +659,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
         }
         results = results | plus_even_more_extended_results
 
-    if verbose > 5:
+    if verbose > 7:
         debug(locals())
 
-    print_irradiance_table_2(
-        longitude=convert_float_to_degrees_if_requested(longitude, angle_output_units),
-        latitude=convert_float_to_degrees_if_requested(latitude, angle_output_units),
-        timestamps=timestamps,
-        dictionary=results,
-        title=title + f" in-plane irradiance series {IRRADIANCE_UNITS}",
-        rounding_places=rounding_places,
-        index=index,
-        verbose=verbose,
-    )
-    if statistics:
-        print_series_statistics(
-            data_array=diffuse_inclined_irradiance_series,
-            timestamps=timestamps,
-            title="Diffuse inclined irradiance",
-        )
-    if csv:
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=results,
-            filename=csv,
-        )
+    if verbose > 0:
+        return results
 
     return diffuse_inclined_irradiance_series
