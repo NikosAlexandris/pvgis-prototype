@@ -15,7 +15,8 @@ from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_a
 from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
 from pvgisprototype.api.irradiance.diffuse import app as diffuse_irradiance
-from pvgisprototype.api.irradiance.diffuse_time_series import app as diffuse_irradiance_series
+# from pvgisprototype.api.irradiance.diffuse_time_series import app as diffuse_irradiance_series
+from pvgisprototype.cli.irradiance.diffuse import app as diffuse_irradiance_series
 from pvgisprototype.api.irradiance.diffuse_time_series import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
 from pvgisprototype.api.irradiance.direct import app as direct_irradiance
