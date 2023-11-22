@@ -1,63 +1,35 @@
 from devtools import debug
-import typer
-from typing import Annotated
 from typing import Optional
+from typing import Union
 from datetime import datetime
-# from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
-from pvgisprototype.cli.typer_parameters import typer_option_timestamps
-from pvgisprototype.cli.typer_parameters import typer_option_start_time
-from pvgisprototype.cli.typer_parameters import typer_option_frequency
-from pvgisprototype.cli.typer_parameters import typer_option_end_time
-from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
 from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.cli.typer_parameters import typer_option_random_days
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE
+from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DAY_OF_YEAR_COLUMN_NAME
+from pvgisprototype.constants import DISTANCE_CORRECTION_COLUMN_NAME
+from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 import numpy as np
-from pvgisprototype.cli.print import print_irradiance_table_2
-# from pvgisprototype.api.utilities.timestamp import get_days_in_year
-
-
-app = typer.Typer(
-    # cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"Calculate the extraterrestrial normal irradiance over a time series",
-)
 
 
 def get_days_per_year(years):
     return 365 + ((years % 4 == 0) & ((years % 100 != 0) | (years % 400 == 0))).astype(int)
 
 
-@app.callback(
-    'extraterrestrial-series',
-    invoke_without_command=True,
-    no_args_is_help=True,
-    help=f"Calculate the extraterrestrial normal irradiance over a time series",
-)
 def calculate_extraterrestrial_normal_irradiance_time_series(
-    # timestamps: Annotated[datetime, typer_argument_timestamps],
-    timestamps: Annotated[datetime, typer_option_timestamps] = None,
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    random_days: Annotated[bool, typer_option_random_days] = RANDOM_DAY_SERIES_FLAG_DEFAULT,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-) -> np.ndarray:
+    timestamps: BaseTimestampSeriesModel = None,
+    start_time: Optional[datetime] = None,
+    frequency: Optional[str] = None,
+    end_time: Optional[datetime] = None,
+    solar_constant: float = SOLAR_CONSTANT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+) -> Union[np.ndarray, dict]:
     """ """
     timestamps = np.array(timestamps)
     years_in_timestamps = timestamps.astype('datetime64[Y]').astype(int) + 1970
@@ -76,28 +48,23 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(position_of_earth_series - perigee_offset)
     extraterrestrial_normal_irradiance_series = solar_constant * distance_correction_factor_series
 
-    if verbose == 3:
+    if verbose == 7:
         debug(locals())
 
-    results = {
-        "Extraterrestrial": extraterrestrial_normal_irradiance_series
-    }
+    if verbose > 0:
+        results = {
+            'Title': EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series
+        }
 
     if verbose > 1:
         extended_results = {
-            "Day of year": day_of_year_series,
-            "Distance correction": distance_correction_factor_series,
+            DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
+            DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
         }
         results = results | extended_results
 
-    print_irradiance_table_2(
-        longitude=None,
-        latitude=None,
-        timestamps=timestamps,
-        dictionary=results,
-        title=f'Extraterrestrial normal irradiance series {IRRADIANCE_UNITS}',
-        rounding_places=rounding_places,
-        verbose=verbose,
-    )
+    if verbose > 0:
+        return results
 
     return extraterrestrial_normal_irradiance_series
