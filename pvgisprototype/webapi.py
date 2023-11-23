@@ -119,18 +119,15 @@ async def read_root():
                     justify-content: center; /* Center items horizontally */
                     /* Other styling as required */
                 }
-
                 .footer-logo {
                     width: 100px; /* Adjust as needed */
                     height: auto; /* Maintain aspect ratio */
                     margin-right: 20px; /* Space between logo and text */
                 }
-
                 .footer-text {
                     text-align: left;
                     /* Additional styling for the text */
                 }
-
                 .footer {
                     background-color: #f4f4f4; /* Light grey background */
                     color: #333; /* Dark text for readability */
@@ -140,16 +137,13 @@ async def read_root():
                     margin-top: 30px; /* Space above the footer */
                     border-top: 1px solid #ddd; /* A subtle top border */
                 }
-
                 .footer a {
                     color: #003399; /* EC Blue */
                     text-decoration: none;
                 }
-
                 .footer a:hover {
                     text-decoration: underline;
                 }
-
                 #globeViz {
                     width: 250px;
                     height: 250px;
@@ -158,6 +152,7 @@ async def read_root():
                     display: flex;
                     justify-content: center;
                     align-items: center;
+                    position: relative;
                 }
             </style>
 
@@ -178,17 +173,16 @@ async def read_root():
                 </ul>
             </div>
 
-            
             <div id="globeViz"></div>
 
             <script>
             const world = Globe()
               .width(300)
               .height(300)
+              .backgroundColor('#f4f4f4')
               .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
               .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
               .pointOfView({ altitude: 100 })
-              .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
               (document.getElementById('globeViz'));
 
             // custom globe material
