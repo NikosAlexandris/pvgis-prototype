@@ -220,6 +220,22 @@ RefractedSolarAltitude:
     type: str
     initial: radians
 
+TemperatureSeries:
+  value:
+    type: Union[ndarray, float]
+    initial:
+  unit:
+    type: str
+    initial: Celsius
+
+WindSpeedSeries:
+  value:
+    type: Union[ndarray, float]
+    initial:
+  unit:
+    type: str
+    initial: m/s
+
 LinkeTurbidityFactor:
   value:
     type: Union[ndarray, float]

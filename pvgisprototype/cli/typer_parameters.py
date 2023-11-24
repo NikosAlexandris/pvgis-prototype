@@ -47,6 +47,10 @@ from pvgisprototype.constants import SOLAR_CONSTANT_MINIMUM
 from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import TEMPERATURE_DEFAULT
+from pvgisprototype.constants import TEMPERATURE_UNIT
+from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.constants import WIND_SPEED_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_MINIMUM
 from pvgisprototype.constants import LINKE_TURBIDITY_MAXIMUM
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
@@ -54,6 +58,8 @@ from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype import TemperatureSeries
+from pvgisprototype import WindSpeedSeries
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import OpticalAirMass
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
@@ -450,6 +456,105 @@ typer_option_eccentricity_correction_factor = typer.Option(
 
 # Atmospheric properties
 
+def parse_temperature_series(temperature_input: int):     # FIXME: Re-design ?
+    from devtools import debug
+    try:
+        if isinstance(temperature_input, str):
+            temperature_input = np.fromstring(temperature_input, sep=',', dtype=float)
+        else:
+            temperature_input = np.array(temperature_input, dtype=float)
+
+        debug(locals())
+        return temperature_input
+
+    except ValueError as e:  # conversion to float failed
+        print(f"Error parsing input: {e}")
+        return None
+
+
+def temperature_series_callback(
+    ctx: Context,
+    temperature_series: TemperatureSeries,
+    param: typer.CallbackParam,
+):
+    # print(f'Context: {ctx.params}')
+    # reference_series = ctx.params.get('timestamps')
+    print('HERE--------------------------------------------------------------')
+    print(f'ctx : {ctx}')
+    print(f'Param : {param}')
+    print(f"Context parameters: {ctx.params}")
+    reference_series = ctx.params.get('irradiance_series')
+    print(f'Reference series : {reference_series}')
+    # if not reference_series:
+    #     reference_series = ctx.params.get('irradiance_series')
+
+    from devtools import debug
+    if temperature_series == TEMPERATURE_DEFAULT:
+        temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=float)
+
+    if temperature_series.size != len(reference_series):
+        raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
+
+    debug(locals())
+    return TemperatureSeries(value=temperature_series, unit=TEMPERATURE_UNIT)
+
+
+temperature_typer_help='Ambient temperature time series'
+typer_option_temperature_series = typer.Option(
+    help=temperature_typer_help,
+    # min=TEMPERATURE_MINIMUM,
+    # max=TEMPERATURE_MAXIMUM,
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+    # is_eager=True,
+    parser=parse_temperature_series,
+    callback=temperature_series_callback,
+    # default_factory=TEMPERATURE_DEFAULT,
+)
+
+
+def parse_wind_speed_series(wind_speed_input: int):     # FIXME: Re-design ?
+    try:
+        if isinstance(wind_speed_input, str):
+            wind_speed_input = np.fromstring(wind_speed_input, sep=',', dtype=float)
+        else:
+            wind_speed_input = np.array(wind_speed_input, dtype=float)
+        return wind_speed_input
+
+    except ValueError as e:  # conversion to float failed
+        print(f"Error parsing input: {e}")
+        return None
+
+
+def wind_speed_series_callback(
+    ctx: Context,
+    wind_speed_series: WindSpeedSeries,
+    param: typer.CallbackParam,
+):
+    # reference_series = ctx.params.get('timestamps')
+    reference_series = ctx.params.get('irradiance_series')
+    # if not reference_series:
+    #     reference_series = ctx.params.get('irradiance_series')
+
+    if wind_speed_series == WIND_SPEED_DEFAULT:
+        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=float)
+
+    if wind_speed_series.size != len(reference_series):
+        raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
+    return WindSpeedSeries(value=wind_speed_series, unit=WIND_SPEED_UNIT)
+
+
+wind_speed_typer_help='Ambient wind_speed time series'
+typer_option_wind_speed_series = typer.Option(
+    help=wind_speed_typer_help,
+    # min=WIND_SPEED_MINIMUM,
+    # max=WIND_SPEED_MAXIMUM,
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+    # is_eager=True,
+    parser=parse_wind_speed_series,
+    callback=wind_speed_series_callback,
+    # default_factory=WIND_SPEED_DEFAULT,
+)
+
 ## Linke turbidity
 
 def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):     # FIXME: Re-design ?
@@ -461,13 +566,13 @@ def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):     
         return linke_turbidity_factor_input
 
 
-def linke_turbidity_callback(ctx: Context, value: np.array):
+def linke_turbidity_factor_callback(ctx: Context, value: np.array):
     if np.any(value):
         return LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_UNIT)
-
-    timestamps = ctx.params.get('timestamps')
-    linke_turbidity = np.array([LINKE_TURBIDITY_DEFAULT for _ in timestamps])
-    return LinkeTurbidityFactor(value=linke_turbidity, unit=LINKE_TURBIDITY_UNIT)
+    else:
+        timestamps = ctx.params.get('timestamps')
+        linke_turbidity = np.array([LINKE_TURBIDITY_DEFAULT for _ in timestamps])
+        return LinkeTurbidityFactor(value=linke_turbidity, unit=LINKE_TURBIDITY_UNIT)
 
 
 linke_turbidity_factor_typer_help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
@@ -477,7 +582,7 @@ typer_argument_linke_turbidity_factor = typer.Argument(
     max=LINKE_TURBIDITY_MAXIMUM,
     rich_help_panel=rich_help_panel_atmospheric_properties,
     parser=parse_linke_turbidity_factor_series,
-    callback=linke_turbidity_callback,
+    callback=linke_turbidity_factor_callback,
     # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
 typer_option_linke_turbidity_factor = typer.Option(
@@ -486,7 +591,7 @@ typer_option_linke_turbidity_factor = typer.Option(
     max=LINKE_TURBIDITY_MAXIMUM,
     rich_help_panel=rich_help_panel_atmospheric_properties,
     parser=parse_linke_turbidity_factor_series,
-    callback=linke_turbidity_callback,
+    callback=linke_turbidity_factor_callback,
     # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
 
@@ -496,7 +601,7 @@ typer_option_linke_turbidity_factor_series = typer.Option(
     # min=LINKE_TURBIDITY_MINIMUM,
     # max=LINKE_TURBIDITY_MAXIMUM,
     parser=parse_linke_turbidity_factor_series,
-    callback=linke_turbidity_callback,
+    callback=linke_turbidity_factor_callback,
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
@@ -568,6 +673,12 @@ typer_option_albedo = typer.Option(
 )
 
 # Solar irradiance
+typer_argument_irradiance_series = typer.Argument(
+    help='Irradiance series',
+    rich_help_panel=rich_help_panel_series_irradiance,
+    # default = None,
+    is_eager=True,
+)
 
 global_horizontal_irradiance_typer_help='Global horizontal irradiance (Surface Incoming Shortwave Irradiance (SIS), `ssrd`'
 typer_argument_global_horizontal_irradiance = typer.Argument(
@@ -651,7 +762,7 @@ typer_option_verbose = typer.Option(
 typer_option_index = typer.Option(
     '--index',
     '-idx',
-    help="Index rows in output table",
+    help="Index rows in output table (works only with at least 1x -v)",
     show_default=True,
     show_choices=True,
     rich_help_panel=rich_help_panel_output,
