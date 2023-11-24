@@ -323,11 +323,9 @@ def calculate_effective_irradiance_time_series(
     
     if verbose > 2:
         more_extended_results = {
-            # "Global*": global_irradiance_series * efficiency_coefficient_series,
             EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_irradiance_series * efficiency_coefficient_series,
             EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series * efficiency_coefficient_series,
             EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series * efficiency_coefficient_series,
-            # "Shade": in_shade,
         }
         results = results | more_extended_results
 
