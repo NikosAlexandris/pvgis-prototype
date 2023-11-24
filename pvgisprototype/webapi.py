@@ -168,8 +168,8 @@ async def read_root():
             <div class="poc-banner">Work in Progress</div>
             <div class="content">
                 <ul class="links">
-                    <li><a href="/docs">API Documentation</a>  <a href="http://pvgis-manual.jrc.it">PVGIS manual</a>  <a href="http://pvgis-forum.jrc.it">Question & Answers forum</a></li>
-                    <div class="explanation">These resources are freely accessible from inside the JRC network</div>
+                    <li><a href="/docs">API</a>  <a href="http://pvgis-manual.jrc.it">Manual</a>  <a href="http://pvgis-forum.jrc.it">Forum</a></li>
+                    <div class="explanation">Resources currently accessible only from inside the JRC network</div>
                 </ul>
             </div>
 
