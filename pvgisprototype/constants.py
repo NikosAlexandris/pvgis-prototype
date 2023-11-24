@@ -37,6 +37,7 @@ Examples
 """
 
 VERBOSE_LEVEL_DEFAULT = 0
+DEBUG_AFTER_THIS_VERBOSITY_LEVEL = 7
 ROUNDING_PLACES_DEFAULT = 5
 TOLERANCE_DEFAULT = 0.1  # Is this a sane default ?
 UNITLESS = 'unitless'
@@ -119,16 +120,23 @@ HOUR_OFFSET_DEFAULT = 0
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 TEMPERATURE_DEFAULT = 25  # Cell temperature under standard test conditions, degrees Celsius.
-TEMPERATURE_COLUMN_NAME = 'Temperature'
+TEMPERATURE_UNIT = '℃'
+TEMPERATURE_ADJUSTED_COLUMN_NAME = 'Temperature′'
+TEMPERATURE_COLUMN_NAME = 'Temperature 🌡'
+TEMPERATURE_DEVIATION_COLUMN_NAME = 'Temperature ≏'  # for the PV module's temperature model
 TEMPERATURE_DEFAULT = 25  # Cell temperature under standard test conditions, degrees Celsius.
 WIND_SPEED_DEFAULT = 0
-WIND_SPEED_COLUMN_NAME = '🌬 Wind speed'
+WIND_SPEED_UNIT = 'm/s'
+WIND_SPEED_COLUMN_NAME = 'Wind speed 🌬'
 ALBEDO_DEFAULT = 0.2
 ALBEDO_COLUMN_NAME = 'Albedo'
 
 SYSTEM_EFFICIENCY_DEFAULT = 0.86
 EFFICIENCY_DEFAULT = 0.86
+EFFICIENCY = 'Efficiency'
 EFFICIENCY_COLUMN_NAME = 'Efficiency'
+EFFICIENCY_FACTOR = 'Factor'
+EFFICIENCY_FACTOR_COLUMN_NAME = 'Factor'
 
 LONGITUDE = 'Longitude'
 LONGITUDE_COLUMN_NAME = 'Longitude'
@@ -159,6 +167,7 @@ UNITLESSS_NAME = 'Unitless'
 # ⌖ ⯐ # position
 # ⭸ ⭹
 
+TITLE_KEY_NAME = 'Title'
 SURFACE_TILT_COLUMN_NAME = '∡ Tilt'
 TIME_ALGORITHM_COLUMN_NAME = 'Timing'  # Algorithm
 DECLINATION_COLUMN_NAME = '∢ Declination'
@@ -182,6 +191,10 @@ NOT_AVAILABLE = 'NA'
 OUT_OF_RANGE_INDICES_COLUMN_NAME = 'Out-of-range'
 
 IRRADIANCE_UNITS = 'W/m²'
+IRRADIANCE_COLUMN_NAME = 'Irradiance'
+RELATIVE_IRRADIANCE_COLUMN_NAME = '% Irradiance'
+LOG_RELATIVE_IRRADIANCE_COLUMN_NAME = 'ln(% Irradiance)'
+NEGATIVE_RELATIVE_IRRADIANCE_COLUMN_NAME = '% Irradiance < 0'
 ALGORITHM_COLUMN_NAME = 'Algorithm'
 IRRADIANCE_SOURCE_COLUMN_NAME = 'Irradiance source'  # Model or external data ?
 IRRADIANCE_ALGORITHM_HOFIERKA_2002 = 'Hofierka, 2002'
