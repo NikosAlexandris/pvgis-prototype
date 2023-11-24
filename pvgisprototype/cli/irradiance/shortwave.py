@@ -5,6 +5,7 @@ from datetime import datetime
 from pvgisprototype.api.irradiance.global_time_series import calculate_global_irradiance_time_series
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
@@ -50,7 +51,7 @@ from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
+from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.constants import IRRADIANCE_UNITS
@@ -73,18 +74,17 @@ app = typer.Typer(
 )
 
 
-@app.callback(
-   'global-time-series',
-   invoke_without_command=True,
-   no_args_is_help=True,
-   # context_settings={"ignore_unknown_options": True},
-   help=f'Calculate the global innclined irradiance',
+@app.command(
+    'global',
+    no_args_is_help=True,
+    help=f'Calculate the global innclined irradiance',
+    rich_help_panel=rich_help_panel_series_irradiance,
 )
 def get_global_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,

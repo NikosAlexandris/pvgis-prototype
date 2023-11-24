@@ -81,7 +81,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_index
 import numpy as np
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
+from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.api.series.statistics import print_series_statistics
