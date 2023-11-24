@@ -106,6 +106,7 @@ from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import RADIANS
@@ -183,7 +184,7 @@ def correct_linke_turbidity_factor_time_series(
     # Perform calculations
     corrected_linke_turbidity_factors_array = -0.8662 * linke_turbidity_factor_series.value
 
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     corrected_linke_turbidity_factors = LinkeTurbidityFactor(
@@ -225,7 +226,7 @@ def calculate_refracted_solar_altitude_time_series(
         unit=DEGREES,
     )
 
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return refracted_solar_altitude_series
@@ -268,7 +269,7 @@ def calculate_optical_air_mass_time_series(
         unit=OPTICAL_AIR_MASS_UNIT,
     )
 
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 1:
@@ -277,13 +278,13 @@ def calculate_optical_air_mass_time_series(
     return optical_air_mass_series
 
 
-def rayleigh_optical_thickness_time_series(
+def calculate_rayleigh_optical_thickness_time_series(
     optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> RayleighThickness:
     """Vectorized function to calculate Rayleigh optical thickness for a time series."""
     # Perform calculations
-    rayleigh_thickness_series_array = np.zeros_like(optical_air_mass_series.value)
+    rayleigh_thickness_series_array = np.zeros_like(optical_air_mass_series.value, dtype=float)
     smaller_than_20 = optical_air_mass_series.value <= 20
     larger_than_20 = optical_air_mass_series.value > 20
     rayleigh_thickness_series_array[smaller_than_20] = 1 / (
@@ -296,13 +297,12 @@ def rayleigh_optical_thickness_time_series(
     rayleigh_thickness_series_array[larger_than_20] = 1 / (
         10.4 + 0.718 * optical_air_mass_series.value[larger_than_20]
     )
-
     rayleigh_thickness_series = RayleighThickness(
         value=rayleigh_thickness_series_array,
         unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
     )
 
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 1:
@@ -316,8 +316,8 @@ def calculate_direct_normal_irradiance_time_series(
     start_time: Optional[datetime] = None,
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
-    optical_air_mass_series: OpticalAirMass = None, # [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
+    linke_turbidity_factor_series: LinkeTurbidityFactor = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
+    optical_air_mass_series: OpticalAirMass = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -351,7 +351,7 @@ def calculate_direct_normal_irradiance_time_series(
             linke_turbidity_factor_series,
             verbose=verbose,
         )
-        rayleigh_optical_thickness_series = rayleigh_optical_thickness_time_series(
+        rayleigh_optical_thickness_series = calculate_rayleigh_optical_thickness_time_series(
             optical_air_mass_series,
             verbose=verbose,
         )
@@ -398,7 +398,7 @@ def calculate_direct_normal_irradiance_time_series(
         }
         results = results | extended_results
 
-    if verbose > 7:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
@@ -536,7 +536,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
-    if verbose > 7:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
@@ -769,7 +769,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         }
         results = results | even_more_extended_results
 
-    if verbose > 7:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
