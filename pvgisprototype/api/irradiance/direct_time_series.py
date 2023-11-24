@@ -17,7 +17,6 @@ from math import cos
 from math import atan
 import numpy as np
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.api.irradiance.direct import adjust_elevation
 from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.api.geometry.models import validate_model
@@ -143,6 +142,8 @@ from pathlib import Path
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.cli.print import print_irradiance_table_2
+from pvgisprototype.validation.functions import AdjustElevationInputModel
+from pvgisprototype import Elevation
 
 
 def compare_temporal_resolution(timestamps, array):
@@ -164,6 +165,30 @@ def compare_temporal_resolution(timestamps, array):
         raise ValueError(
             f"The frequency of `timestamps` ({len(timestamps)}) does not match the temporal resolution of the `array` ({len(array)}). Please ensure they have the same temporal resolution."
         )
+
+
+@validate_with_pydantic(AdjustElevationInputModel)
+def adjust_elevation(
+    elevation: Annotated[float, typer_argument_elevation],
+):
+    """Some correction for the given solar altitude 
+
+    [1]_
+
+    Notes
+    -----
+
+    In PVGIS C source code:
+
+	elevationCorr = exp(-sunVarGeom->z_orig / 8434.5);
+
+    References
+    ----------
+
+    .. [1] Hofierka, 2002
+    """
+    adjusted_elevation = exp(-elevation.value / 8434.5)
+    return Elevation(value=adjusted_elevation, unit="meters")
 
 
 def correct_linke_turbidity_factor_time_series(
