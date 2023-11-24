@@ -89,7 +89,7 @@ app = typer.Typer(
 
 
 @app.command(
-    'normal-series',
+    'normal',
     help=f"Estimate the direct normal irradiance over a period of time",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series_irradiance,
@@ -155,7 +155,7 @@ def get_direct_normal_irradiance_time_series(
 
 
 @app.command(
-    'horizontal-series',
+    'horizontal',
     help=f"Estimate the direct horizontal irradiance over a period of time",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series_irradiance,
@@ -252,7 +252,7 @@ def get_direct_horizontal_irradiance_time_series(
 
 
 @app.command(
-    'inclined-series',
+    'inclined',
     help=f"Estimate the direct inclined irradiance over a period of time",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series_irradiance,
