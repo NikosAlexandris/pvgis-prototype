@@ -9,6 +9,7 @@ from rich import box
 from typing import List
 import numpy as np
 from pvgisprototype.constants import (
+    TITLE_KEY_NAME,
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
@@ -493,6 +494,82 @@ def print_noaa_solar_position_table(
         console.print(Panel(verbose_info, title="Verbose Information"))
 
 
+def print_quantity_table(
+    dictionary: dict = dict(),
+    title: str ='Series',
+    main_key: str = None,
+    rounding_places: int = ROUNDING_PLACES_DEFAULT,
+    verbose=1,
+    index: bool = False,
+):
+    from devtools import debug
+    debug(locals())
+    console = Console()
+    table = Table(title=title, box=box.SIMPLE_HEAD)
+    
+    if index:
+        table.add_column("Index")
+
+    # remove the 'Title' entry! ---------------------------------------------
+    dictionary.pop(TITLE_KEY_NAME, NOT_AVAILABLE)
+    # ------------------------------------------------------------- Important
+    debug(locals())
+
+    # # base columns
+    # if verbose > 0:
+
+    # additional columns based dictionary keys
+    for key in dictionary.keys():
+        print(f'Key : {key}')
+        if dictionary[key] is not None:
+            print(f'Values ? : {type(dictionary[key])}')
+            print(f'Values ? : {dictionary[key]}')
+            table.add_column(key)
+    
+    if not main_key:  # consider the 1st key of having the "valid" number of values
+        main_key = list(dictionary.keys())[0]
+
+    # Convert single float or int values to arrays of the same length as the "main' key
+    for key, value in dictionary.items():
+        if isinstance(value, (float, int)):
+            dictionary[key] = np.full(len(dictionary[main_key]), value)
+
+        if isinstance(value, str):
+            dictionary[key] = np.full(len(dictionary[main_key]), str(value))
+    
+    # Zip series
+    zipped_series = zip(*dictionary.values())
+
+    # Populate table
+    index_counter = 1
+    for values in zipped_series:
+        row = []
+
+        if index:
+            row.append(str(index_counter))
+            index_counter += 1
+
+        for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
+            # print(f'Index, key : value : {idx}, {key} : {value}')
+            from rich.text import Text
+            if idx == 0:  # assuming after 'Time' is the value of main interest
+                bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
+                row.append(bold_value)
+            else:
+                if not isinstance(value, str):
+                    if column_name == 'Loss':
+                        red_value = Text(str(round_float_values(value, rounding_places)), style="bold red")
+                        row.append(red_value)
+                    else:
+                        row.append(str(round_float_values(value, rounding_places)))
+                else:
+                    row.append(value)
+        table.add_row(*row)
+
+    if verbose:
+        console.print(table)
+
+
 def print_irradiance_table_2(
     longitude=None,
     latitude=None,
@@ -526,7 +603,7 @@ def print_irradiance_table_2(
         if dictionary[key] is not None:
             table.add_column(key)
     
-    # Convert single float or int values to arrays of the same length as timestamps
+    # Convert single float, int or str values to arrays of the same length as timestamps
     for key, value in dictionary.items():
         if isinstance(value, (float, int)):
             dictionary[key] = np.full(len(timestamps), value)
@@ -537,7 +614,6 @@ def print_irradiance_table_2(
     # Zip series and timestamps
     zipped_series = zip(*dictionary.values())
     zipped_data = zip(timestamps, zipped_series)
-    
 
     # Populate table
     index_counter = 1
@@ -556,14 +632,13 @@ def print_irradiance_table_2(
 
         for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
             # print(f'Index, key : value : {idx}, {key} : {value}')
-            if idx == 0:  # Assuming after 'Time' is the value of main interest
-                from rich.text import Text
+            from rich.text import Text
+            if idx == 0:  # assuming after 'Time' is the value of main interest
                 bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
                 row.append(bold_value)
             else:
                 if not isinstance(value, str):
                     if column_name == 'Loss':
-                        from rich.text import Text
                         red_value = Text(str(round_float_values(value, rounding_places)), style="bold red")
                         row.append(red_value)
                     else:

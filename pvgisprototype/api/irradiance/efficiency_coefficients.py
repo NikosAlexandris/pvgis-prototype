@@ -103,7 +103,8 @@ EFFICIENCY_MODEL_COEFFICIENTS_CdTe_BUILDING_INTEGRATED = [
     20.0,
     3.2,
 ]
-
+EFFICIENCY_MODEL_COEFFICIENT = 'Coefficient'  # for printing a table
+EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME = 'Coefficient'  # for printing a table
 EFFICIENCY_MODEL_COEFFICIENTS = {
     "cSi": {
         "Free standing": EFFICIENCY_MODEL_COEFFICIENTS_cSi,
