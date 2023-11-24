@@ -457,14 +457,12 @@ typer_option_eccentricity_correction_factor = typer.Option(
 # Atmospheric properties
 
 def parse_temperature_series(temperature_input: int):     # FIXME: Re-design ?
-    from devtools import debug
     try:
         if isinstance(temperature_input, str):
             temperature_input = np.fromstring(temperature_input, sep=',', dtype=float)
         else:
             temperature_input = np.array(temperature_input, dtype=float)
 
-        debug(locals())
         return temperature_input
 
     except ValueError as e:  # conversion to float failed
@@ -475,27 +473,17 @@ def parse_temperature_series(temperature_input: int):     # FIXME: Re-design ?
 def temperature_series_callback(
     ctx: Context,
     temperature_series: TemperatureSeries,
-    param: typer.CallbackParam,
 ):
-    # print(f'Context: {ctx.params}')
-    # reference_series = ctx.params.get('timestamps')
-    print('HERE--------------------------------------------------------------')
-    print(f'ctx : {ctx}')
-    print(f'Param : {param}')
-    print(f"Context parameters: {ctx.params}")
     reference_series = ctx.params.get('irradiance_series')
-    print(f'Reference series : {reference_series}')
     # if not reference_series:
     #     reference_series = ctx.params.get('irradiance_series')
 
-    from devtools import debug
     if temperature_series == TEMPERATURE_DEFAULT:
         temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=float)
 
     if temperature_series.size != len(reference_series):
         raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
 
-    debug(locals())
     return TemperatureSeries(value=temperature_series, unit=TEMPERATURE_UNIT)
 
 
@@ -558,12 +546,17 @@ typer_option_wind_speed_series = typer.Option(
 ## Linke turbidity
 
 def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):     # FIXME: Re-design ?
-    if isinstance(linke_turbidity_factor_input, str):
-        linke_turbidity_factor_strings = linke_turbidity_factor_input.split(',')
-        linke_turbidity_factor_values = [float(value) for value in linke_turbidity_factor_strings]
-        return np.array(linke_turbidity_factor_values)
-    else:
+    try:
+        if isinstance(linke_turbidity_factor_input, str):
+            linke_turbidity_factor_input = np.fromstring(linke_turbidity_factor_input, sep=',', dtype=float)
+        else:
+            linke_turbidity_factor_input = np.array(linke_turbidity_factor_input, dtype=float)
+
         return linke_turbidity_factor_input
+
+    except ValueError as e:  # conversion to float failed
+        print(f"Error parsing input: {e}")
+        return None
 
 
 def linke_turbidity_factor_callback(ctx: Context, value: np.array):
