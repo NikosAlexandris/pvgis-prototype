@@ -22,7 +22,6 @@ from pvgisprototype.api.irradiance.limits import app as limits
 from pvgisprototype.api.irradiance.loss import app as angular_loss_factor
 from pvgisprototype.api.irradiance.shortwave import app as global_irradiance  # global is a Python reserved keyword!
 from pvgisprototype.cli.irradiance.shortwave import app as global_irradiance_series
-from pvgisprototype.api.irradiance.direct import app as direct_irradiance
 from pvgisprototype.cli.irradiance.direct import app as direct_irradiance_series
 from pvgisprototype.api.irradiance.diffuse import app as diffuse_irradiance
 from pvgisprototype.cli.irradiance.diffuse import app as diffuse_irradiance_series
@@ -123,13 +122,6 @@ app.add_typer(
     global_irradiance_series,
     name="global",
     help=f"Estimate the global irradiance over a time series {TO_MERGE_WITH_SINGLE_VALUE_COMMAND}",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
-)
-app.add_typer(
-    direct_irradiance,
-    name="direct-single",
-    help="Estimate the direct irradiance",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series_irradiance,
 )
