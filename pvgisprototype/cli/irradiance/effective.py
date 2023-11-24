@@ -11,7 +11,7 @@ from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
 from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
