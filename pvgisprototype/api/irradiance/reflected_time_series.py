@@ -8,7 +8,6 @@ from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from datetime import datetime
 from pathlib import Path
-from .direct import calculate_direct_horizontal_irradiance
 from math import sin
 from math import cos
 from pvgisprototype.api.irradiance.diffuse_time_series import diffuse_transmission_function_time_series
