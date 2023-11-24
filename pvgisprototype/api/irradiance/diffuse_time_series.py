@@ -33,6 +33,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import TERM_N_IN_SHADE
@@ -49,10 +50,12 @@ import numpy as np
 from math import cos
 from math import sin
 from math import pi
+from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import LOSS_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
@@ -148,14 +151,15 @@ def calculate_diffuse_horizontal_component_from_sarah(
             print(warning)
 
     results = {
-        'Title': DIFFUSE_HORIZONTAL_IRRADIANCE,
-        "Diffuse": diffuse_horizontal_irradiance_series.to_numpy(),
+        TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
+        DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.to_numpy(),
     }
 
     if verbose > 1 :
         extended_results = {
-            "Shortwave": global_horizontal_irradiance_series.to_numpy(),
-            "Direct": direct_horizontal_irradiance_series.to_numpy(),
+            
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series.to_numpy(),
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.to_numpy(),
         }
         results = results | extended_results
 
@@ -618,7 +622,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
     if verbose > 0:
         results = {
-            'Title': DIFFUSE_INCLINED_IRRADIANCE,
+            TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
         }
 
@@ -635,7 +639,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_sky_irradiance_series,
         }
         results = results | more_extended_results
-        results['Title'] += ' & relevant components'
+        results[TITLE_KEY_NAME] += ' & relevant components'
 
     if verbose > 3:
         even_more_extended_results = {
@@ -659,7 +663,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         }
         results = results | plus_even_more_extended_results
 
-    if verbose > 7:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:

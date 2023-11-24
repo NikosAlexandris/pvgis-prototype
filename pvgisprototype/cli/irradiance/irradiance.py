@@ -17,7 +17,7 @@ from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_
 
 from pvgisprototype.cli.irradiance.effective import app as effective_irradiance_series
 from pvgisprototype.api.irradiance.efficiency import app as pv_efficiency
-from pvgisprototype.api.irradiance.efficiency_time_series import app as pv_efficiency_series
+from pvgisprototype.cli.irradiance.efficiency import app as pv_efficiency_series
 from pvgisprototype.api.irradiance.limits import app as limits
 from pvgisprototype.api.irradiance.loss import app as angular_loss_factor
 from pvgisprototype.api.irradiance.shortwave import app as global_irradiance  # global is a Python reserved keyword!
