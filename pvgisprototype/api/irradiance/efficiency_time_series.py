@@ -2,25 +2,32 @@ from devtools import debug
 import typer
 from typing import Annotated
 from typing import List
-from rich import print
-from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.api.irradiance.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import TITLE_KEY_NAME
+from pvgisprototype.constants import EFFICIENCY
+from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
+from pvgisprototype.constants import EFFICIENCY_FACTOR
+from pvgisprototype.constants import EFFICIENCY_FACTOR_COLUMN_NAME
+from pvgisprototype.constants import ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import RELATIVE_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import LOG_RELATIVE_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import NEGATIVE_RELATIVE_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import TEMPERATURE_COLUMN_NAME
+from pvgisprototype.constants import TEMPERATURE_ADJUSTED_COLUMN_NAME
+from pvgisprototype.constants import TEMPERATURE_DEVIATION_COLUMN_NAME
+from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
+from pvgisprototype.constants import NOT_AVAILABLE
 import numpy as np
-
-
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=True,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"Calculate the efficiency of a photovoltaic system",
-)
 
 
 def add_unequal_arrays(array_1, array_2):
@@ -56,18 +63,12 @@ def add_unequal_arrays(array_1, array_2):
     return array_1 + array_2
 
 
-@app.callback(
-    'pv-efficiency-time-series',
-    invoke_without_command=True,
-    no_args_is_help=True,
-    # context_settings={"ignore_unknown_options": True},
-)
 def calculate_pv_efficiency_time_series(
     irradiance_series: List[float],
-    temperature_series: List[float] = [TEMPERATURE_DEFAULT],
+    temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     model_constants: List[float] = EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
-    wind_speed_series: List[float] = None,
+    wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     model: PVModuleEfficiencyAlgorithms = PVModuleEfficiencyAlgorithms.faiman,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -81,27 +82,32 @@ def calculate_pv_efficiency_time_series(
         raise ValueError("Insufficient number of model constants!")
     
     irradiance_series = np.array(irradiance_series)
-    efficiency_series = np.zeros_like(irradiance_series)
     relative_irradiance_series = 0.001 * irradiance_series
-    mask_zero_irradiance = relative_irradiance_series <= 0
-    efficiency_series[mask_zero_irradiance] = 0
     log_relative_irradiance_series = np.log(relative_irradiance_series)
+
+    negative_relative_irradiance = relative_irradiance_series <= 0
+    efficiency_series = np.zeros_like(irradiance_series)
+    efficiency_series[negative_relative_irradiance] = 0
+
+    temperature_series = temperature_series.value  # the array in the custom data class TemperatureSeries
+    wind_speed_series = wind_speed_series.value
 
     # Adjust temperature based on conditions
     if model.value  == PVModuleEfficiencyAlgorithms.faiman:
-        if wind_speed_series:
+        if wind_speed_series is not None:
             if len(model_constants) < 9:
                 return "Insufficient number of model constants for Faiman model with wind speed."
-            temperature_series += irradiance_series / (
+            temperature_series_adjusted = temperature_series + irradiance_series / (
                 model_constants[7] + model_constants[8] * wind_speed_series
             )
         else:
             if len(model_constants) < 8:
                 return "Insufficient number of model constants for Faiman model."
-            temperature_series += model_constants[7] * irradiance_series
+            temperature_series_adjusted = temperature_series + model_constants[7] * irradiance_series
     
 
-    temperature_deviation_series = temperature_series - standard_test_temperature
+    temperature_deviation_series = temperature_series_adjusted - standard_test_temperature
+    debug(locals())
     efficiency_factor_series = (
         model_constants[0]
         + log_relative_irradiance_series
@@ -114,18 +120,52 @@ def calculate_pv_efficiency_time_series(
             + model_constants[6] * temperature_deviation_series
         )
     )
-
-
     efficiency_series = efficiency_factor_series / model_constants[0]
     
     # # Mask where efficiency is out of range [0, 1]
     # mask_invalid_efficiency = (efficiency_series < 0) | (efficiency_series > 1)
-    
 
     # if np.any(mask_invalid_efficiency):
     #     return "Some calculated efficiencies are out of the expected range [0, 1]!"
+
+    if verbose > 0: results = {
+            TITLE_KEY_NAME: EFFICIENCY,
+            EFFICIENCY_COLUMN_NAME: efficiency_series,
+        }
+
+    if verbose > 1:
+        extended_results = {
+            EFFICIENCY_FACTOR_COLUMN_NAME: efficiency_factor_series,
+            EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME: model_constants[0],
+            ALGORITHM_COLUMN_NAME: model.value
+        }
+        results = results | extended_results
+
+    if verbose > 2:
+        more_extended_results = {
+            LOG_RELATIVE_IRRADIANCE_COLUMN_NAME: log_relative_irradiance_series,
+            TEMPERATURE_DEVIATION_COLUMN_NAME: temperature_deviation_series,
+        }
+        results = results | more_extended_results
+        results[TITLE_KEY_NAME] += ' & components'
+
+    if verbose > 3:
+        even_more_extended_results = {
+            RELATIVE_IRRADIANCE_COLUMN_NAME: relative_irradiance_series,
+            NEGATIVE_RELATIVE_IRRADIANCE_COLUMN_NAME: negative_relative_irradiance,
+            IRRADIANCE_COLUMN_NAME: irradiance_series,
+        }
+        results = results | even_more_extended_results
+
+    if verbose > 4:
+        even_even_more_extended_results = {
+            TEMPERATURE_ADJUSTED_COLUMN_NAME: temperature_series_adjusted,
+            TEMPERATURE_COLUMN_NAME: temperature_series,
+            WIND_SPEED_COLUMN_NAME: wind_speed_series if wind_speed_series is not None else NOT_AVAILABLE,
+        }
+        results = results | even_even_more_extended_results
     
     if verbose > 0:
-        print(f'Efficiency array: {efficiency_series}')
+        return results 
     
     return efficiency_series
