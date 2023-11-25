@@ -187,7 +187,7 @@ def adjust_elevation(
 
     .. [1] Hofierka, 2002
     """
-    adjusted_elevation = exp(-elevation.value / 8434.5)
+    adjusted_elevation = np.exp(-elevation.value / 8434.5)
     return Elevation(value=adjusted_elevation, unit="meters")
 
 
