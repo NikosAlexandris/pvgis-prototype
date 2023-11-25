@@ -144,7 +144,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         )
         logger.warning(warning)
 
-        if verbose > 5:
+        if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             debug(locals())
 
         if verbose > 0:
@@ -163,7 +163,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         }
         results = results | extended_results
 
-    if verbose > 7:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
@@ -188,7 +188,7 @@ def calculate_term_n_time_series(
     N: float
         The N term
     """
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2)
@@ -259,7 +259,7 @@ def diffuse_transmission_function_time_series(
         + 0.0003797 * linke_turbidity_factor_series_squared_array
     )
 
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return diffuse_transmission_series
@@ -306,7 +306,7 @@ def diffuse_solar_altitude_coefficients_time_series(
         + 0.0085079 * linke_turbidity_factor_series_squared_array
     )
 
-    if verbose == 7:
+    if verbose == DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return a1_series, a2_series, a3_series
