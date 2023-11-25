@@ -239,9 +239,9 @@ def calculate_diffuse_sky_irradiance_time_series(
         * cos(surface_tilt)
         - pi
         * sin(surface_tilt / 2) ** 2
-    )
+    ) * n_series
 
-    return diffuse_sky_irradiance_series * n_series
+    return diffuse_sky_irradiance_series
 
 
 def diffuse_transmission_function_time_series(
