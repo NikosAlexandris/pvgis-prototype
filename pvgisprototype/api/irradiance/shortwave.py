@@ -73,7 +73,6 @@ app = typer.Typer(
     help=f"Estimate the global (shortwave) irradiance time series {NOT_IMPLEMENTED_CLI}",
 )
 def estimate_global_irradiance(
-    shortwave: Annotated[Path, typer_argument_global_horizontal_irradiance],  # use another typer definition for SIS from SARAH3!
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -81,6 +80,7 @@ def estimate_global_irradiance(
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    shortwave: Annotated[Path, typer_argument_global_horizontal_irradiance] = None,  # use another typer definition for SIS from SARAH3!
     inexact_matches_method: Annotated[MethodsForInexactMatches, typer_option_inexact_matches_method] = MethodsForInexactMatches.nearest,
 ):
     """Calculate the global irradiance incident on a solar surface.
