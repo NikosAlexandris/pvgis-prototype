@@ -211,10 +211,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
 
         return single_value
 
-    # ---------------------------------------------------------- Remove Me ---
-    print(diffuse_horizontal_irradiance.values)
-    # ---------------------------------------------------------- Remove Me ---
-
     # statistics after echoing series which might be Long!
     if statistics:
         data_statistics = calculate_series_statistics(diffuse_horizontal_irradiance)
@@ -296,8 +292,10 @@ def calculate_diffuse_sky_irradiance(
     diffuse_sky_irradiance = sky_view_fraction
     +(
         sin(surface_tilt)
-        - surface_tilt * cos(surface_tilt)
-        - pi * sin(surface_tilt / 2) ** 2
+        - surface_tilt
+        * cos(surface_tilt)
+        - pi
+        * sin(surface_tilt / 2) ** 2
     ) * n
 
     return diffuse_sky_irradiance
