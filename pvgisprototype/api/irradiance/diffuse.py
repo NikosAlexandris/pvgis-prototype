@@ -498,15 +498,15 @@ def calculate_diffuse_inclined_irradiance(
         # Dhc [W.m-2]
         diffuse_horizontal_component = (
             extraterrestrial_normal_irradiance
-            * diffuse_transmission_function(solar_altitude.radians)
+            * diffuse_transmission_function(linke_turbidity_factor.value)
             * diffuse_solar_altitude_function(solar_altitude.radians, linke_turbidity_factor)
         )
 
         # the N term
         n = calculate_term_n(kb)
         diffuse_sky_irradiance = calculate_diffuse_sky_irradiance(
-            surface_tilt,
-            n,
+            n=n,
+            surface_tilt=surface_tilt,
         )
 
         # surface in shade, requires solar incidence
@@ -538,8 +538,8 @@ def calculate_diffuse_inclined_irradiance(
 
             # F(γN)
             diffuse_sky_irradiance = calculate_diffuse_sky_irradiance(
-                    surface_tilt,
                     n=TERM_N_IN_SHADE,
+                    surface_tilt=surface_tilt,
                     )
             diffuse_inclined_irradiance = (
                 diffuse_horizontal_component * diffuse_sky_irradiance
