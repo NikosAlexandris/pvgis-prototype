@@ -8,6 +8,7 @@ from math import cos
 from pathlib import Path
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
@@ -15,21 +16,18 @@ from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_a
 from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
 
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
 from pvgisprototype.cli.irradiance.effective import app as effective_irradiance
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.cli.irradiance.efficiency import app as pv_efficiency
 from pvgisprototype.api.irradiance.limits import app as limits
-from pvgisprototype.api.irradiance.loss import app as angular_loss_factor
 from pvgisprototype.cli.irradiance.shortwave import app as global_irradiance
 from pvgisprototype.cli.irradiance.direct import app as direct_irradiance
 from pvgisprototype.cli.irradiance.diffuse import app as diffuse_irradiance
 from pvgisprototype.cli.irradiance.reflected import app as reflected_irradiance
 from pvgisprototype.cli.irradiance.extraterrestrial import app as extraterrestrial_irradiance
-from pvgisprototype.api.irradiance.direct import SolarIncidenceModels
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
-from pvgisprototype.api.irradiance.reflected_time_series import calculate_ground_reflected_inclined_irradiance_time_series
-
+from pvgisprototype.api.irradiance.loss import app as angular_loss_factor
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
