@@ -107,7 +107,6 @@ def calculate_pv_efficiency_time_series(
     
 
     temperature_deviation_series = temperature_series_adjusted - standard_test_temperature
-    debug(locals())
     efficiency_factor_series = (
         model_constants[0]
         + log_relative_irradiance_series
