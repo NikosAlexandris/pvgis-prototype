@@ -72,7 +72,7 @@ app = typer.Typer(
 
 
 @app.command(
-    'inclined-series',
+    'inclined',
     no_args_is_help=True,
     help=f'☀ Calculate the clear-sky ground reflected irradiance',
     rich_help_panel=rich_help_panel_series_irradiance,

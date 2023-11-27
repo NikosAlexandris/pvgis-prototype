@@ -99,7 +99,7 @@ console = Console()
 
 
 @app.command(
-    'n-term-series',
+    'n-terms',
     no_args_is_help=True,
     help=f'N Calculate the N term for the diffuse sky irradiance function for a period of time',
     rich_help_panel=rich_help_panel_toolbox,
@@ -130,7 +130,7 @@ def get_term_n_series(
 
 
 @app.command(
-    'sky-irradiance-series',
+    'sky-irradiances',
     no_args_is_help=True,
     help=f'⇊ Calculate the diffuse sky irradiance for a period of time',
     rich_help_panel=rich_help_panel_toolbox,
@@ -170,7 +170,7 @@ def get_diffuse_sky_irradiance_series(
 
 
 @app.command(
-    'transmission-function-series',
+    'transmission-function',
     no_args_is_help=True,
     help=f'⇝ Calculate the diffuse transmission function over a series of linke turbidity factors',
     rich_help_panel=rich_help_panel_toolbox,
@@ -189,7 +189,7 @@ def get_diffuse_transmission_function_series(
 
 
 @app.command(
-    'diffuse-altitude-coefficients-series',
+    'diffuse-altitude-coefficients',
     no_args_is_help=True,
     help=f'☀∡ Calculate the diffuse solar altitude coefficients',
     rich_help_panel=rich_help_panel_toolbox,
@@ -239,7 +239,7 @@ def get_diffuse_solar_altitude_function_time_series(
 
 
 @app.command(
-    'inclined-series',
+    'inclined',
     no_args_is_help=True,
     help=f'☀∡ Calculate the diffuse irradiance incident on a surface over a period of time',
     rich_help_panel=rich_help_panel_series_irradiance,
