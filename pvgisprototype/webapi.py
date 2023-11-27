@@ -194,6 +194,10 @@ async def read_root():
               globeMaterial.shininess = 15;
             });
 
+            // Auto-rotate
+            world.controls().autoRotate = true;
+            world.controls().autoRotateSpeed = 0.35;
+
             const directionalLight = world.lights().find(light => light.type === 'DirectionalLight');
             directionalLight && directionalLight.position.set(1, 1, 1); // change light position to see the specularMap's effect
             </script>
