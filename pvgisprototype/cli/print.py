@@ -502,8 +502,6 @@ def print_quantity_table(
     verbose=1,
     index: bool = False,
 ):
-    from devtools import debug
-    debug(locals())
     console = Console()
     table = Table(title=title, box=box.SIMPLE_HEAD)
     
@@ -513,17 +511,13 @@ def print_quantity_table(
     # remove the 'Title' entry! ---------------------------------------------
     dictionary.pop(TITLE_KEY_NAME, NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
-    debug(locals())
 
     # # base columns
     # if verbose > 0:
 
     # additional columns based dictionary keys
     for key in dictionary.keys():
-        print(f'Key : {key}')
         if dictionary[key] is not None:
-            print(f'Values ? : {type(dictionary[key])}')
-            print(f'Values ? : {dictionary[key]}')
             table.add_column(key)
     
     if not main_key:  # consider the 1st key of having the "valid" number of values
@@ -550,7 +544,6 @@ def print_quantity_table(
             index_counter += 1
 
         for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
-            # print(f'Index, key : value : {idx}, {key} : {value}')
             from rich.text import Text
             if idx == 0:  # assuming after 'Time' is the value of main interest
                 bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
@@ -631,7 +624,6 @@ def print_irradiance_table_2(
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
 
         for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
-            # print(f'Index, key : value : {idx}, {key} : {value}')
             from rich.text import Text
             if idx == 0:  # assuming after 'Time' is the value of main interest
                 bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
