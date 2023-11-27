@@ -74,7 +74,7 @@ def get_pv_efficiency_time_series(
         print_quantity_table(
             dictionary=results,
             title=results['Title'],
-            main_key = 'Efficiency',
+            main_key = EFFICIENCY_COLUMN_NAME,
             rounding_places=rounding_places,
             index=index,
             verbose=verbose,
