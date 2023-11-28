@@ -28,7 +28,7 @@ async def process_series_timestamp(
 
     elif timestamps:
         try:
-            timestamps = timestamps.strip().split(",")
+            # timestamps = timestamps.strip().split(",")
             parsed_timestamps = pd.to_datetime(timestamps, format='%Y-%m-%d %H:%M:%S')
             parsed_timestamps = [ts.to_pydatetime() for ts in parsed_timestamps]
         except ValueError as e:
