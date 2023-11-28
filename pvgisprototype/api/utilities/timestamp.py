@@ -147,7 +147,7 @@ def attach_requested_timezone(
     ) -> datetime:
     """Attaches the requested timezone to a naive datetime."""
 
-    print(f'[green]i[/green] Callback function attach_requested_timezone()')
+    # print(f'[green]i[/green] Callback function attach_requested_timezone()')
 
     if timestamp.tzinfo is not None:  # time zone already set
         print("  [yellow]>[/yellow] The provided timestamp already has a timezone.")  
@@ -160,7 +160,7 @@ def attach_requested_timezone(
 
     else:
         try:
-            print(f'[yellow]i[/yellow] Attaching the requested zone [bold]{timezone}[/bold] to {timestamp}')  
+            # print(f'[yellow]i[/yellow] Attaching the requested zone [bold]{timezone}[/bold] to {timestamp}')  
             timezone_aware_timestamp = timestamp.replace(tzinfo=timezone)
 
         except Exception as e:
@@ -179,18 +179,19 @@ def ctx_attach_requested_timezone(
     ) -> datetime:
     """Returns the current datetime in the user-requested timezone."""
 
-    print(f'[yellow]i[/yellow] Context: {ctx.params}')
-    print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
-    print(f'  [yellow]>[/yellow] Executing ctx_attach_requested_timezone()')
+    # print(f'[yellow]i[/yellow] Context: {ctx.params}')
+    # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
+    # print(f'  [yellow]>[/yellow] Executing ctx_attach_requested_timezone()')
     timezone = ctx.params.get('timezone')
-    print(f'  [yellow]>[/yellow] User requested input parameter [code]timezone[/code] = [bold]{timezone}[/bold]')
-    print(f'  [green]>[/green] Callback function returns : {attach_requested_timezone(timestamp, timezone)}')
+    # print(f'  [yellow]>[/yellow] User requested input parameter [code]timezone[/code] = [bold]{timezone}[/bold]')
+    # print(f'  [green]>[/green] Callback function returns : {attach_requested_timezone(timestamp, timezone)}')
+
     return attach_requested_timezone(timestamp, timezone)
 
 
 def convert_to_timezone(timezone_string: str) -> ZoneInfo:
     """Convert string to ZoneInfo object."""
-    print(f'[yellow]i[/yellow] Executing convert_to_timezone()')
+    # print(f'[yellow]i[/yellow] Executing convert_to_timezone()')
 
     if timezone_string is None:
         print(f'  [yellow]>[/yellow] No timezone requested [red]?[/red]')  # Convert to warning!
@@ -352,7 +353,7 @@ def parse_timestamp_series(
     # print(f"[yellow]i[/yellow] Context: {ctx}")
     # print(f"[yellow]i[/yellow] Context: {ctx.params}")
     # print(f"[yellow]i[/yellow] typer.CallbackParam: {param}")
-    print(f"[yellow]i[/yellow] Executing parse_timestamp_series()")
+    # print(f"[yellow]i[/yellow] Executing parse_timestamp_series()")
     # print(f"  Input [yellow]timestamps[/yellow] : {timestamps}")
     # print(f"  Type : {type(timestamps)}")
 
@@ -413,9 +414,9 @@ def callback_generate_datetime_series(
     # value: Union[str, datetime, List[datetime]],
     param: typer.CallbackParam,
 ):
-    print(f'[yellow]i[/yellow] Context: {ctx.params}')
+    # print(f'[yellow]i[/yellow] Context: {ctx.params}')
     # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
-    print("[yellow]i[/yellow] Executing callback_generate_datetime_series()")
+    # print("[yellow]i[/yellow] Executing callback_generate_datetime_series()")
     # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
     start_time = ctx.params.get('start_time')
     end_time = ctx.params.get('end_time')
