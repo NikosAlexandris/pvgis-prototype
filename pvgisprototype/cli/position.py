@@ -65,7 +65,7 @@ from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
-from pvgisprototype.api.geometry.overview_time_series import calculate_solar_geometry_overview_time_series
+from pvgisprototype.api.geometry.overview_series import calculate_solar_geometry_overview_time_series
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
 from pvgisprototype import Latitude
 from pvgisprototype import SurfaceTilt
@@ -319,7 +319,7 @@ def overview_series(
             attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
         ]
         timezone = utc_zoneinfo
-        print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
+        # print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
     # Why does the callback function `_parse_model` not work? 
     solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
