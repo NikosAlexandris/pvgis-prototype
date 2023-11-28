@@ -22,7 +22,12 @@ class SolarPanelTechnology(str, Enum):
     CdTe = 'CdTe'
 
 
-class PVModuleEfficiencyAlgorithms(str, Enum):
+class ModuleTemperatureAlgorithm(str, Enum):
     none = None
-    linear = 'Linear'
     faiman = 'Faiman'
+
+
+class PVModuleEfficiencyAlgorithm(str, Enum):
+    none = None
+    iv = 'IV'
+    king = 'King'
