@@ -26,7 +26,7 @@ from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.web_api.dependencies import process_series_timestamp
-from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
+from pvgisprototype.api.irradiance.effective import calculate_effective_irradiance_time_series
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
