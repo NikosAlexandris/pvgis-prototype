@@ -4,7 +4,7 @@ from typing import Optional
 from datetime import datetime
 from pathlib import Path
 from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.api.irradiance.reflected_time_series import calculate_ground_reflected_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.csv import write_irradiance_csv

@@ -19,18 +19,18 @@ from .typer_parameters import OrderCommands
 from .typer_parameters import typer_option_verbose
 from .typer_parameters import typer_option_version
 from .rich_help_panel_names import rich_help_panel_performance
-from . import energy
 from .rich_help_panel_names import rich_help_panel_series
+from .rich_help_panel_names import rich_help_panel_geometry
+from .rich_help_panel_names import rich_help_panel_toolbox
+from .rich_help_panel_names import rich_help_panel_reference
+
+from .energy import energy
 from . import series
 from .irradiance import irradiance
-from . import meteorology
-from .rich_help_panel_names import rich_help_panel_geometry
 from . import time
 from . import position
 from . import surface
-from .rich_help_panel_names import rich_help_panel_toolbox
 from . import utilities
-from .rich_help_panel_names import rich_help_panel_reference
 from . import manual
 
 
@@ -83,12 +83,6 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series,
 )
-# app.add_typer(
-#     meteorology.app,
-#     name="meteorology",
-#     no_args_is_help=True,
-#     rich_help_panel=rich_help_panel_series,
-# )
 app.add_typer(
     time.app,
     name="time",

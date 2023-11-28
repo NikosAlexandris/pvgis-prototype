@@ -12,13 +12,11 @@ from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
-from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
-
+from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
-from pvgisprototype.cli.irradiance.effective import app as effective_irradiance
+# from pvgisprototype.cli.irradiance.effective import app as effective_irradiance
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.cli.irradiance.efficiency import app as pv_efficiency
 from pvgisprototype.api.irradiance.limits import app as limits
@@ -89,13 +87,13 @@ def intro():
     console.print(introduction)
     console.print(note_in_a_panel)
     console.print(A_PRIMER_ON_SOLAR_IRRADIANCE)
-app.add_typer(
-    effective_irradiance,
-    name="effective",
-    help="Estimate the effective irradiance over a time series",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
-)
+# app.add_typer(
+#     effective_irradiance,
+#     name="effective",
+#     help="Estimate the effective irradiance over a time series",
+#     no_args_is_help=True,
+#     rich_help_panel=rich_help_panel_series_irradiance,
+# )
 app.add_typer(
     pv_efficiency,
     name="pv-efficiency",

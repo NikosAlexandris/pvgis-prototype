@@ -1,5 +1,5 @@
 import typer
-from pvgisprototype.api.irradiance.efficiency_time_series import calculate_pv_efficiency_time_series
+from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
 from typing import Annotated
 from typing import Optional
 from typing import List
@@ -9,7 +9,8 @@ from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.api.irradiance.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
+from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.cli.typer_parameters import typer_argument_irradiance_series
 from pvgisprototype import TemperatureSeries
 from pvgisprototype.cli.typer_parameters import typer_option_temperature_series
@@ -17,6 +18,8 @@ from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype import WindSpeedSeries
 from pvgisprototype.cli.typer_parameters import typer_option_wind_speed_series
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_pv_power_algorithm
+from pvgisprototype.cli.typer_parameters import typer_option_module_temperature_algorithm
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
@@ -51,7 +54,8 @@ def get_pv_efficiency_time_series(
     model_constants: List[float] = EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[WindSpeedSeries, typer_option_wind_speed_series] = WIND_SPEED_DEFAULT,
-    model: PVModuleEfficiencyAlgorithms = PVModuleEfficiencyAlgorithms.faiman,
+    power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
+    temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
@@ -67,7 +71,8 @@ def get_pv_efficiency_time_series(
         model_constants=model_constants,
         standard_test_temperature=standard_test_temperature,
         wind_speed_series=wind_speed_series,
-        model=model,
+        power_model=power_model,
+        temperature_model=temperature_model,
         verbose=verbose,
     )
     if verbose > 0:
