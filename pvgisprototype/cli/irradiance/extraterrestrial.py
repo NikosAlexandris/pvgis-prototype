@@ -2,7 +2,7 @@ import typer
 from typing import Annotated
 from typing import Optional
 from datetime import datetime
-from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_frequency

@@ -2,7 +2,7 @@ from typing import Annotated
 from typing import Optional
 from pathlib import Path
 from datetime import datetime
-from pvgisprototype.api.irradiance.global_time_series import calculate_global_irradiance_time_series
+from pvgisprototype.api.irradiance.shortwave import calculate_global_irradiance_time_series
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance

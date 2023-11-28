@@ -33,11 +33,11 @@ from typing import Optional
 from typing import Union
 from typing import Sequence
 from typing import List
-from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
+from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.utilities.progress import progress
-from pvgisprototype.api.irradiance.extraterrestrial_time_series import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from rich import print
 from pvgisprototype.api.series.statistics import print_series_statistics
