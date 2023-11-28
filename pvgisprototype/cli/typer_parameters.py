@@ -471,6 +471,20 @@ def parse_temperature_series(temperature_input: int):     # FIXME: Re-design ?
         return None
 
 
+def temperature_series_argument_callback(
+    ctx: Context,
+    temperature_series: TemperatureSeries,
+):
+    reference_series = ctx.params.get('timestamps')
+    if temperature_series == TEMPERATURE_DEFAULT:
+        temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=float)
+
+    if temperature_series.size != len(reference_series):
+        raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
+
+    return TemperatureSeries(value=temperature_series, unit=TEMPERATURE_UNIT)
+
+
 def temperature_series_callback(
     ctx: Context,
     temperature_series: TemperatureSeries,
@@ -489,6 +503,16 @@ def temperature_series_callback(
 
 
 temperature_typer_help='Ambient temperature time series'
+typer_argument_temperature_series = typer.Option(
+    help=temperature_typer_help,
+    # min=TEMPERATURE_MINIMUM,
+    # max=TEMPERATURE_MAXIMUM,
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+    # is_eager=True,
+    parser=parse_temperature_series,
+    callback=temperature_series_argument_callback,
+    # default_factory=TEMPERATURE_DEFAULT,
+)
 typer_option_temperature_series = typer.Option(
     help=temperature_typer_help,
     # min=TEMPERATURE_MINIMUM,
@@ -514,12 +538,28 @@ def parse_wind_speed_series(wind_speed_input: int):     # FIXME: Re-design ?
         return None
 
 
+def wind_speed_series_argument_callback(
+    ctx: Context,
+    wind_speed_series: WindSpeedSeries,
+    param: typer.CallbackParam,
+):
+    reference_series = ctx.params.get('timestamps')
+    # if not reference_series:
+    #     reference_series = ctx.params.get('irradiance_series')
+
+    if wind_speed_series == WIND_SPEED_DEFAULT:
+        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=float)
+
+    if wind_speed_series.size != len(reference_series):
+        raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
+    return WindSpeedSeries(value=wind_speed_series, unit=WIND_SPEED_UNIT)
+
+
 def wind_speed_series_callback(
     ctx: Context,
     wind_speed_series: WindSpeedSeries,
     param: typer.CallbackParam,
 ):
-    # reference_series = ctx.params.get('timestamps')
     reference_series = ctx.params.get('irradiance_series')
     # if not reference_series:
     #     reference_series = ctx.params.get('irradiance_series')
@@ -533,6 +573,16 @@ def wind_speed_series_callback(
 
 
 wind_speed_typer_help='Ambient wind_speed time series'
+typer_argument_wind_speed_series = typer.Option(
+    help=wind_speed_typer_help,
+    # min=WIND_SPEED_MINIMUM,
+    # max=WIND_SPEED_MAXIMUM,
+    rich_help_panel=rich_help_panel_atmospheric_properties,
+    # is_eager=True,
+    parser=parse_wind_speed_series,
+    callback=wind_speed_series_argument_callback,
+    # default_factory=WIND_SPEED_DEFAULT,
+)
 typer_option_wind_speed_series = typer.Option(
     help=wind_speed_typer_help,
     # min=WIND_SPEED_MINIMUM,
@@ -730,10 +780,20 @@ typer_option_efficiency = typer.Option(
     # rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory=EFFICIENCY_DEFAULT,
 )
-typer_option_pv_module_efficiency_algorithm = typer.Option(
-    '--efficiency-model',
-    '-em',
-    help='Algorithms for calculaton of the efficiency of a photovoltaic system as a function of total irradiance, temperature',
+typer_option_pv_power_algorithm = typer.Option(
+    '--power-model',
+    '-pm',
+    help='Algorithms for calculation of the PV power output of a photovoltaic system as a function of total irradiance and temperature',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_efficiency,
+    # default_factory='King'
+)
+typer_option_module_temperature_algorithm = typer.Option(
+    '--temperature-model',
+    '-tm',
+    help='Algorithms for calculation of the effect of temperature on the power output of a photovoltaic system as a function of temperature and optionally wind speed',
     show_default=True,
     show_choices=True,
     case_sensitive=False,
@@ -755,7 +815,8 @@ typer_option_verbose = typer.Option(
 )
 typer_option_index = typer.Option(
     '--index',
-    '-idx',
+    '--idx',
+    '-i',
     help="Index rows in output table (works only with at least 1x -v)",
     show_default=True,
     show_choices=True,
