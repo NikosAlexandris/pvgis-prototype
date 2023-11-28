@@ -164,8 +164,9 @@ typer_option_timestamps = typer.Option(
     callback=callback_generate_datetime_series,
 #     default_factory=now_utc_datetimezone_series,
 )
+warning_overrides_timestamps = f'[yellow]Overrides the `timestamps` parameter![/yellow]'
 typer_option_start_time = typer.Option(
-    help=f'Start timestamp of the period. [yellow]Overrides the `timestamps` paramter![/yellow]',
+    help=f'Start timestamp of the period. {warning_overrides_timestamps}',
     rich_help_panel=rich_help_panel_time_series,
     default_factory = None,
 )
@@ -175,7 +176,7 @@ typer_option_frequency = typer.Option(
     # default_factory='h'
 )
 typer_option_end_time = typer.Option(
-    help='End timestamp of the period. [yellow]Overrides the `timestamps` paramter![/yellow]',
+    help=f'End timestamp of the period. {warning_overrides_timestamps}',
     rich_help_panel=rich_help_panel_time_series,
     default_factory = None,
 )
