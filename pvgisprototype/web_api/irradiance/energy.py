@@ -10,7 +10,8 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
+from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -71,7 +72,7 @@ async def get_calculate_effective_irradiance_time_series(
     perigee_offset: float = Query(PERIGEE_OFFSET),
     eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
     system_efficiency: Optional[float] = Query(SYSTEM_EFFICIENCY_DEFAULT),
-    efficiency_model: PVModuleEfficiencyAlgorithms = Query(None),
+    power_model: PVModuleEfficiencyAlgorithm = Query(None),
     efficiency: Optional[float] = Query(None),
     rounding_places: Optional[int] = Query(5),
     verbose: int = Query(VERBOSE_LEVEL_DEFAULT),
@@ -114,7 +115,7 @@ async def get_calculate_effective_irradiance_time_series(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         system_efficiency=system_efficiency,
-        efficiency_model=efficiency_model,
+        power_model=power_model,
         efficiency=efficiency,
         verbose=verbose,
     )

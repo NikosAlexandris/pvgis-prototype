@@ -17,7 +17,7 @@ from pvgisprototype.web_api.series.select import select
 from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 from pvgisprototype.web_api.geometry.overview_series import overview_series
-from pvgisprototype.web_api.irradiance.effective import get_calculate_effective_irradiance_time_series
+from pvgisprototype.web_api.irradiance.energy import get_calculate_effective_irradiance_time_series
 
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
