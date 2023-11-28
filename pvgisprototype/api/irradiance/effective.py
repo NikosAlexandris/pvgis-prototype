@@ -21,16 +21,17 @@ from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
+from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.api.irradiance.direct_time_series import print_irradiance_table_2
-from pvgisprototype.api.irradiance.direct_time_series import calculate_direct_inclined_irradiance_time_series_pvgis
-from pvgisprototype.api.irradiance.diffuse_time_series import calculate_diffuse_inclined_irradiance_time_series
-from pvgisprototype.api.irradiance.reflected_time_series import calculate_ground_reflected_inclined_irradiance_time_series
-from pvgisprototype.api.geometry.solar_incidence_time_series import model_solar_incidence_time_series
-from pvgisprototype.api.geometry.solar_altitude_time_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.solar_time_time_series import model_solar_time_time_series
+from pvgisprototype.cli.print import print_irradiance_table_2
+from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
+from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
+from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -56,7 +57,7 @@ from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.api.irradiance.efficiency_time_series import calculate_pv_efficiency_time_series
+from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
@@ -108,8 +109,8 @@ def calculate_effective_irradiance_time_series(
     random_time_series: bool = False,
     global_horizontal_component: Optional[Path] = None,
     direct_horizontal_component: Optional[Path] = None,
-    temperature_series: float = 25,
-    wind_speed_series: float = 0,
+    temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
+    wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
@@ -134,7 +135,8 @@ def calculate_effective_irradiance_time_series(
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float] = None,
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
-    efficiency_model: PVModuleEfficiencyAlgorithms = None,
+    power_model: PVModuleEfficiencyAlgorithm = None,
+    temperature_model: ModuleTemperatureAlgorithm = None,
     efficiency: Optional[float] = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -290,7 +292,7 @@ def calculate_effective_irradiance_time_series(
         + reflected_irradiance_series
     )
 
-    if not efficiency_model:
+    if not power_model:
         if not efficiency:
             # print(f'Using preset system efficiency {system_efficiency}')
             efficiency_coefficient_series = system_efficiency
@@ -299,16 +301,18 @@ def calculate_effective_irradiance_time_series(
             efficiency_coefficient_series = efficiency
     else:
         if not efficiency:
-            # print(f'Using PV module efficiency algorithm {efficiency_model}')
+            # print(f'Using PV module power output algorithm {power_model}')
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
                 irradiance_series=global_irradiance_series,
                 temperature_series=temperature_series,
                 model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
                 standard_test_temperature=TEMPERATURE_DEFAULT,
                 wind_speed_series=wind_speed_series,
-                model=efficiency_model,
+                power_model=power_model,
+                temperature_model=temperature_model,
                 verbose=0,  # no verbosity here by choice!
             )
+            efficiency_coefficient_series *= system_efficiency  # on-top-of !
 
     effective_irradiance_series = (
         global_irradiance_series * efficiency_coefficient_series
@@ -332,7 +336,7 @@ def calculate_effective_irradiance_time_series(
     if verbose > 1:
         extended_results = {
             EFFICIENCY_COLUMN_NAME: efficiency_coefficient_series,
-            ALGORITHM_COLUMN_NAME: efficiency_model.value if efficiency_model else NOT_AVAILABLE,
+            ALGORITHM_COLUMN_NAME: power_model.value if power_model else NOT_AVAILABLE,
             GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,

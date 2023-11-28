@@ -13,8 +13,9 @@ from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithms
-from pvgisprototype.api.irradiance.effective_time_series import calculate_effective_irradiance_time_series
+from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
+from pvgisprototype.api.irradiance.effective import calculate_effective_irradiance_time_series
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
@@ -24,9 +25,11 @@ from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_argument_temperature_time_series
+from pvgisprototype import TemperatureSeries
+from pvgisprototype.cli.typer_parameters import typer_argument_temperature_series
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
-from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_time_series
+from pvgisprototype import WindSpeedSeries
+from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_series
 from pvgisprototype.cli.typer_parameters import typer_option_albedo
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_units
@@ -49,7 +52,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_fac
 from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
 from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.cli.typer_parameters import typer_option_pv_module_efficiency_algorithm
+from pvgisprototype.cli.typer_parameters import typer_option_pv_power_algorithm
+from pvgisprototype.cli.typer_parameters import typer_option_module_temperature_algorithm
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
@@ -98,15 +102,15 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    # help=f":sun_with_face: Estimate the solar irradiance incident on a horizontal or inclined surface",
-    help=f":sun_with_face: Estimate the effective irradiance incident on a surface over a time series ",
+    # help=f":sun_with_face: Estimate the effective irradiance incident on a surface over a time series ",
+    help=f":electric_plug: Estimate the energy production of a PV system [bold green]Prototype[/bold green]",
 )
 
 
 @app.command(
-    'effective',
+    'energy',
     no_args_is_help=True,
-    help=f"Estimate the effective irradiance incident on a surface over a time series ",
+    help=f"Estimate the energy production of a PV system over a time series based on the effective irradiance incident on a solar surface",
     rich_help_panel=rich_help_panel_series_irradiance,
 )
 def calculate_effective_irradiance(
@@ -121,8 +125,8 @@ def calculate_effective_irradiance(
     random_time_series: bool = False,
     global_horizontal_component: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
-    temperature_series: Annotated[float, typer_argument_temperature_time_series] = 25,
-    wind_speed_series: Annotated[float, typer_argument_wind_speed_time_series] = 0,
+    temperature_series: Annotated[TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
+    wind_speed_series: Annotated[WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
@@ -147,7 +151,8 @@ def calculate_effective_irradiance(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    efficiency_model: Annotated[PVModuleEfficiencyAlgorithms, typer_option_pv_module_efficiency_algorithm] = None,
+    power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
+    temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
@@ -194,7 +199,8 @@ def calculate_effective_irradiance(
         angle_output_units=angle_output_units,
         # horizon_heights=horizon_heights,
         system_efficiency=system_efficiency,
-        efficiency_model=efficiency_model,
+        power_model=power_model,
+        temperature_model=temperature_model,
         efficiency=efficiency,
         verbose=verbose,
     )
