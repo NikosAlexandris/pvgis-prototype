@@ -13,7 +13,7 @@ from pvgisprototype import Latitude
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype import SolarAzimuth
 from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.time import model_solar_time
+from pvgisprototype.api.geometry.solar_time import model_solar_time
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
 from pvgisprototype.constants import RADIANS
 
