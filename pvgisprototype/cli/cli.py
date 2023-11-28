@@ -5,9 +5,10 @@ PV electricity generation potential for different technologies & configurations
 from importlib.metadata import version
 import warnings
 from pathlib import Path
+import sys
 import typer
-# import typer.completion
-# from typer._completion_shared import Shells
+import typer.completion
+from typer._completion_shared import Shells
 from click import Context
 from typer.core import TyperGroup
 from typing import Annotated
@@ -34,29 +35,48 @@ from . import utilities
 from . import manual
 
 
+
 state = {"verbose": False}
 
 
 typer.rich_utils.Panel = Panel.fit
 app = typer.Typer(
     cls=OrderCommands,
-    add_completion=True,
+    add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
     help=f"PVGIS Command Line Interface [bold][magenta]prototype[/magenta][/bold]",
 )
 
 
-# app_completion = typer.Typer(help="Generate and install completion scripts.", hidden=True)
-# app.add_typer(app_completion, name="completion")
+app_completion = typer.Typer(
+    help="Generate and install completion scripts.",
+    hidden=True,
+)
+app.add_typer(
+    app_completion,
+    name="completion",
+)
 
-# @app_completion.command(no_args_is_help=True, help="Show completion for the specified shell, to copy or customize it.")
-# def show(ctx: typer.Context, shell: Shells) -> None:
-#     typer.completion.show_callback(ctx, None, shell)
+@app_completion.command(
+    no_args_is_help=True,
+    help="Show completion for the specified shell, to copy or customize it.",
+)
+def show(
+    ctx: typer.Context,
+    shell: Shells,
+) -> None:
+    typer.completion.show_callback(ctx, None, shell)
 
-# @app_completion.command(no_args_is_help=True, help="Install completion for the specified shell.")
-# def install(ctx: typer.Context, shell: Shells) -> None:
-#     typer.completion.install_callback(ctx, None, shell)
+@app_completion.command(
+    no_args_is_help=True,
+    help="Install completion for the specified shell.",
+)
+def install(
+    ctx: typer.Context,
+    shell: Shells,
+) -> None:
+    typer.completion.install_callback(ctx, None, shell)
 
 
 app.add_typer(
