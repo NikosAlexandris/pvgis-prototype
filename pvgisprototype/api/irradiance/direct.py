@@ -41,7 +41,7 @@ from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterres
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from rich import print
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude

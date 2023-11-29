@@ -33,7 +33,6 @@ from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_t
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.csv import write_irradiance_csv
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT

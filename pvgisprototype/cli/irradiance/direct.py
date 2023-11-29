@@ -72,7 +72,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 import numpy as np
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress
