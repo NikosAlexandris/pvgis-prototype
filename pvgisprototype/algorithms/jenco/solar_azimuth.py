@@ -11,8 +11,6 @@ from pvgisprototype.constants import RADIANS
 
 
 def calculate_solar_azimuth_jenco(
-):
-    """ """
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,

@@ -2,7 +2,8 @@
 This module defines Pydantic models for representing solar data attributes over
 a specific location.
 
-Models:
+Models
+------
 - Location:                 Geographical coordinates of a location.
 - LocationSolarAttributes:  Various variables associated with a location.
 - SolarGeometryConstants:     Constant sun geometry data for a day.
@@ -11,7 +12,8 @@ Models:
 - SolarRadiationVariables: 
 - GridGeometry
 
-In the C/C++ source code, the corrsponding `struct`s for data, are:
+In the original C/C++ source code of PVGIS, the corresponding `struct`s for data, are:
+
 - Location                <- PointData: struct
 - LocationSolarAttributes <- PointVarData: struct
 - SolarGeometryConstants    <- SolarGeometryConstDay : struct
@@ -20,22 +22,26 @@ In the C/C++ source code, the corrsponding `struct`s for data, are:
 - SolarRadiationVariables <- SolarRadVar : struct
 - GridGeometry            <- GridGeometry : struct
 
-Usage:
+Usage
+-----
 Import the models from this module into your code and use them to validate and manipulate solar data.
 
-Example:
+Example
+-------
 from models import Location, LocationSolarAttributes
 
 # Create an instance of Location
 location = Location(latitude=37.7749, longitude=-122.4194, elevation=10.0)
 
 # Validate and access the data
+
 if location.validate():
     print(location.latitude)
     print(location.longitude)
     print(location.elevation)
 
 # Create an instance of LocationSolarAttributes
+
 location_solar_attributes = LocationSolarAttributes(
     linkeTurbidity=2.0,
     beamCoefficient=0.8,
@@ -46,12 +52,12 @@ location_solar_attributes = LocationSolarAttributes(
 )
 
 # Validate and access the data
+
 if location_solar_attributes.validate():
     print(location_solar_attributes.linkeTurbidity)
     print(location_solar_attributes.beamCoefficient)
     print(location_solar_attributes.diffCoefficient)
     # ... rest of the attributes
-
 """
 
 from pydantic import BaseModel
@@ -67,6 +73,7 @@ from math import acos
 from math import fabs
 import numpy as np
 import logging
+
 
 class Location(BaseModel):
     """
@@ -87,6 +94,7 @@ class Location(BaseModel):
     elevation: float
     latitude: float
     longitude: float
+
 
 class LocationSolarAttributes(BaseModel):
     """
@@ -170,13 +178,18 @@ class SolarGeometryDayConstants(BaseModel):
     lum_C?? : Are these (in the original code) indeed luminance?
     local_solar_time: `longitTime` set to 0 in the original source code!
     """
+
     longitude: float = Field(..., description="The longitude of the location.")
     latitude: float = Field(..., description="The latitude of the location.")
-    # local_solar_time: float = Field(0, description="The local solar time.")  
+    # local_solar_time: float = Field(0, description="The local solar time.")
     solar_declination: float = Field(..., description="The solar declination.")
     # time_offset: float = Field(0, description="The time offset.")
-    cosine_solar_declination: float = Field(None, description="The cosine of the solar declination.")
-    sine_solar_declination: float = Field(None, description="The sine of the solar declination.")
+    cosine_solar_declination: float = Field(
+        None, description="The cosine of the solar declination."
+    )
+    sine_solar_declination: float = Field(
+        None, description="The sine of the solar declination."
+    )
     lum_C11: float = Field(None, description="The value of luminance C11.")
     lum_C13: float = Field(None, description="The value of luminance C13.")
     lum_C22: float = Field(None, description="The value of luminance C22.")
@@ -186,7 +199,10 @@ class SolarGeometryDayConstants(BaseModel):
     sunset_time: float = Field(None, description="The time of sunset.")
 
     def __str__(self):
-        attributes = "\n".join(f"{key.replace('_', ' ').capitalize()}: {value}" for key, value in self.dict().items())
+        attributes = "\n".join(
+            f"{key.replace('_', ' ').capitalize()}: {value}"
+            for key, value in self.dict().items()
+        )
         return f"Solar Geometry Day Constants\n{attributes}"
 
 
@@ -194,6 +210,7 @@ class SolarGeometryDayVariables(BaseModel):
     """
     Represents the variable sun geometry data for a day.
     """
+
     is_shadow: bool = Field(False, description="Indicates whether there is a shadow.")
     # z_orig: float = Field(..., description="The original Z value.")
     # z_max: float = Field(..., description="The maximum Z value.")
@@ -207,7 +224,10 @@ class SolarGeometryDayVariables(BaseModel):
     # step_cosine_angle: float
 
     def __str__(self):
-        attributes = "\n".join(f"{key.replace('_', ' ').capitalize()}: {value}" for key, value in self.dict().items())
+        attributes = "\n".join(
+            f"{key.replace('_', ' ').capitalize()}: {value}"
+            for key, value in self.dict().items()
+        )
         return f"Solar Geometry Day Variables\n{attributes}"
 
 
@@ -220,7 +240,7 @@ class SunSurfaceGeometry(BaseModel):
     - longitude_difference: The longitude difference.
     - luminance_C31_long: The luminance C31 for the longitude.
     - luminance_C33_long: The luminance C33 for the longitude.
-    - tilt: The tilt angle of the surface. 
+    - tilt: The tilt angle of the surface.
     - azimuth : The azimuth angle of the surface.
     - sin_tilt: The sine of the surface tilt.
     - cos_tilt: The cosine of the surface tilt.
@@ -257,7 +277,7 @@ class SolarRadiationVariables(BaseModel):
 
     Notes
     -----
-    
+
     In rsun:
 
     - extraterrestrial_direct_normal_irradiance is mentioned as `G_norm_extra`
