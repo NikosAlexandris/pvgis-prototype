@@ -10,6 +10,18 @@ This guide provides an introduction to the basic usage of the PVGIS API.
 
 [Provide an example of making a basic API call, including code snippets and explanations.]
 
+``` python
+form pvgisprototype import Longitude, Latitude
+```
+
+or
+
+``` pycon
+>>> from pvgisprototype import Longitude
+>>> Longitude()
+Longitude(value=None, unit=None, symbol='Λ', desription="The angle between a point on the Earth's surface and the meridian plane, with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180° east or west.")
+```
+
 ## Understanding the Response
 
 [Explain the structure of the API response and how to interpret it.]

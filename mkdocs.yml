@@ -41,6 +41,7 @@ theme:
 extra_css:
   - stylesheets/extra.css
   - stylesheets/links.css
+  - stylesheets/code_select.css
 
 plugins:
   - search
@@ -55,6 +56,7 @@ plugins:
         - scripts/generate_reference_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
+  - section-index
   - mkdocstrings:
       handlers:
         python:
@@ -86,6 +88,9 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
+  - pymdownx.highlight:
+      use_pygments: true
+      pygments_lang_class: true
 
 repo_name: pvis-be-prototype
 repo_url: https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
