@@ -16,24 +16,23 @@ from typing import Optional
 from rich import print
 from rich.panel import Panel
 
-from .typer_parameters import OrderCommands
-from .typer_parameters import typer_option_verbose
-from .typer_parameters import typer_option_version
-from .rich_help_panel_names import rich_help_panel_performance
-from .rich_help_panel_names import rich_help_panel_series
-from .rich_help_panel_names import rich_help_panel_geometry
-from .rich_help_panel_names import rich_help_panel_toolbox
-from .rich_help_panel_names import rich_help_panel_reference
+from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_version
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
 
-from .energy import energy
-from . import series
-from .irradiance import irradiance
-from . import time
-from . import position
-from . import surface
-from . import utilities
-from . import manual
-
+from pvgisprototype.cli.energy import energy
+from pvgisprototype.cli import series
+from pvgisprototype.cli.irradiance import irradiance
+from pvgisprototype.cli import position
+from pvgisprototype.cli import time
+from pvgisprototype.cli import surface
+from pvgisprototype.cli import utilities
+from pvgisprototype.cli import manual
 
 
 state = {"verbose": False}

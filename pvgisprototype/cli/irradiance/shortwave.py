@@ -53,7 +53,7 @@ from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE
 from pvgisprototype.constants import TOLERANCE_DEFAULT
