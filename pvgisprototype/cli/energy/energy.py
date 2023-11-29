@@ -161,6 +161,8 @@ def calculate_effective_irradiance(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
 ):
+    """
+    """
     effective_irradiance_series, results, title = calculate_effective_irradiance_time_series(
         longitude=longitude,
         latitude=latitude,
