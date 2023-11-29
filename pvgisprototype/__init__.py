@@ -140,7 +140,7 @@ def radians_property(self):
         return None
 
 
-def generate_dataclass_models(yaml_file: str):
+def generate_cutom_data_classes(yaml_file: str):
 
     def custom_getattr(self, attr_name):
         if attr_name == 'radians':
@@ -204,4 +204,4 @@ def generate_dataclass_models(yaml_file: str):
 
 package_root = Path(__file__).resolve().parent
 parameters_yaml_file_path = package_root / 'validation' / PARAMETERS_YAML_FILE
-generate_dataclass_models(parameters_yaml_file_path)
+generate_cutom_data_classes(parameters_yaml_file_path)
