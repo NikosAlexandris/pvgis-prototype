@@ -10,9 +10,6 @@ def generate_custom_data_classes(yaml_file: str):
         parameters = yaml.safe_load(f)
 
     for model_name in parameters.keys():
-        DataClassFactory.get_data_class(model_name, parameters)
-
-    for model_name in parameters.keys():
         generated_class = DataClassFactory.get_data_class(model_name, parameters)
         globals()[model_name] = generated_class
 
