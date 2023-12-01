@@ -17,6 +17,7 @@ from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.constants import SOLAR_CONSTANT
 
@@ -61,21 +62,6 @@ from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype import LinkeTurbidityFactor
-
-
-def is_surface_in_shade_time_series(input_array, threshold=10):
-    """
-    Determine if a surface is in shade based on solar altitude for each timestamp.
-
-    Parameters:
-    - solar_altitude_series_array (numpy array): Array of solar altitude angles for each timestamp.
-    - shade_threshold (float): Solar altitude angle below which the surface is considered to be in shade.
-
-    Returns:
-    - numpy array: Boolean array indicating whether the surface is in shade at each timestamp.
-    """
-    # return solar_altitude_series_array < threshold
-    return np.full(input_array.size, False)
 
 
 def calculate_global_irradiance_time_series(

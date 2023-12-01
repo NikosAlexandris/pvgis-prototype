@@ -23,7 +23,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degr
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from datetime import datetime
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
@@ -85,7 +85,7 @@ from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.write import write_irradiance_csv
 
 
 app = typer.Typer(

@@ -77,6 +77,7 @@ def add_unequal_arrays(array_1, array_2):
 
 def calculate_pv_efficiency_time_series(
     irradiance_series: List[float],
+    spectral_factor: List[float],
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     model_constants: List[float] = EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
@@ -86,6 +87,17 @@ def calculate_pv_efficiency_time_series(
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
+    """
+    Parameters
+    ----------
+
+    spectral_factor:
+        Spectral factor for spectrally resolved irradiance series
+
+    Returns
+    -------
+
+    """
     model_constants = np.array(EFFICIENCY_MODEL_COEFFICIENTS['cSi']['Free standing'])
     # or add standard plus selected?
     # model_constants = np.array(STANDARD_EFFICIENCY_MODEL_COEFFICIENTS)
@@ -97,6 +109,9 @@ def calculate_pv_efficiency_time_series(
     
     irradiance_series = np.array(irradiance_series)
     relative_irradiance_series = 0.001 * irradiance_series
+    if spectral_factor:
+        spectral_factor = np.array(spectral_factor)
+        relative_irradiance_series *= spectral_factor
     log_relative_irradiance_series = np.log(relative_irradiance_series)
 
     negative_relative_irradiance = relative_irradiance_series <= radiation_cutoff_threshold

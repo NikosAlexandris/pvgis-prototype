@@ -1,50 +1,50 @@
 # Generic input/output
-from pvgisprototype.validation.parameters import VerbosityModel
+from pvgisprototype.validation.pvis_data_classes import VerbosityModel
 
 # Where?
-from pvgisprototype.validation.parameters import LatitudeModel
-from pvgisprototype.validation.parameters import LongitudeModel
-from pvgisprototype.validation.parameters import BaseCoordinatesModel
-from pvgisprototype.validation.parameters import ElevationModel
+from pvgisprototype.validation.pvis_data_classes import LatitudeModel
+from pvgisprototype.validation.pvis_data_classes import LongitudeModel
+from pvgisprototype.validation.pvis_data_classes import BaseCoordinatesModel
+from pvgisprototype.validation.pvis_data_classes import ElevationModel
 
 # When?
-from pvgisprototype.validation.parameters import BaseTimestampModel
-from pvgisprototype.validation.parameters import BaseTimeModel
-from pvgisprototype.validation.parameters import BaseTimeSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimeModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimeSeriesModel
 
 # Atmospheric effects
-from pvgisprototype.validation.parameters import ApplyAtmosphericRefractionModel
-from pvgisprototype.validation.parameters import RefractedSolarZenithModel
+from pvgisprototype.validation.pvis_data_classes import ApplyAtmosphericRefractionModel
+from pvgisprototype.validation.pvis_data_classes import RefractedSolarZenithModel
 
 # Earth orbit
-from pvgisprototype.validation.parameters import EarthOrbitModel
+from pvgisprototype.validation.pvis_data_classes import EarthOrbitModel
 
 # Solar time
-from pvgisprototype.validation.parameters import SolarTimeModelModel
-from pvgisprototype.validation.parameters import SolarTimeModel
-from pvgisprototype.validation.parameters import TimeOffsetModel
-from pvgisprototype.validation.parameters import HourOffsetModel
-from pvgisprototype.validation.parameters import BaseTimeOutputUnitsModel
-from pvgisprototype.validation.parameters import RandomTimeSeriesModel
+from pvgisprototype.validation.pvis_data_classes import SolarTimeModelModel
+from pvgisprototype.validation.pvis_data_classes import SolarTimeModel
+from pvgisprototype.validation.pvis_data_classes import TimeOffsetModel
+from pvgisprototype.validation.pvis_data_classes import HourOffsetModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimeOutputUnitsModel
+from pvgisprototype.validation.pvis_data_classes import RandomTimeSeriesModel
 
 # Solar geometry
-from pvgisprototype.validation.parameters import RefractedSolarAltitudeModel
-from pvgisprototype.validation.parameters import RefractedSolarAltitudeSeriesModel
-from pvgisprototype.validation.parameters import SolarDeclinationModel
-from pvgisprototype.validation.parameters import SolarPositionModel
-from pvgisprototype.validation.parameters import SolarHourAngleModel
+from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeModel
+from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeSeriesModel
+from pvgisprototype.validation.pvis_data_classes import SolarDeclinationModel
+from pvgisprototype.validation.pvis_data_classes import SolarPositionModel
+from pvgisprototype.validation.pvis_data_classes import SolarHourAngleModel
 
 # Solar Surface
-from pvgisprototype.validation.parameters import SurfaceTiltModel
-from pvgisprototype.validation.parameters import SurfaceOrientationModel
+from pvgisprototype.validation.pvis_data_classes import SurfaceTiltModel
+from pvgisprototype.validation.pvis_data_classes import SurfaceOrientationModel
 
 # Incidence
-from pvgisprototype.validation.parameters import SolarIncidenceModel
+from pvgisprototype.validation.pvis_data_classes import SolarIncidenceModel
 
 # Output
-from pvgisprototype.validation.parameters import BaseAngleUnitsModel
-from pvgisprototype.validation.parameters import BaseAngleInternalUnitsModel
-from pvgisprototype.validation.parameters import BaseAngleOutputUnitsModel
+from pvgisprototype.validation.pvis_data_classes import BaseAngleUnitsModel
+from pvgisprototype.validation.pvis_data_classes import BaseAngleInternalUnitsModel
+from pvgisprototype.validation.pvis_data_classes import BaseAngleOutputUnitsModel
 
 # Validator
 from typing import Type

@@ -42,84 +42,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype.constants import RADIANS
 import numpy as np
-
-
-# @validate_with_pydantic()
-def interpolate_horizon_height(
-    solar_azimuth: float,
-    horizon_heights: List[float],
-    horizon_interval: float,
-) -> HorizonHeight:
-    """Interpolate the height of the horizon at the sun's azimuth angle.
-
-    Parameters
-    ----------
-    solar_azimuth : float
-        The azimuth angle of the sun.
-    horizon_heights : list of float
-        List of horizon height values.
-    horizon_interval : float
-        Interval between successive horizon data points.
-
-    Returns
-    -------
-    float
-        The interpolated horizon height.
-    """
-    position_in_interval = solar_azimuth / horizon_interval
-    position_before = int(position_in_interval)
-    position_after = position_before + 1
-
-    # Handle wrap around
-    position_after = 0 if position_after == len(horizon_heights) else position_after
-
-    # Interpolate the horizon height (or weighted average)
-    horizon_height = (
-        (1 - (position_in_interval - position_before))
-        * horizon_heights[position_before] 
-        + (position_in_interval - position_before)
-        * horizon_heights[position_after]
-    )
-
-    return HorizonHeight(horizon_height, HORIZON_HEIGHT_UNIT)
-
-
-def is_surface_in_shade(
-    solar_altitude: float,
-    solar_azimuth: float,
-    shadow_indicator: Path = None,
-    horizon_heights: Optional[List[float]] = None,
-    horizon_interval: Optional[float] = None,
-) -> bool:
-    """Check whether the solar surface is in shade based on shadow and horizon data.
-
-    Parameters
-    ----------
-    shadow_indicator : int, optional
-        Shadow data indicating presence of shadow, by default None.
-    solar_altitude : float
-        The altitude of the sun.
-    solar_azimuth : float
-        The azimuth angle of the sun.
-    horizon_heights : list of float, optional
-        List of horizon height values, by default None.
-    horizon_interval : float, optional
-        Interval between successive horizon data points, by default None.
-
-    Returns
-    -------
-    bool
-        True if the solar surface is in shade, otherwise False.
-    """
-    if shadow_indicator is not None and bool(shadow_indicator):
-        return True
-
-    if horizon_heights is not None:
-        horizon_height = interpolate_horizon_height(solar_azimuth, horizon_heights, horizon_interval)
-        if horizon_height > solar_altitude:
-            return True
-    
-    return False
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade
 
 
 @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
@@ -255,7 +178,6 @@ def calculate_solar_incidence_jenco(
         `solar_hour_angle = (true_solar_time - 720) * (pi / 720)`.
 
     in which 720 is minutes, whereas 60 is hours in PVGIS' C++ code.
-
     """
     solar_altitude = None
     solar_azimuth = None
@@ -319,6 +241,25 @@ def calculate_solar_incidence_time_series_jenco(
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
+    """Calculate the solar incidence angle based on the position of the sun and
+    the inclination angle of a surface over a period of time
+
+    Parameters
+    ----------
+    longitude : float
+        Longitude in degrees
+    latitude : float
+        Latitude in degrees
+    surface_tilt : float
+        Tilt of the surface in degrees
+    surface_orientation : float
+        Orientation of the surface (azimuth angle in degrees)
+
+    Returns
+    -------
+    ndarray
+        Solar incidence angle or NO_SOLAR_INCIDENCE series if a shadow is detected.
+    """
     sine_relative_inclined_latitude = -(
         cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
         + sin(latitude.radians) * cos(surface_tilt.radians)

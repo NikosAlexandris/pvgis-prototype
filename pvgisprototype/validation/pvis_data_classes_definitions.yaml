@@ -1,4 +1,4 @@
-# Where?
+# Where ?
 
 Longitude:
   value:
@@ -12,9 +12,7 @@ Longitude:
     initial: Λ
   desription:
     type: str
-    initial: "The angle between a point on the Earth's surface and the meridian plane,
-    with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180°
-    east or west."
+    initial: "The angle between a point on the Earth's surface and the meridian plane, with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180° east or west."
 
 Latitude:
   value:
@@ -28,9 +26,7 @@ Latitude:
     initial: Φ
   desription:
     type: str
-    initial: "The angle between a point on the Earth's surface and the equatorial plane.
-    It indicates a location's distance north or south of the equator, ranging from 0°
-    at the Equator to 90° North or South at the poles."
+    initial: "The angle between a point on the Earth's surface and the equatorial plane. It indicates a location's distance north or south of the equator, ranging from 0° at the Equator to 90° North or South at the poles."
 
 Elevation:
   value:
@@ -310,7 +306,7 @@ SolarIncidence:
     type: str
     initial:
 
-# How?
+# How ?
 
 RelativeLongitude:
   value:
