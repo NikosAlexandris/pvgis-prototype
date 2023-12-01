@@ -88,14 +88,51 @@ def calculate_pv_efficiency_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """
+    Calculate the time series efficiency of a photovoltaic (PV) module based on irradiance, temperature, and other factors.
+
     Parameters
     ----------
-
-    spectral_factor:
-        Spectral factor for spectrally resolved irradiance series
+    irradiance_series : List[float]
+        List of irradiance values over time.
+    spectral_factor : List[float]
+        List of spectral factors corresponding to the irradiance series.
+    temperature_series : np.ndarray, optional
+        Numpy array of temperature values over time. Default is np.array(TEMPERATURE_DEFAULT).
+    model_constants : List[float], optional
+        List of coefficients for the efficiency model. Default is EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT.
+    standard_test_temperature : float, optional
+        Temperature used in standard test conditions. Default is TEMPERATURE_DEFAULT.
+    wind_speed_series : np.ndarray, optional
+        Numpy array of wind speed values over time. Default is np.array(WIND_SPEED_DEFAULT).
+    power_model : PVModuleEfficiencyAlgorithm, optional
+        Algorithm used for calculating PV module power. Default is PVModuleEfficiencyAlgorithm.king.
+    temperature_model : ModuleTemperatureAlgorithm, optional
+        Algorithm used for temperature correction. Default is ModuleTemperatureAlgorithm.faiman.
+    radiation_cutoff_threshold : float, optional
+        Minimum irradiance threshold for calculations. Default is RADIATION_CUTOFF_THRESHOLD.
+    verbose : int, optional
+        Level of verbosity for output data. Default is VERBOSE_LEVEL_DEFAULT.
 
     Returns
     -------
+    efficiency_series : np.ndarray
+        Array of calculated efficiency values for the PV module.
+    results : dict, optional
+        Dictionary containing detailed results and intermediate calculations. Provided when `verbose > 0`.
+
+    Raises
+    ------
+    ValueError
+        If an insufficient number of model constants is provided.
+
+    Examples
+    --------
+    >>> calculate_pv_efficiency_time_series([1000, 950], [1.1, 1.05], temperature_series=np.array([25, 26]))
+    # Returns efficiency series and possibly detailed results based on the verbose level.
+
+    Notes
+    -----
+    This function is part of a larger system for analyzing PV module performance. It takes into account spectral factors, temperature variations, and wind speed, applying different models to calculate the efficiency of a PV module under varying conditions.
 
     """
     model_constants = np.array(EFFICIENCY_MODEL_COEFFICIENTS['cSi']['Free standing'])

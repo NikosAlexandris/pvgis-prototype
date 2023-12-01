@@ -94,7 +94,7 @@ def calculate_effective_irradiance_time_series(
     random_time_series: bool = False,
     global_horizontal_component: Optional[Path] = None,
     direct_horizontal_component: Optional[Path] = None,
-    spectral_factor = None,
+    spectral_factor=None,
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
@@ -116,7 +116,7 @@ def calculate_effective_irradiance_time_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = 'minutes',
+    time_output_units: str = "minutes",
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float] = None,
@@ -126,6 +126,61 @@ def calculate_effective_irradiance_time_series(
     efficiency: Optional[float] = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
+    """
+    Estimate the energy production of a PV system over a time series based on the effective irradiance incident on a solar surface.
+
+    Parameters
+    ----------
+    longitude : float
+        The longitude of the location for which the energy production is calculated.
+    latitude : float
+        The latitude of the location.
+    elevation : float
+        Elevation of the location in meters.
+    timestamps : Optional[datetime], optional
+        Specific timestamps for which to calculate the irradiance. Default is None.
+    start_time : Optional[datetime], optional
+        Start time for the calculation period. Default is None.
+    frequency : Optional[str], optional
+        Frequency for time series data generation. Default is None.
+    end_time : Optional[datetime], optional
+        End time for the calculation period. Default is None.
+    timezone : Optional[str], optional
+        Timezone of the location. Default is None.
+    random_time_series : bool, default False
+        If True, generates a random time series.
+    global_horizontal_component : Optional[Path], optional
+        Path to data file for global horizontal irradiance. Default is None.
+    direct_horizontal_component : Optional[Path], optional
+        Path to data file for direct horizontal irradiance. Default is None.
+    temperature_series : TemperatureSeries
+        Series of temperature values. Default is TEMPERATURE_DEFAULT.
+    wind_speed_series : WindSpeedSeries
+        Series of wind speed values. Default is WIND_SPEED_DEFAULT.
+    mask_and_scale : bool, default False
+        If True, applies masking and scaling to the input data.
+
+    # ... other parameters ...
+
+    Returns
+    -------
+    effective_irradiance_series : ndarray
+        Array of effective irradiance values.
+    results : dict
+        Dictionary containing detailed results of the calculation.
+    title : str
+        Title of the output data.
+
+    Examples
+    --------
+    >>> calculate_effective_irradiance(10.0, 20.0, 100.0, start_time="2023-01-01", end_time="2023-01-31")
+    # This will return the effective irradiance series, results, and title for the specified parameters.
+
+    Notes
+    -----
+    This function is part of the Typer-based CLI for the new PVGIS implementation in Python. It provides an interface for estimating the energy production of a photovoltaic system, taking into account various environmental and system parameters.
+
+    """
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -146,16 +201,16 @@ def calculate_effective_irradiance_time_series(
     )
     # Masks based on the solar altitude series
     mask_above_horizon = solar_altitude_series.value > 0
-    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)      # FIXME: Is the value 0.04 in radians or degrees ?
+    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
     in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
-    mask_above_horizon_not_in_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
+    mask_above_horizon_not_in_shade = np.logical_and.reduce(mask_above_horizon, mask_not_in_shade)
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype="float64")
+    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype="float64")
+    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype="float64")
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
@@ -301,17 +356,15 @@ def calculate_effective_irradiance_time_series(
             )
             efficiency_coefficient_series *= system_efficiency  # on-top-of !
 
-    effective_irradiance_series = (
-        global_irradiance_series * efficiency_coefficient_series
-    )
+    effective_irradiance_series = global_irradiance_series * efficiency_coefficient_series
 
     # Reporting --------------------------------------------------------------
 
     results = {
         EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
     }
-    title = 'Effective'
-    
+    title = "Effective"
+
     if verbose > 2:
         more_extended_results = {
             EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_irradiance_series * efficiency_coefficient_series,
@@ -330,7 +383,7 @@ def calculate_effective_irradiance_time_series(
             REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
         }
         results = results | extended_results
-        title += ' & in-plane components'
+        title += " & in-plane components"
 
     if verbose > 3:
         even_more_extended_results = {
@@ -354,7 +407,7 @@ def calculate_effective_irradiance_time_series(
         results = {
             EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
         }
-        title = 'Effective'
+        title = "Effective"
         longitude = latitude = None
 
     if verbose > 6:
