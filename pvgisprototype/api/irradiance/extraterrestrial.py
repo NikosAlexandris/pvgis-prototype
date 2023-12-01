@@ -11,7 +11,7 @@ from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DAY_OF_YEAR_COLUMN_NAME
 from pvgisprototype.constants import DISTANCE_CORRECTION_COLUMN_NAME
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 import numpy as np
 
 

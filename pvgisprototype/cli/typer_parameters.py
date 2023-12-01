@@ -62,7 +62,7 @@ from pvgisprototype import TemperatureSeries
 from pvgisprototype import WindSpeedSeries
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import OpticalAirMass
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 
 
 class OrderCommands(TyperGroup):

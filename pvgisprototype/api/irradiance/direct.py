@@ -17,7 +17,7 @@ from math import cos
 from math import atan
 import numpy as np
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.api.geometry.models import validate_model
 from pvgisprototype.api.geometry.models import SolarTimeModels
