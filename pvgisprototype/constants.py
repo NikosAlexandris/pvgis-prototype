@@ -2,40 +2,6 @@ from math import pi
 import numpy as np
 
 
-PARAMETERS_YAML_FILE = 'parameters.yaml'  # definitions
-"""
-The _paramaters_ YAML file describes custom data classes required to run pvgis.
-including the type, the initial values, the units, and the description.
-
-The file is organized in sections, each corresponding to a different 'group'
-like: 'Where?', 'When?', 'Atmospheric properties', 'Earth orbit', etc.
-
-Each parameter is described by the following keys:
-
-    - value: Contains 'type' and 'initial' values.
-    - unit: Contains 'type' and 'initial' values.
-    - symbol: Symbol used for the parameter.
-    - description: Textual description of what the parameter represents.
-
-See Also
---------
-- Python's PyYAML library for YAML file parsing:
-  https://pypi.org/project/PyYAML/
-
-Examples
---------
-- Longitude:
-    value:
-        type: Optional[float]
-        initial:
-    unit:
-        type: Optional[str]
-        initial:
-    symbol: Λ
-    description: "The angle between a point on the Earth's surface and the meridian plane,
-                  ranging from 0° at the Prime Meridian to 180° east or west."
-"""
-
 VERBOSE_LEVEL_DEFAULT = 0
 DEBUG_AFTER_THIS_VERBOSITY_LEVEL = 7
 ROUNDING_PLACES_DEFAULT = 5
