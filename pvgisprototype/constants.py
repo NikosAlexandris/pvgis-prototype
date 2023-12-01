@@ -1,5 +1,27 @@
+"""
+This file `constants.py` contains important hard-coded values for
+`pvgisprototype`'s components.
+
+The content is sectioned to ease-of reviewing and updating.
+"""
+
 from math import pi
 import numpy as np
+
+
+# Symbols to use ?
+# ⊾ ∢ ⦠ ∡ ⦛ ⦜ ⦣ ⦤ ⦥
+# ⦨ ⦩ # from horizontal upwards
+# ⦪ ⦫ # from horizontal downwards
+# ⦮ ⦯ # from vertical upwards
+# ⦬ ⦭ # from vertical downwards
+# ⭍
+# ☀ ☼ 🌣 # sun
+# 🗤 # rays spreading
+# ⌇ # wavy line
+# 🌬 # wind
+# ⌖ ⯐ # position
+# ⭸ ⭹
 
 
 VERBOSE_LEVEL_DEFAULT = 0
@@ -119,19 +141,6 @@ SOLAR_TIME_NAME = 'Solar Time'
 
 UNITS_NAME = 'Units'
 UNITLESSS_NAME = 'Unitless'
-
-# ⊾ ∢ ⦠ ∡ ⦛ ⦜ ⦣ ⦤ ⦥
-# ⦨ ⦩ # from horizontal upwards
-# ⦪ ⦫ # from horizontal downwards
-# ⦮ ⦯ # from vertical upwards
-# ⦬ ⦭ # from vertical downwards
-# ⭍
-# ☀ ☼ 🌣 # sun
-# 🗤 # rays spreading
-# ⌇ # wavy line
-# 🌬 # wind
-# ⌖ ⯐ # position
-# ⭸ ⭹
 
 TITLE_KEY_NAME = 'Title'
 LONGITUDE_COLUMN_NAME = 'Longitude'
