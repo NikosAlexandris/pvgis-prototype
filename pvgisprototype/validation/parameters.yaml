@@ -1,42 +1,3 @@
-"""
-This `paramaters.yaml` YAML file describes the definition of custom data classes
-required by `pvgisprototype`'s application programming interface (API) and,
-hence, subsequently by the command line interface (CLI) and the Web API
-components.
-
-The content is parsed and converted into a native Python dictionary at
-installation time.  ::: FIXME -- ToDo ! :::
-
-The definition of a custom data class includes type, initial values, units, and
-a textual description. The content is organized in sections : 'Where?',
-  'When?', 'Atmospheric properties', 'Earth orbit' and more.
-
-Each custom data class is described by the following (nested) key-value pairs:
-
-    - value       : 'type' of and 'initial' value
-    - unit        : 'type' of and 'initial' value
-    - symbol      : used to visually distinguish a parameter
-    - description : textual description of the parameter supported by the class
-
-See Also
---------
-- Python's PyYAML library for YAML file parsing:
-  https://pypi.org/project/PyYAML/
-
-Examples
---------
-- Longitude:
-    value:
-        type: Optional[float]
-        initial:
-    unit:
-        type: Optional[str]
-        initial:
-    symbol: Λ
-    description: "The angle between a point on the Earth's surface and the meridian plane,
-                  ranging from 0° at the Prime Meridian to 180° east or west."
-"""
-
 # Where ?
 
 Longitude:
@@ -51,9 +12,7 @@ Longitude:
     initial: Λ
   desription:
     type: str
-    initial: "The angle between a point on the Earth's surface and the meridian plane,
-    with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180°
-    east or west."
+    initial: "The angle between a point on the Earth's surface and the meridian plane, with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180° east or west."
 
 Latitude:
   value:
@@ -67,9 +26,7 @@ Latitude:
     initial: Φ
   desription:
     type: str
-    initial: "The angle between a point on the Earth's surface and the equatorial plane.
-    It indicates a location's distance north or south of the equator, ranging from 0°
-    at the Equator to 90° North or South at the poles."
+    initial: "The angle between a point on the Earth's surface and the equatorial plane. It indicates a location's distance north or south of the equator, ranging from 0° at the Equator to 90° North or South at the poles."
 
 Elevation:
   value:
