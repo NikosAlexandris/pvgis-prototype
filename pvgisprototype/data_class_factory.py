@@ -131,39 +131,6 @@ def radians_property(self):
         return None
 
 
-# def _custom_getattr(self, attr_name):
-#     if attr_name == 'radians':
-#         value = radians_property(self)
-#     elif attr_name == 'degrees':
-#         value = degrees_property(self)
-#     elif attr_name == 'minutes':
-#         value = minutes_property(self)
-#     elif attr_name == 'timedelta':
-#         value = timedelta_property(self)
-#     elif attr_name == 'as_minutes':
-#         value = as_minutes_property(self)
-#     elif attr_name == 'datetime':
-#         value = datetime_property(self)
-#     elif attr_name == 'timestamp':
-#         value = timestamp_property(self)
-#     elif attr_name == 'as_hours':
-#         value = as_hours_property(self)
-#     else:
-#         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr_name}'")
-
-#     try:
-#         if value is None:
-#             raise AttributeError(f"'{self.__class__.__name__}' object can't have attribute '{attr_name}'")
-#     except ValueError:
-#         if not np.any(value):
-#             raise AttributeError(f"'{self.__class__.__name__}' object can't have attribute '{attr_name}'")
-
-#     # self.__dict__[name] = value
-#     # self.__dict__['value'] = value
-#     # self.__dict__['unit'] = attr_name
-#     return value
-
-
 def _custom_getattr(self, attr_name):
     property_functions = {
         "radians": radians_property,

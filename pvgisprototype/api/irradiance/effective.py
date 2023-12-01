@@ -26,6 +26,7 @@ from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.cli.print import print_irradiance_table_2
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
@@ -79,21 +80,6 @@ from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import SHADE_COLUMN_NAME
 from pvgisprototype import LinkeTurbidityFactor
-
-
-def is_surface_in_shade_time_series(input_array, threshold=10):
-    """
-    Determine if a surface is in shade based on solar altitude for each timestamp.
-
-    Parameters:
-    - solar_altitude_series_array (numpy array): Array of solar altitude angles for each timestamp.
-    - shade_threshold (float): Solar altitude angle below which the surface is considered to be in shade.
-
-    Returns:
-    - numpy array: Boolean array indicating whether the surface is in shade at each timestamp.
-    """
-    # return solar_altitude_series_array < threshold
-    return np.full(input_array.size, False)
 
 
 def calculate_effective_irradiance_time_series(
@@ -159,11 +145,11 @@ def calculate_effective_irradiance_time_series(
     )
     # Masks based on the solar altitude series
     mask_above_horizon = solar_altitude_series.value > 0
-    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)      # FIXME: Is this in radians or degrees ?
+    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)      # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
     in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
-    mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
+    mask_above_horizon_not_in_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
     direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
@@ -179,8 +165,8 @@ def calculate_effective_irradiance_time_series(
     reflected_irradiance_series[mask_below_horizon] = 0
 
     # For sun above horizon and not in shade
-    if np.any(mask_above_horizon_not_shade):
-        direct_irradiance_series[mask_above_horizon_not_shade] = (
+    if np.any(mask_above_horizon_not_in_shade):
+        direct_irradiance_series[mask_above_horizon_not_in_shade] = (
             calculate_direct_inclined_irradiance_time_series_pvgis(
                 longitude=longitude,
                 latitude=latitude,
@@ -214,7 +200,7 @@ def calculate_effective_irradiance_time_series(
                 angle_output_units=angle_output_units,
                 verbose=0,  # no verbosity here by choice!
             )
-        )[mask_above_horizon_not_shade]
+        )[mask_above_horizon_not_in_shade]
 
     # Calculate diffuse and reflected irradiance for sun above horizon
     if np.any(mask_above_horizon):
@@ -292,7 +278,7 @@ def calculate_effective_irradiance_time_series(
     )
 
     if not power_model:
-        if not efficiency:
+        if not efficiency:  # user-set  -- RenameMe ?  FIXME
             # print(f'Using preset system efficiency {system_efficiency}')
             efficiency_coefficient_series = system_efficiency
         else:

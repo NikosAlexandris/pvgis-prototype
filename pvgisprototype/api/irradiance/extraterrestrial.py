@@ -30,7 +30,9 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> Union[np.ndarray, dict]:
-    """ """
+    """
+    Calculate the normal extraterrestrial irradiance over a period of time
+    """
     timestamps = np.array(timestamps)
     years_in_timestamps = timestamps.astype('datetime64[Y]').astype(int) + 1970
     years, indices = np.unique(years_in_timestamps, return_inverse=True)
@@ -53,7 +55,7 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
 
     if verbose > 0:
         results = {
-            'Title': EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
+            'Title': EXTRATERRESTRIAL_NORMAL_IRRADIANCE,  # + Units : W / m*m REVIEWME
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series
         }
 
