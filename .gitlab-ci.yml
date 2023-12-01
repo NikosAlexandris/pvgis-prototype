@@ -26,7 +26,7 @@ test:
 
 pages:
   stage: deploy
-  image: python:slim
+  image: python:latest
   script:
     - mkdocs build --site-dir public
   artifacts:
