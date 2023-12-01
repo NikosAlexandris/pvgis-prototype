@@ -1,13 +1,13 @@
 """
-parameters.yaml
----------------
+pvis_data_classes_definitions.yaml
+----------------------------------
 
-This `paramaters.yaml` YAML file describes the definition of custom _atomic_
-data classes required by `pvgisprototype`'s application programming interface
-(API) and, hence, subsequently by the command line interface (CLI) and the Web
-API components.  Atomic data classes are used then to build more complex data
-structures defined in `parameters.py` (or let's call them Models) using
-Pydantic to serve input data validation purposes and more.
+This `pvis_data_classes_definitions.yaml` YAML file describes the definition of
+custom _atomic_ data classes required by `pvgisprototype`'s application
+programming interface (API) and, hence, subsequently by the command line
+interface (CLI) and the Web API components.  Atomic data classes are used then
+to build more complex data structures defined in `parameters.py` (or let's call
+them Models) using Pydantic to serve input data validation purposes and more.
 
 The content is parsed and converted into a native Python dictionary at
 installation time.  ::: FIXME -- ToDo ! :::
