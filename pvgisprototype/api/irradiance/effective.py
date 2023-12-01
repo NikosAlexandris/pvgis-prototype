@@ -94,6 +94,7 @@ def calculate_effective_irradiance_time_series(
     random_time_series: bool = False,
     global_horizontal_component: Optional[Path] = None,
     direct_horizontal_component: Optional[Path] = None,
+    spectral_factor = None,
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
@@ -288,6 +289,7 @@ def calculate_effective_irradiance_time_series(
         if not efficiency:
             # print(f'Using PV module power output algorithm {power_model}')
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
+                spectral_factor=spectral_factor,
                 irradiance_series=global_irradiance_series,
                 temperature_series=temperature_series,
                 model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
