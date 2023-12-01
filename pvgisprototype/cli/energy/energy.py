@@ -6,7 +6,7 @@ from pathlib import Path
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SolarPositionModels

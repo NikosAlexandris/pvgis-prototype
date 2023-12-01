@@ -4,7 +4,7 @@ from typing import List
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from datetime import datetime
 from pathlib import Path

@@ -4,7 +4,7 @@ from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
 from pvgisprototype.api.irradiance.direct import calculate_direct_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from typing import Annotated
 from typing import Optional
@@ -72,7 +72,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 import numpy as np
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress

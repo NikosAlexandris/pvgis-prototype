@@ -10,7 +10,6 @@ from pvgisprototype.cli.typer_parameters import typer_argument_area
 from pvgisprototype.cli.typer_parameters import typer_argument_conversion_efficiency
 
 
-
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=True,

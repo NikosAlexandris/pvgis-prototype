@@ -7,7 +7,7 @@ from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.csv import write_irradiance_csv
+from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
@@ -57,7 +57,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.validation.parameters import BaseTimestampSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 
