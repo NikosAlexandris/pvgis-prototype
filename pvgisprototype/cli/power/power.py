@@ -15,7 +15,9 @@ from pvgisprototype.api.geometry.models import SolarIncidenceModels
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.irradiance.effective import calculate_effective_irradiance_time_series
+from pvgisprototype.api.irradiance.effective import calculate_photovoltaic_power_output_series
+from pvgisprototype.algorithms.pvis.power import calculate_spectral_photovoltaic_power_output
+from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
@@ -102,18 +104,16 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    # help=f":sun_with_face: Estimate the effective irradiance incident on a surface over a time series ",
-    help=f":electric_plug: Estimate the energy production of a PV system [bold green]Prototype[/bold green]",
+    help=f":electric_plug: Estimate the photovoltaic power or aggregated energy production of a PV system over a time series based on solar irradiance and ambient temperature [bold green]Prototype[/bold green]",
 )
-
 
 @app.command(
-    'energy',
+    'broadband',
     no_args_is_help=True,
-    help=f"Estimate the energy production of a PV system over a time series based on the effective irradiance incident on a solar surface",
+    help=f"Estimate the photovoltaic power or aggregated energy production of a PV system over a time series based on broadband solar irradiance incident on a solar surface and ambient temperature",
     rich_help_panel=rich_help_panel_series_irradiance,
 )
-def calculate_effective_irradiance(
+def photovoltaic_power_output_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -162,8 +162,12 @@ def calculate_effective_irradiance(
     index: Annotated[bool, typer_option_index] = False,
 ):
     """
+    Estimate the photovoltaic power over a time series or an arbitrarily
+    aggregated energy production of a PV system connected to the electricity
+    grid (without battery storage) based on broadband solar irradiance, ambient
+    temperature and wind speed.
     """
-    effective_irradiance_series, results, title = calculate_effective_irradiance_time_series(
+    photovoltaic_power_output_series, results, title = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -222,10 +226,10 @@ def calculate_effective_irradiance(
         )
         if statistics:
             print_series_statistics(
-                data_array=effective_irradiance_series,
+                data_array=photovoltaic_power_output_series,
                 timestamps=timestamps,
                 groupby=groupby,
-                title="Effective irradiance",
+                title="Photovoltaic power output",
             )
         if csv:
             write_irradiance_csv(
@@ -236,6 +240,155 @@ def calculate_effective_irradiance(
                 filename=csv,
             )
     else:
-        flat_list = effective_irradiance_series.flatten().astype(str)
+        flat_list = photovoltaic_power_output_series.flatten().astype(str)
         csv_str = ','.join(flat_list)
+        print(csv_str)
+
+
+@app.command(
+    'spectral',
+    no_args_is_help=True,
+    help=f"Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]spectrally resolved irradiance[/bold] incident on a solar surface, ambient temperature, wind speed",
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
+def spectral_photovoltaic_power_output_series(
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_time_series: bool = False,
+    spectrally_resolved_global_horizontal_irradiance_series: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
+    spectrally_resolved_direct_horizontal_irradiance_series: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    number_of_junctions: int = 1,
+    spectral_response_data: Path = None,
+    standard_conditions_response: Optional[Path] = None,  #: float = 1,  # STCresponse : read from external data
+    # extraterrestrial_normal_irradiance_series,  # spectral_ext,
+    minimum_spectral_mismatch = MINIMUM_SPECTRAL_MISMATCH,
+    temperature_series: Annotated[TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
+    wind_speed_series: Annotated[WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: Annotated[Optional[float], typer_option_albedo] = 2,
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_position_model: Annotated[SolarPositionModels, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: Annotated[SolarIncidenceModels, typer_option_solar_incidence_model] = SolarIncidenceModels.jenco,
+    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
+    system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
+    power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
+    temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    groupby: Annotated[Optional[str], typer_option_groupby] = None,
+    csv: Annotated[Path, typer_option_csv] = None,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
+):
+    """
+    This method accounts for the effects of the solar spectrum's varying
+    wavelengths on PV output, offering a more detailed analysis for systems
+    sensitive to specific spectral ranges.
+    """
+    (
+        spectrally_resolved_photovoltaic_power,
+        results,
+        title,
+    ) = calculate_spectral_photovoltaic_power_output(
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        timestamps=timestamps,
+        start_time=start_time,
+        frequency=frequency,
+        end_time=end_time,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        spectrally_resolved_global_horizontal_irradiance_series=spectrally_resolved_global_horizontal_irradiance_series,
+        spectrally_resolved_direct_horizontal_irradiance_series=spectrally_resolved_direct_horizontal_irradiance_series,
+        spectral_response_data=spectral_response_data,
+        number_of_junctions=number_of_junctions,
+        standard_conditions_response=standard_conditions_response,
+        minimum_spectral_mismatch=minimum_spectral_mismatch,
+        temperature_series=temperature_series,
+        wind_speed_series=wind_speed_series,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        albedo=albedo,
+        apply_angular_loss_factor=apply_angular_loss_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        system_efficiency=system_efficiency,
+        power_model=power_model,
+        temperature_model=temperature_model,
+        efficiency=efficiency,
+        verbose=verbose,
+    )
+    # longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    if verbose > 0:
+        pass
+    #     print_irradiance_table_2(
+    #         longitude=longitude,
+    #         latitude=latitude,
+    #         timestamps=timestamps,
+    #         dictionary=results,
+    #         title=title + f' irradiance series {IRRADIANCE_UNITS}',
+    #         rounding_places=rounding_places,
+    #         index=index,
+    #         verbose=verbose,
+    #     )
+    #     if statistics:
+    #         print_series_statistics(
+    #             data_array=spectrally_resolved_photovoltaic_power,
+    #             timestamps=timestamps,
+    #             groupby=groupby,
+    #             title="Spectrally resolved photovoltaic power",
+    #         )
+    #     if csv:
+    #         write_irradiance_csv(
+    #             longitude=longitude,
+    #             latitude=latitude,
+    #             timestamps=timestamps,
+    #             dictionary=results,
+    #             filename=csv,
+    #         )
+    else:
+        flat_list = spectrally_resolved_photovoltaic_power.flatten().astype(str)
+        csv_str = ",".join(flat_list)
         print(csv_str)
