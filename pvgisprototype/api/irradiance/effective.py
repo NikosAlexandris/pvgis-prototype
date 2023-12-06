@@ -127,7 +127,10 @@ def calculate_photovoltaic_power_output_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """
-    Estimate the energy production of a PV system over a time series based on the effective irradiance incident on a solar surface.
+    Estimate the photovoltaic power over a time series or an arbitrarily
+    aggregated energy production of a PV system based on the effective solar
+    irradiance incident on a solar surface, the ambient temperature and
+    optionally wind speed.
 
     Parameters
     ----------
@@ -173,13 +176,12 @@ def calculate_photovoltaic_power_output_series(
 
     Examples
     --------
-    >>> calculate_effective_irradiance(10.0, 20.0, 100.0, start_time="2023-01-01", end_time="2023-01-31")
+    >>> calculate_photovoltaic_power_output_series(10.0, 20.0, 100.0, start_time="2023-01-01", end_time="2023-01-31")
     # This will return the effective irradiance series, results, and title for the specified parameters.
 
     Notes
     -----
     This function is part of the Typer-based CLI for the new PVGIS implementation in Python. It provides an interface for estimating the energy production of a photovoltaic system, taking into account various environmental and system parameters.
-
     """
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
