@@ -205,7 +205,8 @@ def calculate_photovoltaic_power_output_series(
     mask_below_horizon = solar_altitude_series.value < 0
     in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
-    mask_above_horizon_not_in_shade = np.logical_and.reduce(mask_above_horizon, mask_not_in_shade)
+    # mask_above_horizon_not_in_shade = np.logical_and.reduce(mask_above_horizon, mask_not_in_shade)
+    mask_above_horizon_not_in_shade = np.logical_and(mask_above_horizon, mask_not_in_shade)
 
     # Initialize arrays with zeros
     direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype="float64")
