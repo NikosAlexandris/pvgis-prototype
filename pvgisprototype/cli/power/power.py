@@ -4,6 +4,8 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance_toolbox
 from pvgisprototype.cli.power.broadband import app as broadband
 from pvgisprototype.cli.power.spectral import app as spectral
+from pvgisprototype.cli.power.spectral_mismatch import app as spectral_factor
+from pvgisprototype.cli.power.spectral_mismatch import app as spectral_mismatch
 from pvgisprototype.cli.power.average_photon_energy import app as average_photon_energy
 from pvgisprototype.cli.documentation import A_PRIMER_ON_PHOTOVOLTAIC_PERFORMANCE
 
@@ -57,6 +59,18 @@ def intro():
 app.add_typer(
     average_photon_energy,
     name="ape",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_performance_toolbox,
+)
+app.add_typer(
+    spectral_factor,
+    name="spectral-factor",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_performance_toolbox,
+)
+app.add_typer(
+    spectral_mismatch,
+    name="spectral-mismatch",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance_toolbox,
 )
