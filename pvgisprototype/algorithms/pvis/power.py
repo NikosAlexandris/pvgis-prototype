@@ -95,7 +95,7 @@ def integrate_spectrum_response(
     return photovoltaic_power
 
 
-def determine_minimum_spectral_mismatch(
+def calculate_minimum_spectral_mismatch(
     response_wavelengths,
     spectral_response,
     number_of_junctions: int,
@@ -133,7 +133,7 @@ def determine_minimum_spectral_mismatch(
     return minimum_spectral_mismatch, minimum_junction
 
 
-def determine_spectral_factor(
+def calculate_spectral_factor(
     minimum_spectral_mismatch,
     global_total_power,
     standard_conditions_response,
@@ -436,13 +436,13 @@ def calculate_spectral_photovoltaic_power_output(
         (
             minimum_spectral_mismatch,
             minimum_junction,
-        ) = determine_minimum_spectral_mismatch(
+        ) = calculate_minimum_spectral_mismatch(
             response_wavelengths=wavelengths,
             spectral_response=spectral_response,
             number_of_junctions=number_of_junctions,
             spectral_power_density=spectral_power_density_up_to_1050,
         )
-        spectral_factor = determine_spectral_factor(
+        spectral_factor = calculate_spectral_factor(
                 minimum_spectral_mismatch=minimum_spectral_mismatch,
                 global_total_power=spectrally_resolved_global_irradiance_series,
                 standard_conditions_response=standard_conditions_response,
