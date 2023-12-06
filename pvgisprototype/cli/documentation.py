@@ -55,3 +55,14 @@ A_PRIMER_ON_SOLAR_IRRADIANCE = """
     wavelength range of the measuring instrument. Solar irradiance is measured
     in watts per square metre (W/m2) in SI units. (source: Wikipedia)
 """
+
+A_PRIMER_ON_PHOTOVOLTAIC_PERFORMANCE = """
+A key metric for evaluating the overall performance of a photovoltaic (PV)
+system is the cumulative [yellow]Energy[/yellow] produced over a time period
+(e.g., daily, monthly, or annual). In other words, energy production is an
+arbitrary aggregate of the instantaneous power estimations over a time series.
+
+In turn, the instantaneous (effective irradiance, and thereby) power values
+reflect the [italic]current[/italic] output of the photovoltaic (PV) system
+at each moment in time.
+"""
