@@ -61,7 +61,7 @@ from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_tim
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import EFFECTIVE_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import PHOTOVOLTAIC_POWER_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
@@ -82,7 +82,7 @@ from pvgisprototype.constants import SHADE_COLUMN_NAME
 from pvgisprototype import LinkeTurbidityFactor
 
 
-def calculate_effective_irradiance_time_series(
+def calculate_photovoltaic_power_output_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -164,7 +164,7 @@ def calculate_effective_irradiance_time_series(
 
     Returns
     -------
-    effective_irradiance_series : ndarray
+    photovoltaic_power_outout_series : ndarray
         Array of effective irradiance values.
     results : dict
         Dictionary containing detailed results of the calculation.
@@ -356,12 +356,12 @@ def calculate_effective_irradiance_time_series(
             )
             efficiency_coefficient_series *= system_efficiency  # on-top-of !
 
-    effective_irradiance_series = global_irradiance_series * efficiency_coefficient_series
+    photovoltaic_power_outout_series = global_irradiance_series * efficiency_coefficient_series
 
     # Reporting --------------------------------------------------------------
 
     results = {
-        EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
+        PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_outout_series,
     }
     title = "Effective"
 
@@ -405,7 +405,7 @@ def calculate_effective_irradiance_time_series(
 
     if verbose == 6:
         results = {
-            EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
+            EFFECTIVE_IRRADIANCE_COLUMN_NAME: photovoltaic_power_outout_series,
         }
         title = "Effective"
         longitude = latitude = None
@@ -413,4 +413,4 @@ def calculate_effective_irradiance_time_series(
     if verbose > 6:
         debug(locals())
 
-    return effective_irradiance_series, results, title
+    return photovoltaic_power_outout_series, results, title
