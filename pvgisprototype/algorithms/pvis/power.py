@@ -1,10 +1,8 @@
 from pathlib import Path
 from typing import Optional
-from numpy.typing import NDArray
 from datetime import datetime
 
 import numpy as np
-from pvgisprototype.algorithms.pvis.constants import STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
 from pvgisprototype.algorithms.pvis.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE  # why not calculate it?
 from pvgisprototype.algorithms.pvis.constants import BAND_LIMITS
@@ -41,112 +39,10 @@ from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.algorithms.pvis.spectral_factor import calculate_spectral_factor
 
 
-def integrate_spectrum_response(
-    spectral_response_frequencies: NDArray[np.float64] = None,
-    spectral_response: NDArray[np.float64] = None,
-    kato_limits: NDArray[np.float64] = None,
-    spectral_power_density: NDArray[np.float64] = None,
-) -> float:
-    """ """
-    m = 0
-    n = 0
-    # nu_high = float()
-    # response_low = float()
-    # response_high = float()
-    photovoltaic_power = 0
-    response_low = spectral_response[0]
-    # nu_low = float()
-    nu_low = spectral_response_frequencies[0]
-
-    number_of_response_values = len(spectral_response_frequencies)
-    number_of_kato_limits = len(kato_limits)
-
-    while n < number_of_response_values - 1:
-        if spectral_response_frequencies[n + 1] < kato_limits[m + 1]:
-            nu_high = spectral_response_frequencies[n + 1]
-            response_high = spectral_response[n + 1]
-
-        else:
-            nu_high = kato_limits[m + 1]
-            response_high = spectral_response[n] + (
-                nu_high - spectral_response_frequencies[n]
-            ) / (
-                spectral_response_frequencies[n + 1] - spectral_response_frequencies[n]
-            ) * (
-                spectral_response[n + 1] - spectral_response[n]
-            )
-        photovoltaic_power += (
-            spectrum_power[m]
-            * 0.5
-            * (response_high + response_low)
-            * (nu_high - nu_low)
-        )
-
-        if spectral_response_frequencies[n + 1] < kato_limits[m + 1]:
-            n += 1
-        else:
-            m += 1
-
-        nu_low = nu_high
-        response_low = response_high
-
-    return photovoltaic_power
-
-
-def calculate_minimum_spectral_mismatch(
-    response_wavelengths,
-    spectral_response,
-    number_of_junctions: int,
-    spectral_power_density,
-):
-    """
-    Returns
-    -------
-    minimum_spectral_mismatch: float
-
-    minimum_junction:
-
-        By Kirchoff’s Law the overall current produced by the device is only
-        equal to the smallest current produced by an individual junction. This
-        means that the least productive layer in a multi-junction device limits
-        the performance of a multijunction cell [1]_
-
-    References
-    ----------
-    .. [1] Jardine, C.N. & Gottschalg, Ralph & Betts, Thomas & Infield, David.
-      (2002). Influence of Spectral Effects on the Performance of Multijunction
-      Amorphous Silicon Cells. to be published.
-    """
-    for junction in range(number_of_junctions):
-        spectral_mismatch = integrate_spectrum_response(
-                spectral_response_frequencies=response_wavelengths,
-                spectral_response=spectral_response,
-                kato_limits=junction,
-                spectral_power_density=spectral_power_density,
-        )
-        if spectral_mismatch < minimum_spectral_mismatch:
-            minimum_spectral_mismatch = spectral_mismatch
-            minimum_junction = junction
-
-    return minimum_spectral_mismatch, minimum_junction
-
-
-def calculate_spectral_factor(
-    minimum_spectral_mismatch,
-    global_total_power,
-    standard_conditions_response,
-):
-    spectral_factor = (
-        minimum_spectral_mismatch * STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE /
-        (global_total_power * standard_conditions_response)
-    )
-
-    return spectral_factor
-
-
-def calculate_spectral_photovoltaic_power_output(
+def calculate_spectrally_resolved_global_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -158,13 +54,6 @@ def calculate_spectral_photovoltaic_power_output(
     random_time_series: bool = False,
     spectrally_resolved_global_horizontal_irradiance_series: Optional[Path] = None, #global_spectral_radiation,  # g_rad_spec
     spectrally_resolved_direct_horizontal_irradiance_series: Optional[Path] = None, # direct_spectral_radiation,  # d_rad_spec,
-    number_of_junctions: int = 1,
-    spectral_response_data: Path = None,
-    standard_conditions_response: Optional[Path] = None,  #: float = 1,  # STCresponse : read from external data
-    # extraterrestrial_normal_irradiance_series,  # spectral_ext,
-    minimum_spectral_mismatch = MINIMUM_SPECTRAL_MISMATCH,
-    temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),  # pres_temperature ?
-    wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
@@ -189,10 +78,6 @@ def calculate_spectral_photovoltaic_power_output(
     time_output_units: str = MINUTES,
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
-    system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: PVModuleEfficiencyAlgorithm = None,
-    temperature_model: ModuleTemperatureAlgorithm = None,
-    efficiency: Optional[float] = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """
@@ -413,55 +298,144 @@ def calculate_spectral_photovoltaic_power_output(
             + spectrally_resolved_reflected_irradiance_series
         )
 
-        # In PVGIS' source code :
-        # if spectral_band_number < 19:
-            # number_of_photons += (
-            #     global_spectral_power[spectral_band_number]
-            #     / photon_energies[spectral_band_number]
-            # )
-            # global_power_1050 += global_spectral_power[spectral_band_number]
+    return spectrally_resolved_global_irradiance_series
 
-        index_1050 = np.max(np.where(BAND_LIMITS < 1050)[0])
-        photon_energies_up_to_1050 = PHOTON_ENERGIES[index_1050]
-        number_of_photons_up_to_1050 = spectrally_resolved_global_irradiance_series[:, index_1050] / photon_energies_up_to_1050
-        global_irradiance_series_up_to_1050 = spectrally_resolved_global_irradiance_series[:, index_1050].sum()
 
-        bandwidths = np.diff(BAND_LIMITS)
-        spectral_power_density_up_to_1050 = global_irradiance_series_up_to_1050 / bandwidths
+def calculate_spectral_photovoltaic_power_output(
+    longitude: float,
+    latitude: float,
+    elevation: float,
+    timestamps: Optional[datetime] = None,
+    start_time: Optional[datetime] = None,
+    frequency: Optional[str] = None,
+    end_time: Optional[datetime] = None,
+    timezone: Optional[str] = None,
+    random_time_series: bool = False,
+    spectrally_resolved_global_horizontal_irradiance_series: Optional[Path] = None, #global_spectral_radiation,  # g_rad_spec
+    spectrally_resolved_direct_horizontal_irradiance_series: Optional[Path] = None, # direct_spectral_radiation,  # d_rad_spec,
+    number_of_junctions: int = 1,
+    spectral_response_data: Path = None,
+    standard_conditions_response: Optional[Path] = None,  #: float = 1,  # STCresponse : read from external data
+    # extraterrestrial_normal_irradiance_series,  # spectral_ext,
+    temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),  # pres_temperature ?
+    wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
+    mask_and_scale: bool = False,
+    neighbor_lookup: MethodsForInexactMatches = None,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    in_memory: bool = False,
+    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  
+    apply_atmospheric_refraction: Optional[bool] = True,
+    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: Optional[float] = 2,
+    apply_angular_loss_factor: Optional[bool] = True,
+    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
+    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    solar_constant: float = SOLAR_CONSTANT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    # module_temperature,
+    # horizonpointer,
+    time_output_units: str = MINUTES,
+    angle_units: str = RADIANS,
+    angle_output_units: str = RADIANS,
+    system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
+    power_model: PVModuleEfficiencyAlgorithm = None,
+    temperature_model: ModuleTemperatureAlgorithm = None,
+    efficiency: Optional[float] = None,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
+    """
+    Calculate the photovoltaic power output over a location (latitude), surface
+    and atmospheric conditions, and an arbitrary period of time based on
+    spectrally resolved direct (beam), diffuse, reflected solar irradiation and
+    ambient temperature to account for the varying effects of the solar
+    spectrum. Considering shadowing effects of the local topography are
+    optionally incorporated. The solar geometry relevant parameters
+    (e.g.sunrise and sunset, declination, extraterrestrial irradiance, daylight
+    length) can be optionally saved in a file.
+    """
+    spectrally_resolved_global_irradiance_series = calculate_spectrally_resolved_global_irradiance_series(
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        timestamps=timestamps,
+        start_time=start_time,
+        frequency=frequency,
+        end_time=end_time,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        spectrally_resolved_global_horizontal_irradiance_series=spectrally_resolved_global_horizontal_irradiance_series,
+        spectrally_resolved_direct_horizontal_irradiance_series=spectrally_resolved_direct_horizontal_irradiance_series,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        albedo=albedo,
+        apply_angular_loss_factor=apply_angular_loss_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        system_efficiency=system_efficiency,
+        power_model=power_model,
+        temperature_model=temperature_model,
+        efficiency=efficiency,
+        verbose=verbose,
+    )
 
-        spectral_response_data = read_spectral_response(spectral_response_data)
-        wavelengths = spectral_response_data[0]  # response_wavelengths,
-        spectral_response = spectral_response_data[1]
-        standard_conditions_response = spectral_response_data[2]  # STCresponse
-        (
-            minimum_spectral_mismatch,
-            minimum_junction,
-        ) = calculate_minimum_spectral_mismatch(
-            response_wavelengths=wavelengths,
-            spectral_response=spectral_response,
+    # In PVGIS' source code :
+    # if spectral_band_number < 19:
+        # global_power_1050 += global_spectral_power[spectral_band_number]
+
+    index_1050 = np.max(np.where(BAND_LIMITS < 1050)[0])
+    global_irradiance_series_up_to_1050 = spectrally_resolved_global_irradiance_series[:, index_1050].sum()
+    bandwidths = np.diff(BAND_LIMITS)
+    spectral_power_density_up_to_1050 = global_irradiance_series_up_to_1050 / bandwidths
+
+    spectral_response_data = read_spectral_response(spectral_response_data)
+    spectral_response_wavelengths = spectral_response_data[0]  # response_wavelengths,
+    spectral_response = spectral_response_data[1]
+    standard_conditions_response = spectral_response_data[2]  # STCresponse
+
+    spectral_factor = calculate_spectral_factor(
+            global_total_power=spectrally_resolved_global_irradiance_series,
+            spectral_power_density=spectral_power_density_up_to_1050,  # !
             number_of_junctions=number_of_junctions,
-            spectral_power_density=spectral_power_density_up_to_1050,
+            response_wavelengths=spectral_response_wavelengths,
+            spectral_response=spectral_response,
+            standard_conditions_response=standard_conditions_response,
+    )
+    spectrally_resolved_photovoltaic_power = spectrally_resolved_global_irradiance_series * spectral_factor
+
+    if efficiency:  # user-set
+        efficiency_coefficient_series = calculate_pv_efficiency_time_series(
+            irradiance_series=spectrally_resolved_global_irradiance_series,  # global_total_power,
+            spectrally_factor=spectral_factor,  # internally will do *= global_total_power
+            temperature_series=temperature_series,  # pres_temperature,
+            model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
+            standard_test_temperature=TEMPERATURE_DEFAULT,
+            wind_speed_series=wind_speed_series,
+            power_model=power_model,
+            temperature_model=temperature_model,
+            verbose=0,  # no verbosity here by choice!
         )
-        spectral_factor = calculate_spectral_factor(
-                minimum_spectral_mismatch=minimum_spectral_mismatch,
-                global_total_power=spectrally_resolved_global_irradiance_series,
-                standard_conditions_response=standard_conditions_response,
-        )
+        spectrally_resolved_photovoltaic_power *= efficiency_coefficient_series
 
-        spectrally_resolved_photovoltaic_power = spectrally_resolved_global_irradiance_series * spectral_factor
-
-        if efficiency:  # user-set
-            efficiency_coefficient_series = calculate_pv_efficiency_time_series(
-                irradiance_series=spectrally_resolved_global_irradiance_series,  # global_total_power,
-                spectrally_factor=spectral_factor,  # internally will do *= global_total_power
-                temperature_series=temperature_series,  # pres_temperature,
-                model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
-                standard_test_temperature=TEMPERATURE_DEFAULT,
-                wind_speed_series=wind_speed_series,
-                power_model=power_model,
-                temperature_model=temperature_model,
-                verbose=0,  # no verbosity here by choice!
-            )
-            spectrally_resolved_photovoltaic_power *= efficiency_coefficient_series
-
-    return spectrally_resolved_photovoltaic_power, minimum_junction
+    return spectrally_resolved_photovoltaic_power
