@@ -18,7 +18,6 @@ from pvgisprototype.api.irradiance.direct import calculate_extraterrestrial_norm
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
 from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
@@ -26,6 +25,7 @@ from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -342,9 +342,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
-    refracted_solar_zenith: Optional[
-        float
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
     solar_time_model: SolarTimeModels = SolarTimeModels.noaa,
@@ -594,7 +592,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
     # one more thing
     if apply_angular_loss_factor:
-
         diffuse_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
             pi - surface_tilt - sin(surface_tilt)
         ) / (1 + cos(surface_tilt))
@@ -629,6 +626,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         extended_results = {
             LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
         }
         results = results | extended_results
 
@@ -644,10 +642,9 @@ def calculate_diffuse_inclined_irradiance_time_series(
         even_more_extended_results = {
             TERM_N_COLUMN_NAME: n_series,
             KB_RATIO_COLUMN_NAME: kb_series,
-            SURFACE_TILT_COLUMN_NAME: surface_tilt,
-            AZIMUTH_DIFFERENCE_COLUMN_NAME: azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',
-            AZIMUTH_COLUMN_NAME: solar_azimuth_series_array if solar_azimuth_series_array is not None else '-',
-            ALTITUDE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_altitude_series, angle_output_units),
+            AZIMUTH_DIFFERENCE_COLUMN_NAME: azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',# FIXME Convert to degrees if requested!
+            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units) if solar_azimuth_series is not None else '-',
+            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,
         }
         results = results | even_more_extended_results
 
@@ -656,8 +653,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_horizontal_irradiance_series,
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
-            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series,
-            INCIDENCE_COLUMN_NAME: convert_series_to_degrees_arrays_if_requested(solar_incidence_series, angle_output_units),
+            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+            INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units) if solar_incidence_series else None,
             OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range_indices,
         }
         results = results | plus_even_more_extended_results
