@@ -127,9 +127,6 @@ from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
-from pvgisprototype.api.utilities.conversions import convert_series_to_radians_if_requested
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAltitude
 from pvgisprototype import RefractedSolarAltitude
