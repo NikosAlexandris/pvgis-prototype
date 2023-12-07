@@ -106,16 +106,22 @@ def print_solar_position_table(
 
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
+    get_value_or_default = (
+        lambda dictionary, key, default="-", not_available=NOT_AVAILABLE: default
+        if dictionary.get(key, not_available) is None
+        else dictionary.get(key, not_available)
+    )
+
     for model_result in rounded_table:
-        declination_value = model_result.get(DECLINATION_NAME, NOT_AVAILABLE) if declination else None
-        hour_angle_value = model_result.get(HOUR_ANGLE_NAME, NOT_AVAILABLE) if hour_angle else None
-        timing_algorithm = model_result.get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)                # FIXME
-        position_algorithm = model_result.get(POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
-        zenith_value = model_result.get(ZENITH_NAME, NOT_AVAILABLE) if zenith else None
-        altitude_value = model_result.get(ALTITUDE_NAME, NOT_AVAILABLE) if altitude else None
-        azimuth_value = model_result.get(AZIMUTH_NAME, NOT_AVAILABLE) if azimuth else None
-        incidence_value = model_result.get(INCIDENCE_NAME, NOT_AVAILABLE) if incidence else None
-        units = model_result.get(UNITS_NAME, UNITLESS)
+        declination_value = get_value_or_default(model_result, DECLINATION_NAME)
+        hour_angle_value = get_value_or_default(model_result, HOUR_ANGLE_NAME)
+        timing_algorithm = get_value_or_default(model_result, TIME_ALGORITHM_NAME)
+        position_algorithm = get_value_or_default(model_result, POSITION_ALGORITHM_NAME)
+        zenith_value = get_value_or_default(model_result, ZENITH_NAME)
+        altitude_value = get_value_or_default(model_result, ALTITUDE_NAME)
+        azimuth_value = get_value_or_default(model_result, AZIMUTH_NAME)
+        incidence_value = get_value_or_default(model_result, INCIDENCE_NAME)
+        units = get_value_or_default(model_result, UNITS_NAME, not_available=UNITLESS)
 
         row = []
         if longitude:
