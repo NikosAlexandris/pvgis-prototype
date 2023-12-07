@@ -302,12 +302,32 @@ typer_option_solar_incidence_model = typer.Option(
 
 # Solar surface
 
+def surface_tilt_callback(
+    ctx: typer.Context,
+    # param: typer.CallbackParam,
+    surface_tilt: float,
+) -> float:
+    """Set the default surface tilt equal to the latitude"""
+    if ctx.resilient_parsing:
+        return
+    # if type(latitude) != float:
+    #     raise typer.BadParameter("Input should be a float!")
+    if not surface_tilt:
+        surface_tilt = ctx.params.get('latitude')
+        from rich import print
+        print(f'[yellow]* Surface tilt set to match the input latitude[/yellow]!')
+    else:
+        surface_tilt = np.radians(surface_tilt)
+
+    return surface_tilt
+
+
 surface_tilt_typer_help='Solar surface tilt angle from the horizontal plane'  # in PVGIS : slope
 typer_argument_surface_tilt = typer.Argument(
     help=surface_tilt_typer_help,
     min=SURFACE_TILT_MINIMUM,
     max=SURFACE_TILT_MAXIMUM,
-    callback=convert_to_radians,
+    callback=surface_tilt_callback,
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = SURFACE_TILT_DEFAULT,
 )
@@ -315,7 +335,7 @@ typer_option_surface_tilt = typer.Option(
     help=surface_tilt_typer_help,
     min=SURFACE_TILT_MINIMUM,
     max=SURFACE_TILT_MAXIMUM,
-    callback=convert_to_radians,
+    callback=surface_tilt_callback,
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = SURFACE_TILT_DEFAULT,
 )
