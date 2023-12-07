@@ -27,7 +27,7 @@ from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.web_api.dependencies import process_series_timestamp
-from pvgisprototype.api.irradiance.effective import calculate_effective_irradiance_time_series
+from pvgisprototype.api.irradiance.effective import calculate_photovoltaic_power_output_series
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
@@ -38,7 +38,7 @@ TRYITOUT_LATITUDE = 45.
 TRYITOUT_TIMESTAMP = '2020-02-02 20:00:02'
 
 
-async def get_calculate_effective_irradiance_time_series(
+async def get_photovoltaic_power_output_series(
     longitude: float = Depends(process_longitude),
     latitude: float = Depends(process_latitude),
     elevation: float = Query(...),
@@ -77,11 +77,9 @@ async def get_calculate_effective_irradiance_time_series(
     rounding_places: Optional[int] = Query(5),
     verbose: int = Query(VERBOSE_LEVEL_DEFAULT),
 ):
-
     surface_tilt = np.radians(surface_tilt)
     surface_orientation = np.radians(surface_orientation)
-
-    effective_irradiance_series, results, title = calculate_effective_irradiance_time_series(
+    photovoltaic_power_output_series, results, title = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -120,14 +118,4 @@ async def get_calculate_effective_irradiance_time_series(
         verbose=verbose,
     )
 
-    return effective_irradiance_series.tolist()
-
-    # effective_irradiance_series = effective_irradiance_series.tolist()
-    # effective_irradiance_series = [round(value, rounding_places) for value in effective_irradiance_series]
-
-    # return  {
-    #     "effective_irradiance_table":{
-    #         "effective_irradiance":effective_irradiance_series,
-    #         "datetime":timestamps
-    #     }
-    # }
+    return photovoltaic_power_output_series.tolist()
