@@ -5,7 +5,7 @@ from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.geometry.models import SolarPositionModels
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
-from pvgisprototype.api.utilities.conversions import convert_to_radians
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from datetime import datetime
 from pathlib import Path
 from math import sin
@@ -16,7 +16,9 @@ from pvgisprototype.api.irradiance.direct import calculate_extraterrestrial_norm
 from pvgisprototype.api.irradiance.diffuse import diffuse_transmission_function_time_series
 from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_function_time_series
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
@@ -28,6 +30,8 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import MINUTES
@@ -162,43 +166,52 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         ground_reflected_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
             surface_tilt - sin(surface_tilt)
         ) / (1 - cos(surface_tilt))
-        ground_reflected_irradiance_loss_factor_series = calculate_angular_loss_factor_for_nondirect_irradiance(
+        ground_reflected_irradiance_loss_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
             indirect_angular_loss_coefficient=ground_reflected_irradiance_angular_loss_coefficient,
         )
         ground_reflected_inclined_irradiance_series *= (
-            ground_reflected_irradiance_loss_factor_series
+            ground_reflected_irradiance_loss_factor
         )
 
-    results = {
-        "Title": REFLECTED_INCLINED_IRRADIANCE,
-        REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
-    }
+    if verbose > 0:
+        results = {
+            TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE,
+            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
+        }
 
-    if verbose > 1:
+    if verbose > 1 :
         extended_results = {
-            ALBEDO_COLUMN_NAME: albedo,
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
-            VIEW_FRACTION_COLUMN_NAME: ground_view_fraction,
+            LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor if apply_angular_loss_factor else '-',
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
         }
         results = results | extended_results
 
     if verbose > 2:
         more_extended_results = {
-            LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor_series,
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            ALBEDO_COLUMN_NAME: albedo,
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
+            VIEW_FRACTION_COLUMN_NAME: ground_view_fraction,
         }
         results = results | more_extended_results
-        results["Title"] += " & horizontal components"
 
     if verbose > 3:
         even_more_extended_results = {
+            LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor,
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+        }
+        results = results | even_more_extended_results
+        results["Title"] += " & horizontal components"
+
+    if verbose > 4:
+        plus_even_more_extended_results = {
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
         }
-        results = results | even_more_extended_results
+        results = results | plus_even_more_extended_results
 
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
