@@ -1,7 +1,10 @@
+from pvgisprototype.algorithms.pvis.constants import BAND_LIMITS
+from pvgisprototype.algorithms.pvis.constants import PHOTON_ENERGIES
 from pvgisprototype.algorithms.pvis.constants import ELECTRON_CHARGE
 
 
 def calculate_average_photon_energy(  # series ?
+    spectrally_resolved_global_irradiance_series,
     global_irradiance_series_up_to_1050,
     photon_flux_density,
     electron_charge = ELECTRON_CHARGE,
@@ -50,6 +53,16 @@ def calculate_average_photon_energy(  # series ?
       Amorphous Silicon Cells. to be published.
     """
     # name it series ?
+    # In PVGIS' source code :
+    # if spectral_band_number < 19:
+        # number_of_photons += (
+        #     global_spectral_power[spectral_band_number]
+        #     / photon_energies[spectral_band_number]
+        # )
+    index_1050 = np.max(np.where(BAND_LIMITS < 1050)[0])
+    photon_energies_up_to_1050 = PHOTON_ENERGIES[index_1050]
+    global_irradiance_series_up_to_1050 = spectrally_resolved_global_irradiance_series[:, index_1050].sum()
+    number_of_photons_up_to_1050 = spectrally_resolved_global_irradiance_series[:, index_1050] / photon_energies_up_to_1050
     average_photon_energy = (
         global_irradiance_series_up_to_1050 / photon_flux_density * electron_charge
     )
