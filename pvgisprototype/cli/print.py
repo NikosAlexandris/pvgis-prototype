@@ -120,8 +120,8 @@ def print_solar_position_table(
         zenith_value = get_value_or_default(model_result, ZENITH_NAME)
         altitude_value = get_value_or_default(model_result, ALTITUDE_NAME)
         azimuth_value = get_value_or_default(model_result, AZIMUTH_NAME)
-        incidence_value = get_value_or_default(model_result, INCIDENCE_NAME)
-        units = get_value_or_default(model_result, UNITS_NAME, not_available=UNITLESS)
+        incidence_value = get_value_or_default(model_result, INCIDENCE_NAME) if incidence is not None else None
+        units = model_result.get(UNITS_NAME, UNITLESS)
 
         row = []
         if longitude:
@@ -228,8 +228,8 @@ def print_solar_position_series_table(
 
     table = Table(*columns, box=box.SIMPLE_HEAD)
 
-    def safe_get_value(d, key, index, default='NA'):
-        value = d.get(key, default)
+    def safe_get_value(dictionary, key, index, default='NA'):
+        value = dictionary.get(key, default)
         if isinstance(value, (list, np.ndarray)) and len(value) > index:
             return value[index]
         return value
