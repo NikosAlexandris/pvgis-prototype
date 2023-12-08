@@ -40,7 +40,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":timer_clock:  Calculate the solar time for a location and moment",
+    help=f"⌛ Calculate the solar time for a location and moment",
 )
 console = Console()
 
