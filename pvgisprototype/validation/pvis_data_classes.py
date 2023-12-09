@@ -22,15 +22,15 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 
 
 MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
@@ -222,11 +222,11 @@ class SolarDeclinationModel(BaseModel):
 
 
 class SolarPositionModel(BaseModel):
-    solar_position_model: SolarPositionModels = SolarPositionModels.skyfield
+    solar_position_model: SolarPositionModel = SolarPositionModel.skyfield
 
 
 class SolarIncidenceModel(BaseModel):
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco
 
 
 class EarthOrbitModel(BaseModel):
@@ -235,7 +235,7 @@ class EarthOrbitModel(BaseModel):
 
 
 class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield
 
 
 '''
