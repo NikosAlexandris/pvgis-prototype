@@ -28,7 +28,7 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_plotting
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.constants import LATITUDE_MINIMUM
 from pvgisprototype.constants import LATITUDE_MAXIMUM
 from pvgisprototype.constants import LONGITUDE_MINIMUM
@@ -289,7 +289,7 @@ typer_option_solar_constant = typer.Option(
     # default_factory = SOLAR_CONSTANT,
 )
 
-SOLAR_INCIDENCE_ANGLE_MODEL_DEFAULT=SolarIncidenceModels.jenco
+SOLAR_INCIDENCE_ANGLE_MODEL_DEFAULT=SolarIncidenceModel.jenco
 typer_option_solar_incidence_model = typer.Option(
     '--solar-incidence-model',
     help='Method to calculate the solar incidence angle',
@@ -442,7 +442,7 @@ typer_option_solar_time_model = typer.Option(
     show_choices=True,
     case_sensitive=False,
     rich_help_panel=rich_help_panel_solar_time,
-    # default_factory=[SolarTimeModels.skyfield],
+    # default_factory=[SolarTimeModel.skyfield],
 )
 typer_option_global_time_offset = typer.Option(
     help='Global time offset',

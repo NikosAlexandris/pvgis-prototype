@@ -8,10 +8,6 @@ from math import cos
 from pathlib import Path
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
@@ -44,7 +40,6 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.documentation import A_PRIMER_ON_SOLAR_IRRADIANCE
-from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from rich import print
 import math
 import numpy as np

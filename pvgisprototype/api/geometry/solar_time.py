@@ -7,7 +7,7 @@ from pvgisprototype.validation.functions import ModelSolarTimeInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.api.geometry.models import select_models
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
@@ -27,7 +27,7 @@ def model_solar_time(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = 0,
@@ -45,7 +45,7 @@ def model_solar_time(
     """
     # if local and timestamp is not None and timezone is not None:
     #     timestamp = timezone.localize(timestamp)
-    if solar_time_model.value == SolarTimeModels.milne:
+    if solar_time_model.value == SolarTimeModel.milne:
 
         solar_time = calculate_apparent_solar_time_milne1921(
             longitude=longitude,
@@ -53,7 +53,7 @@ def model_solar_time(
             verbose=verbose,
         )
 
-    if solar_time_model.value == SolarTimeModels.ephem:
+    if solar_time_model.value == SolarTimeModel.ephem:
 
         solar_time = calculate_solar_time_ephem(
             longitude=longitude,
@@ -63,7 +63,7 @@ def model_solar_time(
             verbose=verbose,
         )
 
-    if solar_time_model.value == SolarTimeModels.pvgis:
+    if solar_time_model.value == SolarTimeModel.pvgis:
 
         solar_time = calculate_solar_time_pvgis(
             longitude=longitude,
@@ -76,7 +76,7 @@ def model_solar_time(
             verbose=verbose,
         )
 
-    if solar_time_model.value == SolarTimeModels.noaa:
+    if solar_time_model.value == SolarTimeModel.noaa:
 
         solar_time = calculate_true_solar_time_noaa(
             longitude=longitude,
@@ -85,7 +85,7 @@ def model_solar_time(
             verbose=verbose,
         )
 
-    if solar_time_model.value == SolarTimeModels.skyfield:
+    if solar_time_model.value == SolarTimeModel.skyfield:
 
         # vvv vvv vvv --------------------------------------- expects degrees!
         solar_time = calculate_solar_time_skyfield(
@@ -105,7 +105,7 @@ def calculate_solar_time(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_time_models: List[SolarTimeModels] = [SolarTimeModels.skyfield],
+    solar_time_models: List[SolarTimeModel] = [SolarTimeModel.skyfield],
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = 0,
@@ -122,7 +122,7 @@ def calculate_solar_time(
 
     """
     results = []
-    solar_time_models = select_models(SolarTimeModels, solar_time_models)  # Using a callback fails!
+    solar_time_models = select_models(SolarTimeModel, solar_time_models)  # Using a callback fails!
     for solar_time_model in solar_time_models:
         solar_time = model_solar_time(
             longitude=longitude,

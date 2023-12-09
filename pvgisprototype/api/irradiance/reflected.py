@@ -2,8 +2,8 @@ from devtools import debug
 from typing import Optional
 from typing import List
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from datetime import datetime
@@ -65,8 +65,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     albedo: Optional[float] = MEAN_GROUND_ALBEDO_DEFAULT,
     direct_horizontal_component: Optional[Path] = None,
     apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
-    solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
-    solar_time_model: SolarTimeModels = SolarTimeModels.noaa,
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,

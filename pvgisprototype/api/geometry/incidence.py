@@ -6,8 +6,8 @@ from pvgisprototype import Longitude
 from pvgisprototype import RefractedSolarZenith
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from typing import List
 from pvgisprototype import SolarIncidence
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
@@ -32,8 +32,8 @@ def model_solar_incidence(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -45,7 +45,7 @@ def model_solar_incidence(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
     """ """
-    if solar_incidence_model.value == SolarIncidenceModels.jenco:
+    if solar_incidence_model.value == SolarIncidenceModel.jenco:
 
         solar_incidence = calculate_solar_incidence_jenco(
             longitude=longitude,
@@ -59,7 +59,7 @@ def model_solar_incidence(
             verbose=verbose,
         )
 
-    if solar_incidence_model.value == SolarIncidenceModels.pvis:
+    if solar_incidence_model.value == SolarIncidenceModel.pvis:
 
         solar_incidence = calculate_solar_incidence_pvis(
             longitude=longitude,
@@ -86,12 +86,12 @@ def calculate_solar_incidence(
     timestamp: datetime,
     timezone: ZoneInfo = None,
     random_time: bool = RANDOM_DAY_FLAG_DEFAULT,
-    solar_incidence_models: List[SolarIncidenceModels] = [SolarIncidenceModels.jenco],
+    solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.jenco],
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     horizon_heights: List[float] = None,
     horizon_interval: float = None,
-    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = TIME_OFFSET_GLOBAL_DEFAULT,
@@ -102,7 +102,7 @@ def calculate_solar_incidence(
     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
     results = []
     for solar_incidence_model in solar_incidence_models:
-        if solar_incidence_model != SolarIncidenceModels.all:  # ignore 'all' in the enumeration
+        if solar_incidence_model != SolarIncidenceModel.all:  # ignore 'all' in the enumeration
             solar_incidence = model_solar_incidence(
                 longitude=longitude,
                 latitude=latitude,

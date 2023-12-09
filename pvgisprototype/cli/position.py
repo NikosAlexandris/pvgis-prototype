@@ -60,10 +60,10 @@ from pvgisprototype.api.geometry.hour_angle import calculate_event_hour_angle
 from pvgisprototype.api.geometry.altitude import calculate_solar_altitude
 from pvgisprototype.api.geometry.azimuth import calculate_solar_azimuth
 from pvgisprototype.api.geometry.models import select_models
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarDeclinationModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
 from pvgisprototype.api.geometry.overview_series import calculate_solar_geometry_overview_time_series
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
@@ -165,7 +165,7 @@ def intro():
 @app.command(
     'overview',
     no_args_is_help=True,
-    help='⦩⦬ Calculate important solar position parameters',
+    help='⦩⦬ Calculate solar position parameters',
  )
 # @debug_if_needed(app)
 def overview(
@@ -174,10 +174,10 @@ def overview(
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.pvlib],
+    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.pvlib],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -219,7 +219,7 @@ def overview(
         timezone = utc_zoneinfo
         typer.echo(f'Input timestamp & zone ({user_requested_timestamp} & {user_requested_timezone}) converted to {timestamp} for all internal calculations!')
     
-    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
+    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     solar_position = calculate_solar_geometry_overview(
         longitude=longitude,
         latitude=latitude,
@@ -253,10 +253,14 @@ def overview(
     )
 
 
+DEFAULT_ARRAY_BACKEND = 'NUMPY'  # OR 'CUPY', 'DASK'
+DEFAULT_ARRAY_DTYPE = 'float32'
+
+
 @app.command(
     'overview-series',
     no_args_is_help=True,
-    help='⦩⦬ Calculate time series of solar position parameters',
+    help='⦩⦬📈 Calculate series of solar position parameters',
  )
 # @debug_if_needed(app)
 def overview_series(
@@ -269,10 +273,10 @@ def overview_series(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_time_series: bool = False,
-    model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.pvlib],
+    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -282,6 +286,8 @@ def overview_series(
     group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
+    backend: str = DEFAULT_ARRAY_BACKEND,
+    dtype: str = DEFAULT_ARRAY_DTYPE,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
     ):
@@ -323,7 +329,7 @@ def overview_series(
         # print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
     # Why does the callback function `_parse_model` not work? 
-    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
+    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -340,6 +346,8 @@ def overview_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         angle_output_units=angle_output_units,
+        backend=backend,
+        dtype=dtype,
         verbose=verbose,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
@@ -371,7 +379,7 @@ def declination(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     local_time: Annotated[bool, typer_option_local_time] = False,
     random_time: Annotated[bool, typer_option_random_time] = False,
-    model: Annotated[List[SolarDeclinationModels], typer_option_solar_position_model] = [SolarDeclinationModels.pvis],
+    model: Annotated[List[SolarDeclinationModel], typer_option_solar_position_model] = [SolarDeclinationModel.pvis],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = 0.048869,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = 0.03344,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
@@ -412,7 +420,7 @@ def declination(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    solar_declination_models = select_models(SolarDeclinationModels, model)  # Using a callback fails!
+    solar_declination_models = select_models(SolarDeclinationModel, model)  # Using a callback fails!
     solar_declination = calculate_solar_declination(
         timestamp=timestamp,
         timezone=timezone,
@@ -445,9 +453,9 @@ def zenith(
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
+    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -486,7 +494,7 @@ def zenith(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
+    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     solar_altitude = calculate_solar_altitude(
         longitude=longitude,
         latitude=latitude,
@@ -536,9 +544,9 @@ def altitude(
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
+    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -573,7 +581,7 @@ def altitude(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
+    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     solar_altitude = calculate_solar_altitude(
         longitude=longitude,
         latitude=latitude,
@@ -614,9 +622,9 @@ def azimuth(
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    model: Annotated[List[SolarPositionModels], typer_option_solar_position_model] = [SolarPositionModels.skyfield],
+    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
     hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -656,7 +664,7 @@ def azimuth(
         timestamp = timestamp.astimezone(utc_zoneinfo)
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
-    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
+    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     solar_azimuth = calculate_solar_azimuth(
         longitude=longitude,
         latitude=latitude,
@@ -760,20 +768,24 @@ def sunrise(
     )
 
 
-@app.command('incidence', no_args_is_help=True, help='Calculate the solar incidence angle')
+@app.command(
+    'incidence',
+    no_args_is_help=True,
+    help=f'⭸ Calculate the solar incidence angle',
+)
 def incidence(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    solar_incidence_model: Annotated[List[SolarIncidenceModels], typer_option_solar_incidence_model] = [SolarIncidenceModels.jenco],
+    solar_incidence_model: Annotated[List[SolarIncidenceModel], typer_option_solar_incidence_model] = [SolarIncidenceModel.jenco],
     random_time: Annotated[bool, typer_option_random_time] = RANDOM_DAY_FLAG_DEFAULT,
     hour_angle: Annotated[Optional[float], typer_argument_hour_angle] = None,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
-    solar_time_model: Annotated[SolarTimeModels, typer_option_solar_time_model] = SolarTimeModels.milne,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
@@ -820,7 +832,7 @@ def incidence(
         import random
         surface_tilt = random.vonmisesvariate(math.pi, kappa=0)  # radians
 
-    solar_incidence_models = select_models(SolarIncidenceModels, solar_incidence_model)  # Using a callback fails!
+    solar_incidence_models = select_models(SolarIncidenceModel, solar_incidence_model)  # Using a callback fails!
     solar_incidence = calculate_solar_incidence(
         longitude=longitude,
         latitude=latitude,

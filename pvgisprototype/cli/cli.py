@@ -3,14 +3,12 @@ PV electricity generation potential for different technologies & configurations
 """
 
 from importlib.metadata import version
-import warnings
 from pathlib import Path
 import sys
 import typer
 import typer.completion
 from typer._completion_shared import Shells
 from click import Context
-from typer.core import TyperGroup
 from typing import Annotated
 from typing import Optional
 from rich import print

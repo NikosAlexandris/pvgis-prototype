@@ -20,9 +20,9 @@ from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.api.geometry.models import validate_model
-from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
@@ -438,10 +438,10 @@ def calculate_direct_horizontal_irradiance_time_series(
     frequency: Optional[str] = None,  # reuse callback inside function?
     end_time: Optional[datetime] = None,  # reuse callback inside function?
     timezone: Optional[str] = None,#Annotated[Optional[ZoneInfo], typer_option_timezone] = None,
-    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
-    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -465,7 +465,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
     """
-    solar_time_model = validate_model(SolarTimeModels, solar_time_model)  # can be only one of!
+    solar_time_model = validate_model(SolarTimeModel, solar_time_model)  # can be only one of!
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -589,9 +589,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_angular_loss_factor: Optional[bool] = True,
-    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_incidence_model: SolarIncidenceModels = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
-    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+    solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,

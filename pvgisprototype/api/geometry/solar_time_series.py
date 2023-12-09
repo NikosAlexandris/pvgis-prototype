@@ -7,7 +7,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarTimeTimeSeriesInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from .models import SolarTimeModels
+from .models import SolarTimeModel
 from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_time_series_noaa
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -21,7 +21,7 @@ def model_solar_time_time_series(
     latitude: Latitude,
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo = None,
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
@@ -44,19 +44,19 @@ def model_solar_time_time_series(
     """
     # if local and timestamp is not None and timezone is not None:
     #     timestamp = timezone.localize(timestamp)
-    if solar_time_model.value == SolarTimeModels.milne:
+    if solar_time_model.value == SolarTimeModel.milne:
 
         pass
 
-    if solar_time_model.value == SolarTimeModels.ephem:
+    if solar_time_model.value == SolarTimeModel.ephem:
 
         pass
 
-    if solar_time_model.value == SolarTimeModels.pvgis:
+    if solar_time_model.value == SolarTimeModel.pvgis:
 
         pass
 
-    if solar_time_model.value == SolarTimeModels.noaa:
+    if solar_time_model.value == SolarTimeModel.noaa:
 
         solar_time_series = calculate_true_solar_time_time_series_noaa(
             longitude=longitude,
@@ -71,7 +71,7 @@ def model_solar_time_time_series(
             verbose=verbose,
         )
 
-    if solar_time_model.value == SolarTimeModels.skyfield:
+    if solar_time_model.value == SolarTimeModel.skyfield:
 
         pass
 
