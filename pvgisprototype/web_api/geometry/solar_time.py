@@ -2,7 +2,7 @@ from fastapi import Query
 from typing import Optional
 from typing import List
 from pvgisprototype.api.geometry.solar_time import calculate_solar_time
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
@@ -15,7 +15,7 @@ async def get_calculate_solar_time(
     latitude: float = Query(..., ge=-90, le=90),
     timestamp: Optional[datetime] = None,
     timezone: Optional[str] = None,
-    model: List[SolarTimeModels] = Query([SolarTimeModels.skyfield], description="Model to calculate solar time"),
+    model: List[SolarTimeModel] = Query([SolarTimeModel.skyfield], description="Model to calculate solar time"),
     refracted_solar_zenith: float = Query(1.5853349194640094, description='The solar zenith angle defaults to 1.5853349194640094 radians at sunrise or sunset, adjusted for the approximate correction for atmospheric refraction at those times, and the size of the solar disk.'),
     apply_atmospheric_refraction: bool = False,
     time_output_units: Optional[str] = 'minutes',

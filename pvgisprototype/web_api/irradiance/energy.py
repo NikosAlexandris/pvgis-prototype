@@ -5,11 +5,11 @@ from fastapi import Query
 from fastapi import Depends
 from datetime import datetime
 from pathlib import Path
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
@@ -27,7 +27,7 @@ from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.web_api.dependencies import process_series_timestamp
-from pvgisprototype.api.irradiance.effective import calculate_photovoltaic_power_output_series
+from pvgisprototype.api.irradiance.power import calculate_photovoltaic_power_output_series
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
@@ -63,9 +63,9 @@ async def get_photovoltaic_power_output_series(
     refracted_solar_zenith: float = Query(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
     albedo: Optional[float] = Query(2),
     apply_angular_loss_factor: Optional[bool] = Query(True),
-    solar_position_model: SolarPositionModels = Query(SOLAR_POSITION_ALGORITHM_DEFAULT),
-    solar_incidence_model: SolarIncidenceModels = Query(SolarIncidenceModels.jenco),
-    solar_time_model: SolarTimeModels = Query(SOLAR_TIME_ALGORITHM_DEFAULT),
+    solar_position_model: SolarPositionModel = Query(SOLAR_POSITION_ALGORITHM_DEFAULT),
+    solar_incidence_model: SolarIncidenceModel = Query(SolarIncidenceModel.jenco),
+    solar_time_model: SolarTimeModel = Query(SOLAR_TIME_ALGORITHM_DEFAULT),
     time_offset_global: float = Query(0),
     hour_offset: float = Query(0),
     solar_constant: float = Query(SOLAR_CONSTANT),

@@ -3,6 +3,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from fastapi import Depends, Query
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_timeseries_solar_position
 from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
@@ -15,8 +16,8 @@ from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
 from pvgisprototype.web_api.dependencies import process_single_timestamp
 from pvgisprototype.api.geometry.models import select_models
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -31,9 +32,9 @@ async def overview_series(
     end_time: Optional[str] = Query(None),
     timezone: Optional[str] = Query(None),
     random_time_series: bool = Query(False),
-    model: List[SolarTimeModels] = Query([SolarTimeModels.skyfield], description="Model to calculate solar time"),
+    model: List[SolarTimeModel] = Query([SolarTimeModel.skyfield], description="Model to calculate solar time"),
     apply_atmospheric_refraction: Optional[bool] = Query(True),
-    solar_time_model: SolarTimeModels = Query(SolarTimeModels.milne),
+    solar_time_model: SolarTimeModel = Query(SolarTimeModel.milne),
     time_output_units: str = Query('minutes'),
     perigee_offset: float = Query(PERIGEE_OFFSET),
     eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
@@ -82,7 +83,7 @@ async def overview_series(
         timezone = utc_zoneinfo
         print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
-    solar_position_models = select_models(SolarPositionModels, model)  # Using a callback fails!
+    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
