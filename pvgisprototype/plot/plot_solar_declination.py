@@ -14,7 +14,7 @@ from bokeh.models import LegendItem
 from bokeh.plotting import figure
 from bokeh.plotting import output_file
 from bokeh.plotting import save
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
+from pvgisprototype.api.geometry.models import SolarDeclinationModel
 from pvgisprototype.api.geometry.declination import calculate_solar_declination
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
@@ -33,7 +33,7 @@ def calculate_declinations(
     solar_declinations = np.vectorize(calculate_solar_declination)(
         timestamp=timestamps,
         timezone=ZoneInfo('UTC'),
-        # declination_models=[SolarDeclinationModels.noaa],
+        # declination_models=[SolarDeclinationModel.noaa],
         angle_output_units=output_units, # in degrees
     )
     # restructure for plotting
