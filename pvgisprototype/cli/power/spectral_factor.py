@@ -16,7 +16,7 @@ app = typer.Typer(
 
 
 @app.command(
-    'spectral-factor',
+    'factor',
     no_args_is_help=True,
     help=f"Estimate the spectral factor",
     rich_help_panel=rich_help_panel_performance_toolbox,
@@ -37,7 +37,7 @@ def spectral_factor(
 
 
 @app.command(
-    'spectral-mismatch',
+    'mismatch',
     no_args_is_help=True,
     help=f"Estimate the spectral mismatch",
     rich_help_panel=rich_help_panel_performance_toolbox,
