@@ -104,7 +104,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f"Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]spectrally resolved irradiance[/bold], ambient temperature and wind speed [bold green]Prototype[/bold green]",
+    help=f"Estimate the photovoltaic performance based on [bold]spectrally resolved irradiance[/bold], ambient temperature and wind speed [bold green]Prototype[/bold green]",
 )
 
 
@@ -112,6 +112,7 @@ app = typer.Typer(
     'spectral',
     no_args_is_help=True,
     help=f"Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]spectrally resolved irradiance[/bold] incident on a solar surface, ambient temperature, wind speed",
+    # help=f"Estimate the photovoltaic performance based on [bold]spectrally resolved irradiance[/bold], ambient temperature and wind speed",
     rich_help_panel=rich_help_panel_series_irradiance,
 )
 def spectral_photovoltaic_power_output_series(
