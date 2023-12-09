@@ -20,13 +20,13 @@ def validate_model(enum_type: Type[Enum], model: List[Enum]) -> Enum:
     return model
 
 
-class SolarIncidenceModels(str, Enum):
+class SolarIncidenceModel(str, Enum):
     all = 'all'
     pvis = 'PVIS'
     jenco = 'Jenco'
 
 
-class SolarDeclinationModels(str, Enum):
+class SolarDeclinationModel(str, Enum):
     all = 'all'
     # pvgis = 'PVGIS'
     hargreaves = 'Hargreaves'
@@ -35,7 +35,7 @@ class SolarDeclinationModels(str, Enum):
     pvlib = 'pvlib'
 
 
-class SolarTimeModels(str, Enum):
+class SolarTimeModel(str, Enum):
     all = 'all'
     ephem = 'ephem'
     milne = 'Milne1921'
@@ -44,7 +44,7 @@ class SolarTimeModels(str, Enum):
     skyfield = 'Skyfield'
 
 
-class SolarPositionModels(str, Enum):
+class SolarPositionModel(str, Enum):
     all = 'all'
     noaa = 'NOAA'
     # pvgis = 'PVGIS'
@@ -55,7 +55,7 @@ class SolarPositionModels(str, Enum):
     suncalc = 'suncalc'
 
 
-SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModels.jenco
-SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModels.noaa
-SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModels.milne
-SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModels.noaa
+SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.jenco
+SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
+SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
+SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa

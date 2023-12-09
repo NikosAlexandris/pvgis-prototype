@@ -28,11 +28,11 @@ from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_tim
 from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.algorithms.pvis.read import read_spectral_response
-from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
@@ -65,9 +65,9 @@ def calculate_spectrally_resolved_global_irradiance_series(
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = 2,
     apply_angular_loss_factor: Optional[bool] = True,
-    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
-    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,
@@ -330,9 +330,9 @@ def calculate_spectral_photovoltaic_power_output(
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = 2,
     apply_angular_loss_factor: Optional[bool] = True,
-    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
-    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,

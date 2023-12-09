@@ -9,8 +9,8 @@ from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
@@ -344,8 +344,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_angular_loss_factor: Optional[bool] = True,
-    solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
-    solar_time_model: SolarTimeModels = SolarTimeModels.noaa,
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,
@@ -614,7 +614,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
         )
 
-    # Building the output dictionary=========================================
+    # Building the output dictionary ========================================
 
     if verbose > 0:
         results = {

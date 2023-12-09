@@ -8,8 +8,8 @@ from pvgisprototype.validation.functions import ModelSolarAzimuthInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype import SolarAzimuth
-from .models import SolarPositionModels
-from .models import SolarTimeModels
+from .models import SolarPositionModel
+from .models import SolarTimeModel
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_azimuth_noaa
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
@@ -38,9 +38,9 @@ def model_solar_azimuth(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_position_model: SolarPositionModels = SolarPositionModels.pvlib,
+    solar_position_model: SolarPositionModel = SolarPositionModel.pvlib,
     apply_atmospheric_refraction: bool = True,
-    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarAzimuth:
     """
@@ -65,7 +65,7 @@ def model_solar_azimuth(
 
     - The result is returned with units.
     """
-    if solar_position_model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModel.noaa:
 
         solar_azimuth = calculate_solar_azimuth_noaa(
             longitude=longitude,
@@ -76,7 +76,7 @@ def model_solar_azimuth(
             verbose=verbose,
         )
     
-    if solar_position_model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModel.skyfield:
 
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude=longitude,
@@ -84,7 +84,7 @@ def model_solar_azimuth(
                 timestamp=timestamp,
                 )
 
-    if solar_position_model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModel.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
@@ -101,7 +101,7 @@ def model_solar_azimuth(
             timing_algorithm='suncalc',
         )
 
-    if solar_position_model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModel.pysolar:
 
         timestamp = attach_timezone(timestamp, timezone)
 
@@ -118,7 +118,7 @@ def model_solar_azimuth(
             timing_algorithm='pysolar',
         )
 
-    if solar_position_model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModel.pvis:
 
         solar_azimuth = calculate_solar_azimuth_pvis(
             longitude=longitude,
@@ -128,7 +128,7 @@ def model_solar_azimuth(
             solar_time_model=solar_time_model,
         )
 
-    if solar_position_model.value  == SolarPositionModels.pvlib:
+    if solar_position_model.value  == SolarPositionModel.pvlib:
 
         solar_azimuth = calculate_solar_azimuth_pvlib(
             longitude=longitude,
@@ -137,7 +137,7 @@ def model_solar_azimuth(
             timezone=timezone,
         )
 
-    # if model.value  == SolarPositionModels.pvgis:
+    # if model.value  == SolarPositionModel.pvgis:
         
     #     solar_declination = calculate_solar_declination(timestamp)
     #     local_solar_time, _units = calculate_solar_time_pvgis(
@@ -170,8 +170,8 @@ def calculate_solar_azimuth(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_position_models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
@@ -186,7 +186,7 @@ def calculate_solar_azimuth(
     """
     results = []
     for solar_position_model in solar_position_models:
-        if solar_position_model != SolarPositionModels.all:  # ignore 'all' in the enumeration
+        if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
             solar_azimuth = model_solar_azimuth(
                 longitude=longitude,
                 latitude=latitude,
