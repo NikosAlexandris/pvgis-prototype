@@ -39,13 +39,26 @@ def calculate_fractional_year_noaa(
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_time_series_noaa(
         timestamps: Union[datetime, Sequence[datetime]],
+        backend: str = 'numpy',
+        dtype: str = 'float64',
     ) -> FractionalYear:
     """ """
     timestamps = np.atleast_1d(np.array(timestamps, dtype=datetime))
-    days_in_year_series = np.array([get_days_in_year(ts.year) for ts in timestamps])
-    days_of_year_series = np.array([ts.timetuple().tm_yday for ts in timestamps])
-    hours = np.array([ts.hour for ts in timestamps])
-    fractional_year_series = 2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24)
+    days_in_year_series = np.array(
+        [get_days_in_year(ts.year) for ts in timestamps],
+        dtype=dtype,
+    )
+    days_of_year_series = np.array(
+        [ts.timetuple().tm_yday for ts in timestamps],
+        dtype=dtype,
+    )
+    hours = np.array(
+        [ts.hour for ts in timestamps],
+        dtype=dtype,
+    )
+    fractional_year_series = (
+        2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24)
+    )
     fractional_year_series[fractional_year_series < 0] = 0
     
     if not np.all((0 <= fractional_year_series) & (fractional_year_series < 2 * np.pi)):
