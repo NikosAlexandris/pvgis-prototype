@@ -346,30 +346,60 @@ def get_days_in_year(year):
 
 
 def parse_timestamp_series(
-    # ctx: typer.Context,
     timestamps: Union[str, datetime, List[datetime]],
-    # param: typer.CallbackParam,
 ):
-    # print(f"[yellow]i[/yellow] Context: {ctx}")
-    # print(f"[yellow]i[/yellow] Context: {ctx.params}")
-    # print(f"[yellow]i[/yellow] typer.CallbackParam: {param}")
-    # print(f"[yellow]i[/yellow] Executing parse_timestamp_series()")
-    # print(f"  Input [yellow]timestamps[/yellow] : {timestamps}")
-    # print(f"  Type : {type(timestamps)}")
+    """
+    Parse an input of type string or Python datetime object or list of either
+    strings or Python datetime objects and generate a NumPy datetime64 array
+    [1]_.
 
+    either `str`ings or `datetime.datetime` objects and generate a NumPy
+    datetime64 array [1]_
+
+    Parameters
+    ----------
+    timestamps : `str`, `datetime.datetime`, list()
+            A single `str`ing (i.e. '2111-11-11')
+            or single `datetime.datetime` (i.e. datetime.datetime())
+            or list of either `str`ings (i.e. ['2111-11-11', '2111-11-12'])
+            or `datetime.datetime` objects (i.e. [datetime.datetime(),
+            datetime.datetime()]
+
+    Returns
+    -------
+    timestamps :
+        NumPy datetime64 array
+
+    Notes
+    -----
+
+    .. [1] https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.datetime64
+
+    """
     if isinstance(timestamps, str):
         datetime_strings = timestamps.strip().split(",")
-        return [datetime.fromisoformat(timestamp.strip()) for timestamp in datetime_strings]
+        return np.array(datetime_strings, dtype='datetime64')
 
     elif isinstance(timestamps, datetime):
-        return [timestamps]  # return a single datetime as a list
+        return np.array([timestamps], dtype='datetime64')
 
     elif isinstance(timestamps, list):
-        datetime_strings = [string.strip() for string in timestamps]  # convert strings to naive datetime
-        return [datetime.fromisoformat(timestamp) for timestamp in datetime_strings]
+        # === Note ==========================================================
+        # if all(isinstance(ts, datetime) or isinstance(ts, str) for ts in timestamps):
+        #     return np.array(timestamps, dtype='datetime64')
+        # -------------------------------------------------------------------
+        # Two checks seem to be faster after : 
+        # ❯ kernprof -l -v pvgisprototype/api/utilities/timestamp.py
+        # ========================================================== Note ===
+        if all(isinstance(ts, datetime) for ts in timestamps):
+            return np.array(timestamps, dtype='datetime64')
+        if all(isinstance(ts, str) for ts in timestamps):
+            return np.array(timestamps, dtype='datetime64')
+        else:
+            raise ValueError("All elements of the list must be either datetime objects or strings")
 
     else:
-        raise ValueError("Timestamps input must be a string, datetime, or list of datetimes")
+        raise ValueError("Timestamps input must be a string, datetime, or list of either string or datetime elements")
 
 
 def generate_timestamps_for_a_year(year, frequency_minutes=60):
@@ -380,7 +410,6 @@ def generate_timestamps_for_a_year(year, frequency_minutes=60):
     intervals = total_minutes // frequency_minutes
     
     return [start_date + timedelta(minutes=(idx * frequency_minutes)) for idx in range(intervals)]
-
 
 def generate_datetime_series(
     start_time: Optional[str] = None,
