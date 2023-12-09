@@ -15,7 +15,7 @@ import numpy as np
 # ⦪ ⦫ # from horizontal downwards
 # ⦮ ⦯ # from vertical upwards
 # ⦬ ⦭ # from vertical downwards
-# ⭍
+# ⭍ ⌁
 # ☀ ☼ 🌣 # sun
 # 🗤 # rays spreading
 # ⌇ # wavy line
@@ -63,6 +63,7 @@ SOLAR_CONSTANT = 1360.8  # at mean Earth-Sun distance in W/m^2
 SOLAR_CONSTANT_TOLERANCE = 0.5
 SOLAR_CONSTANT_COLUMN_NAME = 'Solar constant'
 AU = 1  # Earth-Sun distance in Astronomical Units
+AU_UNIT = '㍳'
 STEPHAN_BOLTZMANN_CONSTANT = 5.67e-8  # in W/m^2 K^4
 EXTRATERRESTRIAL_IRRADIANCE_MIN = 1315  # 1315.2963089821737 for days_in_a_year = 365.25
 EXTRATERRESTRIAL_IRRADIANCE_MAX = 1407  # 1406.3049813983132 for days_in_a_year = 365.25
@@ -143,10 +144,11 @@ UNITS_NAME = 'Units'
 UNITLESSS_NAME = 'Unitless'
 
 TITLE_KEY_NAME = 'Title'
-LONGITUDE_COLUMN_NAME = 'Longitude'
-LATITUDE_COLUMN_NAME = 'Latitude'
+LONGITUDE_COLUMN_NAME = 'ϑ Longitude'
+LATITUDE_COLUMN_NAME = 'ϕ Latitude'
 SURFACE_TILT_COLUMN_NAME = '∡ Tilt'
-TIME_ALGORITHM_COLUMN_NAME = ':timer_clock: Timing'  # Algorithm
+# TIME_ALGORITHM_COLUMN_NAME = ':timer_clock: Timing'  # Algorithm
+TIME_ALGORITHM_COLUMN_NAME = '⏲ Timing'  # Algorithm
 DECLINATION_COLUMN_NAME = '∢ Declination'
 HOUR_ANGLE_COLUMN_NAME = f':clock12: Hour Angle'
 POSITION_ALGORITHM_COLUMN_NAME = '⯐ Positioning'  # Algorithm
@@ -175,7 +177,7 @@ LOG_RELATIVE_IRRADIANCE_COLUMN_NAME = 'ln(Irradiance ⌇%)'
 NEGATIVE_RELATIVE_IRRADIANCE_COLUMN_NAME = '% Irradiance < 0'
 
 ALGORITHM_COLUMN_NAME = 'Algorithm'
-POWER_ALGORITHM_COLUMN_NAME = '⭍ Algorithm'
+POWER_ALGORITHM_COLUMN_NAME = '⌁ Algorithm'
 TEMPERATURE_ALGORITHM_COLUMN_NAME = '🌡 Algorithm'
 
 IRRADIANCE_SOURCE_COLUMN_NAME = 'Irradiance source'  # Model or external data ?
@@ -195,10 +197,11 @@ DIRECT_CURRENT = '⎓'
 DIRECT_CURRENT_COLUMN_NAME = 'STC ⎓'
 VOLTAGE_COLUMN_NAME = 'STC ⚡'
 POWER_UNIT = '㎾h'
-PHOTOVOLTAIC_POWER_COLUMN_NAME = '⭍ Power'
+PHOTOVOLTAIC_POWER = 'Power'
+PHOTOVOLTAIC_POWER_COLUMN_NAME = '⌁ Power'
 EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME = 'Direct ⭍'
-EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME = 'Diffuse ⭍'
-EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME = 'Reflected ⭍'#☇
+EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME = 'Diffuse 🗤⭍'
+EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME = 'Reflected ☈⭍'#☇
 
 GLOBAL_INCLINED_IRRADIANCE = 'Global'
 GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME = 'Global ∡'#⍼
@@ -218,6 +221,7 @@ DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME = 'Diffuse ☀'
 REFLECTED_INCLINED_IRRADIANCE = 'Reflected'#∡
 REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME = 'Reflected ∡'#☇⭚∡'
 REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME = 'Reflected ⭸'#☇⭚⭛
+
 
 VIEW_FRACTION = "View %fraction"
 VIEW_FRACTION_COLUMN_NAME = "View %"
