@@ -71,9 +71,18 @@ def calculate_fractional_year_time_series_noaa(
         timing_algorithm='NOAA',
     )
 
-    if not np.all((fractional_year_series.min_degrees <= fractional_year_series.degrees) & (fractional_year_series.degrees <= fractional_year_series.max_degrees)):
-        wrong_values_index = np.where(fractional_year_series.min_degrees <= np.all(fractional_year_series.degrees) <= fractional_year_series.max_degrees)
+    if not np.all(
+        (fractional_year_series.min_degrees <= fractional_year_series.degrees)
+        & (fractional_year_series.degrees <= fractional_year_series.max_degrees)
+    ):
+        wrong_values_index = np.where(
+            fractional_year_series.min_degrees
+            <= np.all(fractional_year_series.degrees)
+            <= fractional_year_series.max_degrees
+        )
         wrong_values = fractional_year_series.degrees[wrong_values_index]
-        raise ValueError(f"The calculated fractional year `{wrong_values}` is out of the expected range [{fractional_year_series.min_degrees}, {fractional_year_series.max_degrees}] degrees!')")
+        raise ValueError(
+            f"The calculated fractional year `{wrong_values}` is out of the expected range [{fractional_year_series.min_degrees}, {fractional_year_series.max_degrees}] degrees!')"
+        )
 
     return fractional_year_series
