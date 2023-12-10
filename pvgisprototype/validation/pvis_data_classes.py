@@ -88,17 +88,16 @@ class BaseTimestampModel(BaseModel):
 
 
 class BaseTimestampSeriesModel(BaseModel):
-    timestamps: Union[datetime, Sequence[datetime], DatetimeIndex]
+    timestamps: Union[np.ndarray, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamps')
     def check_empty_list(cls, value):
-        if isinstance(value, list) and not value:
-            raise ValueError('Empty list of timestamps provided')
-        if isinstance(value, DatetimeIndex):
-            return value.to_pydatetime().tolist()
-        if isinstance(value, str):
-            return [value]
+        if isinstance(value, np.ndarray):
+            if value.dtype.type != np.datetime64:
+                raise ValueError("NumPy array must be of dtype 'datetime64'")
+        elif not isinstance(value, DatetimeIndex):
+            raise TypeError("Timestamps must be a NumPy datetime64 array or a Pandas DatetimeIndex")
         return value
 
 
