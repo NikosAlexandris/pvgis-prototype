@@ -436,29 +436,58 @@ def generate_timestamps_for_a_year(year, frequency_minutes=60):
     
     return [start_date + timedelta(minutes=(idx * frequency_minutes)) for idx in range(intervals)]
 
+
 def generate_datetime_series(
     start_time: Optional[str] = None,
-    end_time: Optional[str] = None,
     frequency: Optional[str] = TIMESTAMPS_FREQUENCY_DEFAULT,
+    end_time: Optional[str] = None,
+    timezone: Optional[str] = None,
 ):
     """
+    Generate a series of datetime stamps between start_time and end_time at a specified frequency.
+
+    Parameters
+    ----------
+    start_time : str
+        The starting time in ISO format.
+    end_time : str
+        The ending time in ISO format.
+    frequency : str
+        Frequency of the timestamps, e.g., 'h' for hourly.
+
+    Returns
+    -------
+    DatetimeIndex
+        A Pandas DatetimeIndex at the specified frequency.
+
     Example
     -------
     >>> start_time = '2010-06-01 06:00:00'
     >>> end_time = '2010-06-01 08:00:00'
     >>> frequency = 'h'  # 'h' for hourly
     >>> generate_datetime_series(start_time, end_time, frequency)
-    array(['2010-06-01T06:00:00', '2010-06-01T07:00:00', '2010-06-01T08:00:00'],
-          dtype='datetime64[s]')
+    DatetimeIndex(['2010-06-01 06:00:00', '2010-06-01 07:00:00', '2010-06-01 08:00:00'], dtype='datetime64[ns]', freq=None)
     """
-    start = np.datetime64(start_time)
-    end = np.datetime64(end_time)
-    freq = np.timedelta64(1, frequency)
-    timestamps = np.arange(start, end + freq, freq)  # +freq to include the end time
+    import re
+    datetime_unit = re.sub(r'\d+', '', frequency)
 
-    from pandas import DatetimeIndex
-    timestamps = DatetimeIndex(timestamps.astype('datetime64[ns]'))
-    return timestamps.astype('datetime64[ns]')
+    # NumPy datetime64 array ? ----------------------------------------------
+    # start = np.datetime64(start_time, unit)
+    # end = np.datetime64(end_time, unit)
+    # datetime_unit = np.timedelta64(1, unit)
+    # # stop = end + datetime_unit to _include_ the end time
+    # timestamps = np.arange(start=start, stop=end + datetime_unit, step=datetime_unit)
+    # -----------------------------------------------------------------------
+    import pandas as pd
+    frequency = pd.to_timedelta(f"1{datetime_unit}")
+    timestamps = pd.date_range(
+        start=start_time,
+        end=end_time,
+        freq=frequency,
+        tz=timezone,
+    )
+
+    return timestamps
 
 
 def callback_generate_datetime_series(
