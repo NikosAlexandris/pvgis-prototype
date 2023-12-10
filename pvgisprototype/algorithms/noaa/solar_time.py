@@ -100,16 +100,19 @@ def calculate_true_solar_time_noaa(
 
     return true_solar_time
 
+from pandas import DatetimeIndex
 
 @validate_with_pydantic(CalculateTrueSolarTimeTimeSeriesNOAAInput)
 def calculate_true_solar_time_time_series_noaa(
         longitude: Longitude,   # radians
-        timestamps: Union[datetime, Sequence[datetime]], 
+        timestamps: DatetimeIndex,
         timezone: Optional[ZoneInfo],
         time_output_units: str = 'minutes',
         angle_units: str = RADIANS,
         verbose: int = VERBOSE_LEVEL_DEFAULT,
     ) -> Sequence[datetime]:
+    """
+    """
     true_solar_time_series = []
     for timestamp in timestamps:
         time_offset = calculate_time_offset_noaa(
