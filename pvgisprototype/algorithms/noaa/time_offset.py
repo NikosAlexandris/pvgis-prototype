@@ -116,7 +116,10 @@ def calculate_time_offset_noaa(
 
     # This will be 0 for UTC, obviously! Review-Me! --------------------------
 
-    timestamp = timestamp.astimezone(timezone)
+    if timestamp.tzinfo is None or timestamp.tzinfo.utcoffset(timestamp) is None:
+        timestamp = timestamp.tz_localize(timezone)
+    else:
+        timestamp = timestamp.tz_convert(timezone)
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
