@@ -8,6 +8,7 @@ from typing import Sequence
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import time
+from pandas import Timestamp
 from pandas import DatetimeIndex
 from math import pi
 from pydantic import validator
@@ -83,16 +84,22 @@ class BaseCoordinatesModel(
 # When?
 
 class BaseTimestampModel(BaseModel):
-    timestamp: Union[datetime, np.ndarray, DatetimeIndex]
+    timestamp: Union[np.datetime64, np.ndarray, Timestamp, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamp')
-    def check_empty_list(cls, value):
+    def check_timestamp_type(cls, value):
         if isinstance(value, np.ndarray):
             if value.dtype.type != np.datetime64:
                 raise ValueError("NumPy array must be of dtype 'datetime64'")
-        elif not isinstance(value, DatetimeIndex):
-            raise TypeError("Timestamps must be a NumPy datetime64 array or a Pandas DatetimeIndex")
+        elif isinstance(value, np.datetime64):
+            pass
+        elif isinstance(value, Timestamp):
+            pass
+        elif isinstance(value, DatetimeIndex):
+            pass
+        else:
+            raise TypeError("Timestamp must be a NumPy datetime64, a Pandas DatetimeIndex, or a Pandas Timestamp")
         return value
 
 
