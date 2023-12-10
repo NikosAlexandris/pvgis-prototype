@@ -1,6 +1,4 @@
 from devtools import debug
-from devtools import debug
-from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -12,9 +10,11 @@ from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTi
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_noaa
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
 from typing import Union
-from typing import Sequence
 import numpy as np
 from pvgisprototype import EquationOfTime
+from pandas import Timestamp
+from pandas import DatetimeIndex
+
 
 
 # equivalent to : 4 * longitude (in degrees) ?
@@ -24,7 +24,7 @@ radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_
 @validate_with_pydantic(CalculateTimeOffsetNOAAInput)
 def calculate_time_offset_noaa(
         longitude: Longitude, 
-        timestamp: datetime, 
+        timestamp: Timestamp, 
         timezone: ZoneInfo,
     ) -> TimeOffset:
     """Calculate the time offset (minutes) for NOAA's solar position calculations.
@@ -39,7 +39,7 @@ def calculate_time_offset_noaa(
         The longitude for calculation in radians (note: differs from the original
         equation which expects degrees).
 
-    timestamp: datetime
+    timestamp: Timestamp
         The timestamp to calculate the offset for
 
     equation_of_time: float
@@ -133,9 +133,6 @@ def calculate_time_offset_noaa(
 
     return time_offset
 
-from pandas import Timestamp
-from pandas import DatetimeIndex
-
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
 def calculate_time_offset_time_series_noaa(
     longitude: Longitude, 
@@ -144,9 +141,13 @@ def calculate_time_offset_time_series_noaa(
 ) -> TimeOffset:
     """ """
     # 1
-    timestamps = [timestamp.astimezone(timezone) for timestamp in timestamps]
-    timezone_offset_minutes_series = [timestamp.utcoffset().total_seconds() / 60 for timestamp in timestamps]
-    timezone_offset_minutes_series = np.atleast_1d(np.array(timezone_offset_minutes_series, dtype=float))
+    if timestamps.tzinfo is None or timestamps.tzinfo.utcoffset(timestamps) is None:
+        timestamps = timestamps.tz_localize(timezone)
+    else:
+        timestamps = timestamps.tz_convert(timezone)
+
+    timezone_offset_minutes_series = timestamps.to_series().dt.utcoffset() / timedelta(minutes=1)
+    timezone_offset_minutes_series = np.array(timezone_offset_minutes_series, dtype=float)
 
     # 2
     equation_of_time_series = calculate_equation_of_time_time_series_noaa(
