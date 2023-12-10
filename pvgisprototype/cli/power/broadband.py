@@ -108,6 +108,8 @@ app = typer.Typer(
     help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
 )
 
+from pandas import DatetimeIndex
+
 @app.command(
     'broadband',
     no_args_is_help=True,
@@ -119,7 +121,7 @@ def photovoltaic_power_output_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
+    timestamps: Annotated[Optional[DatetimeIndex], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,

@@ -120,6 +120,7 @@ def calculate_time_offset_noaa(
         timestamp = timestamp.tz_localize(timezone)
     else:
         timestamp = timestamp.tz_convert(timezone)
+
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
@@ -132,11 +133,13 @@ def calculate_time_offset_noaa(
 
     return time_offset
 
+from pandas import Timestamp
+from pandas import DatetimeIndex
 
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
 def calculate_time_offset_time_series_noaa(
     longitude: Longitude, 
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: Union[Timestamp, DatetimeIndex],
     timezone: ZoneInfo,
 ) -> TimeOffset:
     """ """

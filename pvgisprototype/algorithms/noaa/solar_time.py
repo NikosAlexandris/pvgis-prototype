@@ -15,10 +15,12 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
 
 
+from pandas import Timestamp
+
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
 def calculate_true_solar_time_noaa(
     longitude: Longitude,   # radians
-    timestamp: datetime, 
+    timestamp: Timestamp, 
     timezone: Optional[ZoneInfo],
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> datetime:

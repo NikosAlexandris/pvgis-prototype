@@ -107,10 +107,12 @@ def calculate_solar_hour_angle_noaa(
     return solar_hour_angle
 
 
+from pandas import DatetimeIndex
+
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
-    timestamps: Sequence[datetime], 
+    timestamps: DatetimeIndex, 
     timezone: Optional[str] = None, 
     angle_output_units: Optional[str] = RADIANS,
     verbose: int = 0,
