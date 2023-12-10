@@ -345,6 +345,31 @@ def get_days_in_year(year):
     return (end_date - start_date).days
 
 
+def get_days_in_years_series(years):
+    """ Calculate the number of days in a given year, accounting for leap years.
+
+    Parameters
+    ----------
+    years : DatetimeIndex
+        The years series for which to calculate the number of days.
+
+    Returns
+    -------
+    DatetimeIndex :
+        The number of days series for the given years series
+
+    Examples
+    --------
+    >>> get_days_in_years_series(pd.DatetimeIndex(['2000-12-22 21:12:12', '2001-11-11 11:11:11']))
+    Index([366, 365], dtype='int64')
+    """
+    import pandas as pd
+    end_dates = pd.to_datetime(years, format='%Y') + pd.offsets.YearEnd(0)
+    start_dates = end_dates - pd.DateOffset(years=1)
+
+    return (end_dates - start_dates).days
+
+
 def parse_timestamp_series(
     timestamps: Union[str, datetime, List[datetime]],
 ):
