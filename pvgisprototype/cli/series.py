@@ -58,7 +58,6 @@ from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.series.utilities import get_scale_and_offset
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
 from pvgisprototype.api.series.plot import plot_series
 
 from pvgisprototype.api.series.hardcodings import exclamation_mark
