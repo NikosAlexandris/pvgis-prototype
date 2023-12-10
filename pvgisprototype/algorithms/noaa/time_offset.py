@@ -16,7 +16,6 @@ from pandas import Timestamp
 from pandas import DatetimeIndex
 
 
-
 # equivalent to : 4 * longitude (in degrees) ?
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 
@@ -133,6 +132,7 @@ def calculate_time_offset_noaa(
 
     return time_offset
 
+
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
 def calculate_time_offset_time_series_noaa(
     longitude: Longitude, 
@@ -146,7 +146,7 @@ def calculate_time_offset_time_series_noaa(
     else:
         timestamps = timestamps.tz_convert(timezone)
 
-    timezone_offset_minutes_series = timestamps.to_series().dt.utcoffset() / timedelta(minutes=1)
+    timezone_offset_minutes_series = timestamps.map(lambda ts: ts.utcoffset().total_seconds() / 60)
     timezone_offset_minutes_series = np.array(timezone_offset_minutes_series, dtype=float)
 
     # 2
