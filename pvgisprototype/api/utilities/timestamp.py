@@ -397,9 +397,7 @@ def parse_timestamp_series(
 
     Notes
     -----
-
     .. [1] https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.datetime64
-
     """
     if isinstance(timestamps, str):
         datetime_strings = timestamps.strip().split(",")
@@ -501,19 +499,22 @@ def callback_generate_datetime_series(
     # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
     # print("[yellow]i[/yellow] Executing callback_generate_datetime_series()")
     # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
-    start_time = ctx.params.get('start_time')
-    end_time = ctx.params.get('end_time')
-    frequency = ctx.params.get('frequency', 'h')
-    timezone = ctx.params.get('timezone')
 
+    start_time=ctx.params.get('start_time')
+    end_time=ctx.params.get('end_time')
     if start_time is not None and end_time is not None:
-        timestamps = generate_datetime_series(start_time, end_time, frequency)
-
+        timestamps = generate_datetime_series(
+            start_time=start_time,
+            end_time=end_time,
+            frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT),
+            timezone=ctx.params.get('timezone'),
+        )
+    # from pandas import to_datetime
+    # -----------------------------------------------------------------------
     # If we do the following, we need to take care of external naive time series!
     # timezone_aware_timestamps = [
     #     attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
     # ]
-    from pandas import to_datetime
     # return to_datetime(timezone_aware_timestamps, format="mixed")
-    return to_datetime(timestamps, format="mixed")
+    # -----------------------------------------------------------------------
     return timestamps
