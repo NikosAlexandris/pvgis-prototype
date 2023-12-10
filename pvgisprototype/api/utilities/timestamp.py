@@ -168,7 +168,7 @@ def attach_requested_timezone(
 
 def ctx_attach_requested_timezone(
         ctx: typer.Context,
-        timestamp: datetime,
+        timestamp: str,
         param: typer.CallbackParam
     ) -> datetime:
     """Returns the current datetime in the user-requested timezone."""
@@ -180,7 +180,8 @@ def ctx_attach_requested_timezone(
     # print(f'  [yellow]>[/yellow] User requested input parameter [code]timezone[/code] = [bold]{timezone}[/bold]')
     # print(f'  [green]>[/green] Callback function returns : {attach_requested_timezone(timestamp, timezone)}')
 
-    return attach_requested_timezone(timestamp, timezone)
+    from pandas import to_datetime
+    return attach_requested_timezone(to_datetime(timestamp), timezone)
 
 
 def convert_to_timezone(timezone_string: str) -> ZoneInfo:
