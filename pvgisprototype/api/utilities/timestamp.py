@@ -292,24 +292,14 @@ def get_day_from_hour_of_year(year: int, hour_of_year: int):
 
 def parse_timestamp(
     ctx: typer.Context,
-    timestamp_string: str,
+    timestamp: str,
     param: typer.CallbackParam,
 ) -> datetime:
-    print(f'[yellow]i[/yellow] Context: {ctx}')
-    print(f'[yellow]i[/yellow] Context: {ctx.params}')
-    print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
-    # if timestamp_string:
-    #     formats = ['%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%Y-%m', '%Y']
-    #     for fmt in formats:
-    #         try:
-    #             return datetime.strptime(timestamp_string, fmt)
-    #         except ValueError:
-    #             pass
-    #     raise ValueError(f"Invalid timestamp format: {timestamp_string}")
-    # else:
-    #     return None
+    """
+    Parse a string and return a Pandas Timestamp
+    """
     from pandas import to_datetime
-    return to_datetime(timestamp_string, errors='raise')
+    return to_datetime(timestamp, errors='raise')
 
 
 # Time series
