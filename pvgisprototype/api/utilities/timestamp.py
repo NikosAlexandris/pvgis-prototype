@@ -395,29 +395,10 @@ def parse_timestamp_series(
     .. [1] https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.datetime64
     """
     if isinstance(timestamps, str):
-        datetime_strings = timestamps.strip().split(",")
-        return np.array(datetime_strings, dtype='datetime64')
-
-    elif isinstance(timestamps, datetime):
-        return np.array([timestamps], dtype='datetime64')
-
-    elif isinstance(timestamps, list):
-        # === Note ==========================================================
-        # if all(isinstance(ts, datetime) or isinstance(ts, str) for ts in timestamps):
-        #     return np.array(timestamps, dtype='datetime64')
-        # -------------------------------------------------------------------
-        # Two checks seem to be faster after : 
-        # ❯ kernprof -l -v pvgisprototype/api/utilities/timestamp.py
-        # ========================================================== Note ===
-        if all(isinstance(ts, datetime) for ts in timestamps):
-            return np.array(timestamps, dtype='datetime64')
-        if all(isinstance(ts, str) for ts in timestamps):
-            return np.array(timestamps, dtype='datetime64')
-        else:
-            raise ValueError("All elements of the list must be either datetime objects or strings")
+        return to_datetime(timestamps.split(','), format='mixed')
 
     else:
-        raise ValueError("Timestamps input must be a string, datetime, or list of either string or datetime elements")
+        raise ValueError("The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function")
 
 
 def generate_timestamps_for_a_year(year, frequency_minutes=60):
@@ -461,19 +442,8 @@ def generate_datetime_series(
     >>> generate_datetime_series(start_time, end_time, frequency)
     DatetimeIndex(['2010-06-01 06:00:00', '2010-06-01 07:00:00', '2010-06-01 08:00:00'], dtype='datetime64[ns]', freq=None)
     """
-    import re
-    datetime_unit = re.sub(r'\d+', '', frequency)
-
-    # NumPy datetime64 array ? ----------------------------------------------
-    # start = np.datetime64(start_time, unit)
-    # end = np.datetime64(end_time, unit)
-    # datetime_unit = np.timedelta64(1, unit)
-    # # stop = end + datetime_unit to _include_ the end time
-    # timestamps = np.arange(start=start, stop=end + datetime_unit, step=datetime_unit)
-    # -----------------------------------------------------------------------
-    import pandas as pd
-    frequency = pd.to_timedelta(f"1{datetime_unit}")
-    timestamps = pd.date_range(
+    from pandas import date_range
+    timestamps = date_range(
         start=start_time,
         end=end_time,
         freq=frequency,
@@ -488,13 +458,12 @@ def callback_generate_datetime_series(
     timestamps: str,
     # timestamps: List[datetime],
     # value: Union[str, datetime, List[datetime]],
-    param: typer.CallbackParam,
+    # param: typer.CallbackParam,
 ):
     # print(f'[yellow]i[/yellow] Context: {ctx.params}')
     # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
     # print("[yellow]i[/yellow] Executing callback_generate_datetime_series()")
     # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
-
     start_time=ctx.params.get('start_time')
     end_time=ctx.params.get('end_time')
     if start_time is not None and end_time is not None:
