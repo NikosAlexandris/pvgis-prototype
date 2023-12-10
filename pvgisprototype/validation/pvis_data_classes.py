@@ -83,8 +83,17 @@ class BaseCoordinatesModel(
 # When?
 
 class BaseTimestampModel(BaseModel):
-    timestamp: datetime
+    timestamp: Union[datetime, np.ndarray, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @field_validator('timestamp')
+    def check_empty_list(cls, value):
+        if isinstance(value, np.ndarray):
+            if value.dtype.type != np.datetime64:
+                raise ValueError("NumPy array must be of dtype 'datetime64'")
+        elif not isinstance(value, DatetimeIndex):
+            raise TypeError("Timestamps must be a NumPy datetime64 array or a Pandas DatetimeIndex")
+        return value
 
 
 class BaseTimestampSeriesModel(BaseModel):
