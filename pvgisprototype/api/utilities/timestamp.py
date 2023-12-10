@@ -140,37 +140,31 @@ def attach_timezone(
 
     return timestamp
 
+from pandas import Timestamp
 
 def attach_requested_timezone(
-        timestamp: datetime,
-        timezone: ZoneInfo = None
-    ) -> datetime:
-    """Attaches the requested timezone to a naive datetime."""
-
+    timestamp: Union[Timestamp, datetime],
+    timezone: ZoneInfo = None,
+) -> Timestamp:
+    """
+    Attaches the requested timezone to a naive datetime. Attention : Defaults to UTC if no timezone requested!
+    """
     # print(f'[green]i[/green] Callback function attach_requested_timezone()')
 
-    if timestamp.tzinfo is not None:  # time zone already set
-        print("  [yellow]>[/yellow] The provided timestamp already has a timezone.")  
-        print("  [yellow]>[/yellow] Ensure the timestamp is provided as a [yellow]naive[/yellow] datetime object.")
-        return timestamp
+    if timestamp.tzinfo is not None:
+        raise ValueError(f"  [yellow]>[/yellow] The provided timestamp '{timestamp}' already has a timezone!  Expected a [yellow]naive[/yellow] [bold]datetime[/bold] or [bold]Timestamp[/bold] object.")
 
-    if timezone is None:
-        timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
-        print(f'  [yellow]i[/yellow] Timezone not requested! Set to [red]{timezone_aware_timestamp.tzinfo}[/red].') 
-
-    else:
+    if timezone:
         try:
             # print(f'[yellow]i[/yellow] Attaching the requested zone [bold]{timezone}[/bold] to {timestamp}')  
-            timezone_aware_timestamp = timestamp.replace(tzinfo=timezone)
-
+            return timestamp.tz_localize(timezone)
         except Exception as e:
             print(f'[red]x[/red] Failed to attach the requested timezone \'{timezone}\' to the timestamp: {e}!')
-            print("[red]Defaulting to UTC timezone.[/red]")
-            # timezone_aware_timestamp = timestamp.replace(tzinfo=ZoneInfo('UTC'))
-            timezone_aware_timestamp = timestamp.astimezone(tzinfo=ZoneInfo('UTC'))
-
-    return timezone_aware_timestamp
-
+    else:
+        zoneinfo_utc = ZoneInfo('UTC')
+        print(f"  [yellow]i[/yellow] Timezone not requested! Setting to [red]{zoneinfo_utc}[/red].") 
+        return timestamp.tz_localize(zoneinfo_utc)
+    
 
 def ctx_attach_requested_timezone(
         ctx: typer.Context,
