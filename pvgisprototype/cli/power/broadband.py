@@ -16,7 +16,6 @@ from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.power import calculate_photovoltaic_power_output_series
-from pvgisprototype.algorithms.pvis.power import calculate_spectral_photovoltaic_power_output
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -97,6 +96,7 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
+from rich import print
 
 
 app = typer.Typer(
@@ -242,7 +242,7 @@ def photovoltaic_power_output_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=results,
+                dictionary=photovoltaic_power_output_series,
                 filename=csv,
             )
     else:
