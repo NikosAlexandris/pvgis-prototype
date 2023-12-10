@@ -244,12 +244,13 @@ def get_diffuse_solar_altitude_function_time_series(
     help=f'☀∡ Calculate the diffuse irradiance incident on a surface over a period of time',
     rich_help_panel=rich_help_panel_series_irradiance,
 )
-def get_calculate_diffuse_inclined_irradiance_time_series(
+def diffuse_inclined_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_time_series: bool = False,
