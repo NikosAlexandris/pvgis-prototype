@@ -189,8 +189,8 @@ def convert_to_timezone(timezone_string: str) -> ZoneInfo:
     # print(f'[yellow]i[/yellow] Executing convert_to_timezone()')
 
     if timezone_string is None:
-        print(f'  [yellow]>[/yellow] No timezone requested [red]?[/red]')  # Convert to warning!
-        print(f'  [yellow]>[/yellow] Setting timezone to [red]UTC[/red]')
+        # print(f'  [yellow]>[/yellow] No timezone requested [red]?[/red]')  # Convert to warning!
+        # print(f'  [yellow]>[/yellow] Setting timezone to [red]UTC[/red]')
         return ZoneInfo('UTC')
 
     else:
@@ -366,34 +366,32 @@ def get_days_in_years_series(years):
 
 
 def parse_timestamp_series(
-    timestamps: Union[str, datetime, List[datetime]],
+    timestamps: str,
 ):
     """
-    Parse an input of type string or Python datetime object or list of either
-    strings or Python datetime objects and generate a NumPy datetime64 array
-    [1]_.
+    Parse an input of type string and generate a Pandas Timestamp or
+    DatetimeIndex [1]_.
 
     either `str`ings or `datetime.datetime` objects and generate a NumPy
     datetime64 array [1]_
 
     Parameters
     ----------
-    timestamps : `str`, `datetime.datetime`, list()
-            A single `str`ing (i.e. '2111-11-11')
-            or single `datetime.datetime` (i.e. datetime.datetime())
-            or list of either `str`ings (i.e. ['2111-11-11', '2111-11-12'])
-            or `datetime.datetime` objects (i.e. [datetime.datetime(),
-            datetime.datetime()]
+    timestamps : `str`
+            A single `str`ing (i.e. '2111-11-11' or '2121-12-12 12:12:12')
 
     Returns
     -------
     timestamps :
-        NumPy datetime64 array
+        Pandas Timestamp or DatetimeIndex
 
     Notes
     -----
-    .. [1] https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.datetime64
+    .. [1] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html#pandas-timestamp
+    .. [2] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
     """
+    from pandas import to_datetime
+
     if isinstance(timestamps, str):
         return to_datetime(timestamps.split(','), format='mixed')
 
