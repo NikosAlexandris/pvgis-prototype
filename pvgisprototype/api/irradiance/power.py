@@ -464,4 +464,4 @@ def calculate_photovoltaic_power_output_series(
     if verbose > 0:
         return results
 
-    return photovoltaic_power_outout_series, results, title
+    return photovoltaic_power_outout_series
