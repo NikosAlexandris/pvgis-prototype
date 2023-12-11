@@ -17,7 +17,7 @@ from pvgisprototype.web_api.series.select import select
 from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 from pvgisprototype.web_api.geometry.overview_series import overview_series
-from pvgisprototype.web_api.irradiance.energy import get_photovoltaic_power_output_series
+from pvgisprototype.web_api.irradiance.power import get_photovoltaic_power_output_series
 
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
@@ -307,7 +307,7 @@ app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)
 app.get("/calculate/geometry/overview_series")(overview_series)
 
 # irradiance
-app.get("/calculate/irradiance/effective")(get_photovoltaic_power_output_series)
+app.get("/calculate/irradiance/power")(get_photovoltaic_power_output_series)
 
 # plot
 app.get("/plot/example", response_class=HTMLResponse)(plot_example)
