@@ -42,6 +42,7 @@ Read also:
 - https://peps.python.org/pep-0615/
 """
 
+from pandas import Timestamp
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -147,22 +148,21 @@ def convert_to_timezone(timezone: str) -> ZoneInfo:
 
 def attach_timezone(
         timestamp: Optional[datetime] = None,
-        timezone_string: Optional[str] = None
+        timezone: Optional[str] = None
 ) -> datetime:
     """Convert datetime object to timezone-aware."""
     if timestamp is None:
         timestamp = datetime.now(ZoneInfo('UTC'))  # Default to UTC
 
-    if isinstance(timezone_string, str):
+    if isinstance(timezone, str):
         try:
-            tzinfo = convert_to_timezone(timezone_string)
+            tzinfo = convert_to_timezone(timezone)
             timestamp = timestamp.replace(tzinfo=tzinfo)
         except Exception as e:
             raise ValueError(f"Could not convert timezone: {e}")
 
     return timestamp
 
-from pandas import Timestamp
 
 def attach_requested_timezone(
     timestamp: Union[Timestamp, datetime],
@@ -381,10 +381,8 @@ def parse_timestamp_series(
     .. [2] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
     """
     from pandas import to_datetime
-
     if isinstance(timestamps, str):
         return to_datetime(timestamps.split(','), format='mixed')
-
     else:
         raise ValueError("The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function")
 
@@ -457,8 +455,8 @@ def callback_generate_datetime_series(
     if start_time is not None and end_time is not None:
         timestamps = generate_datetime_series(
             start_time=start_time,
-            end_time=end_time,
             frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT),
+            end_time=end_time,
             timezone=ctx.params.get('timezone'),
         )
     # from pandas import to_datetime
