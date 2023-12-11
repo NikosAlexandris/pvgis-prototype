@@ -29,8 +29,66 @@ from pathlib import Path
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
 
+description = """
+PVGISAPI is a public service supported by the European Commission. 🇪🇺
 
-app = FastAPI()
+### Photovoltaic Potential 
+
+Various technologies
+
+- Grid-connected 🔌
+- Stand-alone 🔋
+- Models available in [PVMAPS](https://ec.europa.eu/jrc/en/PVGIS/downloads/PVMAPS) 
+
+### Hourly series of
+
+- Solar radiation
+- PV performance 📈
+- Temperature 🌡️
+- Typical Meteorological Year for 9 climate variables
+
+### Print Ready
+
+Country/regional maps of
+
+- Solar resource
+- Photovoltaic potential 🗺️
+
+### Coverage
+
+- Europe & Africa 🌍
+- Largely Asia 🌏
+- America 🌎
+
+### Languages
+
+/media/svg/languages-in-pvgis.svg
+
+### Public Service
+
+/media/svg/european-flag-edit.svg
+
+- Cost free
+- Open access ✨
+"""
+
+app = FastAPI(
+    title="PVGISAPI",
+    description=description,
+    summary="PVGIS public API",
+    version="0.0.1",
+    terms_of_service="https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-background-information/data-protection_en",
+    contact={
+        "name": "PVGIS, Joint Research Centre, European Commission",
+        "url": "https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-background-information/pvgis-contact-points_en",
+        "email": "JRC-PVGIS@ec.europa.eu",
+    },
+    # license_info={
+    #     "name": "",
+    #     "url": "",
+    # },
+)
+
 app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 templates = Jinja2Templates(directory="templates")
 
