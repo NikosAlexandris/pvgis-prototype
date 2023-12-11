@@ -123,6 +123,28 @@ def now_utc_datetimezone() -> datetime:
     return datetime.now(ZoneInfo('UTC'))
 
 
+def convert_to_timezone(timezone: str) -> ZoneInfo:
+    """Convert string to ZoneInfo object."""
+    # print(f'[yellow]i[/yellow] Executing convert_to_timezone()')
+
+    if timezone is None:
+        # print(f'  [yellow]>[/yellow] No timezone requested [red]?[/red]')  # Convert to warning!
+        # print(f'  [yellow]>[/yellow] Setting timezone to [red]UTC[/red]')
+        return ZoneInfo('UTC')
+
+    else:
+        try:
+            if timezone == 'local':
+                return datetime.now().astimezone(None).tzinfo
+
+            else:
+                return ZoneInfo(timezone)
+
+        except (zoneinfo.ZoneInfoNotFoundError, Exception):
+            print(f"  [yellow]>[/yellow] Requested zone {timezone} not found. Setting it to [red]UTC[/red].")
+            return ZoneInfo('UTC')
+
+
 def attach_timezone(
         timestamp: Optional[datetime] = None,
         timezone_string: Optional[str] = None
@@ -182,28 +204,6 @@ def ctx_attach_requested_timezone(
 
     from pandas import to_datetime
     return attach_requested_timezone(to_datetime(timestamp), timezone)
-
-
-def convert_to_timezone(timezone_string: str) -> ZoneInfo:
-    """Convert string to ZoneInfo object."""
-    # print(f'[yellow]i[/yellow] Executing convert_to_timezone()')
-
-    if timezone_string is None:
-        # print(f'  [yellow]>[/yellow] No timezone requested [red]?[/red]')  # Convert to warning!
-        # print(f'  [yellow]>[/yellow] Setting timezone to [red]UTC[/red]')
-        return ZoneInfo('UTC')
-
-    else:
-        try:
-            if timezone == 'local':
-                return datetime.now().astimzone(None).tzinfo
-
-            else:
-                return ZoneInfo(timezone_string)
-
-        except (zoneinfo.ZoneInfoNotFoundError, Exception):
-            print(f"  [yellow]>[/yellow] Requested zone {timezone} not found. Setting it to [red]UTC[/red].")
-            return ZoneInfo('UTC')
 
 
 def ctx_convert_to_timezone(ctx: typer.Context, param: typer.CallbackParam, value: str):
