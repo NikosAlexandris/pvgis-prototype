@@ -141,7 +141,7 @@ def calculate_time_offset_time_series_noaa(
 ) -> TimeOffset:
     """ """
     # 1
-    if timestamps.tzinfo is None or timestamps.tzinfo.utcoffset(timestamps) is None:
+    if timestamps.tzinfo is None:
         timestamps = timestamps.tz_localize(timezone)
     else:
         timestamps = timestamps.tz_convert(timezone)
@@ -156,7 +156,7 @@ def calculate_time_offset_time_series_noaa(
     time_offset_series = longitude.as_minutes - timezone_offset_minutes_series + equation_of_time_series.minutes
 
     if not np.all((-790 <= time_offset_series) & (time_offset_series <= 790)):
-        raise ValueError("At leasr one calculated time offset is out of the expected range [-790, 790] minutes!")
+        raise ValueError("At least one calculated time offset is out of the expected range [-790, 790] minutes!")
 
     return TimeOffset(
         value=time_offset_series,
