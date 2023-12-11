@@ -223,13 +223,18 @@ typer_option_random_days = typer.Option(
 
 time_series_typer_help='A time series dataset (any format supported by Xarray)'
 typer_argument_time_series = typer.Argument(
-    show_default=False,
     help=time_series_typer_help,
     # rich_help_panel=rich_help_panel_time_series,
+    show_default=False,
 )
 typer_option_time_series = typer.Option(
-    show_default=False,
     help=time_series_typer_help,
+    show_default=False,
+    rich_help_panel=rich_help_panel_time_series,
+)
+typer_option_data_variable = typer.Option(
+    help='Variable name',
+    show_default=False,
     rich_help_panel=rich_help_panel_time_series,
 )
 typer_option_mask_and_scale = typer.Option(

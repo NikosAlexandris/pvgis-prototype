@@ -14,6 +14,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_longitude_in_degr
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude_in_degrees
 from pvgisprototype.cli.typer_parameters import typer_argument_time_series
+from pvgisprototype.cli.typer_parameters import typer_option_data_variable
 from pvgisprototype.cli.typer_parameters import typer_option_time_series
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
@@ -116,6 +117,7 @@ def select(
     frequency: Optional[str] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
+    variable: Annotated[Optional[str], typer_option_data_variable] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
@@ -132,6 +134,14 @@ def select(
         longitude = longitude % 360
     warn_for_negative_longitude(longitude)
 
+    if not variable:
+        dataset = xr.open_dataset(time_series)
+        if len(dataset.data_vars) >= 2:
+            variables = list(dataset.data_vars.keys())
+            print(f"The dataset contains more than one variable : {variables}")
+            variable = typer.prompt("Please specify the variable you are interested in from the above list")
+        else:
+            variable = list(dataset.data_vars)
     location_time_series = select_time_series(
         time_series=time_series,
         longitude=longitude,
@@ -164,7 +174,6 @@ def select(
         variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
     )
-
     if verbose > 7:
         debug(locals())
 
@@ -230,6 +239,40 @@ def select(
             x=location_time_series,
             path=str(csv),
         )
+
+
+@app.command(
+    'select-fast',
+    no_args_is_help=True,
+    help='  Retrieve series over a location.-',
+)
+def select_fast(
+    time_series: Annotated[Path, typer_argument_time_series],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    time_series_2: Annotated[Path, typer_option_time_series] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    # in_memory: Annotated[bool, typer_option_in_memory] = False,
+    csv: Annotated[Path, typer_option_csv] = 'series.csv',
+    tocsv: Annotated[Path, typer_option_csv] = 'seriesto.csv',
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    """Bare read & write"""
+    try:
+        series = xr.open_dataarray(time_series).sel(lon=longitude, lat=latitude, method='nearest')
+        if time_series_2:
+            series_2 = xr.open_dataarray(time_series_2).sel(lon=longitude, lat=latitude, method='nearest')
+        if csv:
+            series.to_pandas().to_csv(csv)
+            if time_series_2:
+                series_2.to_pandas().to_csv(csv.name+'2')
+        elif tocsv:
+            to_csv(x=series, path=str(tocsv))
+            if time_series_2:
+                to_csv(x=series_2, path=str(tocsv)+'2')
+        print('Done.-')
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 @app.command(
