@@ -352,6 +352,10 @@ def calculate_photovoltaic_power_output_series(
         + diffuse_irradiance_series
         + reflected_irradiance_series
     )
+    # -----------------------------------------------------------------------
+    # If we do the following, to deduplicate code,
+    #     how do we collect the intermediate results ?
+    # -----------------------------------------------------------------------
     # global_irradiance_series = calculate_global_irradiance_time_series(
     #     longitude=longitude,
     #     latitude=latitude,
@@ -387,6 +391,7 @@ def calculate_photovoltaic_power_output_series(
     #     angle_output_units=angle_output_units,
     #     verbose=verbose,
     # )
+    # -----------------------------------------------------------------------
     if not power_model:
         if not efficiency:  # user-set  -- RenameMe ?  FIXME
             # print(f'Using preset system efficiency {system_efficiency}')
