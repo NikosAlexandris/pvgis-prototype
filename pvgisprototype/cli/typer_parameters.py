@@ -28,7 +28,7 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_plotting
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.constants import LATITUDE_MINIMUM
 from pvgisprototype.constants import LATITUDE_MAXIMUM
 from pvgisprototype.constants import LONGITUDE_MINIMUM
@@ -99,11 +99,13 @@ typer_argument_longitude = typer.Argument(
     max=LONGITUDE_MAXIMUM,
     callback=convert_to_radians,
     # callback=convert_to_Longitude,
+    show_default=False,
 )
 typer_argument_longitude_in_degrees = typer.Argument(
     help=longitude_typer_help,
     min=LONGITUDE_MINIMUM,
     max=LONGITUDE_MAXIMUM,
+    show_default=False,
 )
 latitude_typer_help='Latitude in decimal degrees ranging in [-90, 90]'
 typer_argument_latitude = typer.Argument(
@@ -111,11 +113,13 @@ typer_argument_latitude = typer.Argument(
     min=LATITUDE_MINIMUM,
     max=LATITUDE_MAXIMUM,
     callback=convert_to_radians,
+    show_default=False,
 )
 typer_argument_latitude_in_degrees = typer.Argument(
     help=latitude_typer_help,
     min=LATITUDE_MINIMUM,
     max=LATITUDE_MAXIMUM,
+    show_default=False,
 )
 typer_argument_elevation = typer.Argument(
     help='Topographical elevation',
@@ -123,23 +127,28 @@ typer_argument_elevation = typer.Argument(
     max=ELEVATION_MAXIMUM,
     # rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory=0,
+    show_default=False,
 )
 typer_argument_horizon_heights = typer.Option(
-    help='List of horizon heights (comma-separated values or .csv file) at equal angular distance around the horizon given in clockwise direction starting at North, going to East, South, West, and back to North (first point is due north, last is west of north). Example: 10, 20, 30, 20, 5, 0, 10, 20, 5, 0, 10, 20, 30, 20, 5, 0, 10, 20, 5, 0'
+    help='List of horizon heights (comma-separated values or .csv file) at equal angular distance around the horizon given in clockwise direction starting at North, going to East, South, West, and back to North (first point is due north, last is west of north). Example: 10, 20, 30, 20, 5, 0, 10, 20, 5, 0, 10, 20, 30, 20, 5, 0, 10, 20, 5, 0',
     # default_factory = None,
+    show_default=False,
 )
 typer_argument_pv_technology = typer.Argument(
     help='Technology of the PV module: crystalline silicon cells, thin film modules made from CIS or CIGS, thin film modules made from Cadmium Telluride (CdTe), other/unknown',
+    show_default=False,
 )
 typer_argument_mounting_type = typer.Argument(
     help='Type of mounting',  # in PVGIS : mountingplace
     # default_factory = 'free',  # see PVGIS for more!
+    show_default=False,
 )
 typer_argument_area = typer.Argument(
     help='The area of the modules in m<sup>2</sup>',
     min=0.001,  # min of mini-solar-panel?
     # rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = None,
+    show_default=False,
 )
 
 # When?
@@ -150,6 +159,7 @@ typer_argument_timestamp = typer.Argument(
     callback=ctx_attach_requested_timezone,
     # rich_help_panel=rich_help_panel_time_series,
     default_factory=now_utc_datetimezone,
+    show_default=False,
 )
 timestamps_typer_help = "Quoted date-time strings of data to extract from series, example: [yellow]'2112-12-21, 2112-12-21 12:21:21, 2112-12-21 21:12:12'[/yellow]'"
 typer_argument_timestamps = typer.Argument(
@@ -157,6 +167,7 @@ typer_argument_timestamps = typer.Argument(
     parser=parse_timestamp_series,
     callback=callback_generate_datetime_series,
 #     default_factory=now_utc_datetimezone_series,
+    show_default=False,
 )
 typer_option_timestamps = typer.Option(
     help='Timestamps',
@@ -212,13 +223,18 @@ typer_option_random_days = typer.Option(
 
 time_series_typer_help='A time series dataset (any format supported by Xarray)'
 typer_argument_time_series = typer.Argument(
-    show_default=False,
     help=time_series_typer_help,
     # rich_help_panel=rich_help_panel_time_series,
+    show_default=False,
 )
 typer_option_time_series = typer.Option(
-    show_default=False,
     help=time_series_typer_help,
+    show_default=False,
+    rich_help_panel=rich_help_panel_time_series,
+)
+typer_option_data_variable = typer.Option(
+    help='Variable name',
+    show_default=False,
     rich_help_panel=rich_help_panel_time_series,
 )
 typer_option_mask_and_scale = typer.Option(
@@ -257,6 +273,7 @@ typer_argument_solar_declination = typer.Argument(
     min=SOLAR_DECLINATION_MINIMUM,
     max=SOLAR_DECLINATION_MAXIMUM,
     callback=convert_to_radians,
+    show_default=False,
 )
 typer_option_solar_declination = typer.Option(
     help='Solar declination angle',
@@ -281,6 +298,7 @@ typer_argument_solar_constant = typer.Argument(
     min=SOLAR_CONSTANT_MINIMUM,
     rich_help_panel=rich_help_panel_earth_orbit,
     # default_factory = SOLAR_CONSTANT,
+    show_default=False,
 )
 typer_option_solar_constant = typer.Option(
     help=solar_constant_typer_help,
@@ -289,7 +307,7 @@ typer_option_solar_constant = typer.Option(
     # default_factory = SOLAR_CONSTANT,
 )
 
-SOLAR_INCIDENCE_ANGLE_MODEL_DEFAULT=SolarIncidenceModels.jenco
+SOLAR_INCIDENCE_ANGLE_MODEL_DEFAULT=SolarIncidenceModel.jenco
 typer_option_solar_incidence_model = typer.Option(
     '--solar-incidence-model',
     help='Method to calculate the solar incidence angle',
@@ -302,20 +320,41 @@ typer_option_solar_incidence_model = typer.Option(
 
 # Solar surface
 
+def surface_tilt_callback(
+    ctx: typer.Context,
+    # param: typer.CallbackParam,
+    surface_tilt: float,
+) -> float:
+    """Set the default surface tilt equal to the latitude"""
+    if ctx.resilient_parsing:
+        return
+    # if type(latitude) != float:
+    #     raise typer.BadParameter("Input should be a float!")
+    if not surface_tilt:
+        surface_tilt = ctx.params.get('latitude')
+        from rich import print
+        print(f'[yellow]* Surface tilt set to match the input latitude[/yellow]!')
+    else:
+        surface_tilt = np.radians(surface_tilt)
+
+    return surface_tilt
+
+
 surface_tilt_typer_help='Solar surface tilt angle from the horizontal plane'  # in PVGIS : slope
 typer_argument_surface_tilt = typer.Argument(
     help=surface_tilt_typer_help,
     min=SURFACE_TILT_MINIMUM,
     max=SURFACE_TILT_MAXIMUM,
-    callback=convert_to_radians,
+    callback=surface_tilt_callback,
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = SURFACE_TILT_DEFAULT,
+    show_default=False,
 )
 typer_option_surface_tilt = typer.Option(
     help=surface_tilt_typer_help,
     min=SURFACE_TILT_MINIMUM,
     max=SURFACE_TILT_MAXIMUM,
-    callback=convert_to_radians,
+    callback=surface_tilt_callback,
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = SURFACE_TILT_DEFAULT,
 )
@@ -344,6 +383,7 @@ typer_argument_surface_orientation = typer.Argument(
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = SURFACE_ORIENTATION_DEFAULT,
+    show_default=False,
 )
 typer_option_surface_orientation = typer.Option(
     help=surface_orientation_typer_help,
@@ -366,12 +406,14 @@ typer_argument_true_solar_time = typer.Argument(
     help='The apparent (or true) solar time in decimal hours on a 24 hour base',
     callback=convert_hours_to_datetime_time,
     rich_help_panel=rich_help_panel_solar_time,
+    show_default=False,
 )
 typer_argument_hour_angle = typer.Argument(
     help="Solar hour angle in radians",
     min=0,
     max=1,
     # default_factory=None,
+    show_default=False,
 )
 
 
@@ -391,10 +433,12 @@ typer_option_solar_position_model = typer.Option(
 typer_argument_solar_altitude = typer.Argument(
     help='Solar altitude',
     rich_help_panel=rich_help_panel_solar_position,
+    show_default=False,
 )
 typer_argument_solar_altitude_series = typer.Argument(
     help='Solar altitude series',
     rich_help_panel=rich_help_panel_solar_position,
+    show_default=False,
 )
 typer_argument_refracted_solar_altitude = typer.Argument(
     help='Refracted solar altitude',
@@ -407,10 +451,12 @@ typer_argument_refracted_solar_altitude_series = typer.Argument(
 typer_argument_solar_incidence = typer.Argument(
     help='Solar incidence',
     rich_help_panel=rich_help_panel_solar_position,
+    show_default=False,
 )
 typer_argument_solar_incidence_series = typer.Argument(
     help='Solar incidence series',
     rich_help_panel=rich_help_panel_solar_position,
+    show_default=False,
 )
 
 # Solar time
@@ -422,7 +468,7 @@ typer_option_solar_time_model = typer.Option(
     show_choices=True,
     case_sensitive=False,
     rich_help_panel=rich_help_panel_solar_time,
-    # default_factory=[SolarTimeModels.skyfield],
+    # default_factory=[SolarTimeModel.skyfield],
 )
 typer_option_global_time_offset = typer.Option(
     help='Global time offset',
@@ -512,6 +558,7 @@ typer_argument_temperature_series = typer.Option(
     parser=parse_temperature_series,
     callback=temperature_series_argument_callback,
     # default_factory=TEMPERATURE_DEFAULT,
+    show_default=False,
 )
 typer_option_temperature_series = typer.Option(
     help=temperature_typer_help,
@@ -582,6 +629,7 @@ typer_argument_wind_speed_series = typer.Option(
     parser=parse_wind_speed_series,
     callback=wind_speed_series_argument_callback,
     # default_factory=WIND_SPEED_DEFAULT,
+    show_default=False,
 )
 typer_option_wind_speed_series = typer.Option(
     help=wind_speed_typer_help,
@@ -628,6 +676,7 @@ typer_argument_linke_turbidity_factor = typer.Argument(
     parser=parse_linke_turbidity_factor_series,
     callback=linke_turbidity_factor_callback,
     # default_factory=LINKE_TURBIDITY_DEFAULT,
+    show_default=False,
 )
 typer_option_linke_turbidity_factor = typer.Option(
     help=linke_turbidity_factor_typer_help,
@@ -721,6 +770,7 @@ typer_argument_irradiance_series = typer.Argument(
     help='Irradiance series',
     rich_help_panel=rich_help_panel_series_irradiance,
     # default = None,
+    show_default=False,
     is_eager=True,
 )
 
@@ -728,30 +778,36 @@ global_horizontal_irradiance_typer_help='Global horizontal irradiance (Surface I
 typer_argument_global_horizontal_irradiance = typer.Argument(
     help=global_horizontal_irradiance_typer_help,
     rich_help_panel=rich_help_panel_series_irradiance,
+    show_default=False,
 )
 typer_option_global_horizontal_irradiance = typer.Option(
     # help=global_horizontal_irradiance_typer_help,
     rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory = Path(),
+    show_default=False,
 )
 direct_horizontal_irradiance_typer_help='Direct (or beam) horizontal irradiance (Surface Incoming Direct radiation (SID), `fdir`'
 typer_argument_direct_horizontal_irradiance = typer.Argument(
     help=direct_horizontal_irradiance_typer_help,
     rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory=None,
+    show_default=False,
 )
 typer_option_direct_horizontal_irradiance = typer.Option(
     # help=direct_horizontal_irradiance_typer_help,
     rich_help_panel=rich_help_panel_series_irradiance,
     # default_factory = Path(),
+    show_default=False,
 )
 the_term_n_unit='unitless'
 typer_argument_term_n = typer.Argument(
-    help=f'The term N for the calculation of the sky dome fraction viewed by a tilted surface [{the_term_n_unit}]'
+    help=f'The term N for the calculation of the sky dome fraction viewed by a tilted surface [{the_term_n_unit}]',
+    show_default=False,
 )
 typer_argument_term_n_series = typer.Argument(
-    help=f'The term N for the calculation of the sky dome fraction viewed by a tilted surface for a period of time [{the_term_n_unit}]'
-)
+    help=f'The term N for the calculation of the sky dome fraction viewed by a tilted surface for a period of time [{the_term_n_unit}]',
+    show_default=False,
+    )
 typer_option_apply_angular_loss_factor = typer.Option(
     help='Apply angular loss function',
     rich_help_panel=rich_help_panel_advanced_options,
@@ -762,6 +818,7 @@ typer_argument_conversion_efficiency = typer.Argument(
     min=0,
     max=100,
     default_factory = None,
+    show_default=False,
 )
 typer_option_system_efficiency = typer.Option(
     '--system-efficiency-factor',

@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarDeclinationInputModel
 from pvgisprototype import SolarDeclination
-from .models import SolarDeclinationModels
+from .models import SolarDeclinationModel
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_hargreaves
@@ -29,19 +29,19 @@ from pvgisprototype.constants import RADIANS
 def model_solar_declination(
     timestamp: datetime,
     timezone: ZoneInfo,
-    declination_model: SolarDeclinationModels = SolarDeclinationModels.pvis,
+    declination_model: SolarDeclinationModel = SolarDeclinationModel.pvis,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarDeclination:
     """ """
-    if declination_model.value == SolarDeclinationModels.noaa:
+    if declination_model.value == SolarDeclinationModel.noaa:
 
         solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
         )
 
-    if declination_model.value  == SolarDeclinationModels.pvis:
+    if declination_model.value  == SolarDeclinationModel.pvis:
 
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
@@ -50,13 +50,13 @@ def model_solar_declination(
             perigee_offset=perigee_offset,
         )
 
-    if declination_model.value  == SolarDeclinationModels.hargreaves:
+    if declination_model.value  == SolarDeclinationModel.hargreaves:
 
         solar_declination = calculate_solar_declination_hargreaves(
             timestamp=timestamp,
         ) # returns values in degrees by default
 
-    if declination_model.value  == SolarDeclinationModels.pvlib:
+    if declination_model.value  == SolarDeclinationModel.pvlib:
 
         solar_declination = calculate_solar_declination_pvlib(
             timestamp=timestamp,
@@ -68,7 +68,7 @@ def model_solar_declination(
 def calculate_solar_declination(
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    declination_models: List[SolarDeclinationModels] = [SolarDeclinationModels.pvis],
+    declination_models: List[SolarDeclinationModel] = [SolarDeclinationModel.pvis],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
@@ -82,7 +82,7 @@ def calculate_solar_declination(
     """
     results = []
     for declination_model in declination_models:
-        if declination_model != SolarDeclinationModels.all:  # ignore 'all' in the enumeration
+        if declination_model != SolarDeclinationModel.all:  # ignore 'all' in the enumeration
             solar_declination = model_solar_declination(
                 timestamp=timestamp,
                 timezone=timezone,

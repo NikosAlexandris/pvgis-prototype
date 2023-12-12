@@ -203,7 +203,7 @@ def select_location_time_series(
     in_memory: bool = False,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
-    """Select a location from a time series dataset format supported by
+    """Select a location from a time series data format supported by
     xarray"""
     data_array = open_data_array(
         time_series,

@@ -11,8 +11,8 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAltitude
 from datetime import datetime
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -31,17 +31,23 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 
 
+DEFAULT_ARRAY_BACKEND = 'NUMPY'  # OR 'CUPY', 'DASK'
+DEFAULT_ARRAY_DTYPE = 'float32'
+
+
 @validate_with_pydantic(ModelSolarAltitudeTimeSeriesInputModel)
 def model_solar_geometry_overview_time_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo,
-    solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
-    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    backend: str = DEFAULT_ARRAY_BACKEND,
+    dtype: str = DEFAULT_ARRAY_DTYPE,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List[SolarAltitude]:
 
@@ -54,10 +60,12 @@ def model_solar_geometry_overview_time_series(
     if verbose > 6:
         debug(locals())
 
-    if solar_position_model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModel.noaa:
 
         solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
+            backend=backend,
+            dtype=dtype,
         )
         solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
             longitude=longitude,
@@ -89,19 +97,19 @@ def model_solar_geometry_overview_time_series(
             verbose=verbose,
         )
 
-    if solar_position_model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModel.skyfield:
         pass
 
-    if solar_position_model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModel.suncalc:
         pass
 
-    if solar_position_model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModel.pysolar:
         pass
 
-    if solar_position_model.value == SolarPositionModels.pvis:
+    if solar_position_model.value == SolarPositionModel.pvis:
         pass
 
-    if solar_position_model.value == SolarPositionModels.pvlib:
+    if solar_position_model.value == SolarPositionModel.pvlib:
         pass
 
     position_series = (
@@ -122,12 +130,14 @@ def calculate_solar_geometry_overview_time_series(
     latitude: Latitude,
     timestamps: datetime,
     timezone: ZoneInfo,
-    solar_position_models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
+    backend: str = DEFAULT_ARRAY_BACKEND,
+    dtype: str = DEFAULT_ARRAY_DTYPE,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """
@@ -135,7 +145,7 @@ def calculate_solar_geometry_overview_time_series(
     """
     results = []
     for solar_position_model in solar_position_models:
-        if solar_position_model != SolarPositionModels.all:  # ignore 'all' in the enumeration
+        if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
             (
                 solar_declination_series,
                 solar_hour_angle_series,
@@ -152,6 +162,8 @@ def calculate_solar_geometry_overview_time_series(
                 solar_time_model=solar_time_model,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
+                backend=backend,
+                dtype=dtype,
                 verbose=verbose,
             )
             results.append({

@@ -8,8 +8,8 @@ from typing import Union
 from zoneinfo import ZoneInfo
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SurfaceOrientation
-from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -35,8 +35,8 @@ def model_solar_incidence_time_series(
     latitude: Latitude,
     timestamps: np.array,
     timezone: Optional[ZoneInfo] = None,
-    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     surface_tilt: Union[float, SurfaceTilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -46,7 +46,7 @@ def model_solar_incidence_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
 
-    if solar_incidence_model.value == SolarIncidenceModels.jenco:
+    if solar_incidence_model.value == SolarIncidenceModel.jenco:
 
         solar_incidence_series = calculate_solar_incidence_time_series_jenco(
             longitude=longitude,
@@ -60,7 +60,7 @@ def model_solar_incidence_time_series(
             verbose=verbose,
         )
 
-    if solar_incidence_model.value == SolarIncidenceModels.pvis:
+    if solar_incidence_model.value == SolarIncidenceModel.pvis:
         pass
 
     return solar_incidence_series

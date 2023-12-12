@@ -9,26 +9,19 @@ import numpy as np
 from enum import Enum
 from rich import print
 
-
 from datetime import datetime
-from pvgisprototype.validation.functions import ModelSolarPositionInputModel
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
+from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype.constants import SOLAR_CONSTANT
-
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
-from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -48,6 +41,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE
@@ -61,7 +55,9 @@ from pvgisprototype.constants import SHADE_COLUMN_NAME
 from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
+NUMPY_DTYPE_DEFAULT = 'float64'
 
 
 def calculate_global_irradiance_time_series(
@@ -74,6 +70,7 @@ def calculate_global_irradiance_time_series(
     end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
     random_time_series: bool = False,
+    global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
     # temperature_series: float = 25,
     # wind_speed_series: float = 0,
@@ -88,9 +85,9 @@ def calculate_global_irradiance_time_series(
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Optional[float] = 2,
     apply_angular_loss_factor: Optional[bool] = True,
-    solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
-    solar_time_model: SolarTimeModels = SolarTimeModels.noaa,
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,
@@ -100,13 +97,15 @@ def calculate_global_irradiance_time_series(
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float]="Array of horizon elevations.")] = None,
+    numpy_dtype: np.dtype = NUMPY_DTYPE_DEFAULT,
     rounding_places: Optional[int] = 5,
     statistics: bool = False,
     csv: Path = "series_in",
     verbose: int = False,
     index: bool = False,
 ):
-    """Calculate the global horizontal irradiance (GHI)
+    """
+    Calculate the global horizontal irradiance (GHI)
 
     The global horizontal irradiance represents the total amount of shortwave
     radiation received from above by a surface horizontal to the ground. It
@@ -128,20 +127,20 @@ def calculate_global_irradiance_time_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
-        verbose=verbose,
+        verbose=0,
         )
     # Masks based on the solar altitude series
     mask_above_horizon = solar_altitude_series.value > 0
-    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)
+    mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
     in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
+    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
+    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
@@ -206,6 +205,7 @@ def calculate_global_irradiance_time_series(
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
+            global_horizontal_component=global_horizontal_irradiance,
             direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
@@ -218,6 +218,7 @@ def calculate_global_irradiance_time_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            neighbor_lookup=neighbor_lookup,
             verbose=0,  # no verbosity here by choice!
         )[
             mask_above_horizon
@@ -274,7 +275,7 @@ def calculate_global_irradiance_time_series(
                 f"{WARNING_OUT_OF_RANGE_VALUES} in `global_irradiance_series` : {out_of_range_indices[0]}!"
         )
 
-    # Reporting =============================================================
+    # Building the output dictionary ========================================
 
     if verbose > 0:
         results = {
@@ -309,10 +310,7 @@ def calculate_global_irradiance_time_series(
         }
         results = results | even_more_extended_results
 
-    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
-    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-
-    if verbose == 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:

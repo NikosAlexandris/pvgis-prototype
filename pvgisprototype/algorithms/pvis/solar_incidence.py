@@ -6,7 +6,7 @@ from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
@@ -24,7 +24,7 @@ def calculate_solar_incidence_pvis(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     surface_tilt: float = 0,
     surface_orientation: float = 180,
     perigee_offset: float = PERIGEE_OFFSET,

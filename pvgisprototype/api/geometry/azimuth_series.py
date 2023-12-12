@@ -9,8 +9,8 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 # from pvgisprototype.validation.functions import ModelSolarAzimuthTimeSeriesInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAzimuth
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -27,10 +27,10 @@ def model_solar_azimuth_time_series(
     latitude: Latitude,
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo,
-    solar_position_model: SolarPositionModels = SolarPositionModels.noaa,
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -41,7 +41,7 @@ def model_solar_azimuth_time_series(
     if verbose > 5:
         debug(locals())
 
-    if solar_position_model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModel.noaa:
 
         solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
             longitude=longitude,
@@ -52,19 +52,19 @@ def model_solar_azimuth_time_series(
             verbose=verbose,
         )
 
-    if solar_position_model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModel.skyfield:
         pass
 
-    if solar_position_model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModel.suncalc:
         pass
 
-    if solar_position_model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModel.pysolar:
         pass
 
-    if solar_position_model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModel.pvis:
         pass
 
-    if solar_position_model.value  == SolarPositionModels.pvlib:
+    if solar_position_model.value  == SolarPositionModel.pvlib:
         pass
 
     return solar_azimuth_series

@@ -1,6 +1,4 @@
 from devtools import debug
-from devtools import debug
-from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import pi
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -12,9 +10,10 @@ from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTi
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_noaa
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
 from typing import Union
-from typing import Sequence
 import numpy as np
 from pvgisprototype import EquationOfTime
+from pandas import Timestamp
+from pandas import DatetimeIndex
 
 
 # equivalent to : 4 * longitude (in degrees) ?
@@ -24,7 +23,7 @@ radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_
 @validate_with_pydantic(CalculateTimeOffsetNOAAInput)
 def calculate_time_offset_noaa(
         longitude: Longitude, 
-        timestamp: datetime, 
+        timestamp: Timestamp, 
         timezone: ZoneInfo,
     ) -> TimeOffset:
     """Calculate the time offset (minutes) for NOAA's solar position calculations.
@@ -39,7 +38,7 @@ def calculate_time_offset_noaa(
         The longitude for calculation in radians (note: differs from the original
         equation which expects degrees).
 
-    timestamp: datetime
+    timestamp: Timestamp
         The timestamp to calculate the offset for
 
     equation_of_time: float
@@ -116,7 +115,11 @@ def calculate_time_offset_noaa(
 
     # This will be 0 for UTC, obviously! Review-Me! --------------------------
 
-    timestamp = timestamp.astimezone(timezone)
+    if timestamp.tzinfo is None or timestamp.tzinfo.utcoffset(timestamp) is None:
+        timestamp = timestamp.tz_localize(timezone)
+    else:
+        timestamp = timestamp.tz_convert(timezone)
+
     timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
     equation_of_time = calculate_equation_of_time_noaa(
         timestamp=timestamp,
@@ -133,14 +136,18 @@ def calculate_time_offset_noaa(
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
 def calculate_time_offset_time_series_noaa(
     longitude: Longitude, 
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: Union[Timestamp, DatetimeIndex],
     timezone: ZoneInfo,
 ) -> TimeOffset:
     """ """
     # 1
-    timestamps = [timestamp.astimezone(timezone) for timestamp in timestamps]
-    timezone_offset_minutes_series = [timestamp.utcoffset().total_seconds() / 60 for timestamp in timestamps]
-    timezone_offset_minutes_series = np.atleast_1d(np.array(timezone_offset_minutes_series, dtype=float))
+    if timestamps.tzinfo is None:
+        timestamps = timestamps.tz_localize(timezone)
+    else:
+        timestamps = timestamps.tz_convert(timezone)
+
+    timezone_offset_minutes_series = timestamps.map(lambda ts: ts.utcoffset().total_seconds() / 60)
+    timezone_offset_minutes_series = np.array(timezone_offset_minutes_series, dtype=float)
 
     # 2
     equation_of_time_series = calculate_equation_of_time_time_series_noaa(
@@ -149,7 +156,7 @@ def calculate_time_offset_time_series_noaa(
     time_offset_series = longitude.as_minutes - timezone_offset_minutes_series + equation_of_time_series.minutes
 
     if not np.all((-790 <= time_offset_series) & (time_offset_series <= 790)):
-        raise ValueError("At leasr one calculated time offset is out of the expected range [-790, 790] minutes!")
+        raise ValueError("At least one calculated time offset is out of the expected range [-790, 790] minutes!")
 
     return TimeOffset(
         value=time_offset_series,

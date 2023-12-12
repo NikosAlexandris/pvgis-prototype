@@ -14,8 +14,8 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import SolarZenith
-from .models import SolarTimeModels
-from .models import SolarPositionModels
+from .models import SolarTimeModel
+from .models import SolarPositionModel
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_hour_angle_noaa
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_noaa
@@ -52,9 +52,9 @@ def model_solar_geometry_overview(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_position_model: SolarPositionModels,
+    solar_position_model: SolarPositionModel,
     apply_atmospheric_refraction: bool,
-    solar_time_model: SolarTimeModels,
+    solar_time_model: SolarTimeModel,
     perigee_offset: float,
     eccentricity_correction_factor: float,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -95,7 +95,7 @@ def model_solar_geometry_overview(
     solar_altitude = None
     solar_azimuth = None
 
-    if solar_position_model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModel.noaa:
 
         solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
@@ -130,7 +130,7 @@ def model_solar_geometry_overview(
             verbose=verbose,
         )
     
-    if solar_position_model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModel.skyfield:
 
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude=longitude,
@@ -151,7 +151,7 @@ def model_solar_geometry_overview(
             timezone=timezone,
         )
 
-    if solar_position_model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModel.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
@@ -181,7 +181,7 @@ def model_solar_geometry_overview(
             timing_algorithm='suncalc',
         )
 
-    if solar_position_model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModel.pysolar:
 
         timestamp = attach_timezone(timestamp, timezone)
 
@@ -216,7 +216,7 @@ def model_solar_geometry_overview(
             timing_algorithm='pysolar',
         )
 
-    if solar_position_model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModel.pvis:
 
         solar_declination = calculate_solar_declination_pvis(
             timestamp=timestamp,
@@ -256,7 +256,7 @@ def model_solar_geometry_overview(
             solar_time_model=solar_time_model,
         )
 
-    if solar_position_model.value == SolarPositionModels.pvlib:
+    if solar_position_model.value == SolarPositionModel.pvlib:
 
         solar_declination = calculate_solar_declination_pvlib(
             timestamp=timestamp,
@@ -302,8 +302,8 @@ def calculate_solar_geometry_overview(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_position_models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = 0.048869,
     eccentricity_correction_factor: float = 0.01672,
@@ -315,7 +315,7 @@ def calculate_solar_geometry_overview(
     """
     results = []
     for solar_position_model in solar_position_models:
-        if solar_position_model != SolarPositionModels.all:  # ignore 'all' in the enumeration
+        if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
             (
                 solar_declination,
                 solar_hour_angle,

@@ -12,7 +12,7 @@ from rich import box
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import select_models
 from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -40,7 +40,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":timer_clock:  Calculate the solar time for a location and moment",
+    help=f"⌛ Calculate the solar time for a location and moment",
 )
 console = Console()
 
@@ -79,7 +79,7 @@ def solar_time(
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    solar_time_model: Annotated[List[SolarTimeModels], typer_option_solar_time_model] = [SolarTimeModels.skyfield],
+    solar_time_model: Annotated[List[SolarTimeModel], typer_option_solar_time_model] = [SolarTimeModel.skyfield],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
@@ -110,7 +110,7 @@ def solar_time(
         timezone = utc_zoneinfo
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
     
-    solar_time_model = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    solar_time_model = select_models(SolarTimeModel, solar_time_model)  # Using a callback fails!
     solar_time = calculate_solar_time(
         longitude=longitude,
         latitude=latitude,

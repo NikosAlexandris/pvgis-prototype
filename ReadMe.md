@@ -94,6 +94,8 @@ PVGIS there-in.
 
 > Too long to document here !
 
+![pvgis-prototype](pvgis-prototype-cli-2023-12-03.png)
+
 
 ### API 
 
