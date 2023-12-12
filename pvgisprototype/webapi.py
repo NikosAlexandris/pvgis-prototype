@@ -17,7 +17,7 @@ from pvgisprototype.web_api.series.select import select
 from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
 from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 from pvgisprototype.web_api.geometry.overview_series import overview_series
-from pvgisprototype.web_api.irradiance.energy import get_calculate_effective_irradiance_time_series
+from pvgisprototype.web_api.irradiance.power import get_photovoltaic_power_output_series
 
 from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 from pvgisprototype.web_api.plot.plot_example import plot_example
@@ -29,8 +29,66 @@ from pathlib import Path
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
 
+description = """
+PVGISAPI is a public service supported by the European Commission. 🇪🇺
 
-app = FastAPI()
+### Photovoltaic Potential 
+
+Various technologies
+
+- Grid-connected 🔌
+- Stand-alone 🔋
+- Models available in [PVMAPS](https://ec.europa.eu/jrc/en/PVGIS/downloads/PVMAPS) 
+
+### Hourly series of
+
+- Solar radiation
+- PV performance 📈
+- Temperature 🌡️
+- Typical Meteorological Year for 9 climate variables
+
+### Print Ready
+
+Country/regional maps of
+
+- Solar resource
+- Photovoltaic potential 🗺️
+
+### Coverage
+
+- Europe & Africa 🌍
+- Largely Asia 🌏
+- America 🌎
+
+### Languages
+
+/media/svg/languages-in-pvgis.svg
+
+### Public Service
+
+/media/svg/european-flag-edit.svg
+
+- Cost free
+- Open access ✨
+"""
+
+app = FastAPI(
+    title="PVGISAPI",
+    description=description,
+    summary="PVGIS public API",
+    version="0.0.1",
+    terms_of_service="https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-background-information/data-protection_en",
+    contact={
+        "name": "PVGIS, Joint Research Centre, European Commission",
+        "url": "https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-background-information/pvgis-contact-points_en",
+        "email": "JRC-PVGIS@ec.europa.eu",
+    },
+    # license_info={
+    #     "name": "",
+    #     "url": "",
+    # },
+)
+
 app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 templates = Jinja2Templates(directory="templates")
 
@@ -176,30 +234,48 @@ async def read_root():
             <div id="globeViz"></div>
 
             <script>
-            const world = Globe()
-              .width(300)
-              .height(300)
-              .backgroundColor('#f4f4f4')
-              .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-              .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-              .pointOfView({ altitude: 100 })
-              (document.getElementById('globeViz'));
+              // Initialize the globe variable outside the fetch block to ensure it's accessible throughout the script
+              let world;
 
-            // custom globe material
-            const globeMaterial = world.globeMaterial();
-            globeMaterial.bumpScale = 10;
-            new THREE.TextureLoader().load('//unpkg.com/three-globe/example/img/earth-water.png', texture => {
-              globeMaterial.specularMap = texture;
-              globeMaterial.specular = new THREE.Color('grey');
-              globeMaterial.shininess = 15;
-            });
+              fetch('/static/sample.geojson').then(res => res.json()).then(data => {
+                // Define the globe inside the fetch's success callback
+                world = Globe()
+                  .width(300)
+                  .height(300)
+                  .backgroundColor('#f4f4f4')
+                  .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+                  .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+                  .pointOfView({ altitude: 100 })
+                  .labelsData(data.features)
+                  .labelLat(d => d.geometry.coordinates[1])
+                  .labelLng(d => d.geometry.coordinates[0])
+                  .labelText(d => d.properties.country_name)
+                  .labelColor(() => 'rgba(255, 165, 0, 0.75)')
+                  .labelResolution(2)
+                  (document.getElementById('globeViz'));
 
-            // Auto-rotate
-            world.controls().autoRotate = true;
-            world.controls().autoRotateSpeed = 0.35;
+                // Custom globe material setup
+                setupGlobeMaterial(world);
+              });
 
-            const directionalLight = world.lights().find(light => light.type === 'DirectionalLight');
-            directionalLight && directionalLight.position.set(1, 1, 1); // change light position to see the specularMap's effect
+              // Function to set up custom globe material
+              function setupGlobeMaterial(globe) {
+                const globeMaterial = globe.globeMaterial();
+                globeMaterial.bumpScale = 10;
+
+                new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-water.png', texture => {
+                  globeMaterial.specularMap = texture;
+                  globeMaterial.specular = new THREE.Color('grey');
+                  globeMaterial.shininess = 15;
+                });
+
+                // Auto-rotate
+                globe.controls().autoRotate = true;
+                globe.controls().autoRotateSpeed = 0.35;
+
+                const directionalLight = globe.lights().find(light => light.type === 'DirectionalLight');
+                directionalLight && directionalLight.position.set(1, 1, 1);
+              }
             </script>
 
             <div class="footer">
@@ -231,7 +307,7 @@ app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)
 app.get("/calculate/geometry/overview_series")(overview_series)
 
 # irradiance
-app.get("/calculate/irradiance/effective")(get_calculate_effective_irradiance_time_series)
+app.get("/calculate/irradiance/power")(get_photovoltaic_power_output_series)
 
 # plot
 app.get("/plot/example", response_class=HTMLResponse)(plot_example)

@@ -8,7 +8,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAltitude
 from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.solar_time import model_solar_time
@@ -26,7 +26,7 @@ def calculate_solar_altitude_pvis(
     perigee_offset: float,
     eccentricity_correction_factor: float,
     time_offset_global: int,
-    solar_time_model: SolarTimeModels,
+    solar_time_model: SolarTimeModel,
     verbose: int = 0,
 ) -> SolarAltitude:
     """Compute various solar geometry variables.

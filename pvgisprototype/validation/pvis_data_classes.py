@@ -8,6 +8,7 @@ from typing import Sequence
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import time
+from pandas import Timestamp
 from pandas import DatetimeIndex
 from math import pi
 from pydantic import validator
@@ -22,15 +23,15 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 
 
 MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
@@ -83,22 +84,36 @@ class BaseCoordinatesModel(
 # When?
 
 class BaseTimestampModel(BaseModel):
-    timestamp: datetime
+    timestamp: Union[np.datetime64, np.ndarray, Timestamp, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @field_validator('timestamp')
+    def check_timestamp_type(cls, value):
+        if isinstance(value, np.ndarray):
+            if value.dtype.type != np.datetime64:
+                raise ValueError("NumPy array must be of dtype 'datetime64'")
+        elif isinstance(value, np.datetime64):
+            pass
+        elif isinstance(value, Timestamp):
+            pass
+        elif isinstance(value, DatetimeIndex):
+            pass
+        else:
+            raise TypeError("Timestamp must be a NumPy datetime64, a Pandas DatetimeIndex, or a Pandas Timestamp")
+        return value
 
 
 class BaseTimestampSeriesModel(BaseModel):
-    timestamps: Union[datetime, Sequence[datetime], DatetimeIndex]
+    timestamps: Union[np.ndarray, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamps')
     def check_empty_list(cls, value):
-        if isinstance(value, list) and not value:
-            raise ValueError('Empty list of timestamps provided')
-        if isinstance(value, DatetimeIndex):
-            return value.to_pydatetime().tolist()
-        if isinstance(value, str):
-            return [value]
+        if isinstance(value, np.ndarray):
+            if value.dtype.type != np.datetime64:
+                raise ValueError("NumPy array must be of dtype 'datetime64'")
+        elif not isinstance(value, DatetimeIndex):
+            raise TypeError("Timestamps must be a NumPy datetime64 array or a Pandas DatetimeIndex")
         return value
 
 
@@ -222,11 +237,11 @@ class SolarDeclinationModel(BaseModel):
 
 
 class SolarPositionModel(BaseModel):
-    solar_position_model: SolarPositionModels = SolarPositionModels.skyfield
+    solar_position_model: SolarPositionModel = SolarPositionModel.skyfield
 
 
 class SolarIncidenceModel(BaseModel):
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco
 
 
 class EarthOrbitModel(BaseModel):
@@ -235,7 +250,7 @@ class EarthOrbitModel(BaseModel):
 
 
 class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield
 
 
 '''

@@ -10,7 +10,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAzimuthPVISInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAzimuth
 from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
 from pvgisprototype.api.geometry.solar_time import model_solar_time
@@ -28,7 +28,7 @@ def calculate_solar_azimuth_pvis(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_time_model: SolarTimeModels,
+    solar_time_model: SolarTimeModel,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth angle
 

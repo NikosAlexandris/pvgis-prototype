@@ -10,16 +10,14 @@ from enum import Enum
 from rich import print
 from datetime import datetime
 from pvgisprototype.validation.functions import ModelSolarPositionInputModel
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarIncidenceModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarDeclinationModel
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
@@ -30,6 +28,7 @@ from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
+# from pvgisprototype.api.irradiance.shortwave import calculate_global_irradiance_time_series
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
@@ -56,12 +55,15 @@ from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import EFFECTIVE_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import TITLE_KEY_NAME
+from pvgisprototype.constants import PHOTOVOLTAIC_POWER
+from pvgisprototype.constants import PHOTOVOLTAIC_POWER_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
@@ -79,10 +81,11 @@ from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import SHADE_COLUMN_NAME
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
 
 
-def calculate_effective_irradiance_time_series(
+def calculate_photovoltaic_power_output_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -92,8 +95,8 @@ def calculate_effective_irradiance_time_series(
     end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
     random_time_series: bool = False,
-    global_horizontal_component: Optional[Path] = None,
-    direct_horizontal_component: Optional[Path] = None,
+    global_horizontal_irradiance: Optional[Path] = None,
+    direct_horizontal_irradiance: Optional[Path] = None,
     spectral_factor=None,
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
@@ -101,6 +104,8 @@ def calculate_effective_irradiance_time_series(
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
+    dtype = 'float64',
+    array_backend = 'NUMPY',
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
@@ -108,9 +113,9 @@ def calculate_effective_irradiance_time_series(
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = 2,
     apply_angular_loss_factor: Optional[bool] = True,
-    solar_position_model: SolarPositionModels = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_incidence_model: SolarIncidenceModels = SolarIncidenceModels.jenco,
-    solar_time_model: SolarTimeModels = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,
@@ -127,7 +132,10 @@ def calculate_effective_irradiance_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """
-    Estimate the energy production of a PV system over a time series based on the effective irradiance incident on a solar surface.
+    Estimate the photovoltaic power over a time series or an arbitrarily
+    aggregated energy production of a PV system based on the effective solar
+    irradiance incident on a solar surface, the ambient temperature and
+    optionally wind speed.
 
     Parameters
     ----------
@@ -164,7 +172,7 @@ def calculate_effective_irradiance_time_series(
 
     Returns
     -------
-    effective_irradiance_series : ndarray
+    photovoltaic_power_outout_series : ndarray
         Array of effective irradiance values.
     results : dict
         Dictionary containing detailed results of the calculation.
@@ -173,13 +181,12 @@ def calculate_effective_irradiance_time_series(
 
     Examples
     --------
-    >>> calculate_effective_irradiance(10.0, 20.0, 100.0, start_time="2023-01-01", end_time="2023-01-31")
+    >>> calculate_photovoltaic_power_output_series(10.0, 20.0, 100.0, start_time="2023-01-01", end_time="2023-01-31")
     # This will return the effective irradiance series, results, and title for the specified parameters.
 
     Notes
     -----
     This function is part of the Typer-based CLI for the new PVGIS implementation in Python. It provides an interface for estimating the energy production of a photovoltaic system, taking into account various environmental and system parameters.
-
     """
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
@@ -205,12 +212,25 @@ def calculate_effective_irradiance_time_series(
     mask_below_horizon = solar_altitude_series.value < 0
     in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
     mask_not_in_shade = ~in_shade
-    mask_above_horizon_not_in_shade = np.logical_and.reduce(mask_above_horizon, mask_not_in_shade)
+    # mask_above_horizon_not_in_shade = np.logical_and.reduce(mask_above_horizon, mask_not_in_shade)
+    mask_above_horizon_not_in_shade = np.logical_and(mask_above_horizon, mask_not_in_shade)
 
-    # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype="float64")
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype="float64")
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype="float64")
+    # =======================================================================
+    from pvgisprototype.validation.arrays import create_array
+
+    shape_of_array = (
+        solar_altitude_series.value.shape
+    )  # Borrow shape from solar_altitude_series
+    direct_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    diffuse_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    reflected_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    # =======================================================================
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
@@ -232,7 +252,7 @@ def calculate_effective_irradiance_time_series(
                 end_time=end_time,
                 timezone=timezone,
                 random_time_series=random_time_series,
-                direct_horizontal_component=direct_horizontal_component,
+                direct_horizontal_component=direct_horizontal_irradiance,
                 mask_and_scale=mask_and_scale,
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
@@ -275,8 +295,8 @@ def calculate_effective_irradiance_time_series(
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
-            global_horizontal_component=global_horizontal_component,
-            direct_horizontal_component=direct_horizontal_component,  # time series, optional
+            global_horizontal_component=global_horizontal_irradiance,
+            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
@@ -309,7 +329,7 @@ def calculate_effective_irradiance_time_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             albedo=albedo,
-            direct_horizontal_component=direct_horizontal_component,  # time series, optional
+            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
@@ -332,7 +352,46 @@ def calculate_effective_irradiance_time_series(
         + diffuse_irradiance_series
         + reflected_irradiance_series
     )
-
+    # -----------------------------------------------------------------------
+    # If we do the following, to deduplicate code,
+    #     how do we collect the intermediate results ?
+    # -----------------------------------------------------------------------
+    # global_irradiance_series = calculate_global_irradiance_time_series(
+    #     longitude=longitude,
+    #     latitude=latitude,
+    #     elevation=elevation,
+    #     timestamps=timestamps,
+    #     start_time=start_time,
+    #     frequency=frequency,
+    #     end_time=end_time,
+    #     timezone=timezone,
+    #     random_time_series=random_time_series,
+    #     direct_horizontal_irradiance=direct_horizontal_irradiance,
+    #     mask_and_scale=mask_and_scale,
+    #     neighbor_lookup=neighbor_lookup,
+    #     tolerance=tolerance,
+    #     in_memory=in_memory,
+    #     surface_tilt=surface_tilt,
+    #     surface_orientation=surface_orientation,
+    #     linke_turbidity_factor_series=linke_turbidity_factor_series,
+    #     apply_atmospheric_refraction=apply_atmospheric_refraction,
+    #     refracted_solar_zenith=refracted_solar_zenith,
+    #     albedo=albedo,
+    #     apply_angular_loss_factor=apply_angular_loss_factor,
+    #     solar_position_model=solar_position_model,
+    #     solar_incidence_model=solar_incidence_model,
+    #     solar_time_model=solar_time_model,
+    #     time_offset_global=time_offset_global,
+    #     hour_offset=hour_offset,
+    #     solar_constant=solar_constant,
+    #     perigee_offset=perigee_offset,
+    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    #     time_output_units=time_output_units,
+    #     angle_units=angle_units,
+    #     angle_output_units=angle_output_units,
+    #     verbose=verbose,
+    # )
+    # -----------------------------------------------------------------------
     if not power_model:
         if not efficiency:  # user-set  -- RenameMe ?  FIXME
             # print(f'Using preset system efficiency {system_efficiency}')
@@ -356,14 +415,15 @@ def calculate_effective_irradiance_time_series(
             )
             efficiency_coefficient_series *= system_efficiency  # on-top-of !
 
-    effective_irradiance_series = global_irradiance_series * efficiency_coefficient_series
+    photovoltaic_power_outout_series = global_irradiance_series * efficiency_coefficient_series
 
-    # Reporting --------------------------------------------------------------
+    # Building the output dictionary ========================================
 
-    results = {
-        EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
-    }
-    title = "Effective"
+    if verbose > 0:
+        results = {
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
+            PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_outout_series,
+        }
 
     if verbose > 2:
         more_extended_results = {
@@ -383,7 +443,7 @@ def calculate_effective_irradiance_time_series(
             REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
         }
         results = results | extended_results
-        title += " & in-plane components"
+        results[TITLE_KEY_NAME] += " & in-plane components"
 
     if verbose > 3:
         even_more_extended_results = {
@@ -403,14 +463,10 @@ def calculate_effective_irradiance_time_series(
         }
         results = results | and_even_more_extended_results
 
-    if verbose == 6:
-        results = {
-            EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
-        }
-        title = "Effective"
-        longitude = latitude = None
-
-    if verbose > 6:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return effective_irradiance_series, results, title
+    if verbose > 0:
+        return results
+
+    return photovoltaic_power_outout_series

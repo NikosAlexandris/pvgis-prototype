@@ -3,6 +3,7 @@ from pvgisprototype import HorizonHeight
 from pathlib import Path
 from typing import Optional
 import numpy as np
+from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
 
 
 # @validate_with_pydantic()

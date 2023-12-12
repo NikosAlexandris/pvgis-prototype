@@ -3,14 +3,12 @@ PV electricity generation potential for different technologies & configurations
 """
 
 from importlib.metadata import version
-import warnings
 from pathlib import Path
 import sys
 import typer
 import typer.completion
 from typer._completion_shared import Shells
 from click import Context
-from typer.core import TyperGroup
 from typing import Annotated
 from typing import Optional
 from rich import print
@@ -25,7 +23,7 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
 
-from pvgisprototype.cli.energy import energy
+from pvgisprototype.cli.power import power
 from pvgisprototype.cli import series
 from pvgisprototype.cli.irradiance import irradiance
 from pvgisprototype.cli import position
@@ -79,8 +77,8 @@ def install(
 
 
 app.add_typer(
-    energy.app,
-    name="energy",
+    power.app,
+    name="power",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance,
 )

@@ -6,8 +6,8 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype.api.geometry.models import SolarPositionModels
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAltitude
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
@@ -38,8 +38,8 @@ def model_solar_altitude(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_time_model: SolarTimeModels = SolarTimeModels.milne,
-    solar_position_model: SolarPositionModels = SolarPositionModels.pvlib,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
+    solar_position_model: SolarPositionModel = SolarPositionModel.pvlib,
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -65,7 +65,7 @@ def model_solar_altitude(
 
     - The result is returned with units.
     """
-    if solar_position_model.value == SolarPositionModels.noaa:
+    if solar_position_model.value == SolarPositionModel.noaa:
 
         solar_altitude = calculate_solar_altitude_noaa(
             longitude=longitude,
@@ -76,14 +76,14 @@ def model_solar_altitude(
             verbose=verbose,
         )
 
-    if solar_position_model.value == SolarPositionModels.skyfield:
+    if solar_position_model.value == SolarPositionModel.skyfield:
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
         )
 
-    if solar_position_model.value == SolarPositionModels.suncalc:
+    if solar_position_model.value == SolarPositionModel.suncalc:
         # note : first azimuth, then altitude
         solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
             date=timestamp,  # this comes first here!
@@ -105,7 +105,7 @@ def model_solar_altitude(
                 [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
             )
 
-    if solar_position_model.value == SolarPositionModels.pysolar:
+    if solar_position_model.value == SolarPositionModel.pysolar:
 
         timestamp = attach_timezone(timestamp, timezone)
         solar_altitude = pysolar.solar.get_altitude(
@@ -129,7 +129,7 @@ def model_solar_altitude(
                 [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
             )
 
-    if solar_position_model.value  == SolarPositionModels.pvis:
+    if solar_position_model.value  == SolarPositionModel.pvis:
 
         solar_altitude = calculate_solar_altitude_pvis(
             longitude=longitude,
@@ -142,7 +142,7 @@ def model_solar_altitude(
             verbose=verbose,
         )
 
-    if solar_position_model.value  == SolarPositionModels.pvlib:
+    if solar_position_model.value  == SolarPositionModel.pvlib:
 
         solar_altitude = calculate_solar_altitude_pvlib(
             longitude=longitude,
@@ -160,8 +160,8 @@ def calculate_solar_altitude(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
-    solar_position_models: List[SolarPositionModels] = [SolarPositionModels.skyfield],
-    solar_time_model: SolarTimeModels = SolarTimeModels.skyfield,
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -173,7 +173,7 @@ def calculate_solar_altitude(
     """
     results = []
     for solar_position_model in solar_position_models:
-        if solar_position_model != SolarPositionModels.all:  # ignore 'all' in the enumeration
+        if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
             solar_altitude = model_solar_altitude(
                 longitude=longitude,
                 latitude=latitude,

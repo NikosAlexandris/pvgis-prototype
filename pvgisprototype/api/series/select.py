@@ -81,10 +81,6 @@ def select_time_series(
             location_time_series.sel(time=slice(start_time, end_time))
         )
 
-    # # if 'timestamps' is a single datetime object, parse it
-    # if isinstance(timestamps, datetime):
-    #     timestamps = parse_timestamp_series(timestamps)
-
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
             start_time = end_time = timestamps[0]
