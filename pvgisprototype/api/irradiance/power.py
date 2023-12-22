@@ -33,6 +33,7 @@ from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_t
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -91,8 +92,9 @@ def calculate_photovoltaic_power_output_series(
     elevation: float,
     timestamps: Optional[datetime] = None,
     start_time: Optional[datetime] = None,
-    frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
+    periods: Optional[int] = None,
+    frequency: Optional[str] = TIMESTAMPS_FREQUENCY_DEFAULT,
     timezone: Optional[str] = None,
     random_time_series: bool = False,
     global_horizontal_irradiance: Optional[Path] = None,

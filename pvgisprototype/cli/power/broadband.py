@@ -41,6 +41,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_i
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_efficiency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_periods
 from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_groupby
 from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
@@ -123,6 +124,7 @@ def photovoltaic_power_output_series(
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[Optional[DatetimeIndex], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
@@ -179,8 +181,9 @@ def photovoltaic_power_output_series(
         elevation=elevation,
         timestamps=timestamps,
         start_time=start_time,
-        frequency=frequency,
         end_time=end_time,
+        periods=periods,
+        frequency=frequency,
         timezone=timezone,
         random_time_series=random_time_series,
         global_horizontal_irradiance=global_horizontal_irradiance,

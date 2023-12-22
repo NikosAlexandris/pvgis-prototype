@@ -399,26 +399,62 @@ def generate_timestamps_for_a_year(year, frequency_minutes=60):
 
 def generate_datetime_series(
     start_time: Optional[str] = None,
-    frequency: Optional[str] = TIMESTAMPS_FREQUENCY_DEFAULT,
     end_time: Optional[str] = None,
+    periods: Optional[str] = None,
+    frequency: Optional[str] = TIMESTAMPS_FREQUENCY_DEFAULT,
     timezone: Optional[str] = None,
+    name: Optional[str] = None,
 ):
-    """
-    Generate a series of datetime stamps between start_time and end_time at a specified frequency.
+    """Generate a fixed frequency DatetimeIndex
+
+    Generates a range of equally spaced timestamps wrapping over Pandas'
+    date_range() function. The timestamps satisfy `start_time <[=] x <[=]
+    end_time`, where the first and last stamps fall on the boundary of the
+    requested ``frequency`` string. The difference between any two timestamps
+    is specified by the requested ``frequency``.
+
+    If exactly one of ``start_time``, ``end_time``, or ``frequency`` is *not*
+    specified, it can be computed by the ``periods``, the number of timesteps
+    in the range.
 
     Parameters
     ----------
-    start_time : str
-        The starting time in ISO format.
-    end_time : str
-        The ending time in ISO format.
-    frequency : str
-        Frequency of the timestamps, e.g., 'h' for hourly.
+    start_time : str, datetime, date, pandas.Timestamp, or period-like, default None
+        The starting time (if str in ISO format), also described as the left
+        bound for generating periods.
+    end_time : str, datetime, date, pandas.Timestamp, or period-like, default None
+        The ending time in ISO format. In Pandas described as the right bound
+        for generating periods.
+    periods : int, default None
+        Number of periods to generate.
+    frequency : str or DateOffset, optional
+        Frequency alias of the timestamps to generate, e.g., 'h' for hourly.
+        By default the frequency is taken from start_time or
+        end_time if those are Period objects. Otherwise, the default is "h" for
+        hourly frequency.
+    name : str, default None
+        Name of the resulting PeriodIndex.
 
     Returns
     -------
     DatetimeIndex
         A Pandas DatetimeIndex at the specified frequency.
+
+    See Also
+    --------
+    pandas.date_range
+        Return a fixed frequency DatetimeIndex.
+
+    Notes
+    -----
+    Of the four parameters ``start_time``, ``end_time``, ``periods``, and
+    ``frequency``, exactly three must be specified. If ``frequency`` is
+    omitted, the resulting ``DatetimeIndex`` will have ``periods`` linearly
+    spaced elements between ``start`` and ``end`` (closed on both sides).
+
+    Common time series frequencies are indexed via a set of string (also
+    referred to as offset) aliases described at 
+    <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases>`__.
 
     Example
     -------
@@ -427,13 +463,22 @@ def generate_datetime_series(
     >>> frequency = 'h'  # 'h' for hourly
     >>> generate_datetime_series(start_time, end_time, frequency)
     DatetimeIndex(['2010-06-01 06:00:00', '2010-06-01 07:00:00', '2010-06-01 08:00:00'], dtype='datetime64[ns]', freq=None)
+
+    Using the periods input parameter to define the number of timesteps to generate : 
+
+    >>> generate_datetime_series(start_time=start_time, periods=4, frequency=frequency)
+    DatetimeIndex(['2010-06-01 06:00:00', '2010-06-01 07:00:00',
+               '2010-06-01 08:00:00', '2010-06-01 09:00:00'],
+              dtype='datetime64[ns]', freq='H')
     """
     from pandas import date_range
     timestamps = date_range(
         start=start_time,
         end=end_time,
+        periods=periods,
         freq=frequency,
         tz=timezone,
+        name=name,
     )
 
     return timestamps
@@ -452,12 +497,18 @@ def callback_generate_datetime_series(
     # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
     start_time=ctx.params.get('start_time')
     end_time=ctx.params.get('end_time')
+    periods=ctx.params.get('periods', None) 
+    frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
+    # print(f'  Input [yellow]start, end time[/yellow] : {start_time}, {end_time}')
+    # print(f"  Input [yellow]frequency[/yellow] : {ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT)}")
     if start_time is not None and end_time is not None:
         timestamps = generate_datetime_series(
             start_time=start_time,
-            frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT),
             end_time=end_time,
+            periods=periods,
+            frequency=frequency,
             timezone=ctx.params.get('timezone'),
+            name=ctx.params.get('datetimeindex_name', None)
         )
     # from pandas import to_datetime
     # -----------------------------------------------------------------------
