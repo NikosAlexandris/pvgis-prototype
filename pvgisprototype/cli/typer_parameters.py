@@ -181,8 +181,14 @@ typer_option_start_time = typer.Option(
     rich_help_panel=rich_help_panel_time_series,
     default_factory = None,
 )
+typer_option_periods = typer.Option(
+    help=f"Number of timestamps to generate",
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=None
+)
 typer_option_frequency = typer.Option(
-    help=f"Frequency for timestamp generation, ex. 30m. A number and date/time unit : (D)ay, (M)onth, (Y)ear, (h)ours, (m)inutes, or (s)econds. See NumPy's timedelta64.",
+    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+    help=f"A common date/time frequency unit optionally with a multiples number, such as [code]H[/code](hourly), [code]min[/code](utely), [code]S[/code](econdly), [code]D[/code](aily), [code]W[/code](eekly), [code]M[/code](onth end), [code]Y[/code](early) or [code]30m[/code]. See Pandas time series offset aliases.",
     rich_help_panel=rich_help_panel_time_series,
     # default_factory='h'
 )
