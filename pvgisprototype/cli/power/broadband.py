@@ -97,6 +97,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
 from rich import print
+from pandas import DatetimeIndex
 
 
 app = typer.Typer(
@@ -108,7 +109,6 @@ app = typer.Typer(
     help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
 )
 
-from pandas import DatetimeIndex
 
 @app.command(
     'broadband',
@@ -218,7 +218,6 @@ def photovoltaic_power_output_series(
         efficiency=efficiency,
         verbose=verbose,
     )
-
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if verbose > 0:

@@ -1,17 +1,19 @@
-# Basic Usage of PVGIS API
+# API Reference
 
-This guide provides an introduction to the basic usage of the PVGIS API. 
+## Python API
+
+This guide provides an introduction to the basic usage of the PVGIS API.
 
 ## Getting Started
 
 [Include steps on how to get started with PVGIS API, such as installation instructions, setting up the environment, etc.]
 
-## Making Your First API Call
+## Examples
 
 [Provide an example of making a basic API call, including code snippets and explanations.]
 
 ``` python
-form pvgisprototype import Longitude, Latitude
+from pvgisprototype import Longitude, Latitude
 ```
 
 or
@@ -22,14 +24,10 @@ or
 Longitude(value=None, unit=None, symbol='Λ', desription="The angle between a point on the Earth's surface and the meridian plane, with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180° east or west.")
 ```
 
-## Understanding the Response
-
-[Explain the structure of the API response and how to interpret it.]
-
 ## Error Handling
 
 [Discuss common errors and how to handle them.]
 
 ## Next Steps
 
-After getting familiar with the basic usage, consider exploring [Advanced Topics](advanced_topics.md) for more complex functionalities of PVGIS API.
+...

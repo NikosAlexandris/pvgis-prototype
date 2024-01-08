@@ -1,28 +1,58 @@
-site_name: PVGIS Reference
+site_name: PVGIS
+site_description: Photovoltaic Geographical Information System
 site_author: Nikos Alexandris and the PVGIS team
 site_url: http://pvgis-reference.jrc.it
 
 repo_name: pvis-be-prototype
 repo_url: https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
-copyright: Copyright &copy; 2023 European Commission
+edit_uri: edit/main/docs/
+# Keep this in sync with pyproject.toml and index.md
+copyright: Copyright &copy; 2023 European Commission. Licensed under the EUPL-1.2 or later
+
+watch:
+  - docs/includes
 
 nav:
-  - Introduction: index.md
-  - Overview: overview.md
-  - Summary: SUMMARY.md
-  - Code Reference: reference/  
-  # rest of the navigation...
-  # - Basic Usage: basic_usage.md
-  # - Configuration: configuration.md
-  # - Update: update.md
-  # - Advanced Usage:
-      # - Projects: projects.md
-      # - Tags: tags.md
+  - Overview:
+    - '': index.md
+  - Installation: install/install.md
+  - How To:
+    - how_to/index.md
+  - Tutorials:
+    - tutorials/index.md
+  - Reference:
+    - reference/index.md
+  - Code Reference:
+    - code_reference/index.md
+    - Algorithms: code_reference/algorithms.md
+    - CLI Reference: code_reference/cli_reference.md
+    - API Reference: code_reference/api_reference.md
+    - Web API Reference: code_reference/web_api_reference.md
+  - Tags: includes/tags.md
+
+extra:
+  tags:
+    Concepts: concepts
+    Chunking: chunking
+    CLI: cli
+    How-To: howto
+    To Do: todo
+    See-Also: seealso
 
 theme:
+  logo: images/pvgis_image_squared.png
+  font:
+    code: Source Code Pro
+  icon:
+    tag:
+      concepts: simple/blueprint
+      chunking: fontawesome/solid/cubes-stacked
+      cli: octicons/terminal-16
+      howto: material/tools
+      todo: octicons/tasklist-16
+      seealso: material/eye
   name: material
   custom_dir: docs/overrides
-  logo: images/pvgis_image_squared.png
   palette:
     # - primary: yellow
     # primary: blue grey
@@ -40,7 +70,25 @@ theme:
   features:
     - announce.dismiss
     - header.autohide
+    - search.highlight
+    - search.share
+    - content.tooltips
+    - content.action.edit
+    - content.action.view
     - navigation.top
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes 
+    - toc.follow
+    # - toc.integrate 
+    - navigation.top
+    - navigation.footer
 
 extra_css:
   - stylesheets/extra.css
@@ -49,13 +97,64 @@ extra_css:
   - css/termynal.css
   - css/custom.css
 
+markdown_extensions:
+  - toc:
+      permalink: true  # Paragraph symbol linking to current headline
+  - footnotes
+  - def_list
+  - tables
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.critic:
+      mode: view
+  - pymdownx.details
+  - pymdownx.highlight:
+      use_pygments: true
+      anchor_linenums: true
+      pygments_lang_class: true
+      linenums: true
+      line_spans: __span
+      linenums_style: pymdownx-inline
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.keys
+  - pymdownx.smartsymbols
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - attr_list
+  - abbr
+  - pymdownx.snippets:
+      auto_append:
+        - docs/includes/abbreviations.md
+      # check_paths: True
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - mkdocs-typer
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
 extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
   - https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js
   - js/termynal.js
   - js/custom.js
 
 plugins:
   - search
+  - tags:
+      tags_file: includes/tags.md
+  - exclude:
+      glob:
+        - "*.py"  # Python scripts
+        - "*.inc"  # includes
   - autolinks
   - autorefs
   - git-revision-date-localized:

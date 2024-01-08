@@ -16,4 +16,4 @@ PVGIS API offers a range of features designed to meet your solar irradiance calc
 
 [Continue listing other features...]
 
-For detailed information on how to use these features, refer to our [Basic Usage](basic_usage.md) guide and [API Reference](SUMMARY.md).
+For detailed information on how to use these features, refer to our [Code Reference](code_reference/index.md).
