@@ -88,4 +88,5 @@ filterwarnings = [
 [project]
 dependencies = [
     "mkdocstrings[python]>=0.18",
+    "mkdocs-exclude",
 ]
