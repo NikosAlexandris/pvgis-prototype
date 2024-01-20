@@ -1,3 +1,11 @@
+---
+tags:
+  - Python
+  - install
+  - pip
+  - virtual environment
+---
+
 # Installation
 
 ## Requirements
@@ -5,7 +13,7 @@
 - Python
 
 1. Clone the source code repository
-2. Step in
+2. Step in the source code directory
 3. Install the Python package
 
 
@@ -23,74 +31,37 @@ Successfully installed pvis
 
 </div>
 
-**Note**: that will include
-<a href="https://rich.readthedocs.io/" class="external-link" target="_blank">Rich</a>.
-Rich is library to *display* visually pleasing information on the terminal.
-Is it deeply integrated into **PVIS**.
+!!! note
+
+    The installation will include
+    <a href="https://rich.readthedocs.io/" class="external-link" target="_blank">Rich</a>.
+    Rich is a library to *display* visually pleasing information on the terminal.
+    It is deeply integrated into **PVIS**.
 
 
-Then, welcome yourself in the command line interface
+Then, welcome yourself in the command line interface by executing 
 
-<div class="termy">
-
-```console
-❯ pvgis-prototype
-
- Usage: pvgis-prototype [OPTIONS] COMMAND [ARGS]...
-
- PVGIS Command Line Interface prototype
-
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────╮
-│ --version                Show the version of the application and exit                             │
-│ --log      -l      PATH  Specify a log file to write logs to, or omit for stderr. [default: None] │
-│ --help                   Show this message and exit.                                              │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Input / Output ───────────────────────────────────────────────────────────────╮
-│ --verbose  -v      INTEGER  Show details while executing commands [default: 0] │
-╰────────────────────────────────────────────────────────────────────────────────╯
-╭─ Performance ──────────────────────────────────────────────────────────────────╮
-│ power  🔌 Estimate the performance of a photovoltaic system over a time series │
-╰────────────────────────────────────────────────────────────────────────────────╯
-╭─ Time series ────────────────────────────────────────────────────────────╮
-│ series      💹 Work with time series                                     │
-│ irradiance  🌞 Estimate the solar irradiance incident on a solar surface │
-╰──────────────────────────────────────────────────────────────────────────╯
-╭─ Solar geometry ───────────────────────────────────────────────────────────────────────────╮
-│ time      ⌛ Calculate the solar time for a location and moment                            │
-│ position  📐 Calculate solar geometry parameters for a location and moment in time         │
-│ surface   󰶛  Calculate solar surface geometry parameters for a location and moment in time │
-╰────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Toolbox ───────────────────────────╮
-│ utilities  🧰  Diagnostic functions │
-╰─────────────────────────────────────╯
-╭─ Reference ─────────────────────────────────────╮
-│ manual  📖 Manual for solar radiation variables │
-╰─────────────────────────────────────────────────╯
+```{.shell linenums="0"}
+pvgis-prototype
 ```
 
-</div>
+returns (**currently**)
 
+``` bash exec="true" result="ansi"
+pvgis-prototype --help
+```
+
+For each and every command, there is a `--help` option.
+Please consult it to grasp the details for a command,
+its arguments and optional parameters,
+default values and settings that can further shape the output.
 
 Auto-completion in the command line can be installed optionally.
-This is offered via a hidden command ! 
+This is offered via the _hidden_ command `completion` :
 
-<div class="termy">
-
-``` console
-❯ pvgis-prototype completion show --help
-
- Usage: pvgis-prototype completion show [OPTIONS]
-                                        SHELL:{bash|zsh|fish|powershell|pwsh}
-
- Show completion for the specified shell, to copy or customize it.
-
-╭─ Arguments ───────────────────────────────────────────────────────────────────────────╮
-│ *    shell      SHELL:{bash|zsh|fish|powershell|p  [default: None] [required]         │
-│                 wsh}                                                                  │
-╰───────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Options ─────────────────────────────────────────────────────────────────────────────╮
-│ --help          Show this message and exit.                                           │
-╰───────────────────────────────────────────────────────────────────────────────────────╯
+```{.shell linenums="0"}
+pvgis-prototype completion show --help
 ```
-
-</div>
+``` bash exec="true" result="ansi"
+pvgis-prototype completion show --help
+```
