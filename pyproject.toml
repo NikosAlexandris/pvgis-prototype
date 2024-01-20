@@ -87,6 +87,31 @@ filterwarnings = [
 # adapt to your dependencies manager
 [project]
 dependencies = [
-    "mkdocstrings[python]>=0.18",
-    "mkdocs-exclude",
+    "typer",
+    "numpy",
+    "rich",
+    "pandas",
+    "xarray",
+    "loguru",
+    "xarray_extras",
+    "pydantic",
+]
+
+[project.optional-dependencies]
+dev = [
+  "devtools",  # move to optional dependencies ?
+  "pre-commit",
+  "black",
+  "flake8",
+  "isort",
+  "pytest",
+]
+docs = [
+  "mkdocs-material",
+  "mkdocs-table-reader-plugin",
+  "mkdocs-exclude",
+  "mkdocstrings[python]",
+# "mkdocstrings[python]>=0.18",
+  "mkdocs-bibtex",
+  "markdown-exec[ansi]",
 ]
