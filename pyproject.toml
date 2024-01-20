@@ -83,3 +83,35 @@ filterwarnings = [
     'ignore:distutils Version classes are deprecated. Use packaging.version instead:DeprecationWarning',
     'ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning',
 ]
+# PEP 621 dependencies declaration
+# adapt to your dependencies manager
+[project]
+dependencies = [
+    "typer",
+    "numpy",
+    "rich",
+    "pandas",
+    "xarray",
+    "loguru",
+    "xarray_extras",
+    "pydantic",
+]
+
+[project.optional-dependencies]
+dev = [
+  "devtools",  # move to optional dependencies ?
+  "pre-commit",
+  "black",
+  "flake8",
+  "isort",
+  "pytest",
+]
+docs = [
+  "mkdocs-material",
+  "mkdocs-table-reader-plugin",
+  "mkdocs-exclude",
+  "mkdocstrings[python]",
+# "mkdocstrings[python]>=0.18",
+  "mkdocs-bibtex",
+  "markdown-exec[ansi]",
+]
