@@ -45,18 +45,16 @@ extra_css:
 
 plugins:
   - search
-  - autolinks
+  # - autolinks
   - autorefs
   - git-revision-date-localized:
       type: timeago
   - minify:
       minify_html: true
-  - gen-files:
-      scripts:
-        - scripts/generate_reference_pages.py
-  - literate-nav:
-      nav_file: SUMMARY.md
-  - section-index
+  # - gen-files:
+  #     scripts:
+  #       - scripts/generate_reference_pages.py
+  # - section-index
   - mkdocstrings:
       handlers:
         python:

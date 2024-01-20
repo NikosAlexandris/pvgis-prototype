@@ -71,6 +71,8 @@ docs = [
   "mkdocstrings[python]",
   "mkdocs-bibtex",
   "markdown-exec[ansi]",
+  "mkdocs-git-revision-date-localized-plugin",
+  "mkdocs-minify-plugin",
 ]
 
 [project.urls]
