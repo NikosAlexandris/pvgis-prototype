@@ -1,3 +1,10 @@
+---
+tags:
+  - Web API
+  - FastAPI
+  - Reference
+---
+
 # Web API Reference
 
 ## Basic usage
@@ -8,7 +15,7 @@ This guide provides an introduction to the basic usage of the PVGIS API.
 
 [Include steps on how to get started with PVGIS API, such as installation instructions, setting up the environment, etc.]
 
-## Your First Web API Call
+## Example Web API Call
 
 [Provide an example of making a basic API call, including code snippets and explanations.]
 

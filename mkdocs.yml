@@ -16,18 +16,20 @@ nav:
   - Overview:
     - '': index.md
   - Installation: install/install.md
-  - How To:
-    - how_to/index.md
   - Tutorials:
     - tutorials/index.md
+  - How To:
+    - how_to/index.md
+    - how_to/help.md
+    - Power: how_to/power.md
   - Reference:
     - reference/index.md
   - Code Reference:
     - code_reference/index.md
     - Algorithms: code_reference/algorithms.md
-    - CLI Reference: code_reference/cli_reference.md
-    - API Reference: code_reference/api_reference.md
-    - Web API Reference: code_reference/web_api_reference.md
+    - CLI: code_reference/cli_reference.md
+    - API: code_reference/api_reference.md
+    - Web API: code_reference/web_api_reference.md
   - Tags: includes/tags.md
 
 extra:
@@ -82,11 +84,10 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
-    - navigation.expand
+    # - navigation.expand
     - navigation.path
     - navigation.indexes 
     - toc.follow
-    # - toc.integrate 
     - navigation.top
     - navigation.footer
 
@@ -96,31 +97,48 @@ extra_css:
   - stylesheets/code_select.css
   - css/termynal.css
   - css/custom.css
+  - css/mkdocstrings.css
+# - css/style.css
+# - css/material.css
 
 markdown_extensions:
+  - extra
+  - mdx_include:
+      base_path: docs
+  - meta
   - toc:
-      permalink: true  # Paragraph symbol linking to current headline
+      permalink: true # Paragraph symbol linking to current headline
+      baselevel: 2
   - footnotes
   - def_list
   - tables
   - pymdownx.arithmatex:
       generic: true
-  - pymdownx.betterem
+  - pymdownx.betterem:
+      smart_enable: all
   - pymdownx.caret
   - pymdownx.mark
   - pymdownx.tilde
+  - pymdownx.magiclink
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.critic
   - pymdownx.critic:
       mode: view
   - pymdownx.details
+  # - markdown.extensions.codehilite:
+  #     guess_lang: false
+  - codehilite
   - pymdownx.highlight:
       use_pygments: true
       anchor_linenums: true
       pygments_lang_class: true
-      linenums: true
+      # linenums: true
       line_spans: __span
       linenums_style: pymdownx-inline
   - pymdownx.inlinehilite
-  - pymdownx.superfences
   - pymdownx.keys
   - pymdownx.smartsymbols
   - pymdownx.tasklist:
@@ -133,8 +151,11 @@ markdown_extensions:
       # check_paths: True
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
-  - mkdocs-typer
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format ''
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -142,82 +163,64 @@ markdown_extensions:
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
   - https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js
   - js/termynal.js
   - js/custom.js
 
 plugins:
   - search
+  - bibtex:
+      bib_file: "references.bib"
   - tags:
       tags_file: includes/tags.md
+  - table-reader
   - exclude:
       glob:
         - "*.py"  # Python scripts
         - "*.inc"  # includes
+  - markdown-exec
   - autolinks
   - autorefs
   - git-revision-date-localized:
       type: timeago
   - minify:
       minify_html: true
-  - gen-files:
-      scripts:
-        - scripts/generate_reference_pages.py
-  - literate-nav:
-      nav_file: SUMMARY.md
-  - section-index
+  # - gen-files:
+  #     scripts:
+  #       - scripts/generate_reference_pages.py
+  # - literate-nav:
+  #     nav_file: SUMMARY.md
+  # - section-index
+  # - include-markdown
   - mkdocstrings:
       handlers:
         python:
           import:
-            - url: https://docs.python-requests.org/en/master/objects.inv
-              domains: [std, py]
+          # - url: https://docs.python-requests.org/en/master/objects.inv
+          #   domains: [std, py]
+          - https://docs.python.org/3/objects.inv
+          # - https://installer.readthedocs.io/en/stable/objects.inv  # demonstration purpose in the docs
+          - https://mkdocstrings.github.io/autorefs/objects.inv
           paths: [.]
-
-
-markdown_extensions:
-  - admonition
-  - meta
-  - toc:
-      permalink: true
-      baselevel: 2
-  - markdown.extensions.codehilite:
-      guess_lang: false
-  - codehilite
-  - extra
-  - pymdownx.arithmatex
-  - pymdownx.betterem:
-      smart_enable: all
-  - pymdownx.caret
-  - pymdownx.critic
-  - pymdownx.details
-  - attr_list
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - pymdownx.inlinehilite
-  - pymdownx.magiclink
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format ''
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.tilde
-  - pymdownx.highlight:
-      use_pygments: true
-      pygments_lang_class: true
-  - mdx_include:
-      base_path: docs
-  # Enable while writing docs to simplify highlighting
-  # - pymdownx.highlight:
-  #     linenums: true
+          options:
+            # docstring_options:
+            #   ignore_init_summary: true
+            docstring_style: numpy
+            docstring_section_style: table
+            filters: ["!^_"]
+            heading_level: 1
+            inherited_members: true
+            merge_init_into_class: true
+            separate_signature: true
+            line_length: 60
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            summary: true
 
 # extra:
 #   social:
