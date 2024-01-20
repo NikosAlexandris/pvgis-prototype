@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pvgisprototype"
 dynamic = ["version"]
-description = "Photovoltaic Geographic Information System"
+description = "Photovoltaic Geographic Information System Prototype"
 readme = {file = "ReadMe.md", content-type = "text/markdown"}
 authors = [
     { name = 'Nikos Alexandris', email = 'Nikos.Alexandris@ec.europa.eu' },
@@ -16,31 +16,33 @@ authors = [
 ]
 requires-python = "==3.11.*"
 dependencies = [
-    "typer",
-    "numpy",
-    "rich",
-    "pandas",
-    "xarray",
-    "loguru",
-    "xarray_extras",
-    "pydantic",
-    "pvlib",
-    "netcdf4",
-    "distributed",
-    "matplotlib",
-    "ephem",
-    "skyfield",
-    "suncalc",
-    "pysolar",
+  "typer",
+  "numpy",
+  "rich",
+  "pandas",
+  "xarray",
+  "loguru",
+  "xarray_extras",
+  "pydantic",
+  "pvlib",
+  "netcdf4",
+  "distributed",
+  "matplotlib",
+  "ephem",
+  "skyfield",
+  "suncalc",
+  "pysolar",
+  "devtools",  # currently part of regular functions !
 ]
 classifiers = [
-    'Development Status :: 3 - Alpha',
-    'Environment :: Console',
-    'Intended Audience :: Science/Research',
-    # 'License :: OSI Approved :: European Union Public License 1.2 (EUPL 1.2)',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python :: 3',
-    'Topic :: Scientific/Engineering :: Information Analysis'
+  'Development Status :: 4 - Beta',
+  'Environment :: Console',
+  'Intended Audience :: Developers',
+  'Intended Audience :: Science/Research',
+  'Natural Language :: English',
+  'Operating System :: OS Independent',
+  'Programming Language :: Python :: 3',
+  'Topic :: Scientific/Engineering :: Information Analysis'
 ]
 license = {text = "EUPL-1.2"}
 keywords = [
@@ -57,22 +59,41 @@ web = [
     "bokeh",
 ]
 dev = [
-  "devtools",  # move to optional dependencies ?
-  "pre-commit",
   "black",
+  "devtools",
   "flake8",
   "isort",
+  "pre-commit",
   "pytest",
+  "towncrier",
 ]
 docs = [
-  "mkdocs-material",
-  "mkdocs-table-reader-plugin",
-  "mkdocs-exclude",
-  "mkdocstrings[python]",
-  "mkdocs-bibtex",
   "markdown-exec[ansi]",
+  "mkdocs-bibtex",
+  "mkdocs-exclude",
   "mkdocs-git-revision-date-localized-plugin",
+  "mkdocs-material",
   "mkdocs-minify-plugin",
+  "mkdocs-table-reader-plugin",
+  "mkdocstrings[python]",
+]
+all = [
+  "black",
+  "bokeh",
+  "devtools",
+  "flake8",
+  "isort",
+  "markdown-exec[ansi]",
+  "mkdocs-bibtex",
+  "mkdocs-exclude",
+  "mkdocs-git-revision-date-localized-plugin",
+  "mkdocs-material",
+  "mkdocs-minify-plugin",
+  "mkdocs-table-reader-plugin",
+  "mkdocstrings[python]",
+  "pre-commit",
+  "pytest",
+  "towncrier",
 ]
 
 [project.urls]
