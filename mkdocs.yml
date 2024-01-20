@@ -103,8 +103,8 @@ extra_css:
 
 markdown_extensions:
   - extra
-  - mdx_include:
-      base_path: docs
+  # - mdx_include:
+  #     base_path: docs
   - meta
   - toc:
       permalink: true # Paragraph symbol linking to current headline
@@ -180,7 +180,7 @@ plugins:
         - "*.py"  # Python scripts
         - "*.inc"  # includes
   - markdown-exec
-  - autolinks
+  # - autolinks
   - autorefs
   - git-revision-date-localized:
       type: timeago
