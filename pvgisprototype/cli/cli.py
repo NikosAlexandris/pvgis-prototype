@@ -17,6 +17,7 @@ from rich.panel import Panel
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_version
+from pvgisprototype.cli.typer_parameters import typer_option_log
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry
@@ -132,26 +133,14 @@ app.add_typer(
 )
 
 
-def setup_logging(logfile: Optional[Path] = None):
-    """
-    Configure logging to either stderr or a file based on the logfile argument.
-    """
-    from loguru import logger
-    logger.remove()  # Remove default handler
-
-    if logfile:
-        logger.add(logfile, enqueue=True, backtrace=True, diagnose=True)
-    
-    # else:
-    #     import sys
-    #     logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
+from pvgisprototype.log import initialize_logger, logger
 
 
 @app.callback(no_args_is_help=True)
 def main(
     version: Annotated[Optional[bool], typer_option_version] = None,
     verbose: Annotated[int, typer_option_verbose] = 0,
-    log: Annotated[Optional[Path], typer.Option("--log", "-l", help="Specify a log file to write logs to, or omit for stderr.")] = None,
+    log: Annotated[Optional[bool], typer_option_log] = False,
 ) -> None:
     """
     The main entry point for PVIS prototype
@@ -159,8 +148,10 @@ def main(
     if verbose:
         print("Will write verbose output")
         state["verbose"] = True
-    setup_logging(log)
-    return
+    if log:
+        initialize_logger()
+        logger.info("Logging initialized")
+    pass
 
 
 if __name__ == "__main__":
