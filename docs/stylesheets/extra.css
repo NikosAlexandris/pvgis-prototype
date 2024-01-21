@@ -1,3 +1,7 @@
+.md-grid {
+  max-width: 1440px; 
+}
+
 .md-content a:link {
   text-decoration:underline;
 }
