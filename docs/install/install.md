@@ -1,4 +1,6 @@
 ---
+hide:
+  - navigation
 tags:
   - Python
   - install
@@ -25,7 +27,7 @@ To begin with,
 [venv]: https://docs.python.org/3/library/venv.html
 
 Next,
-you can install PVIS the following way :
+you can install PVIS in the following way :
 
 1. Clone the source code repository
 2. Step in the source code directory
@@ -47,7 +49,10 @@ Successfully installed pvis
 
     PVIS is under development so for the time being you may want to install
     either _all_ dependencies or the _dev_ ones.  For the latter option,
-    you can do `pip install .[dev]`.
+    you can do
+    ``` bash
+    pip install .[dev]`.
+    ```
 
 !!! note
 
@@ -78,4 +83,4 @@ pvgis-prototype --help
 
 ## Help ?
 
-Check the dedicated [help](how_to/help.md) page.
+Check the dedicated [help](help.md) page.
