@@ -6,18 +6,30 @@ tags:
   - virtual environment
 ---
 
-# Installation
+# Install
+
+!!! danger "Under Development"
+
+    **Everything is under development and subject to change!**
 
 ## Requirements
 
-- Python
+- An operating system that supports Python
+- A Python virtual environment
+
+## Install
+
+To begin with,
+**create a [virtual environment][venv]!**
+
+[venv]: https://docs.python.org/3/library/venv.html
+
+Next,
+you can install PVIS the following way :
 
 1. Clone the source code repository
 2. Step in the source code directory
 3. Install the Python package
-
-
-## Install
 
 <div class="termy">
 
@@ -31,6 +43,12 @@ Successfully installed pvis
 
 </div>
 
+!!! warning
+
+    PVIS is under development so for the time being you may want to install
+    either _all_ dependencies or the _dev_ ones.  For the latter option,
+    you can do `pip install .[dev]`.
+
 !!! note
 
     The installation will include
@@ -38,30 +56,26 @@ Successfully installed pvis
     Rich is a library to *display* visually pleasing information on the terminal.
     It is deeply integrated into **PVIS**.
 
+## Welcome !
 
-Then, welcome yourself in the command line interface by executing 
+Then,
+welcome yourself in the command line interface by executing 
 
-```{.shell linenums="0"}
-pvgis-prototype
-```
-
-returns (**currently**)
-
-``` bash exec="true" result="ansi"
+``` bash exec="true" result="ansi" source="above"
 pvgis-prototype --help
 ```
 
-For each and every command, there is a `--help` option.
-Please consult it to grasp the details for a command,
-its arguments and optional parameters,
-default values and settings that can further shape the output.
+## Auto-completion
 
-Auto-completion in the command line can be installed optionally.
-This is offered via the _hidden_ command `completion` :
+!!! tip "Auto-completion in the command line"
 
-```{.shell linenums="0"}
-pvgis-prototype completion show --help
-```
-``` bash exec="true" result="ansi"
-pvgis-prototype completion show --help
-```
+    Auto-completion in the command line can be installed optionally.
+    This is offered via the _hidden_ command `completion` :
+
+    ``` bash exec="true" result="ansi" source="above"
+    pvgis-prototype completion show --help
+    ```
+
+## Help ?
+
+Check the dedicated [help](how_to/help.md) page.
