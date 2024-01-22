@@ -17,8 +17,6 @@ from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.power import calculate_photovoltaic_power_output_series
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
-import typer
-from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
@@ -98,25 +96,9 @@ from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
 from rich import print
 
-
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    # help=f"Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-    help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-)
-
 from pandas import DatetimeIndex
 
-@app.command(
-    'broadband',
-    no_args_is_help=True,
-    # help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-    help=f"Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-    rich_help_panel=rich_help_panel_series_irradiance,
-)
+
 def photovoltaic_power_output_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
