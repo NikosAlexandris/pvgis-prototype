@@ -32,6 +32,7 @@ dependencies = [
   "skyfield",
   "suncalc",
   "pysolar",
+  "uniplot",
   "devtools",  # currently part of regular functions !
 ]
 classifiers = [
