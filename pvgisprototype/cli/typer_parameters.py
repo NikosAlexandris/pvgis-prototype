@@ -75,9 +75,10 @@ class OrderCommands(TyperGroup):
 
 # Generic
 
-def _version_callback(value: bool) -> None:
-    if value:
-        typer.echo(f"PVGIS prototype version: {version('pvgis-prototype')}")
+def _version_callback(flag: bool) -> None:
+    if flag:
+        from pvgisprototype._version import __version__
+        print(f"PVGIS prototype version: {__version__}")
         raise typer.Exit(code=0)
 
 
@@ -87,6 +88,15 @@ typer_option_version = typer.Option(
     callback=_version_callback,
     is_eager=True,
     # default_factory=None,
+)
+
+typer_option_log = typer.Option(
+    '--log',
+    '-l',
+    help="Enable logging",
+    # help="Specify a log file to write logs to, or omit for stderr.")] = None,
+    is_flag=True,
+    # default_factory=False,
 )
 
 
