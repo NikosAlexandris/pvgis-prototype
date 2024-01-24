@@ -55,8 +55,6 @@ def model_solar_incidence_time_series(
             timezone=timezone,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
-            time_output_units=time_output_units,
-            angle_output_units=angle_output_units,
             verbose=verbose,
         )
 
