@@ -71,7 +71,6 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
-    BaseAngleOutputUnitsModel,
 ):
     pass
 
