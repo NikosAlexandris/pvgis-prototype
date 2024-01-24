@@ -11,6 +11,7 @@ from pvgisprototype import FractionalYear
 from pvgisprototype.constants import RADIANS
 from math import pi
 import numpy as np
+from rich import print
 
 
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
@@ -78,6 +79,7 @@ def calculate_fractional_year_time_series_noaa(
     the timestamps into fractional values considering their position within the year.
     This is used in various solar energy calculations and models.
     """
+    print('FY : calculate_fractional_year_time_series_noaa()')
     days_of_year_series = timestamps.dayofyear
     hours = timestamps.hour
     days_in_year_series = get_days_in_years_series(timestamps.year) 

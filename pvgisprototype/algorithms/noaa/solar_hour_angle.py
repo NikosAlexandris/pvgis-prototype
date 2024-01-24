@@ -1,3 +1,4 @@
+from rich import print
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarHourAngleNOAAInput
@@ -115,6 +116,7 @@ def calculate_solar_hour_angle_time_series_noaa(
     verbose: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians for a time series."""
+    print('SHA : calculate_solar_hour_angle_time_series_noaa()')
     true_solar_time_series= calculate_true_solar_time_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,

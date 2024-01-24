@@ -1,3 +1,4 @@
+from rich import print
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateTrueSolarTimeNOAAInput
@@ -113,6 +114,7 @@ def calculate_true_solar_time_time_series_noaa(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> DatetimeIndex:
     """ """
+    print(f'TST : calculate_true_solar_time_time_series_noaa()')
     time_offset_series = calculate_time_offset_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
