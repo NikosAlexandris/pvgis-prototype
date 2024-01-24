@@ -7,14 +7,17 @@ from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
+from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
+from pvgisprototype.validation.functions import ModelSolarGeometryOverviewTimeSeriesInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAltitude
 from datetime import datetime
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -25,6 +28,9 @@ from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 from pvgisprototype.constants import AZIMUTH_NAME
+from pvgisprototype.constants import SURFACE_TILT_NAME
+from pvgisprototype.constants import SURFACE_ORIENTATION_NAME
+from pvgisprototype.constants import INCIDENCE_NAME
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -35,12 +41,14 @@ DEFAULT_ARRAY_BACKEND = 'NUMPY'  # OR 'CUPY', 'DASK'
 DEFAULT_ARRAY_DTYPE = 'float32'
 
 
-@validate_with_pydantic(ModelSolarAltitudeTimeSeriesInputModel)
+@validate_with_pydantic(ModelSolarGeometryOverviewTimeSeriesInputModel)
 def model_solar_geometry_overview_time_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo,
+    surface_tilt: None | float,
+    surface_orientation: None | float,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
@@ -56,6 +64,7 @@ def model_solar_geometry_overview_time_series(
     solar_zenith_series = None  # updated if applicable
     solar_altitude_series = None
     solar_azimuth_series = None
+    solar_incidence_series = None
 
     if verbose > 6:
         debug(locals())
@@ -96,6 +105,15 @@ def model_solar_geometry_overview_time_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             verbose=verbose,
         )
+        solar_incidence_series = calculate_solar_incidence_time_series_jenco(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+            verbose=verbose,
+        )
 
     if solar_position_model.value == SolarPositionModel.skyfield:
         pass
@@ -118,6 +136,9 @@ def model_solar_geometry_overview_time_series(
         solar_zenith_series if solar_zenith_series is not None else None,
         solar_altitude_series if solar_altitude_series is not None else None,
         solar_azimuth_series if solar_azimuth_series is not None else None,
+        surface_tilt if surface_tilt is not None else None,
+        surface_orientation if surface_orientation is not None else None,
+        solar_incidence_series if solar_incidence_series is not None else None,
     )
     if verbose > 6:
         debug(locals())
@@ -130,6 +151,8 @@ def calculate_solar_geometry_overview_time_series(
     latitude: Latitude,
     timestamps: datetime,
     timezone: ZoneInfo,
+    surface_tilt: float,
+    surface_orientation: float,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     apply_atmospheric_refraction: bool = True,
@@ -143,7 +166,6 @@ def calculate_solar_geometry_overview_time_series(
     """
     Calculates the solar position using all models and returns the results in a table.
     """
-    results = []
     for solar_position_model in solar_position_models:
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
             (
@@ -152,11 +174,16 @@ def calculate_solar_geometry_overview_time_series(
                 solar_zenith_series,
                 solar_altitude_series,
                 solar_azimuth_series,
+                surface_tilt,
+                surface_orientation,
+                solar_incidence_series,
             ) = model_solar_geometry_overview_time_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
                 timezone=timezone,
+                surface_tilt=surface_tilt,
+                surface_orientation=surface_orientation,
                 solar_position_model=solar_position_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 solar_time_model=solar_time_model,
@@ -166,15 +193,20 @@ def calculate_solar_geometry_overview_time_series(
                 dtype=dtype,
                 verbose=verbose,
             )
-            results.append({
-                TIME_ALGORITHM_NAME: solar_azimuth_series.timing_algorithm if solar_azimuth_series else NOT_AVAILABLE,
-                DECLINATION_NAME: getattr(solar_declination_series, angle_output_units, NOT_AVAILABLE) if solar_declination_series else NOT_AVAILABLE,
-                HOUR_ANGLE_NAME: getattr(solar_hour_angle_series, angle_output_units, NOT_AVAILABLE) if solar_hour_angle_series else NOT_AVAILABLE,
-                POSITION_ALGORITHM_NAME: solar_position_model.value,
-                ZENITH_NAME: getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE) if solar_zenith_series else NOT_AVAILABLE,
-                ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
-                AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
-                UNITS_NAME: angle_output_units,
-            })
+            results = {
+                    solar_position_model.name: {
+                        TIME_ALGORITHM_NAME: solar_azimuth_series.timing_algorithm if solar_azimuth_series else NOT_AVAILABLE,
+                        DECLINATION_NAME: getattr(solar_declination_series, angle_output_units, NOT_AVAILABLE) if solar_declination_series else NOT_AVAILABLE,
+                        HOUR_ANGLE_NAME: getattr(solar_hour_angle_series, angle_output_units, NOT_AVAILABLE) if solar_hour_angle_series else NOT_AVAILABLE,
+                        POSITION_ALGORITHM_NAME: solar_position_model.value,
+                        ZENITH_NAME: getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE) if solar_zenith_series else NOT_AVAILABLE,
+                        ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
+                        AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
+                        SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
+                        SURFACE_ORIENTATION_NAME: getattr(surface_orientation, angle_output_units, NOT_AVAILABLE) if surface_orientation else None,
+                        INCIDENCE_NAME: getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE) if solar_incidence_series else NOT_AVAILABLE,
+                        UNITS_NAME: angle_output_units,
+                        }
+                    }
 
     return results
