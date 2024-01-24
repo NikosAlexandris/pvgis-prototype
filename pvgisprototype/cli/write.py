@@ -1,10 +1,14 @@
 import csv
 import numpy as np
+from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     TITLE_KEY_NAME,
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
+    SURFACE_TILT_NAME,
+    SURFACE_ORIENTATION_COLUMN_NAME,
+    SURFACE_ORIENTATION_NAME,
     TIME_ALGORITHM_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     SOLAR_TIME_COLUMN_NAME,
@@ -29,6 +33,7 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     RADIANS,
 )
+
 
 def safe_get_value(dictionary, key, index, default='NA'):
     """
@@ -106,6 +111,8 @@ def write_solar_position_series_csv(
     zenith=None,
     altitude=None,
     azimuth=None,
+    surface_tilt=None,
+    surface_orientation=None,
     incidence=None,
     user_requested_timestamps=None,
     user_requested_timezone=None,
@@ -114,9 +121,9 @@ def write_solar_position_series_csv(
     filename='solar_position.csv',
 ):
     # Round values
-    # longitude = round_float_values(longitude, rounding_places)
-    # latitude = round_float_values(latitude, rounding_places)
-    # rounded_table = round_float_values(table, rounding_places)
+    longitude = round_float_values(longitude, rounding_places)
+    latitude = round_float_values(latitude, rounding_places)
+    rounded_table = round_float_values(table, rounding_places)
     quantities = [declination, zenith, altitude, azimuth, incidence]
 
     header = []
@@ -147,6 +154,8 @@ def write_solar_position_series_csv(
     if azimuth is not None:
         header.append(AZIMUTH_COLUMN_NAME)
     if incidence is not None:
+        header.append(SURFACE_TILT_COLUMN_NAME)
+        header.append(SURFACE_ORIENTATION_COLUMN_NAME)
         header.append(INCIDENCE_COLUMN_NAME)
     header.append(UNITS_COLUMN_NAME)
     import re
@@ -163,6 +172,8 @@ def write_solar_position_series_csv(
             zenith_value = safe_get_value(model_result, ZENITH_NAME, _index) if zenith else None
             altitude_value = safe_get_value(model_result, ALTITUDE_NAME, _index) if altitude else None
             azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, _index) if azimuth else None
+            surface_tilt = safe_get_value(model_result, SURFACE_TILT_NAME, _index) if surface_tilt else None
+            surface_orientation = safe_get_value(model_result, SURFACE_ORIENTATION_NAME, _index) if surface_orientation else None
             incidence_value = safe_get_value(model_result, INCIDENCE_NAME, _index) if incidence else None
             units = safe_get_value(model_result, UNITS_NAME, UNITLESS)
 
@@ -208,12 +219,14 @@ def write_solar_position_series_csv(
             if azimuth_value is not None:
                 row.append(str(azimuth_value))
             if incidence_value is not None:
+                if surface_tilt is not None:
+                    row.append(str(surface_tilt))
+                if surface_orientation is not None:
+                    row.append(str(surface_orientation))
                 row.append(str(incidence_value))
             row.append(str(units))
-
             rows.append(row)
 
-    # Write to CSV
     with open(filename, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(header)
