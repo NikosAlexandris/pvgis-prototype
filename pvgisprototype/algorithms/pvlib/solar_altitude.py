@@ -25,8 +25,8 @@ def calculate_solar_altitude_pvlib(
     solar_altitude = SolarAltitude(
         value=solar_altitude,
         unit=DEGREES,
-        position_algorithm='PVLIB',
-        timing_algorithm='PVLIB',
+        position_algorithm='pvlib',
+        timing_algorithm='pvlib',
     )
     if (
         not isfinite(solar_altitude.degrees)
