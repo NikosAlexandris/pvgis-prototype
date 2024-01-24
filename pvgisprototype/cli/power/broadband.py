@@ -69,6 +69,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_profiling
 from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
@@ -150,6 +151,7 @@ def photovoltaic_power_output_series(
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
+    profile: Annotated[bool, typer_option_profiling] = False,
 ):
     """
     Estimate the photovoltaic power over a time series or an arbitrarily
@@ -202,6 +204,7 @@ def photovoltaic_power_output_series(
         temperature_model=temperature_model,
         efficiency=efficiency,
         verbose=verbose,
+        profile=profile,
     )
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)

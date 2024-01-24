@@ -9,7 +9,6 @@ import numpy as np
 from enum import Enum
 from rich import print
 from datetime import datetime
-from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModel
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
@@ -132,6 +131,7 @@ def calculate_photovoltaic_power_output_series(
     temperature_model: ModuleTemperatureAlgorithm = None,
     efficiency: Optional[float] = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    profile: bool = False, 
 ):
     """
     Estimate the photovoltaic power over a time series or an arbitrarily
@@ -190,6 +190,11 @@ def calculate_photovoltaic_power_output_series(
     -----
     This function is part of the Typer-based CLI for the new PVGIS implementation in Python. It provides an interface for estimating the energy production of a photovoltaic system, taking into account various environmental and system parameters.
     """
+    if profile:
+        import cProfile
+        pr = cProfile.Profile()
+        pr.enable()
+
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -470,5 +475,24 @@ def calculate_photovoltaic_power_output_series(
 
     if verbose > 0:
         return results
+
+    if profile:
+        import pstats
+        import io
+        pr.disable()
+
+        # write profiling statistics to file
+        profile_filename = "profiling_stats.prof"
+        pr.dump_stats(profile_filename)
+        print(f"Profiling stats saved to {profile_filename}")
+
+        s = io.StringIO()
+        sortby = pstats.SortKey.CUMULATIVE
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+
+        if verbose > 6:
+            print(s.getvalue())
+
 
     return photovoltaic_power_outout_series

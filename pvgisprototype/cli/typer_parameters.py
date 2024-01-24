@@ -886,6 +886,12 @@ typer_option_verbose = typer.Option(
     rich_help_panel=rich_help_panel_output,
     # default_factory=0,
 )
+typer_option_profiling = typer.Option(
+    "--profile",
+    "--prfl",
+    help="Enable profiling",
+    # default=False,
+)
 typer_option_index = typer.Option(
     '--index',
     '--idx',
