@@ -6,7 +6,7 @@ hide:
   - toc
 ---
 
-# Learn how to
+# Learn how to use PVGIS tools
 
 !!! abstract "Power"
 
