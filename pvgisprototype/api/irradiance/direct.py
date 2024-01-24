@@ -36,7 +36,8 @@ from typing import List
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
-from pvgisprototype.api.utilities.progress import progress
+# from pvgisprototype.api.utilities.progress import progress
+from rich.progress import Progress
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from rich import print
@@ -345,6 +346,7 @@ def calculate_direct_normal_irradiance_time_series(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct normal irradiance (SID) [W*m-2]
 
@@ -359,7 +361,8 @@ def calculate_direct_normal_irradiance_time_series(
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
     """
-    with progress:
+    # debug(locals())
+    with Progress(disable=not show_progress):
         extraterrestrial_normal_irradiance_series = (
             calculate_extraterrestrial_normal_irradiance_time_series(
                 timestamps=timestamps,
@@ -456,6 +459,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     csv: Path = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     index: bool = False,
+    show_progress: bool = True,
 ) -> np.ndarray:
     """Calculate the direct horizontal irradiance (SID) [W*m-2]
 
@@ -504,6 +508,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         verbose=0,
+        show_progress=show_progress,
     )
 
     # Mask conditions -------------------------------------------------------
@@ -605,6 +610,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     csv: Path = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     index: bool = False,
+    show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
@@ -704,6 +710,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             angle_output_units=angle_output_units,
             rounding_places=rounding_places,
             verbose=0,  # no verbosity here by choice!
+            show_progress=show_progress,
         )
     else:  # read from a time series dataset
         print(f'i [bold]Reading[/bold] [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...')
