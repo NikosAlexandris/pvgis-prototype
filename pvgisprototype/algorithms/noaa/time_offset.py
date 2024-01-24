@@ -148,7 +148,7 @@ def calculate_time_offset_time_series_noaa(
     else:
         timestamps = timestamps.tz_convert(timezone)
 
-    # Optimization: Calculate unique offsets
+    # Optimisation: Calculate unique offsets
     unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
     unique_offsets = {tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)}
     
