@@ -112,7 +112,7 @@ def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex, 
     timezone: Optional[str] = None, 
-    angle_output_units: Optional[str] = RADIANS,
+    # angle_output_units: Optional[str] = RADIANS,
     verbose: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians for a time series."""
