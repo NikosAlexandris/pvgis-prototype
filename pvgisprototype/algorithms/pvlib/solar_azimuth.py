@@ -27,8 +27,8 @@ def calculate_solar_azimuth_pvlib(
     solar_azimuth = SolarAzimuth(
             value=solar_azimuth,
             unit=DEGREES,
-            position_algorithm='PVLIB',
-            timing_algorithm='PVLIB',
+            position_algorithm='pvlib',
+            timing_algorithm='pvlib',
             )
     if (
         not isfinite(solar_azimuth.degrees)
