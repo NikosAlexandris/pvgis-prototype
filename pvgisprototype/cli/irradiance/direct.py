@@ -295,6 +295,7 @@ def get_direct_inclined_irradiance_time_series_pvgis(
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
+    show_progress: bool = True,
 ) -> np.array:
     results = calculate_direct_inclined_irradiance_time_series_pvgis(
         longitude=longitude,
@@ -330,6 +331,7 @@ def get_direct_inclined_irradiance_time_series_pvgis(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
+        show_progress=show_progress,
     )
     if verbose > 0:
         longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
