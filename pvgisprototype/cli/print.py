@@ -97,9 +97,6 @@ def print_solar_position_table(
 ):
     """
     """
-    from devtools import debug
-    debug(locals())
-
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)

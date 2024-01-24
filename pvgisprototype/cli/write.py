@@ -106,6 +106,8 @@ def write_solar_position_series_csv(
     zenith=None,
     altitude=None,
     azimuth=None,
+    surface_tilt=None,
+    surface_orientation=None,
     incidence=None,
     user_requested_timestamps=None,
     user_requested_timezone=None,

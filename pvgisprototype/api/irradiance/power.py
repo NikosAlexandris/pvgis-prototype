@@ -9,7 +9,6 @@ import numpy as np
 from enum import Enum
 from rich import print
 from datetime import datetime
-from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModel
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
