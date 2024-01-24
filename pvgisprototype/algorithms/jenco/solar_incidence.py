@@ -162,7 +162,6 @@ def calculate_solar_incidence_jenco(
     C'31 = cos ϕ' cos δ
     C'33 = sin ϕ' sin δ
 
-
     From PVGIS' C++ source code:
     
     The `timeAngle` (which is the solar hour
@@ -237,8 +236,6 @@ def calculate_solar_incidence_time_series_jenco(
     timezone: Optional[ZoneInfo] = None,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
-    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
     """Calculate the solar incidence angle based on the position of the sun and
@@ -259,6 +256,10 @@ def calculate_solar_incidence_time_series_jenco(
     -------
     ndarray
         Solar incidence angle or NO_SOLAR_INCIDENCE series if a shadow is detected.
+
+    Notes
+    -----
+    - Shadow check not implemented.
     """
     sine_relative_inclined_latitude = -(
         cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
@@ -267,7 +268,6 @@ def calculate_solar_incidence_time_series_jenco(
     relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
-        angle_output_units=angle_output_units,
     )
     c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
         solar_declination_series.radians
@@ -279,8 +279,6 @@ def calculate_solar_incidence_time_series_jenco(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
-        time_output_units=time_output_units,
-        angle_output_units=angle_output_units,
     )
     relative_longitude = calculate_relative_longitude(
         latitude=latitude,
