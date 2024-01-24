@@ -90,6 +90,7 @@ from pvgisprototype.cli.documentation import A_PRIMER_ON_SOLAR_GEOMETRY
 from .rich_help_panel_names import rich_help_panel_geometry_noaa
 from .print import print_solar_position_table
 from .print import print_noaa_solar_position_table
+from pvgisprototype.cli.write import write_solar_position_series_csv
 
 
 def calculate_zenith(angle_output_units, solar_altitude_angle):
@@ -385,6 +386,28 @@ def overview_series(
         rounding_places=rounding_places,
         group_models=group_models,
     )
+    if csv:
+        write_solar_position_series_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_position_series,
+            timing=True,
+            declination=True,
+            hour_angle=True,
+            zenith=True,
+            altitude=True,
+            azimuth=True,
+            surface_tilt=True,
+            surface_orientation=True,
+            incidence=True,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            # rounding_places=rounding_places,
+            # group_models=group_models,
+            filename=csv,
+        )
 
 
 @app.command('declination', no_args_is_help=True, help='∢ Calculate the solar declination')
