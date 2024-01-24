@@ -8,7 +8,7 @@ import pysolar
 from pvgisprototype.api.utilities.conversions import convert_south_to_north_radians_convention
 from pvgisprototype.api.utilities.timestamp import attach_timezone
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarPositionInputModel
+from pvgisprototype.validation.functions import ModelSolarGeometryOverviewInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype import SolarAltitude
@@ -26,6 +26,7 @@ from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_so
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
+from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_hour_angle_declination_skyfield
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_pvlib
@@ -40,18 +41,24 @@ from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 from pvgisprototype.constants import AZIMUTH_NAME
+from pvgisprototype.constants import SURFACE_TILT_NAME
+from pvgisprototype.constants import SURFACE_ORIENTATION_NAME
+from pvgisprototype.constants import INCIDENCE_NAME
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import NOT_AVAILABLE
 
 
-@validate_with_pydantic(ModelSolarPositionInputModel)
+@validate_with_pydantic(ModelSolarGeometryOverviewInputModel)
 def model_solar_geometry_overview(
     longitude: Longitude,
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
+    surface_tilt: float,
+    surface_orientation: float,
     solar_position_model: SolarPositionModel,
     apply_atmospheric_refraction: bool,
     solar_time_model: SolarTimeModel,
@@ -94,6 +101,7 @@ def model_solar_geometry_overview(
     solar_zenith = None  # updated if applicable
     solar_altitude = None
     solar_azimuth = None
+    solar_incidence = None
 
     if solar_position_model.value == SolarPositionModel.noaa:
 
@@ -167,7 +175,6 @@ def model_solar_geometry_overview(
             position_algorithm='suncalc',
             timing_algorithm='suncalc',
         )
-
         solar_altitude = SolarAltitude(
             value=solar_altitude,
             unit=RADIANS,
@@ -255,6 +262,15 @@ def model_solar_geometry_overview(
             timezone=timezone,
             solar_time_model=solar_time_model,
         )
+        solar_incidence = calculate_solar_incidence_pvis(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+            verbose=verbose,
+        )
 
     if solar_position_model.value == SolarPositionModel.pvlib:
 
@@ -290,6 +306,7 @@ def model_solar_geometry_overview(
             solar_zenith if solar_zenith is not None else None,
             solar_altitude if solar_altitude is not None else None,
             solar_azimuth if solar_azimuth is not None else None,
+            solar_incidence if solar_incidence is not None else None,
     )
     if verbose == 3:
         debug(locals())
@@ -302,6 +319,8 @@ def calculate_solar_geometry_overview(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo,
+    surface_tilt: float,
+    surface_orientation: float,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     apply_atmospheric_refraction: bool = True,
@@ -322,11 +341,14 @@ def calculate_solar_geometry_overview(
                 solar_zenith,
                 solar_altitude,
                 solar_azimuth,
+                solar_incidence,
             ) = model_solar_geometry_overview(
                 longitude=longitude,
                 latitude=latitude,
                 timestamp=timestamp,
                 timezone=timezone,
+                surface_tilt=surface_tilt,
+                surface_orientation=surface_orientation,
                 solar_position_model=solar_position_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 solar_time_model=solar_time_model,
@@ -335,13 +357,16 @@ def calculate_solar_geometry_overview(
                 verbose=verbose,
             )
             results.append({
-                TIME_ALGORITHM_NAME: solar_azimuth.timing_algorithm if solar_altitude.timing_algorithm == solar_azimuth.timing_algorithm else None,
-                DECLINATION_NAME: getattr(solar_declination, angle_output_units) if solar_declination else None,
-                HOUR_ANGLE_NAME: getattr(solar_hour_angle, angle_output_units) if solar_hour_angle else None,
+                TIME_ALGORITHM_NAME: solar_azimuth.timing_algorithm if solar_altitude.timing_algorithm == solar_azimuth.timing_algorithm else NOT_AVAILABLE,
+                DECLINATION_NAME: getattr(solar_declination, angle_output_units, NOT_AVAILABLE) if solar_declination else None,
+                HOUR_ANGLE_NAME: getattr(solar_hour_angle, angle_output_units, NOT_AVAILABLE) if solar_hour_angle else None,
                 POSITION_ALGORITHM_NAME: solar_position_model.value,
-                ZENITH_NAME: getattr(solar_zenith, angle_output_units) if solar_zenith else None,
-                ALTITUDE_NAME: getattr(solar_altitude, angle_output_units) if solar_altitude else None,
-                AZIMUTH_NAME: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
+                ZENITH_NAME: getattr(solar_zenith, angle_output_units, NOT_AVAILABLE) if solar_zenith else None,
+                ALTITUDE_NAME: getattr(solar_altitude, angle_output_units, NOT_AVAILABLE) if solar_altitude else None,
+                AZIMUTH_NAME: getattr(solar_azimuth, angle_output_units, NOT_AVAILABLE) if solar_azimuth else None,
+                SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
+                SURFACE_ORIENTATION_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
+                INCIDENCE_NAME: getattr(solar_incidence, angle_output_units, NOT_AVAILABLE) if solar_incidence else None,
                 UNITS_NAME: angle_output_units,
             })
 
