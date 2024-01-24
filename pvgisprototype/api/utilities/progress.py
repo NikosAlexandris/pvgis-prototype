@@ -13,6 +13,7 @@ def track_progress(task_id):
 
 progress = Progress()
 
+
 # ... for direct irradiance components
 task_extraterrestrial_irradiance = progress.add_task(
     "[cyan]Calculating extraterrestrial normal irradiance series...", total=1
