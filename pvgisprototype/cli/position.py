@@ -366,26 +366,27 @@ def overview_series(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     from pvgisprototype.cli.print import print_solar_position_series_table
-    print_solar_position_series_table(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
-        table=solar_position_series,
-        timing=True,
-        declination=True,
-        hour_angle=True,
-        zenith=True,
-        altitude=True,
-        azimuth=True,
-        surface_tilt=True,
-        surface_orientation=True,
-        incidence=True,
-        user_requested_timestamps=user_requested_timestamps, 
-        user_requested_timezone=user_requested_timezone,
-        rounding_places=rounding_places,
-        group_models=group_models,
-    )
+    if not csv:
+        print_solar_position_series_table(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_position_series,
+            timing=True,
+            declination=True,
+            hour_angle=True,
+            zenith=True,
+            altitude=True,
+            azimuth=True,
+            surface_tilt=True,
+            surface_orientation=True,
+            incidence=True,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            rounding_places=rounding_places,
+            group_models=group_models,
+        )
     if csv:
         write_solar_position_series_csv(
             longitude=longitude,
