@@ -18,8 +18,8 @@ def calculate_solar_declination_pvlib(
         solar_declination = SolarDeclination(
                 value=solar_declination,
                 unit=RADIANS,
-                position_algorithm='PVLIB',
-                timing_algorithm='PVLIB',
+                position_algorithm='pvlib',
+                timing_algorithm='pvlib',
         )
         if (
                 not isfinite(solar_declination.degrees)
