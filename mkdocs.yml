@@ -22,6 +22,8 @@ nav:
     - how_to/index.md
     - how_to/help.md
     - Power: how_to/power.md
+    - Geometry:
+      - Incidence angle: how_to/solar_incidence_angle.md
   - Reference:
     - reference/index.md
   - Code Reference:
@@ -84,11 +86,12 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
+    - navigation.prune 
     # - navigation.expand
     - navigation.path
     - navigation.indexes 
     - toc.follow
-    - navigation.top
+    - toc.integrate 
     - navigation.footer
 
 extra_css:
