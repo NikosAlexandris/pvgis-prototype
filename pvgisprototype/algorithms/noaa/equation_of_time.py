@@ -1,3 +1,4 @@
+from rich import print
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateEquationOfTimeNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
@@ -47,6 +48,7 @@ def calculate_equation_of_time_time_series_noaa(
     timestamps: Union[datetime, Sequence[datetime]],
 ) -> EquationOfTime:
     """Calculate the equation of time in minutes for a time series"""
+    print('EOT : calculate_equation_of_time_time_series_noaa()')
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
         angle_output_units=RADIANS

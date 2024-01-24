@@ -1,3 +1,4 @@
+from rich import print
 from devtools import debug
 from zoneinfo import ZoneInfo
 from math import pi
@@ -140,6 +141,7 @@ def calculate_time_offset_time_series_noaa(
     timezone: ZoneInfo,
 ) -> TimeOffset:
     """ """
+    print('TO : calculate_time_offset_time_series_noaa()')
     # 1
     if timestamps.tzinfo is None:
         timestamps = timestamps.tz_localize(timezone)
