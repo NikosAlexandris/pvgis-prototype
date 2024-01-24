@@ -79,17 +79,22 @@ def calculate_fractional_year_time_series_noaa(
     the timestamps into fractional values considering their position within the year.
     This is used in various solar energy calculations and models.
     """
-    print('FY : calculate_fractional_year_time_series_noaa()')
     days_of_year_series = timestamps.dayofyear
     hours = timestamps.hour
     days_in_year_series = get_days_in_years_series(timestamps.year) 
     fractional_year_series = np.array(
-        2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24)
+        2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24),
+        dtype=np.float32,
     )
     fractional_year_series[fractional_year_series < 0] = 0
     
     if not np.all((0 <= fractional_year_series) & (fractional_year_series < 2 * np.pi)):
         raise ValueError(f'The calculated fractional years are outside the expected range [0, {2*pi}] radians')
+
+    print(
+        "FY : calculate_fractional_year_time_series_noaa()",
+        f"Type : [bold]{fractional_year_series.dtype}[/bold]",
+    )
 
     fractional_year_series = FractionalYear(
         value=fractional_year_series,
