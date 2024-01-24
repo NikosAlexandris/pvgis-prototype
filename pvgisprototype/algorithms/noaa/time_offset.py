@@ -146,8 +146,12 @@ def calculate_time_offset_time_series_noaa(
     else:
         timestamps = timestamps.tz_convert(timezone)
 
-    timezone_offset_minutes_series = timestamps.map(lambda ts: ts.utcoffset().total_seconds() / 60)
-    timezone_offset_minutes_series = np.array(timezone_offset_minutes_series, dtype=float)
+    # Optimization: Calculate unique offsets
+    unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
+    unique_offsets = {tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)}
+    
+    # Map the offsets back to the timestamps
+    timezone_offset_minutes_series = np.array([unique_offsets[tz] for tz in unique_timezones], dtype=float)
 
     # 2
     equation_of_time_series = calculate_equation_of_time_time_series_noaa(
