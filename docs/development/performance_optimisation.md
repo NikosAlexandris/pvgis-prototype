@@ -33,7 +33,7 @@ as it stands today
 (see commit : 
 [5cca629ea186ff3c7711fbdbd8219841caf4d6b](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/commit/5cca629ea186ff3c7711fbdbd8219841caf4d6b)
 )
-includes amomng other elements :
+==includes== amomng other elements :
 
 - print statements
 - debugging calls, specifically `debug(locals())` from `devtools`
@@ -42,12 +42,15 @@ includes amomng other elements :
 - custom data classes
 - frequently requested/repeated calculations
 - complete lack of caching/memoization
-- complete lack of asynchronous executions, if and wherever possible 
+- if and wherever possible, complete lack of :
+  - asynchronous executions,
+  - concurrent executions,
+  - parallel executions
 - no parallel processing beyond NumPy's own internals (?)
 - using Pandas' DateTimeIndex which is _not hashable_
 
 Hence,
-the margin for optimisation is quite large.
+the margin for optimisation is large.
 
 ## Caching Strategies
 

@@ -9,7 +9,7 @@ hide:
 
 # Solar Geometry Overview
 
-## For a time series
+## Time series
 
 To get a time series of solar geometry parameters over a location,
 you can use the `pvgis-prototype position overview-series` command.
@@ -32,8 +32,6 @@ Let's verify it worked well
 file solar_incidence_angle_sample.csv
 ```
 
-!!! note
-
-    Here it is :
+??? note "solar_incidence_angle_sample.csv"
 
     {{ read_csv('solar_incidence_angle_sample.csv') }}
