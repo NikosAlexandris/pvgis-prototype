@@ -13,6 +13,23 @@ from math import pi
 import numpy as np
 from rich import print
 
+import hashlib
+import json
+
+
+def ndarray_to_list(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+
+def generate_hash(output):
+    output_str = json.dumps(output, default=ndarray_to_list, sort_keys=True)
+    hash_object = hashlib.sha256(output_str.encode())
+    hash_hex = hash_object.hexdigest()
+
+    return hash_hex
+
 
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
 def calculate_fractional_year_noaa(
@@ -38,6 +55,7 @@ def calculate_fractional_year_noaa(
     return fractional_year
 
 from pandas import DatetimeIndex
+
 
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_time_series_noaa(
@@ -91,9 +109,11 @@ def calculate_fractional_year_time_series_noaa(
     if not np.all((0 <= fractional_year_series) & (fractional_year_series < 2 * np.pi)):
         raise ValueError(f'The calculated fractional years are outside the expected range [0, {2*pi}] radians')
 
+    fractional_year_series_hash = generate_hash(fractional_year_series)
     print(
-        "FY : calculate_fractional_year_time_series_noaa()",
-        f"Type : [bold]{fractional_year_series.dtype}[/bold]",
+        "FY : calculate_fractional_year_time_series_noaa() |",
+        f"Data Type : [bold]{fractional_year_series.dtype}[/bold] |",
+        f"Output Hash : [code]{fractional_year_series_hash}[/code]",
     )
 
     fractional_year_series = FractionalYear(
