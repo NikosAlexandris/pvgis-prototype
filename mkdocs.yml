@@ -30,12 +30,21 @@ nav:
       - Incidence angle: how_to/solar_incidence_angle.md
   - Reference:
     - reference/index.md
+    - reference/solar_geometry_introduction.md
   - Code Reference:
     - code_reference/index.md
     - Algorithms: code_reference/algorithms.md
     - CLI: code_reference/cli_reference.md
     - API: code_reference/api_reference.md
     - Web API: code_reference/web_api_reference.md
+  - Development:
+    - development/roadmap_and_progress.md
+    - development/solar_geometry.md
+    - development/topography.md
+    - development/solar_irradiance.md
+    - development/photovoltaic_performance.md
+    - development/time_series.md
+    - development/performance_optimisation.md
   - Tags: includes/tags.md
 
 extra:
@@ -71,7 +80,7 @@ theme:
         icon: material/brightness-6
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
-      scheme: slate
+      scheme: blue
       toggle:
         icon: material/brightness-3
         name: Switch to light mode
