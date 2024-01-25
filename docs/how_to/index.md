@@ -8,11 +8,16 @@ hide:
 
 # Learn how to use PVGIS tools
 
-!!! abstract "Power"
+!!! abstract "Estimate photovoltaic performance"
 
-    | Power                                                                   |                                                       |
-    |-------------------------------------------------------------------------|-------------------------------------------------------|
-    | 🔌 Estimate the performance of a photovoltaic system over a time series | :octicons-command-palette-24: [**`power`**](power.md) |
+    | Command                                               | Subcommand                                                    | Description                                                                                                                                      |
+    |-------------------------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+    | :octicons-command-palette-24: [**`power`**](power.md) |                                                               | 🔌 Estimate the performance of a photovoltaic system over a time series                                                                          |
+    |                                                       | :octicons-command-palette-24: [**`broadband`**](broadband.md) | :simple-spectrum: Estimate the photovoltaic performance based on broadband irradiance, ambient temperature and wind speed                        |
+    |                                                       | :octicons-command-palette-24: [**`spectral`**](spectral.md)                                 | :material-heat-wave: Estimate the photovoltaic performance based on spectrally resolved irradiance, ambient temperature and wind speed Prototype |
+
+
+
 
 !!! tip "Time Series"
 
@@ -22,12 +27,12 @@ hide:
     | 🌞 Estimate the solar irradiance incident on a solar surface | :octicons-command-palette-24: [**`irradiance`**]() |
 
 !!! hint "Solar Geometry"
-
-    |                                                                                  |                                                  |
-    |----------------------------------------------------------------------------------|--------------------------------------------------|
-    | ⌛ Calculate the solar time for a location and moment                            | :octicons-command-palette-24: [**`time`**]()     |
-    | 📐 Calculate solar geometry parameters for a location and moment in time         | :octicons-command-palette-24: [**`position`**]() |
-    | 󰶛  Calculate solar surface geometry parameters for a location and moment in time | :octicons-command-palette-24: [**`surface`**]()  |
+      | Command                                          | Subcommand                                                                    | Description                                                                      |
+      |--------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+      | :octicons-command-palette-24: [**`time`**]()     |                                                                               | ⌛ Calculate the solar time for a location and moment                            |
+      | :octicons-command-palette-24: [**`position`**]() |                                                                               | 📐 Calculate solar geometry parameters for a location and moment in time         |
+      |                                                  | :fontawesome-solid-info: [**`intro`**](how_to/solar_geometry_introduction.md) | A short primer on solar geometry
+      | :octicons-command-palette-24: [**`surface`**]()  |                                                                               | 󰶛  Calculate solar surface geometry parameters for a location and moment in time |
 
 !!! note "Diagnostics"
 
