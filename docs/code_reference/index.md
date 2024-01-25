@@ -1,6 +1,10 @@
-# Overview
+---
+tags:
+  - Source Code
+  - Reference
+  - Code Reference
+---
 
-This page overviews the source code of PVGIS.
+# Source Code Reference
 
-For a detailed summary of all components,
-please visit the [Summary](references/SUMMARY/SUMMARY.md) page.
+This page documents the source code of PVGIS.
