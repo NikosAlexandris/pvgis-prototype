@@ -25,7 +25,7 @@ nav:
     - Irradiance:
       - Overview: how_to/solar_irradiance.md
       - Direct: how_to/direct_irradiance.md
-    - Geometry:
+    - Position:
       - Geometry overview: how_to/solar_geometry_overview.md
       - Incidence angle: how_to/solar_incidence_angle.md
   - Reference:
@@ -39,6 +39,7 @@ nav:
     - Web API: code_reference/web_api_reference.md
   - Development:
     - development/roadmap_and_progress.md
+    - development/main.md
     - development/solar_geometry.md
     - development/topography.md
     - development/solar_irradiance.md
@@ -140,7 +141,7 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.critic
+      clickable_checkbox: true
   - pymdownx.critic:
       mode: view
   - pymdownx.details
