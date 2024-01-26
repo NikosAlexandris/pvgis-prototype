@@ -114,7 +114,6 @@ def calculate_true_solar_time_time_series_noaa(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> DatetimeIndex:
     """ """
-    print(f'TST : calculate_true_solar_time_time_series_noaa()')
     time_offset_series = calculate_time_offset_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
@@ -142,5 +141,13 @@ def calculate_true_solar_time_time_series_noaa(
             f"The calculated true solar time series `{true_solar_time_series_in_minutes}` is out of the expected range [-1580, 1580] minutes!"
         )
     # ----------------------------------------------------------------------
+
+    # from pvgisprototype.validation.hashing import generate_hash
+    # true_solar_time_series_hash = generate_hash(true_solar_time_series)
+    # print(
+    #     'TST : calculate_true_solar_time_time_series_noaa()|',
+    #     f"Data Type : [bold]{true_solar_time_series.dtype}[/bold] |",
+    #     f"Output Hash : [code]{true_solar_time_series_hash}[/code]",
+    # )
 
     return true_solar_time_series
