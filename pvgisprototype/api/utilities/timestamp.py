@@ -352,6 +352,17 @@ def get_days_in_years_series(years):
     end_dates = pd.to_datetime(years, format='%Y') + pd.offsets.YearEnd(0)
     start_dates = end_dates - pd.DateOffset(years=1)
 
+    # Cannot serialise an index ! -------------------------------
+    # from pvgisprototype.validation.hashing import generate_hash
+    # output_hash = generate_hash((end_dates - start_dates).days)
+    # print(
+    #     "Days in Years Series : get_days_in_years_series() |",
+    #     f"Data Type : [bold]{end_dates.dtype}[/bold] |",
+    #     f"Data Type : [bold]{start_dates.dtype}[/bold] |",
+    #     f"Output Hash : [code]{output_hash}[/code]",
+    # )
+    # ------------------------------ Cannot serialise an index !
+
     return (end_dates - start_dates).days
 
 

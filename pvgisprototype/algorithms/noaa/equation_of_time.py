@@ -62,6 +62,14 @@ def calculate_equation_of_time_time_series_noaa(
     )
     if not np.all((-20 <= equation_of_time_series) & (equation_of_time_series <= 20)):
         raise ValueError("The equation of time must be within the range [-20, 20] minutes for all timestamps.")
+
+    from pvgisprototype.validation.hashing import generate_hash
+    equation_of_time_series_hash = generate_hash(equation_of_time_series)
+    print(
+        "FY : calculate_equation_of_time_time_series_noaa() |",
+        f"Data Type : [bold]{equation_of_time_series.dtype}[/bold] |",
+        f"Output Hash : [code]{equation_of_time_series_hash}[/code]",
+    )
     
     return EquationOfTime(
         value=equation_of_time_series,
