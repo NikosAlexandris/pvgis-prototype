@@ -1,4 +1,5 @@
 ---
+icon: material/console-line
 tags:
   - How-To
   - CLI
@@ -16,9 +17,6 @@ hide:
     |                                                       | :octicons-command-palette-24: [**`broadband`**](broadband.md) | :simple-spectrum: Estimate the photovoltaic performance based on broadband irradiance, ambient temperature and wind speed                        |
     |                                                       | :octicons-command-palette-24: [**`spectral`**](spectral.md)                                 | :material-heat-wave: Estimate the photovoltaic performance based on spectrally resolved irradiance, ambient temperature and wind speed Prototype |
 
-
-
-
 !!! tip "Time Series"
 
     |                                                              |                                                    |
@@ -31,7 +29,7 @@ hide:
       |--------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
       | :octicons-command-palette-24: [**`time`**]()     |                                                                               | ⌛ Calculate the solar time for a location and moment                            |
       | :octicons-command-palette-24: [**`position`**]() |                                                                               | 📐 Calculate solar geometry parameters for a location and moment in time         |
-      |                                                  | :fontawesome-solid-info: [**`intro`**](how_to/solar_geometry_introduction.md) | A short primer on solar geometry
+      |                                                  | :fontawesome-solid-info: [**`intro`**](solar_geometry_introduction.md) | A short primer on solar geometry
       | :octicons-command-palette-24: [**`surface`**]()  |                                                                               | 󰶛  Calculate solar surface geometry parameters for a location and moment in time |
 
 !!! note "Diagnostics"
