@@ -1,124 +1,187 @@
 ---
+icon: material/list-status
 tags:
   - Development
   - Roadmap
   - Progress
 ---
 
-??? note "Roadmap stages"
+<style>
+.twemoji.checked svg {
+    color: #00e676;
+}
+.twemoji.blank svg {
+    color: rgba(0, 0, 0, 0.07);
+}
+</style>
 
-    `Planning`
+??? note "Stages & Status"
 
-    : Items on our roadmap that have not yet been started
-     
-    `Design`
+    !!! note inline "Status"
 
-    : Scoping & user experience design
-     
-    `Develop & Test`
+        - [x] Completed
 
-    : Actively building, testing, and iterating
-     
-    `Beta`
-     
-    : Release for optional use, may have rough edges or additional features in development
+        :material-progress-question: Work In Progress
 
-    `Release`
-     
-    : Stable release
-     
-    `Public Beta`
+        - [ ] In Queue  
 
-    : Release for optional use, may have rough edges or additional features in development
+    !!! info inline "Stages"
 
-    `Full Release`
-     
-    : Stable public release
+        `Planning`
 
-??? info end "Status"
+        : Items that have not yet been started
+         
+        `Design`
 
-    - [x] Completed
+        : Scoping & user experience design
+         
+        `Develop`
 
-    :material-progress-question: Work In Progress
+        : Actively building
+        
+        `Test`
 
-    - [ ] In Queue
+        : Testing and iterating
+         
+        `Beta`
+         
+        : Release for optional use, may have rough edges or additional features in development
 
+        `Release`
+         
+        : Stable release
+         
+        `Public Beta`
+
+        : Release for optional use, may have rough edges or additional features in development
+
+        `Full Release`
+         
+        : Stable public release
 
 ---
 
+## :material-pencil: Input
 
-| Functionality                                                         | Planning | Design | Develop & Test | Beta | Release |
-|-----------------------------------------------------------------------|----------|--------|----------------|------|---------|
-| Parse input arguments                                                 |          |        |                |      |         |
-| Identify pixel row and column offsets                                 |          |        |                |      |         |
-| Select energy model                                                   |          |        |                |      |         |
-| Read elevation data                                                   |          |        |                |      |         |
-| Use horizon data                                                      |          |        |                |      |         |
-| Set number of hours for iterations                                    |          |        |                |      |         |
-| Read {term}`SIS` and {term}`SID` data, compute global irradiance      |          |        |                |      |         |
-| Read spectral correction values, temperature & wind speed time series |          |        |                |      |         |
-| Calculate solar geometry variables                                    |          |        |                |      |         |
-| Optimise slope if requested                                           |          |        |                |      |         |
-| Optimise slope and aspect if requested                                |          |        |                |      |         |
-| Set slope and aspect depending on tracking type                       |          |        |                |      |         |
-| Calculate total radiation                                             |          |        |                |      |         |
-| Calculate system performance                                          |          |        |                |      |         |
+!!! abstract "Read input arguments, parameters and data"
 
+    | Read functions                                                          | Plan | Design | Develop | Test | Beta | Optimise | Release |
+    |-------------------------------------------------------------------------|------|--------|---------|------|------|----------|---------|
+    | ^^Read input required arguments^^                                       |      |        |         |      |      |          |         |
+    | Read start timestamp for time series                                    | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read end timestamp for time series                                      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read input optional parameters                                          | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read ∡ Tilt angle                                                       | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read ↻ Orientation angle                                                | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | ^^Identify geographic location^^                                        |      |        |         |      |      |          |         |
+    | Read geographic location Longitude                                      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read geographic location Latitude                                       | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read input (data, arguments)                                            | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read input data [solar irradiance, meteorological variables, elevation] | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read input data solar irradiance                                        | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read {term}`SIS` and {term}`SID` data                                   | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | ^^Read input data meteorological variables^^                            |      |        |         |      |      |          |         |
+    | Read input temperature                                                  | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read input wind speed                                                   | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   |      |          |         |
+    | Read input elevation data                                               | :material-checkbox-marked-circle:{.checked}   |        |         |      |      |          |         |
+    | Read input horizon data (or calculate on-the-fly?)                      | :material-checkbox-marked-circle:{.checked}   |        |         |      |      |          |         |
 
-Functions 
+## :material-calculator-variant-outline: Calculations
 
-|                                   | C function                              | start line | end  | in Python                                                  | Remarks                                                   |
-|-----------------------------------|-----------------------------------------|------------|------|------------------------------------------------------------|-----------------------------------------------------------|
-| :material-checkbox-blank-circle:  | systemEfficiency()                      | 75         | 78   |                                                            |                                                           |
-| :material-checkbox-blank-circle:  | setSystemEfficiency()                   | 79         | 82   |                                                            |                                                           |
-| :material-checkbox-blank-circle:  | useTimeOffset()                         | 85         | 88   |                                                            |                                                           |
-| :material-checkbox-blank-circle:  | setUseTimeOffset()                      | 89         | 92   |                                                            |                                                           |
-| :material-checkbox-marked-circle: | ~~joules2~~ Not used!                   | 98         | 189  |                                                            |                                                           |
-| :material-checkbox-marked-circle: | joules_onetime()                        | 192        | 284  | to calculate_hourly_radiation.py                           |                                                           |
-| :material-checkbox-blank-circle:  | EnergyContributionPerformanceModelMPP() | 286        | 396  | energy_contribution_performance_model_mpp.py               |                                                           |
-| :material-checkbox-blank-circle:  | optimizeSlope()                         | 400        | 532  | optimise_slope.py                                          |                                                           |
-| :material-checkbox-blank-circle:  | optimizeSlopeAspect()                   | 535        | 868  |                                                            |                                                           |
-| :material-checkbox-blank-circle:  | main()                                  | 889        | 2013 |                                                            |                                                           |
-| :material-checkbox-blank-circle:  | joules_with_unshadowed()                | 2025       | 2147 |                                                            |                                                           |
-| :material-checkbox-marked-circle:                             | dateFromHour()                          | 2158       | 2205 | get_day_from_hour_of_year() in solar_geometry_variables.py |                                                           |
-| :material-checkbox-blank-circle:  | updateGeometryYear()                    | 2208       | 2454 |                                                            |                                                           |
-| :material-checkbox-marked-circle:                             | calculateGeometryYear()                 | 2456       | 2708 | solar_declination.py                                       | Among others, calculates solar declination based on Jenco |
-| :material-checkbox-marked-circle: | calculateTotal()                        | 2711       | 2802 |                                                            |                                                           |
-| :material-checkbox-marked-circle: | calculate()                             | 2805       | 3128 |                                                            |                                                           |
+!!! abstract "Calculate solar geometry variables, solar irradiance components, photovoltaic performance"
 
-## rsun_base.c
+    | Calculation functions                                                      | Plan                                        | Design                                      | Develop                                     | Test                                        | Beta                                        | Optimise | Release |
+    |----------------------------------------------------------------------------|---------------------------------------------|---------------------------------------------|---------------------------------------------|---------------------------------------------|---------------------------------------------|----------|---------|
+    | ^^Generate time series^^ based on user input `start` and `end` timestamps  | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |          |         |
+    | Set default ∡ Tilt angle                                                   | :material-checkbox-marked-circle:{.checked} |                                             |                                             |                                             |                                             |          |         |
+    | Set default ↻ Orientation angle                                            | :material-checkbox-marked-circle:{.checked} |                                             |                                             |                                             |                                             |          |         |
+    | Calculate horizon data on-the-fly (alternative to Read input horizon data) | :material-checkbox-marked-circle:{.checked} |                                             |                                             |                                             |                                             |          |         |
+    | Calculate/Identify shading [Shade]                                         | :material-checkbox-marked-circle:{.checked} |                                             |                                             |                                             |                                             |          |         |
+    | Select energy model                                                        | :material-checkbox-marked-circle:{.checked} |                                             |                                             |                                             |                                             |          |         |
+    | Calculate global irradiance                                                | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |                                             | :material-checkbox-marked-circle:{.checked} |          |         |
+    | Read spectral correction values                                            | :material-checkbox-marked-circle:{.checked} |                                             |                                             |                                             |                                             |          |         |
+    | Calculate solar geometry variables [^0]                                         | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |          |         |
+    | Identify solar position [Above horizon, Low angle, Below horizon]          | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |                                             | :material-checkbox-marked-circle:{.checked} |          |         |
+    | Optimise slope if requested                                                | :material-checkbox-marked-circle:{.checked} |                                             |                                             |                                             |                                             |          |         |
+    | Optimise slope and aspect if requested                                     | :material-checkbox-marked-circle:{.checked} |                                             |                                             |                                             |                                             |          |         |
+    | Set slope and aspect depending on tracking type ?                          | :material-progress-question:                |                                             |                                             |                                             |                                             |          |         |
+    | Calculate total radiation                                                  | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |                                             | :material-checkbox-marked-circle:{.checked} |          |         |
+    | Calculate system performance                                               | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |                                             | :material-checkbox-marked-circle:{.checked} |          |         |
 
-| Function                                                                                      | Start line | End | Notes
-|-----------------------------------------------------------------------------------------------|------------|-----|---------------------------------------------------------------------------------------------------------------------|
-| :material-checkbox-blank-circle: brad.c                                                       |            |     | Not used                                                                                                            |
-| :material-checkbox-marked-circle: brad_angle_irradiance.c                                     |            |     | Defines s0, uses sh  s0 == sh. sh stands for 'solar height/declination' != altitude ?                               |
-| :material-checkbox-blank-circle: brad_angle_loss.c                                            |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: brad_angle_loss_with_cs.c                                    |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: drad.c                                                       |            |     |                                                                                                                     |
-| :material-checkbox-marked-circle: drad.cpp                                                    |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: drad_angle_irradiance.c                                      |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: drad_angle_loss.c                                            |            |     |                                                                                                                     |
-| :material-checkbox-marked-circle: drad_angle_loss.cpp                                         |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: drad_angle_loss_with_cs.c                                    |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: efficiency.c                                                 |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: efficiency_ww.c                                              |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: initEfficiencyCoeffs.c                                       |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: initEfficiencyCoeffsWind.c                                   |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: SplinesMonthlyTemperature.c                                  |            |     |                                                                                                                     |
-| :material-checkbox-marked-circle: calculateAngleLoss.c                                        |            |     | Calculates loss to direct horizontal irradiance due to solar declination. Hardcodes incidence angle (AOIConstants)! |
-| :material-checkbox-marked-circle: calculate_angle_loss.c                                      |            |     | Variable                                                                                                            |
-| :material-checkbox-marked-circle: com_declin.c                                                |            |     | Inverts sign of calculated declination due to trigonometry mathematical error!                                      |
-| :material-checkbox-marked-circle: com_par.c                                                   |            |     | Simpler approximations. How do they compare with others?                                                            |
-| :material-checkbox-marked-circle: com_par_const.c                                             |            |     |                                                                                                                     |
-| :material-checkbox-marked-circle: com_sol_const.c                                             |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: correctTemperatureElevation.c                                |            |     |                                                                                                                     |
-| :material-checkbox-marked-circle: dateFromHour.c                                              |            |     | Complex, not needed                                                                                                 |
-| :material-checkbox-blank-circle: dni_rad.c                                                    |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: imageTimeOffset.c                                            |            |     |                                                                                                                     |
-| :material-checkbox-marked-circle: lumcline2.c                                                 |            |     | Calculates the solar declination based on Jenco                                                                     |
-| :material-checkbox-blank-circle: rearrangeHorizon.c                                           |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: satgeo.c                                                     |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: satgeomsgnew.c                                               |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: slotHourOffset.c                                             |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: small_functions_from_start_and_before_calculate_angle_loss.c |            |     |                                                                                                                     |
-| :material-checkbox-blank-circle: temperature.c                                                |            |     |                                                                                                                     |
+[^0]: See also detailed Implementation for [Solar Geometry](development/solar_geometry.md)
+                                                                                                                                   
+## :octicons-graph-24: Output
+
+!!! abstract "Output"                                                                                                             
+                                                                                                                                 
+    | Output quantities and attributes                                     | Plan | Design | Develop | Test | Beta | Optimise | Release |
+    |----------------------------------------------------------------------|------|--------|---------|------|------|----------|---------|
+    | ϑ Longitude                                                          | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ϕ Latitude                                                           | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Elevation                                                            | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ∡ Tilt                                                               | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ↻ Orientation                                                        | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Timestamps                                                           | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Time zone (if user requested a local time)                           | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Energy (aggregated time series of PV power series)                   | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ⌁ Power                                                              | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Efficiency %                                                         | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Loss                                                                 | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ^^Global irradiance^^                                                | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Global broadband ==modelled== ⭸                                      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Global broadband horizontal read from external source ⭸              | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Global broadband inclined ∡                                          | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Globel spectrally resolved inclined irradiance                       | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   |      |          |         |
+    | Direct horizontal read from external source ⭸                        | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ^^Direct^^                                                           | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Direct irradiance **effective** ⭍                                    | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Direct inclined ∡                                                    | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Direct horizontal irradiance ==modelleld== ⭸                         | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Direct normal irradiance ⦜                                           | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ^^Diffuse irradiance^^                                               | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Diffuse irradiance **effective** 🗤⭍                                  | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Diffuse inclined irradiance ∡                                        | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Diffuse horizontal irradiance ==modelled== ⭸                         | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Diffuse horizontal calculated from external source ⭸                 | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Diffuse clear sky irradiance ☀                                       | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ^^Reflected irradiance^^                                             | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Reflected irradiance **effective** ☈⭍                                | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Reflected ∡                                                          | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ^^Extraterrestrial irradiance^^                                      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Extra ⦜                                                              | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Extraterrestrial normal irradiance ⦜ ==modelled==                    | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ^^Solar geometry variables^^                                         | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Overview ⦩⦬ solar position parameters for a moment or 📈 time series | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ⭸ Solar incidence angle                                              | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | 🕛 🌐 Hour angle (ω)                                                 | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | 🌅 Hour angle (ω) at sun rise and set angle                          | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ⦬ Solar azimuth angle                                                | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Solar zenith angle                                                   | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ∢ Solar declination angle                                            | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ⦩ Solar altitude angle                                               | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ^^Other quantities^^                                                 | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Refracted altitude                                                   | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Albedo **constant** *modifiable*                                     | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Sky view fraction %                                                  | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Solar constant *modifiable*                                          | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Perigee constant *modifiable*                                        | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Eccentricity *modifiable*                                            | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Linke′ turbidity adjusted                                            | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Linke turbidity                                                      | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Rayleigh index                                                       | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Air mass index                                                       | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ^^Metadata^^                                                         | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Efficiency Algorithm                                                 | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Irradiance source                                                    | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | Incidence algorithm                                                  | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ⯐ Positioning algorithm                                              | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+    | ⏲ Timing algorithm                                                   | :material-checkbox-marked-circle:{.checked}   | :material-checkbox-marked-circle:{.checked}     | :material-checkbox-marked-circle:{.checked}      | :material-progress-question:   | :material-checkbox-marked-circle:{.checked}   |          |         |
+
+## Help :material-help:
+
+!!! ract "Introduction in to .."
+
+    | Command / Subject | Introduction subcommand | Description                                |
+    |-------------------|-------------------------|--------------------------------------------|
+    | `power`           | `intro`                 | A short primer on photovoltaic performance |
+    | `position`        | `intro`                 | A short primer on solar geometry           |

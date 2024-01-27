@@ -1,20 +1,22 @@
 # Photovolatic Power
 
+## Broadband irradiance
+
 PVGIS can estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on broadband irradiance, ambient temperature and wind speed.
 
-## Example
+### Example
 
 <div class="termy">
 
 ```console
-$ pvgis-prototype power broadband broadband 8.627626 45.81223 200 --start-time '2000-01-01' --end-time '2000-01-02'
+$ pvgis-prototype power broadband 8.627626 45.81223 200 --start-time '2000-01-01' --end-time '2000-01-02'
 ---> 100%
 nan,nan,nan,nan,nan,nan,nan,nan,125.35688423614582,260.5353314553751,357.0126776097902,397.73380205958784,396.8388479053645,353.32665433982226,254.19124368612873,118.2694763348484,nan,nan,nan,nan,nan,nan,nan,nan,nan
 ```
 
 </div>
 
-### Verbosity levels
+#### Verbosity levels
 
 The commands returned the PV power output
 at hourly frequency for the requested period of time.
@@ -24,7 +26,7 @@ more details via the _verbosity_ flag `-v` :
 <div class="termy">
 
 ```console
-$ pvgis-prototype power broadband broadband 8.627626 45.81223 200 --start-time '2000-01-01' --end-time '2000-01-02' -v
+$ pvgis-prototype power broadband 8.627626 45.81223 200 --start-time '2000-01-01' --end-time '2000-01-02' -v
 ---> 100%
                      Power series ㎾h
 
@@ -64,7 +66,7 @@ and even more by adding to `v`s, i.e. `--vv` as in
 <div class="termy">
 
 ```console
-❯ pvgis-prototype power broadband broadband 8.627626 45.81223 200 --start-time '2000-01-01' --end-time '2000-01-02' -vv
+❯ pvgis-prototype power broadband 8.627626 45.81223 200 --start-time '2000-01-01' --end-time '2000-01-02' -vv
 
                                                 Power & in-plane components series ㎾h
 
@@ -107,7 +109,7 @@ and even more via `-vvv` or `-vvvv` and `-vvvvv`.
     PVGIS. At the moment, it takes for some exploration to discover what useful
     information each commad can reveal!
 
-### Statistics
+#### Statistics
 
 We can also ask from PVGIS to generate a statistical overview.
 Following, we repeat the same calculations however extented over a year's
@@ -116,7 +118,7 @@ period, like so :
 <div class="termy">
 
 ``` console
-$ pvgis-prototype power broadband broadband 8.627626 45.81223 200 --start-time '2000-01-01' --end-time '2001-01-02' --statistics -v
+$ pvgis-prototype power broadband 8.627626 45.81223 200 --start-time '2000-01-01' --end-time '2001-01-02' --statistics -v
 
 
               Photovoltaic power output
@@ -156,3 +158,10 @@ We can do better and ask for a monthly aggregation :
 ```
 
 </div>
+
+## Spectrally resoled irradiance
+
+PVGIS can estimate the photovoltaic power over a time series
+or an arbitrarily aggregated energy production of a PV system
+based on spectrally resolved irradiance,
+ambient temperature and wind speed.

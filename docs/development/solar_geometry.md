@@ -6,28 +6,55 @@ tags:
   - Solar Geometry
 ---
 
+<style>
+.twemoji.checked svg {
+    color: #00e676;
+}
+.twemoji.blank svg {
+    color: rgba(0, 0, 0, 0.07);
+}
+</style>
+
 The following solar geometry _components_
 are hard requirements
-in order to derive the single most important angle of solar incidence
+in order to derive the single most important angle of _solar incidence_
 which is crucial for the estimation of the solar irradiance
 incident on a solar surface.
-
-| Quantity              | Implementation       | Requires                                                    | Required by                                 | Algorithm | Optimisation |
-|-----------------------|----------------------|-------------------------------------------------------------|---------------------------------------------|-----------|--------------|
-| - [x] Fractional year   | fractional_year.py   | Timestamp (+ time zone ? ) [^*]                             | Equation of time, solar declination         |           |              |
-| - [x] Solar declination | solar_declination.py | Fractional year                                             | Solar zenith                                |           |              |
-| - [x] Equation of time  | equation_of_time.py  | Fractional year                                             | Time offset                                 |           |              |
-| - [x] Time offset       | time_offset.py       | Equation of time                                            | True solar time                             |           |              |
-| - [x] True solar time   | solar_time.py        | Time offset                                                 | Solar hour angle                            |           |              |
-| - [x] Solar hour angle  | solar_hour_angle.py  | True solar time                                             | Solar zenith, Solar altitude, Solar azimuth |           |              |
-| - [x] Solar zenith      | solar_zenith.py      | Solar declination, Solar hour angle, Atmospheric refraction | Solar altitude                              |           |              |
-| - [x] Solar altitude    | solar_altitude.py    | Solar hour angle, Solar zenith                              | Solar position                              |           |              |
-| - [x] Solar azimuth     | solar_azimuth.py     | Solar declination, Solar hour angle, Solar zenith           | Solar position                              |           |              |
-
-[^*]: Is the timezone is such that after conversion to UTC it changes the day, then this is indeed required ?
 
 !!! tip
 
     PVGIS CLI offers a primer on the solar geometry parameters.
     Inform yourself using the `pvgis-prototype position intro` command.
-    See [pvgis-prototype position into](how_to/solar_geometry_introduction.md)
+    See [pvgis-prototype position into](../how_to/solar_geometry_introduction.md)
+
+The implementations concern NOAA's solar geometry equations, listed _in dependency order_ : 
+
+| Status                                      | Quantity              | Implementation         | Requires                                                      | Required by                                   | Support a Moment | Support Time series                         | Optimisation   |
+| -----------------------------------         | -------------------   | ---------------------- | ------------------------------------------------------------- | --------------------------------------------- | -----------      | -------------                               | -------------- |
+| :material-checkbox-marked-circle:{.checked} | Fractional year       | fractional_year.py     | Timestamp (+ time zone ? ) [^*]                               | Equation of time, solar declination           |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | Equation of time      | equation_of_time.py    | Fractional year                                               | Time offset                                   |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | Time offset           | time_offset.py         | Equation of time                                              | True solar time                               |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | True solar time [^**] | solar_time.py          | Time offset                                                   | Solar hour angle                              |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | Solar hour angle      | solar_hour_angle.py    | True solar time                                               | Solar zenith, Solar altitude, Solar azimuth   |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | Solar declination     | solar_declination.py   | Fractional year                                               | Solar zenith                                  |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | Solar zenith          | solar_zenith.py        | Solar declination, Solar hour angle, Atmospheric refraction   | Solar altitude                                |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | Solar altitude        | solar_altitude.py      | Solar hour angle, Solar zenith                                | Solar position                                |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | Solar azimuth         | solar_azimuth.py       | Solar declination, Solar hour angle, Solar zenith             | Solar position                                |                  | :material-checkbox-marked-circle:{.checked} |                |
+
+Further are listed more _quantities_
+which are, however, not _hard-requirements_
+for the calculations of photovoltaic performance.
+
+Also to support ?
+
+| Status | Quantity         | Implementation      | Requires | Required by | Algorithm | Time series | Optimisation |
+|--------|------------------|---------------------|----------|-------------|-----------|-------------|--------------|
+|        | Events           | events.py           |          |             |           |             |              |
+|        | Event hour angle | event_hour_angle.py |          |             |           |             |              |
+|        | Event time       | event_time.py       |          |             |           |             |              |
+|        | Local time       | local_time.py       |          |             |           |             |              |
+
+
+[^*]: Is the timezone is such that after conversion to UTC it changes the day, then this is indeed required ?
+
+[^**]: partially since time offset is not yet vectorised!**
