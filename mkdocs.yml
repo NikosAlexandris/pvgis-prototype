@@ -15,37 +15,48 @@ watch:
 nav:
   - Overview:
     - '': index.md
-  - Installation: install/install.md
+  - Installation:
+    - install/index.md
+    # - install/install.md
   - Tutorials:
     - tutorials/index.md
-  - How To:
-    - how_to/index.md
-    - how_to/help.md
-    - Power: how_to/power.md
+  - API:
+    - api/index.md
+  - CLI:
+    - cli/index.md
+    - cli/help.md
+    - Power: cli/power/power.md
     - Irradiance:
-      - Overview: how_to/solar_irradiance.md
-      - Direct: how_to/direct_irradiance.md
-    - Position:
-      - Geometry overview: how_to/solar_geometry_overview.md
-      - Incidence angle: how_to/solar_incidence_angle.md
+      - Overview: cli/irradiance/irradiance.md
+      - Direct: cli/irradiance/direct.md
+    - Solar Geometry:
+      - Introduction: cli/position/intro.md
+      - Overview: cli/position/overview.md
+      - Incidence: cli/position/incidence.md
+  - Web API:
+    - web_api/index.md
+    # - web_api/web_api.md
   - Reference:
     - reference/index.md
     - reference/solar_geometry_introduction.md
-  - Code Reference:
-    - code_reference/index.md
-    - Algorithms: code_reference/algorithms.md
-    - CLI: code_reference/cli_reference.md
-    - API: code_reference/api_reference.md
-    - Web API: code_reference/web_api_reference.md
+    - reference/pvgis52.md
+    - reference/pvgis52_rsun_standalone_opt.md
+  - Source Code:
+    - source_code/index.md
+    - Dependencies: source_code/dependencies.md
+    - Algorithms: source_code/algorithms.md
+    - API: source_code/api.md
+    - CLI: source_code/cli.md
+    - Web API: source_code/web_api.md
   - Development:
+    - development/index.md
+    - development/gantt.md
     - development/roadmap_and_progress.md
-    - development/main.md
+    - development/optimisation.md
+    - development/photovoltaic_performance.md
+    - development/solar_irradiance.md
     - development/solar_geometry.md
     - development/topography.md
-    - development/solar_irradiance.md
-    - development/photovoltaic_performance.md
-    - development/time_series.md
-    - development/performance_optimisation.md
   - Tags: includes/tags.md
 
 extra:
@@ -172,7 +183,8 @@ markdown_extensions:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format ''
+          format: !!python/name:mermaid2.fence_mermaid_custom
+          # format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -181,12 +193,13 @@ extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  - https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js
+  # - https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js
   - js/termynal.js
   - js/custom.js
 
 plugins:
   - search
+  - mermaid2
   - bibtex:
       bib_file: "references.bib"
   - tags:

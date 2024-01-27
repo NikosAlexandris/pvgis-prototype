@@ -1,4 +1,5 @@
 ---
+icon: material/eye
 tags:
   - How-To
   - CLI
@@ -6,7 +7,7 @@ hide:
   - toc
 ---
 
-!!! note 
+!!! warning
 
     This documentation is auto-generated and regularly updated
     to reflect the latest development changes.
@@ -67,7 +68,7 @@ In overview :
 - **Feature 3**: [Short description of feature]
 - [And so on...]
 
-For a full list of features, see the [Features](features.md) page.
+For a full list of features, see the [Features](overview/features.md) page.
 
 #### Web API
 
@@ -80,12 +81,7 @@ Mention key features of the Web API.]
 Dive into the detailed documentation
 to understand the full capabilities of PVGIS' Web API:
 
-- [Module Index](SUMMARY.md): Explore the comprehensive list of all modules, classes, and functions provided by PVGIS API.
-- [Class References](reference/classes.md): Detailed documentation of all classes within the API.
-- [Function Index](reference/functions.md): List and descriptions of all functions available in the API.
-
-[PVGIS]: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en
-[PVGIS Web Application]: https://re.jrc.ec.europa.eu/pvg_tools/en/
+- [Source Code Reference](code_reference/index.md) : Overview of documentation for the source code.
 
 #### CLI
 
@@ -125,7 +121,12 @@ please read our [Contribution Guidelines](development/contribution_guidelines.md
 ## Support & Community
 
 If you have questions or need support,
-join our [Community Forum](community_forum.md)
-or check out the [FAQ](faq.md) section.
+join our [Community Forum](support/community_forum.md)
+or check out the [FAQ](support/faq.md) section.
 
-Thank you for choosing PVGIS API for your solar irradiance calculation needs!
+Thank you for choosing PVGIS for your solar irradiance calculation needs!
+:fontawesome-solid-hands-praying:
+
+[PVGIS]: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en
+
+[PVGIS Web Application]: https://re.jrc.ec.europa.eu/pvg_tools/en/

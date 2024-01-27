@@ -3,6 +3,11 @@ tags:
   - Features
 ---
 
+!!! warning
+
+    This documentation is auto-generated and regularly updated
+    to reflect the latest development changes.
+
 # Features
 
 The PVGIS Web API offers a range of features
