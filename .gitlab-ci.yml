@@ -14,6 +14,9 @@ before_script:
   - pip install 'mkdocstrings[python]'
   - pip install rich
   - pip install mkdocs-mermaid2-plugin
+  - pip install pipdeptree
+  - pip install mkdocs-pagetree-plugin
+  - pip install mkdocs-badges
 
 test:
   stage: test
