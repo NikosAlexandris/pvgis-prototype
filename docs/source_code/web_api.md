@@ -1,4 +1,5 @@
 ---
+icon: simple/fastapi
 tags:
   - Web API
   - FastAPI

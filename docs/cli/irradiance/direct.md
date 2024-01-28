@@ -23,5 +23,6 @@ Let's calculate the direct inclined irradiance over the location at
 (longitude, latitude, elevation) = $$8.627626 45.812233 200$$
 
 ``` bash exec="true" result="ansi" source="above"
+export COLUMNS=1000  # markdown-exec: hide
 pvgis-prototype irradiance direct inclined 8.627626 45.812233 200 --start-time '2020-01-01' --end-time '2020-01-02' -r2 -aou degrees -vvv
 ```
