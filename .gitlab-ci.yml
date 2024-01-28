@@ -13,6 +13,7 @@ before_script:
   - pip install mkdocstrings
   - pip install 'mkdocstrings[python]'
   - pip install rich
+  - pip install mkdocs-mermaid2-plugin
 
 test:
   stage: test
