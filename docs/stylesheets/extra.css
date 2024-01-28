@@ -19,6 +19,12 @@
 }
 
 
+/* Mermaid */
+
+div.mermaid {
+  width: 1192px;
+}
+
 /* Other */
 
 .md-content a:link {

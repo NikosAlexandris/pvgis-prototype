@@ -1,4 +1,7 @@
 ---
+title: How To use PVGIS
+subtitle: Learn how to use PVGIS
+description: A collection of How-To recipes on the use of PVGIS
 icon: material/console-line
 tags:
   - How-To
@@ -13,9 +16,9 @@ hide:
 
     | Command                                               | Subcommand                                                    | Description                                                                                                                                      |
     |-------------------------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-    | :octicons-command-palette-24: [**`power`**](power.md) |                                                               | 🔌 Estimate the performance of a photovoltaic system over a time series                                                                          |
-    |                                                       | :octicons-command-palette-24: [**`broadband`**](broadband.md) | :simple-spectrum: Estimate the photovoltaic performance based on broadband irradiance, ambient temperature and wind speed                        |
-    |                                                       | :octicons-command-palette-24: [**`spectral`**](spectral.md)                                 | :material-heat-wave: Estimate the photovoltaic performance based on spectrally resolved irradiance, ambient temperature and wind speed Prototype |
+    | :octicons-command-palette-24: [**`power`**](power/power.md) |                                                               | 🔌 Estimate the performance of a photovoltaic system over a time series                                                                          |
+    |                                                       | :octicons-command-palette-24: [**`broadband`**](power/power.md##Broadband irradiance) | :simple-spectrum: Estimate the photovoltaic performance based on broadband irradiance, ambient temperature and wind speed                        |
+    |                                                       | :octicons-command-palette-24: [**`spectral`**](power/power.md##Spectrally resoled irradiance)                                 | :material-heat-wave: Estimate the photovoltaic performance based on spectrally resolved irradiance, ambient temperature and wind speed Prototype |
 
 !!! tip "Time Series"
 
@@ -24,12 +27,12 @@ hide:
     | 💹 Work with time series                                     | :octicons-command-palette-24: [**`series`**]()     |
     | 🌞 Estimate the solar irradiance incident on a solar surface | :octicons-command-palette-24: [**`irradiance`**]() |
 
-!!! hint "Solar Geometry"
+!!! hint ":octicons-sun-24: :triangular_ruler: Solar Geometry"
       | Command                                          | Subcommand                                                                    | Description                                                                      |
       |--------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-      | :octicons-command-palette-24: [**`time`**]()     |                                                                               | ⌛ Calculate the solar time for a location and moment                            |
-      | :octicons-command-palette-24: [**`position`**]() |                                                                               | 📐 Calculate solar geometry parameters for a location and moment in time         |
-      |                                                  | :fontawesome-solid-info: [**`intro`**](solar_geometry_introduction.md) | A short primer on solar geometry
+      | :octicons-command-palette-24: [**`time`**]()     |                                                                               | :material-sun-clock: Calculate the solar time for a location and moment                            |
+      | :octicons-command-palette-24: [**`position`**]() |                                                                               | :material-sun-angle: Calculate solar geometry parameters for a location and moment in time         |
+      |                                                  | :fontawesome-solid-info: [**`intro`**](position/intro.md) | A short primer on solar geometry
       | :octicons-command-palette-24: [**`surface`**]()  |                                                                               | 󰶛  Calculate solar surface geometry parameters for a location and moment in time |
 
 !!! note "Diagnostics"

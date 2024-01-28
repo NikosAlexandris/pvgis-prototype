@@ -39,4 +39,4 @@ the steps to integrate it in PVGIS' API are:
 
 [Provide information on how users can share their custom functions]
 
-For more advanced features, see our [Advanced Usage](tutorials/advanced_usage.md) section.
+For more advanced features, see our [Advanced Usage](../tutorials/advanced_usage.md) section.
