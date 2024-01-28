@@ -45,7 +45,7 @@ for systems using various PV (Photo Voltaic) technologies.
 
 <div class="grid cards" markdown>
 
--   :material-solar-power-variant:{ .lg .middle } __Photovoltaic Potential__
+- :material-solar-power-variant:{ .lg .middle } __Photovoltaic Potential__
 
     ---
     Various technologies
@@ -55,7 +55,7 @@ for systems using various PV (Photo Voltaic) technologies.
 
     Models available in [PVMAPS](https://ec.europa.eu/jrc/en/PVGIS/downloads/PVMAPS) 
 
--   :octicons-graph-24:{ .lg .middle } __Time Series__
+- :octicons-graph-24:{ .lg .middle } __Time Series__
 
     ---
 
@@ -77,7 +77,7 @@ for systems using various PV (Photo Voltaic) technologies.
 
         [:thinking: https://thinkbeforeprinting.org/](https://thinkbeforeprinting.org/)
 
--   :octicons-feed-public-16:{ .lg .middle } __Public Service__
+- :octicons-feed-public-16:{ .lg .middle } __Public Service__
 
     ---
 
@@ -148,19 +148,27 @@ Thank you for choosing PVGIS for your solar irradiance calculation needs!
 
 ### Contact points
 
-!!! info "PVGIS Support mailbox"
+<div class="grid cards" markdown>
+
+- :material-at: __Support Mailbox__
+
+    ---
 
     Questions and comments can be sent to our mailbox:
 
     [JRC-PVGIS@ec.europa.eu](JRC-PVGIS@ec.europa.eu)
 
-!!! info "Postal address"
+- :fontawesome-solid-map-location-dot: __Postal Address__
+
+    ---
 
     European Commission, Joint Research Centre
     Energy Efficiency and Renewables Unit
     via E. Fermi 2749, TP 450
     I-21027 Ispra (VA)
     Italy
+
+</div>
 
 [PVGIS]: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en
 

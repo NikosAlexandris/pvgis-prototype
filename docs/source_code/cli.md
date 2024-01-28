@@ -1,4 +1,6 @@
 ---
+title: Source Code for CLI
+icon: material/console-line
 tags:
   - CLI
   - Reference

@@ -252,6 +252,7 @@ plugins:
             show_symbol_type_toc: true
             signature_crossrefs: true
             summary: true
+            show_bases: true
 
 # extra:
 #   social:
