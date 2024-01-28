@@ -16,7 +16,7 @@ test:
 
 pages:
   stage: deploy
-  image: python:latest
+  image: python:3.11.6
   script:
     - mkdocs build --site-dir public
   artifacts:
