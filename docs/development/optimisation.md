@@ -34,7 +34,7 @@ The current Proof-of-Concept,
 )
 ==includes== among other elements :
 
-- quite some constants (see [constants.py][constants.py-commit-5cca629ea186ff3c7711fbdbd8219841caf4d6b1]
+- quite some constants (see [constants.py][constants.py-commit-5cca629ea186ff3c7711fbdbd8219841caf4d6b1])
 - [`print()`][print()] statements for output and support debugging _which is slowing down_ a programs runtime [^0]
 - debugging calls, specifically `debug(locals())` from [`devtools`][devtools]
 - input data validation using [Pydantic][Pydantic]
@@ -49,27 +49,12 @@ The current Proof-of-Concept,
     - parallel executions
         - no parallel processing beyond NumPy's own internals (?)
 - using Pandas' [DatetimeIndex][DatetimeIndex] which is _not hashable_
+- no use of any external compiler or library for High-Performance Computing
 
 !!! quote ""
 
     Hence,
     the margin for optimisation is quite large.
-
-### High Performance Computation with Python ?
-
-- Compilers/Just-in-Time Compilers
-
-    - PyPy: A Just-In-Time (JIT) compiler for Python.
-    - mypyc: A compiler that compiles Python to C-extension modules.
-    - Pyjion: A JIT compiler for Python, using the .NET CLR.
-    - Cython: A compiler that converts Python code to C for better performance.
-
-- Libraries/Frameworks
-
-    - Jax: A library for numerical computations with auto-differentiation and GPU/TPU support.
-    - GT4Py: A framework for writing stencil computations in geosciences.
-    - Pythran: A compiler-like tool that converts Python to optimized C++ code, but also acts as a library.
-    - Dace: An framework for data-centric parallel programming with support for Ahead-of-Time (AoT) compilation in addition to JIT.
 
 ## Profiling
 
@@ -338,6 +323,26 @@ The focus is on :
 - reviewing and refactoring core algorithms to reduce complexity
 - use systematically efficient libraries like [NumPy][NumPy] and [SciPy][SciPy] for numerical computations.
 - best programming practices like avoiding Python's currently inefficient `for` loop
+
+## High Performance Computation with Python ?
+
+Explore the great potential
+of using external libraries/frameworks for High Performance Computing
+to boost the performance of PVGIS.
+
+- Compilers/Just-in-Time Compilers
+
+    - PyPy: A Just-In-Time (JIT) compiler for Python.
+    - mypyc: A compiler that compiles Python to C-extension modules.
+    - Pyjion: A JIT compiler for Python, using the .NET CLR.
+    - Cython: A compiler that converts Python code to C for better performance.
+
+- Libraries/Frameworks
+
+    - Jax: A library for numerical computations with auto-differentiation and GPU/TPU support.
+    - GT4Py: A framework for writing stencil computations in geosciences.
+    - Pythran: A compiler-like tool that converts Python to optimized C++ code, but also acts as a library.
+    - Dace: An framework for data-centric parallel programming with support for Ahead-of-Time (AoT) compilation in addition to JIT.
 
 ## Load Balancing
 
