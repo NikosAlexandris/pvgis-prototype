@@ -34,24 +34,42 @@ The current Proof-of-Concept,
 )
 ==includes== among other elements :
 
-- print statements for output and support debugging _which is slowing down_ a programs runtime [^0]
+- quite some constants (see [constants.py][constants.py-commit-5cca629ea186ff3c7711fbdbd8219841caf4d6b1]
+- [`print()`][print()] statements for output and support debugging _which is slowing down_ a programs runtime [^0]
 - debugging calls, specifically `debug(locals())` from [`devtools`][devtools]
 - input data validation using [Pydantic][Pydantic]
-- in-function manual output data validation
+- in-function output data validation
 - custom data classes/[Pydantic models][Pydantic models]
+- use of lists and list comprehensions
 - frequently requested/repeated calculations
-- complete lack of caching/memoization
-- if and wherever possible, complete lack of :
+- lack of caching/memoization practices
+- lack of :
     - asynchronous executions,
     - concurrent executions,
     - parallel executions
         - no parallel processing beyond NumPy's own internals (?)
-- using Pandas' DateTimeIndex which is _not hashable_
+- using Pandas' [DatetimeIndex][DatetimeIndex] which is _not hashable_
 
 !!! quote ""
 
     Hence,
     the margin for optimisation is quite large.
+
+### High Performance Computation with Python ?
+
+- Compilers/Just-in-Time Compilers
+
+    - PyPy: A Just-In-Time (JIT) compiler for Python.
+    - mypyc: A compiler that compiles Python to C-extension modules.
+    - Pyjion: A JIT compiler for Python, using the .NET CLR.
+    - Cython: A compiler that converts Python code to C for better performance.
+
+- Libraries/Frameworks
+
+    - Jax: A library for numerical computations with auto-differentiation and GPU/TPU support.
+    - GT4Py: A framework for writing stencil computations in geosciences.
+    - Pythran: A compiler-like tool that converts Python to optimized C++ code, but also acts as a library.
+    - Dace: An framework for data-centric parallel programming with support for Ahead-of-Time (AoT) compilation in addition to JIT.
 
 ## Profiling
 
@@ -113,6 +131,30 @@ or removed completely in the production version to reduce overhead.
     # Using Pydantic for validation
     example = ExampleModel(attribute1=123, attribute2="test")
     ```
+## NumPy Arrays
+
+[NumPy][NumPy] is the golden standard
+for scientific and high-performance computing with Python.
+NumPy arrays outpace significantly common Python lists
+in processing massive data and performing numerical computations.
+consuming less memory than lists.
+
+## Generator expressions
+
+Use generator expressions instead of list comprehensions
+
+## Peephole Optimization
+
+Code readability often comes with cost in terms of efficiency
+as the language interpreter automatically calculates constant expressions.
+The [peephole][Peephole] technique means to
+let Python pre-compute such expressions,
+replace repetitive instances with the result
+and employ membership tests.
+This may help to avoid performance decrease
+and boost software performance.
+
+[Peephole]: https://en.wikipedia.org/wiki/Peephole_optimization
 
 ## Data structure Optimization
 
@@ -319,6 +361,10 @@ The focus is on :
 
 [5cca629ea186ff3c7711fbdbd8219841caf4d6b]: https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/commit/5cca629ea186ff3c7711fbdbd8219841caf4d6b
 
+[constants.py-commit-5cca629ea186ff3c7711fbdbd8219841caf4d6b1]: https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/blob/5cca629ea186ff3c7711fbdbd8219841caf4d6b1/pvgisprototype/constants.py
+
+[print()]: https://docs.python.org/3/library/functions.html#print
+
 [devtools]: https://python-devtools.helpmanual.io/usage/#debug
 
 [Pydantic]: https://docs.pydantic.dev/latest/
@@ -326,6 +372,8 @@ The focus is on :
 [Pydantic models]: https://docs.pydantic.dev/latest/concepts/models/
 
 [structlog]: https://www.structlog.org/en/stable/index.html
+
+[DatetimeIndex]: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
 
 [Redis]: https://redis.io/
 

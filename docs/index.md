@@ -1,93 +1,112 @@
 ---
 icon: material/eye
 tags:
-  - How-To
-  - CLI
+  - PVGIS
+  - Overview
 hide:
   - toc
 ---
 
-!!! warning
-
-    This documentation is auto-generated and regularly updated
-    to reflect the latest development changes.
-
-Welcome to the documentation of
+:material-human-greeting-variant: Welcome to the documentation of
 the Photovoltaic Geographical Information System (PVGIS).
 
-The content is designed to help you navigate through the features,
-capabilities, and detailed references of PVGIS' Web API, CLI or even its core
-API.
+The content is designed to help you navigate through
+the features, capabilities, and detailed references
+for the PVGIS command line interface (CLI),
+its Web application programming interface (Web API),
+or even its core API[^0].
 
-!!! warning
+[^0]:!!! warning
 
-    The Web API is not the same at the core API. The former consumes the latter
-    to produce a FastAPI-based Web API interface.
+        The Web API is not the same at the core API.
+        The former consumes the latter
+        to produce a FastAPI-based Web API interface.
 
 ## What is PVGIS ?
 
 [PVGIS][PVGIS]
-is an open web tool of the European Commission
-developed and maintained by
-the Energy Efficiency and Renewables Unit (Ispra) of the Energy,
+is an open [web application][PVGIS Web Application]
+of the :flag_eu: European Commission.
+Is it developed and maintained
+in the [Joint Research Centre (JRC)][JRC]
+for over two decades
+by the Energy Efficiency and Renewables Unit (Ispra) of the Energy,
 Transport and Climate directorate.
 
-For over two decades,
-the European Commission's Joint Research Centre (JRC)
-has maintained the [web application PVGIS][PVGIS Web Application].
+[JRC]: https://joint-research-centre.ec.europa.eu/index_en
 
 ### Features & Capabilities
 
-**Photovoltaic performance**
-
 PVGIS
-offers public service insights on solar radiation and photovoltaic performance,
+offers cost-free public service insights
+on solar radiation and photovoltaic performance,
 providing location-specific estimates of power output
 for systems using various PV (Photo Voltaic) technologies.
 
-**TMY**
+<div class="grid cards" markdown>
 
-Additionally,
-it can generate Typical Meteorological Year (TMY) datasets,
-commonly used in energy efficiency studies for buildings.
-Its capabilities,
-combined with its cost-free accessibility,
-have made it popular within the solar and photovoltaic community,
-attracting professionals, students, and interested citizens alike.
+-   :material-solar-power-variant:{ .lg .middle } __Photovoltaic Potential__
 
-**Significance**
+    ---
+    Various technologies
 
-A testament to PVGIS’ significance
-is the usage of its public Web API (Application Programming Interface) service,
-which receives weekly over 50,000 unique requests.
+    - :material-power-plug: Grid-connected
+    - :material-battery-high: Stand-alone
 
-In overview :
+    Models available in [PVMAPS](https://ec.europa.eu/jrc/en/PVGIS/downloads/PVMAPS) 
 
-- **Feature 1**: [Short description of feature]
-- **Feature 2**: [Short description of feature]
-- **Feature 3**: [Short description of feature]
-- [And so on...]
+-   :octicons-graph-24:{ .lg .middle } __Time Series__
+
+    ---
+
+    - :material-solar-power: PV Performance 
+    - :material-sun-wireless-outline: Solar Radiation
+    - :material-thermometer: Temperature & :wind_blowing_face: Wind Speed 
+    - :material-weather-partly-cloudy: Typical Meteorological Year for 9 climate variables
+    
+- :material-map:{ .lg .middle } __Coverage & Maps__ [^1]
+
+    ---
+
+    - Europe & Africa :earth_africa:
+    - Largely Asia :earth_asia:
+    - America :earth_americas:
+    - Country/regional maps of solar resource & PV potential
+
+[^1]:!!! warning "Printing ?"
+
+        [:thinking: https://thinkbeforeprinting.org/](https://thinkbeforeprinting.org/)
+
+-   :octicons-feed-public-16:{ .lg .middle } __Public Service__
+
+    ---
+
+    ![](images/Logo_EUPL.svg.png){align=right height=100px width=100px}
+
+    - :material-currency-eur-off: Cost free & Open access
+    - :material-search-web: 50+K Web API requests / week
+    - :material-open-source-initiative: Open Source license EUPL-1.2
+
+    [:octicons-arrow-right-24: License](#)
+
+- :material-translate:{ .lg .middle } __Languages__
+
+    ---
+
+    ![](images/languages-in-pvgis.svg)
+
+- __Components__
+
+    ---
+
+    - :material-language-python: Python [API](#)
+    - :material-console: [CLI](#) based on Typer
+    - :material-web: [Web API](#)
+    based on :simple-fastapi: FastAPI
+
+</div>
 
 For a full list of features, see the [Features](overview/features.md) page.
-
-#### Web API
-
-[Provide a brief overview of what: 
-- PVGIS Web API is,
-- its purpose,
-- and what problems it solves.
-Mention key features of the Web API.]
-
-Dive into the detailed documentation
-to understand the full capabilities of PVGIS' Web API:
-
-- [Source Code Reference](code_reference/index.md) : Overview of documentation for the source code.
-
-#### CLI
-
-`pvis` is the CLI component of PVGIS.
-
-#### Core API
 
 ## Getting Started
 
@@ -126,6 +145,22 @@ or check out the [FAQ](support/faq.md) section.
 
 Thank you for choosing PVGIS for your solar irradiance calculation needs!
 :fontawesome-solid-hands-praying:
+
+### Contact points
+
+!!! info "PVGIS Support mailbox"
+
+    Questions and comments can be sent to our mailbox:
+
+    [JRC-PVGIS@ec.europa.eu](JRC-PVGIS@ec.europa.eu)
+
+!!! info "Postal address"
+
+    European Commission, Joint Research Centre
+    Energy Efficiency and Renewables Unit
+    via E. Fermi 2749, TP 450
+    I-21027 Ispra (VA)
+    Italy
 
 [PVGIS]: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en
 

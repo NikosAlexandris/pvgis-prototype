@@ -1,10 +1,13 @@
 ---
+title: EUPL-1.2
+subtitle: European Union Public License 1.2
+description: The European Union Public License version 1.2
 tags:
   - License
   - EUPL-1.2
 ---
 
-# European Union Public Licence v. 1.2
+# European Union Public Licence 1.2
 
 ## Keywords 
 
@@ -22,7 +25,11 @@ tags:
 
 - **Compliant** -- with EU and Member State laws
 
-Source :  European Commission, Directorate-General for Digital Services, Schmitz, P., European Union Public Licence (EUPL) – Guidelines July 2021, Publications Office, 2021, [https://data.europa.eu/doi/10.2799/77160](https://data.europa.eu/doi/10.2799/77160)
+!!! seealso
+
+    Source :  European Commission, Directorate-General for Digital Services, Schmitz, P., European Union Public Licence (EUPL) – Guidelines July 2021, Publications Office, 2021, [https://data.europa.eu/doi/10.2799/77160](https://data.europa.eu/doi/10.2799/77160)
+
+    [https://joinup.ec.europa.eu/collection/eupl/discussion/ultimately-how-copyleft-eupl](https://joinup.ec.europa.eu/collection/eupl/discussion/ultimately-how-copyleft-eupl)
 
 ## Full text
 

@@ -5,33 +5,19 @@
 
 ## Installation and Setup
 
-PVGIS can be installed relatively simply using `pip`. However, it is rather a
-good idea to [create a virtual environment][] first and install
-PVGIS there-in.
+PVGIS can be installed relatively simply using `pip`.
+However,
+it is rather a good idea to [create a virtual environment][] first
+and install PVGIS there-in.
 
-### Install PVGIS
+### Install Python
 
-- Install PVGIS using pip
+Ensure Python is installed on your system.
+You can download it from [python.org](https://python.org).
 
-    - While inside the virtual environment, install `pvgis` using pip:
-      ``` bash
-      pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
-      ```
+### Virtual environment
 
-- Verify Installation
-
-    - After installation, you can verify that the package is installed
-      correctly by checking its version or running a basic command, if
-      available.
-
-### Create a virtual environment manually
-
-#### Install Python
-
-Ensure Python is installed on your system. You can download it from
-[python.org](python.org).
-
-#### Create a virtual environment
+#### Create a virtual environment manually
 
 1- Access your terminal (Linux/Mac) or command prompt (Windows).
 
@@ -47,46 +33,67 @@ Ensure Python is installed on your system. You can download it from
 
        On Linux/Mac: ``` python python3 -m venv env ```
 
-    - Activate the Virtual Environment
+3- Activate the Virtual Environment
 
-        - Before installing packages, activate the virtual environment : 
+    - Before installing packages, activate the virtual environment : 
 
-          On Windows:
-          ``` sh
-          .\env\Scripts\activate
-          ```
-          
-          On Linux/Mac : 
-          ``` bash
-          source env/bin/activate
-          ```
+      On Windows:
+      ``` sh
+      .\env\Scripts\activate
+      ```
+      
+      On Linux/Mac : 
+      ``` bash
+      source env/bin/activate
+      ```
 
-        - Your command prompt should now show the name of the virtual
-          environment, indicating it is active.
+    - Your command prompt should now show the name of the virtual environment,
+    indicating it is active.
 
-    - Install PVGIS using pip
-
-        - While inside the virtual environment, install `pvgis` using pip:
-          ``` bash
-          pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
-          ```
-
-    - Verify Installation
-
-        - After installation, you can verify that the package is installed
-          correctly by checking its version or running a basic command, if
-          available.
+    - Now you can install regular Python packages by using `pip`.
 
 4- Deactivating the Virtual Environment
-    - Once you want to leave working with PVGIS, don't forget to deactivate the
-      virtual environment by typing `deactivate` in the terminal or command
-      prompt.
 
-### Creating a virtual environment automatically using `direnv`
+    - To leave from working with PVGIS,
+      don't forget to deactivate the virtual environment
+      by typing `deactivate` in the terminal or command prompt.
 
-#### Install `direnv`
+#### Creating a virtual environment automatically using `direnv`
+
+##### Install `direnv`
 
 ...
+
+### Install PVGIS
+
+- Install PVGIS using pip
+
+    PVGIS is not yet available in PyPi.
+    However,
+    `pip` can install Python packages directly from a Git repository.
+
+    - While inside the virtual environment,
+    install `pvgis` using pip:
+
+    ``` bash
+    pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
+    ```
+
+- Verify Installation
+
+    - After installation, 
+    you can verify that the package is installed correctly
+    by checking its version
+
+    ``` bash
+    pvgis-prototype --version
+    ```
+
+    or running a basic command, if available.
+
+    ``` bash
+    pvgis-prototype --help
+    ```
 
 ## Basic Commands and Syntax
 
