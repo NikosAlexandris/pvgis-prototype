@@ -159,7 +159,7 @@ We can do better and ask for a monthly aggregation :
 
 </div>
 
-## Spectrally resoled irradiance
+## Spectrally resolved irradiance
 
 PVGIS can estimate the photovoltaic power over a time series
 or an arbitrarily aggregated energy production of a PV system

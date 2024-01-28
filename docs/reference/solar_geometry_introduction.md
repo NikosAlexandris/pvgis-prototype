@@ -15,7 +15,7 @@ depends primarily on the ==Solar Incidence== angle.
 
     PVGIS CLI offers a primer on the solar geometry parameters.
     Inform yourself using the `pvgis-prototype position intro` command.
-    See [pvgis-prototype position into](how_to/solar_geometry_introduction.md)
+    See [pvgis-prototype position intro](../cli/position/intro.md)
 
 To calculcate the critical ==solar incidence== angle,
 PVGIS requires the relative Latitude and Longitude coordinates

@@ -57,9 +57,11 @@ We can see the required arguments to run the command
 
 Let's give it a first try with some _reasonable_ inputs
 
-``` pycon exec="1" source="console" session="solar-altitude"
->>> calculate_solar_altitude(8, 45, '2001-01-01 10:00:00', 'UTC')
-```
+!!! failure
+
+    ``` pycon exec="1" source="console" session="solar-altitude"
+    >>> calculate_solar_altitude(8, 45, '2001-01-01 10:00:00', 'UTC')
+    ```
 
 PVGIS' API is indeed idiomatic and our _reasonable_ inputs won't work.
 However,

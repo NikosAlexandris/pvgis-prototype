@@ -15,6 +15,7 @@ watch:
 nav:
   - Overview:
     - '': index.md
+    - Page tree: pagetree.md
   - Installation:
     - install/index.md
     # - install/install.md
@@ -41,6 +42,7 @@ nav:
     - reference/solar_geometry_introduction.md
     - reference/pvgis52.md
     - reference/pvgis52_rsun_standalone_opt.md
+    - reference/web_traffic.md
   - Source Code:
     - source_code/index.md
     - Dependencies: source_code/dependencies.md
@@ -57,6 +59,7 @@ nav:
     - development/solar_irradiance.md
     - development/solar_geometry.md
     - development/topography.md
+    - development/state_and_future_of_pvgis.md
   - Tags: includes/tags.md
 
 extra:
@@ -111,8 +114,8 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
-    - navigation.prune 
-    # - navigation.expand
+    # - navigation.prune 
+    - navigation.expand
     - navigation.path
     - navigation.indexes 
     - toc.follow
@@ -123,6 +126,7 @@ extra_css:
   - stylesheets/extra.css
   - stylesheets/links.css
   - stylesheets/code_select.css
+  # - stylesheets/tufte-sidebars.css
   - css/termynal.css
   - css/custom.css
   - css/mkdocstrings.css
@@ -192,13 +196,15 @@ markdown_extensions:
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
-  # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  # - https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js
   - js/termynal.js
   - js/custom.js
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - js/tablesort.js
 
 plugins:
   - search
+  - badges
+  - pagetree
   - mermaid2
   - bibtex:
       bib_file: "references.bib"
@@ -213,6 +219,9 @@ plugins:
   - autorefs
   - git-revision-date-localized:
       type: timeago
+  # - git-committers:
+  #     gitlab_repository: 12345678
+  #     token: !ENV ["GH_TOKEN"]
   - minify:
       minify_html: true
   - mkdocstrings:
