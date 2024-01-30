@@ -32,7 +32,11 @@ tags:
 
 !!! abstract
 
-    **Origin of requests between 28 May and 4 June 2023**
+<div class="grid cards" markdown>
+
+- **Origin of requests between 28 May and 4 June 2023**
+
+    ---
 
     | Country | Requests |    % |
     |:-------:|---------:|-----:|
@@ -42,7 +46,9 @@ tags:
     |  France |     7286 |  9.1 |
     |  Italy  |     4853 |  6.0 |
 
-    **Tools popularity**
+- **Tools popularity**
+
+    ---
 
     |     Tool     |   Count |
     |:------------:|--------:|
@@ -60,6 +66,8 @@ tags:
     !!! note
 
         IP addresses hereafter are redacted for the obvious privacy reasons!
+
+</div>
 
 # Web Traffic
 

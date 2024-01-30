@@ -5,16 +5,41 @@ title: State and Future of PVGIS
 
 # State and Future of PVGIS
 
-I joined the PVGIS team in the unit C2 in November 2021.
-I mostly work in programmatic issues and matters of data processing.
-There is a lot of good work put into this system by several people,
-from the creators to contributors up until today.
+by Nikos Alexandris
+
+
+## Summary
+
+After almost 9 months of working in and for the PVGIS team,
+on programmatic issues and matters of data processing,
+I gained an appreciation
+for the amount of good work put into PVGIS by several people.
 Notably,
-high quality work has been delivered by external contributors in the last years,
-mainly on the software side of PVGIS.
+high quality work has been delivered by external contributors
+on the software side of PVGIS.
 Notwithstanding,
-from the modern world's software and user experience perspective,
-PVGIS deserves an overhaul. 
+from a modern world's software and user experience perspective,
+and after a holistic assessment,
+my recommendation is that PVGIS deserves an overhaul. 
+
+I presented my findings and recommendations on September 2022
+in the members of the PVGIS team.
+
+!!! info "Presentation of findings and recommendations"
+
+    [State & Future of PVGIS](https://eceuropaeu.sharepoint.com/:p:/r/teams/GRP-PVGIS/Shared%20Documents/General/Presentations/State%20and%20future%20of%20PVGIS.pptx?d=w2c9d36bb03fb4fe091f4c02cf4d058fa&csf=1&web=1&e=kar8Dh)
+
+Due to the lack of resources,
+at the time of the presentation,
+the proposed recommendations did not meet a univocal agreement
+in order to launch a feasibility study.
+
+On April 2023,
+the recommendations were re-assessed and it was decided to launch a research &
+conception effort in order to showcase the potential for a modern version of
+PVGIS based on Python and modern technologies for scientific and high
+performance computations.
+
 
 ## State 
 
@@ -48,6 +73,7 @@ and ask questions or communicate feature requests.
 Naturally, there is repetition of questions.
 The lack of a proper Question & Answer system
 requires valuable time to be put into responding to users. 
+
 
 ## Future 
 
@@ -126,6 +152,7 @@ which are used to generate PVGIS time series in the desired custom data format.
 The web server back-end software is of high quality,
 written in Python based on the Flask web framework.  
 
+
 ## What to do? 
 
 The core of PVGIS software needs to be rewritten and accompanied with unit tests,
@@ -137,6 +164,7 @@ however, will require to redesign the web server back-end too.
 
 - To ease off technical works and focus on science. 
 - To enable the software to be open-sourced 
+
 
 ## Good practice examples 
 
@@ -154,9 +182,16 @@ and share this link to the result.
 This would save the time from re-fillling the parameters for the same query.
 At the moment, PVGIS supports for pre-setting the location. 
 
+
 ## How long will it take? 
 
-... 
+An rough estimation for producing a modern Proof-of-Concept version (excluding
+work on the Front-end),
+would be one skillful person with some additional help,
+working over a 1-year period.
+This would be more or less
+the amount of time put by the previous two external consultants,
+plus some extra time.
 
 ## Data format 
 

@@ -5,7 +5,7 @@ site_url: http://pvgis-reference.jrc.it
 
 repo_name: pvis-be-prototype
 repo_url: https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
-edit_uri: edit/main/docs/
+edit_uri: edit/mkdocs/docs/
 # Keep this in sync with pyproject.toml and index.md
 copyright: Copyright &copy; 2023 European Commission. Licensed under the EUPL-1.2 or later
 
@@ -23,6 +23,7 @@ nav:
     - tutorials/index.md
   - API:
     - api/index.md
+    - api/api.md
   - CLI:
     - cli/index.md
     - cli/help.md
@@ -36,13 +37,14 @@ nav:
       - Incidence: cli/position/incidence.md
   - Web API:
     - web_api/index.md
-    # - web_api/web_api.md
+    - web_api/web_api.md
   - Reference:
     - reference/index.md
     - reference/solar_geometry_introduction.md
     - reference/pvgis52.md
     - reference/pvgis52_rsun_standalone_opt.md
     - reference/web_traffic.md
+    - reference/external_tools.md
   - Source Code:
     - source_code/index.md
     - Dependencies: source_code/dependencies.md
@@ -126,6 +128,7 @@ extra_css:
   - stylesheets/extra.css
   - stylesheets/links.css
   - stylesheets/code_select.css
+  - stylesheets/mermaid.css
   # - stylesheets/tufte-sidebars.css
   - css/termynal.css
   - css/custom.css
@@ -200,6 +203,8 @@ extra_javascript:
   - js/custom.js
   - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
   - js/tablesort.js
+  - js/mermaid_config.js
+  - js/extra-loader.js
 
 plugins:
   - search
