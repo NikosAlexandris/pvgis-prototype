@@ -77,6 +77,7 @@ from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
+from pvgisprototype.constants import ENERGY_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
@@ -219,7 +220,7 @@ def photovoltaic_power_output_series(
                 data_array=photovoltaic_power_output_series,
                 timestamps=timestamps,
                 groupby=groupby,
-                title="Photovoltaic power output",
+                title="Photovoltaic energy output" + f" series {ENERGY_UNIT}",
             )
         if csv:
             write_irradiance_csv(
