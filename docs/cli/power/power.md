@@ -1,3 +1,12 @@
+---
+title: Estimate the photovoltaic performance
+subtitle: Estimate photovoltaic performance over a time series
+icon: material/solar-power 
+tags:
+  - How-To
+  - CLI
+---
+
 # Photovolatic Power
 
 ## Broadband irradiance

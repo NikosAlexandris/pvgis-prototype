@@ -26,6 +26,7 @@ This page overviews some key areas for optimization.
     caching strategies and load balancing
     are essential for enhancing performance and scalability.
 
+
 ## Status
 
 The current Proof-of-Concept,
@@ -56,6 +57,7 @@ The current Proof-of-Concept,
     Hence,
     the margin for optimisation is quite large.
 
+
 ## Profiling
 
 Before optimising,
@@ -66,6 +68,7 @@ Using profiling tools like `cProfile` for Python
 we can analyse and understand
 which parts of the code are consuming the most resources.
 
+
 ## Areas for improvement
 
 Out of common/public programmatic experience,
@@ -73,6 +76,7 @@ documented in books, articles, software projects,
 publicly accessible wikis and fora,
 we can list ahead some areas for improvement
 and discuss possible optimisation actions.
+
 
 ## Logging
   
@@ -87,11 +91,13 @@ and discuss possible optimisation actions.
    and return only JSON or other structured
    output through the Web API in the production version ?
 
+
 ## Debugging
 
 The `debug(locals())` calls from [`devtools`][devtools]
 can be optimised (?)
 or removed completely in the production version to reduce overhead.
+
 
 ## Data Validation
 
@@ -116,7 +122,17 @@ or removed completely in the production version to reduce overhead.
     # Using Pydantic for validation
     example = ExampleModel(attribute1=123, attribute2="test")
     ```
-## NumPy Arrays
+
+## Use libraries developed in C/C++
+
+There are numerous libraries/packages developed in C/C++
+that can be integrated into Python programs. 
+[Numpy][NumPy] and [Scipy][] are prominent examples,
+known for their effectiveness in handling large datasets.
+
+Use such libraries to speed-up operations. 
+
+### NumPy Arrays
 
 [NumPy][NumPy] is the golden standard
 for scientific and high-performance computing with Python.
@@ -124,9 +140,48 @@ NumPy arrays outpace significantly common Python lists
 in processing massive data and performing numerical computations.
 consuming less memory than lists.
 
+
+## Do Not Use .dot Operation
+
+Dot operations may be time-consuming!
+
+Function with a `.` (dot)
+first call `__getattribute()__` or `__getattr()__`,
+which then uses a dictionary operation.
+This adds some overhead.
+It is recommended to import functions for optimizing Python code for speed.
+
+
+## Intern Strings in Python
+
+!!! danger
+
+    Explain.-
+
+
 ## Generator expressions
 
 Use generator expressions instead of list comprehensions
+
+
+## Apply multiple assignements
+
+Instead of doing
+
+``` python
+a = 3
+b = 6
+c = 9
+```
+
+better do 
+
+```python
+a, b, c = 3, 6, 9
+```
+
+This approach optimizes and speeds up the code execution.
+
 
 ## Peephole Optimization
 
@@ -141,6 +196,7 @@ and boost software performance.
 
 [Peephole]: https://en.wikipedia.org/wiki/Peephole_optimization
 
+
 ## Data structure Optimization
 
 Optimize in-advance massive time series data structures :
@@ -150,6 +206,7 @@ Optimize in-advance massive time series data structures :
 
 - Handle massive time series data programmatically
   by using efficient data structures like NumPy Arrays.
+
 
 ## Data Classes
 
@@ -272,6 +329,7 @@ to distribute computations and enhance performance.
   explore libraries like `concurrent.futures`
   to manage concurrent tasks efficiently.
   
+
 ## Parallel operations
 
 - Use parallel processing techniques and software
@@ -324,6 +382,7 @@ The focus is on :
 - use systematically efficient libraries like [NumPy][NumPy] and [SciPy][SciPy] for numerical computations.
 - best programming practices like avoiding Python's currently inefficient `for` loop
 
+
 ## High Performance Computation with Python ?
 
 Explore the great potential
@@ -343,6 +402,7 @@ to boost the performance of PVGIS.
     - GT4Py: A framework for writing stencil computations in geosciences.
     - Pythran: A compiler-like tool that converts Python to optimized C++ code, but also acts as a library.
     - Dace: An framework for data-centric parallel programming with support for Ahead-of-Time (AoT) compilation in addition to JIT.
+
 
 ## Load Balancing
 
@@ -383,3 +443,12 @@ to boost the performance of PVGIS.
 [Redis]: https://redis.io/
 
 [Memcached]: https://www.memcached.org/
+
+
+# References
+
+- [How not to lie with statistics: the correct way to summarize benchmark results](https://dl.acm.org/doi/10.1145/5666.5673)
+
+- [][softformance.com-how-to-speed-up-python-code]
+
+[softformance.com-how-to-speed-up-python-code]: https://www.softformance.com/blog/how-to-speed-up-python-code/

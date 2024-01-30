@@ -5,16 +5,7 @@ tags:
   - Web API
 ---
 
-# Work with the PVGIS Web API server
-
-## Run the PVGIS Web API server
-
-``` bash
-cd pvgisprototype
-uvicorn pvgisprototype.webapi:app --reload
-```
-
-## Request examples
+# Request examples
 
 Then, demonstration of an endpoint
 

@@ -1,3 +1,5 @@
+# PVGIS 5.2 main function
+
 The main function of `rsun_standalone_hourly_opt.c` :
 
 1.  Define  `main()`
