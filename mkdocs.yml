@@ -66,6 +66,7 @@ nav:
     - development/solar_geometry.md
     - development/topography.md
     # - development/state_and_future_of_pvgis.md
+    - "<p><i class='fas fa-flask'>&nbsp;</i> Coverage report</p>": coverage.md
   - Tags: includes/tags.md
 
 extra:
@@ -224,10 +225,19 @@ plugins:
       glob:
         - "*.py"  # Python scripts
         - "*.inc"  # includes
+  - coverage
+      # page_name: coverage  # default
+      # html_report_dir: coverage_html  # default
   - markdown-exec
   - autorefs
   - git-revision-date-localized:
       type: timeago
+      fallback_to_build_date: false
+      enable_creation_date: true
+      exclude:
+          - coverage.md
+      # enabled: true
+      # strict: true
   # - git-committers:
   #     gitlab_repository: 12345678
   #     token: !ENV ["GH_TOKEN"]

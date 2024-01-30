@@ -3,8 +3,6 @@ icon: material/eye
 tags:
   - PVGIS
   - Overview
-hide:
-  - toc
 ---
 
 :material-human-greeting-variant: Welcome to the documentation of
