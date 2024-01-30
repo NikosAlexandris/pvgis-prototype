@@ -14,7 +14,7 @@ watch:
 
 nav:
   - Overview:
-    - '': index.md
+    - Overview: index.md
     - Page tree: pagetree.md
   - Installation:
     - install/index.md
@@ -27,7 +27,11 @@ nav:
   - CLI:
     - cli/index.md
     - cli/help.md
-    - Power: cli/power/power.md
+    - Power:
+      - Introduction: cli/power/intro.md
+      - Broadband: cli/power/broadband.md
+      - Spectrally Resolved: cli/power/spectral.md
+      - Toolbox: cli/power/tools.md
     - Irradiance:
       - Overview: cli/irradiance/irradiance.md
       - Direct: cli/irradiance/direct.md
@@ -61,7 +65,7 @@ nav:
     - development/solar_irradiance.md
     - development/solar_geometry.md
     - development/topography.md
-    - development/state_and_future_of_pvgis.md
+    # - development/state_and_future_of_pvgis.md
   - Tags: includes/tags.md
 
 extra:

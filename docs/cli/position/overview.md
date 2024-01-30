@@ -1,4 +1,5 @@
 ---
+icon: material/sun-angle
 tags:
   - How-To
   - CLI
