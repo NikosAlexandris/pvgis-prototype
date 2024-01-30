@@ -9,54 +9,47 @@ tags:
   - Gantt diagram
 ---
 
-``` mermaid
-gantt
-    title A Gantt Diagram
-    dateFormat  YYYY-MM-DD
-    section Section
-    A task           :a1, 2014-01-01, 30d
-    Another task     :after a1, 20d
-    section Another
-    Task in sec      :2014-01-12, 12d
-    another task     :24d
-```
 # State & Future of PVGIS
 
 by Nikos Alexandris
 
-After almost 9 months of working in and for the PVGIS team,
-on programmatic issues and matters of data processing,
-I gained an appreciation
-for the amount of good work put into PVGIS by several people.
-Notably,
-high quality work has been delivered by external contributors
-on the software side of PVGIS.
-Notwithstanding,
-from a modern world's software and user experience perspective,
-and after a holistic assessment,
-my recommendation is that PVGIS deserves an overhaul. 
+During the period November 2021 to July 2022,
+and while working on programmatic issues and matters of data processing,
+an assessment of the current state of PVGIS was carried out.
+Findings and recommendations were presented on September 2022.
+A feasibility study and the production of a Proof-of-Concept,
+modernised version of PVGIS was discussed and launched on April/May 2023.
+
+``` mermaid
+    gantt
+        title Modern PVGIS : Research, Review, Conception
+        dateFormat  YYYY-MM-DD
+        todayMarker Off
+        excludes    weekends
+
+        section Milestones
+        Conception : milestone, done, after RR, 2023-05-28,
+        Research & Review : done, RR, after Beginning,
+        Beginning : milestone, done, crit, Beginning, 2023-05-01,
+
+        section Conception
+        Web API: done, 2023-06-05, 2023-06-15
+        CLI: crit, done, 2023-06-01, 2023-06-10
+        
+        section Review
+        Web API frameworks: crit, done, 2023-06-01, 2023-06-10
+        CLI frameworks: crit, done, 2023-05-01, 2023-05-28
+        Software for scientific computation: done, 2023-05-01, 2023-05-31
+        Relevant tools : done, active, 2023-05-01
+
+        section Research
+        Best programming practices: active, done, 2023-05-01, 2023-05-31
+        Understand solar geometry : crit, done, 2023-05-01
+```
 
 !!! info "Supporting document"
 
     [State and Future of PVGIS](state_and_future_of_pvgis.md)
-
-I presented my findings and recommendations on September 2022
-in the members of the PVGIS team.
-
-!!! info "Presentation of findings and recommendations"
-
-    [State & Future of PVGIS](https://eceuropaeu.sharepoint.com/:p:/r/teams/GRP-PVGIS/Shared%20Documents/General/Presentations/State%20and%20future%20of%20PVGIS.pptx?d=w2c9d36bb03fb4fe091f4c02cf4d058fa&csf=1&web=1&e=kar8Dh)
-
-Due to the lack of resources,
-at the time of the presentation,
-the proposed recommendations did not meet a univocal agreement
-in order to launch a feasibility study.
-
-On April 2023,
-the recommendations were re-assessed and it was decided to launch a research &
-conception effort in order to showcase the potential for a modern version of
-PVGIS based on Python and modern technologies for scientific and high
-performance computations.
 
 # Research, Review, Conception
 
@@ -124,7 +117,9 @@ gantt
     Solar geometry (NOAA): crit, done, NOAA, 2023-06-15,
 ```
 
-# Proof-of-Concept
+# Packaging & Documentation
+
+# Optimisation
 
 !!! info "On-line Pan-&-Zoom version"
 
