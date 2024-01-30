@@ -1,4 +1,5 @@
 ---
+icon: material/sun-wireless
 tags:
   - Development
   - Solar Irradiance
