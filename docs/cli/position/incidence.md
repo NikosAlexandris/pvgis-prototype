@@ -22,4 +22,4 @@ pvgis-prototype position incidence 8.627626 45.812233 '2020-01-01 15:00:00' -v
     Currently,
     for a time series of solar geometry parameters over a location,
     you can use the `pvgis-prototype position overview-series` command.
-    See [Solar Geometry Overview](solar_geometry_overview.md).
+    See [Solar Geometry Overview](overview.md).
