@@ -11,14 +11,19 @@ tags:
 
 # State & Future of PVGIS
 
-by Nikos Alexandris
+!!! note
 
-During the period November 2021 to July 2022,
-and while working on programmatic issues and matters of data processing,
-an assessment of the current state of PVGIS was carried out.
-Findings and recommendations were presented on September 2022.
-A feasibility study and the production of a Proof-of-Concept,
-modernised version of PVGIS was discussed and launched on April/May 2023.
+    by Nikos Alexandris
+
+    During the period November 2021 to July 2022,
+    and while working on programmatic issues and matters of data processing,
+    an assessment of the current state of PVGIS was carried out.
+    Findings and recommendations were presented on September 2022.
+    A feasibility study and the production of a Proof-of-Concept,
+    modernised version of PVGIS was discussed on April 2023
+    and launched on April/May 2023.
+
+**Chart**
 
 ``` mermaid
     gantt

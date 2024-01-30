@@ -1,6 +1,5 @@
 ---
-title: How To use PVGIS
-subtitle: Learn how to use PVGIS
+icon: material/eye
 description: A collection of How-To recipes on the use of PVGIS
 icon: material/console-line
 tags:

@@ -30,4 +30,3 @@ or
 ``` bash exec="true" result="ansi" source="above"
 pvgis-prototype --help
 ```
-

@@ -2,8 +2,6 @@
 icon: material/tag
 ---
 
-# Tags
-
 Tags in this documentation site : 
 
 <!-- material/tags -->
