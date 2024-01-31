@@ -1,6 +1,6 @@
 import pytest
 from pvgisprototype.api.geometry.overview import model_solar_geometry_overview
-from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarTimeModel, SolarPositionModel
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
@@ -38,19 +38,19 @@ tolerances = [0.1]      # 1, 0.5,
 
 # FIXME: The combinations of the timing/position models are repeated
 solar_time_models = [
-    # SolarTimeModels.ephem,
-    SolarTimeModels.milne,
-    SolarTimeModels.noaa,
-    # SolarTimeModels.pvgis,
-    # SolarTimeModels.skyfield,
+    # SolarTimeModel.ephem,
+    SolarTimeModel.milne,
+    SolarTimeModel.noaa,
+    # SolarTimeModel.pvgis,
+    # SolarTimeModel.skyfield,
 ]
 solar_position_models = [
-    SolarPositionModels.noaa,
-    SolarPositionModels.pvis,
-    SolarPositionModels.pvlib,
-    SolarPositionModels.pysolar,
-    SolarPositionModels.skyfield,
-    SolarPositionModels.suncalc,
+    SolarPositionModel.noaa,
+    SolarPositionModel.pvis,
+    SolarPositionModel.pvlib,
+    SolarPositionModel.pysolar,
+    SolarPositionModel.skyfield,
+    SolarPositionModel.suncalc,
 ]
 
 @pytest.mark.parametrize(
