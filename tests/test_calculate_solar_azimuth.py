@@ -1,6 +1,6 @@
 import pytest
 from pvgisprototype.api.geometry.azimuth import calculate_solar_azimuth
-from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarTimeModel, SolarPositionModel
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import AZIMUTH_NAME, TIME_ALGORITHM_NAME, POSITION_ALGORITHM_NAME, UNITS_NAME, DEGREES
 
@@ -21,19 +21,19 @@ tolerances = [0.1]
 
 # FIXME: The combinations of the timing/position models are repeated
 solar_time_models = [
-    # SolarTimeModels.ephem,
-    SolarTimeModels.milne,
-    SolarTimeModels.noaa,
-    # SolarTimeModels.pvgis,
-    # SolarTimeModels.skyfield,
+    # SolarTimeModel.ephem,
+    SolarTimeModel.milne,
+    SolarTimeModel.noaa,
+    # SolarTimeModel.pvgis,
+    # SolarTimeModel.skyfield,
 ]
 solar_position_models = [[
-    SolarPositionModels.noaa,
-    SolarPositionModels.pvis,
-    SolarPositionModels.pvlib,
-    SolarPositionModels.pysolar,
-    SolarPositionModels.skyfield,
-    SolarPositionModels.suncalc,
+    SolarPositionModel.noaa,
+    SolarPositionModel.pvis,
+    SolarPositionModel.pvlib,
+    SolarPositionModel.pysolar,
+    SolarPositionModel.skyfield,
+    SolarPositionModel.suncalc,
 ]]
 
 @pytest.mark.parametrize(
