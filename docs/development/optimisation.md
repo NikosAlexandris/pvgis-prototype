@@ -394,7 +394,10 @@ to boost the performance of PVGIS.
     - PyPy: A Just-In-Time (JIT) compiler for Python.
     - mypyc: A compiler that compiles Python to C-extension modules.
     - Pyjion: A JIT compiler for Python, using the .NET CLR.
-    - Cython: A compiler that converts Python code to C for better performance.
+    - [Cython][Cython]: an optimising static compiler for Python and Cython,
+      allows writing C extensions for Python.
+
+Cython gives you the combined power of Python and C to let you 
 
 - Libraries/Frameworks
 
@@ -417,6 +420,8 @@ to boost the performance of PVGIS.
 - Collaborate with the IT support team for implementing load balancing. This includes distributing API requests across servers and enhancing system scalability and reliability.
 
 [^0]: https://www.codeease.net/programming/python/python-slow-print
+
+[Cython]: https://cython.org/
 
 [NumPy]: https://numpy.org/
 

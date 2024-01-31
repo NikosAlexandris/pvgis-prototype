@@ -21,18 +21,19 @@ hide:
 
 !!! tip "Time Series"
 
-    |                                                              |                                                    |
-    |--------------------------------------------------------------|----------------------------------------------------|
-    | 💹 Work with time series                                     | :octicons-command-palette-24: [**`series`**]()     |
-    | 🌞 Estimate the solar irradiance incident on a solar surface | :octicons-command-palette-24: [**`irradiance`**]() |
+    |                                                    |                                               |                                                                                   |
+    |----------------------------------------------------|-----------------------------------------------|-----------------------------------------------------------------------------------|
+    | :octicons-command-palette-24: [**`series`**]()     |                                               | 💹 Work with time series                                                          |
+    | :octicons-command-palette-24: [**`irradiance`**]() |                                               | :material-sun-wireless: Estimate the solar irradiance incident on a solar surface |
+    |                                                    | :octicons-command-palette-24: [**`intro`**]() | :fontawesome-solid-info: A short primer on solar irradiance                        |
 
 !!! hint ":octicons-sun-24: :triangular_ruler: Solar Geometry"
-      | Command                                          | Subcommand                                                                    | Description                                                                      |
-      |--------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-      | :octicons-command-palette-24: [**`time`**]()     |                                                                               | :material-sun-clock: Calculate the solar time for a location and moment                            |
-      | :octicons-command-palette-24: [**`position`**]() |                                                                               | :material-sun-angle: Calculate solar geometry parameters for a location and moment in time         |
-      |                                                  | :fontawesome-solid-info: [**`intro`**](position/intro.md) | A short primer on solar geometry
-      | :octicons-command-palette-24: [**`surface`**]()  |                                                                               | 󰶛  Calculate solar surface geometry parameters for a location and moment in time |
+      | Command                                          | Subcommand                                                    | Description                                                                                |
+      |--------------------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+      | :octicons-command-palette-24: [**`time`**]()     |                                                               | :material-sun-clock: Calculate the solar time for a location and moment                    |
+      | :octicons-command-palette-24: [**`position`**]() |                                                               | :material-sun-angle: Calculate solar geometry parameters for a location and moment in time |
+      |                                                  | :octicons-command-palette-24: [**`intro`**](position/intro.md) | :fontawesome-solid-info: A short primer on solar geometry
+      | :octicons-command-palette-24: [**`surface`**]()  |                                                               | 󰶛  Calculate solar surface geometry parameters for a location and moment in time           |
 
 !!! note "Diagnostics"
 
