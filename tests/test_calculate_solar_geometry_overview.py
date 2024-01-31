@@ -1,6 +1,6 @@
 import pytest
 from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
-from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 # from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.constants import (
@@ -14,7 +14,7 @@ from pvgisprototype.constants import (
     UNITS_NAME,
     DEGREES,
 )
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 
 
 test_cases_data = read_noaa_spreadsheet(
@@ -37,19 +37,19 @@ tolerances = [0.1]      # 1, 0.5,
 
 # FIXME: The combinations of the timing/position models are repeated
 solar_time_models = [
-    # SolarTimeModels.ephem,
-    SolarTimeModels.milne,
-    SolarTimeModels.noaa,
-    # SolarTimeModels.pvgis,
-    # SolarTimeModels.skyfield,
+    # SolarTimeModel.ephem,
+    SolarTimeModel.milne,
+    SolarTimeModel.noaa,
+    # SolarTimeModel.pvgis,
+    # SolarTimeModel.skyfield,
 ]
 solar_position_models = [[
-    SolarPositionModels.noaa,
-    SolarPositionModels.pvis,
-    SolarPositionModels.pvlib,
-    SolarPositionModels.pysolar,
-    SolarPositionModels.skyfield,
-    SolarPositionModels.suncalc,
+    SolarPositionModel.noaa,
+    SolarPositionModel.pvis,
+    SolarPositionModel.pvlib,
+    SolarPositionModel.pysolar,
+    SolarPositionModel.skyfield,
+    SolarPositionModel.suncalc,
 ]]
 
 @pytest.mark.parametrize(

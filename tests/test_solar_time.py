@@ -8,7 +8,7 @@ from datetime import timezone
 from zoneinfo import ZoneInfo
 from math import radians
 
-from pvgisprototype.api.geometry.time import calculate_solar_time
+from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 from pvgisprototype.api.geometry.hour_angle import calculate_solar_hour_angle
 from pvgisprototype import SolarHourAngle
 from pvgisprototype.api.geometry.hour_angle import calculate_event_hour_angle

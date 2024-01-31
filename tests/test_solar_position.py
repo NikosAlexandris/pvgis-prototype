@@ -1,6 +1,6 @@
 import pytest
 from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
-from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
 from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
 from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
@@ -25,12 +25,12 @@ from pvgisprototype.constants import (
 
 
 models = [
-        SolarPositionModels.noaa,
-        SolarPositionModels.pysolar,
-        SolarPositionModels.pvis,
-        # SolarPositionModels.pvgis,
-        SolarPositionModels.suncalc,
-        SolarPositionModels.skyfield,
+        SolarPositionModel.noaa,
+        SolarPositionModel.pysolar,
+        SolarPositionModel.pvis,
+        # SolarPositionModel.pvgis,
+        SolarPositionModel.suncalc,
+        SolarPositionModel.skyfield,
 ]
 dates = [
         datetime.now().replace(tzinfo=timezone.utc, year=year) for year in range(2000, 2010)
@@ -128,7 +128,7 @@ def test_calculate_solar_position(model):
 # @pytest.mark.parametrize("timestamp", dates)
 # @pytest.mark.parametrize("model", models)
 # def test_calculate_solar_position_valid_coordinates(longitude, latitude, timestamp, model):
-#     # altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
+#     # altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, SolarPositionModel.suncalc)
 #     # altitude_suncalc, azimuth_suncalc = calculate_solar_position(longitude, latitude, timestamp, model)
 #     altitude, azimuth = calculate_solar_position(longitude, latitude, timestamp, model)
 #     # assert isinstance(altitude_suncalc, float)
@@ -141,7 +141,7 @@ def test_calculate_solar_position(model):
 # @pytest.mark.parametrize("timestamp", dates)
 # def test_calculate_solar_position_invalid_coordinates(longitude, latitude, timestamp):
 #     with pytest.raises(ValueError):
-#         calculate_solar_position(longitude, latitude, timestamp, SolarPositionModels.suncalc)
+#         calculate_solar_position(longitude, latitude, timestamp, SolarPositionModel.suncalc)
 #         # assert False, f"Expected ValueError for invalid coordinates ({longitude}, {latitude}), but got ({altitude_suncalc}, {azimuth_suncalc})"
 
 
@@ -243,7 +243,7 @@ def test_plot_yearly_solar_position():
     longitude = 0.0
     latitude = 0.0
     year = datetime.today().year
-    model = SolarPositionModels.suncalc
+    model = SolarPositionModel.suncalc
     try:
         plot_yearly_solar_position(longitude, latitude, year, model)
     except Exception as e:
@@ -255,7 +255,7 @@ def test_plot_yearly_solar_position():
 #     longitude = 0.0
 #     latitude = 0.0
 #     year = datetime.now().year
-#     model = SolarPositionModels.suncalc
+#     model = SolarPositionModel.suncalc
 #     try:
 #         return plot_analemma(longitude, latitude, year, model)
 #     except Exception as e:
