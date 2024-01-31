@@ -1,3 +1,7 @@
+[![pipeline status](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/badges/mkdocs/pipeline.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/commits/mkdocs) 
+[![coverage report](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/badges/mkdocs/coverage.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/commits/mkdocs) 
+[![Latest Release](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/badges/release.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/releases) 
+
 # Photovoltaic Information System
 
 <!-- vim-markdown-toc GitLab -->
@@ -8,14 +12,6 @@
     * [CLI](#cli)
     * [API](#api)
         * [Examples](#examples-1)
-    * [Additional Resources](#additional-resources)
-        * [Theoretical Background & Scientific Information](#theoretical-background-scientific-information)
-            * [Wikipedia](#wikipedia)
-            * [PV Education](#pv-education)
-        * [Informative Articles & Dates](#informative-articles-dates)
-            * [Skyfield Community Discussions](#skyfield-community-discussions)
-        * [Visuals](#visuals)
-    * [Frequent questions](#frequent-questions)
     * [Contact and Support](#contact-and-support)
     * [Acknowledgments and Credits](#acknowledgments-and-credits)
 
@@ -23,10 +19,10 @@
 
 # Installation
 
-PVGIS can be installed relatively simply using `pip`. However, it is rather a
-good idea to [create a virtual environment][] first and install
-PVGIS there-in.
-
+PVGIS can be installed relatively simply using `pip`.
+However,
+it is strongly recommended to [create a virtual environment][] first
+and install PVGIS there-in.
 
 ### Install PVGIS
 
@@ -42,7 +38,6 @@ PVGIS there-in.
     - After installation, you can verify that the package is installed
       correctly by checking its version or running a basic command, if
       available.
-
 
 # Examples
 
@@ -73,46 +68,6 @@ Then, test some endpoints!
 ```
 http://localhost:8001/calculate/geometry/overview?solar_position_models=Skyfield&solar_time_model=Skyfield&apply_atmospheric_refraction=true&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&angle_output_units=radians&verbose=0&longitude=8&latitude=45&timestamp=2006-12-28
 ```
-
-
-## Additional Resources
-
-### Theoretical Background & Scientific Information
-
-#### Wikipedia
-
-- [Position of the Sun](https://en.wikipedia.org/wiki/Position_of_the_Sun)
-- [Equation of Time](https://en.wikipedia.org/wiki/Equation_of_time)
-
-#### PV Education
-
-- [Solar Time](https://www.pveducation.org/pvcdrom/properties-of-sunlight/solar-time)
-
-
-### Informative Articles & Dates
-
-#### Skyfield Community Discussions
-
-- In Stack Exchange :
-
-  - https://stackoverflow.com/a/69541317/1172302
-  - https://astronomy.stackexchange.com/q/49580/51316
-
-- Skyfield GitHub Discussion : https://github.com/skyfielders/python-skyfield/discussions/648
-
-- **Multi-processing** to Improve performance of sunrise/sunset calculations in
-
-
-### Visuals
-
-- https://niwa.co.nz/our-services/online-services/solarview/solarviewexplanation
-
-
-## Frequent questions
-
-- Common issues users might encounter
-- Frequently asked questions with concise answers.
-
 
 ## Contact and Support
 

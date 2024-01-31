@@ -2,6 +2,7 @@
 icon: material/tools
 tags:
   - External Tools
+  - Tools
 ---
 
 # External Tools
