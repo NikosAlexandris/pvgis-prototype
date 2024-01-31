@@ -49,6 +49,7 @@ nav:
     - reference/pvgis52_rsun_standalone_opt.md
     - reference/web_traffic.md
     - reference/external_tools.md
+    - reference/external_resources.md
   - Source Code:
     - source_code/index.md
     - Dependencies: source_code/dependencies.md
@@ -225,9 +226,9 @@ plugins:
       glob:
         - "*.py"  # Python scripts
         - "*.inc"  # includes
-  - coverage
+  - coverage:
+      html_report_dir: docs/development/coverage_html
       # page_name: coverage  # default
-      # html_report_dir: coverage_html  # default
   - markdown-exec
   - autorefs
   - git-revision-date-localized:
