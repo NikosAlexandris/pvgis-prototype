@@ -3,11 +3,6 @@ author: Nikos Alexandris
 title: State and Future of PVGIS
 ---
 
-# State and Future of PVGIS
-
-by Nikos Alexandris
-
-
 ## Summary
 
 After almost 9 months of working in and for the PVGIS team,
@@ -28,11 +23,6 @@ in the members of the PVGIS team.
 !!! info "Presentation of findings and recommendations"
 
     [State & Future of PVGIS](https://eceuropaeu.sharepoint.com/:p:/r/teams/GRP-PVGIS/Shared%20Documents/General/Presentations/State%20and%20future%20of%20PVGIS.pptx?d=w2c9d36bb03fb4fe091f4c02cf4d058fa&csf=1&web=1&e=kar8Dh)
-
-Due to the lack of resources,
-at the time of the presentation,
-the proposed recommendations did not meet a univocal agreement
-in order to launch a feasibility study.
 
 On April 2023,
 the recommendations were re-assessed and it was decided to launch a research &
