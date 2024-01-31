@@ -11,9 +11,9 @@ tags:
 
     | Command                                               | Subcommand                                                    | Description                                                                                                                                      |
     |-------------------------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-    | :octicons-command-palette-24: [**`power`**](power/power.md) |                                                               | 🔌 Estimate the performance of a photovoltaic system over a time series                                                                          |
-    |                                                       | :octicons-command-palette-24: [**`broadband`**](power/power.md##Broadband irradiance) | :simple-spectrum: Estimate the photovoltaic performance based on broadband irradiance, ambient temperature and wind speed                        |
-    |                                                       | :octicons-command-palette-24: [**`spectral`**](power/power.md##Spectrally resoled irradiance)                                 | :material-heat-wave: Estimate the photovoltaic performance based on spectrally resolved irradiance, ambient temperature and wind speed Prototype |
+    | :octicons-command-palette-24: [**`power`**](power.md) |                                                               | 🔌 Estimate the performance of a photovoltaic system over a time series                                                                          |
+    |                                                       | :octicons-command-palette-24: [**`broadband`**](broadband.md) | :simple-spectrum: Estimate the photovoltaic performance based on broadband irradiance, ambient temperature and wind speed                        |
+    |                                                       | :octicons-command-palette-24: [**`spectral`**](spectral.md)                                 | :material-heat-wave: Estimate the photovoltaic performance based on spectrally resolved irradiance, ambient temperature and wind speed Prototype |
 
 We can see the available `power` commands in the command line :
 

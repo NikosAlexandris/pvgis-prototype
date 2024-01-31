@@ -4,7 +4,10 @@ tags:
   - PVGIS
   - Overview
 ---
-
+[![pipeline status](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/badges/mkdocs/pipeline.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/commits/mkdocs) 
+[![coverage report](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/badges/mkdocs/coverage.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/commits/mkdocs) 
+[![Latest Release](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/badges/release.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/releases) 
+---
 :material-human-greeting-variant: Welcome to the documentation of
 the Photovoltaic Geographical Information System (PVGIS).
 
@@ -16,8 +19,8 @@ or even its core API[^0].
 
 [^0]:!!! warning
 
-        The Web API is not the same at the core API.
-        The former consumes the latter
+        The _Web_ API is not the same at the _core_ API.
+        The former _consumes_ the latter
         to produce a FastAPI-based Web API interface.
 
 ## What is PVGIS ?
