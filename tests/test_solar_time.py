@@ -15,8 +15,8 @@ from pvgisprototype.api.geometry.hour_angle import calculate_event_hour_angle
 
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
-from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
-from pvgisprototype.api.geometry.models import SolarTimeModels
+# from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_time_pvgis
+from pvgisprototype.api.geometry.models import SolarTimeModel
 
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import convert_hours_to_seconds
@@ -37,11 +37,11 @@ random_year = random.randint(2005, 2023)
 
 
 models = [
-        SolarTimeModels.ephem,
-        SolarTimeModels.milne,
-        SolarTimeModels.noaa,
-        SolarTimeModels.pvgis,
-        SolarTimeModels.skyfield,
+        SolarTimeModel.ephem,
+        SolarTimeModel.milne,
+        SolarTimeModel.noaa,
+        # SolarTimeModel.pvgis,
+        SolarTimeModel.skyfield,
 ]
 locations = [
     (0, 90, 'North Pole', 'UTC'),
