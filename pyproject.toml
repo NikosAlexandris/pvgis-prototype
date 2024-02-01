@@ -69,6 +69,7 @@ dev = [
   "pre-commit",
   "pytest",
   "towncrier",
+  "timezonefinder",
 ]
 docs = [
   "markdown-exec[ansi]",
