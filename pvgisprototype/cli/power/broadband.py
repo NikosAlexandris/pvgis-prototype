@@ -67,6 +67,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import ALBEDO_DEFAULT
@@ -94,6 +96,7 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype import LinkeTurbidityFactor
 from rich import print
 
@@ -147,6 +150,8 @@ def photovoltaic_power_output_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     groupby: Annotated[Optional[str], typer_option_groupby] = None,
     csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
 ):
@@ -230,6 +235,40 @@ def photovoltaic_power_output_series(
                 dictionary=photovoltaic_power_output_series,
                 filename=csv,
             )
+        if uniplot:
+            import os 
+            terminal_columns, _ = os.get_terminal_size() # we don't need lines!
+            terminal_length = int(terminal_columns * terminal_width_fraction)
+            from functools import partial
+            from uniplot import plot as default_plot
+            plot = partial(default_plot, width=terminal_length)
+            from pvgisprototype.api.series.hardcodings import exclamation_mark
+            title="Photovoltaic power output"
+            lines = True
+            if isinstance(photovoltaic_power_output_series, float):
+                print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
+                return
+            import numpy as np
+            photovoltaic_power_output_series = list(photovoltaic_power_output_series.values())[0]
+            if isinstance(photovoltaic_power_output_series, np.ndarray):
+                # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
+                supertitle = 'Photovoltaic Power Output Series'
+                # label = getattr(photovoltaic_power_output_series, 'name', None)
+                label = 'Photovoltaic Power'
+                # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
+                # unit = getattr(photovoltaic_power_output_series, 'units', None)
+                unit = POWER_UNIT
+                plot(
+                    # xs=timestamps,
+                    # xs=photovoltaic_power_output_series,
+                    # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
+                    ys=photovoltaic_power_output_series,
+                    legend_labels=label,
+                    lines=lines,
+                    title=title if title else supertitle,
+                    y_unit=' ' + str(unit),
+                )
+
     else:
         flat_list = photovoltaic_power_output_series.flatten().astype(str)
         csv_str = ','.join(flat_list)
