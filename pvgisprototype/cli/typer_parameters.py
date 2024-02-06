@@ -998,6 +998,12 @@ typer_option_in_memory = typer.Option(
 
 # Plotting
 
+typer_option_uniplot = typer.Option(
+    help='Plot the PV power output time series in the terminal',
+    rich_help_panel=rich_help_panel_plotting,
+    # default_factory=False,
+)
+
 typer_option_uniplot_lines = typer.Option(
     help='Symbol for plotting data points with uniplot',
     rich_help_panel=rich_help_panel_plotting,
@@ -1008,6 +1014,10 @@ typer_option_uniplot_title = typer.Option(
 )
 typer_option_uniplot_unit = typer.Option(
     help='Unit for the Uniplot',
+    rich_help_panel=rich_help_panel_plotting,
+)
+typer_option_uniplot_terminal_width = typer.Option(
+    help='Fraction of number of columns of the current terminal, ex. 0.9',
     rich_help_panel=rich_help_panel_plotting,
 )
 typer_option_tufte_style = typer.Option(
