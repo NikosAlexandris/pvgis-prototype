@@ -30,6 +30,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 from pvgisprototype.cli.typer_parameters import typer_option_uniplot_lines
 from pvgisprototype.cli.typer_parameters import typer_option_uniplot_title
 from pvgisprototype.cli.typer_parameters import typer_option_uniplot_unit
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_csv
@@ -75,6 +76,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype import Longitude
 from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 
 
 app = typer.Typer(
@@ -294,7 +296,6 @@ def resample(
     - daily
     - monthly
 
-
     Parameters
     ----------
     indexer: str
@@ -369,10 +370,16 @@ def uniplot(
     lines: Annotated[bool, typer_option_uniplot_lines] = True,
     title: Annotated[str, typer_option_uniplot_title] = None,
     unit: Annotated[str, typer_option_uniplot_unit] = UNITS_NAME,  #" °C")
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot time series in the terminal"""
-    from uniplot import plot
+    import os 
+    terminal_columns, _ = os.get_terminal_size() # we don't need lines!
+    terminal_length = int(terminal_columns * terminal_width_fraction)
+    from functools import partial
+    from uniplot import plot as default_plot
+    plot = partial(default_plot, width=terminal_length)
     data_array = select_time_series(
         time_series=time_series,
         longitude=longitude,
@@ -406,18 +413,18 @@ def uniplot(
         typer.Abort()
 
     if isinstance(data_array, xr.DataArray):
-        supertitle = f'{data_array.long_name}'
-        label = f'{data_array.name}'
-        label_2 = f'{data_array_2.name}' if data_array_2 is not None else None
-        unit = data_array.units
+        supertitle = getattr(data_array, 'long_name', 'Untitled')
+        label = getattr(data_array, 'name', None)
+        label_2 = getattr(data_array_2, 'name', None) if data_array_2 is not None else None
+        unit = getattr(data_array, 'units', None)
         plot(
             # x=data_array,
             # xs=data_array,
             ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
             legend_labels = [label, label_2],
             lines=lines,
-            title=supertitle if not title else title,
-            y_unit=' ' + unit,
+            title=title if title else supertitle,
+            y_unit=' ' + str(unit),
         )
 
 
