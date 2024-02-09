@@ -142,12 +142,12 @@ def calculate_true_solar_time_time_series_noaa(
         )
     # ----------------------------------------------------------------------
 
-    # from pvgisprototype.validation.hashing import generate_hash
+    from pvgisprototype.validation.hashing import generate_hash
     # true_solar_time_series_hash = generate_hash(true_solar_time_series)
-    # print(
-    #     'TST : calculate_true_solar_time_time_series_noaa()|',
-    #     f"Data Type : [bold]{true_solar_time_series.dtype}[/bold] |",
-    #     f"Output Hash : [code]{true_solar_time_series_hash}[/code]",
-    # )
+    print(
+        'TST : calculate_true_solar_time_time_series_noaa()|',
+        f"Data Type : [bold]{true_solar_time_series.dtype}[/bold] |",
+        # f"Output Hash : [code]{true_solar_time_series_hash}[/code]",
+    )
 
     return true_solar_time_series
