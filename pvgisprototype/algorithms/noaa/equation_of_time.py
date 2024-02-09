@@ -43,12 +43,21 @@ def calculate_equation_of_time_noaa(
     return equation_of_time
 
 
+from pandas import DatetimeIndex
+from cachetools.keys import hashkey
+def custom_hashkey(*args, **kwargs):
+    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
+    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
+    return hashkey(*args, **kwargs)
+
+from cachetools import cached
+# @cached(cache={})
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput) 
 def calculate_equation_of_time_time_series_noaa(
     timestamps: Union[datetime, Sequence[datetime]],
 ) -> EquationOfTime:
     """Calculate the equation of time in minutes for a time series"""
-    print('EOT : calculate_equation_of_time_time_series_noaa()')
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
         angle_output_units=RADIANS
@@ -66,7 +75,7 @@ def calculate_equation_of_time_time_series_noaa(
     from pvgisprototype.validation.hashing import generate_hash
     equation_of_time_series_hash = generate_hash(equation_of_time_series)
     print(
-        "FY : calculate_equation_of_time_time_series_noaa() |",
+        "EOT : calculate_equation_of_time_time_series_noaa() |",
         f"Data Type : [bold]{equation_of_time_series.dtype}[/bold] |",
         f"Output Hash : [code]{equation_of_time_series_hash}[/code]",
     )
