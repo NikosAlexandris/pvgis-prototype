@@ -21,7 +21,6 @@ from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 
 
-
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
 def calculate_solar_hour_angle_noaa(
     longitude: Longitude,
