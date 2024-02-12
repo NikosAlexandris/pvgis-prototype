@@ -13,6 +13,8 @@ from math import pi
 import numpy as np
 from rich import print
 from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
+from pandas import DatetimeIndex
 
 
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
@@ -38,16 +40,7 @@ def calculate_fractional_year_noaa(
 
     return fractional_year
 
-from pandas import DatetimeIndex
 
-from pandas import DatetimeIndex
-from cachetools.keys import hashkey
-def custom_hashkey(*args, **kwargs):
-    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
-    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
-    return hashkey(*args, **kwargs)
-
-from cachetools import cached
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_time_series_noaa(

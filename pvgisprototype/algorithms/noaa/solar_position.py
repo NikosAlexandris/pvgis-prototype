@@ -149,8 +149,6 @@ def calculate_noaa_solar_position(
     return result
 
 
-
-
 @validate_with_pydantic(CalculateTimeserieSolarPositionNOAAInput)
 def calculate_noaa_timeseries_solar_position(
     longitude: Longitude,       # radians 

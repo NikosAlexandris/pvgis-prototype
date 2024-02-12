@@ -18,7 +18,15 @@ import numpy as np
 def get_days_per_year(years):
     return 365 + ((years % 4 == 0) & ((years % 100 != 0) | (years % 400 == 0))).astype(int)
 
+from pandas import DatetimeIndex
+from cachetools.keys import hashkey
+def custom_hashkey(*args, **kwargs):
+    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
+    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
+    return hashkey(*args, **kwargs)
 
+from cachetools import cached
+@cached(cache={}, key=custom_hashkey)
 def calculate_extraterrestrial_normal_irradiance_time_series(
     timestamps: BaseTimestampSeriesModel = None,
     start_time: Optional[datetime] = None,

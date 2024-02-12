@@ -16,6 +16,8 @@ from datetime import timedelta
 from zoneinfo import ZoneInfo
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
@@ -104,6 +106,7 @@ def calculate_true_solar_time_noaa(
     return true_solar_time
 
 
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateTrueSolarTimeTimeSeriesNOAAInput)
 def calculate_true_solar_time_time_series_noaa(
     longitude: Longitude,  # radians

@@ -13,13 +13,15 @@ from typing import Sequence
 import numpy as np
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa 
 from pvgisprototype.constants import RADIANS
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
+
 
 EQUATIONOFTIME_MINIMUM = -20
 EQUATIONOFTIME_MAXIMUM = 20
 EQUATIONOFTIME_UNITS = 'minutes'
 
 
-# @cache_result
 @validate_with_pydantic(CalculateEquationOfTimeNOAAInput)
 def calculate_equation_of_time_noaa(
     timestamp: datetime,
@@ -43,15 +45,6 @@ def calculate_equation_of_time_noaa(
     return equation_of_time
 
 
-from pandas import DatetimeIndex
-from cachetools.keys import hashkey
-def custom_hashkey(*args, **kwargs):
-    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
-    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
-    return hashkey(*args, **kwargs)
-
-from cachetools import cached
-# @cached(cache={})
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput) 
 def calculate_equation_of_time_time_series_noaa(

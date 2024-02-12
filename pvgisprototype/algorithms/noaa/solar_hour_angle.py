@@ -16,6 +16,10 @@ from math import isfinite
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 import numpy as np
 from pvgisprototype.constants import RADIANS
+from pandas import DatetimeIndex
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
+
 
 
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
@@ -106,15 +110,7 @@ def calculate_solar_hour_angle_noaa(
 
     return solar_hour_angle
 
-from pandas import DatetimeIndex
-from cachetools.keys import hashkey
-def custom_hashkey(*args, **kwargs):
-    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
-    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
-    return hashkey(*args, **kwargs)
 
-from cachetools import cached
-# @cached(cache={})
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_time_series_noaa(
