@@ -82,6 +82,7 @@ docs = [
   "pipdeptree",
   "mkdocs-pagetree-plugin",
   "mkdocs-badges",
+  "mkdocs-coverage",
 ]
 all = [
   "black",
