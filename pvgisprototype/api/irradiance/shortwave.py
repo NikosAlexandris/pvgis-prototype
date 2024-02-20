@@ -83,7 +83,7 @@ def calculate_global_irradiance_time_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    albedo: Optional[float] = 2,
+    albedo: Optional[float] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
