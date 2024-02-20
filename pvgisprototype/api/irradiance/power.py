@@ -110,7 +110,7 @@ def calculate_photovoltaic_power_output_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = 2,
+    albedo: Optional[float] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
@@ -172,7 +172,7 @@ def calculate_photovoltaic_power_output_series(
 
     Returns
     -------
-    photovoltaic_power_outout_series : ndarray
+    photovoltaic_power_output_series : ndarray
         Array of effective irradiance values.
     results : dict
         Dictionary containing detailed results of the calculation.
@@ -420,14 +420,14 @@ def calculate_photovoltaic_power_output_series(
             )
             efficiency_coefficient_series *= system_efficiency  # on-top-of !
 
-    photovoltaic_power_outout_series = global_irradiance_series * efficiency_coefficient_series
+    photovoltaic_power_output_series = global_irradiance_series * efficiency_coefficient_series
 
     # Building the output dictionary ========================================
 
     if verbose > 0:
         results = {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
-            PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_outout_series,
+            PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
         }
 
     if verbose > 2:
@@ -492,5 +492,4 @@ def calculate_photovoltaic_power_output_series(
         if verbose > 6:
             print(s.getvalue())
 
-
-    return photovoltaic_power_outout_series
+    return photovoltaic_power_output_series
