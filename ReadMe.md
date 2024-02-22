@@ -7,7 +7,7 @@
 <!-- vim-markdown-toc GitLab -->
 
 * [Installation](#installation)
-        * [Install PVGIS](#install-pvgis)
+    * [Install PVGIS](#install-pvgis)
 * [Examples](#examples)
     * [CLI](#cli)
     * [API](#api)
