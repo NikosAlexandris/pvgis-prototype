@@ -106,7 +106,7 @@ def calculate_angular_loss_factor_for_direct_irradiance(
         where:
 
         - br : direct inclined irradiance
-        - sh : _sine_ of solar incidence angle (as per Jenco) *Error*
+        - sh : _sine_ of _complementary_ solar incidence angle (as per Jenco)
         - a_r : angular loss coefficient
 
 
@@ -144,9 +144,12 @@ def calculate_angular_loss_factor_for_direct_irradiance_time_series(
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
+    """
+    This function implements the solar incidence angle modifier as per Martin &
+    Ruiz (2005). Expected is the angle between the sun-solar-surface vector and
+    the vector normal to the reference solar surface.
+    """
     try:
-        # PVGIS uses sin() ?
-        # numerator = 1 - np.exp( - np.sin(solar_incidence_series) / angular_loss_coefficient )
         numerator = 1 - np.exp( - np.cos(solar_incidence_series) / angular_loss_coefficient )
         denominator =  1 / ( 1 - exp( -1 / angular_loss_coefficient))
         incidence_angle_modifier_series = numerator / denominator
