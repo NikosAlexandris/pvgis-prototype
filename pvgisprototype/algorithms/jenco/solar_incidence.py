@@ -365,16 +365,18 @@ def calculate_solar_incidence_time_series_jenco(
         + c_inclined_33_series
     )
     solar_incidence_series = np.arcsin(sine_solar_incidence_series)
-    solar_incidence_series[solar_incidence_series < 0] = NO_SOLAR_INCIDENCE
 
     if not complementary_incidence_angle:
         solar_incidence_series = np.pi/2 - solar_incidence_series
 
+    solar_incidence_series[solar_incidence_series < 0] = NO_SOLAR_INCIDENCE
+
     solar_incidence_series = SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
-        position_algorithm='Jenco',
+        positioning_algorithm='Jenco',
         timing_algorithm='Jenco',
+        description='Incidence angle between sun-vector and surface-plane'
     )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
