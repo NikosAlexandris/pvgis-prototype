@@ -33,6 +33,7 @@ from pvgisprototype.constants import (
     AZIMUTH_NAME,
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
+    INCIDENCE_DEFINITION,
     UNITS_COLUMN_NAME,
     UNITLESS,
     UNITS_NAME,
@@ -263,17 +264,23 @@ def print_solar_position_series_table(
         user_requested_timestamps is not None
         and user_requested_timezone is not None
     ):
-        caption += f"Local zone : {user_requested_timezone}, "
+        caption += f"Local zone : {user_requested_timezone}"
            # [
            #     str(user_requested_timestamps.get_loc(timestamp)),
            #     str(user_requested_timezone),
            # ]
     # Should be the same in case of multiple models!
     first_model = next(iter(rounded_table))
+
     surface_tilt = rounded_table[first_model].get(SURFACE_TILT_NAME, None) if surface_tilt else None
+    caption += f"\nTilt : [bold]{surface_tilt}[/bold], "
+
     surface_orientation = rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
-    caption += f"Tilt : {surface_tilt}, "
-    caption += f"Orientation : {surface_orientation}"
+    caption += f"Orientation : [bold]{surface_orientation}[/bold], "
+
+    incidence_angle_definition = rounded_table[first_model].get(INCIDENCE_DEFINITION, None) if incidence else None
+    caption += f"Incidence definition : [bold]{incidence_angle_definition}[/bold]"
+
     table = Table(
         *columns,
         title=title,
