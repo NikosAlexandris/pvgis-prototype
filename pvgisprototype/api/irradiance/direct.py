@@ -124,6 +124,7 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -604,6 +605,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+    complementary_incidence_angle: bool = True,  # Let Me Hardcoded, Read the docstring!
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
@@ -626,14 +628,34 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     Notes
     -----
+
               B   ⋅ sin ⎛δ   ⎞                    
                hc       ⎝ exp⎠         ⎛ W ⎞
         B   = ────────────────     in  ⎜───⎟
          ic       sin ⎛h ⎞             ⎜ -2⎟           
                       ⎝ 0⎠             ⎝m  ⎠           
+
+    The implementation by Hofierka (2002) uses the solar incidence angle
+    between the sun-vetor and plance of the reference surface (as per Jenco,
+    1992). This is very important and relates to the hardcoded value `True` for
+    the `complementary_incidence_angle` input parameter of the function. We
+    call this angle (definition) the _complementary_ incidence angle.
+
+    For the losses due to reflectivity, the incidence angle modifier by Martin
+    & Ruiz (2005) expects the incidence angle between the sun-vector and the
+    surface-normal. Hence, the respective call of the function
+    `calculate_angular_loss_factor_for_direct_irradiance_time_series()`,
+    expects the complement of the angle defined by Jenco (1992). We call the
+    incidence angle expected by the incidence angle modifier by Martin & Ruiz
+    (2005) the _typical_ incidence angle.
+
+    See also the documentation of the function
+    calculate_solar_incidence_time_series_jenco().
+
     References
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
+
     """
     solar_incidence_series = model_solar_incidence_time_series(
         longitude=longitude,
@@ -762,11 +784,11 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         try:
             # expects typical sun-vector-to-normal-of-surface incidence angles
             # as per Martin & Ruiz 2005) !
-            solar_incidence_series.value = 90 - solar_incidence_series.value
+            solar_incidence_series.value = np.pi/2 - solar_incidence_series.value
             angular_loss_factor_series = (
                 calculate_angular_loss_factor_for_direct_irradiance_time_series(
                     solar_incidence_series=solar_incidence_series.radians,
-                    verbose=verbose,
+                    verbose=0,
                 )
             )
             direct_inclined_irradiance_series = (
@@ -807,6 +829,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         even_more_extended_results = {
             'Irradiance source': 'External data' if direct_horizontal_component else IRRADIANCE_ALGORITHM_HOFIERKA_2002,
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
+            INCIDENCE_DEFINITION: 'Sun-to-Plane' if complementary_incidence_angle else 'Sun-to-Surface-Normal',
             POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
             TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
             # "Shade": in_shade,
