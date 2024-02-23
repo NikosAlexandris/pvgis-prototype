@@ -31,6 +31,8 @@ from pvgisprototype.constants import AZIMUTH_NAME
 from pvgisprototype.constants import SURFACE_TILT_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_NAME
 from pvgisprototype.constants import INCIDENCE_NAME
+from pvgisprototype.constants import INCIDENCE_DEFINITION
+from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -56,6 +58,7 @@ def model_solar_geometry_overview_time_series(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     backend: str = DEFAULT_ARRAY_BACKEND,
     dtype: str = DEFAULT_ARRAY_DTYPE,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List[SolarAltitude]:
 
@@ -112,6 +115,7 @@ def model_solar_geometry_overview_time_series(
             timezone=timezone,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
+            complementary_incidence_angle=complementary_incidence_angle,
             verbose=verbose,
         )
 
@@ -161,6 +165,7 @@ def calculate_solar_geometry_overview_time_series(
     angle_output_units: str = RADIANS,
     backend: str = DEFAULT_ARRAY_BACKEND,
     dtype: str = DEFAULT_ARRAY_DTYPE,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """
@@ -191,6 +196,7 @@ def calculate_solar_geometry_overview_time_series(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 backend=backend,
                 dtype=dtype,
+                complementary_incidence_angle=complementary_incidence_angle,
                 verbose=verbose,
             )
             results = {
@@ -205,6 +211,7 @@ def calculate_solar_geometry_overview_time_series(
                         SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
                         SURFACE_ORIENTATION_NAME: getattr(surface_orientation, angle_output_units, NOT_AVAILABLE) if surface_orientation else None,
                         INCIDENCE_NAME: getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE) if solar_incidence_series else NOT_AVAILABLE,
+                        INCIDENCE_DEFINITION: 'Sun-to-Plane' if complementary_incidence_angle else 'Sun-to-Surface-Normal',
                         UNITS_NAME: angle_output_units,
                         }
                     }
