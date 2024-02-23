@@ -17,8 +17,6 @@ from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.power import calculate_photovoltaic_power_output_series
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
-import typer
-from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
@@ -41,6 +39,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_i
 from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer_parameters import typer_option_efficiency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_periods
 from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_groupby
 from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
@@ -69,7 +68,10 @@ from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
 from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_profiling
 from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
@@ -95,34 +97,19 @@ from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype import LinkeTurbidityFactor
 from rich import print
 from pandas import DatetimeIndex
 
 
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    # help=f"Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-    help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-)
-
-
-@app.command(
-    'broadband',
-    no_args_is_help=True,
-    # help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-    help=f"Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-    rich_help_panel=rich_help_panel_series_irradiance,
-)
 def photovoltaic_power_output_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[Optional[DatetimeIndex], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
@@ -142,7 +129,7 @@ def photovoltaic_power_output_series(
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Annotated[Optional[float], typer_option_albedo] = 2,
+    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
@@ -164,8 +151,11 @@ def photovoltaic_power_output_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     groupby: Annotated[Optional[str], typer_option_groupby] = None,
     csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
+    profile: Annotated[bool, typer_option_profiling] = False,
 ):
     """
     Estimate the photovoltaic power over a time series or an arbitrarily
@@ -179,8 +169,9 @@ def photovoltaic_power_output_series(
         elevation=elevation,
         timestamps=timestamps,
         start_time=start_time,
-        frequency=frequency,
         end_time=end_time,
+        periods=periods,
+        frequency=frequency,
         timezone=timezone,
         random_time_series=random_time_series,
         global_horizontal_irradiance=global_horizontal_irradiance,
@@ -217,6 +208,7 @@ def photovoltaic_power_output_series(
         temperature_model=temperature_model,
         efficiency=efficiency,
         verbose=verbose,
+        profile=profile,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -246,6 +238,40 @@ def photovoltaic_power_output_series(
                 dictionary=photovoltaic_power_output_series,
                 filename=csv,
             )
+        if uniplot:
+            import os 
+            terminal_columns, _ = os.get_terminal_size() # we don't need lines!
+            terminal_length = int(terminal_columns * terminal_width_fraction)
+            from functools import partial
+            from uniplot import plot as default_plot
+            plot = partial(default_plot, width=terminal_length)
+            from pvgisprototype.api.series.hardcodings import exclamation_mark
+            title="Photovoltaic power output"
+            lines = True
+            if isinstance(photovoltaic_power_output_series, float):
+                print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
+                return
+            import numpy as np
+            photovoltaic_power_output_series = list(photovoltaic_power_output_series.values())[0]
+            if isinstance(photovoltaic_power_output_series, np.ndarray):
+                # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
+                supertitle = 'Photovoltaic Power Output Series'
+                # label = getattr(photovoltaic_power_output_series, 'name', None)
+                label = 'Photovoltaic Power'
+                # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
+                # unit = getattr(photovoltaic_power_output_series, 'units', None)
+                unit = POWER_UNIT
+                plot(
+                    # xs=timestamps,
+                    # xs=photovoltaic_power_output_series,
+                    # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
+                    ys=photovoltaic_power_output_series,
+                    legend_labels=label,
+                    lines=lines,
+                    title=title if title else supertitle,
+                    y_unit=' ' + str(unit),
+                )
+
     else:
         flat_list = photovoltaic_power_output_series.flatten().astype(str)
         csv_str = ','.join(flat_list)

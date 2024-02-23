@@ -11,6 +11,10 @@ from pvgisprototype import FractionalYear
 from pvgisprototype.constants import RADIANS
 from math import pi
 import numpy as np
+from rich import print
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
+from pandas import DatetimeIndex
 
 
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
@@ -36,8 +40,8 @@ def calculate_fractional_year_noaa(
 
     return fractional_year
 
-from pandas import DatetimeIndex
 
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_time_series_noaa(
         timestamps: Union[datetime, DatetimeIndex],
@@ -82,12 +86,21 @@ def calculate_fractional_year_time_series_noaa(
     hours = timestamps.hour
     days_in_year_series = get_days_in_years_series(timestamps.year) 
     fractional_year_series = np.array(
-        2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24)
+        2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24),
+        dtype=np.float32,
     )
     fractional_year_series[fractional_year_series < 0] = 0
     
     if not np.all((0 <= fractional_year_series) & (fractional_year_series < 2 * np.pi)):
         raise ValueError(f'The calculated fractional years are outside the expected range [0, {2*pi}] radians')
+
+    from pvgisprototype.validation.hashing import generate_hash
+    fractional_year_series_hash = generate_hash(fractional_year_series)
+    print(
+        "FY : calculate_fractional_year_time_series_noaa() |",
+        f"Data Type : [bold]{fractional_year_series.dtype}[/bold] |",
+        f"Output Hash : [code]{fractional_year_series_hash}[/code]",
+    )
 
     fractional_year_series = FractionalYear(
         value=fractional_year_series,

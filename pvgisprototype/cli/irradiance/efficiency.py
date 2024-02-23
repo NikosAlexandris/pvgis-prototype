@@ -50,6 +50,7 @@ import numpy as np
 )
 def get_pv_efficiency_time_series(
     irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
+    spectral_factor=None,
     temperature_series: Annotated[TemperatureSeries, typer_option_temperature_series] = TEMPERATURE_DEFAULT,
     model_constants: List[float] = EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
@@ -67,6 +68,7 @@ def get_pv_efficiency_time_series(
     # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
     results = calculate_pv_efficiency_time_series(
         irradiance_series=irradiance_series,
+        spectral_factor=spectral_factor,
         temperature_series=temperature_series,
         model_constants=model_constants,
         standard_test_temperature=standard_test_temperature,
