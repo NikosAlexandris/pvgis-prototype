@@ -679,6 +679,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     #
     # To add : ---------------------------------------------------------------
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
+
     # Followint, the _complementary_ solar incidence angle is used (Jenco, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
     mask_not_in_shade = np.full_like(
