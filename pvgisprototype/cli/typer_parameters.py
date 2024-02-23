@@ -191,8 +191,14 @@ typer_option_start_time = typer.Option(
     rich_help_panel=rich_help_panel_time_series,
     default_factory = None,
 )
+typer_option_periods = typer.Option(
+    help=f"Number of timestamps to generate",
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=None
+)
 typer_option_frequency = typer.Option(
-    help=f"Frequency for timestamp generation, ex. 30m. A number and date/time unit : (D)ay, (M)onth, (Y)ear, (h)ours, (m)inutes, or (s)econds. See NumPy's timedelta64.",
+    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+    help=f"A common date/time frequency unit optionally with a multiples number, such as [code]H[/code](hourly), [code]min[/code](utely), [code]S[/code](econdly), [code]D[/code](aily), [code]W[/code](eekly), [code]M[/code](onth end), [code]Y[/code](early) or [code]30m[/code]. See Pandas time series offset aliases.",
     rich_help_panel=rich_help_panel_time_series,
     # default_factory='h'
 )
@@ -880,6 +886,12 @@ typer_option_verbose = typer.Option(
     rich_help_panel=rich_help_panel_output,
     # default_factory=0,
 )
+typer_option_profiling = typer.Option(
+    "--profile",
+    "--prfl",
+    help="Enable profiling",
+    # default=False,
+)
 typer_option_index = typer.Option(
     '--index',
     '--idx',
@@ -986,6 +998,12 @@ typer_option_in_memory = typer.Option(
 
 # Plotting
 
+typer_option_uniplot = typer.Option(
+    help='Plot the PV power output time series in the terminal',
+    rich_help_panel=rich_help_panel_plotting,
+    # default_factory=False,
+)
+
 typer_option_uniplot_lines = typer.Option(
     help='Symbol for plotting data points with uniplot',
     rich_help_panel=rich_help_panel_plotting,
@@ -996,6 +1014,10 @@ typer_option_uniplot_title = typer.Option(
 )
 typer_option_uniplot_unit = typer.Option(
     help='Unit for the Uniplot',
+    rich_help_panel=rich_help_panel_plotting,
+)
+typer_option_uniplot_terminal_width = typer.Option(
+    help='Fraction of number of columns of the current terminal, ex. 0.9',
     rich_help_panel=rich_help_panel_plotting,
 )
 typer_option_tufte_style = typer.Option(

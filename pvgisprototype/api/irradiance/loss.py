@@ -42,8 +42,8 @@ def calculate_angular_loss_factor_for_direct_irradiance(
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
-    """Calculate the angular loss factor for the direct horizontal radiation based
-    on the solar incident angle
+    """Calculate the angular loss factor for the direct horizontal radiation
+    based on the solar incidence angle
 
     The adjustment factor represents the fraction of the original
     `direct_radiation` that is retained after accounting for the loss of
@@ -106,7 +106,7 @@ def calculate_angular_loss_factor_for_direct_irradiance(
         where:
 
         - br : direct inclined irradiance
-        - sh : _sine_ of solar incidence angle (as per Jenco) *Error*
+        - sh : _sine_ of _complementary_ solar incidence angle (as per Jenco)
         - a_r : angular loss coefficient
 
 
@@ -130,7 +130,7 @@ def calculate_angular_loss_factor_for_direct_irradiance(
         denominator =  1 / ( 1 - exp( -1 / angular_loss_coefficient))
         incidence_angle_modifier = numerator / denominator
         if verbose > 0:
-            print(f'Angular loss factor : {angular_loss_factor}')
+            print(f'Incidence angle modifier : {incidence_angle_modifier}')
         return incidence_angle_modifier
 
     except ZeroDivisionError as e:
@@ -144,13 +144,24 @@ def calculate_angular_loss_factor_for_direct_irradiance_time_series(
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
+    """
+    Notes
+    -----
+    This function implements the solar incidence angle modifier as per Martin &
+    Ruiz (2005). Expected is the angle between the sun-solar-surface vector and
+    the vector normal to the reference solar surface. We call this the
+    _typical_ incidence angle as opposed to the _complementary_ incidence angle
+    defined by Jenco (1992).
+
+    """
     try:
-        # numerator = 1 - np.exp( - np.sin(solar_incidence_series) / angular_loss_coefficient )
         numerator = 1 - np.exp( - np.cos(solar_incidence_series) / angular_loss_coefficient )
         denominator =  1 / ( 1 - exp( -1 / angular_loss_coefficient))
         incidence_angle_modifier_series = numerator / denominator
         if verbose > 5:
             debug(locals())
+        if verbose > 0:
+            print(f'Incidence angle modifier series: {incidence_angle_modifier_series}')
         return incidence_angle_modifier_series
 
     except ZeroDivisionError as e:

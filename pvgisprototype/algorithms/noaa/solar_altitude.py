@@ -29,6 +29,7 @@ from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_t
 from math import pi
 from math import isfinite
 import numpy as np
+from pandas import DatetimeIndex
 
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
@@ -79,7 +80,7 @@ def calculate_solar_altitude_noaa(
 def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: Union[float, Sequence[float]],
+    timestamps: Union[datetime, DatetimeIndex],
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,

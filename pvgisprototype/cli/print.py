@@ -33,6 +33,7 @@ from pvgisprototype.constants import (
     AZIMUTH_NAME,
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
+    INCIDENCE_DEFINITION,
     UNITS_COLUMN_NAME,
     UNITLESS,
     UNITS_NAME,
@@ -263,17 +264,23 @@ def print_solar_position_series_table(
         user_requested_timestamps is not None
         and user_requested_timezone is not None
     ):
-        caption += f"Local zone : {user_requested_timezone}, "
+        caption += f"Local zone : {user_requested_timezone}"
            # [
            #     str(user_requested_timestamps.get_loc(timestamp)),
            #     str(user_requested_timezone),
            # ]
     # Should be the same in case of multiple models!
     first_model = next(iter(rounded_table))
+
     surface_tilt = rounded_table[first_model].get(SURFACE_TILT_NAME, None) if surface_tilt else None
+    caption += f"\nTilt : [bold]{surface_tilt}[/bold], "
+
     surface_orientation = rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
-    caption += f"Tilt : {surface_tilt}, "
-    caption += f"Orientation : {surface_orientation}"
+    caption += f"Orientation : [bold]{surface_orientation}[/bold], "
+
+    incidence_angle_definition = rounded_table[first_model].get(INCIDENCE_DEFINITION, None) if incidence else None
+    caption += f"Incidence definition : [bold]{incidence_angle_definition}[/bold]"
+
     table = Table(
         *columns,
         title=title,
@@ -634,17 +641,28 @@ def print_irradiance_table_2(
     index: bool = False,
 ):
     console = Console()
-    table = Table(title=title, box=box.SIMPLE_HEAD)
+    caption = f"({LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME}) = ({longitude}, {latitude}), "
+    caption += f"\n⌁ : Power, "
+    caption += f"⭍ : Effective component, "
+    caption += f"🗤 : Diffuse, "
+    caption += f"☈ : Reflected, "
+    caption += f"∡ : On inclined plane, "
+    caption += f"↻ : Orientation\n"
+    table = Table(
+            title=title,
+            caption=caption,
+            box=box.SIMPLE_HEAD,
+            )
     
     if index:
         table.add_column("Index")
 
     # base columns
-    if verbose > 0:
-        if longitude:
-            table.add_column('Longitude')
-        if latitude:
-            table.add_column('Latitude')
+    # if verbose > 0:
+    #     if longitude:
+    #         table.add_column('Longitude')
+    #     if latitude:
+    #         table.add_column('Latitude')
     table.add_column('Time')
     
     # remove the 'Title' entry! ---------------------------------------------
@@ -677,9 +695,9 @@ def print_irradiance_table_2(
             row.append(str(index_counter))
             index_counter += 1
 
-        if verbose > 0 and longitude and latitude:
-            row.append(round_float_values(longitude, rounding_places))
-            row.append(round_float_values(latitude, rounding_places))
+        # if verbose > 0 and longitude and latitude:
+        #     row.append(round_float_values(longitude, rounding_places))
+        #     row.append(round_float_values(latitude, rounding_places))
 
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
 

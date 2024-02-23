@@ -36,7 +36,8 @@ from typing import List
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
-from pvgisprototype.api.utilities.progress import progress
+# from pvgisprototype.api.utilities.progress import progress
+from rich.progress import Progress
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from rich import print
@@ -123,6 +124,7 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -345,6 +347,7 @@ def calculate_direct_normal_irradiance_time_series(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct normal irradiance (SID) [W*m-2]
 
@@ -359,7 +362,8 @@ def calculate_direct_normal_irradiance_time_series(
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
     """
-    with progress:
+    # debug(locals())
+    with Progress(disable=not show_progress):
         extraterrestrial_normal_irradiance_series = (
             calculate_extraterrestrial_normal_irradiance_time_series(
                 timestamps=timestamps,
@@ -428,7 +432,15 @@ def calculate_direct_normal_irradiance_time_series(
 
     return direct_normal_irradiance_series
 
+from pandas import DatetimeIndex
+from cachetools.keys import hashkey
+def custom_hashkey(*args, **kwargs):
+    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
+    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
+    return hashkey(*args, **kwargs)
 
+from cachetools import cached
+# @cached(cache={}, key=custom_hashkey)
 def calculate_direct_horizontal_irradiance_time_series(
     longitude: float,
     latitude: float,
@@ -456,6 +468,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     csv: Path = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     index: bool = False,
+    show_progress: bool = True,
 ) -> np.ndarray:
     """Calculate the direct horizontal irradiance (SID) [W*m-2]
 
@@ -504,6 +517,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         verbose=0,
+        show_progress=show_progress,
     )
 
     # Mask conditions -------------------------------------------------------
@@ -591,6 +605,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+    complementary_incidence_angle: bool = True,  # Let Me Hardcoded, Read the docstring!
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
@@ -605,6 +620,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     csv: Path = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     index: bool = False,
+    show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
@@ -612,14 +628,34 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     Notes
     -----
+
               B   ⋅ sin ⎛δ   ⎞                    
                hc       ⎝ exp⎠         ⎛ W ⎞
         B   = ────────────────     in  ⎜───⎟
          ic       sin ⎛h ⎞             ⎜ -2⎟           
                       ⎝ 0⎠             ⎝m  ⎠           
+
+    The implementation by Hofierka (2002) uses the solar incidence angle
+    between the sun-vetor and plance of the reference surface (as per Jenco,
+    1992). This is very important and relates to the hardcoded value `True` for
+    the `complementary_incidence_angle` input parameter of the function. We
+    call this angle (definition) the _complementary_ incidence angle.
+
+    For the losses due to reflectivity, the incidence angle modifier by Martin
+    & Ruiz (2005) expects the incidence angle between the sun-vector and the
+    surface-normal. Hence, the respective call of the function
+    `calculate_angular_loss_factor_for_direct_irradiance_time_series()`,
+    expects the complement of the angle defined by Jenco (1992). We call the
+    incidence angle expected by the incidence angle modifier by Martin & Ruiz
+    (2005) the _typical_ incidence angle.
+
+    See also the documentation of the function
+    calculate_solar_incidence_time_series_jenco().
+
     References
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
+
     """
     solar_incidence_series = model_solar_incidence_time_series(
         longitude=longitude,
@@ -635,6 +671,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
         verbose=0,
     )
     solar_altitude_series = model_solar_altitude_time_series(
@@ -664,6 +701,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     #
     # To add : ---------------------------------------------------------------
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
+
+    # Followint, the _complementary_ solar incidence angle is used (Jenco, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
     mask_not_in_shade = np.full_like(
         solar_altitude_series.radians, True
@@ -704,6 +743,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             angle_output_units=angle_output_units,
             rounding_places=rounding_places,
             verbose=0,  # no verbosity here by choice!
+            show_progress=show_progress,
         )
     else:  # read from a time series dataset
         print(f'i [bold]Reading[/bold] [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...')
@@ -725,6 +765,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         ).to_numpy()
 
     try:
+        # the number of timestamps should match the number of "x" values
         compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
@@ -741,10 +782,13 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if apply_angular_loss_factor:
 
         try:
+            # expects typical sun-vector-to-normal-of-surface incidence angles
+            # as per Martin & Ruiz 2005) !
+            solar_incidence_series.value = np.pi/2 - solar_incidence_series.value
             angular_loss_factor_series = (
                 calculate_angular_loss_factor_for_direct_irradiance_time_series(
                     solar_incidence_series=solar_incidence_series.radians,
-                    verbose=verbose,
+                    verbose=0,
                 )
             )
             direct_inclined_irradiance_series = (
@@ -785,6 +829,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         even_more_extended_results = {
             'Irradiance source': 'External data' if direct_horizontal_component else IRRADIANCE_ALGORITHM_HOFIERKA_2002,
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
+            INCIDENCE_DEFINITION: 'Sun-to-Plane' if complementary_incidence_angle else 'Sun-to-Surface-Normal',
             POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
             TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
             # "Shade": in_shade,

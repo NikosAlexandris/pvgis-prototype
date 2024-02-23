@@ -1,6 +1,6 @@
 import pytest
-from pvgisprototype.api.geometry.time import model_solar_time
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.geometry.models import SolarTimeModel
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 from datetime import datetime
@@ -22,11 +22,11 @@ test_cases = test_cases_from_data(
 tolerances = [0.1]      # 1, 0.5, 
 
 solar_time_models = [
-    # SolarTimeModels.ephem,
-    SolarTimeModels.milne,
-    SolarTimeModels.noaa,
-    # SolarTimeModels.pvgis,
-    # SolarTimeModels.skyfield,
+    # SolarTimeModel.ephem,
+    SolarTimeModel.milne,
+    SolarTimeModel.noaa,
+    # SolarTimeModel.pvgis,
+    # SolarTimeModel.skyfield,
 ]
 
 @pytest.mark.parametrize(

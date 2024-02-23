@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 import matplotlib.pyplot as plt
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MIN
 from pvgisprototype.constants import EXTRATERRESTRIAL_IRRADIANCE_MAX
 from pvgisprototype.plot.plot_extraterrestrial_irradiance import plot_extraterrestrial_irradiance
@@ -15,12 +15,12 @@ import random
 @pytest.mark.parametrize("timestamp, expected", cases_for_extraterrestrial_irradiance)
 @pytest.mark.parametrize('tolerance', tolerances)
 def test_calculate_extraterrestrial_irradiance(timestamp: datetime, expected: float, tolerance: float):
-    assert pytest.approx(expected, tolerance) == calculate_extraterrestrial_normal_irradiance(timestamp)
+    assert pytest.approx(expected, tolerance) == calculate_extraterrestrial_normal_irradiance_time_series(timestamp)
 
 
 @pytest.mark.parametrize('timestamp', random_timestamp) 
 def test_calculate_extraterrestrial_irradiance_for_random_day(timestamp: datetime):
-    calculated = calculate_extraterrestrial_normal_irradiance(timestamp)
+    calculated = calculate_extraterrestrial_normal_irradiance_time_series(timestamp)
     assert EXTRATERRESTRIAL_IRRADIANCE_MIN <= calculated <= EXTRATERRESTRIAL_IRRADIANCE_MAX
 
 
