@@ -649,6 +649,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
         verbose=0,
     )
     solar_altitude_series = model_solar_altitude_time_series(
@@ -678,6 +679,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     #
     # To add : ---------------------------------------------------------------
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
+    # Followint, the _complementary_ solar incidence angle is used (Jenco, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
     mask_not_in_shade = np.full_like(
         solar_altitude_series.radians, True
@@ -740,6 +742,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         ).to_numpy()
 
     try:
+        # the number of timestamps should match the number of "x" values
         compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
@@ -756,6 +759,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if apply_angular_loss_factor:
 
         try:
+            # expects typical sun-vector-to-normal-of-surface incidence angles
+            # as per Martin & Ruiz 2005) !
+            solar_incidence_series.value = 90 - solar_incidence_series.value
             angular_loss_factor_series = (
                 calculate_angular_loss_factor_for_direct_irradiance_time_series(
                     solar_incidence_series=solar_incidence_series.radians,
