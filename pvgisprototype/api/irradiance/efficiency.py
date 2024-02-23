@@ -39,6 +39,7 @@ from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MOD
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 import numpy as np
 
 
@@ -87,8 +88,10 @@ def calculate_pv_efficiency_time_series(
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
-    """
-    Calculate the time series efficiency of a photovoltaic (PV) module based on irradiance, temperature, and other factors.
+    """Calculate the time series efficiency of a photovoltaic (PV) module
+
+    Calculate the time series efficiency of a photovoltaic (PV) module based on
+    irradiance, temperature, and other factors.
 
     Parameters
     ----------
@@ -132,7 +135,10 @@ def calculate_pv_efficiency_time_series(
 
     Notes
     -----
-    This function is part of a larger system for analyzing PV module performance. It takes into account spectral factors, temperature variations, and wind speed, applying different models to calculate the efficiency of a PV module under varying conditions.
+    This function is part of a larger system for analyzing PV module
+    performance. It takes into account spectral factors, temperature
+    variations, and wind speed, applying different models to calculate the
+    efficiency of a PV module under varying conditions.
 
     """
     model_constants = np.array(EFFICIENCY_MODEL_COEFFICIENTS['cSi']['Free standing'])
@@ -149,7 +155,9 @@ def calculate_pv_efficiency_time_series(
     if spectral_factor:
         spectral_factor = np.array(spectral_factor)
         relative_irradiance_series *= spectral_factor
-    log_relative_irradiance_series = np.log(relative_irradiance_series)
+    log_relative_irradiance_series = np.where(relative_irradiance_series > 0, 
+                                              np.log(relative_irradiance_series), 
+                                              0)
 
     negative_relative_irradiance = relative_irradiance_series <= radiation_cutoff_threshold
     efficiency_series = np.zeros_like(irradiance_series)
@@ -218,6 +226,9 @@ def calculate_pv_efficiency_time_series(
 
     # if np.any(mask_invalid_efficiency):
     #     return "Some calculated efficiencies are out of the expected range [0, 1]!"
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     if verbose > 0: results = {
             TITLE_KEY_NAME: EFFICIENCY,
