@@ -641,17 +641,28 @@ def print_irradiance_table_2(
     index: bool = False,
 ):
     console = Console()
-    table = Table(title=title, box=box.SIMPLE_HEAD)
+    caption = f"({LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME}) = ({longitude}, {latitude}), "
+    caption += f"\n⌁ : Power, "
+    caption += f"⭍ : Effective component, "
+    caption += f"🗤 : Diffuse, "
+    caption += f"☈ : Reflected, "
+    caption += f"∡ : On inclined plane, "
+    caption += f"↻ : Orientation\n"
+    table = Table(
+            title=title,
+            caption=caption,
+            box=box.SIMPLE_HEAD,
+            )
     
     if index:
         table.add_column("Index")
 
     # base columns
-    if verbose > 0:
-        if longitude:
-            table.add_column('Longitude')
-        if latitude:
-            table.add_column('Latitude')
+    # if verbose > 0:
+    #     if longitude:
+    #         table.add_column('Longitude')
+    #     if latitude:
+    #         table.add_column('Latitude')
     table.add_column('Time')
     
     # remove the 'Title' entry! ---------------------------------------------
@@ -684,9 +695,9 @@ def print_irradiance_table_2(
             row.append(str(index_counter))
             index_counter += 1
 
-        if verbose > 0 and longitude and latitude:
-            row.append(round_float_values(longitude, rounding_places))
-            row.append(round_float_values(latitude, rounding_places))
+        # if verbose > 0 and longitude and latitude:
+        #     row.append(round_float_values(longitude, rounding_places))
+        #     row.append(round_float_values(latitude, rounding_places))
 
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
 
