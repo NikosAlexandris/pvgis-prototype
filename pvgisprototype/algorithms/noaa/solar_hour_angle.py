@@ -1,3 +1,4 @@
+from rich import print
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarHourAngleNOAAInput
@@ -15,6 +16,9 @@ from math import isfinite
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 import numpy as np
 from pvgisprototype.constants import RADIANS
+from pandas import DatetimeIndex
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
@@ -106,6 +110,7 @@ def calculate_solar_hour_angle_noaa(
     return solar_hour_angle
 
 
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
@@ -115,7 +120,7 @@ def calculate_solar_hour_angle_time_series_noaa(
     verbose: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians for a time series."""
-    true_solar_time_series= calculate_true_solar_time_time_series_noaa(
+    true_solar_time_series = calculate_true_solar_time_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
@@ -130,6 +135,14 @@ def calculate_solar_hour_angle_time_series_noaa(
             # Identify the out-of-range values for a more informative error message
             out_of_range_values = solar_hour_angle_series[~((-np.pi <= solar_hour_angle_series) & (solar_hour_angle_series <= np.pi))]
             raise ValueError(f"The solar hour angle(s) {out_of_range_values} is/are out of the expected range [-π, π] radians!")
+
+    from pvgisprototype.validation.hashing import generate_hash
+    # solar_hour_angle_series_hash = generate_hash(solar_hour_angle_series)
+    print(
+        'SHA : calculate_solar_hour_angle_time_series_noaa() |',
+        f"Data Type : [bold]{solar_hour_angle_series.dtype}[/bold] |",
+        # f"Output Hash : [code]{solar_hour_angle_series_hash}[/code]",
+    )
 
     solar_hour_angle_series = SolarHourAngle(
         value=np.array(solar_hour_angle_series),

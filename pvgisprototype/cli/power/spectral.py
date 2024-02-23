@@ -18,8 +18,6 @@ from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.power import calculate_photovoltaic_power_output_series
 from pvgisprototype.algorithms.pvis.power import calculate_spectral_photovoltaic_power_output
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
-import typer
-from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
@@ -99,21 +97,6 @@ from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
 
 
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"Estimate the photovoltaic performance based on [bold]spectrally resolved irradiance[/bold], ambient temperature and wind speed [bold green]Prototype[/bold green]",
-)
-
-
-@app.command(
-    'spectral',
-    no_args_is_help=True,
-    help=f"Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]spectrally resolved irradiance[/bold] incident on a solar surface, ambient temperature or wind speed",
-    rich_help_panel=rich_help_panel_series_irradiance,
-)
 def spectral_photovoltaic_power_output_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],

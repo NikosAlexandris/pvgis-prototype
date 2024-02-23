@@ -20,6 +20,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
@@ -34,6 +35,7 @@ def model_solar_incidence(
     timezone: ZoneInfo = None,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -56,6 +58,7 @@ def model_solar_incidence(
             surface_orientation=surface_orientation,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
+            complementary_incidence_angle=complementary_incidence_angle,
             verbose=verbose,
         )
 
@@ -87,6 +90,7 @@ def calculate_solar_incidence(
     timezone: ZoneInfo = None,
     random_time: bool = RANDOM_DAY_FLAG_DEFAULT,
     solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.jenco],
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     horizon_heights: List[float] = None,
@@ -110,6 +114,7 @@ def calculate_solar_incidence(
                 timezone=timezone,
                 solar_time_model=solar_time_model,
                 solar_incidence_model=solar_incidence_model,
+                complementary_incidence_angle=complementary_incidence_angle,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
                 surface_tilt=surface_tilt,
@@ -123,6 +128,7 @@ def calculate_solar_incidence(
                     TIME_ALGORITHM_NAME: solar_time_model.value,
                     POSITION_ALGORITHM_NAME: solar_incidence_model.value,
                     INCIDENCE_NAME: getattr(solar_incidence, angle_output_units, None) if solar_incidence else None,
+                    'Sun-to-Plane': complementary_incidence_angle,
                     UNITS_NAME: angle_output_units,
                 }
             )

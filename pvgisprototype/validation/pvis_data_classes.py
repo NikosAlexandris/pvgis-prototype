@@ -154,11 +154,11 @@ class HourOffsetModel(BaseModel):
 
 
 class RandomTimeModel(BaseModel):
-    random_time: bool
+    random_time: bool = False
 
 
 class RandomTimeSeriesModel(BaseModel):
-    random_time_series: bool
+    random_time_series: bool = False
 
 
 class BaseTimeOutputUnitsModel(BaseModel):
@@ -242,6 +242,10 @@ class SolarPositionModel(BaseModel):
 
 class SolarIncidenceModel(BaseModel):
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco
+
+
+class ComplementaryIncidenceAngleModel(BaseModel):
+    complementary_incidence_angle: bool = False
 
 
 class EarthOrbitModel(BaseModel):

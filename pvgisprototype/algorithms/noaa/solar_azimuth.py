@@ -23,6 +23,7 @@ from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.constants import RADIANS
+from pandas import DatetimeIndex
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
@@ -140,7 +141,7 @@ def calculate_solar_azimuth_noaa(
 def calculate_solar_azimuth_time_series_noaa(
     longitude: Longitude,   # radians
     latitude: Latitude,     # radians
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: Union[datetime, DatetimeIndex],
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
