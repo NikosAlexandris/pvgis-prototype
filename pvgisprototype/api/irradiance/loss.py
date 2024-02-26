@@ -140,7 +140,7 @@ def calculate_angular_loss_factor_for_direct_irradiance(
 
 
 def calculate_angular_loss_factor_for_direct_irradiance_time_series(
-    solar_incidence_series: Annotated[ List[float], typer_argument_solar_incidence_series],
+    solar_incidence_series: Annotated[List[float], typer_argument_solar_incidence_series],
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
