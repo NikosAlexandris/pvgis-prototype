@@ -256,7 +256,7 @@ def diffuse_inclined_irradiance_time_series(
     random_time_series: bool = False,
     global_horizontal_component: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
-    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = None,
+    surface_tilt: Annotated[float, typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
