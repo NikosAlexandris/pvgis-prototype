@@ -535,40 +535,47 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
         # prepare size of output array!
         diffuse_inclined_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
-        # mask surfaces in shade, yet there is ambient light
-        mask = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
-        if np.any(mask):
 
+        # surface in shade, yet there is ambient light
+        mask_surface_in_shade_series = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
+        if np.any(mask_surface_in_shade_series):
             # F(γN)
-            diffuse_sky_irradiance_series[mask] = (
+            diffuse_sky_irradiance_series[mask_surface_in_shade_series] = (
                 calculate_diffuse_sky_irradiance_time_series(
                     n_series=np.full(len(timestamps), TERM_N_IN_SHADE),
                     surface_tilt=surface_tilt,
-                )[mask]
+                )[mask_surface_in_shade_series]
             )
-            diffuse_inclined_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-            diffuse_inclined_irradiance_series[mask] = (
-                diffuse_horizontal_irradiance_series[mask] 
-                * diffuse_sky_irradiance_series[mask]
+            diffuse_inclined_irradiance_series[mask_surface_in_shade_series] = (
+                diffuse_horizontal_irradiance_series[mask_surface_in_shade_series] 
+                * diffuse_sky_irradiance_series[mask_surface_in_shade_series]
             )
 
         else:  # sunlit surface and non-overcast sky
-            # extract float values from the SolarAltitude objects
-            # solar_altitude_series_array = np.array([altitude.radians for altitude in solar_altitude_series])
             # ----------------------------------------------------------------
             azimuth_difference_series_array = None  # Avoid UnboundLocalError!
             solar_azimuth_series_array = None
             # ----------------------------------------------------------------
 
-            if np.any(solar_altitude_series.radians >= 0.1):  # radians or 5.7 degrees
-                diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series * (
-                    diffuse_sky_irradiance_series * (1 - kb_series)
-                    + kb_series * np.sin(solar_incidence_series.radians) / np.sin(solar_altitude_series.radians)
+            mask_sunlit_surface_series = solar_altitude_series.radians >= 0.1 
+            if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
+                diffuse_sky_irradiance_series = np.full_like(
+                    diffuse_horizontal_irradiance_series, diffuse_sky_irradiance_series
+                )
+                diffuse_inclined_irradiance_series[
+                    mask_sunlit_surface_series
+                ] = diffuse_horizontal_irradiance_series[mask_sunlit_surface_series] * (
+                    diffuse_sky_irradiance_series[mask_sunlit_surface_series]
+                    * (1 - kb_series[mask_sunlit_surface_series])
+                    + kb_series[mask_sunlit_surface_series]
+                    * np.sin(solar_incidence_series.radians[mask_sunlit_surface_series])
+                    / np.sin(solar_altitude_series.radians[mask_sunlit_surface_series])
                 )
 
-            else:  # if solar_altitude.value < 0.1:
+            else:  # if solar altitude < 0.1 : potential sunlit surface series
+                mask_potential_sunlit_surface_series = ~mask_sunlit_surface_series 
                 # requires the solar azimuth
-                solar_azimuth_series = model_solar_azimuth_time_series(
+                solar_azimuth_series_array = model_solar_azimuth_time_series(
                     longitude=longitude,
                     latitude=latitude,
                     timestamps=timestamps,
@@ -588,16 +595,34 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 # ALN : angle between the vertical surface containing the normal to the
                 #   surface and vertical surface passing through the centre of the solar
                 #   disc [rad]
-                azimuth_difference_series_array = solar_azimuth_series.value - surface_orientation
-                azimuth_difference_series_array = np.arctan2(np.sin(azimuth_difference_series_array), np.cos(azimuth_difference_series_array))
-                diffuse_inclined_irradiance_series = (
-                    diffuse_inclined_irradiance_series_before_angular_loss
-                ) = diffuse_horizontal_irradiance_series * (
-                    diffuse_sky_irradiance_series * (1 - kb_series)
-                    + kb_series
+                azimuth_difference_series_array = (
+                    solar_azimuth_series_array.value - surface_orientation
+                )
+                azimuth_difference_series_array = np.arctan2(
+                    np.sin(azimuth_difference_series_array),
+                    np.cos(azimuth_difference_series_array),
+                )
+                diffuse_inclined_irradiance_series[
+                    mask_potential_sunlit_surface_series
+                ] = diffuse_horizontal_irradiance_series[
+                    mask_potential_sunlit_surface_series
+                ] * (
+                    diffuse_sky_irradiance_series[mask_potential_sunlit_surface_series]
+                    * (1 - kb_series[mask_potential_sunlit_surface_series])
+                    + kb_series[mask_potential_sunlit_surface_series]
                     * sin(surface_tilt)
-                    * np.cos(azimuth_difference_series_array)
-                    / (0.1 - 0.008 * solar_altitude_series.radians)
+                    * np.cos(
+                        azimuth_difference_series_array[
+                            mask_potential_sunlit_surface_series
+                        ]
+                    )
+                    / (
+                        0.1
+                        - 0.008
+                        * solar_altitude_series.radians[
+                            mask_potential_sunlit_surface_series
+                        ]
+                    )
                 )
 
     # one more thing
