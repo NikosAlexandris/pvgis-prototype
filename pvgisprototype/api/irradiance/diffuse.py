@@ -25,7 +25,7 @@ from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
-from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
+from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 
@@ -515,13 +515,13 @@ def calculate_diffuse_inclined_irradiance_time_series(
             surface_tilt=surface_tilt,
         )
 
-        # surface in shade requires solar incidence angles -- REVIEW-ME ----
-        solar_incidence_series = calculate_solar_incidence_time_series_jenco(
+        solar_incidence_series = model_solar_incidence_time_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
             random_time_series=random_time_series,
+            solar_incidence_model=solar_incidence_model,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
             perigee_offset=perigee_offset,
@@ -529,7 +529,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-            verbose=verbose,
+            complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
+            verbose=0,
         )
 
         # mask surfaces in shade, yet there is ambient light
