@@ -197,10 +197,10 @@ SolarAltitude:
     initial:
   min_radians:
     type: float
-    initial: -3.15
+    initial: -3.141592653589793
   max_radians:
     type: float
-    initial: 3.15
+    initial: 3.141592653589793
   min_degrees:
     type: float
     initial: -90
