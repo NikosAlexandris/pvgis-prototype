@@ -40,6 +40,8 @@ from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_ti
 from rich.progress import Progress
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from rich import print
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.write import write_irradiance_csv
@@ -392,9 +394,6 @@ def calculate_direct_normal_irradiance_time_series(
             )
         )
         # Warning
-        LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
-        UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
-        # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
         out_of_range_indices = np.where(
             (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
             | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)

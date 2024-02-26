@@ -14,6 +14,13 @@ from rich import box
 from rich.console import Console
 import numpy as np
 
+
+# ------------------------------------------------------------------ FixMe ---
+LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
+UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
+# See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
+# --- FixMe --- Use stuff below... ! -----------------------------------------
+
 PHYSICALLY_POSSIBLE_LIMITS = {
     "Global SWdn": {
         "Min": -4,
