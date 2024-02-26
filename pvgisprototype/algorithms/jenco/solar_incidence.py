@@ -59,16 +59,16 @@ def calculate_relative_longitude(
     Hofierka, 2002 uses equations presented by Jenco :
 
         tangent_relative_longitude =
-                                    (
-                                        - sin(surface_tilt)
-                                        * sin(surface_orientation)
-                                    ) / (
-                                        sin(latitude)
-                                        * sin(surface_tilt)
-                                        * cos(surface_orientation)
-                                        + cos(latitude)
-                                        * cos(surface_tilt)
-                                    )
+            (
+                - sin(surface_tilt)
+                * sin(surface_orientation)
+            ) / (
+                sin(latitude)
+                * sin(surface_tilt)
+                * cos(surface_orientation)
+                + cos(latitude)
+                * cos(surface_tilt)
+            )
 
     In PVGIS' C source code, there is an error of one negative sign in either
     of the expressions! That is so because : cos(pi/2 + x) = -sin(x).
@@ -125,6 +125,7 @@ def calculate_relative_longitude(
         value=relative_longitude,
         unit=RADIANS,
     )
+
     return relative_longitude
 
 
