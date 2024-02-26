@@ -258,7 +258,7 @@ def print_solar_position_series_table(
     columns.append(UNITS_COLUMN_NAME)
 
     title = 'Solar geometry overview'
-    caption = f"({LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME}) = ({longitude}, {latitude}), "
+    caption = f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
     caption += f"Zone : {timezone}, "
     if (
         user_requested_timestamps is not None
@@ -641,7 +641,7 @@ def print_irradiance_table_2(
     index: bool = False,
 ):
     console = Console()
-    caption = f"({LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME}) = ({longitude}, {latitude}), "
+    caption = f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
     caption += f"\n⌁ : Power, "
     caption += f"⭍ : Effective component, "
     caption += f"🗤 : Diffuse, "
@@ -714,7 +714,8 @@ def print_irradiance_table_2(
                     else:
                         row.append(str(round_float_values(value, rounding_places)))
                 else:
-                    row.append(value)
+                    if value is not None:
+                        row.append(value)
         table.add_row(*row)
 
     if verbose:
