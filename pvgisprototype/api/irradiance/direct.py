@@ -221,14 +221,17 @@ def correct_linke_turbidity_factor_time_series(
 
 
 def calculate_refracted_solar_altitude_time_series(
-    solar_altitude_series:SolarAltitude,
+    solar_altitude_series: SolarAltitude,
     verbose: int = 0,
 ) -> RefractedSolarAltitude:
     """Adjust the solar altitude angle for atmospheric refraction for a time series.
     
-    Note
-    ----
-    This function is vectorized to handle arrays of solar altitudes.
+    Notes
+    -----
+    This function :
+    - requires solar altitude values in degrees.
+    - is vectorized to handle arrays of solar altitudes.
+
     """
     atmospheric_refraction = (
         0.061359
@@ -264,12 +267,16 @@ def calculate_optical_air_mass_time_series(
     refracted_solar_altitude_series: RefractedSolarAltitude,
     verbose: Annotated[int, typer_option_verbose] = 0,
 ) -> OpticalAirMass:
-    """Vectorized function to approximate the relative optical air mass for a time series.
-    This function implements the algorithm described by Minzer et al. [1]_ 
-    and Hofierka [2]_ in which the relative optical air mass (unitless) is
-    defined as follows :
+    """Approximate the relative optical air mass.
 
-        m = (p / p0) / (sin h0_ref + 0.50572 (h0_ref + 6.07995) - 1.6364)
+    Vectorized function to approximate the relative optical air mass for a time
+    series.
+
+    This function implements the algorithm described by Minzer et al. [1]_ 
+    and Hofierka [2]_ (equation 5) in which the relative optical air mass
+    (unitless) is defined as follows :
+
+        m = (p/p0) / (sin h0_ref + 0.50572 (h0_ref + 6.07995)^(- 1.6364))
     
         where :
 
@@ -285,7 +292,7 @@ def calculate_optical_air_mass_time_series(
     """
     adjusted_elevation = adjust_elevation(elevation.value)
     optical_air_mass_series = adjusted_elevation.value / (
-        np.sin(refracted_solar_altitude_series.radians)
+        np.sin(refracted_solar_altitude_series.radians)  # in radians for NumPy
         + 0.50572
         * np.power((refracted_solar_altitude_series.degrees + 6.07995), -1.6364)
     )
@@ -308,8 +315,11 @@ def calculate_rayleigh_optical_thickness_time_series(
     optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> RayleighThickness:
-    """Vectorized function to calculate Rayleigh optical thickness for a time series."""
-    # Perform calculations
+    """Calculate the Rayleigh optical thickness.
+
+    Vectorized function to calculate Rayleigh optical thickness for a time series.
+
+    """
     rayleigh_thickness_series_array = np.zeros_like(optical_air_mass_series.value, dtype=float)
     smaller_than_20 = optical_air_mass_series.value <= 20
     larger_than_20 = optical_air_mass_series.value > 20
@@ -649,7 +659,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     (2005) the _typical_ incidence angle.
 
     See also the documentation of the function
-    calculate_solar_incidence_time_series_jenco().
+    `calculate_solar_incidence_time_series_jenco()`.
 
     References
     ----------
@@ -701,7 +711,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     # To add : ---------------------------------------------------------------
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
 
-    # Followint, the _complementary_ solar incidence angle is used (Jenco, 1992)!
+    # Following, the _complementary_ solar incidence angle is used (Jenco, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
     mask_not_in_shade = np.full_like(
         solar_altitude_series.radians, True
