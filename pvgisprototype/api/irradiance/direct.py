@@ -38,6 +38,7 @@ from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_t
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 # from pvgisprototype.api.utilities.progress import progress
 from rich.progress import Progress
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
@@ -289,6 +290,7 @@ def calculate_optical_air_mass_time_series(
            The ARDC Model Atmosphere. Air Force Surveys in Geophysics, 115. AFCRL.
 
     .. [2] Hofierka, 2002
+
     """
     adjusted_elevation = adjust_elevation(elevation.value)
     optical_air_mass_series = adjusted_elevation.value / (
@@ -713,9 +715,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     # Following, the _complementary_ solar incidence angle is used (Jenco, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
-    mask_not_in_shade = np.full_like(
-        solar_altitude_series.radians, True
-    )  # Stub, replace with actual condition
+    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
+    mask_not_in_shade = ~in_shade
     mask = np.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
     )
