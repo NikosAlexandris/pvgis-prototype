@@ -22,6 +22,8 @@ from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -263,9 +265,6 @@ def calculate_global_irradiance_time_series(
         + reflected_irradiance_series
     )
     # Warning
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
-    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
     out_of_range_indices = np.where(
         (global_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
         | (global_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)

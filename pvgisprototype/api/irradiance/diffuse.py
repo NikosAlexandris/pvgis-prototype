@@ -15,6 +15,8 @@ from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -601,10 +603,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
         diffuse_inclined_irradiance_series *= diffuse_irradiance_loss_factor
 
     # Warning
-
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
-    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
     out_of_range_indices = np.where(
         (diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
         | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
