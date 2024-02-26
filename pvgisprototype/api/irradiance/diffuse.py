@@ -533,6 +533,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
             verbose=0,
         )
 
+        # prepare size of output array!
+        diffuse_inclined_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
         # mask surfaces in shade, yet there is ambient light
         mask = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
         if np.any(mask):
