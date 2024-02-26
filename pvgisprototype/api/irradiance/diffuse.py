@@ -655,7 +655,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
     if verbose > 1 :
         extended_results = {
-            LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
+            LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
+            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series / diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
         }
