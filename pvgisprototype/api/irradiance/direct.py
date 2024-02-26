@@ -794,10 +794,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         try:
             # expects typical sun-vector-to-normal-of-surface incidence angles
             # as per Martin & Ruiz 2005) !
-            solar_incidence_series.value = np.pi/2 - solar_incidence_series.value
             angular_loss_factor_series = (
                 calculate_angular_loss_factor_for_direct_irradiance_time_series(
-                    solar_incidence_series=solar_incidence_series.radians,
+                    solar_incidence_series=(np.pi/2 - solar_incidence_series.value),
                     verbose=0,
                 )
             )
