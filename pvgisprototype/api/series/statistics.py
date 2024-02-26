@@ -17,7 +17,8 @@ def calculate_series_statistics(
 ):
     """ """
     import xarray as xr
-    data_array = list(data_array.values())[0]  # Review Me !  Improve Me !
+    if isinstance(data_array, dict):
+        data_array = list(data_array.values())[0]  # Review Me !  Improve Me !
     data_xarray = xr.DataArray(
         data_array,
         coords=[('time', timestamps)],
