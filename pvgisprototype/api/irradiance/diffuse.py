@@ -48,6 +48,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
@@ -674,8 +675,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         even_more_extended_results = {
             TERM_N_COLUMN_NAME: n_series,
             KB_RATIO_COLUMN_NAME: kb_series,
-            AZIMUTH_DIFFERENCE_COLUMN_NAME: azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',# FIXME Convert to degrees if requested!
-            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units) if solar_azimuth_series is not None else '-',
+            AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(azimuth_difference_series_array, angle_output_units, NOT_AVAILABLE),
+            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series_array, angle_output_units, NOT_AVAILABLE),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,
         }
         results = results | even_more_extended_results
@@ -687,8 +688,9 @@ def calculate_diffuse_inclined_irradiance_time_series(
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
             LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
             INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units) if solar_incidence_series else None,
-            OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range_indices,
         }
+        if out_of_range_indices[0].size > 0:
+            plus_even_more_extended_results[OUT_OF_RANGE_INDICES_COLUMN_NAME] = out_of_range_indices
         results = results | plus_even_more_extended_results
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
