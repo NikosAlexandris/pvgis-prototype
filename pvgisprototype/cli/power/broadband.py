@@ -226,13 +226,6 @@ def photovoltaic_power_output_series(
             index=index,
             verbose=verbose,
         )
-        if statistics:
-            print_series_statistics(
-                data_array=photovoltaic_power_output_series,
-                timestamps=timestamps,
-                groupby=groupby,
-                title="Photovoltaic energy output" + f" series {ENERGY_UNIT}",
-            )
         if csv:
             write_irradiance_csv(
                 longitude=longitude,
