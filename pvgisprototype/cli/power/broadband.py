@@ -225,6 +225,14 @@ def photovoltaic_power_output_series(
             index=index,
             verbose=verbose,
         )
+        if csv:
+            write_irradiance_csv(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                dictionary=photovoltaic_power_output_series,
+                filename=csv,
+            )
 
     else:
         flat_list = photovoltaic_power_output_series.flatten().astype(str)
@@ -237,14 +245,6 @@ def photovoltaic_power_output_series(
             timestamps=timestamps,
             groupby=groupby,
             title="Photovoltaic power output",
-        )
-    if csv:
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=photovoltaic_power_output_series,
-            filename=csv,
         )
     if uniplot:
         import os 
