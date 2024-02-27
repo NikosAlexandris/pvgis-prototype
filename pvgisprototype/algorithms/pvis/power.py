@@ -10,6 +10,7 @@ from pvgisprototype.algorithms.pvis.constants import PHOTON_ENERGIES
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -63,7 +64,7 @@ def calculate_spectrally_resolved_global_irradiance_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = 2,
+    albedo: Optional[float] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
@@ -328,7 +329,7 @@ def calculate_spectral_photovoltaic_power_output(
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = 2,
+    albedo: Optional[float] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
