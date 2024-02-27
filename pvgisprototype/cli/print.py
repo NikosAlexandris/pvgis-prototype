@@ -66,7 +66,7 @@ def safe_get_value(dictionary, key, index, default='NA'):
     return value
 
 
-def print_table(headers: List[str], data: List[List[str]]):
+def print_table(headers: List[str], data: List[List[str]]) -> None:
     """Create and print a table with provided headers and data."""
     table = Table(show_header=True, header_style="bold magenta", box=box.SIMPLE_HEAD)
     for header in headers:
@@ -95,7 +95,7 @@ def print_solar_position_table(
     user_requested_timestamp=None,
     user_requested_timezone=None,
     rounding_places=ROUNDING_PLACES_DEFAULT,
-):
+) -> None:
     """
     """
     longitude = round_float_values(longitude, rounding_places)
@@ -217,7 +217,7 @@ def print_solar_position_series_table(
     user_requested_timezone=None,
     rounding_places=ROUNDING_PLACES_DEFAULT,
     group_models=False,
-):
+) -> None:
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
@@ -371,7 +371,7 @@ def print_hour_angle_table_2(
     rounding_places,
     hour_angle=None,
     units=None,
-):
+) -> None:
     """ """
     solar_time = round_float_values(solar_time, rounding_places)
     hour_angle = round_float_values(hour_angle, rounding_places)
@@ -407,7 +407,7 @@ def print_hour_angle_table(
     declination=None,
     hour_angle=None,
     units=None,
-):
+) -> None:
     """ """
     console = Console()
 
@@ -459,7 +459,7 @@ def print_noaa_solar_position_table(
     user_requested_timezone: str = None,
     angle_output_units: str = RADIANS,
     verbose: bool = False,  # New verbose argument
-):
+) -> None:
     console = Console()
 
     # Round off longitude, latitude and solar position calculations
@@ -568,7 +568,7 @@ def print_quantity_table(
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     verbose=1,
     index: bool = False,
-):
+) -> None:
     console = Console()
     table = Table(title=title, box=box.SIMPLE_HEAD)
     
@@ -639,7 +639,7 @@ def print_irradiance_table_2(
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     verbose=1,
     index: bool = False,
-):
+) -> None:
     console = Console()
     caption = f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
     caption += f"\n⌁ : Power, "
