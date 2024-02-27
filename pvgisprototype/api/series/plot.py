@@ -37,6 +37,9 @@ def plot_series(
     add_offset=False,
     variable_name_as_suffix=None,
     tufte_style=None,
+    width=16,
+    height=9,
+    resample_large_series=False,
 ):
     """
     Plot series over a location
@@ -48,14 +51,17 @@ def plot_series(
     x, y = get_coordinates(data_array)
 
     # Prepare plot
-    fig, ax = plt.subplots(figsize=(16, 9))
+    fig, ax = plt.subplots(figsize=(width, height))
 
     # Set grid properties
     # ax.grid(color='grey', linestyle='-', linewidth=0.5, alpha=0.5, zorder=0)
     
     # Plot data
+    if resample_large_series:
+       data_array = data_array.resample(time='1D').mean()
     data_array.plot(
-            alpha=0.7,
+            ax=ax,
+            alpha=0.5,
             color='black',
             linewidth=1,
             marker='o',
@@ -70,8 +76,8 @@ def plot_series(
     # Remove x-axis label
     plt.xlabel('')
 
-    # Set title
-    supertitle = f'{data_array.long_name}'
+    # Set title with fallback for missing 'long_name'
+    supertitle = getattr(data_array, 'long_name', None)
     fig.suptitle(
             supertitle,
             fontsize='xx-large',
@@ -81,7 +87,6 @@ def plot_series(
             y=0.95,
             # rotation=270,
             )
-    # title = f'{data_array.long_name} '
     coordinate_x = round(float(data_array[x]), 3)
     coordinate_y = round(float(data_array[y]), 3)
     title = f"({data_array[x].name}, {data_array[y].name}) "
@@ -152,7 +157,7 @@ def plot_series(
         ax.set_yticks(tick_locations)
 
         # Set axis labels
-        ax.set_xlabel(data_array[x].name, fontsize=18)
+        # ax.set_xlabel(data_array['time'].name, fontsize=16)
         # ax.set_ylabel(data_array[y].units, fontsize=18)
 
         # Do not plot the 'normal' title
@@ -160,28 +165,36 @@ def plot_series(
         plt.title(None)
 
         # Plot title on the side
-        if data_array.long_name:
+        if getattr(data_array, 'long_name', None):
             # supertitle = f'{data_array.long_name}'
             # supertitle += f'\n{title}'
+
+            # Adjust the positioning slightly to the right of the plot
+            right_margin_offset = 0.02  # Adjust as needed based on figure size
+            text_x_position = 1 + right_margin_offset  # 1 corresponds to the far right of the plot
+            text_background_box = dict(facecolor='white', alpha=0.5, edgecolor='none', boxstyle='round,pad=0.5')
             supertitle_right = ax.text(
-                maximum_timestamp,
-                maximum_value,
+                text_x_position, # maximum_timestamp,
+                1, # maximum_value,
                 f"{data_array.long_name}",
                 fontsize="x-large",
-                # bbox=dict(boxstyle='round', facecolor='white', edgecolor='gray'),
+                bbox=text_background_box,
                 va="top",
                 ha="right",
+                transform=ax.transAxes  # ensure positioning is relative to axes size
             )
             supertitle_right_bbox = supertitle_right.get_window_extent()
             supertitle_right_height = supertitle_right_bbox.height
+            # semi-transparent background box for legibility ?
             ax.text(
-                    maximum_timestamp,
-                    supertitle_right_bbox.y0 - supertitle_right_height,
+                    text_x_position, # maximum_timestamp,
+                    1, # supertitle_right_bbox.y0 - supertitle_right_height,
                     f'{title}',
                     fontsize='large',
-                    # bbox=dict(boxstyle='round', facecolor='white', edgecolor='gray'),
+                    bbox=text_background_box,
                     va='top',
                     ha='right',
+                    transform=ax.transAxes  # ensure positioning is relative to axes size
                     )
         else:
             # plt.suptitle(f'{data_array.name}')
@@ -193,21 +206,34 @@ def plot_series(
                     fontsize='x-large'
                     )
 
+    # Identity
 
+    data_source = 'Data Source'
+    fig.text(
+            0.5,
+            0.02,
+            f'© PV(G)IS, European Commission {data_source}',
+            fontsize=12,
+            color='gray',
+            ha='center',
+            alpha=0.5,
+    )
+
+    # Handle variable name as suffix
     if variable_name_as_suffix:
-        if data_array.long_name:
-            long_name = data_array.long_name.replace(' ', '_').lower()
-            figure_name = Path(str(figure_name) + '_' + long_name)
-        else:
-            name = data_array.name.replace(' ', '_')
-            figure_name = Path(str(figure_name) + '_' + name)
+        name_suffix = getattr(data_array, 'long_name', data_array.name).replace(' ', '_').lower()
+        figure_name = Path(f"{figure_name}_{name_suffix}")
 
-    if len(time) == 1:
-        time = str(time).replace('-', '')
-        figure_name = Path(str(figure_name) + '_' + str(time))
+    # ------------------------------------------------------------------------
+    # Handle time-based naming
+    if isinstance(time, (list, tuple)) and len(time) == 1:
+        time = time[0]
+        time_string = str(time).replace('-', '')
     else:
-        minimum_timestamp = data_array.time.values[0]
-        figure_name = Path(str(figure_name) + '_' + str(minimum_timestamp))
+        time_string = data_array.time.values[0]
+
+    figure_name = Path(f"{figure_name}_{time_string}")
+    # ------------------------------------------------------------------------
 
     # plt.legend(loc='upper right')
     file_extension='png'
@@ -309,4 +335,5 @@ def plot_outliers(
     number_of_outliers = len(outliers_values)
     logger.info(f'{check_mark} Time series plot of {number_of_outliers} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!')
     print(f'{check_mark} Time series plot of {number_of_outliers} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!')
+
     return output_filename

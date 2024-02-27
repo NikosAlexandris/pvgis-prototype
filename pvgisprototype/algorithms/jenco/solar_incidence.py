@@ -59,19 +59,41 @@ def calculate_relative_longitude(
     Hofierka, 2002 uses equations presented by Jenco :
 
         tangent_relative_longitude =
-                                    (
-                                        - sin(surface_tilt)
-                                        * sin(surface_orientation)
-                                    ) / (
-                                        sin(latitude)
-                                        * sin(surface_tilt)
-                                        * cos(surface_orientation)
-                                        + cos(latitude)
-                                        * cos(surface_tilt)
-                                    )
+            (
+                - sin(surface_tilt)
+                * sin(surface_orientation)
+            ) / (
+                sin(latitude)
+                * sin(surface_tilt)
+                * cos(surface_orientation)
+                + cos(latitude)
+                * cos(surface_tilt)
+            )
 
     In PVGIS' C source code, there is an error of one negative sign in either
     of the expressions! That is so because : cos(pi/2 + x) = -sin(x).
+
+        Source code :
+
+
+        /* These calculations depend on slope and aspect. Constant for the day if not tracking */
+        sin_phi_l = -gridGeom->coslat * cos_u * sin_v + gridGeom->sinlat * sin_u;
+        latid_l = asin(sin_phi_l);
+        cos_latid_l = cos(latid_l);
+        q1 = gridGeom->sinlat * cos_u * sin_v + gridGeom->coslat * sin_u;
+        tan_lam_l = - cos_u * cos_v / q1;
+        longit_l = atan (tan_lam_l);
+        if((aspect<M_PI)&&(longit_l<0.))
+        {
+            longit_l += M_PI;
+        }				
+        else if((aspect>M_PI)&&(longit_l>0.))
+        {
+            longit_l -= M_PI;
+        }				
+
+
+        Translation in to Python / pseudocode :
 
         tangent_relative_longitude =
             (
@@ -125,6 +147,7 @@ def calculate_relative_longitude(
         value=relative_longitude,
         unit=RADIANS,
     )
+
     return relative_longitude
 
 
@@ -313,8 +336,14 @@ def calculate_solar_incidence_time_series_jenco(
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
-    """Calculate the solar incidence angle based on the position of the sun and
-    the inclination angle of a surface over a period of time
+    """Calculate the solar incidence angle between the position of the sun and
+    the inclination plane of a surface.
+
+    Calculate the solar incidence angle based on the position of the sun
+    (sun-vector) and the inclination angle of a surface (surface-plane)
+    over a period of time. We call this the "complementary" incidence angle
+    contrasting typical definitions of the incidence angle between the
+    sun-vector and the normal to the surface in question.
 
     Parameters
     ----------
@@ -335,6 +364,18 @@ def calculate_solar_incidence_time_series_jenco(
     Notes
     -----
     - Shadow check not implemented.
+    - In PVGIS' source code, in order :
+      1. positive numerator for the relative_longitude -- which is an error
+      2. following adjustments -- unsure what they mean to achieve -- are
+         placed befor calculating the incidence angle :
+
+          if surface_orientation.radians < np.pi and relative_longitude.value < 0:
+              relative_longitude += np.pi
+          if surface_orientation.radians > np.pi and relative_longitude.value > 0:
+              relative_longitude -= np.pi
+
+      3. negative solar hour angle for the incidence angle
+
     """
     sine_relative_inclined_latitude = -(
         cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)

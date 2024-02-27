@@ -20,6 +20,7 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -91,7 +92,7 @@ async def get_photovoltaic_power_output_series(
     linke_turbidity_factor_series: Annotated[float, fastapi_query_linke_turbidity_factor_series] = LINKE_TURBIDITY_DEFAULT,
     apply_atmospheric_refraction: Annotated[Optional[bool], fastapi_query_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[float, fastapi_query_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Annotated[Optional[float], fastapi_query_albedo] = 2,
+    albedo: Annotated[Optional[float], fastapi_query_albedo] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], fastapi_query_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, fastapi_query_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, fastapi_query_solar_incidence_model] = SolarIncidenceModel.jenco,
