@@ -10,18 +10,24 @@ from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
+from pvgisprototype.api.geometry.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
-from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
+from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
-from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
 
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -42,6 +48,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
@@ -57,6 +64,7 @@ from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
@@ -344,8 +352,9 @@ def calculate_diffuse_inclined_irradiance_time_series(
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_angular_loss_factor: Optional[bool] = True,
-    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
-    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+    solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,
@@ -508,13 +517,13 @@ def calculate_diffuse_inclined_irradiance_time_series(
             surface_tilt=surface_tilt,
         )
 
-        # surface in shade requires solar incidence angles -- REVIEW-ME ----
-        solar_incidence_series = calculate_solar_incidence_time_series_jenco(
+        solar_incidence_series = model_solar_incidence_time_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
             random_time_series=random_time_series,
+            solar_incidence_model=solar_incidence_model,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
             perigee_offset=perigee_offset,
@@ -522,43 +531,53 @@ def calculate_diffuse_inclined_irradiance_time_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-            verbose=verbose,
+            complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
+            verbose=0,
         )
 
-        # mask surfaces in shade, yet there is ambient light
-        mask = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
-        if np.any(mask):
+        # prepare size of output array!
+        diffuse_inclined_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
 
+        # surface in shade, yet there is ambient light
+        mask_surface_in_shade_series = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
+        if np.any(mask_surface_in_shade_series):
             # F(γN)
-            diffuse_sky_irradiance_series[mask] = (
+            diffuse_sky_irradiance_series[mask_surface_in_shade_series] = (
                 calculate_diffuse_sky_irradiance_time_series(
                     n_series=np.full(len(timestamps), TERM_N_IN_SHADE),
                     surface_tilt=surface_tilt,
-                )[mask]
+                )[mask_surface_in_shade_series]
             )
-            diffuse_inclined_irradiance_series = np.zeros_like(solar_altitude_series, dtype='float64')
-            diffuse_inclined_irradiance_series[mask] = (
-                diffuse_horizontal_irradiance_series[mask] 
-                * diffuse_sky_irradiance_series[mask]
+            diffuse_inclined_irradiance_series[mask_surface_in_shade_series] = (
+                diffuse_horizontal_irradiance_series[mask_surface_in_shade_series] 
+                * diffuse_sky_irradiance_series[mask_surface_in_shade_series]
             )
 
         else:  # sunlit surface and non-overcast sky
-            # extract float values from the SolarAltitude objects
-            # solar_altitude_series_array = np.array([altitude.radians for altitude in solar_altitude_series])
             # ----------------------------------------------------------------
             azimuth_difference_series_array = None  # Avoid UnboundLocalError!
             solar_azimuth_series_array = None
             # ----------------------------------------------------------------
 
-            if np.any(solar_altitude_series.radians >= 0.1):  # radians or 5.7 degrees
-                diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series * (
-                    diffuse_sky_irradiance_series * (1 - kb_series)
-                    + kb_series * np.sin(solar_incidence_series.radians) / np.sin(solar_altitude_series.radians)
+            mask_sunlit_surface_series = solar_altitude_series.radians >= 0.1 
+            if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
+                diffuse_sky_irradiance_series = np.full_like(
+                    diffuse_horizontal_irradiance_series, diffuse_sky_irradiance_series
+                )
+                diffuse_inclined_irradiance_series[
+                    mask_sunlit_surface_series
+                ] = diffuse_horizontal_irradiance_series[mask_sunlit_surface_series] * (
+                    diffuse_sky_irradiance_series[mask_sunlit_surface_series]
+                    * (1 - kb_series[mask_sunlit_surface_series])
+                    + kb_series[mask_sunlit_surface_series]
+                    * np.sin(solar_incidence_series.radians[mask_sunlit_surface_series])
+                    / np.sin(solar_altitude_series.radians[mask_sunlit_surface_series])
                 )
 
-            else:  # if solar_altitude.value < 0.1:
+            else:  # if solar altitude < 0.1 : potential sunlit surface series
+                mask_potential_sunlit_surface_series = ~mask_sunlit_surface_series 
                 # requires the solar azimuth
-                solar_azimuth_series = model_solar_azimuth_time_series(
+                solar_azimuth_series_array = model_solar_azimuth_time_series(
                     longitude=longitude,
                     latitude=latitude,
                     timestamps=timestamps,
@@ -578,16 +597,34 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 # ALN : angle between the vertical surface containing the normal to the
                 #   surface and vertical surface passing through the centre of the solar
                 #   disc [rad]
-                azimuth_difference_series_array = solar_azimuth_series.value - surface_orientation
-                azimuth_difference_series_array = np.arctan2(np.sin(azimuth_difference_series_array), np.cos(azimuth_difference_series_array))
-                diffuse_inclined_irradiance_series = (
-                    diffuse_inclined_irradiance_series_before_angular_loss
-                ) = diffuse_horizontal_irradiance_series * (
-                    diffuse_sky_irradiance_series * (1 - kb_series)
-                    + kb_series
+                azimuth_difference_series_array = (
+                    solar_azimuth_series_array.value - surface_orientation
+                )
+                azimuth_difference_series_array = np.arctan2(
+                    np.sin(azimuth_difference_series_array),
+                    np.cos(azimuth_difference_series_array),
+                )
+                diffuse_inclined_irradiance_series[
+                    mask_potential_sunlit_surface_series
+                ] = diffuse_horizontal_irradiance_series[
+                    mask_potential_sunlit_surface_series
+                ] * (
+                    diffuse_sky_irradiance_series[mask_potential_sunlit_surface_series]
+                    * (1 - kb_series[mask_potential_sunlit_surface_series])
+                    + kb_series[mask_potential_sunlit_surface_series]
                     * sin(surface_tilt)
-                    * np.cos(azimuth_difference_series_array)
-                    / (0.1 - 0.008 * solar_altitude_series.radians)
+                    * np.cos(
+                        azimuth_difference_series_array[
+                            mask_potential_sunlit_surface_series
+                        ]
+                    )
+                    / (
+                        0.1
+                        - 0.008
+                        * solar_altitude_series.radians[
+                            mask_potential_sunlit_surface_series
+                        ]
+                    )
                 )
 
     # one more thing
@@ -601,10 +638,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
         diffuse_inclined_irradiance_series *= diffuse_irradiance_loss_factor
 
     # Warning
-
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
-    # See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
     out_of_range_indices = np.where(
         (diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
         | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
@@ -624,7 +657,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
     if verbose > 1 :
         extended_results = {
-            LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else '-',
+            LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
+            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series / diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
         }
@@ -642,8 +676,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         even_more_extended_results = {
             TERM_N_COLUMN_NAME: n_series,
             KB_RATIO_COLUMN_NAME: kb_series,
-            AZIMUTH_DIFFERENCE_COLUMN_NAME: azimuth_difference_series_array if azimuth_difference_series_array is not None else '-',# FIXME Convert to degrees if requested!
-            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units) if solar_azimuth_series is not None else '-',
+            AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(azimuth_difference_series_array, angle_output_units, NOT_AVAILABLE),
+            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series_array, angle_output_units, NOT_AVAILABLE),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,
         }
         results = results | even_more_extended_results
@@ -655,8 +689,9 @@ def calculate_diffuse_inclined_irradiance_time_series(
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
             LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
             INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units) if solar_incidence_series else None,
-            OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range_indices,
         }
+        if out_of_range_indices[0].size > 0:
+            plus_even_more_extended_results[OUT_OF_RANGE_INDICES_COLUMN_NAME] = out_of_range_indices
         results = results | plus_even_more_extended_results
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
