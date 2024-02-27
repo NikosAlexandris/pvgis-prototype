@@ -320,7 +320,10 @@ def plot(
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
+    width: Annotated[int, 'Width for the plot'] = 16,
+    height: Annotated[int, 'Height for the plot'] = 9,
     tufte_style: Annotated[bool, typer_option_tufte_style] = False,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot selected time series"""
@@ -346,6 +349,9 @@ def plot(
             # add_offset=add_offset,
             variable_name_as_suffix=variable_name_as_suffix,
             tufte_style=tufte_style,
+            width=width,
+            height=height,
+            resample_large_series=resample_large_series,
         )
     except Exception as exception:
         print(f"{ERROR_IN_PLOTTING_DATA} : {exception}")
