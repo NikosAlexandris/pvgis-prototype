@@ -15,6 +15,7 @@ from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.timestamp import now_local_datetimezone
 from pvgisprototype.api.utilities.timestamp import convert_hours_to_datetime_time
 from pvgisprototype.api.utilities.timestamp import callback_generate_datetime_series
+from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
@@ -191,8 +192,14 @@ typer_option_start_time = typer.Option(
     rich_help_panel=rich_help_panel_time_series,
     default_factory = None,
 )
+typer_option_periods = typer.Option(
+    help=f"Number of timestamps to generate",
+    rich_help_panel=rich_help_panel_time_series,
+    # default_factory=None
+)
 typer_option_frequency = typer.Option(
-    help=f"Frequency for timestamp generation, ex. 30m. A number and date/time unit : (D)ay, (M)onth, (Y)ear, (h)ours, (m)inutes, or (s)econds. See NumPy's timedelta64.",
+    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+    help=f"A common date/time frequency unit optionally with a multiples number, such as [code]H[/code](hourly), [code]min[/code](utely), [code]S[/code](econdly), [code]D[/code](aily), [code]W[/code](eekly), [code]M[/code](onth end), [code]Y[/code](early) or [code]30m[/code]. See Pandas time series offset aliases.",
     rich_help_panel=rich_help_panel_time_series,
     # default_factory='h'
 )
@@ -531,12 +538,28 @@ def temperature_series_argument_callback(
     ctx: Context,
     temperature_series: TemperatureSeries,
 ):
-    reference_series = ctx.params.get('timestamps')
-    if temperature_series == TEMPERATURE_DEFAULT:
-        temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=float)
+    timestamps = ctx.params.get('timestamps', None)
+    if timestamps is None:
+        start_time=ctx.params.get('start_time')
+        end_time=ctx.params.get('end_time')
+        periods=ctx.params.get('periods', None) 
+        from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
+        frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
+        if start_time is not None and end_time is not None:
+            timestamps = generate_datetime_series(
+                start_time=start_time,
+                end_time=end_time,
+                periods=periods,
+                frequency=frequency,
+                timezone=ctx.params.get('timezone'),
+                name=ctx.params.get('datetimeindex_name', None)
+            )
 
-    if temperature_series.size != len(reference_series):
-        raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
+    if np.all(temperature_series == TEMPERATURE_DEFAULT):
+        temperature_series = np.full(len(timestamps), TEMPERATURE_DEFAULT, dtype=float)
+
+    if temperature_series.size != len(timestamps):
+        raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(timestamps)}).")
 
     return TemperatureSeries(value=temperature_series, unit=TEMPERATURE_UNIT)
 
@@ -546,9 +569,6 @@ def temperature_series_callback(
     temperature_series: TemperatureSeries,
 ):
     reference_series = ctx.params.get('irradiance_series')
-    # if not reference_series:
-    #     reference_series = ctx.params.get('irradiance_series')
-
     if temperature_series == TEMPERATURE_DEFAULT:
         temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=float)
 
@@ -618,9 +638,6 @@ def wind_speed_series_callback(
     param: typer.CallbackParam,
 ):
     reference_series = ctx.params.get('irradiance_series')
-    # if not reference_series:
-    #     reference_series = ctx.params.get('irradiance_series')
-
     if wind_speed_series == WIND_SPEED_DEFAULT:
         wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=float)
 
@@ -879,6 +896,12 @@ typer_option_verbose = typer.Option(
     help='Show details while executing commands',
     rich_help_panel=rich_help_panel_output,
     # default_factory=0,
+)
+typer_option_profiling = typer.Option(
+    "--profile",
+    "--prfl",
+    help="Enable profiling",
+    # default=False,
 )
 typer_option_index = typer.Option(
     '--index',

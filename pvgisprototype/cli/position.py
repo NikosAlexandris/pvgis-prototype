@@ -82,6 +82,7 @@ from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
@@ -90,6 +91,7 @@ from pvgisprototype.cli.documentation import A_PRIMER_ON_SOLAR_GEOMETRY
 from .rich_help_panel_names import rich_help_panel_geometry_noaa
 from .print import print_solar_position_table
 from .print import print_noaa_solar_position_table
+from pvgisprototype.cli.write import write_solar_position_series_csv
 
 
 def calculate_zenith(angle_output_units, solar_altitude_angle):
@@ -174,6 +176,10 @@ def overview(
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
+    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.pvlib],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -225,6 +231,8 @@ def overview(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
         solar_position_models=solar_position_models,  # could be named models!
         solar_time_model=solar_time_model,
         perigee_offset=perigee_offset,
@@ -273,7 +281,12 @@ def overview_series(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_time_series: bool = False,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
+    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
+    complementary_incidence_angle: Annotated[bool, 'Measure angle between sun-vector and surface-plane'] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
@@ -335,6 +348,8 @@ def overview_series(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
         solar_position_models=solar_position_models,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         # refracted_solar_zenith=refracted_solar_zenith,
@@ -348,29 +363,55 @@ def overview_series(
         angle_output_units=angle_output_units,
         backend=backend,
         dtype=dtype,
+        complementary_incidence_angle=complementary_incidence_angle,
         verbose=verbose,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     from pvgisprototype.cli.print import print_solar_position_series_table
-    print_solar_position_series_table(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
-        table=solar_position_series,
-        timing=True,
-        declination=True,
-        hour_angle=True,
-        zenith=True,
-        altitude=True,
-        azimuth=True,
-        incidence=True,
-        user_requested_timestamps=user_requested_timestamps, 
-        user_requested_timezone=user_requested_timezone,
-        rounding_places=rounding_places,
-        group_models=group_models,
-    )
+    if not csv:
+        print_solar_position_series_table(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_position_series,
+            timing=True,
+            declination=True,
+            hour_angle=True,
+            zenith=True,
+            altitude=True,
+            azimuth=True,
+            surface_tilt=True,
+            surface_orientation=True,
+            incidence=True,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            rounding_places=rounding_places,
+            group_models=group_models,
+        )
+    if csv:
+        write_solar_position_series_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_position_series,
+            timing=True,
+            declination=True,
+            hour_angle=True,
+            zenith=True,
+            altitude=True,
+            azimuth=True,
+            surface_tilt=True,
+            surface_orientation=True,
+            incidence=True,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            # rounding_places=rounding_places,
+            # group_models=group_models,
+            filename=csv,
+        )
 
 
 @app.command('declination', no_args_is_help=True, help='∢ Calculate the solar declination')
@@ -779,6 +820,7 @@ def incidence(
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     solar_incidence_model: Annotated[List[SolarIncidenceModel], typer_option_solar_incidence_model] = [SolarIncidenceModel.jenco],
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     random_time: Annotated[bool, typer_option_random_time] = RANDOM_DAY_FLAG_DEFAULT,
     hour_angle: Annotated[Optional[float], typer_argument_hour_angle] = None,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
@@ -839,6 +881,7 @@ def incidence(
         timestamp=timestamp,
         timezone=timezone,
         solar_incidence_models=solar_incidence_models,
+        complementary_incidence_angle=complementary_incidence_angle,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         solar_time_model=solar_time_model,

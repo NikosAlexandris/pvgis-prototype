@@ -209,6 +209,10 @@ def convert_dictionary_to_table(dictionary):
 def round_float_values(obj, decimal_places=3):
     if isinstance(obj, float):
         return f"{round(obj, decimal_places):.{decimal_places}f}"
+    elif isinstance(obj, dict):
+        for key, value in obj.items():
+            obj[key] = round_float_values(value, decimal_places)
+        return obj
     elif isinstance(obj, list):
         for i, v in enumerate(obj):
             if isinstance(v, dict):

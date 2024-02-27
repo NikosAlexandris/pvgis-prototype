@@ -14,9 +14,11 @@ from math import isfinite
 import numpy as np
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import RADIANS
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
+from pandas import DatetimeIndex
 
 
-# @cache_result
 @validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
 def calculate_solar_declination_noaa(
     timestamp: datetime,
@@ -53,9 +55,11 @@ def calculate_solar_declination_noaa(
 DEFAULT_ARRAY_BACKEND = 'NUMPY'  # OR 'CUPY', 'DASK'
 DEFAULT_ARRAY_DTYPE = 'float32'
 
+
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)
 def calculate_solar_declination_time_series_noaa(
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: Union[datetime, DatetimeIndex],
     backend: str = DEFAULT_ARRAY_BACKEND,
     dtype: str = DEFAULT_ARRAY_DTYPE,
 ) -> SolarDeclination:

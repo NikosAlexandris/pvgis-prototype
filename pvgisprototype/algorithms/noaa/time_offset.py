@@ -1,3 +1,4 @@
+from rich import print
 from devtools import debug
 from zoneinfo import ZoneInfo
 from math import pi
@@ -132,7 +133,15 @@ def calculate_time_offset_noaa(
 
     return time_offset
 
+from pandas import DatetimeIndex
+from cachetools.keys import hashkey
+def custom_hashkey(*args, **kwargs):
+    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
+    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
+    return hashkey(*args, **kwargs)
 
+from cachetools import cached
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
 def calculate_time_offset_time_series_noaa(
     longitude: Longitude, 
@@ -146,8 +155,12 @@ def calculate_time_offset_time_series_noaa(
     else:
         timestamps = timestamps.tz_convert(timezone)
 
-    timezone_offset_minutes_series = timestamps.map(lambda ts: ts.utcoffset().total_seconds() / 60)
-    timezone_offset_minutes_series = np.array(timezone_offset_minutes_series, dtype=float)
+    # Optimisation: Calculate unique offsets
+    unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
+    unique_offsets = {tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)}
+    
+    # Map the offsets back to the timestamps
+    timezone_offset_minutes_series = np.array([unique_offsets[tz] for tz in unique_timezones], dtype=float)
 
     # 2
     equation_of_time_series = calculate_equation_of_time_time_series_noaa(
@@ -158,6 +171,13 @@ def calculate_time_offset_time_series_noaa(
     if not np.all((-790 <= time_offset_series) & (time_offset_series <= 790)):
         raise ValueError("At least one calculated time offset is out of the expected range [-790, 790] minutes!")
 
+    from pvgisprototype.validation.hashing import generate_hash
+    time_offset_series_hash = generate_hash(time_offset_series)
+    print(
+        'TO : calculate_time_offset_time_series_noaa() |',
+        f"Data Type : [bold]{time_offset_series.dtype}[/bold] |",
+        f"Output Hash : [code]{time_offset_series_hash}[/code]",
+    )
     return TimeOffset(
         value=time_offset_series,
         unit='minutes',

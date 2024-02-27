@@ -9,7 +9,6 @@ import numpy as np
 from enum import Enum
 from rich import print
 from datetime import datetime
-from pvgisprototype.validation.functions import ModelSolarPositionInputModel
 from pvgisprototype.api.geometry.models import SolarDeclinationModel
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
@@ -29,10 +28,9 @@ from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irrad
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
 # from pvgisprototype.api.irradiance.shortwave import calculate_global_irradiance_time_series
-from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -91,8 +89,9 @@ def calculate_photovoltaic_power_output_series(
     elevation: float,
     timestamps: Optional[datetime] = None,
     start_time: Optional[datetime] = None,
-    frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
+    periods: Optional[int] = None,
+    frequency: Optional[str] = TIMESTAMPS_FREQUENCY_DEFAULT,
     timezone: Optional[str] = None,
     random_time_series: bool = False,
     global_horizontal_irradiance: Optional[Path] = None,
@@ -111,7 +110,7 @@ def calculate_photovoltaic_power_output_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = 2,
+    albedo: Optional[float] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
@@ -130,6 +129,7 @@ def calculate_photovoltaic_power_output_series(
     temperature_model: ModuleTemperatureAlgorithm = None,
     efficiency: Optional[float] = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    profile: bool = False, 
 ):
     """
     Estimate the photovoltaic power over a time series or an arbitrarily
@@ -172,7 +172,7 @@ def calculate_photovoltaic_power_output_series(
 
     Returns
     -------
-    photovoltaic_power_outout_series : ndarray
+    photovoltaic_power_output_series : ndarray
         Array of effective irradiance values.
     results : dict
         Dictionary containing detailed results of the calculation.
@@ -188,6 +188,11 @@ def calculate_photovoltaic_power_output_series(
     -----
     This function is part of the Typer-based CLI for the new PVGIS implementation in Python. It provides an interface for estimating the energy production of a photovoltaic system, taking into account various environmental and system parameters.
     """
+    if profile:
+        import cProfile
+        pr = cProfile.Profile()
+        pr.enable()
+
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -415,14 +420,14 @@ def calculate_photovoltaic_power_output_series(
             )
             efficiency_coefficient_series *= system_efficiency  # on-top-of !
 
-    photovoltaic_power_outout_series = global_irradiance_series * efficiency_coefficient_series
+    photovoltaic_power_output_series = global_irradiance_series * efficiency_coefficient_series
 
     # Building the output dictionary ========================================
 
     if verbose > 0:
         results = {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
-            PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_outout_series,
+            PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
         }
 
     if verbose > 2:
@@ -469,4 +474,22 @@ def calculate_photovoltaic_power_output_series(
     if verbose > 0:
         return results
 
-    return photovoltaic_power_outout_series
+    if profile:
+        import pstats
+        import io
+        pr.disable()
+
+        # write profiling statistics to file
+        profile_filename = "profiling_stats.prof"
+        pr.dump_stats(profile_filename)
+        print(f"Profiling stats saved to {profile_filename}")
+
+        s = io.StringIO()
+        sortby = pstats.SortKey.CUMULATIVE
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+
+        if verbose > 6:
+            print(s.getvalue())
+
+    return photovoltaic_power_output_series

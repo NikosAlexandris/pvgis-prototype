@@ -38,6 +38,8 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype.constants import RADIANS
@@ -71,24 +73,66 @@ def calculate_relative_longitude(
     In PVGIS' C source code, there is an error of one negative sign in either
     of the expressions! That is so because : cos(pi/2 + x) = -sin(x).
 
+        Source code :
+
+
+        /* These calculations depend on slope and aspect. Constant for the day if not tracking */
+        sin_phi_l = -gridGeom->coslat * cos_u * sin_v + gridGeom->sinlat * sin_u;
+        latid_l = asin(sin_phi_l);
+        cos_latid_l = cos(latid_l);
+        q1 = gridGeom->sinlat * cos_u * sin_v + gridGeom->coslat * sin_u;
+        tan_lam_l = - cos_u * cos_v / q1;
+        longit_l = atan (tan_lam_l);
+        if((aspect<M_PI)&&(longit_l<0.))
+        {
+            longit_l += M_PI;
+        }				
+        else if((aspect>M_PI)&&(longit_l>0.))
+        {
+            longit_l -= M_PI;
+        }				
+
+
+        Translation in to Python / pseudocode :
+
         tangent_relative_longitude =
             (
-              - cos(half_pi - surface_tilt)           # cos(pi/2 - x) = sin(x)
-              * cos(half_pi + surface_orientation)    # cos(pi/2 + x) = -sin(x)
+              - cos(half_pi - surface_tilt)         # cos(pi/2 - x) = sin(x)
+              * cos(half_pi + surface_orientation)  # cos(pi/2 + x) = -sin(x) #
             ) / (
               sin(latitude) 
               * cos(half_pi - surface_tilt) 
-              * sin(half_pi + surface_orientation)    # sin(pi/2 + x) = cos(x)
+              * sin(half_pi + surface_orientation)  # sin(pi/2 + x) = cos(x)
               + cos(latitude) 
-              * sin(half_pi - surface_tilt)           # sin(pi/2 - x) = cos(x)
+              * sin(half_pi - surface_tilt)         # sin(pi/2 - x) = cos(x)
+            )
+
+    As a consequence, PVGIS is like (note the positive numerator!) : 
+
+        tangent_relative_longitude =
+            (
+                sin(surface_tilt)
+                * sin(surface_orientation)
+            ) / (
+                sin(latitude)
+                * sin(surface_tilt)
+                * cos(surface_orientation)
+                + cos(latitude)
+                * cos(surface_tilt)
             )
     """
+    # -----------------------------------------------------------------------
+    # in PVGIS an extra minus sign results to an all positive numerator!
+    # tangent_relative_longitude_numerator = sin(surface_tilt.radians) * sin(
+    #     surface_orientation.radians
+    # )
+    # -----------------------------------------------------------------------
     tangent_relative_longitude_numerator = -(
         sin(surface_tilt.radians)
         * sin(surface_orientation.radians)
     )
     tangent_relative_longitude_denominator = (
-            sin(latitude.radians)
+        sin(latitude.radians)
         * sin(surface_tilt.radians)
         * cos(surface_orientation.radians)
         + cos(latitude.radians)
@@ -120,10 +164,15 @@ def calculate_solar_incidence_jenco(
     horizon_interval: Optional[float] = None,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
-    """Calculate the solar incidence angle based on the position of the sun and
-    the inclination angle of a surface.
+    """Calculate the solar incidence angle 
+
+    Calculate the solar incidence angle between the direction of the sun
+    rays and the inclination angle of a reference surface. Alternatively the
+    function can return the angle between the sun-vector and the normal vector
+    to the reference surface.
 
     Parameters
     ----------
@@ -152,6 +201,47 @@ def calculate_solar_incidence_jenco(
 
     Notes
     -----
+    The solar incidence angle is the single most important quantity in the
+    solar geometry setup. Its definition will affect all subsequent operations
+    excluding none of the irradiance components, nor the photovoltaic power or
+    energy estimations.
+
+    Attention! There is no one, and only one, definition of the solar incidence
+    angle! While many authors refer to the angle between the sun-vector and the
+    normal to the reference surface, for example Martin and Ruiz (2002, 2005),
+    others, like for example Jenco (1992) and Hofierka (2002), consider as
+    incidence the angle between the sun-vector and the reference surface-plane.
+    These angles are complementary to each other. This fact is an important one
+    when treating trigonometric relationships that affect the calculation of
+    the incidence angle.
+
+    In this program, we implement and consider as _complementary_ the incidence
+    angle as defined by Jenco (1992) between the direction of the sun-rays and
+    the inclination angle, or plane, of a reference surface. Hence, the default
+    modus of this function returns the _complementary_ incidence angle.
+
+    Following is meant to visualise a flat horizontal surface and the
+    direction of a sun-ray. The angle between the two is what we call
+    complementary.
+
+          \
+           \
+        ____\
+
+    Optionally, the function can return the _typical_ incidence angle between
+    the direction of the sun-rays and the normal direction to the reference
+    surface in question.
+
+    Following means to visualise the same direction of a sun-ray and then the
+    normal (vertical here) direction to the flat horizontal surface. The angle
+    between the sun-ray and the normal (vertical here) direction is the
+    _typical_ definition of the solar incidence angle. This angle can be
+    generated via the `complementary_incidence_angle` flag.
+
+         \  |
+          \ |
+           \|
+        -----
 
     An inclined surface is defined by the inclination angle (also known as
     slope or tilt) `γN` and the azimuth (also known as aspect or orientation)
@@ -162,7 +252,6 @@ def calculate_solar_incidence_jenco(
     sin(ϕ') = - cos(ϕ) * sin(γN) * cos(AN) + sin(ϕ) * cos(γN)
     C'31 = cos ϕ' cos δ
     C'33 = sin ϕ' sin δ
-
 
     From PVGIS' C++ source code:
     
@@ -224,8 +313,14 @@ def calculate_solar_incidence_jenco(
         )
         solar_incidence = asin(sine_solar_incidence)
 
+    if not complementary_incidence_angle:
+        solar_incidence = np.pi/2 - solar_incidence
+
     if solar_incidence < 0:
         solar_incidence = NO_SOLAR_INCIDENCE
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     return SolarIncidence(value=solar_incidence, unit=RADIANS)
 
@@ -238,12 +333,17 @@ def calculate_solar_incidence_time_series_jenco(
     timezone: Optional[ZoneInfo] = None,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
-    time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
-    """Calculate the solar incidence angle based on the position of the sun and
-    the inclination angle of a surface over a period of time
+    """Calculate the solar incidence angle between the position of the sun and
+    the inclination plane of a surface.
+
+    Calculate the solar incidence angle based on the position of the sun
+    (sun-vector) and the inclination angle of a surface (surface-plane)
+    over a period of time. We call this the "complementary" incidence angle
+    contrasting typical definitions of the incidence angle between the
+    sun-vector and the normal to the surface in question.
 
     Parameters
     ----------
@@ -260,6 +360,22 @@ def calculate_solar_incidence_time_series_jenco(
     -------
     ndarray
         Solar incidence angle or NO_SOLAR_INCIDENCE series if a shadow is detected.
+
+    Notes
+    -----
+    - Shadow check not implemented.
+    - In PVGIS' source code, in order :
+      1. positive numerator for the relative_longitude -- which is an error
+      2. following adjustments -- unsure what they mean to achieve -- are
+         placed befor calculating the incidence angle :
+
+          if surface_orientation.radians < np.pi and relative_longitude.value < 0:
+              relative_longitude += np.pi
+          if surface_orientation.radians > np.pi and relative_longitude.value > 0:
+              relative_longitude -= np.pi
+
+      3. negative solar hour angle for the incidence angle
+
     """
     sine_relative_inclined_latitude = -(
         cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
@@ -268,7 +384,6 @@ def calculate_solar_incidence_time_series_jenco(
     relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
-        angle_output_units=angle_output_units,
     )
     c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
         solar_declination_series.radians
@@ -280,8 +395,6 @@ def calculate_solar_incidence_time_series_jenco(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
-        time_output_units=time_output_units,
-        angle_output_units=angle_output_units,
     )
     relative_longitude = calculate_relative_longitude(
         latitude=latitude,
@@ -293,16 +406,21 @@ def calculate_solar_incidence_time_series_jenco(
         + c_inclined_33_series
     )
     solar_incidence_series = np.arcsin(sine_solar_incidence_series)
+
+    if not complementary_incidence_angle:
+        solar_incidence_series = np.pi/2 - solar_incidence_series
+
     solar_incidence_series[solar_incidence_series < 0] = NO_SOLAR_INCIDENCE
 
     solar_incidence_series = SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
-        position_algorithm='Jenco',
+        positioning_algorithm='Jenco',
         timing_algorithm='Jenco',
+        description='Incidence angle between sun-vector and surface-plane'
     )
 
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return solar_incidence_series
