@@ -33,24 +33,33 @@ def calculate_series_statistics(
 ) -> dict:
     """ """
     import xarray as xr
+    irradiance_xarray = None  # Ugly Hack :-/
     if isinstance(data_array, dict):
-        data_xarray = xr.DataArray(
-            data_array[PHOTOVOLTAIC_POWER_COLUMN_NAME],
-            coords=[('time', timestamps)],
-            name='Effective irradiance series'
-        )
-        data_xarray.attrs['units'] = 'W/m^2'
-        data_xarray.attrs['long_name'] = 'Effective Solar Irradiance'
-        data_xarray.load()
 
-        irradiance_xarray = xr.DataArray(
-            data_array[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME],
-            coords=[('time', timestamps)],
-            name='Effective irradiance series'
-        )
-        irradiance_xarray.attrs['units'] = 'W/m^2'
-        irradiance_xarray.attrs['long_name'] = 'Effective Solar Irradiance'
-        irradiance_xarray.load()
+        # First, irradiance may exist only in a dictionary !
+        irradiance_xarray = data_array.get(GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME, None)
+        if irradiance_xarray is not None:
+            irradiance_xarray = xr.DataArray(
+                irradiance_xarray,
+                coords=[('time', timestamps)],
+                name='Effective irradiance series'
+            )
+            irradiance_xarray.attrs['units'] = 'W/m^2'
+            irradiance_xarray.attrs['long_name'] = 'Effective Solar Irradiance'
+            irradiance_xarray.load()
+
+        # Then, the primary wanted data
+        data_array = data_array[PHOTOVOLTAIC_POWER_COLUMN_NAME]
+
+    # Regardless of whether the input data_array is a array or a dict :
+    data_xarray = xr.DataArray(
+        data_array,
+        coords=[('time', timestamps)],
+        name='Effective irradiance series'
+    )
+    data_xarray.attrs['units'] = 'W/m^2'
+    data_xarray.attrs['long_name'] = 'Photovoltaic power'
+    data_xarray.load()
     statistics = {
         'Start': data_xarray.time.values[0],
         'End': data_xarray.time.values[-1],
@@ -85,11 +94,13 @@ def calculate_series_statistics(
         freq, label = time_groupings[groupby]
         if groupby in ['Y', 'M', 'S']:
             statistics[label] = data_xarray.groupby(f'time.{freq}').mean().values
-            statistics[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME] = irradiance_xarray.groupby(f'time.{freq}').mean().values
+            if irradiance_xarray is not None:
+                statistics[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME] = irradiance_xarray.groupby(f'time.{freq}').mean().values
         else:
             statistics[label] = data_xarray.resample(time=freq).mean().values
         statistics['Sum of Group Means'] = statistics[label].sum()
-        statistics[f'Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}'] = statistics[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME].sum()
+        if irradiance_xarray is not None:
+            statistics[f'Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}'] = statistics[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME].sum()
 
     elif groupby:  # custom frequencies like '3H', '2W', etc.
         custom_label = f'{groupby} means'
