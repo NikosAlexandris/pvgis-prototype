@@ -8,25 +8,49 @@ from rich import box
 import csv
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pandas import DatetimeIndex
+# from pvgisprototype.constants import TITLE_KEY_NAME
+from pvgisprototype.constants import PHOTOVOLTAIC_POWER_COLUMN_NAME
+# from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
+# from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
+# from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
+# from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
+# from pvgisprototype.constants import ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
+# from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
+# from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
+# from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
+# from pvgisprototype.constants import TEMPERATURE_COLUMN_NAME
+# from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
+# from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
+# from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 
 
 def calculate_series_statistics(
-        data_array,
-        timestamps,
-        groupby: str = None,
-):
+    data_array: np.array,
+    timestamps: DatetimeIndex,
+    groupby: str = None,
+) -> dict:
     """ """
     import xarray as xr
     if isinstance(data_array, dict):
-        data_array = list(data_array.values())[0]  # Review Me !  Improve Me !
-    data_xarray = xr.DataArray(
-        data_array,
-        coords=[('time', timestamps)],
-        name='Effective irradiance series'
-    )
-    data_xarray.attrs['units'] = 'W/m^2'
-    data_xarray.attrs['long_name'] = 'Effective Solar Irradiance'
-    data_xarray.load()
+        data_xarray = xr.DataArray(
+            data_array[PHOTOVOLTAIC_POWER_COLUMN_NAME],
+            coords=[('time', timestamps)],
+            name='Effective irradiance series'
+        )
+        data_xarray.attrs['units'] = 'W/m^2'
+        data_xarray.attrs['long_name'] = 'Effective Solar Irradiance'
+        data_xarray.load()
+
+        irradiance_xarray = xr.DataArray(
+            data_array[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME],
+            coords=[('time', timestamps)],
+            name='Effective irradiance series'
+        )
+        irradiance_xarray.attrs['units'] = 'W/m^2'
+        irradiance_xarray.attrs['long_name'] = 'Effective Solar Irradiance'
+        irradiance_xarray.load()
     statistics = {
         'Start': data_xarray.time.values[0],
         'End': data_xarray.time.values[-1],
@@ -46,6 +70,7 @@ def calculate_series_statistics(
         'Index of Max': data_xarray.argmax().values,
         # 'Longitude of Max': data_xarray.argmax('lon').values,
         # 'Latitude of Max': data_xarray.argmax('lat').values,
+        'Sum of Group Means': float,
     }
     time_groupings = {
         'Y': ('year', 'Yearly means'),
@@ -55,42 +80,43 @@ def calculate_series_statistics(
         'D': ('1D', 'Daily means'),
         'H': ('1H', 'Hourly means'),
     }
+    print(f'Groupby : {groupby}')
     if groupby in time_groupings:
         freq, label = time_groupings[groupby]
         if groupby in ['Y', 'M', 'S']:
             statistics[label] = data_xarray.groupby(f'time.{freq}').mean().values
+            statistics[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME] = irradiance_xarray.groupby(f'time.{freq}').mean().values
         else:
             statistics[label] = data_xarray.resample(time=freq).mean().values
+        statistics['Sum of Group Means'] = statistics[label].sum()
+        statistics[f'Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}'] = statistics[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME].sum()
 
     elif groupby:  # custom frequencies like '3H', '2W', etc.
         custom_label = f'{groupby} means'
         statistics[custom_label] = data_xarray.resample(time=groupby).mean().values
+        statistics['Sum of Group Means'] = statistics[custom_label].sum()
 
     return statistics
 
-# def print_series_statistics(statistics):
-#     table = Table(title="Descriptive Statistics")
-
-#     table.add_column("Statistic", justify="right", style="cyan", no_wrap=True)
-#     table.add_column("Value", style="magenta")
-
-#     for statistic, value in statistics.items():
-#         table.add_row(statistic, str(value))
-
-#     console = Console()
-#     console.print(table)
-
 
 def print_series_statistics(
-    data_array,
-    timestamps,
-    title='Time series',
+    data_array: np.array,
+    timestamps: DatetimeIndex,
+    title: str ='Time series',
     groupby: str = None,
+    yearly_overview: bool = False,
     rounding_places: int = None,
-):
+    verbose=1,
+) -> None:
     """
     """
-    statistics = calculate_series_statistics(data_array, timestamps, groupby)
+    rename_yearly_output_rows = {
+        "Sum of Group Means": "Yearly PV energy",
+        f"Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}": 'Yearly in-plane irradiance',
+    }
+    if groupby and groupby.lower() == 'yearly':
+        yearly_overview = True
+
     table = Table(
         title=title,
         caption='Caption text',
@@ -100,11 +126,21 @@ def print_series_statistics(
         box=box.SIMPLE_HEAD,
         highlight=True,
     )
-    table.add_column("Statistic", justify="right", style="magenta", no_wrap=True)
-    table.add_column("Value", style="cyan")
+    if yearly_overview:  # typical overview !
+        table.add_column("Statistic", justify="right", style="bright_blue", no_wrap=True)
+        table.add_column("Value", style="cyan")
+        # get monthly mean values
+        statistics = calculate_series_statistics(data_array, timestamps, 'M')
+    else:
+        table.add_column("Statistic", justify="right", style="magenta", no_wrap=True)
+        table.add_column("Value", style="cyan")
+        statistics = calculate_series_statistics(data_array, timestamps, groupby)
 
     # Basic metadata
-    basic_metadata = ["Start", "End", "Count"]
+    if not yearly_overview:
+        basic_metadata = ["Start", "End", "Count"]
+    else:
+        basic_metadata = ["Start", "End"]
     for key in basic_metadata:
         if key in statistics:
             table.add_row(key, str(statistics[key]))
@@ -122,29 +158,61 @@ def print_series_statistics(
         'Hourly means',
         ]
 
+    if yearly_overview:
+        yearly_metadata = [
+                # 'Min',
+                # 'Mean',
+                # 'Max',
+                # 'Standard deviation',
+                'Sum of Group Means',
+                'Irradiance',
+               f"Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}",
+            ]
+
     # Index of items
-    index_metadata = [
-        'Time of Min',
-        'Index of Min',
-        'Time of Max',
-        'Index of Max', 
-        ]
+    if not yearly_overview:
+        index_metadata = [
+            'Time of Min',
+            'Index of Min',
+            'Time of Max',
+            'Index of Max', 
+            ]
+    else:
+        index_metadata = [
+            # 'Time of Min',
+            # 'Time of Max',
+            ]
 
     # Add statistics
     for key, value in statistics.items():
-        if key not in basic_metadata and key not in time_groupings and key not in index_metadata:
-            # table.add_row(key, str(round_float_values(value, rounding_places)))
-            table.add_row(key, str(value))
+        if not yearly_overview:
+            if key not in basic_metadata and key not in time_groupings and key not in index_metadata:
+                # table.add_row(key, str(round_float_values(value, rounding_places)))
+                table.add_row(key, str(value))
+        else:
+            if key in yearly_metadata and key not in basic_metadata and key not in index_metadata:
+                # table.add_row(key, str(round_float_values(value, rounding_places)))
+                # table.add_row(key, str(value))
+                display_key = rename_yearly_output_rows.get(key, key)
+                table.add_row(display_key, str(value))
 
     # Separate!
     table.add_row("", "")
+
+    if yearly_overview:
+        key = 'Monthly means'
 
     # Groups
     custom_freq_label = f'{groupby} means' if groupby and groupby not in time_groupings else None
     for key, value in statistics.items():
         if key in time_groupings:
 
-            if key == 'Monthly means':
+            if key == 'Yearly means':
+                for year, value in enumerate(statistics[key]):
+                    table.add_row(str(year), str(value))
+                table.add_row("", "")
+
+            elif key == 'Monthly means':
                 import calendar
                 for idx, value in enumerate(statistics[key], start=1):
                     month_name = calendar.month_name[idx]
@@ -184,7 +252,6 @@ def print_series_statistics(
         if key in index_metadata:
             # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
-
 
     console = Console()
     console.print(table)
