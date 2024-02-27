@@ -15,8 +15,8 @@ from bokeh.plotting import show
 
 from datetime import datetime, timedelta
 from pvgisprototype.api.geometry.models import select_models
-from pvgisprototype.api.geometry.models import SolarTimeModels
-from pvgisprototype.api.geometry.time import model_solar_time
+from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.geometry.solar_time import model_solar_time
 
 import numpy as np
 from rich.progress import track
@@ -26,11 +26,11 @@ import pytz
 def plot_solar_time(longitude, latitude, location, timezone, model):
     timestamp = datetime.now(tz=pytz.timezone(timezone))
 
-    theta = np.linspace(0.0, 2 * np.pi, len(SolarTimeModels), endpoint=False)
+    theta = np.linspace(0.0, 2 * np.pi, len(SolarTimeModel), endpoint=False)
     radii = []
     labels = []
 
-    solar_time_models = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    solar_time_models = select_models(SolarTimeModel, solar_time_model)  # Using a callback fails!
     for solar_time_model in solar_time_models:
         solar_time, unit = model_solar_time(
             longitude=longitude,
@@ -84,7 +84,7 @@ def plot_solar_time_one_year(
     timestamps = [datetime(year, 1, 1, tzinfo=timezone) + timedelta(days=i) for i in range((datetime(year+1, 1, 1, tzinfo=timezone) - datetime(year, 1, 1, tzinfo=timezone)).days)]
 
     results = {}
-    solar_time_models = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    solar_time_models = select_models(SolarTimeModel, solar_time_model)  # Using a callback fails!
     for solar_time_model in solar_time_models:
         solar_times = []
         for timestamp in track(timestamps, description=f'Calculating solar time after {solar_time_model}'):
@@ -140,7 +140,7 @@ def plot_solar_time_one_year_bokeh_static(
 
     # Calculate and collect solar times for each model
     results = {}
-    solar_time_models = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    solar_time_models = select_models(SolarTimeModel, solar_time_model)  # Using a callback fails!
     for solar_time_model in solar_time_models:
         solar_times = []
         for timestamp in track(timestamps, description='Calculating solar time after {solar_time_model}'):
@@ -229,7 +229,7 @@ def plot_solar_time_one_year_bokeh(
     timestamps_float = [timestamp.toordinal() for timestamp in timestamps]  # Bokeh doesn't handle datetime
 
     results = {}
-    solar_time_models = select_models(SolarTimeModels, solar_time_model)  # Using a callback fails!
+    solar_time_models = select_models(SolarTimeModel, solar_time_model)  # Using a callback fails!
     for solar_time_model in solar_time_models:
         model_results = []
         for timestamp in timestamps:
@@ -238,7 +238,7 @@ def plot_solar_time_one_year_bokeh(
                 latitude,
                 timestamp,
                 timezone,
-                SolarTimeModels(solar_time_model),
+                SolarTimeModel(solar_time_model),
             )
             model_results.append(solar_time)
         results[solar_time_model.value] = model_results

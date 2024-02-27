@@ -22,6 +22,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype.constants import RADIANS
 from pvgisprototype import SolarIncidence
@@ -37,6 +38,7 @@ def model_solar_incidence_time_series(
     timezone: Optional[ZoneInfo] = None,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     surface_tilt: Union[float, SurfaceTilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -55,8 +57,7 @@ def model_solar_incidence_time_series(
             timezone=timezone,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
-            time_output_units=time_output_units,
-            angle_output_units=angle_output_units,
+            complementary_incidence_angle=complementary_incidence_angle,
             verbose=verbose,
         )
 

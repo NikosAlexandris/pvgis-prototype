@@ -1,7 +1,7 @@
 
 import pytest
 from pvgisprototype.api.geometry.declination import model_solar_declination
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
+from pvgisprototype.api.geometry.models import SolarDeclinationModel
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import DECLINATION_NAME, DEGREES
 from pvgisprototype import SolarDeclination
@@ -20,10 +20,10 @@ test_cases = test_cases_from_data(
 tolerances = [0.1]
 
 declination_models = [
-    SolarDeclinationModels.hargreaves,
-    SolarDeclinationModels.noaa,
-    SolarDeclinationModels.pvis,
-    SolarDeclinationModels.pvlib,
+    SolarDeclinationModel.hargreaves,
+    SolarDeclinationModel.noaa,
+    SolarDeclinationModel.pvis,
+    SolarDeclinationModel.pvlib,
 ]
 
 @pytest.mark.parametrize(

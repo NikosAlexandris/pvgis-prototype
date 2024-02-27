@@ -46,6 +46,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -91,7 +92,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    albedo: Annotated[Optional[float], typer_option_albedo] = 2,
+    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
     direct_horizontal_component: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,

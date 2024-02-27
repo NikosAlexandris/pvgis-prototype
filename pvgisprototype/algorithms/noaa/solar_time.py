@@ -1,3 +1,4 @@
+from rich import print
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateTrueSolarTimeNOAAInput
@@ -15,6 +16,8 @@ from datetime import timedelta
 from zoneinfo import ZoneInfo
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
@@ -103,6 +106,7 @@ def calculate_true_solar_time_noaa(
     return true_solar_time
 
 
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateTrueSolarTimeTimeSeriesNOAAInput)
 def calculate_true_solar_time_time_series_noaa(
     longitude: Longitude,  # radians
@@ -140,5 +144,13 @@ def calculate_true_solar_time_time_series_noaa(
             f"The calculated true solar time series `{true_solar_time_series_in_minutes}` is out of the expected range [-1580, 1580] minutes!"
         )
     # ----------------------------------------------------------------------
+
+    from pvgisprototype.validation.hashing import generate_hash
+    # true_solar_time_series_hash = generate_hash(true_solar_time_series)
+    print(
+        'TST : calculate_true_solar_time_time_series_noaa()|',
+        f"Data Type : [bold]{true_solar_time_series.dtype}[/bold] |",
+        # f"Output Hash : [code]{true_solar_time_series_hash}[/code]",
+    )
 
     return true_solar_time_series

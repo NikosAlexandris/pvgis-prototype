@@ -33,6 +33,7 @@ from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeSe
 from pvgisprototype.validation.pvis_data_classes import SolarDeclinationModel
 from pvgisprototype.validation.pvis_data_classes import SolarPositionModel
 from pvgisprototype.validation.pvis_data_classes import SolarHourAngleModel
+from pvgisprototype.validation.pvis_data_classes import ComplementaryIncidenceAngleModel
 
 # Solar Surface
 from pvgisprototype.validation.pvis_data_classes import SurfaceTiltModel
@@ -351,13 +352,31 @@ class ModelSolarAzimuthInputModel(
     pass
 
 
-class ModelSolarPositionInputModel(
+class ModelSolarGeometryOverviewInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
+    SurfaceTiltModel,
+    SurfaceOrientationModel,
     SolarPositionModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
     EarthOrbitModel,
+    ComplementaryIncidenceAngleModel,
+    VerbosityModel,
+):
+    pass
+
+
+class ModelSolarGeometryOverviewTimeSeriesInputModel(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    SurfaceTiltModel,
+    SurfaceOrientationModel,
+    SolarPositionModel,
+    SolarTimeModelModel,
+    ApplyAtmosphericRefractionModel,
+    EarthOrbitModel,
+    ComplementaryIncidenceAngleModel,
     VerbosityModel,
 ):
     pass
@@ -397,6 +416,7 @@ class CalculateSolarIncidenceJencoInputModel(
     SurfaceTiltModel,
     SurfaceOrientationModel,
     EarthOrbitModel,
+    ComplementaryIncidenceAngleModel,
     VerbosityModel,
 ):
     pass
@@ -407,8 +427,7 @@ class CalculateSolarIncidenceTimeSeriesJencoInputModel(
     BaseTimeSeriesModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
+    ComplementaryIncidenceAngleModel,
     VerbosityModel,
 ):
     pass
@@ -419,6 +438,7 @@ class ModelSolarIncidenceInputModel(
     BaseTimeModel,
     SolarTimeModelModel,
     SolarIncidenceModel,
+    ComplementaryIncidenceAngleModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
     ApplyAtmosphericRefractionModel,
@@ -436,6 +456,7 @@ class ModelSolarIncidenceTimeSeriesInputModel(
     BaseTimeSeriesModel,
     SolarTimeModelModel,
     SolarIncidenceModel,
+    ComplementaryIncidenceAngleModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
     EarthOrbitModel,
