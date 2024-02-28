@@ -55,10 +55,10 @@ def calculate_fractional_year_time_series_noaa(
         A Pandas DatetimeIndex representing the timestamps.
 
     backend : str, optional
-        The backend used for calculations (the default is 'numpy').
+        The backend used for calculations (the default is 'NUMPY').
     
     dtype : str, optional
-        The data type for the calculations (the default is 'float64').
+        The data type for the calculations (the default is 'float32').
 
     Returns
     -------
@@ -81,6 +81,12 @@ def calculate_fractional_year_time_series_noaa(
     The function calculates the fractional year considering leap years and converts
     the timestamps into fractional values considering their position within the year.
     This is used in various solar energy calculations and models.
+
+    See also
+    --------
+    Default data type (`dtype`) and backend for (NumPy) arrays set in
+    `constants.py`.
+
     """
     days_of_year_series = timestamps.dayofyear
     hours = timestamps.hour

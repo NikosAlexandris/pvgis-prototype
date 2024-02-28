@@ -10,6 +10,7 @@ from enum import Enum
 from rich import print
 
 from datetime import datetime
+from pvgisprototype.validation.arrays import create_array
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
@@ -24,6 +25,8 @@ from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irr
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -59,7 +62,6 @@ from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
-NUMPY_DTYPE_DEFAULT = 'float64'
 
 
 def calculate_global_irradiance_time_series(
@@ -99,7 +101,8 @@ def calculate_global_irradiance_time_series(
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float]="Array of horizon elevations.")] = None,
-    numpy_dtype: np.dtype = NUMPY_DTYPE_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     rounding_places: Optional[int] = 5,
     statistics: bool = False,
     csv: Path = "series_in",
@@ -140,9 +143,18 @@ def calculate_global_irradiance_time_series(
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
+    shape_of_array = (
+        solar_altitude_series.value.shape
+    )  # Borrow shape from solar_altitude_series
+    direct_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    diffuse_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    reflected_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible

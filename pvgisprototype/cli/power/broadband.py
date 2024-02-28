@@ -73,6 +73,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_wi
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_profiling
 from pvgisprototype.cli.typer_parameters import typer_option_index
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -124,8 +126,8 @@ def photovoltaic_power_output_series(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
-    dtype = 'float64',
-    array_backend = 'NUMPY',
+    dtype = DATA_TYPE_DEFAULT,
+    array_backend = ARRAY_BACKEND_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
