@@ -43,6 +43,7 @@ Read also:
 """
 
 from pandas import Timestamp
+from pandas import date_range
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -53,7 +54,8 @@ from typing import Union
 from typing import List
 from typing import Sequence
 import calendar
-import random
+from random import randint
+from random import choice
 # import time
 import typer
 import zoneinfo
@@ -83,7 +85,7 @@ def random_day_of_year(days_in_year: int) -> int:
     """
     Generate a random datetime and timezone object
     """
-    return random.randint(1, days_in_year)
+    return randint(1, days_in_year)
 
 
 def random_datetimezone() -> tuple:
@@ -91,14 +93,14 @@ def random_datetimezone() -> tuple:
     Generate a random datetime and timezone object
     """
     year = datetime.now().year
-    month = random.randint(1, 12)
+    month = randint(1, 12)
     _, days_in_month = calendar.monthrange(year, month)
-    day = random.randint(1, days_in_month)
-    hour = random.randint(0, 23)
-    minute = random.randint(0, 59)
-    second = random.randint(0, 59)
+    day = randint(1, days_in_month)
+    hour = randint(0, 23)
+    minute = randint(0, 59)
+    second = randint(0, 59)
     datetimestamp = datetime(year, month, day, hour, minute, second, tzinfo=ZoneInfo('UTC'))
-    timezone_str = random.choice(list(zoneinfo.available_timezones()))
+    timezone_str = choice(list(zoneinfo.available_timezones()))
     timezone = ZoneInfo(timezone_str)
 
     return datetimestamp, timezone
@@ -255,6 +257,8 @@ def timestamp_to_decimal_hours(t):  # NOTE: Integrated in dateclasses
 def timestamp_to_decimal_hours_time_series(
     timestamps: Union[datetime, Sequence[datetime]]
 ) -> np.ndarray:
+    """
+    """
     if isinstance(timestamps, datetime):
         timestamps = [timestamps]
 
@@ -268,6 +272,8 @@ def timestamp_to_decimal_hours_time_series(
 
 
 def hour_of_year_to_datetime(year, hour):
+    """
+    """
     start_of_year = datetime.datetime(year, 1, 1)
     timedelta_hours = datetime.timedelta(hours=hour)
     desired_datetime = start_of_year + timedelta_hours
@@ -510,7 +516,6 @@ def generate_datetime_series(
                '2010-06-01 08:00:00', '2010-06-01 09:00:00'],
               dtype='datetime64[ns]', freq='H')
     """
-    from pandas import date_range
     timestamps = date_range(
         start=start_time,
         end=end_time,
