@@ -4,10 +4,10 @@ from pvgisprototype.algorithms.pvis.constants import STANDARD_CONDITIONS_EFFECTI
 
 
 def integrate_spectrum_response(
-    spectral_response_frequencies: NDArray[np.float64] = None,
-    spectral_response: NDArray[np.float64] = None,
-    kato_limits: NDArray[np.float64] = None,
-    spectral_power_density: NDArray[np.float64] = None,
+    spectral_response_frequencies: NDArray[np.float32] = None,
+    spectral_response: NDArray[np.float32] = None,
+    kato_limits: NDArray[np.float32] = None,
+    spectral_power_density: NDArray[np.float32] = None,
 ) -> float:
     """ """
     m = 0

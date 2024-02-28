@@ -30,6 +30,8 @@ from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_i
 # from pvgisprototype.api.irradiance.shortwave import calculate_global_irradiance_time_series
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
@@ -103,8 +105,8 @@ def calculate_photovoltaic_power_output_series(
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
-    dtype = 'float64',
-    array_backend = 'NUMPY',
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
@@ -222,7 +224,6 @@ def calculate_photovoltaic_power_output_series(
 
     # =======================================================================
     from pvgisprototype.validation.arrays import create_array
-
     shape_of_array = (
         solar_altitude_series.value.shape
     )  # Borrow shape from solar_altitude_series

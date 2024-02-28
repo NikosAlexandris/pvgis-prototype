@@ -29,6 +29,8 @@ from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_t
 from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
 
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
@@ -368,6 +370,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> np.array:
     """Calculate the diffuse irradiance incident on a solar surface
@@ -536,7 +540,13 @@ def calculate_diffuse_inclined_irradiance_time_series(
         )
 
         # prepare size of output array!
-        diffuse_inclined_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+        from pvgisprototype.validation.arrays import create_array
+        shape_of_array = (
+            solar_altitude_series.value.shape
+        )  # Borrow shape from solar_altitude_series
+        diffuse_inclined_irradiance_series = create_array(
+            shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+        )
 
         # surface in shade, yet there is ambient light
         mask_surface_in_shade_series = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
