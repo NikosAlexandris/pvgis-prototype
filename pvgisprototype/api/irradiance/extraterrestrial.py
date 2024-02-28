@@ -28,7 +28,7 @@ def custom_hashkey(*args, **kwargs):
 from cachetools import cached
 @cached(cache={}, key=custom_hashkey)
 def calculate_extraterrestrial_normal_irradiance_time_series(
-    timestamps: BaseTimestampSeriesModel = None,
+    timestamps: BaseTimestampSeriesModel = None,  # DatetimeIndex ?
     start_time: Optional[datetime] = None,
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
