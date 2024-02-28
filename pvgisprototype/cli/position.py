@@ -299,8 +299,8 @@ def overview_series(
     group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
-    backend: str = DEFAULT_ARRAY_BACKEND,
     dtype: str = DEFAULT_ARRAY_DTYPE,
+    backend: str = DEFAULT_ARRAY_BACKEND,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
     ):
