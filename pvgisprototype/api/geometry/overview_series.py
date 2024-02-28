@@ -16,6 +16,9 @@ from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAltitude
 from datetime import datetime
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -39,10 +42,6 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 
 
-DEFAULT_ARRAY_BACKEND = 'NUMPY'  # OR 'CUPY', 'DASK'
-DEFAULT_ARRAY_DTYPE = 'float32'
-
-
 @validate_with_pydantic(ModelSolarGeometryOverviewTimeSeriesInputModel)
 def model_solar_geometry_overview_time_series(
     longitude: Longitude,
@@ -52,16 +51,17 @@ def model_solar_geometry_overview_time_series(
     surface_tilt: None | float,
     surface_orientation: None | float,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = True,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    backend: str = DEFAULT_ARRAY_BACKEND,
-    dtype: str = DEFAULT_ARRAY_DTYPE,
-    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List[SolarAltitude]:
-
+    """
+    """
     solar_declination_series = None  # updated if applicable
     solar_hour_angle_series = None
     solar_zenith_series = None  # updated if applicable
@@ -76,7 +76,7 @@ def model_solar_geometry_overview_time_series(
 
         solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
-            backend=backend,
+            backend=array_backend,
             dtype=dtype,
         )
         solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
@@ -144,7 +144,7 @@ def model_solar_geometry_overview_time_series(
         surface_orientation if surface_orientation is not None else None,
         solar_incidence_series if solar_incidence_series is not None else None,
     )
-    if verbose > 6:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return position_series
@@ -158,14 +158,14 @@ def calculate_solar_geometry_overview_time_series(
     surface_tilt: float,
     surface_orientation: float,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
-    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = True,
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
-    backend: str = DEFAULT_ARRAY_BACKEND,
-    dtype: str = DEFAULT_ARRAY_DTYPE,
-    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """
@@ -190,13 +190,13 @@ def calculate_solar_geometry_overview_time_series(
                 surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
                 solar_position_model=solar_position_model,
+                complementary_incidence_angle=complementary_incidence_angle,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 solar_time_model=solar_time_model,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
-                backend=backend,
+                backend=array_backend,
                 dtype=dtype,
-                complementary_incidence_angle=complementary_incidence_angle,
                 verbose=verbose,
             )
             results = {
