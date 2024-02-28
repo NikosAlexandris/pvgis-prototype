@@ -71,6 +71,11 @@ dev = [
   "towncrier",
   "timezonefinder",
 ]
+test = [
+    "pytest",
+    "bokeh",
+    "openpyxl",
+]
 docs = [
   "markdown-exec[ansi]",
   "mkdocs-bibtex",
