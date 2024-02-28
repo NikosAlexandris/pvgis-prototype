@@ -335,5 +335,5 @@ def test_calculate_solar_hour_angle_plot(angle_output_units):
     # plt.ylabel('Hour Angle (radians)')
     # plt.legend()
     plt.title('Calculated vs Expected Hour Angles')
-    plt.savefig('hour_angle_from_solat_time_calculated_vs_expected.png')
+    plt.savefig('hour_angle_from_solar_time_calculated_vs_expected.png')
     return fig
