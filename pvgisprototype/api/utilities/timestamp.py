@@ -398,15 +398,43 @@ def parse_timestamp_series(
         raise ValueError("The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function")
 
 
-def generate_timestamps_for_a_year(year, frequency_minutes=60):
-    start_date = datetime(year, 1, 1)
-    days_in_year = get_days_in_year(year)
-    end_date = start_date + timedelta(days=days_in_year)
-    total_minutes = int((end_date - start_date).total_seconds() // 60)
-    intervals = total_minutes // frequency_minutes
-    
-    return [start_date + timedelta(minutes=(idx * frequency_minutes)) for idx in range(intervals)]
+def generate_timestamps_for_a_year(
+    year: int = None,
+    frequency: str = 'h',  # default to hourly timestamps
+    random: bool = False,
+):
+    """
+    Generate timestamps for a given or random year.
 
+    Parameters
+    ----------
+    year: int, optional
+        The year for which to generate timestamps. If not specified, a random
+        year is chosen.
+
+    frequency: str
+        The frequency of timestamps to generate, e.g., 'h' for hourly. Defaults
+        to 'h'.
+
+    Returns:
+    - DatetimeIndex: A Pandas DatetimeIndex of timestamps for the specified or
+      random year
+
+    """
+    if random:
+        year = randint(2005, 2024)  # Relating to PVGIS' 2005 starting year
+
+    start_time = f"{year}-01-01 00:00:00"
+    end_time = f"{year+1}-01-01 00:00:00"
+
+    timestamps = date_range(
+        start=start_time,
+        end=end_time,
+        freq=frequency,
+        inclusive='left'  # Exclude the end_time to keep within the year
+    )
+
+    return timestamps
 
 def generate_datetime_series(
     start_time: Optional[str] = None,
