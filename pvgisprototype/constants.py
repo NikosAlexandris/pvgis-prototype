@@ -112,8 +112,8 @@ HOUR_OFFSET_DEFAULT = 0
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 TEMPERATURE_UNIT = '℃'
-TEMPERATURE_DEFAULT = 25  # Cell temperature under standard test conditions, degrees Celsius.
-TEMPERATURE_AT_STANDARD_TEST_CONDITIONS = 25
+TEMPERATURE_DEFAULT = 14  # global average surface air temperature, Celsius degrees
+TEMPERATURE_AT_STANDARD_TEST_CONDITIONS = 25 # Cell temperature under standard test conditions, Celsius degrees
 TEMPERATURE_COLUMN_NAME = 'Temperature ℃ '#
 TEMPERATURE_ADJUSTED_COLUMN_NAME = 'Temperature′ ℃'
 TEMPERATURE_DEVIATION_COLUMN_NAME = 'Temperature ≏℃ '  # for the PV module's temperature model
