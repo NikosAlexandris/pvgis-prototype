@@ -1,7 +1,5 @@
-
-
 import pytest
-from pvgisprototype.api.geometry.time import calculate_solar_time
+from pvgisprototype.api.geometry.solar_time import calculate_solar_time
 from pvgisprototype.api.geometry.models import SolarTimeModels
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import SOLAR_TIME_NAME, TIME_ALGORITHM_NAME, UNITS_NAME
@@ -10,7 +8,7 @@ from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 
 
 test_cases_data = read_noaa_spreadsheet(
-    './tests/data/test_cases_noaa_spreadsheet.xlsx'
+    './tests/cases/noaa.xlsx'
 )
 test_cases = test_cases_from_data(
     test_cases_data,
