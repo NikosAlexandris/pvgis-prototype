@@ -20,8 +20,8 @@ def test_calculate_angular_loss_factor_for_direct_irradiance_with_invalid_inputs
 ):
     with pytest.raises(ValueError):
         calculate_angular_loss_factor_for_direct_irradiance(
-                solar_incidence,
-                angular_loss_coefficient)
+            solar_incidence, angular_loss_coefficient
+        )
 
 
 # Old! ----------------------------------------------------------------------
@@ -58,5 +58,6 @@ def test_calculate_angular_loss_factor_for_direct_irradiance(
 ):
     with pytest.raises(ValueError):
         calculate_angular_loss_factor_for_direct_irradiance(
-                solar_incidence,
-                angular_loss_coefficient)
+            solar_incidence,
+            angular_loss_coefficient,
+        )
