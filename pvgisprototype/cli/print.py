@@ -237,14 +237,14 @@ def print_solar_position_series_table(
     #     columns.append('Zone')
     # if user_requested_timestamps is not None and user_requested_timezone is not None:
     #     columns.extend(["Local Time", "Local Zone"])
-    if timing is not None:
-        columns.append(TIME_ALGORITHM_COLUMN_NAME)
+    # if timing is not None:
+    #     columns.append(TIME_ALGORITHM_COLUMN_NAME)
     if declination is not None:
         columns.append(DECLINATION_COLUMN_NAME)
     if hour_angle is not None:
         columns.append(HOUR_ANGLE_COLUMN_NAME)
-    if any(quantity is not None for quantity in quantities):
-        columns.append(POSITION_ALGORITHM_COLUMN_NAME)
+    # if any(quantity is not None for quantity in quantities):
+    #     columns.append(POSITION_ALGORITHM_COLUMN_NAME)
     if zenith is not None:
         columns.append(ZENITH_COLUMN_NAME)
     if altitude is not None:
@@ -255,31 +255,44 @@ def print_solar_position_series_table(
         # columns.append(SURFACE_TILT_COLUMN_NAME)
         # columns.append(SURFACE_ORIENTATION_COLUMN_NAME)
         columns.append(INCIDENCE_COLUMN_NAME)
-    columns.append(UNITS_COLUMN_NAME)
+    # columns.append(UNITS_COLUMN_NAME)
 
     title = 'Solar geometry overview'
-    caption = f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
+    caption = f"[underline]Position[/underline]  "
+    caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
+    # Should be the same in case of multiple models!
+    first_model = next(iter(rounded_table))
+
+    surface_tilt = rounded_table[first_model].get(SURFACE_TILT_NAME, None) if surface_tilt else None
+    caption += f"Tilt : [bold]{surface_tilt}[/bold], "
+
+    surface_orientation = rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
+    caption += f"Orientation : [bold]{surface_orientation}[/bold], "
+
+    units = rounded_table[first_model].get(UNITS_NAME, UNITLESS)
+    caption += f"Units : {units}"
+
+    caption += f"\n[underline]Algorithms[/underline]  "
+
+    timing_algorithm = rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
+    caption += f"Timing : [bold]{timing_algorithm}[/bold], "
+
     caption += f"Zone : {timezone}, "
     if (
         user_requested_timestamps is not None
         and user_requested_timezone is not None
     ):
-        caption += f"Local zone : {user_requested_timezone}"
+        caption += f"Local zone : {user_requested_timezone}, "
            # [
            #     str(user_requested_timestamps.get_loc(timestamp)),
            #     str(user_requested_timezone),
            # ]
-    # Should be the same in case of multiple models!
-    first_model = next(iter(rounded_table))
 
-    surface_tilt = rounded_table[first_model].get(SURFACE_TILT_NAME, None) if surface_tilt else None
-    caption += f"\nTilt : [bold]{surface_tilt}[/bold], "
-
-    surface_orientation = rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
-    caption += f"Orientation : [bold]{surface_orientation}[/bold], "
+    position_algorithm = rounded_table[first_model].get(POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
+    caption += f"Positioning : [bold]{position_algorithm}[/bold], "
 
     incidence_angle_definition = rounded_table[first_model].get(INCIDENCE_DEFINITION, None) if incidence else None
-    caption += f"Incidence definition : [bold yellow]{incidence_angle_definition}[/bold yellow]"
+    caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
     table = Table(
         *columns,
@@ -291,17 +304,17 @@ def print_solar_position_series_table(
     # Iterate over each timestamp and its corresponding result
     for model_name, model_result in rounded_table.items():
         for _index, timestamp in enumerate(timestamps):
-            timing_algorithm = safe_get_value(model_result, TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
+            # timing_algorithm = safe_get_value(model_result, TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
             declination_value = safe_get_value(model_result, DECLINATION_NAME, _index) if declination else None
             hour_angle_value = safe_get_value(model_result, HOUR_ANGLE_NAME, _index) if hour_angle else None
-            position_algorithm = safe_get_value(model_result, POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
+            # position_algorithm = safe_get_value(model_result, POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
             zenith_value = safe_get_value(model_result, ZENITH_NAME, _index) if zenith else None
             altitude_value = safe_get_value(model_result, ALTITUDE_NAME, _index) if altitude else None
             azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, _index) if azimuth else None
             # surface_tilt = safe_get_value(model_result, SURFACE_TILT_NAME, _index) if surface_tilt else None
             # surface_orientation = safe_get_value(model_result, SURFACE_ORIENTATION_NAME, _index) if surface_orientation else None
             incidence_value = safe_get_value(model_result, INCIDENCE_NAME, _index) if incidence else None
-            units = safe_get_value(model_result, UNITS_NAME, UNITLESS)
+            # units = safe_get_value(model_result, UNITS_NAME, UNITLESS)
 
             row = []
             if index:
@@ -331,14 +344,14 @@ def print_solar_position_series_table(
            #     )
            ##=====================================================================
 
-            if timing is not None:
-                row.append(timing_algorithm)
+            # if timing is not None:
+            #     row.append(timing_algorithm)
             if declination_value is not None:
                 row.append(str(declination_value))
             if hour_angle_value is not None:
                 row.append(str(hour_angle_value))
-            if position_algorithm is not None:
-                row.append(position_algorithm)
+            # if position_algorithm is not None:
+            #     row.append(position_algorithm)
             if zenith_value is not None:
                 row.append(str(zenith_value))
             if altitude_value is not None:
@@ -351,7 +364,7 @@ def print_solar_position_series_table(
                 # if surface_orientation is not None:
                 #     row.append(str(surface_orientation))
                 row.append(str(incidence_value))
-            row.append(str(units))
+            # row.append(str(units))
 
             style_map = {
                 "pvis": "red",  # red because PVIS is incomplete!
