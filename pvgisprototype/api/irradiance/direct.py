@@ -34,6 +34,7 @@ from typing import Union
 from typing import Sequence
 from typing import List
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 # from pvgisprototype.api.utilities.progress import progress
@@ -685,6 +686,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
         verbose=0,
     )
+    
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -694,13 +696,31 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
+        # time_offset_global=time_offset_global,
+        # hour_offset=hour_offset,
+        # perigee_offset=perigee_offset,
+        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
+        verbose=0,
+    )
+    solar_azimuth_series = model_solar_azimuth_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_position_model=solar_position_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
+        # time_offset_global=time_offset_global,
+        # hour_offset=hour_offset,
+        # perigee_offset=perigee_offset,
+        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
         verbose=0,
     )
 
@@ -715,7 +735,10 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     # Following, the _complementary_ solar incidence angle is used (Jenco, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
-    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
+    in_shade = is_surface_in_shade_time_series(
+            solar_altitude_series,
+            solar_azimuth_series,
+            )
     mask_not_in_shade = ~in_shade
     mask = np.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
@@ -728,7 +751,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     # ========================================================================
 
     if not direct_horizontal_component:
-        print(f'i [bold]Modelling[/bold] [bold magenta]direct horizontal irradiance[/bold magenta]...')
+        print(f':information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...')
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
             longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
