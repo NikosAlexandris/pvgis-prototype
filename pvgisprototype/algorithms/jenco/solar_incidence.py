@@ -337,6 +337,10 @@ def calculate_solar_incidence_time_series_jenco(
     timezone: Optional[ZoneInfo] = None,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+    apply_atmospheric_refraction: bool = True,
+    shadow_indicator: Path = None,
+    horizon_heights: Optional[List[float]] = None,
+    horizon_interval: Optional[float] = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
