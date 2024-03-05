@@ -210,13 +210,13 @@ SolarZenith:
     initial: 0
   max_radians:
     type: float
-    initial: 3.1561926469419914
+    initial: 3.1561926535897933  # pi + 0.0146
   min_degrees:
     type: float
     initial: 0
   max_degrees:
     type: float
-    initial: 180.836518
+    initial: 180.83651838089102
 
 RefractedSolarZenith:
   value:
