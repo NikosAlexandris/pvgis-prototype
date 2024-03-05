@@ -84,19 +84,20 @@ def is_surface_in_shade(
     return False
 
 
-def is_surface_in_shade_time_series(input_array, threshold=10):
+def is_surface_in_shade_time_series(
+    solar_altitude_series,
+    solar_azimuth_series,
+    shadow_indicator: Path = None,
+    horizon_heights: Optional[List[float]] = None,
+    horizon_interval: Optional[float] = None,
+) -> List[bool]:
     """
     Determine if a surface is in shade based on solar altitude for each timestamp.
 
     Parameters:
     - solar_altitude_series_array (numpy array): Array of solar altitude angles for each timestamp.
-    - shade_threshold (float): Solar altitude angle below which the surface is considered to be in shade.
 
     Returns:
     - numpy array: Boolean array indicating whether the surface is in shade at each timestamp.
     """
-    # return solar_altitude_series_array < threshold
-    return np.full(input_array.size, False)
-
-
-
+    return np.full(solar_altitude_series.value.shape, False)
