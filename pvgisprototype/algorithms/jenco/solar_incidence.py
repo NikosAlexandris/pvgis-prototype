@@ -266,14 +266,26 @@ def calculate_solar_incidence_jenco(
 
     where HOUR_ANGLE is defined as `HOUR_ANGLE = pi / 12.0`
     which is the conversion factor to radians (π / 12 = 0.261799)
-    and hence this is the equation to calculate the hour angle
+    and hence this is the equation to calculate the hour angle in radians,
     e.g., as per NOAA's equation:
         
         `solar_hour_angle = (true_solar_time - 720) * (pi / 720)`.
 
     in which 720 is minutes, whereas 60 is hours in PVGIS' C++ code.
     """
-    solar_altitude = None
+    solar_altitude = calculate_solar_altitude(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            # solar_position_models=solar_position_model,
+            # solar_time_model=solar_time_model,
+            # apply_atmospheric_refraction=apply_atmospheric_refraction,
+            # perigee_offset=perigee_offset,
+            # eccentricity_correction_factor=eccentricity_correction_factor,
+            # angle_output_units=angle_output_units,
+            verbose=0,
+            )
     solar_azimuth = None
     in_shade = is_surface_in_shade(
             solar_altitude=solar_altitude,
@@ -294,10 +306,8 @@ def calculate_solar_incidence_jenco(
             * cos(surface_tilt.radians)
         )
         relative_inclined_latitude = asin(sine_relative_inclined_latitude)
-        solar_declination = calculate_solar_declination_pvis(
+        solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
         )
         c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.radians)
         c_inclined_33 = sin(relative_inclined_latitude) * sin(solar_declination.radians)
