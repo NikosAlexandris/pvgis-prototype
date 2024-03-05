@@ -12,7 +12,10 @@ def interpolate_horizon_height(
     horizon_heights: List[float],
     horizon_interval: float,
 ) -> HorizonHeight:
-    """Interpolate the height of the horizon at the sun's azimuth angle.
+    """Interpolate the height of the horizon for a given sun azimuth angle.
+
+    Interpolate the hiehgt of the horizon for a given sun azimuth angle based
+    on existing horizon height values at a given interval.
 
     Parameters
     ----------
@@ -46,6 +49,54 @@ def interpolate_horizon_height(
     return HorizonHeight(horizon_height, HORIZON_HEIGHT_UNIT)
 
 
+# @validate_with_pydantic()
+def interpolate_horizon_height_series(
+    solar_azimuth_series: float,
+    horizon_heights: List[float],
+    horizon_interval: float,
+) -> HorizonHeight:
+    """Interpolate the height of the horizon for a given sun azimuth angle.
+
+    Interpolate the hiehgt of the horizon for a given sun azimuth angle based
+    on existing horizon height values at a given interval.
+
+    Parameters
+    ----------
+    solar_azimuth : float
+        The azimuth angle of the sun.
+    horizon_heights : list of float
+        List of horizon height values.
+    horizon_interval : float
+        Interval between successive horizon data points.
+
+    Returns
+    -------
+    float
+        The interpolated horizon height.
+    """
+    positions_in_interval = solar_azimuth_series / horizon_interval
+    positions_before = np.floor(positions_in_interval).astype(int)
+    positions_after = positions_before + 1
+
+    # Handle wrap around
+    # positions_after = 0 if positions_after == len(horizon_heights) else positions_after ?
+    positions_after[positions_after >= len(horizon_heights)] = 0
+
+    # Interpolate the horizon height (or weighted average)
+    weights_after = positions_in_interval - positions_before
+    weights_before = 1 - weights_after
+    interpolated_horizon_heights = (
+        weights_before
+        * horizon_heights[positions_before]
+        + weights_after
+        * horizon_heights[positions_after]
+    )
+
+    return HorizonHeight(interpolated_horizon_heights, HORIZON_HEIGHT_UNIT)
+
+
+
+
 def is_surface_in_shade(
     solar_altitude: float,
     solar_azimuth: float,
@@ -53,7 +104,11 @@ def is_surface_in_shade(
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
 ) -> bool:
-    """Check whether the solar surface is in shade based on shadow and horizon data.
+    """Determine whether the solar surface is in shade
+
+    Determine if the solar surface is in shade based the solar altitude and the
+    horizon_height. The solar azimuth is required to interpolate the horizon
+    height based on existing horizon height values at a given interval.
 
     Parameters
     ----------
