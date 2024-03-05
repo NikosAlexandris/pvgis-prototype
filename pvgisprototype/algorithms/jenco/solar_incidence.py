@@ -383,7 +383,9 @@ def calculate_solar_incidence_time_series_jenco(
     -----
     - Shadow check not implemented.
     - In PVGIS' source code, in order :
+
       1. positive numerator for the relative_longitude -- which is an error
+      
       2. following adjustments -- unsure what they mean to achieve -- are
          placed befor calculating the incidence angle :
 
@@ -391,6 +393,32 @@ def calculate_solar_incidence_time_series_jenco(
               relative_longitude += np.pi
           if surface_orientation.radians > np.pi and relative_longitude.value > 0:
               relative_longitude -= np.pi
+
+        Here a ready-to-use snippet in Python:
+
+        ``` py
+        from rich import print
+        print(f'Surface orientation  : {surface_orientation}')
+        print(f'Relative longitude : {relative_longitude}')
+        if surface_orientation.radians < np.pi and relative_longitude.value < 0:
+            print(f'[bold red]Add[/bold red] {np.pi} to relative_longitude {relative_longitude}')
+            relative_longitude.value += np.pi
+        if surface_orientation.radians > np.pi and relative_longitude.value > 0:
+            print(f'[bold red]Remove[/bold red] {np.pi} from relative_longitude {relative_longitude}')
+            relative_longitude.value -= np.pi
+        print(f'Relative longitude Adjusted ? : {relative_longitude}')
+        ```
+
+        Manually testing the adjustment, seems to invert logical results in a
+        way such as :
+
+        - If the panel looks east (90 degrees orientation), then it shows
+        zero-to-somewhat-low power output values in the morning than when looking west.
+
+        - If the panel looks west (270 degrees), the opposite output is
+        generated : high power output in the morning and 0-to-somewhat-low
+        output in the evening.
+
 
       3. negative solar hour angle for the incidence angle
 
