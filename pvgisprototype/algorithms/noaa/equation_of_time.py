@@ -13,20 +13,17 @@ from typing import Sequence
 import numpy as np
 from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa 
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import MINUTES
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
-
-
-EQUATIONOFTIME_MINIMUM = -20
-EQUATIONOFTIME_MAXIMUM = 20
-EQUATIONOFTIME_UNITS = 'minutes'
+from pandas import DatetimeIndex
 
 
 @validate_with_pydantic(CalculateEquationOfTimeNOAAInput)
 def calculate_equation_of_time_noaa(
     timestamp: datetime,
 ) -> EquationOfTime:
-    """Calculate the equation of time in minutes"""
+    """Calculate the equation of time in minutes."""
     fractional_year = calculate_fractional_year_noaa(
         timestamp=timestamp,
     )
@@ -39,7 +36,7 @@ def calculate_equation_of_time_noaa(
     )
     equation_of_time = EquationOfTime(value=equation_of_time_minutes, unit='minutes')
 
-    if not EQUATIONOFTIME_MINIMUM <= equation_of_time.minutes <= EQUATIONOFTIME_MAXIMUM:
+    if not equation_of_time.min_minutes <= equation_of_time.minutes <= equation_of_time.max_minutes:
         raise ValueError("The calculated equation of time is out of the expected range [{EQUATIONOFTIME_MINIMUM}, {EQUATIONOFTIME_MAXIMUM}] {EQUATIONOFTIME_UNITS}")
 
     return equation_of_time
@@ -48,9 +45,9 @@ def calculate_equation_of_time_noaa(
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput) 
 def calculate_equation_of_time_time_series_noaa(
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: DatetimeIndex,
 ) -> EquationOfTime:
-    """Calculate the equation of time in minutes for a time series"""
+    """Calculate the equation of time in minutes for a time series."""
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
         angle_output_units=RADIANS
@@ -62,20 +59,25 @@ def calculate_equation_of_time_time_series_noaa(
         - 0.014615 * np.cos(2 * fractional_year_series.radians)
         - 0.040849 * np.sin(2 * fractional_year_series.radians)
     )
-    if not np.all((-20 <= equation_of_time_series) & (equation_of_time_series <= 20)):
-        raise ValueError("The equation of time must be within the range [-20, 20] minutes for all timestamps.")
+    if not np.all(
+        (EquationOfTime().min_minutes <= equation_of_time_series)
+        & (equation_of_time_series <= EquationOfTime().max_minutes)
+    ):
+        raise ValueError(
+            "The equation of time must be within the range [{EquationOfTime().min_minutes}, {EquationOfTime().max_minutes()}] minutes for all timestamps."
+        )
 
     from pvgisprototype.validation.hashing import generate_hash
     equation_of_time_series_hash = generate_hash(equation_of_time_series)
     print(
-        "EOT : calculate_equation_of_time_time_series_noaa() |",
+        "EquationOfTime : calculate_equation_of_time_time_series_noaa() |",
         f"Data Type : [bold]{equation_of_time_series.dtype}[/bold] |",
         f"Output Hash : [code]{equation_of_time_series_hash}[/code]",
     )
     
     return EquationOfTime(
         value=equation_of_time_series,
-        unit='minutes',
+        unit=MINUTES,
         position_algorithm='NOAA',
         timing_algorithm='NOAA',
     )

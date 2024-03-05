@@ -27,7 +27,9 @@ def calculate_time_offset_noaa(
         timestamp: Timestamp, 
         timezone: ZoneInfo,
     ) -> TimeOffset:
-    """Calculate the time offset (minutes) for NOAA's solar position calculations.
+    """Calculate the time offset in minutes based on NOAA's solar geometry equations.
+
+    Calculate the time offset (minutes) for NOAA's solar position calculations.
 
     The time offset (in minutes) incorporates the Equation of Time and accounts
     for the variation of the Local Solar Time (LST) within a given time zone
@@ -127,11 +129,11 @@ def calculate_time_offset_noaa(
         )  # minutes
     time_offset = longitude.as_minutes - timezone_offset_minutes + equation_of_time.minutes
     time_offset = TimeOffset(value=time_offset, unit='minutes')
-    # if not -720 + 70 <= time_offset <= 720 + 70:
-    if not -790 <= time_offset.minutes <= 790:
-        raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [-720, 720] minutes!')
+    if not TimeOffset().min_minutes <= time_offset.minutes <= TimeOffset().max_minutes:
+        raise ValueError(f'The calculated time offset {time_offset} is out of the expected range [{TimeOffset().min_minutes, TimeOffset().max_minutes}] minutes!')
 
     return time_offset
+
 
 from pandas import DatetimeIndex
 from cachetools.keys import hashkey
@@ -168,13 +170,13 @@ def calculate_time_offset_time_series_noaa(
     )
     time_offset_series = longitude.as_minutes - timezone_offset_minutes_series + equation_of_time_series.minutes
 
-    if not np.all((-790 <= time_offset_series) & (time_offset_series <= 790)):
-        raise ValueError("At least one calculated time offset is out of the expected range [-790, 790] minutes!")
+    if not np.all((TimeOffset().min_minutes <= time_offset_series) & (time_offset_series <= TimeOffset().max_minutes)):
+        raise ValueError("At least one calculated time offset is out of the expected range [{TimeOffset().min_minutes, TimeOffset().max_minutes] minutes!")
 
     from pvgisprototype.validation.hashing import generate_hash
     time_offset_series_hash = generate_hash(time_offset_series)
     print(
-        'TO : calculate_time_offset_time_series_noaa() |',
+        'TimeOffset : calculate_time_offset_time_series_noaa() |',
         f"Data Type : [bold]{time_offset_series.dtype}[/bold] |",
         f"Output Hash : [code]{time_offset_series_hash}[/code]",
     )
