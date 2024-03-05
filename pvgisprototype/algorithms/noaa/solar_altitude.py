@@ -32,6 +32,8 @@ from math import isfinite
 import numpy as np
 from pandas import DatetimeIndex
 from rich import print
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
@@ -77,8 +79,6 @@ def calculate_solar_altitude_noaa(
 
     return solar_altitude
 
-from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAltitudeTimeSeriesNOAAInput)
 def calculate_solar_altitude_time_series_noaa(
