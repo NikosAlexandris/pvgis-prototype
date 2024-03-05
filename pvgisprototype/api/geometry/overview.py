@@ -75,16 +75,29 @@ def model_solar_geometry_overview(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
-    """
+    """Model solar geometry parameters for a position and moment in time.
+
+    Model the following solar geometry parameters for a position and moment in
+    time and for a given solar position model (as in positioning algorithm, see
+    class `SolarPositionModel`) and solar time model (as in solar timing
+    algorithm, see class `SolarTimeModel`) :
+
+    - solar declination 
+    - solar hour angle 
+    - solar zenith 
+    - solar altitude 
+    - solar azimuth 
+    - solar incidence 
+
+    Notes
+    -----
+
     The solar altitude angle measures from the horizon up towards the zenith
     (positive, and down towards the nadir (negative)). The altitude is zero all
     along the great circle between zenith and nadir.
 
     The solar azimuth angle measures horizontally around the horizon from north
     through east, south, and west.
-
-    Notes
-    -----
 
     - All solar calculation functions return floating angular measurements in
       radians.
@@ -148,6 +161,12 @@ def model_solar_geometry_overview(
     
     if solar_position_model.value == SolarPositionModel.skyfield:
 
+        solar_hour_angle, solar_declination = calculate_solar_hour_angle_declination_skyfield(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+        )
         solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
                 longitude=longitude,
                 latitude=latitude,
@@ -158,13 +177,6 @@ def model_solar_geometry_overview(
             unit = DEGREES,
             position_algorithm=solar_azimuth.position_algorithm,
             timing_algorithm=solar_azimuth.timing_algorithm,
-        )
-        # --------------------------------------------------------------------
-        solar_hour_angle, solar_declination = calculate_solar_hour_angle_declination_skyfield(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
         )
 
     if solar_position_model.value == SolarPositionModel.suncalc:
@@ -314,6 +326,8 @@ def model_solar_geometry_overview(
             solar_zenith if solar_zenith is not None else None,
             solar_altitude if solar_altitude is not None else None,
             solar_azimuth if solar_azimuth is not None else None,
+            surface_tilt if surface_tilt is not None else None,
+            surface_orientation if surface_orientation is not None else None,
             solar_incidence if solar_incidence is not None else None,
     )
     if verbose == 3:
@@ -352,6 +366,8 @@ def calculate_solar_geometry_overview(
                 solar_zenith,
                 solar_altitude,
                 solar_azimuth,
+                surface_tilt,
+                surface_orientation,
                 solar_incidence,
             ) = model_solar_geometry_overview(
                 longitude=longitude,

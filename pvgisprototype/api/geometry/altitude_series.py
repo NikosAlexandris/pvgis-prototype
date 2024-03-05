@@ -38,7 +38,7 @@ def model_solar_altitude_time_series(
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
-) -> List[SolarAltitude]:
+) -> SolarAltitude:
 
     if verbose == 3:
         debug(locals())
