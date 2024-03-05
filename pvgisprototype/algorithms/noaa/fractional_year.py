@@ -35,8 +35,8 @@ def calculate_fractional_year_noaa(
         fractional_year = 0
     fractional_year = FractionalYear(value=fractional_year, unit=RADIANS)
 
-    if not 0 <= fractional_year.radians < 2 * pi:
-        raise ValueError(f'The calculated fractional year {fractional_year} is outside the expected range [0, 2*pi] radians')
+    if not FractionalYear().min_radians <= fractional_year.radians < FractionalYear().max_radians:
+        raise ValueError(f'The calculated fractional year {fractional_year} is outside the expected range [0, {2*pi}] radians')
 
     return fractional_year
 
@@ -97,26 +97,9 @@ def calculate_fractional_year_time_series_noaa(
     )
     fractional_year_series[fractional_year_series < 0] = 0
     
-    if not np.all((0 <= fractional_year_series) & (fractional_year_series < 2 * np.pi)):
-        raise ValueError(f'The calculated fractional years are outside the expected range [0, {2*pi}] radians')
-
-    from pvgisprototype.validation.hashing import generate_hash
-    fractional_year_series_hash = generate_hash(fractional_year_series)
-    print(
-        "FY : calculate_fractional_year_time_series_noaa() |",
-        f"Data Type : [bold]{fractional_year_series.dtype}[/bold] |",
-        f"Output Hash : [code]{fractional_year_series_hash}[/code]",
-    )
-
-    fractional_year_series = FractionalYear(
-        value=fractional_year_series,
-        unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
-    )
     if not np.all(
-        (fractional_year_series.min_degrees <= fractional_year_series.degrees)
-        & (fractional_year_series.degrees <= fractional_year_series.max_degrees)
+        (FractionalYear().min_radians <= fractional_year_series)
+        & (fractional_year_series <= FractionalYear().max_radians)
     ):
         wrong_values_index = np.where(
             fractional_year_series.min_degrees
@@ -125,7 +108,20 @@ def calculate_fractional_year_time_series_noaa(
         )
         wrong_values = fractional_year_series.degrees[wrong_values_index]
         raise ValueError(
-            f"The calculated fractional year `{wrong_values}` is out of the expected range [{fractional_year_series.min_degrees}, {fractional_year_series.max_degrees}] degrees!')"
+            f"The calculated fractional year `{wrong_values}` is out of the expected range [{FractionalYear().min_degrees}, {FractionalYear().max_degrees}] degrees!')"
         )
 
-    return fractional_year_series
+    from pvgisprototype.validation.hashing import generate_hash
+    fractional_year_series_hash = generate_hash(fractional_year_series)
+    print(
+        "FractionalYear : calculate_fractional_year_time_series_noaa() |",
+        f"Data Type : [bold]{fractional_year_series.dtype}[/bold] |",
+        f"Output Hash : [code]{fractional_year_series_hash}[/code]",
+    )
+
+    return FractionalYear(
+        value=fractional_year_series,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )

@@ -23,7 +23,9 @@ from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
+from rich import print
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
@@ -106,21 +108,14 @@ def calculate_solar_azimuth_noaa(
 
     numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
     denominator = cos(latitude.radians) * sin(solar_zenith.radians)
-    numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
-    denominator = cos(latitude.radians) * sin(solar_zenith.radians)
     # try else raise ... ?
     cosine_solar_azimuth = -1 * numerator / denominator
     solar_azimuth = acos(cosine_solar_azimuth)
 
-    if solar_hour_angle.radians > 0:
-        solar_azimuth = 2 * pi - solar_azimuth
-
-    solar_azimuth = SolarAzimuth(
-        value=solar_azimuth,
-        unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
-    )
+    # ----------------------------------------------------- What is this for ?
+    # if solar_hour_angle.radians > 0:
+    #     solar_azimuth = 2 * pi - solar_azimuth
+    # ------------------------------------------------------------------------
 
     if (
         not isfinite(solar_azimuth.degrees)
@@ -131,12 +126,20 @@ def calculate_solar_azimuth_noaa(
             [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
         )
 
-    if verbose == 3:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return solar_azimuth
+    return SolarAzimuth(
+        value=solar_azimuth,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
 
 
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesNOAAInput)
 def calculate_solar_azimuth_time_series_noaa(
     longitude: Longitude,   # radians
@@ -146,7 +149,7 @@ def calculate_solar_azimuth_time_series_noaa(
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
 ) -> SolarAzimuth:
-    """Calculate the solar azimuth (θ) in radians for a time series"""
+    """Calculate the solar azimuth (θ) for a time series"""
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
     )
@@ -169,9 +172,17 @@ def calculate_solar_azimuth_time_series_noaa(
     if not np.all(np.isfinite(solar_azimuth_series)) or not np.all(
         (0 <= solar_azimuth_series) & (solar_azimuth_series <= 2 * np.pi)
     ):
-        raise ValueError(f'The `solar_azimuth` is out of the expected range [0, {2* np.pi}] radians')
+        raise ValueError(f'At least one `solar_azimuth` value is out of the expected range [0, {2* np.pi}] radians : {solar_azimuth_series}')
 
-    if verbose == 3:
+    from pvgisprototype.validation.hashing import generate_hash
+    solar_azimuth_series_hash = generate_hash(solar_azimuth_series)
+    print(
+        "SolarAzimuth : calculate_solar_azimuth_time_series_noaa() |",
+        f"Data Type : [bold]{solar_azimuth_series.dtype}[/bold] |",
+        f"Output Hash : [code]{solar_azimuth_series_hash}[/code]",
+    )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return SolarAzimuth(
