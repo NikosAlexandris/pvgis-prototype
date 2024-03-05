@@ -40,6 +40,7 @@ from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED
 
 
 @validate_with_pydantic(ModelSolarGeometryOverviewTimeSeriesInputModel)
@@ -59,7 +60,7 @@ def model_solar_geometry_overview_time_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-) -> List[SolarAltitude]:
+) -> List:
     """
     """
     solar_declination_series = None  # updated if applicable
@@ -168,10 +169,28 @@ def calculate_solar_geometry_overview_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
-    """
-    Calculates the solar position using all models and returns the results in a table.
+    """Calculates the solar geometry overview for a time series
+
+    Calculate the solar geometry overview for a geographic position over a
+    series of timestamps for the user-requested solar position models (as in
+    positioning algorithms) and one solar time model (as in solar timing
+    algorithm).
+
+    Notes
+    -----
+    While it is straightforward to report the solar geometry parameters for a
+    series of solar position models (positioning algorithms), offering the
+    option for multiple solar time models (timing algorithms), would mean to
+    carefully craft the combinations for each solar time model and solar
+    position models. Not impossible, yet something for expert users that would
+    like to assess different combinations of algorithms to derive solar
+    geometry parameters.
+
     """
     for solar_position_model in solar_position_models:
+        # for the time being!
+        if solar_position_model != SolarPositionModel.noaa:
+            raise ValueError(f"Solar geometry overview series is not implemented for the requested solar position model : {solar_position_model}!")
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
             (
                 solar_declination_series,

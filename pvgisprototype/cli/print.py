@@ -279,7 +279,7 @@ def print_solar_position_series_table(
     caption += f"Orientation : [bold]{surface_orientation}[/bold], "
 
     incidence_angle_definition = rounded_table[first_model].get(INCIDENCE_DEFINITION, None) if incidence else None
-    caption += f"Incidence definition : [bold]{incidence_angle_definition}[/bold]"
+    caption += f"Incidence definition : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
     table = Table(
         *columns,

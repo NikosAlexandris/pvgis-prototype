@@ -2,7 +2,7 @@ from rich import print
 from devtools import debug
 import numpy as np
 import dask.array as da
-import cupy as cp
+# import cupy as cp
 from pvgisprototype.validation.arrays import NDArrayBackend
 from pvgisprototype.validation.arrays import create_array
 
