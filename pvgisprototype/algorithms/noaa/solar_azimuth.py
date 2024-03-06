@@ -170,9 +170,12 @@ def calculate_solar_azimuth_time_series_noaa(
     solar_azimuth_series = np.arccos(cosine_solar_azimuth_series)
 
     if not np.all(np.isfinite(solar_azimuth_series)) or not np.all(
-        (0 <= solar_azimuth_series) & (solar_azimuth_series <= 2 * np.pi)
+        (SolarAzimuth().min_radians <= solar_azimuth_series)
+        & (solar_azimuth_series <= SolarAzimuth().max_radians)
     ):
-        raise ValueError(f'At least one `solar_azimuth` value is out of the expected range [0, {2* np.pi}] radians : {solar_azimuth_series}')
+        raise ValueError(
+            f"At least one `solar_azimuth` value out of {solar_azimuth_series} is out of the expected range [{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
+        )
 
     from pvgisprototype.validation.hashing import generate_hash
     solar_azimuth_series_hash = generate_hash(solar_azimuth_series)
