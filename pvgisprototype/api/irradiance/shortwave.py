@@ -20,6 +20,7 @@ from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
@@ -143,10 +144,27 @@ def calculate_global_irradiance_time_series(
         verbose=0,
         log=log,
         )
+    solar_azimuth_series = model_solar_azimuth_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_position_model=solar_position_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
+        # time_offset_global=time_offset_global,
+        # hour_offset=hour_offset,
+        # perigee_offset=perigee_offset,
+        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
         log=log,
+    )
     # Masks based on the solar altitude series
     mask_above_horizon = solar_altitude_series.value > 0
     mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
