@@ -1,13 +1,5 @@
 from devtools import debug
-import logging
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler('error.log'),  # Save log to a file
-        logging.StreamHandler()  # Print log to the console
-    ]
-)
+from pvgisprototype.log import logger
 import typer
 from typing import Annotated
 from typing import List
@@ -22,10 +14,15 @@ from pvgisprototype.cli.typer_parameters import typer_argument_solar_incidence
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_incidence_series
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import ANGULAR_LOSS_COEFFICIENT
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 import numpy as np
 from rich import print
+from pvgisprototype.log import log_function
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 app = typer.Typer(
@@ -37,6 +34,7 @@ app = typer.Typer(
 
 
 # @app.callback(invoke_without_command=True)
+@log_function_call
 def calculate_angular_loss_factor_for_direct_irradiance(
     solar_incidence: Annotated[float, typer_argument_solar_incidence],
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
@@ -134,15 +132,17 @@ def calculate_angular_loss_factor_for_direct_irradiance(
         return incidence_angle_modifier
 
     except ZeroDivisionError as e:
-        logging.error(f"Zero Division Error: {e}")
+        logger.error(f"Zero Division Error: {e}")
         print("Error: Division by zero in calculating the angular loss factor.")
         return 1
 
 
+@log_function_call
 def calculate_angular_loss_factor_for_direct_irradiance_time_series(
-    solar_incidence_series: Annotated[ List[float], typer_argument_solar_incidence_series],
+    solar_incidence_series: Annotated[List[float], typer_argument_solar_incidence_series],
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
 ):
     """
     Notes
@@ -158,14 +158,23 @@ def calculate_angular_loss_factor_for_direct_irradiance_time_series(
         numerator = 1 - np.exp( - np.cos(solar_incidence_series) / angular_loss_coefficient )
         denominator =  1 / ( 1 - exp( -1 / angular_loss_coefficient))
         incidence_angle_modifier_series = numerator / denominator
-        if verbose > 5:
+
+        if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             debug(locals())
+
         if verbose > 0:
             print(f'Incidence angle modifier series: {incidence_angle_modifier_series}')
+
+        log_data_fingerprint(
+            data=incidence_angle_modifier_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        )
+
         return incidence_angle_modifier_series
 
     except ZeroDivisionError as e:
-        logging.error(f"Zero Division Error: {e}")
+        logger.error(f"Zero Division Error: {e}")
         print("Error: Division by zero in calculating the angular loss factor.")
         return np.array([1])  # Return an array with a single element as 1
 

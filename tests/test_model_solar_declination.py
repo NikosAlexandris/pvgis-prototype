@@ -8,7 +8,7 @@ from pvgisprototype import SolarDeclination
 
 
 test_cases_data = read_noaa_spreadsheet(
-    './tests/data/test_cases_noaa_spreadsheet.xlsx'
+    './tests/cases/noaa.xlsx'
 )
 test_cases = test_cases_from_data(
     test_cases_data,

@@ -1,5 +1,7 @@
 # Generic input/output
 from pvgisprototype.validation.pvis_data_classes import VerbosityModel
+from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
+from pvgisprototype.validation.pvis_data_classes import ArrayBackendModel
 
 # Where?
 from pvgisprototype.validation.pvis_data_classes import LatitudeModel
@@ -62,15 +64,18 @@ def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
                 # If the passed argument is already an instance of the expected model, skip validation
                 validated_input = args[0]
             else:
-                input_data = {**kwargs, **dict(zip(func.__annotations__.keys(), args))}
+                # input_data = {**kwargs,
+                # **dict(zip(func.__annotations__.keys(), args))}  # Not supported by Numba's nonpython mode!
+                input_data = {}  # an empty dictionary
+                input_data.update(kwargs)  # update with kwargs
+                input_data.update(dict(zip(func.__annotations__.keys(), args)))  # update with zipped annotations and args
                 validated_input = input_model(**input_data)
             dictionary_input = {}
             for k, v in validated_input:
                 dictionary_input[k] = v
             return func(**dictionary_input)
-
+            # return func(**validated_input.dict())  # Use .dict() to convert Pydantic model to dictionary
         return wrapper
-
     return decorator
 
 
@@ -337,6 +342,9 @@ class ModelSolarAltitudeTimeSeriesInputModel(
     BaseTimeSeriesModel,
     SolarPositionModel,
     ApplyAtmosphericRefractionModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    VerbosityModel,
 ):
     pass
 

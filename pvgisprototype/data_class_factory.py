@@ -7,6 +7,16 @@ import numpy as np
 from numpy import ndarray
 
 
+type_mapping = {
+    'int': int,
+    'float': float,
+    'str': str,
+    'list': list,
+    'dict': dict,
+    'Union[ndarray, float]': Union[np.ndarray, float],
+}
+
+
 def _degrees_to_timedelta(degrees):
     return degrees / 15.0
 
@@ -150,7 +160,6 @@ def _custom_getattr(self, attr_name):
             f"'{self.__class__.__name__}' object has no attribute '{attr_name}'"
         )
 
-
 class DataClassFactory:
     _cache = {}
 
@@ -172,7 +181,9 @@ class DataClassFactory:
         default_values = {}
 
         for field_name, field_data in parameters[model_name].items():
-            annotations[field_name] = eval(field_data["type"])
+            if field_data["type"] in type_mapping:
+                annotations[field_name] = type_mapping[field_data["type"]]
+
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
 

@@ -81,6 +81,26 @@ EquationOfTime:
   unit:
     type: str
     initial: minutes
+  min_minutes:
+    type: float
+    initial: -20
+  max_minutes:
+    type: float
+    initial: 20
+
+TrueSolarTime:
+  value:
+    type: Union[ndarray, float]
+    initial:
+  unit:
+    type: str
+    initial:
+  min_minutes:
+    type: float
+    initial: -1580
+  max_minutes:
+    type: float
+    initial: 1580
 
 SolarHourAngle:
   value:
@@ -95,6 +115,12 @@ SolarHourAngle:
   timing_algorithm:
     type: str
     initial:
+  min_radians:
+    type: float
+    initial: -3.141592653589793
+  max_radians:
+    type: float
+    initial: 3.141592653589793
   min_degrees:
     type: float
     initial: -180
@@ -127,6 +153,12 @@ FractionalYear:
   unit:
     type: str
     initial:
+  min_radians:
+    type: float
+    initial: 0
+  max_radians:
+    type: float
+    initial: 6.283185307179586
   min_degrees:
     type: float
     initial: 0
@@ -147,6 +179,12 @@ SolarDeclination:
   timing_algorithm:
     type: str
     initial:
+  min_radians:
+    type: float
+    initial: -0.40910517666747087
+  max_radians:
+    type: float
+    initial: 0.40910517666747087
   min_degrees:
     type: float
     initial: -23.44
@@ -167,12 +205,18 @@ SolarZenith:
   timing_algorithm:
     type: str
     initial:
+  min_radians:
+    type: float
+    initial: 0
+  max_radians:
+    type: float
+    initial: 3.1561926535897933  # pi + 0.0146
   min_degrees:
     type: float
     initial: 0
   max_degrees:
     type: float
-    initial: 180.836518
+    initial: 180.83651838089102
 
 RefractedSolarZenith:
   value:
@@ -197,10 +241,10 @@ SolarAltitude:
     initial:
   min_radians:
     type: float
-    initial: -3.15
+    initial: -3.141592653589793
   max_radians:
     type: float
-    initial: 3.15
+    initial: 3.141592653589793
   min_degrees:
     type: float
     initial: -90
@@ -235,7 +279,7 @@ WindSpeedSeries:
 LinkeTurbidityFactor:
   value:
     type: Union[ndarray, float]
-    initial:
+    initial: 0.2
   unit:
     type: str
     initial: unitless
@@ -269,6 +313,12 @@ SolarAzimuth:
   timing_algorithm:
     type: str
     initial:
+  min_radians:
+    type: float
+    initial: 0
+  max_radians:
+    type: float
+    initial: 6.283185307179586
   min_degrees:
     type: float
     initial: 0
@@ -323,6 +373,12 @@ TimeOffset:
   unit:
     type: str
     initial: minutes
+  min_minutes:
+    type: float
+    initial: -790  # -(720 + 70)
+  max_minutes:
+    type: float
+    initial: 790  # 720 + 70
 
 HorizonHeight:
   value:
