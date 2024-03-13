@@ -473,7 +473,7 @@ def calculate_solar_incidence_time_series_jenco(
             cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
             + sin(latitude.radians) * cos(surface_tilt.radians)
         )
-        relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
+        relative_inclined_latitude = asin(sine_relative_inclined_latitude)
         solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
             dtype=dtype,
