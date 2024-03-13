@@ -80,9 +80,12 @@ def select_time_series(
             start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
             end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
     
-        location_time_series = (
-            location_time_series.sel(time=slice(start_time, end_time))
-        )
+        try:
+            location_time_series = (
+                location_time_series.sel(time=slice(start_time, end_time))
+            )
+        except Exception as e:
+            print(f"No data found for the given period {start_time} and {end_time}.")
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
