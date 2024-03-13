@@ -466,8 +466,15 @@ def calculate_direct_normal_irradiance_time_series(
             * rayleigh_optical_thickness_series.value
         )
     )
+    # Warning
+    if (
+        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    ).any():
+        out_of_range_values = direct_normal_irradiance_series[
             (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
             | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+        ]
         warning_unstyled = (
                 f"\n"
                 f"{WARNING_OUT_OF_RANGE_VALUES} "
