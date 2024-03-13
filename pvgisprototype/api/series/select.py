@@ -6,7 +6,8 @@ from pvgisprototype import Latitude
 from datetime import datetime
 from pathlib import Path
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.api.series.log import logger
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.log import logger
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.series.utilities import get_scale_and_offset
@@ -29,6 +30,7 @@ def select_time_series(
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ):
     """Select location series"""
     if time_series is None:
@@ -62,6 +64,7 @@ def select_time_series(
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         verbose=verbose,
+        log=log,
     )
     # ------------------------------------------------------------------------
     if start_time or end_time:
@@ -105,7 +108,7 @@ def select_time_series(
         if verbose > 0:
             print(warning)
 
-    if verbose >7:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return location_time_series

@@ -1,5 +1,5 @@
 import typer
-from .log import logger
+from pvgisprototype.log import logger
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker

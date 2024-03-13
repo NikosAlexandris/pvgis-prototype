@@ -1,3 +1,6 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from typing import Optional
 from typing import Union
@@ -6,6 +9,8 @@ from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
@@ -26,6 +31,7 @@ def custom_hashkey(*args, **kwargs):
     kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
     return hashkey(*args, **kwargs)
 
+@log_function_call
 from cachetools import cached
 @cached(cache={}, key=custom_hashkey)
 def calculate_extraterrestrial_normal_irradiance_time_series(
@@ -38,6 +44,7 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> Union[np.ndarray, dict]:
     """
     Calculate the normal extraterrestrial irradiance over a period of time
@@ -59,7 +66,7 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(position_of_earth_series - perigee_offset)
     extraterrestrial_normal_irradiance_series = solar_constant * distance_correction_factor_series
 
-    if verbose == 7:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
@@ -77,5 +84,11 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
 
     if verbose > 0:
         return results
+
+    log_data_fingerprint(
+        data=extraterrestrial_normal_irradiance_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return extraterrestrial_normal_irradiance_series

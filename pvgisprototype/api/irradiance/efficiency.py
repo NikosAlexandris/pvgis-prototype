@@ -1,3 +1,6 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 import typer
 from typing import Annotated
@@ -76,6 +79,7 @@ def add_unequal_arrays(array_1, array_2):
     return array_1 + array_2
 
 
+@log_function_call
 def calculate_pv_efficiency_time_series(
     irradiance_series: List[float],
     spectral_factor: List[float],

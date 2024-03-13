@@ -15,6 +15,11 @@ import numpy as np
 from pvgisprototype import EquationOfTime
 from pandas import Timestamp
 from pandas import DatetimeIndex
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 # equivalent to : 4 * longitude (in degrees) ?
@@ -135,6 +140,7 @@ def calculate_time_offset_noaa(
     return time_offset
 
 
+@log_function_call
 from pandas import DatetimeIndex
 from cachetools.keys import hashkey
 def custom_hashkey(*args, **kwargs):
@@ -149,6 +155,8 @@ def calculate_time_offset_time_series_noaa(
     longitude: Longitude, 
     timestamps: Union[Timestamp, DatetimeIndex],
     timezone: ZoneInfo,
+    verbose: int = 0,
+    log: int = 0,
 ) -> TimeOffset:
     """ """
     # 1
@@ -167,19 +175,19 @@ def calculate_time_offset_time_series_noaa(
     # 2
     equation_of_time_series = calculate_equation_of_time_time_series_noaa(
         timestamps,
+        verbose=verbose,
     )
     time_offset_series = longitude.as_minutes - timezone_offset_minutes_series + equation_of_time_series.minutes
 
     if not np.all((TimeOffset().min_minutes <= time_offset_series) & (time_offset_series <= TimeOffset().max_minutes)):
         raise ValueError("At least one calculated time offset is out of the expected range [{TimeOffset().min_minutes, TimeOffset().max_minutes] minutes!")
 
-    from pvgisprototype.validation.hashing import generate_hash
-    time_offset_series_hash = generate_hash(time_offset_series)
-    print(
-        'TimeOffset : calculate_time_offset_time_series_noaa() |',
-        f"Data Type : [bold]{time_offset_series.dtype}[/bold] |",
-        f"Output Hash : [code]{time_offset_series_hash}[/code]",
+    log_data_fingerprint(
+            data=time_offset_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+
     return TimeOffset(
         value=time_offset_series,
         unit='minutes',

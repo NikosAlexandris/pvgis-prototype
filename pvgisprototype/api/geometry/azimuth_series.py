@@ -19,8 +19,14 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype import RefractedSolarZenith
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
+@log_function_call
 # @validate_with_pydantic(ModelSolarAzimuthTimeSeriesInputModel)
 def model_solar_azimuth_time_series(
     longitude: Longitude,
@@ -36,6 +42,7 @@ def model_solar_azimuth_time_series(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> List[SolarAzimuth]:
 
     if verbose > 5:
@@ -50,6 +57,7 @@ def model_solar_azimuth_time_series(
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             verbose=verbose,
+            log=log,
         )
 
     if solar_position_model.value == SolarPositionModel.skyfield:
@@ -67,5 +75,10 @@ def model_solar_azimuth_time_series(
     if solar_position_model.value  == SolarPositionModel.pvlib:
         pass
 
-    return solar_azimuth_series
+    log_data_fingerprint(
+            solar_azimuth_series.value,
+            log,
+            HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
+    return solar_azimuth_series

@@ -15,6 +15,11 @@ from rich import print
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pandas import DatetimeIndex
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.log import log_function_call
 
 
 @validate_with_pydantic(CalculateFractionalYearNOAAInput)
@@ -41,11 +46,14 @@ def calculate_fractional_year_noaa(
     return fractional_year
 
 
+@log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_time_series_noaa(
         timestamps: Union[datetime, DatetimeIndex],
     ) -> FractionalYear:
+    verbose: int = 0,
+    log: int = 0,
     """
     Calculate the fractional year series for a given series of timestamps.
 
@@ -110,15 +118,11 @@ def calculate_fractional_year_time_series_noaa(
         raise ValueError(
             f"The calculated fractional year `{wrong_values}` is out of the expected range [{FractionalYear().min_degrees}, {FractionalYear().max_degrees}] degrees!')"
         )
-
-    from pvgisprototype.validation.hashing import generate_hash
-    fractional_year_series_hash = generate_hash(fractional_year_series)
-    print(
-        "FractionalYear : calculate_fractional_year_time_series_noaa() |",
-        f"Data Type : [bold]{fractional_year_series.dtype}[/bold] |",
-        f"Output Hash : [code]{fractional_year_series_hash}[/code]",
+    log_data_fingerprint(
+            data=fractional_year_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-
     return FractionalYear(
         value=fractional_year_series,
         unit=RADIANS,

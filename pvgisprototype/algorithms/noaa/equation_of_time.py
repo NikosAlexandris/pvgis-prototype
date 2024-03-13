@@ -17,6 +17,12 @@ from pvgisprototype.constants import MINUTES
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pandas import DatetimeIndex
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 @validate_with_pydantic(CalculateEquationOfTimeNOAAInput)
@@ -42,15 +48,19 @@ def calculate_equation_of_time_noaa(
     return equation_of_time
 
 
+@log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput) 
 def calculate_equation_of_time_time_series_noaa(
     timestamps: DatetimeIndex,
+    verbose: int = 0,
+    log: int = 0,
 ) -> EquationOfTime:
     """Calculate the equation of time in minutes for a time series."""
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
         angle_output_units=RADIANS
+        verbose=verbose,
     )
     equation_of_time_series = 229.18 * (
         0.000075
@@ -66,13 +76,10 @@ def calculate_equation_of_time_time_series_noaa(
         raise ValueError(
             "The equation of time must be within the range [{EquationOfTime().min_minutes}, {EquationOfTime().max_minutes()}] minutes for all timestamps."
         )
-
-    from pvgisprototype.validation.hashing import generate_hash
-    equation_of_time_series_hash = generate_hash(equation_of_time_series)
-    print(
-        "EquationOfTime : calculate_equation_of_time_time_series_noaa() |",
-        f"Data Type : [bold]{equation_of_time_series.dtype}[/bold] |",
-        f"Output Hash : [code]{equation_of_time_series_hash}[/code]",
+    log_data_fingerprint(
+            data=equation_of_time_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
     
     return EquationOfTime(

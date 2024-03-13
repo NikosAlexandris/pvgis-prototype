@@ -14,9 +14,14 @@ from math import isfinite
 import numpy as np
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pandas import DatetimeIndex
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 @validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
@@ -62,6 +67,8 @@ def calculate_solar_declination_time_series_noaa(
     timestamps: Union[datetime, DatetimeIndex],
     backend: str = DEFAULT_ARRAY_BACKEND,
     dtype: str = DEFAULT_ARRAY_DTYPE,
+    verbose: int = 0,
+    log: int = 0,
 ) -> SolarDeclination:
     """
     """
@@ -93,3 +100,8 @@ def calculate_solar_declination_time_series_noaa(
     #     raise ValueError(f"The calculated solar declination `{wrong_values}` is out of the expected range [{declination_series.min_degrees}, {declination_series.max_degrees}] degrees!")
 
     return declination_series
+    log_data_fingerprint(
+        data=solar_declination_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )

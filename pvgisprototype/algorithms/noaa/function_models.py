@@ -43,12 +43,14 @@ class CalculateFractionalYearNOAAInput(
 
 class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     BaseTimestampSeriesModel,  # != BaseTimestampModel
+    VerbosityModel,
 ):
     pass
 
 
 class CalculateEquationOfTimeTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
+    VerbosityModel,
 ):
     pass
 
@@ -56,6 +58,7 @@ class CalculateEquationOfTimeTimeSeriesNOAAInput(
 class CalculateTimeOffsetTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
+    VerbosityModel,
 ):
     pass
 
@@ -64,6 +67,7 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
+    VerbosityModel,
 ):
     pass
 
@@ -71,12 +75,14 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
+    VerbosityModel,
 ):
     pass
 
 
 class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
     BaseTimestampSeriesModel,  # != BaseTimestampModel
+    VerbosityModel,
 ):
     pass
 
@@ -142,6 +148,7 @@ class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
 
+    VerbosityModel,
 ):
     pass
 

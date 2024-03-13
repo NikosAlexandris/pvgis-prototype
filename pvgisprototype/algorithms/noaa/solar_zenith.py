@@ -27,9 +27,13 @@ from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_dec
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 import numpy as np
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 def atmospheric_refraction_for_high_solar_altitude(
@@ -176,7 +180,7 @@ def adjust_solar_zenith_for_atmospheric_refraction(
             [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
         )
 
-    if verbose > 5:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return solar_zenith
@@ -271,6 +275,8 @@ def calculate_solar_zenith_time_series_noaa(
         apply_atmospheric_refraction: bool = False,
         verbose: int = 0,
     ) -> SolarZenith:
+    verbose: int = 0,
+    log: int = 0,
     """Calculate the solar zenith angle for a location over a time series"""
     solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
@@ -309,8 +315,11 @@ def calculate_solar_zenith_time_series_noaa(
             f"Solar zenith values should be finite numbers and range in [{SolarZenith().min_radians}, {SolarZenith().max_radians}] radians"
         )
 
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
+    log_data_fingerprint(
+        data=solar_zenith_series.value,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     # return SolarZenith(
     #     value=solar_zenith_series,

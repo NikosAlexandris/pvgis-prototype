@@ -23,9 +23,14 @@ from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
 from rich import print
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
@@ -137,6 +142,7 @@ def calculate_solar_azimuth_noaa(
     )
 
 
+@log_function_call
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 @cached(cache={}, key=custom_hashkey)
@@ -148,21 +154,25 @@ def calculate_solar_azimuth_time_series_noaa(
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
+    log: int = 0,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth (θ) for a time series"""
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
+        verbose=verbose,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        verbose=verbose,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
         timestamps=timestamps,
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
+        verbose=verbose,
     )
     numerator_series = sin(latitude.radians) * np.cos(solar_zenith_series.radians) - np.sin(solar_declination_series.radians)
     denominator_series = cos(latitude.radians) * np.sin(solar_zenith_series.radians)
@@ -176,17 +186,11 @@ def calculate_solar_azimuth_time_series_noaa(
         raise ValueError(
             f"At least one `solar_azimuth` value out of {solar_azimuth_series} is out of the expected range [{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
         )
-
-    from pvgisprototype.validation.hashing import generate_hash
-    solar_azimuth_series_hash = generate_hash(solar_azimuth_series)
-    print(
-        "SolarAzimuth : calculate_solar_azimuth_time_series_noaa() |",
-        f"Data Type : [bold]{solar_azimuth_series.dtype}[/bold] |",
-        f"Output Hash : [code]{solar_azimuth_series_hash}[/code]",
+    log_data_fingerprint(
+            data=solar_azimuth_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
 
     return SolarAzimuth(
         value=solar_azimuth_series,

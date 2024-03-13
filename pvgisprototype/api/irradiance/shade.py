@@ -1,12 +1,18 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from typing import List
 from pvgisprototype import HorizonHeight
 from pathlib import Path
 from typing import Optional
 import numpy as np
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
 
 
 # @validate_with_pydantic()
+@log_function_call
 def interpolate_horizon_height(
     solar_azimuth: float,
     horizon_heights: List[float],
@@ -95,8 +101,7 @@ def interpolate_horizon_height_series(
     return HorizonHeight(interpolated_horizon_heights, HORIZON_HEIGHT_UNIT)
 
 
-
-
+@log_function_call
 def is_surface_in_shade(
     solar_altitude: float,
     solar_azimuth: float,
@@ -139,12 +144,15 @@ def is_surface_in_shade(
     return False
 
 
+@log_function_call
 def is_surface_in_shade_time_series(
     solar_altitude_series,
     solar_azimuth_series,
     shadow_indicator: Path = None,
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
+    verbose: int = 0,
+    log: int = 0,
 ) -> List[bool]:
     """
     Determine if a surface is in shade based on solar altitude for each timestamp.
@@ -155,4 +163,9 @@ def is_surface_in_shade_time_series(
     Returns:
     - numpy array: Boolean array indicating whether the surface is in shade at each timestamp.
     """
+    log_data_fingerprint(
+            data=np.full(solar_altitude_series.value.shape, False),
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
     return np.full(solar_altitude_series.value.shape, False)
