@@ -1,5 +1,7 @@
 # Generic input/output
 from pvgisprototype.validation.pvis_data_classes import VerbosityModel
+from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
+from pvgisprototype.validation.pvis_data_classes import ArrayBackendModel
 
 # Where?
 from pvgisprototype.validation.pvis_data_classes import LatitudeModel
@@ -72,9 +74,8 @@ def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
             for k, v in validated_input:
                 dictionary_input[k] = v
             return func(**dictionary_input)
-
+            # return func(**validated_input.dict())  # Use .dict() to convert Pydantic model to dictionary
         return wrapper
-
     return decorator
 
 
@@ -341,6 +342,9 @@ class ModelSolarAltitudeTimeSeriesInputModel(
     BaseTimeSeriesModel,
     SolarPositionModel,
     ApplyAtmosphericRefractionModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    VerbosityModel,
 ):
     pass
 
