@@ -2,6 +2,7 @@ from pydantic import field_validator
 
 # Generic input/output
 from pvgisprototype.validation.pvis_data_classes import VerbosityModel
+from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
 
 # When?
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampModel
@@ -43,6 +44,7 @@ class CalculateFractionalYearNOAAInput(
 
 class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     BaseTimestampSeriesModel,  # != BaseTimestampModel
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
@@ -50,6 +52,7 @@ class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
 
 class CalculateEquationOfTimeTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
@@ -58,6 +61,7 @@ class CalculateEquationOfTimeTimeSeriesNOAAInput(
 class CalculateTimeOffsetTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
@@ -67,6 +71,7 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
     BaseTimeOutputUnitsModel,
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
@@ -75,6 +80,7 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
 class CalculateSolarHourAngleTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
@@ -82,6 +88,7 @@ class CalculateSolarHourAngleTimeSeriesNOAAInput(
 
 class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
     BaseTimestampSeriesModel,  # != BaseTimestampModel
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
@@ -122,6 +129,7 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     SolarHourAngleSeriesModel,
     ApplyAtmosphericRefractionModel,
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
@@ -131,6 +139,7 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     ApplyAtmosphericRefractionModel,
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
@@ -147,7 +156,7 @@ class CalculateSolarAzimuthNOAAInput(
 class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-
+    ArrayTypeModel,
     VerbosityModel,
 ):
     pass
