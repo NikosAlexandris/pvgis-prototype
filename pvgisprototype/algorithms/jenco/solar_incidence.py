@@ -50,6 +50,8 @@ from pvgisprototype.constants import RADIANS
 import numpy as np
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function
 from pvgisprototype.log import log_function_call
@@ -359,6 +361,8 @@ def calculate_solar_incidence_time_series_jenco(
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> SolarIncidence:
@@ -437,6 +441,8 @@ def calculate_solar_incidence_time_series_jenco(
             timestamps=timestamps,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,
             )
     solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
@@ -445,6 +451,8 @@ def calculate_solar_incidence_time_series_jenco(
             timestamps=timestamps,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,
             )
     in_shade = is_surface_in_shade_time_series(
@@ -465,6 +473,8 @@ def calculate_solar_incidence_time_series_jenco(
         relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
         solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
+            dtype=dtype,
+            array_backend=array_backend,
         )
         c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
             solar_declination_series.radians
@@ -476,6 +486,8 @@ def calculate_solar_incidence_time_series_jenco(
             longitude=longitude,
             timestamps=timestamps,
             timezone=timezone,
+            dtype=dtype,
+            array_backend=array_backend,
         )
         relative_longitude = calculate_relative_longitude(
             latitude=latitude,

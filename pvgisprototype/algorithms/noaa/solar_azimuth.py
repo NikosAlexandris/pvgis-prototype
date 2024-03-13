@@ -27,6 +27,8 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
 from rich import print
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -153,18 +155,24 @@ def calculate_solar_azimuth_time_series_noaa(
     timestamps: Union[datetime, DatetimeIndex],
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth (θ) for a time series"""
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
+        dtype=dtype,
+        backend=array_backend,
         verbose=verbose,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        dtype=dtype,
+        backend=array_backend,
         verbose=verbose,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
@@ -172,6 +180,8 @@ def calculate_solar_azimuth_time_series_noaa(
         timestamps=timestamps,
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
+        dtype=dtype,
+        backend=array_backend,
         verbose=verbose,
     )
     numerator_series = sin(latitude.radians) * np.cos(solar_zenith_series.radians) - np.sin(solar_declination_series.radians)

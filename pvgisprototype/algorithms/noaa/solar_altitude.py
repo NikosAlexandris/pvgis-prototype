@@ -35,6 +35,8 @@ from pandas import DatetimeIndex
 from rich import print
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -83,6 +85,7 @@ def calculate_solar_altitude_noaa(
 
     return solar_altitude
 
+
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAltitudeTimeSeriesNOAAInput)
@@ -92,6 +95,8 @@ def calculate_solar_altitude_time_series_noaa(
     timestamps: Union[datetime, DatetimeIndex],
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> SolarAltitude:
@@ -100,6 +105,8 @@ def calculate_solar_altitude_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
@@ -107,6 +114,8 @@ def calculate_solar_altitude_time_series_noaa(
         timestamps=timestamps,
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     solar_altitude_series = np.pi / 2 - solar_zenith_series.radians

@@ -77,8 +77,8 @@ def model_solar_geometry_overview_time_series(
 
         solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
-            backend=array_backend,
             dtype=dtype,
+            array_backend=array_backend,
         )
         solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
             longitude=longitude,

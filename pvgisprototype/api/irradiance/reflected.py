@@ -19,6 +19,8 @@ from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irr
 from pvgisprototype.api.irradiance.direct import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse import diffuse_transmission_function_time_series
 from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_function_time_series
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -82,6 +84,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     time_output_units: str = MINUTES,
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ):
@@ -112,6 +116,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
         )

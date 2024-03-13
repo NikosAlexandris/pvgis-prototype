@@ -31,6 +31,8 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -119,6 +121,8 @@ def atmospheric_refraction_for_below_horizon(
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction(
     solar_zenith: SolarZenith,  # radians
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
 ) -> SolarZenith:
     """Adjust solar zenith for atmospheric refraction
@@ -188,15 +192,17 @@ def adjust_solar_zenith_for_atmospheric_refraction(
 
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction_time_series(
-        solar_zenith_series: SolarZenith,
-        verbose: int = 0,
-    ) -> SolarZenith:
+    solar_zenith_series: SolarZenith,
+    verbose: int = 0,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+) -> SolarZenith:
     """Adjust solar zenith for atmospheric refraction for a time series of solar zenith angles"""
     # Mask 
-    solar_altitude_series_array = np.radians(90) - solar_zenith_series.radians  # in radians
-    mask_high = solar_altitude_series_array > np.radians(5)
-    mask_near = (solar_altitude_series_array > np.radians(-0.575)) & ~mask_high
-    mask_below = solar_altitude_series_array <= np.radians(-0.575)
+    solar_altitude_series_array = np.radians(90, dtype=dtype) - solar_zenith_series.radians  # in radians
+    mask_high = solar_altitude_series_array > np.radians(5, dtype=dtype)
+    mask_near = (solar_altitude_series_array > np.radians(-0.575, dtype=dtype)) & ~mask_high
+    mask_below = solar_altitude_series_array <= np.radians(-0.575, dtype=dtype)
 
     # Adjust
     function_high = np.vectorize(lambda x: atmospheric_refraction_for_high_solar_altitude(x).value)
@@ -266,21 +272,25 @@ def calculate_solar_zenith_noaa(
     )
 
 
+@log_function_call
 # @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarZenithTimeSeriesNOAAInput)
 def calculate_solar_zenith_time_series_noaa(
-        latitude: Latitude,  # radians
-        timestamps: Union[datetime, Sequence[datetime]],
-        solar_hour_angle_series: SolarHourAngle,
-        apply_atmospheric_refraction: bool = False,
-        verbose: int = 0,
-    ) -> SolarZenith:
+    latitude: Latitude,  # radians
+    timestamps: Union[datetime, Sequence[datetime]],
+    solar_hour_angle_series: SolarHourAngle,
+    apply_atmospheric_refraction: bool = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
+) -> SolarZenith:
     """Calculate the solar zenith angle for a location over a time series"""
     solar_declination_series = calculate_solar_declination_time_series_noaa(
-            timestamps=timestamps,
-            )
+        timestamps=timestamps,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
     cosine_solar_zenith = (
         np.sin(latitude.radians) * np.sin(solar_declination_series.radians)
         + np.cos(latitude.radians) * np.cos(solar_declination_series.radians) * np.cos(solar_hour_angle_series.radians)

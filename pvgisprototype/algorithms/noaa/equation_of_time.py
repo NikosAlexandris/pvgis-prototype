@@ -17,6 +17,8 @@ from pvgisprototype.constants import MINUTES
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pandas import DatetimeIndex
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.log import log_data_fingerprint
@@ -53,13 +55,17 @@ def calculate_equation_of_time_noaa(
 @validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput) 
 def calculate_equation_of_time_time_series_noaa(
     timestamps: DatetimeIndex,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> EquationOfTime:
     """Calculate the equation of time in minutes for a time series."""
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
-        angle_output_units=RADIANS
+        angle_output_units=RADIANS,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     equation_of_time_series = 229.18 * (

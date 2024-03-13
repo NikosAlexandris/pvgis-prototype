@@ -2,9 +2,9 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-import typer
-from typing import Annotated
 from typing import List
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import RADIATION_CUTOFF_THRESHHOLD
 from pvgisprototype.constants import POWER_AT_STANDARD_TEST_CONDITIONS
@@ -90,6 +90,8 @@ def calculate_pv_efficiency_time_series(
     power_model: PVModuleEfficiencyAlgorithm = PVModuleEfficiencyAlgorithm.king,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the time series efficiency of a photovoltaic (PV) module

@@ -5,6 +5,8 @@ from devtools import debug
 from typing import Optional
 from typing import Union
 from datetime import datetime
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -43,6 +45,8 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> Union[np.ndarray, dict]:
