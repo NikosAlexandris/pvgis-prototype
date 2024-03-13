@@ -27,6 +27,7 @@ import numpy as np
 DATA_TYPE_DEFAULT = 'float32'  # takes halve of the time to process than float64
 ARRAY_BACKEND_DEFAULT = 'NUMPY'
 VERBOSE_LEVEL_DEFAULT = 0
+HASH_AFTER_THIS_VERBOSITY_LEVEL = 6
 DEBUG_AFTER_THIS_VERBOSITY_LEVEL = 7
 ROUNDING_PLACES_DEFAULT = 5
 TOLERANCE_DEFAULT = 0.1  # Is this a sane default ?
