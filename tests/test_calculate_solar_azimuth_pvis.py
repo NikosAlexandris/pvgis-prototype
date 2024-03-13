@@ -3,11 +3,11 @@ from pvgisprototype import SolarAzimuth
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import AZIMUTH_NAME, DEGREES
 from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
-from pvgisprototype.api.geometry.models import SolarTimeModels
+from pvgisprototype.api.geometry.models import SolarTimeModel
 
 
 test_cases_data = read_noaa_spreadsheet(
-    './tests/data/test_cases_noaa_spreadsheet.xlsx'
+    './tests/cases/noaa.xlsx'
 )
 test_cases = test_cases_from_data(
     test_cases_data,

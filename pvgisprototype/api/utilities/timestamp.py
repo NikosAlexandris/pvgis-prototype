@@ -43,6 +43,7 @@ Read also:
 """
 
 from pandas import Timestamp
+from pandas import date_range
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -53,7 +54,8 @@ from typing import Union
 from typing import List
 from typing import Sequence
 import calendar
-import random
+from random import randint
+from random import choice
 # import time
 import typer
 import zoneinfo
@@ -83,7 +85,7 @@ def random_day_of_year(days_in_year: int) -> int:
     """
     Generate a random datetime and timezone object
     """
-    return random.randint(1, days_in_year)
+    return randint(1, days_in_year)
 
 
 def random_datetimezone() -> tuple:
@@ -91,14 +93,14 @@ def random_datetimezone() -> tuple:
     Generate a random datetime and timezone object
     """
     year = datetime.now().year
-    month = random.randint(1, 12)
+    month = randint(1, 12)
     _, days_in_month = calendar.monthrange(year, month)
-    day = random.randint(1, days_in_month)
-    hour = random.randint(0, 23)
-    minute = random.randint(0, 59)
-    second = random.randint(0, 59)
+    day = randint(1, days_in_month)
+    hour = randint(0, 23)
+    minute = randint(0, 59)
+    second = randint(0, 59)
     datetimestamp = datetime(year, month, day, hour, minute, second, tzinfo=ZoneInfo('UTC'))
-    timezone_str = random.choice(list(zoneinfo.available_timezones()))
+    timezone_str = choice(list(zoneinfo.available_timezones()))
     timezone = ZoneInfo(timezone_str)
 
     return datetimestamp, timezone
@@ -255,6 +257,8 @@ def timestamp_to_decimal_hours(t):  # NOTE: Integrated in dateclasses
 def timestamp_to_decimal_hours_time_series(
     timestamps: Union[datetime, Sequence[datetime]]
 ) -> np.ndarray:
+    """
+    """
     if isinstance(timestamps, datetime):
         timestamps = [timestamps]
 
@@ -268,6 +272,8 @@ def timestamp_to_decimal_hours_time_series(
 
 
 def hour_of_year_to_datetime(year, hour):
+    """
+    """
     start_of_year = datetime.datetime(year, 1, 1)
     timedelta_hours = datetime.timedelta(hours=hour)
     desired_datetime = start_of_year + timedelta_hours
@@ -398,15 +404,43 @@ def parse_timestamp_series(
         raise ValueError("The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function")
 
 
-def generate_timestamps_for_a_year(year, frequency_minutes=60):
-    start_date = datetime(year, 1, 1)
-    days_in_year = get_days_in_year(year)
-    end_date = start_date + timedelta(days=days_in_year)
-    total_minutes = int((end_date - start_date).total_seconds() // 60)
-    intervals = total_minutes // frequency_minutes
-    
-    return [start_date + timedelta(minutes=(idx * frequency_minutes)) for idx in range(intervals)]
+def generate_timestamps_for_a_year(
+    year: int = None,
+    frequency: str = 'h',  # default to hourly timestamps
+    random: bool = False,
+):
+    """
+    Generate timestamps for a given or random year.
 
+    Parameters
+    ----------
+    year: int, optional
+        The year for which to generate timestamps. If not specified, a random
+        year is chosen.
+
+    frequency: str
+        The frequency of timestamps to generate, e.g., 'h' for hourly. Defaults
+        to 'h'.
+
+    Returns:
+    - DatetimeIndex: A Pandas DatetimeIndex of timestamps for the specified or
+      random year
+
+    """
+    if random:
+        year = randint(2005, 2024)  # Relating to PVGIS' 2005 starting year
+
+    start_time = f"{year}-01-01 00:00:00"
+    end_time = f"{year+1}-01-01 00:00:00"
+
+    timestamps = date_range(
+        start=start_time,
+        end=end_time,
+        freq=frequency,
+        inclusive='left'  # Exclude the end_time to keep within the year
+    )
+
+    return timestamps
 
 def generate_datetime_series(
     start_time: Optional[str] = None,
@@ -482,7 +516,6 @@ def generate_datetime_series(
                '2010-06-01 08:00:00', '2010-06-01 09:00:00'],
               dtype='datetime64[ns]', freq='H')
     """
-    from pandas import date_range
     timestamps = date_range(
         start=start_time,
         end=end_time,

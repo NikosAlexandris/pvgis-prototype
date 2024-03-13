@@ -11,6 +11,8 @@ from pvgisprototype import SurfaceOrientation
 from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype import RefractedSolarZenith
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -45,6 +47,8 @@ def model_solar_incidence_time_series(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> SolarIncidence:
 
@@ -58,6 +62,8 @@ def model_solar_incidence_time_series(
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
             complementary_incidence_angle=complementary_incidence_angle,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=verbose,
         )
 

@@ -133,7 +133,8 @@ def test_cases_from_data(
         iana_time_zone_name = tf.timezone_at(lat=row[map_field_name['latitude']], lng=row[map_field_name['longitude']])
         time_zone = ZoneInfo(iana_time_zone_name)
 
-        dt = datetime(
+        from pandas import Timestamp
+        dt = Timestamp(
                     year=row[map_field_name['date']].year,
                     month=row[map_field_name['date']].month,
                     day=row[map_field_name['date']].day,
@@ -196,4 +197,3 @@ def test_cases_from_data(
         single_case.append(against_unit)
         test_cases.append(tuple(single_case))
     return test_cases
-

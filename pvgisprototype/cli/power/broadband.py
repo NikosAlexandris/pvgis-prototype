@@ -1,3 +1,4 @@
+from pvgisprototype.log import logger
 from typing import Annotated
 from typing import List
 from typing import Optional
@@ -73,6 +74,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_wi
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_profiling
 from pvgisprototype.cli.typer_parameters import typer_option_index
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -81,6 +84,7 @@ from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
+from pvgisprototype.constants import ENERGY_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
@@ -100,9 +104,12 @@ from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype import LinkeTurbidityFactor
 from rich import print
+from pvgisprototype.log import log_function_call
 from pandas import DatetimeIndex
 
+import typer
 
+@log_function_call
 def photovoltaic_power_output_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -116,16 +123,16 @@ def photovoltaic_power_output_series(
     random_time_series: bool = False,
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
-    temperature_series: Annotated[TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
+    temperature_series: Annotated[Path|TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
-    dtype = 'float64',
-    array_backend = 'NUMPY',
-    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -154,6 +161,7 @@ def photovoltaic_power_output_series(
     uniplot: Annotated[bool, typer_option_uniplot] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
     profile: Annotated[bool, typer_option_profiling] = False,
 ):
@@ -162,6 +170,24 @@ def photovoltaic_power_output_series(
     aggregated energy production of a PV system connected to the electricity
     grid (without battery storage) based on broadband solar irradiance, ambient
     temperature and wind speed.
+
+    Notes
+    -----
+    The optional input parameters `global_horizontal_irradiance` and
+    `direct_horizontal_irradiance` accept any Xarray-support data file format
+    and mean the global and direct irradiance on the horizontal plane.
+
+    Inside the API, however, and for legibility, the same parameters in the
+    functions that calculate the diffuse and direct components, are defined as
+    `global_horizontal_component` and `direct_horizontal_component`. This is to
+    avoid confusion at the function level. For example, the function
+    `calculate_diffuse_inclined_irradiance_time_series()` can read the direct
+    horizontal component (thus the name of it `direct_horizontal_component` as
+    well as simulate it.  The point is to make it clear that if the
+    `direct_horizontal_component` parameter is True (which means the user has
+    provided an external dataset), then read it using the
+    `select_time_series()` function.
+
     """
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
@@ -221,15 +247,10 @@ def photovoltaic_power_output_series(
             title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
             rounding_places=rounding_places,
             index=index,
+            surface_orientation=True,
+            surface_tilt=True,
             verbose=verbose,
         )
-        if statistics:
-            print_series_statistics(
-                data_array=photovoltaic_power_output_series,
-                timestamps=timestamps,
-                groupby=groupby,
-                title="Photovoltaic power output",
-            )
         if csv:
             write_irradiance_csv(
                 longitude=longitude,
@@ -238,41 +259,53 @@ def photovoltaic_power_output_series(
                 dictionary=photovoltaic_power_output_series,
                 filename=csv,
             )
-        if uniplot:
-            import os 
-            terminal_columns, _ = os.get_terminal_size() # we don't need lines!
-            terminal_length = int(terminal_columns * terminal_width_fraction)
-            from functools import partial
-            from uniplot import plot as default_plot
-            plot = partial(default_plot, width=terminal_length)
-            from pvgisprototype.api.series.hardcodings import exclamation_mark
-            title="Photovoltaic power output"
-            lines = True
-            if isinstance(photovoltaic_power_output_series, float):
-                print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
-                return
-            import numpy as np
-            photovoltaic_power_output_series = list(photovoltaic_power_output_series.values())[0]
-            if isinstance(photovoltaic_power_output_series, np.ndarray):
-                # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
-                supertitle = 'Photovoltaic Power Output Series'
-                # label = getattr(photovoltaic_power_output_series, 'name', None)
-                label = 'Photovoltaic Power'
-                # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
-                # unit = getattr(photovoltaic_power_output_series, 'units', None)
-                unit = POWER_UNIT
-                plot(
-                    # xs=timestamps,
-                    # xs=photovoltaic_power_output_series,
-                    # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
-                    ys=photovoltaic_power_output_series,
-                    legend_labels=label,
-                    lines=lines,
-                    title=title if title else supertitle,
-                    y_unit=' ' + str(unit),
-                )
-
     else:
         flat_list = photovoltaic_power_output_series.flatten().astype(str)
         csv_str = ','.join(flat_list)
         print(csv_str)
+
+    if statistics:
+        print_series_statistics(
+            data_array=photovoltaic_power_output_series,
+            timestamps=timestamps,
+            groupby=groupby,
+            title="Photovoltaic power output",
+        )
+    if uniplot:
+        print(f'[reverse]Uniplot[/reverse]')
+        import os 
+        terminal_columns, _ = os.get_terminal_size() # we don't need lines!
+        terminal_length = int(terminal_columns * terminal_width_fraction)
+        from functools import partial
+        from uniplot import plot as default_plot
+        plot = partial(default_plot, width=terminal_length)
+        from pvgisprototype.api.series.hardcodings import exclamation_mark
+        title="Photovoltaic power output"
+        lines = True
+
+        if isinstance(photovoltaic_power_output_series, float):
+            print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
+            return
+        import numpy as np
+        
+        if verbose > 0:
+            photovoltaic_power_output_series = list(photovoltaic_power_output_series.values())[0]
+        
+        if isinstance(photovoltaic_power_output_series, np.ndarray):
+            # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
+            supertitle = 'Photovoltaic Power Output Series'
+            # label = getattr(photovoltaic_power_output_series, 'name', None)
+            label = 'Photovoltaic Power'
+            # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
+            # unit = getattr(photovoltaic_power_output_series, 'units', None)
+            unit = POWER_UNIT
+            plot(
+                # xs=timestamps,
+                # xs=photovoltaic_power_output_series,
+                # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
+                ys=photovoltaic_power_output_series,
+                legend_labels=label,
+                lines=lines,
+                title=title if title else supertitle,
+                y_unit=' ' + str(unit),
+            )
