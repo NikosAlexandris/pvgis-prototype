@@ -147,6 +147,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.validation.functions import AdjustElevationInputModel
 from pvgisprototype import Elevation
+from pandas import DatetimeIndex
 
 
 def compare_temporal_resolution(timestamps, array):
@@ -351,7 +352,7 @@ def calculate_rayleigh_optical_thickness_time_series(
 
 
 def calculate_direct_normal_irradiance_time_series(
-    timestamps: BaseTimestampSeriesModel = None,
+    timestamps: DatetimeIndex = None,
     start_time: Optional[datetime] = None,
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
