@@ -145,7 +145,6 @@ from pvgisprototype import OpticalAirMass
 from pvgisprototype import RayleighThickness
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.series.select import select_time_series
-# from pvgisprototype.api.series.utilities import select_location_time_series
 from pathlib import Path
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -158,9 +157,12 @@ from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @log_function_call
-def compare_temporal_resolution(timestamps, array):
+def compare_temporal_resolution(
+    timestamps,
+    array,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+):
     """
     Check if the frequency of `timestamps` matches the temporal resolution of the `array`.
     
@@ -206,7 +208,7 @@ def adjust_elevation(
 
     .. [1] Hofierka, 2002
     """
-    adjusted_elevation = np.exp(-elevation.value / 8434.5)
+    adjusted_elevation = np.array(np.exp(-elevation.value / 8434.5), dtype=dtype)
 
     log_data_fingerprint(
         data=adjusted_elevation,
@@ -236,7 +238,7 @@ def correct_linke_turbidity_factor_time_series(
     - List[LinkeTurbidityFactor] or LinkeTurbidityFactor: 
       The corrected Linke turbidity factors as a list of LinkeTurbidityFactor objects or a single object.
     """
-    corrected_linke_turbidity_factors_array = -0.8662 * linke_turbidity_factor_series.value
+    corrected_linke_turbidity_factors = -0.8662 * np.array(linke_turbidity_factor_series.value, dtype=dtype)
 
     log_data_fingerprint(
         data=corrected_linke_turbidity_factors,
@@ -246,12 +248,11 @@ def correct_linke_turbidity_factor_time_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    corrected_linke_turbidity_factors = LinkeTurbidityFactor(
-        value=corrected_linke_turbidity_factors_array,
+    return LinkeTurbidityFactor(
+        value=corrected_linke_turbidity_factors,
         unit=LINKE_TURBIDITY_UNIT,
     )
-    return corrected_linke_turbidity_factors
-
+    
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
@@ -269,6 +270,8 @@ def calculate_refracted_solar_altitude_time_series(
     This function :
     - requires solar altitude values in degrees.
     - is vectorized to handle arrays of solar altitudes.
+    - The output _should_ expectedly be of the same `dtype` as the input
+      `solar_altitude_series` array.
 
     """
     atmospheric_refraction = (
@@ -284,7 +287,7 @@ def calculate_refracted_solar_altitude_time_series(
             + 277.3971 * np.power(solar_altitude_series.degrees, 2)
         )
     )
-    refracted_solar_altitude_series_array = (
+    refracted_solar_altitude_series = (
         solar_altitude_series.degrees + atmospheric_refraction
     )
 
@@ -292,22 +295,21 @@ def calculate_refracted_solar_altitude_time_series(
         data=refracted_solar_altitude_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    refracted_solar_altitude_series = RefractedSolarAltitude(
-        value=refracted_solar_altitude_series_array,
-        unit=DEGREES,
     )
-
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return refracted_solar_altitude_series
+    return RefractedSolarAltitude(
+        value=refracted_solar_altitude_series,  # ensure output is of input dtype !
+        unit=DEGREES,
+    )
 
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateOpticalAirMassTimeSeriesInputModel)
 def calculate_optical_air_mass_time_series(
-    elevation: Annotated[float, typer_argument_elevation],
+    elevation: float,
     refracted_solar_altitude_series: RefractedSolarAltitude,
     verbose: int = 0,
     log: int = 0,
@@ -337,24 +339,29 @@ def calculate_optical_air_mass_time_series(
 
     """
     adjusted_elevation = adjust_elevation(elevation.value)
+    degrees_plus_offset = refracted_solar_altitude_series.degrees + 6.07995
+
+    # Handle negative values subjected to np.power()
+    power_values = np.where(
+        degrees_plus_offset > 0, np.power(degrees_plus_offset, -1.6364), 0
+    )
     optical_air_mass_series = adjusted_elevation.value / (
         np.sin(refracted_solar_altitude_series.radians)  # in radians for NumPy
-        + 0.50572
-        * np.power((refracted_solar_altitude_series.degrees + 6.07995), -1.6364)
+        + 0.50572 * power_values
     )
 
     log_data_fingerprint(
         data=optical_air_mass_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    optical_air_mass_series = OpticalAirMass(
-        value=optical_air_mass_series,
-        unit=OPTICAL_AIR_MASS_UNIT,
     )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return optical_air_mass_series
+    return OpticalAirMass(
+        value=optical_air_mass_series,
+        unit=OPTICAL_AIR_MASS_UNIT,
+    )
 
 
 @log_function_call
@@ -371,22 +378,18 @@ def calculate_rayleigh_optical_thickness_time_series(
     Vectorized function to calculate Rayleigh optical thickness for a time series.
 
     """
-    rayleigh_thickness_series_array = np.zeros_like(optical_air_mass_series.value, dtype=float)
+    rayleigh_thickness_series = np.zeros_like(optical_air_mass_series.value, dtype=dtype)
     smaller_than_20 = optical_air_mass_series.value <= 20
     larger_than_20 = optical_air_mass_series.value > 20
-    rayleigh_thickness_series_array[smaller_than_20] = 1 / (
+    rayleigh_thickness_series[smaller_than_20] = 1 / (
         6.6296
         + 1.7513 * optical_air_mass_series.value[smaller_than_20]
         - 0.1202 * np.power(optical_air_mass_series.value[smaller_than_20], 2)
         + 0.0065 * np.power(optical_air_mass_series.value[smaller_than_20], 3)
         - 0.00013 * np.power(optical_air_mass_series.value[smaller_than_20], 4)
     )
-    rayleigh_thickness_series_array[larger_than_20] = 1 / (
+    rayleigh_thickness_series[larger_than_20] = 1 / (
         10.4 + 0.718 * optical_air_mass_series.value[larger_than_20]
-    )
-    rayleigh_thickness_series = RayleighThickness(
-        value=rayleigh_thickness_series_array,
-        unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
     )
 
     log_data_fingerprint(
@@ -397,7 +400,10 @@ def calculate_rayleigh_optical_thickness_time_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return rayleigh_thickness_series
+    return RayleighThickness(
+        value=rayleigh_thickness_series,
+        unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
+    )
 
 
 @log_function_call
@@ -675,7 +681,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: BaseTimestampSeriesModel = None,
+    timestamps: DatetimeIndex = None,
     start_time: Optional[datetime] = None,
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
@@ -727,6 +733,10 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         B   = ────────────────     in  ⎜───⎟
          ic       sin ⎛h ⎞             ⎜ -2⎟           
                       ⎝ 0⎠             ⎝m  ⎠           
+
+        or else :
+
+        Direct Inclined = Direct Horizontal * sin( Solar Incidence ) / sin( Solar Altitude )
 
     The implementation by Hofierka (2002) uses the solar incidence angle
     between the sun-vetor and plance of the reference surface (as per Jenco,
@@ -786,6 +796,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,
         log=log,
     )
@@ -917,9 +929,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
                     verbose=0,
                 )
             )
-            direct_inclined_irradiance_series = (
-                direct_horizontal_irradiance_series * angular_loss_factor_series
-            )
+            direct_inclined_irradiance_series *= angular_loss_factor_series
 
         except ZeroDivisionError as e:
             logger.error(f"Which Error? {e}")

@@ -1,3 +1,5 @@
+from rich import print
+from devtools import debug
 from typing import Optional
 from typing import Union
 from typing import Sequence
@@ -80,7 +82,7 @@ def calculate_solar_declination_time_series_noaa(
         dtype=dtype,
         backend=array_backend,
     )
-    declination_series = (
+    solar_declination_series = (
         0.006918
         - 0.399912 * np.cos(fractional_year_series.radians)
         + 0.070257 * np.sin(fractional_year_series.radians)
@@ -89,21 +91,20 @@ def calculate_solar_declination_time_series_noaa(
         - 0.002697 * np.cos(3 * fractional_year_series.radians)
         + 0.00148 * np.sin(3 * fractional_year_series.radians)
     )
-    declination_series = SolarDeclination(
-        value=declination_series,
-        unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
-    )
-
     # if not np.all((declination_series.min_degrees <= declination_series.degrees) & (declination_series.degrees <= declination_series.max_degrees)):           # FIXME: Comparison between floats
     #     wrong_values_index = np.where((declination_series.degrees < declination_series.min_degrees) | (declination_series.degrees > declination_series.max_degrees))
     #     wrong_values = declination_series.degrees[wrong_values_index]
     #     raise ValueError(f"The calculated solar declination `{wrong_values}` is out of the expected range [{declination_series.min_degrees}, {declination_series.max_degrees}] degrees!")
 
-    return declination_series
     log_data_fingerprint(
         data=solar_declination_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+
+    return SolarDeclination(
+        value=solar_declination_series,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
     )

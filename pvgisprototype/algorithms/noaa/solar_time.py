@@ -138,10 +138,10 @@ def calculate_true_solar_time_time_series_noaa(
     )
     true_solar_time_series = timestamps + to_timedelta(time_offset_series.value, unit='min')
     true_solar_time_series_in_minutes = (
-        (true_solar_time_series.hour * 60)
-        + true_solar_time_series.minute
-        + (true_solar_time_series.second / 60.0)
-    )
+        (timestamps - timestamps.normalize()).total_seconds()
+        + (time_offset_series.value * 60)
+    ).astype(dtype) / 60
+
     if not (
         (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
         & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)

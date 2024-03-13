@@ -52,12 +52,12 @@ def calculate_fractional_year_noaa(
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_time_series_noaa(
-        timestamps: Union[datetime, DatetimeIndex],
-    ) -> FractionalYear:
+    timestamps: Union[datetime, DatetimeIndex],
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
+) -> FractionalYear:
     """
     Calculate the fractional year series for a given series of timestamps.
 
@@ -114,13 +114,12 @@ def calculate_fractional_year_time_series_noaa(
         & (fractional_year_series <= FractionalYear().max_radians)
     ):
         wrong_values_index = np.where(
-            fractional_year_series.min_degrees
-            <= np.all(fractional_year_series.degrees)
-            <= fractional_year_series.max_degrees
+            (fractional_year_series.degrees < FractionalYear().min_degrees) |
+            (fractional_year_series.degrees > FractionalYear().max_degrees)
         )
         wrong_values = fractional_year_series.degrees[wrong_values_index]
         raise ValueError(
-            f"The calculated fractional year `{wrong_values}` is out of the expected range [{FractionalYear().min_degrees}, {FractionalYear().max_degrees}] degrees!')"
+            f"The calculated fractional year value/s [code]`{wrong_values}`[/code] is out of the expected range [{FractionalYear().min_degrees}, {FractionalYear().max_degrees}] degrees!')"
         )
     log_data_fingerprint(
             data=fractional_year_series,

@@ -3,6 +3,7 @@ from pvgisprototype.log import log_function
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
+from rich import print
 from typing import Optional
 from typing import List
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance

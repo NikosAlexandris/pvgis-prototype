@@ -22,24 +22,22 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from rich import print
 from pandas import DatetimeIndex
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools.keys import hashkey
-def custom_hashkey(*args, **kwargs):
-    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
-    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
-    return hashkey(*args, **kwargs)
-
 from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
+
+
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(ModelSolarAltitudeTimeSeriesInputModel)
 def model_solar_altitude_time_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,

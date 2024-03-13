@@ -1,3 +1,4 @@
+from rich import print
 from devtools import debug
 from typing import Union
 from typing import Sequence
@@ -149,13 +150,19 @@ def adjust_solar_zenith_for_atmospheric_refraction(
         'below_horizon': atmospheric_refraction_for_below_horizon
     }
 
-    solar_altitude = radians(90) - solar_zenith.radians
-    if solar_altitude <= radians(85):
+    # solar_altitude = radians(90) - solar_zenith.radians
+    solar_altitude = radians(90, dtype=dtype) - solar_zenith.radians
+    # adjusted_solar_zenith = solar_zenith.radians  # Default to input if no adjustment is made
 
-        if solar_altitude > radians(5):
+    # if solar_altitude <= radians(85):
+    if solar_altitude <= radians(85, dtype=dtype):
+
+        # if solar_altitude > radians(5):
+        if solar_altitude > radians(5, dtype=dtype):
             function: Callable = atmospheric_refraction_functions['high_solar_altitude']
         
-        elif solar_altitude > radians(-0.575):
+        # elif solar_altitude > radians(-0.575):
+        elif solar_altitude > radians(-0.575, dtype=dtype):
             function = atmospheric_refraction_functions['near_horizon']
         
         else:
@@ -168,6 +175,8 @@ def adjust_solar_zenith_for_atmospheric_refraction(
     solar_zenith = SolarZenith(
         value=adjusted_solar_zenith,
         unit=RADIANS,
+        position_algorithm=solar_zenith.position_algorithm,
+        timing_algorithm=solar_zenith.timing_algorithm
     )
 
     # Reasonably increase the upper limit for the solar zenith
@@ -250,7 +259,12 @@ def calculate_solar_zenith_noaa(
     solar_zenith = acos(cosine_solar_zenith)
     if apply_atmospheric_refraction:
         solar_zenith = adjust_solar_zenith_for_atmospheric_refraction(
-            solar_zenith,
+            solar_zenith=SolarZenith(
+                value=solar_zenith,
+                unit=RADIANS,
+                position_algorithm='NOAA',
+                timing_algorithm='NOAA',
+            )
         )  # always in radians!
     if (
         not isfinite(solar_zenith.degrees)
@@ -264,12 +278,13 @@ def calculate_solar_zenith_noaa(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return SolarZenith(
-        value=solar_zenith,
-        unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
-    )
+    return solar_zenith
+    # return SolarZenith(
+    #     value=solar_zenith,
+    #     unit=RADIANS,
+    #     position_algorithm='NOAA',
+    #     timing_algorithm='NOAA',
+    # )
 
 
 @log_function_call
@@ -291,19 +306,12 @@ def calculate_solar_zenith_time_series_noaa(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+    )
     cosine_solar_zenith = (
-        np.sin(latitude.radians) * np.sin(solar_declination_series.radians)
-        + np.cos(latitude.radians) * np.cos(solar_declination_series.radians) * np.cos(solar_hour_angle_series.radians)
+        sin(latitude.radians) * np.sin(solar_declination_series.radians)
+        + cos(latitude.radians) * np.cos(solar_declination_series.radians) * np.cos(solar_hour_angle_series.radians)
     )
     solar_zenith_series = np.arccos(cosine_solar_zenith)
-
-    # from pvgisprototype.validation.hashing import generate_hash
-    # solar_zenith_series_hash = generate_hash(solar_zenith_series)
-    # print(
-    #     "SolarZenith : calculate_solar_zenith_time_series_noaa() |",
-    #     f"Data Type : [bold]{solar_zenith_series.dtype}[/bold] |",
-    #     f"Output Hash : [code]{solar_zenith_series_hash}[/code]",
-    # )
 
     if apply_atmospheric_refraction:
         solar_zenith_series = (
@@ -331,10 +339,10 @@ def calculate_solar_zenith_time_series_noaa(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
+    return solar_zenith_series  # Is this a SolarZenith data class ?
     # return SolarZenith(
     #     value=solar_zenith_series,
     #     unit=RADIANS,
     #     position_algorithm='NOAA',
     #     timing_algorithm='NOAA',
     # )
-    return solar_zenith_series

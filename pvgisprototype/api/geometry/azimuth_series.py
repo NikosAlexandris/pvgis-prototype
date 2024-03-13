@@ -23,6 +23,8 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from rich import print
+from pandas import DatetimeIndex
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -36,7 +38,7 @@ from pvgisprototype.algorithms.caching import custom_hashkey
 def model_solar_azimuth_time_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
@@ -50,7 +52,9 @@ def model_solar_azimuth_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
-) -> List[SolarAzimuth]:
+) -> SolarAzimuth:
+    """
+    """
     if solar_position_model.value == SolarPositionModel.noaa:
 
         solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
