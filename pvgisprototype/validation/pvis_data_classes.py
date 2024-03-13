@@ -1,3 +1,5 @@
+from pydantic import Field
+from typing import Tuple
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import field_validator
@@ -32,6 +34,11 @@ from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.validation.arrays import ArrayDType
+from pvgisprototype.validation.arrays import NDArrayBackend
+from pvgisprototype.validation.arrays import CUPY_ENABLED
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 
 
 MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
@@ -42,6 +49,59 @@ MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
 
 class VerbosityModel(BaseModel):
     verbose: int = VERBOSE_LEVEL_DEFAULT
+
+
+class ArrayShapeModel(BaseModel):
+    shape: Tuple[int, ...]
+
+
+class ArrayInitialisationModel(BaseModel):
+    initialisation_method: str = 'zeros' 
+
+    @validator('initialisation_method')
+    def check_init_method(cls, v):
+        valid_methods = ['zeros', 'ones', 'empty']
+        if v not in valid_methods:
+            raise ValueError(f"Invalid initialisation method. Choose among {valid_methods}.")
+        return v
+
+
+class ArrayTypeModel(BaseModel):
+    # dtype: ArrayDType = DATA_TYPE_DEFAULT
+    dtype: str = DATA_TYPE_DEFAULT
+
+    # @validator('dtype', pre=True)
+    # def validate_dtype(cls, v):
+    #     if isinstance(v, ArrayDType):
+    #         return v
+    #     try:
+    #         return ArrayDType.from_string(v)
+    #     except ValueError as e:
+    #         raise ValueError(f"Validation error for dtype: {e}")
+
+
+class ArrayBackendModel(BaseModel):
+    array_backend: str = ARRAY_BACKEND_DEFAULT
+
+    @validator('array_backend')
+    def check_backend(cls, v, values, **kwargs):
+        if values.get('use_gpu') and CUPY_ENABLED:
+            return 'CUPY'
+        if v.upper() not in NDArrayBackend.__members__:
+            raise ValueError(f"Invalid backend. Choose among {list(NDArrayBackend.__members__.keys())}.")
+        return v.upper()
+
+    class Config:
+        use_enum_values = True
+
+
+class ArrayModel(
+    ArrayShapeModel,
+    ArrayInitialisationModel,
+    ArrayTypeModel,
+    ArrayBackendModel,
+):
+    pass
 
 
 # Where?
@@ -237,7 +297,7 @@ class SolarDeclinationModel(BaseModel):
 
 
 class SolarPositionModel(BaseModel):
-    solar_position_model: SolarPositionModel = SolarPositionModel.skyfield
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa
 
 
 class SolarIncidenceModel(BaseModel):
