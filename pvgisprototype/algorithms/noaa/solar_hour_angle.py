@@ -155,6 +155,13 @@ def calculate_solar_hour_angle_time_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
     )
+    # true_solar_time_series_in_minutes = np.array(
+    #     (true_solar_time_series.hour * 60)
+    #     + true_solar_time_series.minute
+    #     + (true_solar_time_series.second / 60.0), dtype
+    # )
+
+    # The following gives a slightly different result than the above approach!
     true_solar_time_series_in_minutes = (
         np.array(
             (

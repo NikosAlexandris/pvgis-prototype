@@ -340,7 +340,6 @@ def calculate_optical_air_mass_time_series(
     """
     adjusted_elevation = adjust_elevation(elevation.value)
     degrees_plus_offset = refracted_solar_altitude_series.degrees + 6.07995
-
     # Handle negative values subjected to np.power()
     power_values = np.where(
         degrees_plus_offset > 0, np.power(degrees_plus_offset, -1.6364), 0
@@ -767,6 +766,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
 
     """
+    if verbose > 0:
+        verbosity = ''
+
     solar_incidence_series = model_solar_incidence_time_series(
         longitude=longitude,
         latitude=latitude,

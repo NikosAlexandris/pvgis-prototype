@@ -52,23 +52,9 @@ def calculate_solar_azimuth_noaa(
     ----------
     latitude: float
         The latitude in radians
-    """
-    # Review & Cache Me ! ----------------------------------------------------
-    solar_declination = calculate_solar_declination_noaa(
-        timestamp=timestamp,
-    )
-    # ------------------------------------------------------------------------
-    solar_hour_angle = calculate_solar_hour_angle_noaa(
-        longitude=longitude,
-        timestamp=timestamp,
-        timezone=timezone,
-    )
-    solar_zenith = calculate_solar_zenith_noaa(
-        latitude=latitude,
-        timestamp=timestamp,
-        solar_hour_angle=solar_hour_angle,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-    )
+
+    Notes
+    -----
 
                    #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
     # cos(180 - θ) = - ----------------------------------------------------------
@@ -113,8 +99,21 @@ def calculate_solar_azimuth_noaa(
     # - cos(θ) = ----------------------------------------------------------
                #            cos(latitude) * sin(solar_zenith)
 
-    # which is the same as reported in 
-
+    """
+    solar_declination = calculate_solar_declination_noaa(
+        timestamp=timestamp,
+    )
+    solar_hour_angle = calculate_solar_hour_angle_noaa(
+        longitude=longitude,
+        timestamp=timestamp,
+        timezone=timezone,
+    )
+    solar_zenith = calculate_solar_zenith_noaa(
+        latitude=latitude,
+        timestamp=timestamp,
+        solar_hour_angle=solar_hour_angle,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+    )
     numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
     denominator = cos(latitude.radians) * sin(solar_zenith.radians)
     # try else raise ... ?
@@ -159,7 +158,55 @@ def calculate_solar_azimuth_time_series_noaa(
     verbose: int = 0,
     log: int = 0,
 ) -> SolarAzimuth:
-    """Calculate the solar azimuth (θ) for a time series"""
+    """Calculate the solar azimuth (θ) for a time series
+
+    Notes
+    -----
+
+                   #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    # cos(180 - θ) = - ----------------------------------------------------------
+                   #            cos(latitude) * sin(solar_zenith)
+
+
+    # or after converting cos(180 - θ) to - cos(θ)
+
+                   #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+        # - cos(θ) = - ------------------------------------------------------------
+                   #              cos(latitude) * sin(solar_zenith)
+
+
+    # or :
+
+                   # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # cos(θ) = ----------------------------------------------------------
+                   #             cos(latitude) * sin(solar_zenith)
+
+                          # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # θ = arccos(  -------------------------------------------------------------- )
+                            #      cos(latitude) * sin(solar_zenith)
+
+
+    # or else, from the first equation, after multiplying by -1 :
+
+                     # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    # - cos(180 - θ) = ----------------------------------------------------------
+                     #          cos(latitude) * sin(solar_zenith)
+
+
+    # or after multiplying by -1 again :
+
+                   # sin(solar_declination) - sin(latitude) * cos(solar_zenith)
+    # cos(180 - θ) = ----------------------------------------------------------
+                   #            cos(latitude) * sin(solar_zenith)
+
+
+    # or after converting cos(180 - θ) to - cos(θ)
+
+               # sin(solar_declination) - sin(latitude) * cos(solar_zenith)
+    # - cos(θ) = ----------------------------------------------------------
+               #            cos(latitude) * sin(solar_zenith)
+
+    """
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
@@ -187,6 +234,12 @@ def calculate_solar_azimuth_time_series_noaa(
     denominator_series = cos(latitude.radians) * np.sin(solar_zenith_series.radians)
     cosine_solar_azimuth_series = -1 * numerator_series / denominator_series
     solar_azimuth_series = np.arccos(cosine_solar_azimuth_series)
+
+    # # ----------------------------------------------------- What is this for ?
+    # condition = solar_azimuth_series > 0
+    # if np.any(condition):
+    #     solar_azimuth_series[condition] = 2 * np.pi - solar_azimuth_series[condition]
+    # # ------------------------------------------------------------------------
 
     if (
         (solar_azimuth_series < SolarAzimuth().min_radians)

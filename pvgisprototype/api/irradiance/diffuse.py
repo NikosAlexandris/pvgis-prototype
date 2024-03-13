@@ -682,7 +682,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
     if out_of_range_indices[0].size > 0:
         warning = f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
         logger.warning(warning)
-        print(warning)
 
     # Building the output dictionary ========================================
 

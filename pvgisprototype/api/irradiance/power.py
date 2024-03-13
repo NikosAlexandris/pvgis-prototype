@@ -200,6 +200,21 @@ def calculate_photovoltaic_power_output_series(
     -----
     This function is part of the Typer-based CLI for the new PVGIS implementation in Python. It provides an interface for estimating the energy production of a photovoltaic system, taking into account various environmental and system parameters.
     """
+    # import click
+    # ctx = click.get_current_context()
+    # print(f"args here : {ctx.args}")
+    # print(f"Command here : {ctx.command}")
+    # print(f"Command name here : {ctx.command.name}")
+    # print(f"Command path here : {ctx.command_path}")
+    # print(f"get_parameter_source() : {ctx.get_parameter_source('temperature_series')}")
+    # print(f"get_usage() : {ctx.get_usage()}")
+    # print(f"info_name : {ctx.info_name}")
+    # print(f"invoked_subcommand : {ctx.invoked_subcommand}")
+    # print(f"meta : {ctx.meta}")
+    # print(f"obj : {ctx.obj}")
+    # print(f"params : {ctx.params}")
+    # print(f"parent : {ctx.parent}")
+    # print()
     if profile:
         import cProfile
         pr = cProfile.Profile()
