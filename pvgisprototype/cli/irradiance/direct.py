@@ -79,6 +79,7 @@ from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
+from pandas import DatetimeIndex
 
 
 app = typer.Typer(
@@ -97,7 +98,7 @@ app = typer.Typer(
     rich_help_panel=rich_help_panel_series_irradiance,
 )
 def get_direct_normal_irradiance_time_series(
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
+    timestamps: Annotated[Optional[DatetimeIndex], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
@@ -166,7 +167,7 @@ def get_direct_horizontal_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
+    timestamps: Annotated[Optional[DatetimeIndex], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
@@ -265,7 +266,7 @@ def get_direct_inclined_irradiance_time_series_pvgis(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
+    timestamps: Annotated[Optional[DatetimeIndex], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
@@ -279,8 +280,8 @@ def get_direct_inclined_irradiance_time_series_pvgis(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians

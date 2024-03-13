@@ -13,6 +13,7 @@ from pvgisprototype.constants import DAY_OF_YEAR_COLUMN_NAME
 from pvgisprototype.constants import DISTANCE_CORRECTION_COLUMN_NAME
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 import numpy as np
+from pandas import DatetimeIndex
 
 
 def get_days_per_year(years):
@@ -28,7 +29,7 @@ def custom_hashkey(*args, **kwargs):
 from cachetools import cached
 @cached(cache={}, key=custom_hashkey)
 def calculate_extraterrestrial_normal_irradiance_time_series(
-    timestamps: BaseTimestampSeriesModel = None,  # DatetimeIndex ?
+    timestamps: DatetimeIndex = None,
     start_time: Optional[datetime] = None,
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
