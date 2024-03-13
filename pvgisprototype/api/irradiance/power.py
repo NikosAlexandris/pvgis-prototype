@@ -550,6 +550,12 @@ def calculate_photovoltaic_power_output_series(
         }
         results = results | and_even_more_extended_results
 
+    if verbose > 5:
+        extra_results = {
+                INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
+                }
+        results = results | extra_results
+
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
