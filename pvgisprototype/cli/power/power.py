@@ -12,6 +12,7 @@ from pvgisprototype.cli.power.average_photon_energy import app as average_photon
 
 app = typer.Typer(
     cls=OrderCommands,
+    # pretty_exceptions_short=True,
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",

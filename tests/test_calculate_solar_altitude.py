@@ -1,12 +1,12 @@
 import pytest
 from pvgisprototype.api.geometry.altitude import calculate_solar_altitude
-from pvgisprototype.api.geometry.models import SolarTimeModels, SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarTimeModel, SolarPositionModel
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import ALTITUDE_NAME, TIME_ALGORITHM_NAME, POSITION_ALGORITHM_NAME, UNITS_NAME, DEGREES
 
 
 test_cases_data = read_noaa_spreadsheet(
-    './tests/data/test_cases_noaa_spreadsheet.xlsx'
+    './tests/cases/noaa.xlsx'
 )
 test_cases = test_cases_from_data(
     test_cases_data,

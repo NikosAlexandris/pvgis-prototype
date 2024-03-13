@@ -4,6 +4,7 @@ import dask.array
 import importlib.util
 import types
 import collections.abc as cabc
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
 
 
 CUPY_ENABLED = importlib.util.find_spec("cupy") is not None
@@ -102,7 +103,7 @@ def supported_array_types() -> cabc.Collection[type]:
 
 def create_array(
     shape,
-    dtype='float32',
+    dtype=DATA_TYPE_DEFAULT,
     init_method='zeros',
     backend='numpy',
     use_gpu=False,
