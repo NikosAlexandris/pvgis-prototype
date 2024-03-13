@@ -1,3 +1,7 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from typing import Optional
 from typing import List
@@ -30,6 +34,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import IRRADIANCE_UNITS
@@ -48,6 +53,7 @@ from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype import LinkeTurbidityFactor
 
 
+@log_function_call
 def calculate_ground_reflected_inclined_irradiance_time_series(
     longitude: float,
     latitude: float,
@@ -77,6 +83,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ):
     """Calculate the clear-sky diffuse ground reflected irradiance on an inclined surface (Ri).
 
@@ -106,6 +113,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
             eccentricity_correction_factor=eccentricity_correction_factor,
             angle_output_units=angle_output_units,
             verbose=0,  # no verbosity here by choice!
+            log=log,
         )
     )
 
@@ -216,5 +224,11 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
 
     if verbose > 0:
         return results
+
+    log_data_fingerprint(
+        data=ground_reflected_inclined_irradiance_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return ground_reflected_inclined_irradiance_series

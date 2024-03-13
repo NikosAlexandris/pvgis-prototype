@@ -1,3 +1,6 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pathlib import Path
 from math import cos
@@ -46,6 +49,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
@@ -64,6 +68,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
 
 
+@log_function_call
 def calculate_global_irradiance_time_series(
     longitude: float,
     latitude: float,
@@ -107,6 +112,7 @@ def calculate_global_irradiance_time_series(
     statistics: bool = False,
     csv: Path = "series_in",
     verbose: int = False,
+    log: int = 0,
     index: bool = False,
 ):
     """
@@ -133,12 +139,19 @@ def calculate_global_irradiance_time_series(
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
         verbose=0,
+        log=log,
         )
+        verbose=0,
+        log=log,
     # Masks based on the solar altitude series
     mask_above_horizon = solar_altitude_series.value > 0
     mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
-    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
+    in_shade = is_surface_in_shade_time_series(
+            solar_altitude_series,
+            solar_azimuth_series,
+            log=log,
+            )
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
@@ -199,6 +212,7 @@ def calculate_global_irradiance_time_series(
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
                 verbose=0,  # no verbosity here by choice!
+                log=log,
             )
         )[mask_above_horizon_not_shade]
 
@@ -234,6 +248,7 @@ def calculate_global_irradiance_time_series(
             angle_output_units=angle_output_units,
             neighbor_lookup=neighbor_lookup,
             verbose=0,  # no verbosity here by choice!
+            log=log,
         )[
             mask_above_horizon
         ]
@@ -266,6 +281,7 @@ def calculate_global_irradiance_time_series(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             verbose=0,  # no verbosity here by choice!
+            log=log,
         )[
             mask_above_horizon
         ]
@@ -326,5 +342,11 @@ def calculate_global_irradiance_time_series(
 
     if verbose > 0:
         return results
+
+    log_data_fingerprint(
+            data=global_irradiance_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return global_irradiance_series

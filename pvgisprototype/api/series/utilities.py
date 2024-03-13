@@ -3,7 +3,7 @@ from rich import print
 import warnings
 import typer
 import netCDF4
-from .log import logger
+from pvgisprototype.log import logger
 import xarray as xr
 
 from pvgisprototype import Latitude
@@ -13,6 +13,7 @@ from typing import Tuple
 from enum import Enum
 from pathlib import Path
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.hardcodings import check_mark
@@ -202,6 +203,7 @@ def select_location_time_series(
     mask_and_scale: bool = False,
     in_memory: bool = False,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ):
     """Select a location from a time series data format supported by
     xarray"""
@@ -228,7 +230,7 @@ def select_location_time_series(
         print(f"{ERROR_IN_SELECTING_DATA} : {exception}")
         raise SystemExit(33)
 
-    if verbose == 3:
+    if verbose == DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return location_time_series

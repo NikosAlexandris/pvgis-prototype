@@ -16,10 +16,14 @@ from math import isfinite
 from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
 import numpy as np
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
@@ -28,6 +32,7 @@ def calculate_solar_hour_angle_noaa(
     timestamp: datetime, 
     timezone: Optional[ZoneInfo] = None, 
     verbose: int = 0,
+    log: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians.
 
@@ -120,6 +125,7 @@ def calculate_solar_hour_angle_noaa(
     )
 
 
+@log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_time_series_noaa(
@@ -128,6 +134,7 @@ def calculate_solar_hour_angle_time_series_noaa(
     timezone: Optional[str] = None, 
     # angle_output_units: Optional[str] = RADIANS,
     verbose: int = 0,
+    log: int = 0,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians for a time series.
 
@@ -141,6 +148,7 @@ def calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        verbose=verbose,
     )
     true_solar_time_series_in_minutes = (
         (true_solar_time_series.hour * 60)
@@ -165,17 +173,11 @@ def calculate_solar_hour_angle_time_series_noaa(
         raise ValueError(
             f"The solar hour angle(s) {out_of_range_values} is/are out of the expected range [-π, π] radians!"
         )
-
-    from pvgisprototype.validation.hashing import generate_hash
-    solar_hour_angle_series_hash = generate_hash(solar_hour_angle_series.values)
-    print(
-        'SolarHourAngle : calculate_solar_hour_angle_time_series_noaa() |',
-        f"Data Type : [bold]{solar_hour_angle_series.dtype}[/bold] |",
-        f"Output Hash : [code]{solar_hour_angle_series_hash}[/code]",
+    log_data_fingerprint(
+            data=solar_hour_angle_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
 
     return SolarHourAngle(
         value=np.array(solar_hour_angle_series),

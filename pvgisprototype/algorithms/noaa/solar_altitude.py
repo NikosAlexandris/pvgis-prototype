@@ -15,6 +15,7 @@ from typing import Sequence
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAltitude
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_noaa
@@ -34,6 +35,9 @@ from pandas import DatetimeIndex
 from rich import print
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
@@ -79,6 +83,7 @@ def calculate_solar_altitude_noaa(
 
     return solar_altitude
 
+@log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAltitudeTimeSeriesNOAAInput)
 def calculate_solar_altitude_time_series_noaa(
@@ -88,18 +93,21 @@ def calculate_solar_altitude_time_series_noaa(
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
+    log: int = 0,
 ) -> SolarAltitude:
     """Calculate the solar altitude angle for a location over a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        verbose=verbose,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
         timestamps=timestamps,
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
+        verbose=verbose,
     )
     solar_altitude_series = np.pi / 2 - solar_zenith_series.radians
     if not np.all(np.isfinite(solar_altitude_series)) or not np.all(
@@ -109,17 +117,11 @@ def calculate_solar_altitude_time_series_noaa(
             f"The `solar_altitude` should be a finite number ranging in [{-np.pi/2}, {np.pi/2}] radians"
         )
 
-    from pvgisprototype.validation.hashing import generate_hash
-    solar_altitude_series_hash = generate_hash(solar_altitude_series)
-    print(
-        "SolarAltitude : calculate_solar_altitude_time_series_noaa() |",
-        f"Data Type : [bold]{solar_altitude_series.dtype}[/bold] |",
-        f"Output Hash : [code]{solar_altitude_series_hash}[/code]",
+    log_data_fingerprint(
+            data=solar_altitude_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
     return SolarAltitude(
         value=solar_altitude_series,
         unit=RADIANS,

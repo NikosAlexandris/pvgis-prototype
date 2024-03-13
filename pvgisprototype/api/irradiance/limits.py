@@ -9,10 +9,14 @@ from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import AU
 from pvgisprototype.constants import STEPHAN_BOLTZMANN_CONSTANT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from rich.table import Table
 from rich import box
 from rich.console import Console
 import numpy as np
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 # ------------------------------------------------------------------ FixMe ---
@@ -121,6 +125,7 @@ def print_limits_table(
     console.print(table)
 
 
+@log_function_call
 def calculate_limits(
     solar_zenith: float,
     air_temperature: float,
@@ -154,6 +159,11 @@ def calculate_limits(
         else:
             calculated_limits[key]["Max"] = value["Max"]
 
+    log_data_fingerprint(
+            calculated_limits,
+            verbosity_level = 7,
+            hash_after_this_verbosity_level = HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
     return calculated_limits
 
 

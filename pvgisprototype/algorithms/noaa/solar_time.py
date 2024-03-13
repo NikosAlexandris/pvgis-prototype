@@ -18,8 +18,13 @@ from datetime import timedelta
 from zoneinfo import ZoneInfo
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 @validate_with_pydantic(CalculateTrueSolarTimeNOAAInput)
@@ -106,6 +111,7 @@ def calculate_true_solar_time_noaa(
     return true_solar_time
 
 
+@log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateTrueSolarTimeTimeSeriesNOAAInput)
 def calculate_true_solar_time_time_series_noaa(
@@ -115,12 +121,14 @@ def calculate_true_solar_time_time_series_noaa(
     time_output_units: str = "minutes",
     angle_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> DatetimeIndex:
     """ """
     time_offset_series = calculate_time_offset_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        verbose=verbose,
     )
     true_solar_time_series = timestamps + to_timedelta(time_offset_series.value, unit='min')
     true_solar_time_series_in_minutes = (
@@ -141,14 +149,10 @@ def calculate_true_solar_time_time_series_noaa(
         raise ValueError(
             f"The calculated true solar time series `{true_solar_time_series_in_minutes}` is out of the expected range [{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes!"
         )
-    # ----------------------------------------------------------------------
-
-    from pvgisprototype.validation.hashing import generate_hash
-    true_solar_time_series_hash = generate_hash(true_solar_time_series_in_minutes.values)
-    print(
-        'TrueSolarTime : calculate_true_solar_time_time_series_noaa()|',
-        f"Data Type : [bold]{true_solar_time_series.dtype}[/bold] |",
-        f"Output Hash : [code]{true_solar_time_series_hash}[/code]",
+    log_data_fingerprint(
+            data=true_solar_time_series_in_minutes.values,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return true_solar_time_series

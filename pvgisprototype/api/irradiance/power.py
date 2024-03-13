@@ -56,6 +56,7 @@ from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
@@ -84,8 +85,12 @@ from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import SHADE_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
+@log_function_call
 def calculate_photovoltaic_power_output_series(
     longitude: float,
     latitude: float,
@@ -132,6 +137,7 @@ def calculate_photovoltaic_power_output_series(
     temperature_model: ModuleTemperatureAlgorithm = None,
     efficiency: Optional[float] = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
     profile: bool = False, 
 ):
     """
@@ -204,7 +210,7 @@ def calculate_photovoltaic_power_output_series(
         solar_position_model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        solar_time_model=solar_time_model,
+        # solar_time_model=solar_time_model,
         # time_offset_global=time_offset_global,
         # hour_offset=hour_offset,
         # perigee_offset=perigee_offset,
@@ -212,7 +218,7 @@ def calculate_photovoltaic_power_output_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
-        verbose=0,
+        verbose=verbose,
     )
     solar_azimuth_series = model_solar_azimuth_time_series(
         longitude=longitude,
@@ -230,7 +236,7 @@ def calculate_photovoltaic_power_output_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
-        verbose=0,
+        verbose=verbose,
     )
     # Masks based on the solar altitude series
     mask_above_horizon = solar_altitude_series.value > 0
@@ -270,6 +276,10 @@ def calculate_photovoltaic_power_output_series(
 
     # For sun above horizon and not in shade
     if np.any(mask_above_horizon_not_in_shade):
+        if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
+            # verbosity += f'\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade ..'
+            verbosity = f'\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade ..'
+            print(verbosity)
         direct_irradiance_series[mask_above_horizon_not_in_shade] = (
             calculate_direct_inclined_irradiance_time_series_pvgis(
                 longitude=longitude,
@@ -308,6 +318,9 @@ def calculate_photovoltaic_power_output_series(
 
     # Calculate diffuse and reflected irradiance for sun above horizon
     if np.any(mask_above_horizon):
+        if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
+            verbosity = f'\ni [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for moments not in shade ..'
+            print(verbosity)
         diffuse_irradiance_series[
             mask_above_horizon
         ] = calculate_diffuse_inclined_irradiance_time_series(
@@ -341,6 +354,9 @@ def calculate_photovoltaic_power_output_series(
         )[
             mask_above_horizon
         ]
+        if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
+            verbosity = f'\ni [bold]Calculating[/bold] the [magenta]reflected inclined irradiance[/magenta] for moments not in shade ..'
+            print(verbosity)
         reflected_irradiance_series[
             mask_above_horizon
         ] = calculate_ground_reflected_inclined_irradiance_time_series(
@@ -375,6 +391,9 @@ def calculate_photovoltaic_power_output_series(
         ]
 
     # sum components
+    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
+        verbosity = f'\ni [bold]Calculating[/bold] the [magenta]global inclined irradiance[/magenta] for moments not in shade ..'
+        print(verbosity)
     global_irradiance_series = (
         direct_irradiance_series
         + diffuse_irradiance_series
@@ -429,6 +448,7 @@ def calculate_photovoltaic_power_output_series(
             efficiency_coefficient_series = efficiency
     else:
         if not efficiency:
+                            verbose=0,  # no verbosity here by choice!
             # print(f'Using PV module power output algorithm {power_model}')
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
                 spectral_factor=spectral_factor,
@@ -475,15 +495,18 @@ def calculate_photovoltaic_power_output_series(
 
     if verbose > 3:
         even_more_extended_results = {
-            # TEMPERATURE_COLUMN_NAME: temperature_series,          # FIXME: Not defined
-            # WIND_SPEED_COLUMN_NAME: wind_speed_series,          # FIXME: Not defined
+            # DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME:
+            # DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: 
+            # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME:
+            TEMPERATURE_COLUMN_NAME: temperature_series.value,          # FIXME: Not defined
+            WIND_SPEED_COLUMN_NAME: NOT_AVAILABLE,#wind_speed_series,          # FIXME: Not defined
         }
         results = results | even_more_extended_results
 
     if verbose > 4:
         and_even_more_extended_results = {
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
             LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
@@ -514,5 +537,11 @@ def calculate_photovoltaic_power_output_series(
 
         if verbose > 6:
             print(s.getvalue())
+
+    log_data_fingerprint(
+            data=photovoltaic_power_output_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return photovoltaic_power_output_series

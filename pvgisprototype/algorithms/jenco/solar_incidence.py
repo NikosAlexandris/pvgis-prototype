@@ -41,6 +41,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -49,6 +50,10 @@ from pvgisprototype.constants import RADIANS
 import numpy as np
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
@@ -273,7 +278,8 @@ def calculate_solar_incidence_jenco(
 
     in which 720 is minutes, whereas 60 is hours in PVGIS' C++ code.
     """
-    solar_altitude = calculate_solar_altitude(
+    # Would it make sense to offer other _altitude algorithms_ ? -------------
+    solar_altitude = calculate_solar_altitude_noaa(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
@@ -339,6 +345,7 @@ def calculate_solar_incidence_jenco(
     return SolarIncidence(value=solar_incidence, unit=RADIANS)
 
 
+@log_function_call
 @validate_with_pydantic(CalculateSolarIncidenceTimeSeriesJencoInputModel)
 def calculate_solar_incidence_time_series_jenco(
     longitude: Longitude,
@@ -353,6 +360,7 @@ def calculate_solar_incidence_time_series_jenco(
     horizon_interval: Optional[float] = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> SolarIncidence:
     """Calculate the solar incidence angle between the position of the sun and
     the inclination plane of a surface.
@@ -485,6 +493,11 @@ def calculate_solar_incidence_time_series_jenco(
 
     solar_incidence_series[solar_incidence_series < 0] = NO_SOLAR_INCIDENCE
 
+    log_data_fingerprint(
+            data=solar_incidence_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
