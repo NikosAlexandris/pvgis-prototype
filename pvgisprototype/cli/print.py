@@ -16,6 +16,7 @@ from pvgisprototype.constants import (
     SURFACE_TILT_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
+    ALGORITHM_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     SOLAR_TIME_COLUMN_NAME,
@@ -31,6 +32,7 @@ from pvgisprototype.constants import (
     ALTITUDE_NAME,
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_NAME,
+    INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
     INCIDENCE_DEFINITION,
@@ -652,18 +654,47 @@ def print_irradiance_table_2(
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     verbose=1,
     index: bool = False,
+    surface_tilt=True,
+    surface_orientation=None,
 ) -> None:
+    """
+    """
+    longitude = round_float_values(longitude, rounding_places)
+    latitude = round_float_values(latitude, rounding_places)
+    rounded_table = round_float_values(dictionary, rounding_places)
+
     console = Console()
     caption = f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
+
+    # Extract specific values for the caption if they exist
+
+    surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None) if surface_orientation else None
+    if surface_orientation is not None:
+        caption += f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
+
+    surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    if surface_tilt is not None:
+        caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold], "
+    
+    algorithm = dictionary.get(ALGORITHM_COLUMN_NAME, None)
+    if algorithm is not None:
+        caption += f"{ALGORITHM_COLUMN_NAME}: [bold]{algorithm}[/bold], "
+
+    solar_incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
+    if solar_incidence_algorithm is not None:
+        caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow]"
+
     caption += f"\n⌁ : Power, "
     caption += f"⭍ : Effective component, "
     caption += f"🗤 : Diffuse, "
     caption += f"☈ : Reflected, "
     caption += f"∡ : On inclined plane, "
-    caption += f"↻ : Orientation\n"
+    # caption += f"↻ : Orientation\n"
+
     table = Table(
             title=title,
-            caption=caption,
+            # caption=caption,
+            caption=caption.rstrip(', '),  # Remove trailing comma
             box=box.SIMPLE_HEAD,
             )
     
@@ -682,10 +713,18 @@ def print_irradiance_table_2(
     dictionary.pop('Title', NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
 
+    keys_to_exclude = {
+            SURFACE_ORIENTATION_COLUMN_NAME,
+            SURFACE_TILT_COLUMN_NAME,
+            ALGORITHM_COLUMN_NAME,
+            INCIDENCE_ALGORITHM_COLUMN_NAME,
+    }
+
     # additional columns based dictionary keys
     for key in dictionary.keys():
-        if dictionary[key] is not None:
-            table.add_column(key)
+        if key not in keys_to_exclude:
+            if dictionary[key] is not None:
+                table.add_column(key)
     
     # Convert single float, int or str values to arrays of the same length as timestamps
     for key, value in dictionary.items():
@@ -696,7 +735,8 @@ def print_irradiance_table_2(
             dictionary[key] = np.full(len(timestamps), str(value))
     
     # Zip series and timestamps
-    zipped_series = zip(*dictionary.values())
+    filtered_dictionary = {key: value for key, value in dictionary.items() if key not in keys_to_exclude}
+    zipped_series = zip(*filtered_dictionary.values())
     zipped_data = zip(timestamps, zipped_series)
 
     # Populate table
@@ -714,7 +754,7 @@ def print_irradiance_table_2(
 
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
 
-        for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
+        for idx, (column_name, value) in enumerate(zip(filtered_dictionary.keys(), values)):
             from rich.text import Text
             if idx == 0:  # assuming after 'Time' is the value of main interest
                 bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
