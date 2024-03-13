@@ -225,7 +225,10 @@ def round_float_values(obj, decimal_places=3):
                 obj[i] = f"{round(v, decimal_places):.{decimal_places}f}"
         return obj
     elif isinstance(obj, np.ndarray):
-        return np.around(obj, decimals=decimal_places)
+        if obj.dtype == np.bool_:
+            return obj # return as is
+        if obj.dtype.kind in 'if':  # Check for integer ('i') or float ('f') arrays
+            return np.around(obj, decimals=decimal_places)
     else:
         return obj
 
