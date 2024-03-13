@@ -26,9 +26,12 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(ModelSolarAzimuthTimeSeriesInputModel)
 def model_solar_azimuth_time_series(
     longitude: Longitude,

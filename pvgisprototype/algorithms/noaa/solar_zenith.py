@@ -273,7 +273,7 @@ def calculate_solar_zenith_noaa(
 
 
 @log_function_call
-# @cached(cache={}, key=custom_hashkey)
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarZenithTimeSeriesNOAAInput)
 def calculate_solar_zenith_time_series_noaa(
     latitude: Latitude,  # radians

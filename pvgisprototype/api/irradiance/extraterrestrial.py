@@ -21,20 +21,15 @@ from pvgisprototype.constants import DISTANCE_CORRECTION_COLUMN_NAME
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 import numpy as np
 from pandas import DatetimeIndex
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 def get_days_per_year(years):
     return 365 + ((years % 4 == 0) & ((years % 100 != 0) | (years % 400 == 0))).astype(int)
 
-from pandas import DatetimeIndex
-from cachetools.keys import hashkey
-def custom_hashkey(*args, **kwargs):
-    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
-    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
-    return hashkey(*args, **kwargs)
 
 @log_function_call
-from cachetools import cached
 @cached(cache={}, key=custom_hashkey)
 def calculate_extraterrestrial_normal_irradiance_time_series(
     timestamps: DatetimeIndex = None,

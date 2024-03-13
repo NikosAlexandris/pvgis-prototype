@@ -56,6 +56,8 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
@@ -348,6 +350,7 @@ def calculate_solar_incidence_jenco(
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarIncidenceTimeSeriesJencoInputModel)
 def calculate_solar_incidence_time_series_jenco(
     longitude: Longitude,

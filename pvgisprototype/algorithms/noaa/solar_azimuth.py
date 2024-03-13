@@ -33,6 +33,8 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
@@ -145,8 +147,6 @@ def calculate_solar_azimuth_noaa(
 
 
 @log_function_call
-from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesNOAAInput)
 def calculate_solar_azimuth_time_series_noaa(

@@ -24,9 +24,12 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 def model_solar_declination_time_series(
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo = None,

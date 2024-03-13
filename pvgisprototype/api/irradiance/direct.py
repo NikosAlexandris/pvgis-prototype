@@ -153,6 +153,8 @@ from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.validation.functions import AdjustElevationInputModel
 from pvgisprototype import Elevation
 from pandas import DatetimeIndex
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @log_function_call
@@ -252,6 +254,7 @@ def correct_linke_turbidity_factor_time_series(
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 def calculate_refracted_solar_altitude_time_series(
     solar_altitude_series: SolarAltitude,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -301,6 +304,7 @@ def calculate_refracted_solar_altitude_time_series(
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateOpticalAirMassTimeSeriesInputModel)
 def calculate_optical_air_mass_time_series(
     elevation: Annotated[float, typer_argument_elevation],
@@ -354,6 +358,7 @@ def calculate_optical_air_mass_time_series(
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 def calculate_rayleigh_optical_thickness_time_series(
     optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     dtype: str = DATA_TYPE_DEFAULT,
@@ -396,6 +401,7 @@ def calculate_rayleigh_optical_thickness_time_series(
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 def calculate_direct_normal_irradiance_time_series(
     timestamps: DatetimeIndex = None,
     start_time: Optional[datetime] = None,
@@ -507,16 +513,9 @@ def calculate_direct_normal_irradiance_time_series(
 
     return direct_normal_irradiance_series
 
-from pandas import DatetimeIndex
-from cachetools.keys import hashkey
-def custom_hashkey(*args, **kwargs):
-    args = tuple(str(arg) if isinstance(arg, DatetimeIndex) else arg for arg in args)
-    kwargs = {k: str(v) if isinstance(v, DatetimeIndex) else v for k, v in kwargs.items()}
-    return hashkey(*args, **kwargs)
 
 @log_function_call
-from cachetools import cached
-# @cached(cache={}, key=custom_hashkey)
+@cached(cache={}, key=custom_hashkey)
 def calculate_direct_horizontal_irradiance_time_series(
     longitude: float,
     latitude: float,
@@ -671,6 +670,7 @@ def calculate_direct_horizontal_irradiance_time_series(
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 def calculate_direct_inclined_irradiance_time_series_pvgis(
     longitude: float,
     latitude: float,
