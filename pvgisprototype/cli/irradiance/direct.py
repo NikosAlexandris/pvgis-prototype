@@ -12,6 +12,8 @@ from datetime import datetime
 from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
@@ -186,6 +188,7 @@ def get_direct_horizontal_irradiance_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
 ) -> None:
     """Calculate the direct horizontal irradiance (SID) [W*m-2]
@@ -219,6 +222,7 @@ def get_direct_horizontal_irradiance_time_series(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
+        log=log,
     )
     # Reporting =============================================================
     if verbose > 0:
@@ -273,6 +277,8 @@ def get_direct_inclined_irradiance_time_series_pvgis(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
@@ -294,6 +300,7 @@ def get_direct_inclined_irradiance_time_series_pvgis(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
     show_progress: bool = True,
 ) -> np.array:
@@ -330,7 +337,10 @@ def get_direct_inclined_irradiance_time_series_pvgis(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
+        log=log,
         show_progress=show_progress,
     )
     if verbose > 0:
