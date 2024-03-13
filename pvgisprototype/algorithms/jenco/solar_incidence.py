@@ -53,7 +53,6 @@ from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
-from pvgisprototype.log import log_function
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from cachetools import cached
