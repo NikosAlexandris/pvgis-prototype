@@ -102,6 +102,8 @@ def calculate_diffuse_horizontal_component_from_sarah(
     rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
     statistics: bool = False,
     csv: Path = None,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     index: bool = False,
@@ -149,6 +151,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     diffuse_horizontal_irradiance_series = (
         global_horizontal_irradiance_series
         - direct_horizontal_irradiance_series
+    ).astype(dtype=dtype)
 
     if diffuse_horizontal_irradiance_series.size == 1:
         single_value = float(diffuse_horizontal_irradiance_series.values)
@@ -448,6 +451,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,  # no verbosity here by choice!
         log=log,
     )
@@ -462,6 +467,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             random_days=random_days,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
         )
@@ -484,6 +491,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,  # Is this wanted here ? i.e. not setting = 0 ?
     )
     # on a horizontal surface : G0h = G0 sin(h0)
@@ -687,8 +696,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         extended_results = {
             LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series / diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
         }
         results = results | extended_results
 

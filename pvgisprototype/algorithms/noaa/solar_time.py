@@ -22,6 +22,8 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -120,6 +122,8 @@ def calculate_true_solar_time_time_series_noaa(
     timezone: Optional[ZoneInfo],
     time_output_units: str = "minutes",
     angle_units: str = RADIANS,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> DatetimeIndex:
@@ -128,6 +132,8 @@ def calculate_true_solar_time_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     true_solar_time_series = timestamps + to_timedelta(time_offset_series.value, unit='min')

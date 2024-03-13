@@ -15,6 +15,8 @@ from rich import print
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pandas import DatetimeIndex
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.log import logger
@@ -52,6 +54,8 @@ def calculate_fractional_year_noaa(
 def calculate_fractional_year_time_series_noaa(
         timestamps: Union[datetime, DatetimeIndex],
     ) -> FractionalYear:
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
     """
@@ -101,7 +105,7 @@ def calculate_fractional_year_time_series_noaa(
     days_in_year_series = get_days_in_years_series(timestamps.year) 
     fractional_year_series = np.array(
         2 * np.pi / days_in_year_series * (days_of_year_series - 1 + (hours - 12) / 24),
-        dtype=np.float32,
+        dtype=dtype,
     )
     fractional_year_series[fractional_year_series < 0] = 0
     

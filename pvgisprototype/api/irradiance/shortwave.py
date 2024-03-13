@@ -87,6 +87,8 @@ def calculate_global_irradiance_time_series(
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     surface_tilt: Optional[float] = 45,
     surface_orientation: Optional[float] = 180,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
@@ -106,8 +108,6 @@ def calculate_global_irradiance_time_series(
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float]="Array of horizon elevations.")] = None,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
     rounding_places: Optional[int] = 5,
     statistics: bool = False,
     csv: Path = "series_in",
@@ -138,9 +138,13 @@ def calculate_global_irradiance_time_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,
         log=log,
         )
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,
         log=log,
     # Masks based on the solar altitude series
@@ -211,6 +215,8 @@ def calculate_global_irradiance_time_series(
                 time_output_units=time_output_units,
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
+                dtype=dtype,
+                array_backend=array_backend,
                 verbose=0,  # no verbosity here by choice!
                 log=log,
             )
@@ -247,6 +253,8 @@ def calculate_global_irradiance_time_series(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             neighbor_lookup=neighbor_lookup,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
         )[
@@ -280,6 +288,8 @@ def calculate_global_irradiance_time_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
         )[

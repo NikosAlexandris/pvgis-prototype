@@ -15,6 +15,8 @@ import numpy as np
 from pvgisprototype import EquationOfTime
 from pandas import Timestamp
 from pandas import DatetimeIndex
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.log import logger
@@ -155,26 +157,30 @@ def calculate_time_offset_time_series_noaa(
     longitude: Longitude, 
     timestamps: Union[Timestamp, DatetimeIndex],
     timezone: ZoneInfo,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> TimeOffset:
     """ """
-    # 1
+    # We need a timezone!
     if timestamps.tzinfo is None:
         timestamps = timestamps.tz_localize(timezone)
     else:
         timestamps = timestamps.tz_convert(timezone)
 
-    # Optimisation: Calculate unique offsets
+    # Optimisation : calculate unique offsets
     unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
     unique_offsets = {tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)}
     
-    # Map the offsets back to the timestamps
-    timezone_offset_minutes_series = np.array([unique_offsets[tz] for tz in unique_timezones], dtype=float)
+    # Map offsets back to timestamps
+    timezone_offset_minutes_series = np.array([unique_offsets[tz] for tz in unique_timezones], dtype=dtype)
 
     # 2
     equation_of_time_series = calculate_equation_of_time_time_series_noaa(
         timestamps,
+        dtype=dtype,
+        backend=array_backend,
         verbose=verbose,
     )
     time_offset_series = longitude.as_minutes - timezone_offset_minutes_series + equation_of_time_series.minutes

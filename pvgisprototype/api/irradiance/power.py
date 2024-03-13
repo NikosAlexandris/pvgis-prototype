@@ -218,6 +218,8 @@ def calculate_photovoltaic_power_output_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     solar_azimuth_series = model_solar_azimuth_time_series(
@@ -236,6 +238,8 @@ def calculate_photovoltaic_power_output_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     # Masks based on the solar altitude series
@@ -312,6 +316,8 @@ def calculate_photovoltaic_power_output_series(
                 time_output_units=time_output_units,
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
+                dtype=dtype,
+                array_backend=array_backend,
                 verbose=0,  # no verbosity here by choice!
             )
         )[mask_above_horizon_not_in_shade]
@@ -350,6 +356,8 @@ def calculate_photovoltaic_power_output_series(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             neighbor_lookup=neighbor_lookup,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
         )[
             mask_above_horizon
@@ -385,6 +393,8 @@ def calculate_photovoltaic_power_output_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
         )[
             mask_above_horizon
@@ -459,6 +469,8 @@ def calculate_photovoltaic_power_output_series(
                 wind_speed_series=wind_speed_series,
                 power_model=power_model,
                 temperature_model=temperature_model,
+                dtype=dtype,
+                array_backend=array_backend,
                 verbose=0,  # no verbosity here by choice!
             )
             efficiency_coefficient_series *= system_efficiency  # on-top-of !

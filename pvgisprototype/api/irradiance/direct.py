@@ -89,6 +89,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.cli.typer_parameters import typer_option_index
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -181,6 +183,8 @@ def compare_temporal_resolution(timestamps, array):
 @validate_with_pydantic(AdjustElevationInputModel)
 def adjust_elevation(
     elevation: Annotated[float, typer_argument_elevation],
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ):
@@ -214,6 +218,8 @@ def adjust_elevation(
 @log_function_call
 def correct_linke_turbidity_factor_time_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> LinkeTurbidityFactor:
@@ -248,6 +254,8 @@ def correct_linke_turbidity_factor_time_series(
 @log_function_call
 def calculate_refracted_solar_altitude_time_series(
     solar_altitude_series: SolarAltitude,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> RefractedSolarAltitude:
@@ -348,6 +356,8 @@ def calculate_optical_air_mass_time_series(
 @log_function_call
 def calculate_rayleigh_optical_thickness_time_series(
     optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> RayleighThickness:
@@ -397,6 +407,8 @@ def calculate_direct_normal_irradiance_time_series(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     show_progress: bool = True,
@@ -414,37 +426,34 @@ def calculate_direct_normal_irradiance_time_series(
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
     """
-    # debug(locals())
-    with Progress(disable=not show_progress):
-        extraterrestrial_normal_irradiance_series = (
-            calculate_extraterrestrial_normal_irradiance_time_series(
-                timestamps=timestamps,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                random_days=random_days,
-            )
+    # with Progress(disable=not show_progress):
+    extraterrestrial_normal_irradiance_series = (
+        calculate_extraterrestrial_normal_irradiance_time_series(
+            timestamps=timestamps,
+            solar_constant=solar_constant,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            random_days=random_days,
         )
-        corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
-            linke_turbidity_factor_series,
-            verbose=verbose,
-        )
-        rayleigh_optical_thickness_series = calculate_rayleigh_optical_thickness_time_series(
-            optical_air_mass_series,
-            verbose=verbose,
-        )
+    )
+    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
+        linke_turbidity_factor_series,
+        verbose=verbose,
+    )
+    rayleigh_optical_thickness_series = calculate_rayleigh_optical_thickness_time_series(
+        optical_air_mass_series,
+        verbose=verbose,
+    )  # _quite_ high when the sun is below the horizon. Makes sense ?
 
-        # Calculate
-        direct_normal_irradiance_series = (
-            extraterrestrial_normal_irradiance_series
-            * np.exp(
-                corrected_linke_turbidity_factor_series.value
-                * optical_air_mass_series.value
-                * rayleigh_optical_thickness_series.value
-            )
+    # Calculate
+    direct_normal_irradiance_series = (
+        extraterrestrial_normal_irradiance_series
+        * np.exp(
+            corrected_linke_turbidity_factor_series.value
+            * optical_air_mass_series.value
+            * rayleigh_optical_thickness_series.value
         )
-        # Warning
-        out_of_range_indices = np.where(
+    )
             (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
             | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
         warning_unstyled = (
@@ -533,6 +542,8 @@ def calculate_direct_horizontal_irradiance_time_series(
     rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
     statistics: bool = False,
     csv: Path = None,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     index: bool = False,
@@ -563,6 +574,8 @@ def calculate_direct_horizontal_irradiance_time_series(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     
@@ -584,6 +597,8 @@ def calculate_direct_horizontal_irradiance_time_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,
         show_progress=show_progress,
     )
@@ -693,6 +708,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
     statistics: bool = False,
     csv: Path = None,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     index: bool = False,
@@ -748,6 +765,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,
         log=log,
     )

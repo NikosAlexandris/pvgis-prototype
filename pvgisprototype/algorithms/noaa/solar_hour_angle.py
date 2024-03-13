@@ -21,6 +21,8 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -132,7 +134,8 @@ def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex, 
     timezone: Optional[str] = None, 
-    # angle_output_units: Optional[str] = RADIANS,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> SolarHourAngle:
@@ -148,6 +151,8 @@ def calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     true_solar_time_series_in_minutes = (
@@ -155,10 +160,11 @@ def calculate_solar_hour_angle_time_series_noaa(
         + true_solar_time_series.minute
         + (true_solar_time_series.second / 60.0)
     )
-    solar_hour_angle_series = (true_solar_time_series_in_minutes - 720) * (np.pi / 720)
+    nppi = np.array(np.pi, dtype=dtype)
+    solar_hour_angle_series = (true_solar_time_series_in_minutes - 720) * (nppi / 720)
 
-    if np.any(solar_hour_angle_series < -pi):
-        solar_hour_angle_series[solar_hour_angle_series < -np.pi] = solar_hour_angle_series[solar_hour_angle_series < -np.pi] + 2 * pi
+    if np.any(solar_hour_angle_series < -nppi):
+        solar_hour_angle_series += 2 * nppi * (solar_hour_angle_series < -nppi)
 
     if not np.all(
         (SolarHourAngle().min_radians <= solar_hour_angle_series)

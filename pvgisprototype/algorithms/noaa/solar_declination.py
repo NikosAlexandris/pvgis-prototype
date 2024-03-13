@@ -19,6 +19,8 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pandas import DatetimeIndex
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -65,8 +67,8 @@ DEFAULT_ARRAY_DTYPE = 'float32'
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)
 def calculate_solar_declination_time_series_noaa(
     timestamps: Union[datetime, DatetimeIndex],
-    backend: str = DEFAULT_ARRAY_BACKEND,
-    dtype: str = DEFAULT_ARRAY_DTYPE,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> SolarDeclination:
@@ -74,9 +76,8 @@ def calculate_solar_declination_time_series_noaa(
     """
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
-        backend=backend,
         dtype=dtype,
-        # angle_output_units=RADIANS,
+        backend=array_backend,
     )
     declination_series = (
         0.006918

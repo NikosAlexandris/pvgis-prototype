@@ -20,6 +20,8 @@ from pvgisprototype.constants import ALTITUDE_NAME
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pandas import DatetimeIndex
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
@@ -41,6 +43,8 @@ def model_solar_altitude_time_series(
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> SolarAltitude:
@@ -54,6 +58,8 @@ def model_solar_altitude_time_series(
             timestamps=timestamps,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=verbose,
             log=log,
         )
@@ -92,6 +98,8 @@ def calculate_solar_altitude_time_series(
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> List:
@@ -110,6 +118,8 @@ def calculate_solar_altitude_time_series(
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
+                dtype=dtype,
+                array_backend=array_backend,
                 verbose=verbose,
                 log=log,
             )
