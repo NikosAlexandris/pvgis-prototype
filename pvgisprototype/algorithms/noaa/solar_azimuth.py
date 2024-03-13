@@ -127,12 +127,11 @@ def calculate_solar_azimuth_noaa(
     # ------------------------------------------------------------------------
 
     if (
-        not isfinite(solar_azimuth.degrees)
-        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+        not isfinite(solar_azimuth)
+        or not SolarAzimuth().min_radians <= solar_azimuth <= SolarAzimuth().max_radians
     ):
         raise ValueError(
-            f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
-            [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+            f"The calculated solar azimuth angle {solar_azimuth} is out of the expected range [{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
         )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -189,12 +188,19 @@ def calculate_solar_azimuth_time_series_noaa(
     cosine_solar_azimuth_series = -1 * numerator_series / denominator_series
     solar_azimuth_series = np.arccos(cosine_solar_azimuth_series)
 
-    if not np.all(np.isfinite(solar_azimuth_series)) or not np.all(
-        (SolarAzimuth().min_radians <= solar_azimuth_series)
-        & (solar_azimuth_series <= SolarAzimuth().max_radians)
-    ):
-        raise ValueError(
-            f"At least one `solar_azimuth` value out of {solar_azimuth_series} is out of the expected range [{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
+    if (
+        (solar_azimuth_series < SolarAzimuth().min_radians)
+        | (solar_azimuth_series > SolarAzimuth().max_radians)
+    ).any():
+        out_of_range_values = solar_azimuth_series[
+            (solar_azimuth_series < SolarAzimuth().min_radians)
+            | (solar_azimuth_series > SolarAzimuth().max_radians)
+        ]
+        # raise ValueError(# ?
+        print(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
+                f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
         )
     log_data_fingerprint(
             data=solar_azimuth_series,

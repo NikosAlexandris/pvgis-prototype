@@ -1,3 +1,4 @@
+from devtools import debug
 from rich import print
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateEquationOfTimeNOAAInput

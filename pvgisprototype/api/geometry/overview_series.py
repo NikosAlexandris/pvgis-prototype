@@ -190,7 +190,8 @@ def calculate_solar_geometry_overview_time_series(
     for solar_position_model in solar_position_models:
         # for the time being!
         if solar_position_model != SolarPositionModel.noaa:
-            raise ValueError(f"Solar geometry overview series is not implemented for the requested solar position model : {solar_position_model}!")
+            import warnings
+            warnings.warn(f"Solar geometry overview series is not implemented for the requested solar position model: {solar_position_model}!")
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
             (
                 solar_declination_series,

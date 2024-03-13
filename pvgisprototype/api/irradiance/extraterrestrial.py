@@ -48,18 +48,17 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     """
     Calculate the normal extraterrestrial irradiance over a period of time
     """
-    timestamps = np.array(timestamps)
-    years_in_timestamps = timestamps.astype('datetime64[Y]').astype(int) + 1970
+    years_in_timestamps = timestamps.year
     years, indices = np.unique(years_in_timestamps, return_inverse=True)
-    days_per_year = get_days_per_year(years)
+    days_per_year = get_days_per_year(years).astype(dtype)
     days_in_years = days_per_year[indices]
 
     if random_days:
         day_of_year_series = np.random.randint(1, days_in_years + 1)
+        day_of_year_series = np.random.randint(1, days_in_years.max() + 1, size=timestamps.size).astype(dtype)
+
     else:
-        start_of_years = np.datetime64('1970-01-01').astype('datetime64[D]').astype(int) + 365 * (years - 1970) + (years // 4 - 1970 // 4)
-        start_of_timestamp_years = start_of_years[indices]
-        day_of_year_series = (timestamps.astype('datetime64[D]').astype(int) - start_of_timestamp_years) + 1
+        day_of_year_series = timestamps.dayofyear.to_numpy().astype(dtype)
 
     position_of_earth_series = 2 * np.pi * day_of_year_series / days_in_years
     distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(position_of_earth_series - perigee_offset)

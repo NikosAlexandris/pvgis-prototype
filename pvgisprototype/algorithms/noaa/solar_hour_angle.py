@@ -156,9 +156,13 @@ def calculate_solar_hour_angle_time_series_noaa(
         verbose=verbose,
     )
     true_solar_time_series_in_minutes = (
-        (true_solar_time_series.hour * 60)
-        + true_solar_time_series.minute
-        + (true_solar_time_series.second / 60.0)
+        np.array(
+            (
+                true_solar_time_series - true_solar_time_series.normalize()
+            ).total_seconds(),
+            dtype,
+        )
+        / 60
     )
     nppi = np.array(np.pi, dtype=dtype)
     solar_hour_angle_series = (true_solar_time_series_in_minutes - 720) * (nppi / 720)
@@ -177,7 +181,7 @@ def calculate_solar_hour_angle_time_series_noaa(
             )
         ]
         raise ValueError(
-            f"The solar hour angle(s) {out_of_range_values} is/are out of the expected range [-π, π] radians!"
+            f"Calculated solar hour angle/s out of the expected range [{-nppi}, {nppi}] radians : {out_of_range_values}"
         )
     log_data_fingerprint(
             data=solar_hour_angle_series,
@@ -186,7 +190,7 @@ def calculate_solar_hour_angle_time_series_noaa(
     )
 
     return SolarHourAngle(
-        value=np.array(solar_hour_angle_series),
+        value=solar_hour_angle_series,
         unit=RADIANS,
         position_algorithm='NOAA',
         timing_algorithm='NOAA',
