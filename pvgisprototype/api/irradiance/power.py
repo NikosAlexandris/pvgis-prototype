@@ -35,6 +35,7 @@ from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
+from pvgisprototype.constants import TEMPERATURE_UNIT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -72,6 +73,7 @@ from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
@@ -83,6 +85,7 @@ from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import SHADE_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.log import logger
@@ -458,7 +461,28 @@ def calculate_photovoltaic_power_output_series(
             efficiency_coefficient_series = efficiency
     else:
         if not efficiency:
+            from pvgisprototype.api.series.select import select_time_series
+            from pvgisprototype.constants import DEGREES
+            from pvgisprototype import TemperatureSeries
+            if isinstance(temperature_series, Path):
+                temperature_series = TemperatureSeries(
+                        value=select_time_series(
+                            time_series=temperature_series,
+                            # longitude=longitude_for_selection,
+                            # latitude=latitude_for_selection,
+                            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                            timestamps=timestamps,
+                            start_time=start_time,
+                            end_time=end_time,
+                            # convert_longitude_360=convert_longitude_360,
+                            neighbor_lookup=neighbor_lookup,
+                            tolerance=tolerance,
+                            mask_and_scale=mask_and_scale,
+                            in_memory=in_memory,
                             verbose=0,  # no verbosity here by choice!
+                            ).to_numpy().astype(dtype=dtype),
+                        unit=TEMPERATURE_UNIT)
             # print(f'Using PV module power output algorithm {power_model}')
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
                 spectral_factor=spectral_factor,
