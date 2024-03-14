@@ -3,8 +3,8 @@ from pvgisprototype.constants import RADIANS, DEGREES
 from datetime import datetime
 from datetime import time
 from typing import Union
+from typing import Tuple
 import numpy as np
-from numpy import ndarray
 
 
 type_mapping = {
@@ -13,7 +13,12 @@ type_mapping = {
     'str': str,
     'list': list,
     'dict': dict,
+    'ndarray': np.ndarray,
     'Union[ndarray, float]': Union[np.ndarray, float],
+    'Tuple[Longitude, Latitude]': Tuple[float, float],
+    'Elevation': float,
+    'SurfaceOrientation': float,
+    'SurfaceTilt': float,
 }
 
 
