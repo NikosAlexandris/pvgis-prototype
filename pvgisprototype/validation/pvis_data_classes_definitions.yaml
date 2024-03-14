@@ -44,6 +44,8 @@ Elevation:
 
 # When?
 
+# Taken care with Pandas' DatetimeIndex
+
 # Atmospheric properties
 
 AtmosphericRefraction:
@@ -260,6 +262,8 @@ RefractedSolarAltitude:
     type: str
     initial: radians
 
+# Meteorological variables
+
 TemperatureSeries:
   value:
     type: Union[ndarray, float]
@@ -390,6 +394,14 @@ HorizonHeight:
 
 # Surface
 
+SurfaceOrientation:
+  value:
+    type: float
+    initial: 180.0
+  unit:
+    type: str
+    initial: 'degrees'
+
 SurfaceTilt:
   value:
     type: float
@@ -398,10 +410,53 @@ SurfaceTilt:
     type: str
     initial: 'degrees'
 
-SurfaceOrientation:
+
+# Photovoltaic Power
+
+PhotovoltaicPower:
   value:
-    type: float
-    initial: 180.0
+    type: ndarray
+    initial:
   unit:
     type: str
-    initial: 'degrees'
+    initial: 
+  symbol:
+    type: str
+    initial: 
+  desription:
+    type: str
+    initial: "The height of a geographic point above a fixed reference point, commonly the mean sea level."
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial: (0.0, 0.0)
+  elevation:
+    type: Elevation
+  surface_orientation:
+    type: SurfaceOrientation
+  surface_tilt:
+    type: SurfaceTilt
+  solar_positioning_algorithm:
+    type: str
+    initial:
+  solar_timing_algorithm:
+    type: str
+    initial:
+  irradiance:
+    type: ndarray
+    unit: W/m^2
+    description: The solar power received per unit area at a given moment, expressed in watts per square meter (W/m²).
+  irradiance_data_source:
+    type: str
+    description: The solar radiation database used for calculations, e.g., PVGIS-SARAH2.
+    initial: PVGIS-SARAH2
+  pv_technology:
+    type: str
+    description: Type of photovoltaic technology, e.g., Crystalline silicon.
+    initial: Crystalline silicon
+  system_loss:
+    type: float
+    initial:
+  components:
+    type: dict
+    initial: {}
