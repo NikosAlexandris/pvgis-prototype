@@ -30,6 +30,7 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_plotting
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import LATITUDE_MINIMUM
 from pvgisprototype.constants import LATITUDE_MAXIMUM
 from pvgisprototype.constants import LONGITUDE_MINIMUM
@@ -90,7 +91,6 @@ typer_option_version = typer.Option(
     is_eager=True,
     # default_factory=None,
 )
-
 typer_option_log = typer.Option(
     '--log',
     '-l',
@@ -99,6 +99,18 @@ typer_option_log = typer.Option(
     is_flag=True,
     # default_factory=False,
 )
+typer_option_log_rich_handler = typer.Option(
+    "--log-rich-handler",
+    "--log-rich",
+    help="Use RichHandler along with `--log` to prettify logs",
+    # default_factory=False,
+)
+typer_option_logfile = typer.Option(
+    "--log-file",
+    help="Optional log file",
+    # default_factory=False,
+)
+
 
 
 # Where?
@@ -520,13 +532,35 @@ typer_option_eccentricity_correction_factor = typer.Option(
 
 # Atmospheric properties
 
-def parse_temperature_series(temperature_input: int):     # FIXME: Re-design ?
+from typing import Union
+
+def validate_path(path: Path) -> Path:
+    """Validate the path according to custom constraints."""
+    if not path.exists():
+        raise typer.BadParameter("Path does not exist.")
+    if not path.is_file():
+        raise typer.BadParameter("Path is not a file.")
+    # if not path.is_readable():
+    #     raise typer.BadParameter("File is not readable.")
+    return path.resolve()
+
+
+def parse_temperature_series(
+    temperature_input: Union[str, int, Path]
+):     # FIXME: Re-design ?
+    """
+    """
     try:
+        if isinstance(temperature_input, int):
+            return temperature_input
+
+        if isinstance(temperature_input, (str, Path)) and Path(temperature_input).exists():
+            return Path(temperature_input)
+
         if isinstance(temperature_input, str):
             temperature_input = np.fromstring(temperature_input, sep=',', dtype=float)
-        else:
-            temperature_input = np.array(temperature_input, dtype=float)
 
+        print(f'{type(temperature_input)}')
         return temperature_input
 
     except ValueError as e:  # conversion to float failed
@@ -538,6 +572,11 @@ def temperature_series_argument_callback(
     ctx: Context,
     temperature_series: TemperatureSeries,
 ):
+    """
+    """
+    if isinstance(temperature_series, Path):
+        return validate_path(temperature_series)
+
     timestamps = ctx.params.get('timestamps', None)
     if timestamps is None:
         start_time=ctx.params.get('start_time')
@@ -555,16 +594,21 @@ def temperature_series_argument_callback(
                 name=ctx.params.get('datetimeindex_name', None)
             )
 
-    if np.all(temperature_series == TEMPERATURE_DEFAULT):
-        temperature_series = np.full(len(timestamps), TEMPERATURE_DEFAULT, dtype=float)
+    # How to use print(ctx.get_parameter_source('temperature_series')) ?
+    # See : class click.core.ParameterSource(value)
+    if isinstance(temperature_series, int) and temperature_series == TEMPERATURE_DEFAULT:
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        temperature_series = np.full(len(timestamps), TEMPERATURE_DEFAULT, dtype=dtype)
 
+    # at this point, temperature_series should be an array !
     if temperature_series.size != len(timestamps):
+        # Improve error message with useful hint/s ?
         raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(timestamps)}).")
 
     return TemperatureSeries(value=temperature_series, unit=TEMPERATURE_UNIT)
 
 
-def temperature_series_callback(
+def temperature_series_option_callback(
     ctx: Context,
     temperature_series: TemperatureSeries,
 ):
@@ -597,7 +641,7 @@ typer_option_temperature_series = typer.Option(
     rich_help_panel=rich_help_panel_atmospheric_properties,
     # is_eager=True,
     parser=parse_temperature_series,
-    callback=temperature_series_callback,
+    callback=temperature_series_option_callback,
     # default_factory=TEMPERATURE_DEFAULT,
 )
 

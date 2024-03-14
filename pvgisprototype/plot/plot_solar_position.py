@@ -9,7 +9,7 @@ logging.basicConfig(
     ]
 )
 from typing import List
-from pvgisprototype.api.geometry.models import SolarPositionModels
+from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.overview import model_solar_geometry_overview
 # from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
 from pvgisprototype.algorithms.pvgis.solar_geometry import calculate_solar_position_pvgis
@@ -29,7 +29,7 @@ def plot_daily_solar_altitude(
         longitude: float,
         latitude: float,
         day: datetime,
-        model: SolarPositionModels,
+        model: SolarPositionModel,
         title: str = 'Daily Variation of Solar Position',
         solar_geometry_day_constants=None,
         year=None,
@@ -69,7 +69,7 @@ def plot_daily_solar_azimuth(
         longitude: float,
         latitude: float,
         day: datetime,
-        model: SolarPositionModels,
+        model: SolarPositionModel,
         title: str = 'Daily Variation of Solar Position',
         ):
     azimuths = []
@@ -101,7 +101,7 @@ def plot_daily_solar_position(
         longitude: float,
         latitude: float,
         timestamp: datetime,
-        model: SolarPositionModels,
+        model: SolarPositionModel,
         title: str = 'Daily Variation of Solar Position',
         ):
     altitudes = []
@@ -153,7 +153,7 @@ def plot_daily_solar_position_models(
         longitude: float,
         latitude: float,
         day: datetime,
-        models: List[SolarPositionModels],
+        models: List[SolarPositionModel],
         title: str = 'Daily Variation of Solar Position',
         ):
     timestamps = [day.replace(hour=h, minute=0, second=0, microsecond=0) for h in range(24)]
@@ -189,7 +189,7 @@ def plot_daily_solar_position_scatter(
         longitude: float,
         latitude: float,
         day: datetime,
-        model: SolarPositionModels,
+        model: SolarPositionModel,
         title: str = 'Daily Variation of Solar Position',
         ):
     altitudes = []
@@ -219,7 +219,7 @@ def plot_yearly_solar_position(
         longitude: float,
         latitude: float,
         year: int,
-        model: SolarPositionModels,
+        model: SolarPositionModel,
         ):
     start_date = datetime(year, 1, 1)
     end_date = datetime(year, 12, 31)

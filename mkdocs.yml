@@ -21,6 +21,7 @@ nav:
     # - install/install.md
   - Tutorials:
     - tutorials/index.md
+    - tutorials/introduction.md
   - API:
     - api/index.md
     - api/api.md

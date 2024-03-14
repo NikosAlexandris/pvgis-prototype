@@ -45,6 +45,10 @@ from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import RefractedSolarZenith
 
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+
 
 radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
 degrees_to_time_minuts = lambda value_in_degrees: 4 * value_in_degrees
@@ -149,6 +153,7 @@ def calculate_noaa_solar_position(
     return result
 
 
+@log_function_call
 @validate_with_pydantic(CalculateTimeserieSolarPositionNOAAInput)
 def calculate_noaa_timeseries_solar_position(
     longitude: Longitude,       # radians 

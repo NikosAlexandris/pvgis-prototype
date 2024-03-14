@@ -1,3 +1,4 @@
+from pvgisprototype.log import logger
 from devtools import debug
 from typing import List, Union, Sequence
 from datetime import datetime
@@ -16,6 +17,9 @@ from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAltitude
 from datetime import datetime
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -37,10 +41,7 @@ from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
-
-
-DEFAULT_ARRAY_BACKEND = 'NUMPY'  # OR 'CUPY', 'DASK'
-DEFAULT_ARRAY_DTYPE = 'float32'
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED
 
 
 @validate_with_pydantic(ModelSolarGeometryOverviewTimeSeriesInputModel)
@@ -52,16 +53,17 @@ def model_solar_geometry_overview_time_series(
     surface_tilt: None | float,
     surface_orientation: None | float,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = True,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    backend: str = DEFAULT_ARRAY_BACKEND,
-    dtype: str = DEFAULT_ARRAY_DTYPE,
-    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-) -> List[SolarAltitude]:
-
+) -> List:
+    """
+    """
     solar_declination_series = None  # updated if applicable
     solar_hour_angle_series = None
     solar_zenith_series = None  # updated if applicable
@@ -76,8 +78,8 @@ def model_solar_geometry_overview_time_series(
 
         solar_declination_series = calculate_solar_declination_time_series_noaa(
             timestamps=timestamps,
-            backend=backend,
             dtype=dtype,
+            array_backend=array_backend,
         )
         solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
             longitude=longitude,
@@ -144,7 +146,7 @@ def model_solar_geometry_overview_time_series(
         surface_orientation if surface_orientation is not None else None,
         solar_incidence_series if solar_incidence_series is not None else None,
     )
-    if verbose > 6:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return position_series
@@ -158,20 +160,38 @@ def calculate_solar_geometry_overview_time_series(
     surface_tilt: float,
     surface_orientation: float,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
-    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = True,
+    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
-    backend: str = DEFAULT_ARRAY_BACKEND,
-    dtype: str = DEFAULT_ARRAY_DTYPE,
-    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
-    """
-    Calculates the solar position using all models and returns the results in a table.
+    """Calculates the solar geometry overview for a time series
+
+    Calculate the solar geometry overview for a geographic position over a
+    series of timestamps for the user-requested solar position models (as in
+    positioning algorithms) and one solar time model (as in solar timing
+    algorithm).
+
+    Notes
+    -----
+    While it is straightforward to report the solar geometry parameters for a
+    series of solar position models (positioning algorithms), offering the
+    option for multiple solar time models (timing algorithms), would mean to
+    carefully craft the combinations for each solar time model and solar
+    position models. Not impossible, yet something for expert users that would
+    like to assess different combinations of algorithms to derive solar
+    geometry parameters.
+
     """
     for solar_position_model in solar_position_models:
+        # for the time being!
+        if solar_position_model != SolarPositionModel.noaa:
+            logger.warning(f"Solar geometry overview series is not implemented for the requested solar position model: {solar_position_model}!")
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
             (
                 solar_declination_series,
@@ -190,13 +210,13 @@ def calculate_solar_geometry_overview_time_series(
                 surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
                 solar_position_model=solar_position_model,
+                complementary_incidence_angle=complementary_incidence_angle,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 solar_time_model=solar_time_model,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
-                backend=backend,
+                backend=array_backend,
                 dtype=dtype,
-                complementary_incidence_angle=complementary_incidence_angle,
                 verbose=verbose,
             )
             results = {

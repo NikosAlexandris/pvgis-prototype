@@ -34,6 +34,7 @@ dependencies = [
   "pysolar",
   "uniplot",
   "devtools",  # currently part of regular functions !
+  "cachetools",
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
@@ -57,9 +58,9 @@ keywords = [
 ]
 [project.optional-dependencies]
 web = [
-    "uvicorn",
-    "fastapi",
-    "bokeh",
+  "uvicorn",
+  "fastapi",
+  "bokeh",
 ]
 dev = [
   "black",
@@ -70,6 +71,11 @@ dev = [
   "pytest",
   "towncrier",
   "timezonefinder",
+]
+test = [
+  "pytest",
+  "bokeh",
+  "openpyxl",
 ]
 docs = [
   "markdown-exec[ansi]",
@@ -90,6 +96,7 @@ all = [
   "black",
   "bokeh",
   "devtools",
+  "cachetools",
   "flake8",
   "isort",
   "markdown-exec[ansi]",
@@ -103,6 +110,9 @@ all = [
   "pre-commit",
   "pytest",
   "towncrier",
+  "pytest",
+  "bokeh",
+  "openpyxl",
 ]
 
 [project.urls]

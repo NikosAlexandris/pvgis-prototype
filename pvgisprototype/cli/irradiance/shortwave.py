@@ -134,6 +134,7 @@ def get_global_irradiance_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = False,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the global horizontal irradiance (GHI)
@@ -177,6 +178,7 @@ def get_global_irradiance_time_series(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
+        log=log,
     )
     if verbose > 0:
         print_irradiance_table_2(
@@ -255,7 +257,8 @@ def get_spectrally_resolved_global_irradiance_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
-    verbose: Annotated[int, typer_option_verbose] = False,
+    verbose: Annotated[int, typer_option_verbose] = 0,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
 ):
     """
@@ -305,6 +308,7 @@ def get_spectrally_resolved_global_irradiance_series(
         temperature_model=temperature_model,
         efficiency=efficiency,
         verbose=verbose,
+        log=log,
     )
 
     if verbose > 0:
