@@ -234,6 +234,7 @@ def photovoltaic_power_output_series(
         temperature_model=temperature_model,
         efficiency=efficiency,
         verbose=verbose,
+        log=log,
         profile=profile,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)

@@ -21,7 +21,7 @@ def model_solar_time_time_series(
     latitude: Latitude,
     timestamps: Union[datetime, Sequence[datetime]],
     timezone: ZoneInfo = None,
-    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
+    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
@@ -32,7 +32,7 @@ def model_solar_time_time_series(
     angle_units: str = RADIANS,
     verbose: int = 0,
 ):
-    """Calculates the solar time and returns the calculated value and the units.
+    """Calculates the solar time using the requested _algorithm_.
 
     Parameters
     ----------

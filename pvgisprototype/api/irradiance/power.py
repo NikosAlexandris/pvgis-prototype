@@ -239,6 +239,7 @@ def calculate_photovoltaic_power_output_series(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     solar_azimuth_series = model_solar_azimuth_time_series(
         longitude=longitude,
@@ -259,6 +260,7 @@ def calculate_photovoltaic_power_output_series(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     # Masks based on the solar altitude series
     mask_above_horizon = solar_altitude_series.value > 0
@@ -337,6 +339,7 @@ def calculate_photovoltaic_power_output_series(
                 dtype=dtype,
                 array_backend=array_backend,
                 verbose=0,  # no verbosity here by choice!
+                log=log,
             )
         )[mask_above_horizon_not_in_shade]
 
@@ -377,6 +380,7 @@ def calculate_photovoltaic_power_output_series(
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
+            log=log,
         )[
             mask_above_horizon
         ]
