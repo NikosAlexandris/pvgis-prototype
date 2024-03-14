@@ -1,18 +1,27 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from typing import List
 from pvgisprototype import HorizonHeight
 from pathlib import Path
 from typing import Optional
 import numpy as np
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
 
 
 # @validate_with_pydantic()
+@log_function_call
 def interpolate_horizon_height(
     solar_azimuth: float,
     horizon_heights: List[float],
     horizon_interval: float,
 ) -> HorizonHeight:
-    """Interpolate the height of the horizon at the sun's azimuth angle.
+    """Interpolate the height of the horizon for a given sun azimuth angle.
+
+    Interpolate the hiehgt of the horizon for a given sun azimuth angle based
+    on existing horizon height values at a given interval.
 
     Parameters
     ----------
@@ -46,6 +55,53 @@ def interpolate_horizon_height(
     return HorizonHeight(horizon_height, HORIZON_HEIGHT_UNIT)
 
 
+# @validate_with_pydantic()
+def interpolate_horizon_height_series(
+    solar_azimuth_series: float,
+    horizon_heights: List[float],
+    horizon_interval: float,
+) -> HorizonHeight:
+    """Interpolate the height of the horizon for a given sun azimuth angle.
+
+    Interpolate the hiehgt of the horizon for a given sun azimuth angle based
+    on existing horizon height values at a given interval.
+
+    Parameters
+    ----------
+    solar_azimuth : float
+        The azimuth angle of the sun.
+    horizon_heights : list of float
+        List of horizon height values.
+    horizon_interval : float
+        Interval between successive horizon data points.
+
+    Returns
+    -------
+    float
+        The interpolated horizon height.
+    """
+    positions_in_interval = solar_azimuth_series / horizon_interval
+    positions_before = np.floor(positions_in_interval).astype(int)
+    positions_after = positions_before + 1
+
+    # Handle wrap around
+    # positions_after = 0 if positions_after == len(horizon_heights) else positions_after ?
+    positions_after[positions_after >= len(horizon_heights)] = 0
+
+    # Interpolate the horizon height (or weighted average)
+    weights_after = positions_in_interval - positions_before
+    weights_before = 1 - weights_after
+    interpolated_horizon_heights = (
+        weights_before
+        * horizon_heights[positions_before]
+        + weights_after
+        * horizon_heights[positions_after]
+    )
+
+    return HorizonHeight(interpolated_horizon_heights, HORIZON_HEIGHT_UNIT)
+
+
+@log_function_call
 def is_surface_in_shade(
     solar_altitude: float,
     solar_azimuth: float,
@@ -53,7 +109,11 @@ def is_surface_in_shade(
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
 ) -> bool:
-    """Check whether the solar surface is in shade based on shadow and horizon data.
+    """Determine whether the solar surface is in shade
+
+    Determine if the solar surface is in shade based the solar altitude and the
+    horizon_height. The solar azimuth is required to interpolate the horizon
+    height based on existing horizon height values at a given interval.
 
     Parameters
     ----------
@@ -84,19 +144,28 @@ def is_surface_in_shade(
     return False
 
 
-def is_surface_in_shade_time_series(input_array, threshold=10):
+@log_function_call
+def is_surface_in_shade_time_series(
+    solar_altitude_series,
+    solar_azimuth_series,
+    shadow_indicator: Path = None,
+    horizon_heights: Optional[List[float]] = None,
+    horizon_interval: Optional[float] = None,
+    verbose: int = 0,
+    log: int = 0,
+) -> List[bool]:
     """
     Determine if a surface is in shade based on solar altitude for each timestamp.
 
     Parameters:
     - solar_altitude_series_array (numpy array): Array of solar altitude angles for each timestamp.
-    - shade_threshold (float): Solar altitude angle below which the surface is considered to be in shade.
 
     Returns:
     - numpy array: Boolean array indicating whether the surface is in shade at each timestamp.
     """
-    # return solar_altitude_series_array < threshold
-    return np.full(input_array.size, False)
-
-
-
+    log_data_fingerprint(
+            data=np.full(solar_altitude_series.value.shape, False),
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+    return np.full(solar_altitude_series.value.shape, False)

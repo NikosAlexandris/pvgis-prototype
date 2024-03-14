@@ -1,3 +1,6 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pathlib import Path
 from math import cos
@@ -10,12 +13,14 @@ from enum import Enum
 from rich import print
 
 from datetime import datetime
+from pvgisprototype.validation.arrays import create_array
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
@@ -24,6 +29,8 @@ from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irr
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -43,6 +50,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
@@ -59,9 +67,9 @@ from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
-NUMPY_DTYPE_DEFAULT = 'float64'
 
 
+@log_function_call
 def calculate_global_irradiance_time_series(
     longitude: float,
     latitude: float,
@@ -80,6 +88,8 @@ def calculate_global_irradiance_time_series(
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     surface_tilt: Optional[float] = 45,
     surface_orientation: Optional[float] = 180,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
@@ -99,11 +109,11 @@ def calculate_global_irradiance_time_series(
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float]="Array of horizon elevations.")] = None,
-    numpy_dtype: np.dtype = NUMPY_DTYPE_DEFAULT,
     rounding_places: Optional[int] = 5,
     statistics: bool = False,
     csv: Path = "series_in",
     verbose: int = False,
+    log: int = 0,
     index: bool = False,
 ):
     """
@@ -129,20 +139,57 @@ def calculate_global_irradiance_time_series(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,
+        log=log,
         )
+    solar_azimuth_series = model_solar_azimuth_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_position_model=solar_position_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
+        # time_offset_global=time_offset_global,
+        # hour_offset=hour_offset,
+        # perigee_offset=perigee_offset,
+        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        # angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=0,
+        log=log,
+    )
     # Masks based on the solar altitude series
     mask_above_horizon = solar_altitude_series.value > 0
     mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
-    in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
+    in_shade = is_surface_in_shade_time_series(
+            solar_altitude_series,
+            solar_azimuth_series,
+            log=log,
+            )
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce((mask_above_horizon, mask_not_in_shade))
 
     # Initialize arrays with zeros
-    direct_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
-    diffuse_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
-    reflected_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype=numpy_dtype)
+    shape_of_array = (
+        solar_altitude_series.value.shape
+    )  # Borrow shape from solar_altitude_series
+    direct_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    diffuse_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    reflected_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
 
     # For very low sun angles
     direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
@@ -186,7 +233,10 @@ def calculate_global_irradiance_time_series(
                 time_output_units=time_output_units,
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
+                dtype=dtype,
+                array_backend=array_backend,
                 verbose=0,  # no verbosity here by choice!
+                log=log,
             )
         )[mask_above_horizon_not_shade]
 
@@ -221,7 +271,10 @@ def calculate_global_irradiance_time_series(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             neighbor_lookup=neighbor_lookup,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
+            log=log,
         )[
             mask_above_horizon
         ]
@@ -253,7 +306,10 @@ def calculate_global_irradiance_time_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
+            log=log,
         )[
             mask_above_horizon
         ]
@@ -314,5 +370,11 @@ def calculate_global_irradiance_time_series(
 
     if verbose > 0:
         return results
+
+    log_data_fingerprint(
+            data=global_irradiance_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return global_irradiance_series

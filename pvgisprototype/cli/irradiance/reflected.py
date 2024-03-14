@@ -43,6 +43,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_index
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
@@ -109,7 +111,10 @@ def get_ground_reflected_inclined_irradiance_time_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
 ):
     """Calculate the clear-sky diffuse ground reflected irradiance on an inclined surface (Ri).

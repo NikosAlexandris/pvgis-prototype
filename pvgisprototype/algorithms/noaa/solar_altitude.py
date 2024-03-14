@@ -15,6 +15,8 @@ from typing import Sequence
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAltitude
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_noaa
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
@@ -30,6 +32,14 @@ from math import pi
 from math import isfinite
 import numpy as np
 from pandas import DatetimeIndex
+from rich import print
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
@@ -76,6 +86,8 @@ def calculate_solar_altitude_noaa(
     return solar_altitude
 
 
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAltitudeTimeSeriesNOAAInput)
 def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,
@@ -83,19 +95,28 @@ def calculate_solar_altitude_time_series_noaa(
     timestamps: Union[datetime, DatetimeIndex],
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
+    log: int = 0,
 ) -> SolarAltitude:
     """Calculate the solar altitude angle for a location over a time series"""
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
         timestamps=timestamps,
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
     )
     solar_altitude_series = np.pi / 2 - solar_zenith_series.radians
     if not np.all(np.isfinite(solar_altitude_series)) or not np.all(
@@ -105,14 +126,14 @@ def calculate_solar_altitude_time_series_noaa(
             f"The `solar_altitude` should be a finite number ranging in [{-np.pi/2}, {np.pi/2}] radians"
         )
 
-    solar_altitude_series = SolarAltitude(
+    log_data_fingerprint(
+            data=solar_altitude_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+    return SolarAltitude(
         value=solar_altitude_series,
         unit=RADIANS,
         position_algorithm='NOAA',
         timing_algorithm='NOAA',
     )
-
-    if verbose > 5:
-        debug(locals())
-
-    return solar_altitude_series

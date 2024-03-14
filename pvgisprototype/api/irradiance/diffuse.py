@@ -1,5 +1,4 @@
 from devtools import debug
-from loguru import logger
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -29,6 +28,8 @@ from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_t
 from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
 
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
@@ -39,6 +40,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import TERM_N_IN_SHADE
@@ -77,8 +79,13 @@ from pvgisprototype.constants import OUT_OF_RANGE_INDICES_COLUMN_NAME
 from pvgisprototype.constants import TERM_N_COLUMN_NAME
 from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
+@log_function_call
 def calculate_diffuse_horizontal_component_from_sarah(
     shortwave: Path,
     direct: Path,
@@ -95,7 +102,10 @@ def calculate_diffuse_horizontal_component_from_sarah(
     rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
     statistics: bool = False,
     csv: Path = None,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
     index: bool = False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
@@ -123,6 +133,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         in_memory=in_memory,
+        log=log,
     )#.to_numpy()  # We need NumPy!
 
     direct_horizontal_irradiance_series = select_time_series(
@@ -134,12 +145,13 @@ def calculate_diffuse_horizontal_component_from_sarah(
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         in_memory=in_memory,
+        log=log,
     )#.to_numpy()  # We need NumPy!
 
     diffuse_horizontal_irradiance_series = (
         global_horizontal_irradiance_series
         - direct_horizontal_irradiance_series
-    )
+    ).astype(dtype=dtype)
 
     if diffuse_horizontal_irradiance_series.size == 1:
         single_value = float(diffuse_horizontal_irradiance_series.values)
@@ -150,12 +162,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
             + f"{single_value}"
         )
         logger.warning(warning)
-
-        if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-            debug(locals())
-
-        if verbose > 0:
-            print(warning)
 
     results = {
         TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
@@ -179,9 +185,11 @@ def calculate_diffuse_horizontal_component_from_sarah(
     return diffuse_horizontal_irradiance_series
 
 
+@log_function_call
 def calculate_term_n_time_series(
     kb_series: List[float],
     verbose: int = 0,
+    log: int = 0,
 ):
     """Define the N term for a period of time
 
@@ -201,9 +209,11 @@ def calculate_term_n_time_series(
     return 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2)
 
 
+@log_function_call
 def calculate_diffuse_sky_irradiance_time_series(
     n_series: List[float],
     surface_tilt: Optional[float] = np.radians(45),
+    log: int = 0,
 ):
     """Calculate the diffuse sky irradiance
 
@@ -251,9 +261,11 @@ def calculate_diffuse_sky_irradiance_time_series(
     return diffuse_sky_irradiance_series
 
 
+@log_function_call
 def diffuse_transmission_function_time_series(
     linke_turbidity_factor_series,
     verbose: int = 0,
+    log: int = 0,
 ) -> np.array:
     """ Diffuse transmission function over a period of time """
     linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series.value, 2)
@@ -272,9 +284,11 @@ def diffuse_transmission_function_time_series(
     return diffuse_transmission_series
 
 
+@log_function_call
 def diffuse_solar_altitude_coefficients_time_series(
     linke_turbidity_factor_series,
     verbose: int = 0,
+    log: int = 0,
 ):
     """
     Vectorized function to calculate the diffuse solar altitude coefficients over a period of time.
@@ -319,10 +333,12 @@ def diffuse_solar_altitude_coefficients_time_series(
     return a1_series, a2_series, a3_series
 
 
+@log_function_call
 def diffuse_solar_altitude_function_time_series(
     solar_altitude_series: List[float],
     linke_turbidity_factor_series: LinkeTurbidityFactor,#: np.ndarray,
     verbose: int = 0,
+    log: int = 0,
 ):
     """Diffuse solar altitude function Fd"""
     a1_series, a2_series, a3_series = diffuse_solar_altitude_coefficients_time_series(
@@ -335,6 +351,7 @@ def diffuse_solar_altitude_function_time_series(
     )
 
 
+@log_function_call
 def calculate_diffuse_inclined_irradiance_time_series(
     longitude: float,
     latitude: float,
@@ -368,7 +385,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> np.array:
     """Calculate the diffuse irradiance incident on a solar surface
 
@@ -413,6 +433,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
             in_memory=in_memory,
+            log=log,
         ).to_numpy()  # We need NumPy!
 
     else:  # from the model
@@ -430,7 +451,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,  # no verbosity here by choice!
+        log=log,
     )
 
     # 2. Get quantities to calculate the diffuse horizontal irradiance
@@ -443,6 +467,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             random_days=random_days,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,  # no verbosity here by choice!
+            log=log,
         )
     )
 
@@ -463,7 +491,9 @@ def calculate_diffuse_inclined_irradiance_time_series(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
-        verbose=verbose,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,  # Is this wanted here ? i.e. not setting = 0 ?
     )
     # on a horizontal surface : G0h = G0 sin(h0)
     extraterrestrial_horizontal_irradiance_series = (
@@ -485,6 +515,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 timezone=timezone,
                 neighbor_lookup=neighbor_lookup,
                 verbose=0,
+                log=log,
             )
         ).to_numpy()  # We need NumPy!
 
@@ -536,7 +567,13 @@ def calculate_diffuse_inclined_irradiance_time_series(
         )
 
         # prepare size of output array!
-        diffuse_inclined_irradiance_series = np.zeros_like(solar_altitude_series.value, dtype='float64')
+        from pvgisprototype.validation.arrays import create_array
+        shape_of_array = (
+            solar_altitude_series.value.shape
+        )  # Borrow shape from solar_altitude_series
+        diffuse_inclined_irradiance_series = create_array(
+            shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+        )
 
         # surface in shade, yet there is ambient light
         mask_surface_in_shade_series = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
@@ -643,9 +680,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     )
     if out_of_range_indices[0].size > 0:
-        print(
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
-        )
+        warning = f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
+        logger.warning(warning)
 
     # Building the output dictionary ========================================
 
@@ -659,8 +695,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         extended_results = {
             LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series / diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
         }
         results = results | extended_results
 
@@ -699,5 +735,11 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
     if verbose > 0:
         return results
+
+    log_data_fingerprint(
+        data=diffuse_inclined_irradiance_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return diffuse_inclined_irradiance_series

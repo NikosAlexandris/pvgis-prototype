@@ -52,8 +52,7 @@ import numpy as np
 from distributed import LocalCluster, Client
 import dask
 
-import logging
-from pvgisprototype.api.series.log import logger
+from pvgisprototype.log import logger
 import warnings
 
 from pvgisprototype.api.series.models import MethodsForInexactMatches
@@ -318,12 +317,12 @@ def plot(
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     width: Annotated[int, 'Width for the plot'] = 16,
-    height: Annotated[int, 'Height for the plot'] = 9,
+    height: Annotated[int, 'Height for the plot'] = 3,
     tufte_style: Annotated[bool, typer_option_tufte_style] = False,
-    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot selected time series"""
@@ -373,6 +372,7 @@ def uniplot(
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     lines: Annotated[bool, typer_option_uniplot_lines] = True,
     title: Annotated[str, typer_option_uniplot_title] = None,
     unit: Annotated[str, typer_option_uniplot_unit] = UNITS_NAME,  #" °C")
@@ -400,6 +400,8 @@ def uniplot(
         # in_memory=in_memory,
         verbose=verbose,
     )
+    if resample_large_series:
+        data_array = data_array.resample(time='1M').mean()
     data_array_2 = select_time_series(
         time_series=time_series_2,
         longitude=longitude,
@@ -414,6 +416,8 @@ def uniplot(
         # in_memory=in_memory,
         verbose=verbose,
     )
+    if resample_large_series:
+        data_array_2 = data_array_2.resample(time='1M').mean()
     if isinstance(data_array, float):
         print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
         typer.Abort()
