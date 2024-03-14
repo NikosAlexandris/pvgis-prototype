@@ -64,6 +64,7 @@ def calculate_relative_longitude(
     latitude: Latitude,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+    log: int = 0,
 ) -> RelativeLongitude:
     """
     Notes
@@ -84,6 +85,7 @@ def calculate_relative_longitude(
 
     In PVGIS' C source code, there is an error of one negative sign in either
     of the expressions! That is so because : cos(pi/2 + x) = -sin(x).
+    As a consequence, the numerator becomes a positive number.
 
         Source code :
 
@@ -150,17 +152,20 @@ def calculate_relative_longitude(
         + cos(latitude.radians)
         * cos(surface_tilt.radians)
     )
-    tangent_relative_longitude = (
-        tangent_relative_longitude_numerator /
-        tangent_relative_longitude_denominator
+    relative_longitude = atan(
+        tangent_relative_longitude_numerator / tangent_relative_longitude_denominator
     )
-    relative_longitude = atan(tangent_relative_longitude)
-    relative_longitude = RelativeLongitude(
+
+    log_data_fingerprint(
+            data=relative_longitude,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+
+    return RelativeLongitude(
         value=relative_longitude,
         unit=RADIANS,
     )
-
-    return relative_longitude
 
 
 @validate_with_pydantic(CalculateSolarIncidenceJencoInputModel)
@@ -433,36 +438,38 @@ def calculate_solar_incidence_time_series_jenco(
         generated : high power output in the morning and 0-to-somewhat-low
         output in the evening.
 
-
       3. negative solar hour angle for the incidence angle
 
     """
     solar_altitude_series = calculate_solar_altitude_time_series_noaa(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            dtype=dtype,
-            array_backend=array_backend,
-            verbose=0,
-            )
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=0,
+        log=log,
+    )
     solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            dtype=dtype,
-            array_backend=array_backend,
-            verbose=0,
-            )
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=0,
+        log=log,
+    )
     in_shade = is_surface_in_shade_time_series(
-            solar_altitude_series=solar_altitude_series,
-            solar_azimuth_series=solar_azimuth_series,
-            shadow_indicator=shadow_indicator,
-            horizon_heights=horizon_heights,
-            horizon_interval=horizon_interval,
+        solar_altitude_series=solar_altitude_series,
+        solar_azimuth_series=solar_azimuth_series,
+        shadow_indicator=shadow_indicator,
+        horizon_heights=horizon_heights,
+        horizon_interval=horizon_interval,
+        log=log,
     )
     if np.all(in_shade):
         return NO_SOLAR_INCIDENCE
@@ -512,6 +519,7 @@ def calculate_solar_incidence_time_series_jenco(
             log_level=log,
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 

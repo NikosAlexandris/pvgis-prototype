@@ -491,7 +491,6 @@ def calculate_direct_normal_irradiance_time_series(
                 f"\n"
                 )
         logger.warning(warning_unstyled, alt=warning)
-        print(warning)
 
     # Building the output dictionary=========================================
 
