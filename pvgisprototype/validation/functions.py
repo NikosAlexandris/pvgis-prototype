@@ -1,5 +1,6 @@
 # Generic input/output
 from pvgisprototype.validation.pvis_data_classes import VerbosityModel
+from pvgisprototype.validation.pvis_data_classes import LoggingModel
 from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
 from pvgisprototype.validation.pvis_data_classes import ArrayBackendModel
 
@@ -345,6 +346,7 @@ class ModelSolarAltitudeTimeSeriesInputModel(
     ArrayTypeModel,
     # ArrayBackendModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -356,6 +358,7 @@ class ModelSolarAzimuthInputModel(
     SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -370,6 +373,7 @@ class ModelSolarGeometryOverviewInputModel(
     ApplyAtmosphericRefractionModel,
     EarthOrbitModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -385,6 +389,7 @@ class ModelSolarGeometryOverviewTimeSeriesInputModel(
     EarthOrbitModel,
     ComplementaryIncidenceAngleModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -395,6 +400,7 @@ class CalculateRelativeLongitudeInputModel(
     LatitudeModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
+    LoggingModel,
 ):
     pass
 
@@ -404,6 +410,7 @@ class CalculateSolarIncidenceInputModel(
     SolarDeclinationModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
+    LoggingModel,
 ):
     pass
 
@@ -413,6 +420,7 @@ class CalculateSolarIncidencePVISInputModel(
     BaseTimeModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
+    LoggingModel,
 ):
     pass
 
@@ -425,6 +433,7 @@ class CalculateSolarIncidenceJencoInputModel(
     EarthOrbitModel,
     ComplementaryIncidenceAngleModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -436,6 +445,7 @@ class CalculateSolarIncidenceTimeSeriesJencoInputModel(
     SurfaceOrientationModel,
     ComplementaryIncidenceAngleModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -454,6 +464,7 @@ class ModelSolarIncidenceInputModel(
     TimeOffsetModel,
     HourOffsetModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -470,6 +481,7 @@ class ModelSolarIncidenceTimeSeriesInputModel(
     BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -477,7 +489,8 @@ class ModelSolarIncidenceTimeSeriesInputModel(
 # Direct irradiance
 
 class AdjustElevationInputModel(
-    ElevationModel
+    ElevationModel,
+    LoggingModel,
 ):
     pass
 
@@ -485,6 +498,7 @@ class AdjustElevationInputModel(
 class CalculateOpticalAirMassInputModel(
     ElevationModel,
     RefractedSolarAltitudeModel,
+    LoggingModel,
 ):
     pass
 
@@ -500,5 +514,6 @@ class CalculateOpticalAirMassInputModel(
 class CalculateOpticalAirMassTimeSeriesInputModel(
     ElevationModel,
     RefractedSolarAltitudeSeriesModel,
+    LoggingModel,
 ):
     pass
