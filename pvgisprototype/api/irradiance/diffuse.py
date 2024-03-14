@@ -494,6 +494,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,  # Is this wanted here ? i.e. not setting = 0 ?
+        log=log,
     )
     # on a horizontal surface : G0h = G0 sin(h0)
     extraterrestrial_horizontal_irradiance_series = (
@@ -563,7 +564,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,
+            log=log,
         )
 
         # prepare size of output array!

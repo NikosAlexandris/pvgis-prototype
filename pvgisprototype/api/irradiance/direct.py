@@ -311,7 +311,8 @@ def calculate_refracted_solar_altitude_time_series(
 def calculate_optical_air_mass_time_series(
     elevation: float,
     refracted_solar_altitude_series: RefractedSolarAltitude,
-    verbose: int = 0,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> OpticalAirMass:
     """Approximate the relative optical air mass.
@@ -445,6 +446,8 @@ def calculate_direct_normal_irradiance_time_series(
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             random_days=random_days,
+            dtype=dtype,
+            array_backend=array_backend,
         )
     )
     corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
@@ -592,12 +595,18 @@ def calculate_direct_horizontal_irradiance_time_series(
     # expects solar altitude in degrees! ----------------------------------vvv
     refracted_solar_altitude_series = calculate_refracted_solar_altitude_time_series(
         solar_altitude_series=solar_altitude_series,   # expects altitude in degrees!
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     optical_air_mass_series = calculate_optical_air_mass_time_series(
         elevation=elevation,
         refracted_solar_altitude_series=refracted_solar_altitude_series,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     # ^^^ --------------------------------- expects solar altitude in degrees!
     direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
@@ -609,7 +618,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=0,
+        verbose=verbose,
         show_progress=show_progress,
     )
 
@@ -825,6 +834,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         # angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=0,
         log=log,
     )
@@ -881,13 +892,15 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             angle_units=angle_units,
             angle_output_units=angle_output_units,
             rounding_places=rounding_places,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
             show_progress=show_progress,
         )
     else:  # read from a time series dataset
         if verbose > 0:
-            verbosity += f'i [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...'
+            verbosity += f':information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...'
         direct_horizontal_irradiance_series = select_time_series(
             time_series=direct_horizontal_component,
             # longitude=longitude_for_selection,
