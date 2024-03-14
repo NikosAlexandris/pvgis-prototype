@@ -529,7 +529,6 @@ def calculate_photovoltaic_power_output_series(
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         verbosity += f'i [bold]Building the output[/bold] ..'
 
-
     components_container = {
         'main': lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
