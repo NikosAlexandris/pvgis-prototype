@@ -236,7 +236,7 @@ def photovoltaic_power_output_series(
         verbose=verbose,
         log=log,
         profile=profile,
-    )
+    )  # Re-Design Me ! ------------------------------------------------
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if verbose > 0:
@@ -244,8 +244,8 @@ def photovoltaic_power_output_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=photovoltaic_power_output_series,
-            title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
+            dictionary=photovoltaic_power_output_series.components,
+            # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
             rounding_places=rounding_places,
             index=index,
             surface_orientation=True,
@@ -257,11 +257,11 @@ def photovoltaic_power_output_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=photovoltaic_power_output_series,
+                dictionary=photovoltaic_power_output_series['results'],
                 filename=csv,
             )
     else:
-        flat_list = photovoltaic_power_output_series.flatten().astype(str)
+        flat_list = photovoltaic_power_output_series.value.flatten().astype(str)
         csv_str = ','.join(flat_list)
         print(csv_str)
 
