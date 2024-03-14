@@ -6,7 +6,7 @@ from typing import Sequence
 from datetime import datetime
 from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
 from pvgisprototype.validation.functions import validate_with_pydantic
-# from pvgisprototype.validation.functions import ModelSolarAzimuthTimeSeriesInputModel
+from pvgisprototype.validation.functions import ModelSolarAzimuthTimeSeriesInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.api.geometry.models import SolarPositionModel
@@ -34,7 +34,7 @@ from pvgisprototype.algorithms.caching import custom_hashkey
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
-# @validate_with_pydantic(ModelSolarAzimuthTimeSeriesInputModel)
+@validate_with_pydantic(ModelSolarAzimuthTimeSeriesInputModel)
 def model_solar_azimuth_time_series(
     longitude: Longitude,
     latitude: Latitude,
