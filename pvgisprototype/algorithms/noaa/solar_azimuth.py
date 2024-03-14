@@ -23,7 +23,18 @@ from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
+from rich import print
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @validate_with_pydantic(CalculateSolarAzimuthNOAAInput)
@@ -41,23 +52,9 @@ def calculate_solar_azimuth_noaa(
     ----------
     latitude: float
         The latitude in radians
-    """
-    # Review & Cache Me ! ----------------------------------------------------
-    solar_declination = calculate_solar_declination_noaa(
-        timestamp=timestamp,
-    )
-    # ------------------------------------------------------------------------
-    solar_hour_angle = calculate_solar_hour_angle_noaa(
-        longitude=longitude,
-        timestamp=timestamp,
-        timezone=timezone,
-    )
-    solar_zenith = calculate_solar_zenith_noaa(
-        latitude=latitude,
-        timestamp=timestamp,
-        solar_hour_angle=solar_hour_angle,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-    )
+
+    Notes
+    -----
 
                    #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
     # cos(180 - θ) = - ----------------------------------------------------------
@@ -102,41 +99,53 @@ def calculate_solar_azimuth_noaa(
     # - cos(θ) = ----------------------------------------------------------
                #            cos(latitude) * sin(solar_zenith)
 
-    # which is the same as reported in 
-
-    numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
-    denominator = cos(latitude.radians) * sin(solar_zenith.radians)
+    """
+    solar_declination = calculate_solar_declination_noaa(
+        timestamp=timestamp,
+    )
+    solar_hour_angle = calculate_solar_hour_angle_noaa(
+        longitude=longitude,
+        timestamp=timestamp,
+        timezone=timezone,
+    )
+    solar_zenith = calculate_solar_zenith_noaa(
+        latitude=latitude,
+        timestamp=timestamp,
+        solar_hour_angle=solar_hour_angle,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+    )
     numerator = sin(latitude.radians) * cos(solar_zenith.radians) - sin(solar_declination.radians)
     denominator = cos(latitude.radians) * sin(solar_zenith.radians)
     # try else raise ... ?
     cosine_solar_azimuth = -1 * numerator / denominator
     solar_azimuth = acos(cosine_solar_azimuth)
 
-    if solar_hour_angle.radians > 0:
-        solar_azimuth = 2 * pi - solar_azimuth
+    # ----------------------------------------------------- What is this for ?
+    # if solar_hour_angle.radians > 0:
+    #     solar_azimuth = 2 * pi - solar_azimuth
+    # ------------------------------------------------------------------------
 
-    solar_azimuth = SolarAzimuth(
+    if (
+        not isfinite(solar_azimuth)
+        or not SolarAzimuth().min_radians <= solar_azimuth <= SolarAzimuth().max_radians
+    ):
+        raise ValueError(
+            f"The calculated solar azimuth angle {solar_azimuth} is out of the expected range [{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
+        )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    return SolarAzimuth(
         value=solar_azimuth,
         unit=RADIANS,
         position_algorithm='NOAA',
         timing_algorithm='NOAA',
     )
 
-    if (
-        not isfinite(solar_azimuth.degrees)
-        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
-            [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
-        )
 
-    if verbose == 3:
-        debug(locals())
-
-    return solar_azimuth
-
-
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesNOAAInput)
 def calculate_solar_azimuth_time_series_noaa(
     longitude: Longitude,   # radians
@@ -144,35 +153,113 @@ def calculate_solar_azimuth_time_series_noaa(
     timestamps: Union[datetime, DatetimeIndex],
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
+    log: int = 0,
 ) -> SolarAzimuth:
-    """Calculate the solar azimuth (θ) in radians for a time series"""
+    """Calculate the solar azimuth (θ) for a time series
+
+    Notes
+    -----
+
+                   #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    # cos(180 - θ) = - ----------------------------------------------------------
+                   #            cos(latitude) * sin(solar_zenith)
+
+
+    # or after converting cos(180 - θ) to - cos(θ)
+
+                   #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+        # - cos(θ) = - ------------------------------------------------------------
+                   #              cos(latitude) * sin(solar_zenith)
+
+
+    # or :
+
+                   # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # cos(θ) = ----------------------------------------------------------
+                   #             cos(latitude) * sin(solar_zenith)
+
+                          # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+          # θ = arccos(  -------------------------------------------------------------- )
+                            #      cos(latitude) * sin(solar_zenith)
+
+
+    # or else, from the first equation, after multiplying by -1 :
+
+                     # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    # - cos(180 - θ) = ----------------------------------------------------------
+                     #          cos(latitude) * sin(solar_zenith)
+
+
+    # or after multiplying by -1 again :
+
+                   # sin(solar_declination) - sin(latitude) * cos(solar_zenith)
+    # cos(180 - θ) = ----------------------------------------------------------
+                   #            cos(latitude) * sin(solar_zenith)
+
+
+    # or after converting cos(180 - θ) to - cos(θ)
+
+               # sin(solar_declination) - sin(latitude) * cos(solar_zenith)
+    # - cos(θ) = ----------------------------------------------------------
+               #            cos(latitude) * sin(solar_zenith)
+
+    """
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
+        dtype=dtype,
+        backend=array_backend,
+        verbose=verbose,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
+        dtype=dtype,
+        backend=array_backend,
+        verbose=verbose,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
         timestamps=timestamps,
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
+        dtype=dtype,
+        backend=array_backend,
+        verbose=verbose,
     )
     numerator_series = sin(latitude.radians) * np.cos(solar_zenith_series.radians) - np.sin(solar_declination_series.radians)
     denominator_series = cos(latitude.radians) * np.sin(solar_zenith_series.radians)
     cosine_solar_azimuth_series = -1 * numerator_series / denominator_series
     solar_azimuth_series = np.arccos(cosine_solar_azimuth_series)
 
-    if not np.all(np.isfinite(solar_azimuth_series)) or not np.all(
-        (0 <= solar_azimuth_series) & (solar_azimuth_series <= 2 * np.pi)
-    ):
-        raise ValueError(f'The `solar_azimuth` is out of the expected range [0, {2* np.pi}] radians')
+    # # ----------------------------------------------------- What is this for ?
+    # condition = solar_azimuth_series > 0
+    # if np.any(condition):
+    #     solar_azimuth_series[condition] = 2 * np.pi - solar_azimuth_series[condition]
+    # # ------------------------------------------------------------------------
 
-    if verbose == 3:
-        debug(locals())
+    if (
+        (solar_azimuth_series < SolarAzimuth().min_radians)
+        | (solar_azimuth_series > SolarAzimuth().max_radians)
+    ).any():
+        out_of_range_values = solar_azimuth_series[
+            (solar_azimuth_series < SolarAzimuth().min_radians)
+            | (solar_azimuth_series > SolarAzimuth().max_radians)
+        ]
+        # raise ValueError(# ?
+        print(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
+                f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
+        )
+    log_data_fingerprint(
+            data=solar_azimuth_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return SolarAzimuth(
         value=solar_azimuth_series,

@@ -4,7 +4,7 @@ import pytest
 from pvgisprototype.api.geometry.declination import calculate_solar_declination
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_five_years
-from pvgisprototype.api.geometry.models import SolarDeclinationModels
+from pvgisprototype.api.geometry.models import SolarDeclinationModel
 from .helpers import read_noaa_spreadsheet, test_cases_from_data
 from pvgisprototype.constants import DECLINATION_NAME, DEGREES
 

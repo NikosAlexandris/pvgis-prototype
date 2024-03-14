@@ -18,6 +18,8 @@ from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_version
 from pvgisprototype.cli.typer_parameters import typer_option_log
+from pvgisprototype.cli.typer_parameters import typer_option_log_rich_handler
+from pvgisprototype.cli.typer_parameters import typer_option_logfile
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry
@@ -32,6 +34,7 @@ from pvgisprototype.cli import time
 from pvgisprototype.cli import surface
 from pvgisprototype.cli import utilities
 from pvgisprototype.cli import manual
+from pvgisprototype.log import initialize_logger, logger
 
 
 state = {"verbose": False}
@@ -133,14 +136,13 @@ app.add_typer(
 )
 
 
-from pvgisprototype.log import initialize_logger, logger
-
-
 @app.callback(no_args_is_help=True)
 def main(
     version: Annotated[Optional[bool], typer_option_version] = None,
     verbose: Annotated[int, typer_option_verbose] = 0,
     log: Annotated[Optional[bool], typer_option_log] = False,
+    log_rich_handler: Annotated[Optional[bool], typer_option_log_rich_handler] = False,
+    log_file: Annotated[Optional[Path], typer_option_logfile] = None,
 ) -> None:
     """
     The main entry point for PVIS prototype
@@ -148,8 +150,12 @@ def main(
     if verbose:
         print("Will write verbose output")
         state["verbose"] = True
-    if log:
-        initialize_logger()
+    if log or log_file:
+        initialize_logger(
+                log_file=log_file,
+                verbosity_level=verbose,
+                rich_handler=log_rich_handler,
+        )
         logger.info("Logging initialized")
     pass
 

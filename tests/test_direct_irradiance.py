@@ -2,7 +2,7 @@ import pytest
 from typer.testing import CliRunner
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
-from pvgisprototype.api.irradiance.direct import calculate_refracted_solar_altitude
+from pvgisprototype.api.irradiance.direct import calculate_refracted_solar_altitude_time_series
 from pvgisprototype.api.irradiance.direct import calculate_optical_air_mass
 from pvgisprototype.api.irradiance.direct import calculate_rayleigh_optical_thickness
 from pvgisprototype.api.irradiance.direct import calculate_direct_normal_irradiance
@@ -37,8 +37,8 @@ def run_app(arguments):
 #     assert expected_output in result.output
 
 
-# def test_calculate_refracted_solar_altitude():
-#     result = calculate_refracted_solar_altitude(0.5)
+# def test_calculate_refracted_solar_altitude_time_series():
+#     result = calculate_refracted_solar_altitude_time_series(0.5)
 #     assert isinstance(result, float)
 
 

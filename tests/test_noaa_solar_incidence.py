@@ -32,7 +32,10 @@ def test_calculate_solar_incidence_time_series_jenco(
         time_output_units,
         angle_output_units,
         ):
-    timestamps = generate_timestamps_for_a_year()
+
+
+    timestamps = generate_timestamps_for_a_year(random=True)
+
     calculated = calculate_solar_incidence_time_series_jenco(
         longitude=longitude,
         latitude=latitude,

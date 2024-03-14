@@ -8,10 +8,13 @@ from math import sin, cos, acos
 from math import asin
 from math import atan
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
-from pvgisprototype.api.geometry.declination import calculate_solar_declination_pvis
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_noaa
+from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
@@ -38,6 +41,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -45,6 +49,14 @@ from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype.constants import RADIANS
 import numpy as np
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
@@ -262,14 +274,27 @@ def calculate_solar_incidence_jenco(
 
     where HOUR_ANGLE is defined as `HOUR_ANGLE = pi / 12.0`
     which is the conversion factor to radians (π / 12 = 0.261799)
-    and hence this is the equation to calculate the hour angle
+    and hence this is the equation to calculate the hour angle in radians,
     e.g., as per NOAA's equation:
         
         `solar_hour_angle = (true_solar_time - 720) * (pi / 720)`.
 
     in which 720 is minutes, whereas 60 is hours in PVGIS' C++ code.
     """
-    solar_altitude = None
+    # Would it make sense to offer other _altitude algorithms_ ? -------------
+    solar_altitude = calculate_solar_altitude_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            # solar_position_models=solar_position_model,
+            # solar_time_model=solar_time_model,
+            # apply_atmospheric_refraction=apply_atmospheric_refraction,
+            # perigee_offset=perigee_offset,
+            # eccentricity_correction_factor=eccentricity_correction_factor,
+            # angle_output_units=angle_output_units,
+            verbose=0,
+            )
     solar_azimuth = None
     in_shade = is_surface_in_shade(
             solar_altitude=solar_altitude,
@@ -290,10 +315,8 @@ def calculate_solar_incidence_jenco(
             * cos(surface_tilt.radians)
         )
         relative_inclined_latitude = asin(sine_relative_inclined_latitude)
-        solar_declination = calculate_solar_declination_pvis(
+        solar_declination = calculate_solar_declination_noaa(
             timestamp=timestamp,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
         )
         c_inclined_31 = cos(relative_inclined_latitude) * cos(solar_declination.radians)
         c_inclined_33 = sin(relative_inclined_latitude) * sin(solar_declination.radians)
@@ -325,6 +348,8 @@ def calculate_solar_incidence_jenco(
     return SolarIncidence(value=solar_incidence, unit=RADIANS)
 
 
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarIncidenceTimeSeriesJencoInputModel)
 def calculate_solar_incidence_time_series_jenco(
     longitude: Longitude,
@@ -333,8 +358,15 @@ def calculate_solar_incidence_time_series_jenco(
     timezone: Optional[ZoneInfo] = None,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+    apply_atmospheric_refraction: bool = True,
+    shadow_indicator: Path = None,
+    horizon_heights: Optional[List[float]] = None,
+    horizon_interval: Optional[float] = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> SolarIncidence:
     """Calculate the solar incidence angle between the position of the sun and
     the inclination plane of a surface.
@@ -365,7 +397,9 @@ def calculate_solar_incidence_time_series_jenco(
     -----
     - Shadow check not implemented.
     - In PVGIS' source code, in order :
+
       1. positive numerator for the relative_longitude -- which is an error
+      
       2. following adjustments -- unsure what they mean to achieve -- are
          placed befor calculating the incidence angle :
 
@@ -374,53 +408,117 @@ def calculate_solar_incidence_time_series_jenco(
           if surface_orientation.radians > np.pi and relative_longitude.value > 0:
               relative_longitude -= np.pi
 
+        Here a ready-to-use snippet in Python:
+
+        ``` py
+        from rich import print
+        print(f'Surface orientation  : {surface_orientation}')
+        print(f'Relative longitude : {relative_longitude}')
+        if surface_orientation.radians < np.pi and relative_longitude.value < 0:
+            print(f'[bold red]Add[/bold red] {np.pi} to relative_longitude {relative_longitude}')
+            relative_longitude.value += np.pi
+        if surface_orientation.radians > np.pi and relative_longitude.value > 0:
+            print(f'[bold red]Remove[/bold red] {np.pi} from relative_longitude {relative_longitude}')
+            relative_longitude.value -= np.pi
+        print(f'Relative longitude Adjusted ? : {relative_longitude}')
+        ```
+
+        Manually testing the adjustment, seems to invert logical results in a
+        way such as :
+
+        - If the panel looks east (90 degrees orientation), then it shows
+        zero-to-somewhat-low power output values in the morning than when looking west.
+
+        - If the panel looks west (270 degrees), the opposite output is
+        generated : high power output in the morning and 0-to-somewhat-low
+        output in the evening.
+
+
       3. negative solar hour angle for the incidence angle
 
     """
-    sine_relative_inclined_latitude = -(
-        cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
-        + sin(latitude.radians) * cos(surface_tilt.radians)
+    solar_altitude_series = calculate_solar_altitude_time_series_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            )
+    solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            )
+    in_shade = is_surface_in_shade_time_series(
+            solar_altitude_series=solar_altitude_series,
+            solar_azimuth_series=solar_azimuth_series,
+            shadow_indicator=shadow_indicator,
+            horizon_heights=horizon_heights,
+            horizon_interval=horizon_interval,
     )
-    relative_inclined_latitude = np.arcsin(sine_relative_inclined_latitude)
-    solar_declination_series = calculate_solar_declination_time_series_noaa(
-        timestamps=timestamps,
-    )
-    c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
-        solar_declination_series.radians
-    )
-    c_inclined_33_series = sin(relative_inclined_latitude) * np.sin(
-        solar_declination_series.radians
-    )
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
-        longitude=longitude,
-        timestamps=timestamps,
-        timezone=timezone,
-    )
-    relative_longitude = calculate_relative_longitude(
-        latitude=latitude,
-        surface_tilt=surface_tilt,
-        surface_orientation=surface_orientation,
-    )
-    sine_solar_incidence_series = (
-        c_inclined_31_series * np.cos(solar_hour_angle_series.radians - relative_longitude.radians)
-        + c_inclined_33_series
-    )
-    solar_incidence_series = np.arcsin(sine_solar_incidence_series)
+    if np.all(in_shade):
+        return NO_SOLAR_INCIDENCE
 
-    if not complementary_incidence_angle:
+    else:
+        sine_relative_inclined_latitude = -(
+            cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
+            + sin(latitude.radians) * cos(surface_tilt.radians)
+        )
+        relative_inclined_latitude = asin(sine_relative_inclined_latitude)
+        solar_declination_series = calculate_solar_declination_time_series_noaa(
+            timestamps=timestamps,
+            dtype=dtype,
+            array_backend=array_backend,
+        )
+        c_inclined_31_series = cos(relative_inclined_latitude) * np.cos(
+            solar_declination_series.radians
+        )
+        c_inclined_33_series = sin(relative_inclined_latitude) * np.sin(
+            solar_declination_series.radians
+        )
+        solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+            longitude=longitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            dtype=dtype,
+            array_backend=array_backend,
+        )
+        relative_longitude = calculate_relative_longitude(
+            latitude=latitude,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+        )
+        sine_solar_incidence_series = (
+            c_inclined_31_series * np.cos(solar_hour_angle_series.radians - relative_longitude.radians)
+            + c_inclined_33_series
+        )
+        solar_incidence_series = np.arcsin(sine_solar_incidence_series)
+
+    if not complementary_incidence_angle:  # derive the 'tyical' incidence angle
         solar_incidence_series = np.pi/2 - solar_incidence_series
 
     solar_incidence_series[solar_incidence_series < 0] = NO_SOLAR_INCIDENCE
 
-    solar_incidence_series = SolarIncidence(
+    log_data_fingerprint(
+            data=solar_incidence_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    return SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
         positioning_algorithm='Jenco',
         timing_algorithm='Jenco',
         description='Incidence angle between sun-vector and surface-plane'
     )
-
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
-    return solar_incidence_series
