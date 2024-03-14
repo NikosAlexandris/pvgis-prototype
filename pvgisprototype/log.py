@@ -76,16 +76,18 @@ def log_data_fingerprint(
         data,
         log_level,
         hash_after_this_verbosity_level=2,
+        output=None,
 ):
     """
     """
+    if output:
+        print(type(output))
     if log_level > hash_after_this_verbosity_level:
         import inspect
         caller_name = inspect.stack()[1].function
         data_hash = generate_hash(data)
         logger.info(
-                f"Output of {caller_name}() : {type(data)}, {data.dtype}, Hash {data_hash}",
-                alt = f"Output of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]"
+                f"Output of {caller_name}() : {type(output)} : {type(data)}, {data.dtype}, Hash {data_hash}", alt = f"Output of {caller_name}() = {type(output)}, Object type = {type(data)}, Data type = [reverse]{data.dtype}[/reverse], Hash = [code]{data_hash}[/code]"
         )
     if log_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         from devtools import debug
