@@ -61,8 +61,8 @@ def log_function_call(func):
         if verbosity_level > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             data_type = kwargs.get('dtype', None)
             logger.info(
-                    f"Call : {func.__name__}() | Requested data type : {data_type}",
-                    alt=f"Call {func.__name__}(), Requested data type : [reverse]{data_type}[/reverse]"
+                    f"> Call : {func.__name__}(), Requested data type : {data_type}",
+                    alt=f"> Call {func.__name__}(), Requested data type : [reverse]{data_type}[/reverse]"
                 )
         return func(*args, **kwargs)
 
@@ -84,8 +84,8 @@ def log_data_fingerprint(
         caller_name = inspect.stack()[1].function
         data_hash = generate_hash(data)
         logger.info(
-                f"Output of {caller_name}() : {type(data)}, {data.dtype}, Hash {data_hash}",
-                alt = f"Output of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]"
+                f"< Output {caller_name}() : {type(data)}, {data.dtype}, Hash {data_hash}",
+                alt = f"< Output of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]"
         )
     if log_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         from devtools import debug
