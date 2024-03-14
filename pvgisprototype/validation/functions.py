@@ -363,6 +363,19 @@ class ModelSolarAzimuthInputModel(
     pass
 
 
+class ModelSolarAzimuthTimeSeriesInputModel(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    SolarPositionModel,
+    ApplyAtmosphericRefractionModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    VerbosityModel,
+    LoggingModel,
+):
+    pass
+
+
 class ModelSolarGeometryOverviewInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
@@ -400,6 +413,8 @@ class CalculateRelativeLongitudeInputModel(
     LatitudeModel,
     SurfaceTiltModel,
     SurfaceOrientationModel,
+    ArrayTypeModel,
+    VerbosityModel,
     LoggingModel,
 ):
     pass
@@ -432,6 +447,7 @@ class CalculateSolarIncidenceJencoInputModel(
     SurfaceOrientationModel,
     EarthOrbitModel,
     ComplementaryIncidenceAngleModel,
+    ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
 ):
@@ -444,6 +460,7 @@ class CalculateSolarIncidenceTimeSeriesJencoInputModel(
     SurfaceTiltModel,
     SurfaceOrientationModel,
     ComplementaryIncidenceAngleModel,
+    ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
 ):
@@ -480,6 +497,7 @@ class ModelSolarIncidenceTimeSeriesInputModel(
     EarthOrbitModel,
     BaseTimeOutputUnitsModel,
     BaseAngleOutputUnitsModel,
+    ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
 ):
@@ -498,6 +516,7 @@ class AdjustElevationInputModel(
 class CalculateOpticalAirMassInputModel(
     ElevationModel,
     RefractedSolarAltitudeModel,
+    VerbosityModel,
     LoggingModel,
 ):
     pass
