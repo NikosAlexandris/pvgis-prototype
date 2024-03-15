@@ -281,7 +281,7 @@ def calculate_pv_efficiency_time_series(
         } if verbose > 4 else {},
 
         'fingerprint': lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
+            FINGERPRINT_COLUMN_NAME: generate_hash(efficiency_series),
         } if fingerprint else {},
     }
 
