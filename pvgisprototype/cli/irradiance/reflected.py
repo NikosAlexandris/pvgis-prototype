@@ -156,6 +156,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     if verbose > 0:
         longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)

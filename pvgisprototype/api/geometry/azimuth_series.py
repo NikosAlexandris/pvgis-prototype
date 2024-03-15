@@ -85,9 +85,9 @@ def model_solar_azimuth_time_series(
         pass
 
     log_data_fingerprint(
-            solar_azimuth_series.value,
-            log,
-            HASH_AFTER_THIS_VERBOSITY_LEVEL,
+            data=solar_azimuth_series.value,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return solar_azimuth_series

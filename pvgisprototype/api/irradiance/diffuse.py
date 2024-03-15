@@ -84,6 +84,7 @@ from pvgisprototype.constants import OUT_OF_RANGE_INDICES_COLUMN_NAME
 from pvgisprototype.constants import TERM_N_COLUMN_NAME
 from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
+from pvgisprototype.validation.hashing import generate_hash
 
 
 @log_function_call
@@ -135,7 +136,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         tolerance=tolerance,
         in_memory=in_memory,
         log=log,
-    )#.to_numpy()  # We need NumPy!
+    ).astype(dtype=dtype)
 
     direct_horizontal_irradiance_series = select_time_series(
         time_series=direct,
@@ -147,12 +148,13 @@ def calculate_diffuse_horizontal_component_from_sarah(
         tolerance=tolerance,
         in_memory=in_memory,
         log=log,
-    )#.to_numpy()  # We need NumPy!
+    ).astype(dtype=dtype)
 
     diffuse_horizontal_irradiance_series = (
         global_horizontal_irradiance_series
         - direct_horizontal_irradiance_series
     ).astype(dtype=dtype)
+    print(f'direct horizontal type : {direct_horizontal_irradiance_series.dtype}')
 
     if diffuse_horizontal_irradiance_series.size == 1:
         single_value = float(diffuse_horizontal_irradiance_series.values)
@@ -192,6 +194,8 @@ def calculate_diffuse_horizontal_component_from_sarah(
 @log_function_call
 def calculate_term_n_time_series(
     kb_series: List[float],
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ):
@@ -210,7 +214,8 @@ def calculate_term_n_time_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2)
+    kb_series = np.array(kb_series, dtype=dtype)
+    return 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2, dtype=dtype)
 
 
 @log_function_call
@@ -268,11 +273,15 @@ def calculate_diffuse_sky_irradiance_time_series(
 @log_function_call
 def diffuse_transmission_function_time_series(
     linke_turbidity_factor_series,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> np.array:
     """ Diffuse transmission function over a period of time """
-    linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series.value, 2)
+    linke_turbidity_factor_series_squared_array = np.power(
+        linke_turbidity_factor_series.value, 2, dtype=dtype
+    )
 
     # From r.pv's source code:
     # tn = -0.015843 + locLinke * (0.030543 + 0.0003797 * locLinke);
@@ -439,7 +448,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             tolerance=tolerance,
             in_memory=in_memory,
             log=log,
-        ).to_numpy()  # We need NumPy!
+        ).to_numpy().astype(dtype)
 
     else:  # from the model
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
@@ -506,7 +515,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
         extraterrestrial_normal_irradiance_series
         * np.sin(solar_altitude_series.radians)
     )
-
     # calculate from external data
     if global_horizontal_component and direct_horizontal_component:
         diffuse_horizontal_irradiance_series = (
@@ -520,6 +528,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 end_time=end_time,
                 timezone=timezone,
                 neighbor_lookup=neighbor_lookup,
+                dtype=dtype,
+                array_backend=array_backend,
                 verbose=0,
                 log=log,
             )
@@ -548,7 +558,12 @@ def calculate_diffuse_inclined_irradiance_time_series(
         )
 
         # the N term
-        n_series = calculate_term_n_time_series(kb_series)
+        n_series = calculate_term_n_time_series(
+            kb_series,
+            dtype=dtype,
+            array_backend=array_backend,
+        )
+        print(f'n_series : {n_series.dtype}')
         diffuse_sky_irradiance_series = calculate_diffuse_sky_irradiance_time_series(
             n_series=n_series,
             surface_tilt=surface_tilt,
@@ -737,7 +752,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         } if out_of_range_indices[0].size > 0 else {},
 
         'fingerprint': lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
+            FINGERPRINT_COLUMN_NAME: generate_hash(diffuse_inclined_irradiance_series),
         } if fingerprint else {},
     }
 
