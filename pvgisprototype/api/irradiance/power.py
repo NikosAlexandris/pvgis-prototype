@@ -1,3 +1,6 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pathlib import Path
 from math import cos
@@ -91,11 +94,10 @@ from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import PhotovoltaicPower
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 from pandas import DatetimeIndex
 from pvgisprototype import SurfaceTilt
+from pvgisprototype.validation.hashing import generate_hash
+
 
 @log_function_call
 def calculate_photovoltaic_power_output_series(
@@ -506,6 +508,7 @@ def calculate_photovoltaic_power_output_series(
                             mask_and_scale=mask_and_scale,
                             in_memory=in_memory,
                             verbose=0,  # no verbosity here by choice!
+                            log=log,
                             ).to_numpy().astype(dtype=dtype),
                         unit=TEMPERATURE_UNIT)
             # print(f'Using PV module power output algorithm {power_model}')
@@ -535,7 +538,7 @@ def calculate_photovoltaic_power_output_series(
         'main': lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
-        } if verbose > 0 else {},
+        },# if verbose > 0 else {},
         
         'extended': lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & in-plane components",

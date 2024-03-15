@@ -91,12 +91,15 @@ typer_option_version = typer.Option(
     is_eager=True,
     # default_factory=None,
 )
+from pvgisprototype.log import initialize_logger
 typer_option_log = typer.Option(
     '--log',
     '-l',
     help="Enable logging",
     # help="Specify a log file to write logs to, or omit for stderr.")] = None,
-    is_flag=True,
+    count=True,
+    is_flag=False,
+    callback=initialize_logger,
     # default_factory=False,
 )
 typer_option_log_rich_handler = typer.Option(

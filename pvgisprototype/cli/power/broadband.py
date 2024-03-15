@@ -1,4 +1,5 @@
 from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
 from typing import Annotated
 from typing import List
 from typing import Optional
@@ -104,7 +105,6 @@ from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype import LinkeTurbidityFactor
 from rich import print
-from pvgisprototype.log import log_function_call
 from pandas import DatetimeIndex
 
 import typer
@@ -164,6 +164,7 @@ def photovoltaic_power_output_series(
     log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
     fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
     profile: Annotated[bool, typer_option_profiling] = False,
 ):
     """
@@ -241,31 +242,34 @@ def photovoltaic_power_output_series(
     )  # Re-Design Me ! ------------------------------------------------
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    if verbose > 0:
-        print_irradiance_table_2(
+    if not quiet:
+        if verbose > 0:
+            print_irradiance_table_2(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                dictionary=photovoltaic_power_output_series.components,
+                # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
+                rounding_places=rounding_places,
+                index=index,
+                surface_orientation=True,
+                surface_tilt=True,
+                verbose=verbose,
+            )
+        else:
+            flat_list = photovoltaic_power_output_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if csv:
+        write_irradiance_csv(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             dictionary=photovoltaic_power_output_series.components,
-            # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
-            rounding_places=rounding_places,
+            filename=csv,
             index=index,
-            surface_orientation=True,
-            surface_tilt=True,
-            verbose=verbose,
         )
-        if csv:
-            write_irradiance_csv(
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                dictionary=photovoltaic_power_output_series['results'],
-                filename=csv,
-            )
-    else:
-        flat_list = photovoltaic_power_output_series.value.flatten().astype(str)
-        csv_str = ','.join(flat_list)
-        print(csv_str)
 
     if statistics:
         print_series_statistics(
@@ -291,10 +295,11 @@ def photovoltaic_power_output_series(
             return
         import numpy as np
         
-        if verbose > 0:
-            photovoltaic_power_output_series = list(photovoltaic_power_output_series.values())[0]
+        # if verbose > 0:
+        #     photovoltaic_power_output_series = list(photovoltaic_power_output_series.value)[0]
+        #     print(f'{type(photovoltaic_power_output_series)}')
         
-        if isinstance(photovoltaic_power_output_series, np.ndarray):
+        if isinstance(photovoltaic_power_output_series.value, np.ndarray):
             # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
             supertitle = 'Photovoltaic Power Output Series'
             # label = getattr(photovoltaic_power_output_series, 'name', None)
@@ -302,11 +307,12 @@ def photovoltaic_power_output_series(
             # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
             # unit = getattr(photovoltaic_power_output_series, 'units', None)
             unit = POWER_UNIT
+            print(f'{type(photovoltaic_power_output_series)}')
             plot(
                 # xs=timestamps,
                 # xs=photovoltaic_power_output_series,
                 # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
-                ys=photovoltaic_power_output_series,
+                ys=photovoltaic_power_output_series.value,
                 legend_labels=label,
                 lines=lines,
                 title=title if title else supertitle,
