@@ -19,6 +19,7 @@ from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irr
 from pvgisprototype.api.irradiance.direct import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse import diffuse_transmission_function_time_series
 from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_function_time_series
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -53,6 +54,7 @@ from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.validation.hashing import generate_hash
 
 
 @log_function_call
@@ -88,6 +90,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+    fingerprint: bool = False,
 ):
     """Calculate the clear-sky diffuse ground reflected irradiance on an inclined surface (Ri).
 
@@ -187,49 +190,53 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
             ground_reflected_irradiance_loss_factor
         )
 
-    if verbose > 0:
-        results = {
+    components_container = {
+        'main': lambda: {
             TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE,
             REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
-        }
+        },# if verbose > 0 else {},
 
-    if verbose > 1 :
-        extended_results = {
+        'extended': lambda: {
             LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor if apply_angular_loss_factor else '-',
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
-        }
-        results = results | extended_results
+        } if verbose > 1 else {},
 
-    if verbose > 2:
-        more_extended_results = {
+        'more_extended': lambda: {
             ALBEDO_COLUMN_NAME: albedo,
             GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
             VIEW_FRACTION_COLUMN_NAME: ground_view_fraction,
-        }
-        results = results | more_extended_results
+        } if verbose > 2 else {},
 
-    if verbose > 3:
-        even_more_extended_results = {
+        'even_more_extended': lambda: {
+            TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE + " & horizontal components",
             LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-        }
-        results = results | even_more_extended_results
-        results["Title"] += " & horizontal components"
+        } if verbose > 3 else {},
 
-    if verbose > 4:
-        plus_even_more_extended_results = {
+        'and_even_more_extended': lambda: {
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
-        }
-        results = results | plus_even_more_extended_results
+        } if verbose > 4 else {},
+
+        'extra': lambda: {
+        } if verbose > 5 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(direct_inclined_irradiance_series),
+        } if fingerprint else {},
+    }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
-        return results
+        return components
 
     log_data_fingerprint(
         data=ground_reflected_inclined_irradiance_series,
