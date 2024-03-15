@@ -129,7 +129,7 @@ def photovoltaic_power_output_series(
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     temperature_series: Annotated[Path|TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
-    wind_speed_series: Annotated[WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
+    wind_speed_series: Annotated[Path|WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,

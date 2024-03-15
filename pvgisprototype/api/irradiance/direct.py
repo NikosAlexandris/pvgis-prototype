@@ -918,7 +918,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             in_memory=in_memory,
             verbose=0,  # no verbosity here by choice!
             log=log,
-        ).to_numpy()
+        ).to_numpy().astype(dtype=dtype)
         logger.info(f'Direct horizontal irradiance series : {direct_horizontal_irradiance_series}')
 
     try:
