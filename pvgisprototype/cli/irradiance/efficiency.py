@@ -25,6 +25,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_log
 from pvgisprototype.cli.typer_parameters import typer_option_index
 from pvgisprototype.cli.typer_parameters import typer_option_photovoltaic_module_model
 from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
@@ -65,10 +66,12 @@ def get_pv_efficiency_time_series(
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[Optional[int], typer_option_log] = 0,
     index: Annotated[bool, typer_option_index] = False,
     ctx: typer.Context = typer.Context,
 ):
     print(f'Context: {ctx.params}')
+    print(f'photovoltaic_module : {type(photovoltaic_module)}')
     # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
     results = calculate_pv_efficiency_time_series(
         irradiance_series=irradiance_series,
