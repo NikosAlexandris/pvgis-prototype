@@ -81,9 +81,12 @@ def log_data_fingerprint(
         data,
         log_level,
         hash_after_this_verbosity_level=2,
+        output=None,
 ):
     """
     """
+    if output:
+        print(type(output))
     if log_level > hash_after_this_verbosity_level:
         import inspect
         caller_name = inspect.stack()[1].function
