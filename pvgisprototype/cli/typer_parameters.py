@@ -607,6 +607,9 @@ def temperature_series_argument_callback(
                 timezone=ctx.params.get('timezone'),
                 name=ctx.params.get('datetimeindex_name', None)
             )
+        else:
+            from pvgisprototype.log import logger
+            logger.error(f'Did you provide both a start and an end time ?')
 
     # How to use print(ctx.get_parameter_source('temperature_series')) ?
     # See : class click.core.ParameterSource(value)
