@@ -100,6 +100,7 @@ def calculate_pv_efficiency_time_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
     fingerprint: bool = False,
 ):
     """Calculate the time series efficiency of a photovoltaic (PV) module

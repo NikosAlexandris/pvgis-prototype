@@ -151,6 +151,9 @@ def main(
         print("Will write verbose output")
         state["verbose"] = True
 
+    if log:
+        print(f'Log = {log}')
+
     # if log > 0 or log_file:
     #     initialize_logger(
     #             log_level=log,
