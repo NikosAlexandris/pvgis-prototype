@@ -43,6 +43,7 @@ from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MOD
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 import numpy as np
 from pvgisprototype.validation.hashing import generate_hash
@@ -295,4 +296,9 @@ def calculate_pv_efficiency_time_series(
     if verbose > 0:
         return components
     
+    log_data_fingerprint(
+            data=efficiency_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
     return efficiency_series
