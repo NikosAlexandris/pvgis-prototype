@@ -1,0 +1,43 @@
+from enum import Enum, auto
+from typing import List, Dict
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_cSi
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_cSi_OLD
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_OLD
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_CIS
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_CIS_BUILDING_INTEGRATED
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_CdTe
+from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_CdTe_BUILDING_INTEGRATED
+
+
+class PhotovoltaicModuleModel(Enum):
+    CSI_FREE_STANDING = 'cSi:Free standing'
+    CSI_INTEGRATED = 'cSi:Integrated'
+    OLD_CSI_FREE_STANDING = 'Old cSi:Free standing'
+    OLD_CSI_INTEGRATED = 'Old cSi:Integrated'
+    CIS_FREE_STANDING = 'CIS:Free standing'
+    CIS_INTEGRATED = 'CIS:Integrated'
+    CDTE_FREE_STANDING = 'CdTe:Free standing'
+    CDTE_INTEGRATED = 'CdTe:Integrated'
+
+
+PHOTOVOLTAIC_MODULE_COEFFICIENTS_MAP: Dict[PhotovoltaicModuleModel, List[float]] = {
+    PhotovoltaicModuleModel.CSI_FREE_STANDING: EFFICIENCY_MODEL_COEFFICIENTS_cSi,
+    PhotovoltaicModuleModel.CSI_INTEGRATED: EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED,
+    PhotovoltaicModuleModel.OLD_CSI_FREE_STANDING: EFFICIENCY_MODEL_COEFFICIENTS_cSi_OLD,
+    PhotovoltaicModuleModel.OLD_CSI_INTEGRATED: EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_OLD,
+    PhotovoltaicModuleModel.CIS_FREE_STANDING: EFFICIENCY_MODEL_COEFFICIENTS_CIS,
+    PhotovoltaicModuleModel.CIS_INTEGRATED: EFFICIENCY_MODEL_COEFFICIENTS_CIS_BUILDING_INTEGRATED,
+    PhotovoltaicModuleModel.CDTE_FREE_STANDING: EFFICIENCY_MODEL_COEFFICIENTS_CdTe,
+    PhotovoltaicModuleModel.CDTE_INTEGRATED: EFFICIENCY_MODEL_COEFFICIENTS_CdTe_BUILDING_INTEGRATED,
+}
+
+
+def get_coefficients_for_photovoltaic_module(
+    photovoltaic_module: PhotovoltaicModuleModel,
+) -> List[float]:
+    """Retrieve model coefficients based on the selected PhotovoltaicModuleModel Enum."""
+    coefficients = PHOTOVOLTAIC_MODULE_COEFFICIENTS_MAP.get(photovoltaic_module, [])
+    print(f"Module: {photovoltaic_module}, Coefficients: {coefficients}")  # Debug print
+    return coefficients
+
