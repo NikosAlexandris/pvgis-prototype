@@ -2,13 +2,17 @@
 Attention : This should be part of the main() function, that is : a global
 logging mechanism and configuration.
 """
+# import richuru
+# richuru.install()
 from loguru import logger
-import richuru
-richuru.install()
+print("Logger initialized!")
 from functools import wraps
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+
+
+import traceback
 
 
 from typer import Context
@@ -28,12 +32,12 @@ def initialize_logger(
     Attention : Used in typer_option_log !
 
     """
+    # print(f'Remove logger')
     logger.remove()
     # print(f'Caller command name : {ctx.command.name}')
     # print(f"Command path : {ctx.command_path}")
     # print(f"info_name : {ctx.info_name}")
     # print(f"params : {ctx.params}")
-    rich_handler = ctx.params.get('log_rich_handler')
 
     LOGURU_LEVELS = {
         0: "WARNING",  # Only show warnings and errors by default
@@ -41,28 +45,34 @@ def initialize_logger(
         # Define more levels as needed
         7: "DEBUG",    # Show debug messages only if log level is 7 or higher
     }
-    log_file = ctx.params.get('log_file')
     minimum_log_level = LOGURU_LEVELS.get(log_level, "WARNING")
+    # print(f'Minimum log level : {minimum_log_level}')
 
+    rich_handler = ctx.params.get('log_rich_handler')
     if rich_handler:
+        print(f'RichHandler')
         from rich.logging import RichHandler
         logger.add(RichHandler(), level=minimum_log_level)
 
+    log_file = ctx.params.get('log_file')
     if log_file:
-        print(f'Logging to file {log_file} ?')
         log_file = "pvgisprototype_{time}.log"
         logger.add(log_file, level=minimum_log_level)  # , compression="tar.gz")
+        logger.info(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
 
     if log_level > 0:
+        print(f'Logging to sys.stderr')
         import sys
         # logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
         logger.add(sys.stderr, level=minimum_log_level)
+
+    return log_level
 
 
 def log_function_call(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        verbosity_level = kwargs.get('log', 0)
+        verbosity_level = kwargs.get('log', 0) or 0
         if verbosity_level > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             data_type = kwargs.get('dtype', None)
             logger.info(
