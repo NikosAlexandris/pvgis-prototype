@@ -140,6 +140,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
+            log=log,
         )
     )
 
@@ -162,7 +163,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=verbose,
+        verbose=0,
+        log=log,
     )
 
     # Dhc [W.m-2]

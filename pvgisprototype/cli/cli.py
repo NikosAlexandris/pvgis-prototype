@@ -154,24 +154,6 @@ def main(
     if log:
         print(f'Log = {log}')
 
-    # if log > 0 or log_file:
-    #     initialize_logger(
-    #             log_level=log,
-    #             log_file=log_file,
-    #             verbosity_level=verbose,
-    #             rich_handler=log_rich_handler,
-    #     )
-    #     logger.info("Logging initialized")
-    # else:
-    #     logger.remove()
-    # if log_rich_handler:
-    #     print(f'log : {log}')
-    #     initialize_logger(
-    #             log_level=log,
-    #             verbosity_level=verbose,
-    #             rich_handler=log_rich_handler,
-    #     )
-
 
 if __name__ == "__main__":
     app()

@@ -163,7 +163,7 @@ def is_surface_in_shade_time_series(
     - numpy array: Boolean array indicating whether the surface is in shade at each timestamp.
     """
     log_data_fingerprint(
-            data=np.full(solar_altitude_series.value.shape, False),
+            data=np.full(solar_altitude_series.value.shape, False), ### FixMe!
             log_level=log,
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )

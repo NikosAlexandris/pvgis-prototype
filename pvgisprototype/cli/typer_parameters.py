@@ -357,7 +357,13 @@ def surface_tilt_callback(
     # param: typer.CallbackParam,
     surface_tilt: float,
 ) -> float:
-    """Set the default surface tilt equal to the latitude"""
+    """Set the default surface tilt equal to the latitude
+
+    Notes
+    -----
+    Redesign Me ?
+
+    """
     if ctx.resilient_parsing:
         return
     # if type(latitude) != float:
@@ -560,9 +566,14 @@ def validate_path(path: Path) -> Path:
 
 
 def parse_temperature_series(
-    temperature_input: Union[str, int, Path]
-):     # FIXME: Re-design ?
+    ctx: Context,
+    temperature_input: Union[str, int, Path] = TEMPERATURE_DEFAULT,
+):
     """
+    Notes
+    -----
+    FIXME: Re-design ?
+
     """
     try:
         if isinstance(temperature_input, int):
@@ -572,7 +583,8 @@ def parse_temperature_series(
             return Path(temperature_input)
 
         if isinstance(temperature_input, str):
-            temperature_input = np.fromstring(temperature_input, sep=',', dtype=float)
+            dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+            temperature_input = np.fromstring(temperature_input, sep=',', dtype=dtype)
 
         print(f'{type(temperature_input)}')
         return temperature_input
@@ -631,7 +643,8 @@ def temperature_series_option_callback(
 ):
     reference_series = ctx.params.get('irradiance_series')
     if temperature_series.size == 1 and temperature_series == TEMPERATURE_DEFAULT:
-        temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=float)
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=dtype)
 
     if temperature_series.size != len(reference_series):
         raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
@@ -663,12 +676,22 @@ typer_option_temperature_series = typer.Option(
 )
 
 
-def parse_wind_speed_series(wind_speed_input: int):     # FIXME: Re-design ?
+def parse_wind_speed_series(
+    wind_speed_input: Union[str, int, Path],
+    dtype: str = DATA_TYPE_DEFAULT,
+    # ctx: Context,  # will not work!
+):
+    """
+    Notes
+    -----
+    FIXME: Re-design ?
+
+    """
     try:
         if isinstance(wind_speed_input, str):
-            wind_speed_input = np.fromstring(wind_speed_input, sep=',', dtype=float)
+            wind_speed_input = np.fromstring(wind_speed_input, sep=',')
         else:
-            wind_speed_input = np.array(wind_speed_input, dtype=float)
+            wind_speed_input = np.array(wind_speed_input)
         return wind_speed_input
 
     except ValueError as e:  # conversion to float failed
@@ -679,14 +702,14 @@ def parse_wind_speed_series(wind_speed_input: int):     # FIXME: Re-design ?
 def wind_speed_series_argument_callback(
     ctx: Context,
     wind_speed_series: WindSpeedSeries,
-    param: typer.CallbackParam,
 ):
     reference_series = ctx.params.get('timestamps')
     # if not reference_series:
     #     reference_series = ctx.params.get('irradiance_series')
 
     if wind_speed_series == WIND_SPEED_DEFAULT:
-        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=float)
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=dtype)
 
     if wind_speed_series.size != len(reference_series):
         raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
@@ -700,7 +723,8 @@ def wind_speed_series_callback(
 ):
     reference_series = ctx.params.get('irradiance_series')
     if wind_speed_series == WIND_SPEED_DEFAULT:
-        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=float)
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=dtype)
 
     if wind_speed_series.size != len(reference_series):
         raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
@@ -727,17 +751,31 @@ typer_option_wind_speed_series = typer.Option(
     # is_eager=True,
     parser=parse_wind_speed_series,
     callback=wind_speed_series_callback,
-    # default_factory=WIND_SPEED_DEFAULT,
+    # default_factory=wind_speed_series_default(WIND_SPEED_DEFAULT), ?
 )
 
 ## Linke turbidity
 
-def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):     # FIXME: Re-design ?
+def parse_linke_turbidity_factor_series(
+    ctx: Context,
+    linke_turbidity_factor_input: str,
+):
+    """
+    Notes
+    -----
+    FIXME: Re-design ?
+
+    """
     try:
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
         if isinstance(linke_turbidity_factor_input, str):
-            linke_turbidity_factor_input = np.fromstring(linke_turbidity_factor_input, sep=',', dtype=float)
+            linke_turbidity_factor_input = np.fromstring(
+                linke_turbidity_factor_input, sep=",", dtype=dtype
+            )
         else:
-            linke_turbidity_factor_input = np.array(linke_turbidity_factor_input, dtype=float)
+            linke_turbidity_factor_input = np.array(
+                linke_turbidity_factor_input, dtype=dtype
+            )
 
         return linke_turbidity_factor_input
 
@@ -751,7 +789,10 @@ def linke_turbidity_factor_callback(ctx: Context, value: np.array):
         return LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_UNIT)
     else:
         timestamps = ctx.params.get('timestamps')
-        linke_turbidity = np.array([LINKE_TURBIDITY_DEFAULT for _ in timestamps])
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        linke_turbidity = np.array(
+            [LINKE_TURBIDITY_DEFAULT for _ in timestamps], dtype=dtype
+        )
         return LinkeTurbidityFactor(value=linke_turbidity, unit=LINKE_TURBIDITY_UNIT)
 
 
