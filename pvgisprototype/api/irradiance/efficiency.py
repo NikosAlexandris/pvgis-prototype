@@ -3,6 +3,7 @@ from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from typing import List
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -44,6 +45,7 @@ from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MOD
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 import numpy as np
+from pvgisprototype.validation.hashing import generate_hash
 
 
 def add_unequal_arrays(array_1, array_2):
@@ -93,6 +95,7 @@ def calculate_pv_efficiency_time_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    fingerprint: bool = False,
 ):
     """Calculate the time series efficiency of a photovoltaic (PV) module
 
@@ -233,56 +236,55 @@ def calculate_pv_efficiency_time_series(
     # if np.any(mask_invalid_efficiency):
     #     return "Some calculated efficiencies are out of the expected range [0, 1]!"
 
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
-    if verbose > 0: results = {
+    components_container = {
+        'main': lambda: {
             TITLE_KEY_NAME: EFFICIENCY,
             EFFICIENCY_COLUMN_NAME: efficiency_series,
-        }
+        },# if verbose > 0 else {},
 
-    if verbose > 1:
-        if power_model.value == PVModuleEfficiencyAlgorithm.king:
-            power_model_results = {
-            EFFICIENCY_FACTOR_COLUMN_NAME: efficiency_factor_series if power_model.value == PVModuleEfficiencyAlgorithm.king else NOT_AVAILABLE,
-            }
-        if power_model.value == PVModuleEfficiencyAlgorithm.iv:
-            power_model_results = {
-            DIRECT_CURRENT_COLUMN_NAME: current_series,
-            VOLTAGE_COLUMN_NAME: voltage_series,
-            }
-        extended_results = {
-            EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME: model_constants[0],
+        'extended': lambda: {
+            EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME: photovoltaic_module_efficiency_coefficients[0],
             POWER_ALGORITHM_COLUMN_NAME: power_model.value,
             TEMPERATURE_ALGORITHM_COLUMN_NAME: temperature_model.value,
-        }
-        results = results | power_model_results | extended_results
+        } if verbose > 1 else {},
 
-    if verbose > 2:
-        more_extended_results = {
+        'power_model_results': lambda: {
+            EFFICIENCY_FACTOR_COLUMN_NAME: efficiency_factor_series if (verbose > 1 and power_model.value == PVModuleEfficiencyAlgorithm.king) else NOT_AVAILABLE,
+            DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PVModuleEfficiencyAlgorithm.iv) else NOT_AVAILABLE,
+            VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PVModuleEfficiencyAlgorithm.iv) else NOT_AVAILABLE,
+        } if verbose > 1 else {},
+
+        'more_extended': lambda: {
+            TITLE_KEY_NAME: EFFICIENCY + ' & components',
             LOG_RELATIVE_IRRADIANCE_COLUMN_NAME: log_relative_irradiance_series,
             TEMPERATURE_DEVIATION_COLUMN_NAME: temperature_deviation_series,
-        }
-        results = results | more_extended_results
-        results[TITLE_KEY_NAME] += ' & components'
+        } if verbose > 2 else {},
 
-    if verbose > 3:
-        even_more_extended_results = {
+        'even_more_extended': lambda: {
             RELATIVE_IRRADIANCE_COLUMN_NAME: relative_irradiance_series,
             NEGATIVE_RELATIVE_IRRADIANCE_COLUMN_NAME: negative_relative_irradiance,
             IRRADIANCE_COLUMN_NAME: irradiance_series,
-        }
-        results = results | even_more_extended_results
+        } if verbose > 3 else {},
 
-    if verbose > 4:
-        even_even_more_extended_results = {
+        'and_even_more_extended': lambda: {
             TEMPERATURE_ADJUSTED_COLUMN_NAME: temperature_series_adjusted.value,
             TEMPERATURE_COLUMN_NAME: temperature_series.value,
             WIND_SPEED_COLUMN_NAME: wind_speed_series.value if wind_speed_series is not None else NOT_AVAILABLE,
-        }
-        results = results | even_even_more_extended_results
-    
+        } if verbose > 4 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
+        } if fingerprint else {},
+    }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     if verbose > 0:
-        return results 
+        return components
     
     return efficiency_series
