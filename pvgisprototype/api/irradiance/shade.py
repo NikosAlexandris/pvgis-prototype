@@ -35,6 +35,7 @@ def interpolate_horizon_height(
     -------
     float
         The interpolated horizon height.
+
     """
     position_in_interval = solar_azimuth / horizon_interval
     position_before = int(position_in_interval)
@@ -78,6 +79,7 @@ def interpolate_horizon_height_series(
     -------
     float
         The interpolated horizon height.
+
     """
     positions_in_interval = solar_azimuth_series / horizon_interval
     positions_before = np.floor(positions_in_interval).astype(int)
@@ -131,6 +133,7 @@ def is_surface_in_shade(
     -------
     bool
         True if the solar surface is in shade, otherwise False.
+
     """
     if shadow_indicator is not None and bool(shadow_indicator):
         return True
@@ -156,11 +159,16 @@ def is_surface_in_shade_time_series(
     """
     Determine if a surface is in shade based on solar altitude for each timestamp.
 
-    Parameters:
-    - solar_altitude_series_array (numpy array): Array of solar altitude angles for each timestamp.
+    Parameters
+    ----------
+    solar_altitude_series_array: numpy array
+        Array of solar altitude angles for each timestamp.
 
-    Returns:
-    - numpy array: Boolean array indicating whether the surface is in shade at each timestamp.
+    Returns
+    -------
+    NumPy array: Boolean array indicating whether the surface is in shade at
+    each timestamp.
+
     """
     log_data_fingerprint(
             data=np.full(solar_altitude_series.value.shape, False), ### FixMe!

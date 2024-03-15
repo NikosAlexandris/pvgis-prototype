@@ -57,7 +57,6 @@ def get_pv_efficiency_time_series(
     spectral_factor=None,
     temperature_series: Annotated[TemperatureSeries, typer_option_temperature_series] = TEMPERATURE_DEFAULT,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
-    # model_constants: List[float] = EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[WindSpeedSeries, typer_option_wind_speed_series] = WIND_SPEED_DEFAULT,
     power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
@@ -70,15 +69,13 @@ def get_pv_efficiency_time_series(
     index: Annotated[bool, typer_option_index] = False,
     ctx: typer.Context = typer.Context,
 ):
-    print(f'Context: {ctx.params}')
-    print(f'photovoltaic_module : {type(photovoltaic_module)}')
+    # print(f'Context: {ctx.params}')
     # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
-    results = calculate_pv_efficiency_time_series(
+    photovoltaic_efficiency_time_series = calculate_pv_efficiency_time_series(
         irradiance_series=irradiance_series,
         spectral_factor=spectral_factor,
         temperature_series=temperature_series,
         photovoltaic_module=photovoltaic_module,
-        # model_constants=model_constants,
         standard_test_temperature=standard_test_temperature,
         wind_speed_series=wind_speed_series,
         power_model=power_model,
@@ -87,8 +84,8 @@ def get_pv_efficiency_time_series(
     )
     if verbose > 0:
         print_quantity_table(
-            dictionary=results,
-            title=results['Title'],
+            dictionary=photovoltaic_efficiency_time_series,
+            title=photovoltaic_efficiency_time_series['Title'],
             main_key = EFFICIENCY_COLUMN_NAME,
             rounding_places=rounding_places,
             index=index,
@@ -96,7 +93,7 @@ def get_pv_efficiency_time_series(
         )
         # if statistics:
         #     print_series_statistics(
-        #         data_array=results[GLOBAL_INCLINED_IRRADIANCE],
+        #         data_array=photovoltaic_efficiency_time_series[GLOBAL_INCLINED_IRRADIANCE],
         #         timestamps=timestamps,
         #         title="Efficiency",
         #         rounding_places=rounding_places,
@@ -106,8 +103,8 @@ def get_pv_efficiency_time_series(
         #         longitude=None,
         #         latitude=None,
         #         timestamps=timestamps,
-        #         dictionary=results,
+        #         dictionary=photovoltaic_efficiency_time_series,
         #         filename=csv,
         #     )
     else:
-        print(results)
+        print(photovoltaic_efficiency_time_series)

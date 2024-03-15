@@ -40,7 +40,7 @@ from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 # from pvgisprototype.api.utilities.progress import progress
-from rich.progress import Progress
+# from rich.progress import Progress
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
@@ -226,16 +226,22 @@ def correct_linke_turbidity_factor_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> LinkeTurbidityFactor:
-    """
-    Vectorized function to calculate the air mass 2 Linke atmospheric turbidity factor for a time series.
+    """Calculate the air mass 2 Linke turbidity factor.
 
-    Parameters:
-    - linke_turbidity_factor_series (List[LinkeTurbidityFactor] or LinkeTurbidityFactor): 
-      The Linke turbidity factors as a list of LinkeTurbidityFactor objects or a single object.
+    Calculate the air mass 2 Linke atmospheric turbidity factor for a time series.
 
-    Returns:
-    - List[LinkeTurbidityFactor] or LinkeTurbidityFactor: 
-      The corrected Linke turbidity factors as a list of LinkeTurbidityFactor objects or a single object.
+    Parameters
+    ----------
+    linke_turbidity_factor_series: (List[LinkeTurbidityFactor] or LinkeTurbidityFactor)
+        The Linke turbidity factors as a list of LinkeTurbidityFactor objects
+        or a single object.
+
+    Returns
+    -------
+    List[LinkeTurbidityFactor] or LinkeTurbidityFactor
+        The corrected Linke turbidity factors as a list of LinkeTurbidityFactor
+        objects or a single object.
+
     """
     corrected_linke_turbidity_factors = -0.8662 * np.array(linke_turbidity_factor_series.value, dtype=dtype)
 
@@ -262,13 +268,15 @@ def calculate_refracted_solar_altitude_time_series(
     verbose: int = 0,
     log: int = 0,
 ) -> RefractedSolarAltitude:
-    """Adjust the solar altitude angle for atmospheric refraction for a time series.
+    """Adjust the solar altitude angle for atmospheric refraction.
+
+    Adjust the solar altitude angle for atmospheric refraction for a time
+    series.
     
     Notes
     -----
     This function :
     - requires solar altitude values in degrees.
-    - is vectorized to handle arrays of solar altitudes.
     - The output _should_ expectedly be of the same `dtype` as the input
       `solar_altitude_series` array.
 
@@ -316,8 +324,7 @@ def calculate_optical_air_mass_time_series(
 ) -> OpticalAirMass:
     """Approximate the relative optical air mass.
 
-    Vectorized function to approximate the relative optical air mass for a time
-    series.
+    Approximate the relative optical air mass for a time series.
 
     This function implements the algorithm described by Minzer et al. [1]_ 
     and Hofierka [2]_ (equation 5) in which the relative optical air mass
@@ -374,7 +381,7 @@ def calculate_rayleigh_optical_thickness_time_series(
 ) -> RayleighThickness:
     """Calculate the Rayleigh optical thickness.
 
-    Vectorized function to calculate Rayleigh optical thickness for a time series.
+    Calculate Rayleigh optical thickness for a time series.
 
     """
     rayleigh_thickness_series = np.zeros_like(optical_air_mass_series.value, dtype=dtype)
@@ -425,7 +432,7 @@ def calculate_direct_normal_irradiance_time_series(
     fingerprint: bool = False,
     show_progress: bool = True,
 ) -> np.array:
-    """Calculate the direct normal irradiance (SID) [W*m-2]
+    """Calculate the direct normal irradiance.
 
     The direct normal irradiance represents the amount of solar radiation
     received per unit area by a surface that is perpendicular (normal) to the
@@ -434,9 +441,14 @@ def calculate_direct_normal_irradiance_time_series(
 
     This function implements the algorithm described by Hofierka [1]_.
 
+    Notes
+    -----
+    Known also as : SID, units : W*m-2
+
     References
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
+
     """
     # with Progress(disable=not show_progress):
     extraterrestrial_normal_irradiance_series = (
@@ -570,13 +582,18 @@ def calculate_direct_horizontal_irradiance_time_series(
     index: bool = False,
     show_progress: bool = True,
 ) -> np.ndarray:
-    """Calculate the direct horizontal irradiance (SID) [W*m-2]
+    """Calculate the direct horizontal irradiance
 
     This function implements the algorithm described by Hofierka [1]_.
+
+    Notes
+    -----
+    Known also as : SID, units : W*m-2
 
     References
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
+
     """
     solar_time_model = validate_model(SolarTimeModel, solar_time_model)  # can be only one of!
     solar_altitude_series = model_solar_altitude_time_series(

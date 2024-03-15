@@ -30,7 +30,6 @@ from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
-# from pvgisprototype.api.irradiance.shortwave import calculate_global_irradiance_time_series
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
@@ -92,6 +91,8 @@ from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import SHADE_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import PhotovoltaicPower
@@ -444,44 +445,9 @@ def calculate_photovoltaic_power_output_series(
         + reflected_irradiance_series
     )
     # -----------------------------------------------------------------------
-    # If we do the following, to deduplicate code,
-    #     how do we collect the intermediate results ?
-    # -----------------------------------------------------------------------
-    # global_irradiance_series = calculate_global_irradiance_time_series(
-    #     longitude=longitude,
-    #     latitude=latitude,
-    #     elevation=elevation,
-    #     timestamps=timestamps,
-    #     start_time=start_time,
-    #     frequency=frequency,
-    #     end_time=end_time,
-    #     timezone=timezone,
-    #     random_time_series=random_time_series,
-    #     direct_horizontal_irradiance=direct_horizontal_irradiance,
-    #     mask_and_scale=mask_and_scale,
-    #     neighbor_lookup=neighbor_lookup,
-    #     tolerance=tolerance,
-    #     in_memory=in_memory,
-    #     surface_tilt=surface_tilt,
-    #     surface_orientation=surface_orientation,
-    #     linke_turbidity_factor_series=linke_turbidity_factor_series,
-    #     apply_atmospheric_refraction=apply_atmospheric_refraction,
-    #     refracted_solar_zenith=refracted_solar_zenith,
-    #     albedo=albedo,
-    #     apply_angular_loss_factor=apply_angular_loss_factor,
-    #     solar_position_model=solar_position_model,
-    #     solar_incidence_model=solar_incidence_model,
-    #     solar_time_model=solar_time_model,
-    #     time_offset_global=time_offset_global,
-    #     hour_offset=hour_offset,
-    #     solar_constant=solar_constant,
-    #     perigee_offset=perigee_offset,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
-    #     time_output_units=time_output_units,
-    #     angle_units=angle_units,
-    #     angle_output_units=angle_output_units,
-    #     verbose=verbose,
-    # )
+    # Try the following, to deduplicate code,
+    # global_irradiance_series = calculate_global_irradiance_time_series()
+    # ?
     # -----------------------------------------------------------------------
     if not power_model:
         if not efficiency:  # user-set  -- RenameMe ?  FIXME
@@ -515,7 +481,6 @@ def calculate_photovoltaic_power_output_series(
                             log=log,
                             ).to_numpy().astype(dtype=dtype),
                         unit=TEMPERATURE_UNIT)
-            # print(f'Using PV module power output algorithm {power_model}')
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
                 spectral_factor=spectral_factor,
                 irradiance_series=global_irradiance_series,
@@ -581,6 +546,8 @@ def calculate_photovoltaic_power_output_series(
         
         'extra': lambda: {
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
+            ALTITUDE_COLUMN_NAME: solar_altitude_series,
+            AZIMUTH_COLUMN_NAME: solar_azimuth_series,
         } if verbose > 5 else {},
 
         'fingerprint': lambda: {
