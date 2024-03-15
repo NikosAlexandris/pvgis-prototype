@@ -75,12 +75,14 @@ from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_wi
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_profiling
 from pvgisprototype.cli.typer_parameters import typer_option_index
+from pvgisprototype.cli.typer_parameters import typer_option_photovoltaic_module_model
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
@@ -106,6 +108,7 @@ from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype import LinkeTurbidityFactor
 from rich import print
 from pandas import DatetimeIndex
+from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
 
 import typer
 
@@ -150,6 +153,7 @@ def photovoltaic_power_output_series(
     angle_units: Annotated[str, typer_option_angle_units] = 'radians',
     angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
+    photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
@@ -231,6 +235,7 @@ def photovoltaic_power_output_series(
         angle_units=angle_units,
         angle_output_units=angle_output_units,
         # horizon_heights=horizon_heights,
+        photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
         power_model=power_model,
         temperature_model=temperature_model,
