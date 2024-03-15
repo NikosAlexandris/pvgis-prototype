@@ -100,7 +100,7 @@ typer_option_log = typer.Option(
     count=True,
     is_flag=False,
     callback=initialize_logger,
-    # default_factory=False,
+    default_factory=0,
 )
 typer_option_log_rich_handler = typer.Option(
     "--log-rich-handler",
