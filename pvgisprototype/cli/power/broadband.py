@@ -298,7 +298,7 @@ def photovoltaic_power_output_series(
         lines = True
 
         if isinstance(photovoltaic_power_output_series, float):
-            print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
+            logger.error(f"{exclamation_mark} Aborting as I cannot plot the single float value {float}!", alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
             return
         import numpy as np
         
