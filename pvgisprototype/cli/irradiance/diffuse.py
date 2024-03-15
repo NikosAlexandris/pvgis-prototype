@@ -391,15 +391,12 @@ def get_diffuse_horizontal_component_from_sarah(
     diffuse_irradiance: float
         The diffuse radiant flux incident on a surface per unit area in W/m².
     """
-    results = calculate_diffuse_horizontal_component_from_sarah(
+    diffuse_horizontal_irradiance_series = calculate_diffuse_horizontal_component_from_sarah(
         shortwave=shortwave,
         direct=direct,
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
-        start_time=start_time,
-        end_time=end_time,
-        timezone=timezone,
         mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
@@ -411,7 +408,7 @@ def get_diffuse_horizontal_component_from_sarah(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=results,
+            dictionary=diffuse_horizontal_irradiance_series,
             title=DIFFUSE_HORIZONTAL_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
             rounding_places=rounding_places,
             index=index,
@@ -419,7 +416,7 @@ def get_diffuse_horizontal_component_from_sarah(
         )
         if statistics:
             print_series_statistics(
-                data_array=results[DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME],
+                data_array=diffuse_horizontal_irradiance_series[DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME],
                 timestamps=timestamps,
                 title="Diffuse horizontal irradiance",
                 # title=DIFFUSE_HORIZONTAL_IRRADIANCE,
@@ -429,8 +426,8 @@ def get_diffuse_horizontal_component_from_sarah(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=results,
+                dictionary=diffuse_horizontal_irradiance_series,
                 filename=csv,
             )
     else:
-        print(results)
+        print(diffuse_horizontal_irradiance_series)

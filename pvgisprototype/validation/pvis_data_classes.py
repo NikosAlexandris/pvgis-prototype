@@ -51,6 +51,10 @@ class VerbosityModel(BaseModel):
     verbose: int = VERBOSE_LEVEL_DEFAULT
 
 
+class LoggingModel(BaseModel):
+    log: int = VERBOSE_LEVEL_DEFAULT
+
+
 class ArrayShapeModel(BaseModel):
     shape: Tuple[int, ...]
 

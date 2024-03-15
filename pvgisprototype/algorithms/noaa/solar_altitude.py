@@ -108,6 +108,7 @@ def calculate_solar_altitude_time_series_noaa(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
@@ -117,6 +118,7 @@ def calculate_solar_altitude_time_series_noaa(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     solar_altitude_series = np.pi / 2 - solar_zenith_series.radians
     if not np.all(np.isfinite(solar_altitude_series)) or not np.all(

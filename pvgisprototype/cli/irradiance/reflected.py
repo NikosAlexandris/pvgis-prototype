@@ -63,6 +63,7 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
+from rich import print
 
 
 app = typer.Typer(
@@ -117,15 +118,20 @@ def get_ground_reflected_inclined_irradiance_time_series(
     log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
 ):
-    """Calculate the clear-sky diffuse ground reflected irradiance on an inclined surface (Ri).
+    """Calculate the clear-sky diffuse ground reflected irradiance on an
 
     The calculation relies on an isotropic assumption. The ground reflected
     clear-sky irradiance received on an inclined surface [W.m-2] is
     proportional to the global horizontal irradiance Ghc, to the mean ground
     albedo ρg and a fraction of the ground viewed by an inclined surface
     rg(γN).
+
+    Notes
+    -----
+    Known also as : Ri
+
     """
-    results = calculate_ground_reflected_inclined_irradiance_time_series(
+    ground_reflected_inclined_irradiance_series = calculate_ground_reflected_inclined_irradiance_time_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -153,8 +159,11 @@ def get_ground_reflected_inclined_irradiance_time_series(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
-            )
+        log=log,
+    )
     if verbose > 0:
         longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
         latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -162,7 +171,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=results,
+            dictionary=ground_reflected_inclined_irradiance_series,
             title=REFLECTED_INCLINED_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
             rounding_places=rounding_places,
             index=index,
@@ -170,7 +179,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
         )
         if statistics:
             print_series_statistics(
-                data_array=results[REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME],
+                data_array=ground_reflected_inclined_irradiance_series[REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME],
                 timestamps=timestamps,
                 title="Reflected inclined irradiance",
             )
@@ -179,9 +188,8 @@ def get_ground_reflected_inclined_irradiance_time_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=results,
+                dictionary=ground_reflected_inclined_irradiance_series,
                 filename=csv,
             )
     else:
-        print(results)
-
+        print(ground_reflected_inclined_irradiance_series)

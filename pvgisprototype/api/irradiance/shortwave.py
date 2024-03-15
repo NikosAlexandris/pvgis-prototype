@@ -29,6 +29,7 @@ from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irr
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -54,6 +55,7 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
@@ -67,6 +69,7 @@ from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.validation.hashing import generate_hash
 
 
 @log_function_call
@@ -114,6 +117,7 @@ def calculate_global_irradiance_time_series(
     csv: Path = "series_in",
     verbose: int = False,
     log: int = 0,
+    fingerprint: bool = False,
     index: bool = False,
 ):
     """
@@ -332,44 +336,47 @@ def calculate_global_irradiance_time_series(
 
     # Building the output dictionary ========================================
 
-    if verbose > 0:
-        results = {
-                'Title': GLOBAL_INCLINED_IRRADIANCE,
-                GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
-        }
-    
-    if verbose > 2:
-        more_extended_results = {
+    components_container = {
+        'main': lambda: {
+            TITLE_KEY_NAME: GLOBAL_INCLINED_IRRADIANCE,
+            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
+        },# if verbose > 0 else {},
+
+        'extended': lambda: {
+            TITLE_KEY_NAME: GLOBAL_INCLINED_IRRADIANCE + ' & relevant components',
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
+        } if verbose > 1 else {},
+
+        'more_extended': lambda: {
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,
             REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
             # "Temperature": temperature_series,
             # "Wind speed": wind_speed_series,
-        }
-        results = results | more_extended_results
+        } if verbose > 2 else {},
 
-    if verbose > 1:
-        extended_results = {
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
-            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
-        }
-        results = results | extended_results
-        results['Title'] += ' & relevant components'
-
-    if verbose > 3:
-        even_more_extended_results = {
+        'even_more_extended': lambda: {
             SHADE_COLUMN_NAME: in_shade,
             ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
             LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
-        }
-        results = results | even_more_extended_results
+        } if verbose > 3 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(global_irradiance_series),
+        } if fingerprint else {},
+    }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
+
+    if verbose > 0:
+        return components
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
-
-    if verbose > 0:
-        return results
 
     log_data_fingerprint(
             data=global_irradiance_series,

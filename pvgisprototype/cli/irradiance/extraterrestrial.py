@@ -55,9 +55,6 @@ def get_extraterrestrial_normal_irradiance_time_series(
     """ """
     results = calculate_extraterrestrial_normal_irradiance_time_series(
         timestamps=timestamps,
-        start_time=start_time,
-        frequency=frequency,
-        end_time=end_time,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,

@@ -38,6 +38,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_output_filename
 from pvgisprototype.cli.typer_parameters import typer_option_variable_name_as_suffix
 from pvgisprototype.cli.typer_parameters import typer_option_tufte_style
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+# from pvgisprototype.cli.typer_parameters import typer_option_log
 
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
@@ -73,6 +74,7 @@ from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype import Longitude
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
@@ -99,8 +101,8 @@ def warn_for_negative_longitude(
         warning += f'The longitude '
         warning += f'{longitude} ' + f'is negative. '
         warning += f'If the input dataset\'s longitude values range in [0, 360], consider using `--convert-longitude-360`!'
-        # logger.warning(warning)
-        print(warning)
+        logger.warning(warning)
+        # print(warning)
 
 
 @app.command(
@@ -129,6 +131,7 @@ def select(
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
 ):
     """Select location series"""
     if convert_longitude_360:
@@ -158,6 +161,7 @@ def select(
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
+        log=log,
     )
     location_time_series_2 = select_time_series(
         time_series=time_series_2,
@@ -174,8 +178,9 @@ def select(
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
+        log=log,
     )
-    if verbose > 7:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     # if output_filename:
