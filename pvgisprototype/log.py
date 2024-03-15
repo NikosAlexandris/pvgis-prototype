@@ -3,6 +3,7 @@ Attention : This should be part of the main() function, that is : a global
 logging mechanism and configuration.
 """
 from loguru import logger
+logger.remove()
 from functools import wraps
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
@@ -23,9 +24,8 @@ def initialize_logger(
     Attention : Used in typer_option_log !
 
     """
-    import richuru
-    richuru.install()
-    from loguru import logger
+    # import richuru
+    # richuru.install()
     # print(f'Remove logger')
     # logger.remove()
     # import richuru

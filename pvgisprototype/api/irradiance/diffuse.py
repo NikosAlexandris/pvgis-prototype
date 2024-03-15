@@ -55,7 +55,6 @@ from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
-from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 import numpy as np
@@ -94,21 +93,14 @@ def calculate_diffuse_horizontal_component_from_sarah(
     longitude: float,
     latitude: float,
     timestamps: Optional[datetime] = None,
-    start_time: Optional[datetime] = None,
-    end_time: Optional[datetime] = None,
-    timezone: Optional[str] = None,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
-    rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
-    statistics: bool = False,
-    csv: Path = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
-    index: bool = False,
 ):
     """Calculate the diffuse irradiance incident on a solar surface from SARAH
     time series.
@@ -278,13 +270,17 @@ def diffuse_transmission_function_time_series(
     verbose: int = 0,
     log: int = 0,
 ) -> np.array:
-    """ Diffuse transmission function over a period of time """
+    """ Diffuse transmission function over a period of time
+
+    Notes
+    -----
+    From r.pv's source code:
+    tn = -0.015843 + locLinke * (0.030543 + 0.0003797 * locLinke);
+    
+    """
     linke_turbidity_factor_series_squared_array = np.power(
         linke_turbidity_factor_series.value, 2, dtype=dtype
     )
-
-    # From r.pv's source code:
-    # tn = -0.015843 + locLinke * (0.030543 + 0.0003797 * locLinke);
     diffuse_transmission_series = (
         -0.015843
         + 0.030543 * linke_turbidity_factor_series.value
@@ -303,19 +299,20 @@ def diffuse_solar_altitude_coefficients_time_series(
     verbose: int = 0,
     log: int = 0,
 ):
-    """
-    Vectorized function to calculate the diffuse solar altitude coefficients over a period of time.
+    """Calculate the diffuse solar altitude coefficients.
+
+    Calculate the diffuse solar altitude coefficients over a period of time.
 
     Parameters
     ----------
-    - linke_turbidity_factor_series (List[LinkeTurbidityFactor] or LinkeTurbidityFactor): 
-      The Linke turbidity factors as a list of LinkeTurbidityFactor objects or a single object.
+    linke_turbidity_factor_series: (List[LinkeTurbidityFactor] or LinkeTurbidityFactor)
+        The Linke turbidity factors as a list of LinkeTurbidityFactor objects
+        or a single object.
 
     Returns
     -------
-    """
 
-    # Calculate common terms only once
+    """
     linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series.value, 2)
     diffuse_transmission_series = diffuse_transmission_function_time_series(linke_turbidity_factor_series)
     diffuse_transmission_series_array = np.array(diffuse_transmission_series)
@@ -349,11 +346,17 @@ def diffuse_solar_altitude_coefficients_time_series(
 @log_function_call
 def diffuse_solar_altitude_function_time_series(
     solar_altitude_series: List[float],
-    linke_turbidity_factor_series: LinkeTurbidityFactor,#: np.ndarray,
+    linke_turbidity_factor_series: LinkeTurbidityFactor,
     verbose: int = 0,
     log: int = 0,
 ):
-    """Diffuse solar altitude function Fd"""
+    """Calculate the diffuse solar altitude
+
+    Notes
+    -----
+    Other symbol: function Fd
+
+    """
     a1_series, a2_series, a3_series = diffuse_solar_altitude_coefficients_time_series(
         linke_turbidity_factor_series
     )
@@ -434,9 +437,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     - surface_orientation :
     - diffuse_irradiance
     """
-
     # 1. Calculate the direct horizontal irradiance
-
     if direct_horizontal_component:  # read from external dataset
         direct_horizontal_irradiance_series = select_time_series(
             time_series=direct_horizontal_component,
@@ -472,8 +473,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
     )
 
     # 2. Get quantities to calculate the diffuse horizontal irradiance
-
-    # G0
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
@@ -487,7 +486,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
             log=log,
         )
     )
-
     # extraterrestrial on a horizontal surface requires the solar altitude
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
@@ -510,12 +508,12 @@ def calculate_diffuse_inclined_irradiance_time_series(
         verbose=verbose,  # Is this wanted here ? i.e. not setting = 0 ?
         log=log,
     )
-    # on a horizontal surface : G0h = G0 sin(h0)
     extraterrestrial_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series
         * np.sin(solar_altitude_series.radians)
     )
-    # calculate from external data
+    print(f'extraterrestrial_horizontal_irradiance_series : {extraterrestrial_horizontal_irradiance_series.dtype}')
+    # calculate based on external global and direct irradiance series
     if global_horizontal_component and direct_horizontal_component:
         diffuse_horizontal_irradiance_series = (
             calculate_diffuse_horizontal_component_from_sarah(
@@ -524,9 +522,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
                 latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
                 timestamps=timestamps,
-                start_time=start_time,
-                end_time=end_time,
-                timezone=timezone,
                 neighbor_lookup=neighbor_lookup,
                 dtype=dtype,
                 array_backend=array_backend,
@@ -536,7 +531,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
         ).to_numpy()  # We need NumPy!
 
     else:  # model it
-        # Dhc [W.m-2]
         diffuse_horizontal_irradiance_series = (
             extraterrestrial_normal_irradiance_series
             * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
@@ -551,24 +545,19 @@ def calculate_diffuse_inclined_irradiance_time_series(
     else:  # tilted (or inclined) surface
     # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
 
-        # proportion between direct (beam) and extraterrestrial irradiance : Kb
-        kb_series = (
+        kb_series = ( # proportion between direct and extraterrestrial
             direct_horizontal_irradiance_series
             / extraterrestrial_horizontal_irradiance_series
         )
-
-        # the N term
         n_series = calculate_term_n_time_series(
             kb_series,
             dtype=dtype,
             array_backend=array_backend,
         )
-        print(f'n_series : {n_series.dtype}')
         diffuse_sky_irradiance_series = calculate_diffuse_sky_irradiance_time_series(
             n_series=n_series,
             surface_tilt=surface_tilt,
         )
-
         solar_incidence_series = model_solar_incidence_time_series(
             longitude=longitude,
             latitude=latitude,
@@ -602,7 +591,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
         # surface in shade, yet there is ambient light
         mask_surface_in_shade_series = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
         if np.any(mask_surface_in_shade_series):
-            # F(γN)
             diffuse_sky_irradiance_series[mask_surface_in_shade_series] = (
                 calculate_diffuse_sky_irradiance_time_series(
                     n_series=np.full(len(timestamps), TERM_N_IN_SHADE),
@@ -688,7 +676,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
                     )
                 )
 
-    # one more thing
     if apply_angular_loss_factor:
         diffuse_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
             pi - surface_tilt - sin(surface_tilt)
@@ -698,7 +685,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
         )
         diffuse_inclined_irradiance_series *= diffuse_irradiance_loss_factor
 
-    # Warning
     out_of_range_indices = np.where(
         (diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
         | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)

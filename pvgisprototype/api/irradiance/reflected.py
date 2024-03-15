@@ -125,14 +125,9 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
             log=log,
         )
     )
-
-    # G0
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
-            start_time=start_time,
-            frequency=frequency,
-            end_time=end_time,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
@@ -166,8 +161,6 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         verbose=0,
         log=log,
     )
-
-    # Dhc [W.m-2]
     diffuse_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series
         * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
@@ -200,7 +193,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         'main': lambda: {
             TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE,
             REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
-        },# if verbose > 0 else {},
+        },
 
         'extended': lambda: {
             LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor if apply_angular_loss_factor else '-',
