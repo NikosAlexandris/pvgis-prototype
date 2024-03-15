@@ -1,3 +1,6 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from datetime import datetime
 from pathlib import Path
@@ -79,10 +82,6 @@ from pvgisprototype.constants import OUT_OF_RANGE_INDICES_COLUMN_NAME
 from pvgisprototype.constants import TERM_N_COLUMN_NAME
 from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 
 
 @log_function_call

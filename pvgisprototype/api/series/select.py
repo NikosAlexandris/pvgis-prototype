@@ -1,3 +1,6 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from typing import Any
 from typing import Optional
@@ -6,8 +9,8 @@ from pvgisprototype import Latitude
 from datetime import datetime
 from pathlib import Path
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.log import logger
 from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.series.utilities import get_scale_and_offset
@@ -16,6 +19,7 @@ from pvgisprototype.api.series.hardcodings import check_mark
 from pvgisprototype.api.series.hardcodings import x_mark
 
 
+@log_function_call
 def select_time_series(
     time_series: Path,
     longitude: Longitude,
@@ -40,13 +44,6 @@ def select_time_series(
     #     longitude = longitude % 360
     # warn_for_negative_longitude(longitude)
 
-    # logger.handlers = []  # Remove any existing handlers
-    # file_handler = logging.FileHandler(f'{output_filename}_{time_series.name}.log')
-    # file_handler = logging.FileHandler(f'{time_series.name}.log')
-    # file_handler.setLevel(logging.INFO)
-    # formatter = logging.Formatter("%(asctime)s, %(msecs)d; %(levelname)-8s; %(lineno)4d: %(message)s", datefmt="%I:%M:%S")
-    # file_handler.setFormatter(formatter)
-    # logger.addHandler(file_handler)
     logger.info(f'Dataset : {time_series.name}')
     logger.info(f'Path to : {time_series.parent.absolute()}')
     scale_factor, add_offset = get_scale_and_offset(time_series)
@@ -64,7 +61,7 @@ def select_time_series(
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         verbose=verbose,
-        log=log,
+        # log=log,
     )
     # ------------------------------------------------------------------------
     if start_time or end_time:
@@ -111,6 +108,11 @@ def select_time_series(
         if verbose > 0:
             print(warning)
 
+    log_data_fingerprint(
+            data=location_time_series.values,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+            )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
