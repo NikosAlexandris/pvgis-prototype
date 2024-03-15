@@ -231,7 +231,7 @@ def calculate_photovoltaic_power_output_series(
         pr.enable()
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        verbosity = f'i [bold]Modelling[/bold] the [magenta]solar altitude[/magenta] for the given timestamps ..'
+        logger.info('i [bold]Modelling[/bold] the [magenta]solar altitude[/magenta] for the given timestamps ..')
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -254,7 +254,7 @@ def calculate_photovoltaic_power_output_series(
         log=log,
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        verbosity += f'i [bold]Modelling[/bold] the [magenta]solar azimuth[/magenta] for the given timestamps ..'
+        logger.info(f'i [bold]Modelling[/bold] the [magenta]solar azimuth[/magenta] for the given timestamps ..')
     solar_azimuth_series = model_solar_azimuth_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -278,7 +278,7 @@ def calculate_photovoltaic_power_output_series(
     )
     # Masks based on the solar altitude series
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        verbosity += f'i [bold]Masking out[/bold] moments in time when [magenta]the surface is not illuminated [/magenta] ..'
+        logger.info(f'i [bold]Masking out[/bold] moments in time when [magenta]the surface is not illuminated [/magenta] ..')
     mask_above_horizon = solar_altitude_series.value > 0
     mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
@@ -317,7 +317,7 @@ def calculate_photovoltaic_power_output_series(
     # For sun above horizon and not in shade
     if np.any(mask_above_horizon_not_in_shade):
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-            verbosity += f'i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade ..'
+            logger.info(f'i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade ..')
         direct_irradiance_series[mask_above_horizon_not_in_shade] = (
             calculate_direct_inclined_irradiance_time_series_pvgis(
                 longitude=longitude,
@@ -360,7 +360,7 @@ def calculate_photovoltaic_power_output_series(
     # Calculate diffuse and reflected irradiance for sun above horizon
     if np.any(mask_above_horizon):
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-            verbosity += f'i [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for daylight moments ..'
+            logger.info(f'i [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for daylight moments ..')
         diffuse_irradiance_series[
             mask_above_horizon
         ] = calculate_diffuse_inclined_irradiance_time_series(
@@ -398,7 +398,7 @@ def calculate_photovoltaic_power_output_series(
             mask_above_horizon
         ]
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-            verbosity += f'i [bold]Calculating[/bold] the [magenta]reflected inclined irradiance[/magenta] for daylight moments ..'
+            logger.info(f'i [bold]Calculating[/bold] the [magenta]reflected inclined irradiance[/magenta] for daylight moments ..')
         reflected_irradiance_series[
             mask_above_horizon
         ] = calculate_ground_reflected_inclined_irradiance_time_series(
@@ -430,13 +430,14 @@ def calculate_photovoltaic_power_output_series(
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
+            log=log,
         )[
             mask_above_horizon
         ]
 
     # sum components
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        verbosity += f'\ni [bold]Calculating[/bold] the [magenta]global inclined irradiance[/magenta] ..'
+        logger.info(f'\ni [bold]Calculating[/bold] the [magenta]global inclined irradiance[/magenta] ..')
     global_irradiance_series = (
         direct_irradiance_series
         + diffuse_irradiance_series
@@ -528,15 +529,16 @@ def calculate_photovoltaic_power_output_series(
                 dtype=dtype,
                 array_backend=array_backend,
                 verbose=0,  # no verbosity here by choice!
+                log=log,
             )
             efficiency_coefficient_series *= system_efficiency  # on-top-of !
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        verbosity += f'i [bold]Applying[/bold] some [magenta]efficiency coefficients[/magenta] on the global inclined irradiance ..'
+        logger.info(f'i [bold]Applying[/bold] some [magenta]efficiency coefficients[/magenta] on the global inclined irradiance ..')
     photovoltaic_power_output_series = global_irradiance_series * efficiency_coefficient_series
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        verbosity += f'i [bold]Building the output[/bold] ..'
+        logger.info(f'i [bold]Building the output[/bold] ..')
 
     components_container = {
         'main': lambda: {
