@@ -33,9 +33,6 @@ def get_days_per_year(years):
 @cached(cache={}, key=custom_hashkey)
 def calculate_extraterrestrial_normal_irradiance_time_series(
     timestamps: DatetimeIndex = None,
-    start_time: Optional[datetime] = None,
-    frequency: Optional[str] = None,
-    end_time: Optional[datetime] = None,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -47,6 +44,11 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
 ) -> Union[np.ndarray, dict]:
     """
     Calculate the normal extraterrestrial irradiance over a period of time
+
+    Notes
+    -----
+    Symbol in ... `G0`
+
     """
     years_in_timestamps = timestamps.year
     years, indices = np.unique(years_in_timestamps, return_inverse=True)
