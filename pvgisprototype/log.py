@@ -2,56 +2,61 @@
 Attention : This should be part of the main() function, that is : a global
 logging mechanism and configuration.
 """
+from loguru import logger
 import richuru
 richuru.install()
-from loguru import logger
 from functools import wraps
-    
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 
 
+from typer import Context
+# Attention : Used in typer_option_log !
 def initialize_logger(
-    log_file = None,
-    verbosity_level=0,
-    rich_handler: bool = False,
+    ctx: Context,
+    log_level: int = 0,
+    # log_file: bool = None,
+    # verbosity_level: int = 0,
+    # rich_handler: bool = False,
 ):
     """
     Initialise logging to either stderr or a file ?
+
+    Notes
+    -----
+    Attention : Used in typer_option_log !
+
     """
-    def filter_function(record):
-        """Determine which logs to include based on the verbosity level."""
-        return record["level"].name == "INFO" if verbosity_level == 1 else True
+    logger.remove()
+    # print(f'Caller command name : {ctx.command.name}')
+    # print(f"Command path : {ctx.command_path}")
+    # print(f"info_name : {ctx.info_name}")
+    # print(f"params : {ctx.params}")
+    rich_handler = ctx.params.get('log_rich_handler')
+
+    LOGURU_LEVELS = {
+        0: "WARNING",  # Only show warnings and errors by default
+        1: "INFO",     # Show info, warnings, and errors if log level is 1 or higher
+        # Define more levels as needed
+        7: "DEBUG",    # Show debug messages only if log level is 7 or higher
+    }
+    log_file = ctx.params.get('log_file')
+    minimum_log_level = LOGURU_LEVELS.get(log_level, "WARNING")
 
     if rich_handler:
-        logger.remove()
         from rich.logging import RichHandler
-        logger.add(RichHandler(), filter=filter_function)
+        logger.add(RichHandler(), level=minimum_log_level)
 
     if log_file:
+        print(f'Logging to file {log_file} ?')
         log_file = "pvgisprototype_{time}.log"
-        logger.add(log_file, filter=filter_function)  # , compression="tar.gz")
-        # logger.add(logfile, enqueue=True, backtrace=True, diagnose=True)
+        logger.add(log_file, level=minimum_log_level)  # , compression="tar.gz")
 
-    # else:
-    #     import sys
-    #     logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
-
-
-def log_function(
-        verbosity_level,
-        data_type,
-):
-    """
-    """
-    if verbosity_level > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        import inspect
-        caller_name = inspect.stack()[1].function
-        logger.info(
-                f"Call : {caller_name}() | Requested data type : {data_type}",
-                alt=f"Call {caller_name}(), Requested data type : [reverse]{data_type}[/reverse]"
-            )
+    if log_level > 0:
+        import sys
+        # logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
+        logger.add(sys.stderr, level=minimum_log_level)
 
 
 def log_function_call(func):
@@ -85,7 +90,7 @@ def log_data_fingerprint(
         data_hash = generate_hash(data)
         logger.info(
                 f"< Output {caller_name}() : {type(data)}, {data.dtype}, Hash {data_hash}",
-                alt = f"< Output of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]"
+                alt = f"< [bold]Output[/bold] of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]"
         )
     if log_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         from devtools import debug

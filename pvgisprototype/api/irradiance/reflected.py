@@ -1,5 +1,4 @@
 from pvgisprototype.log import logger
-from pvgisprototype.log import log_function
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug

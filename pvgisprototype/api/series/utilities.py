@@ -1,9 +1,9 @@
+from pvgisprototype.log import logger
 from devtools import debug
 from rich import print
 import warnings
 import typer
 import netCDF4
-from pvgisprototype.log import logger
 import xarray as xr
 
 from pvgisprototype import Latitude
@@ -128,7 +128,6 @@ def set_location_indexers(
     if not (longitude and latitude):
         warning = f'{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates.'
         logger.warning(warning)
-        typer.echo(warning)
 
         center_longitude = float(data_array[x][len(data_array[x])//2])
         center_latitude = float(data_array[y][len(data_array[y])//2])
@@ -227,7 +226,7 @@ def select_location_time_series(
         location_time_series.load()  # load into memory for fast processing
 
     except Exception as exception:
-        print(f"{ERROR_IN_SELECTING_DATA} : {exception}")
+        logger.error(f"{ERROR_IN_SELECTING_DATA} : {exception}")
         raise SystemExit(33)
 
     if verbose == DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
