@@ -14,7 +14,7 @@ import traceback
 from typer import Context
 def initialize_logger(
     ctx: Context,
-    log_level: int = 0,
+    log_level: None|int = None,
 ):
     """
     Initialise logging to either stderr or a file ?
@@ -24,8 +24,6 @@ def initialize_logger(
     Attention : Used in typer_option_log !
 
     """
-    # import richuru
-    # richuru.install()
     # print(f'Remove logger')
     # logger.remove()
     # import richuru
@@ -48,18 +46,17 @@ def initialize_logger(
     if rich_handler:
         print(f'RichHandler')
         logger.remove()
-        from rich.logging import RichHandler
-        logger.add(RichHandler(), level=minimum_log_level)
+        import richuru
+        richuru.install(level=0, rich_traceback=False)
 
     log_file = ctx.params.get('log_file')
     if log_file:
         # print(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
-        # logger.remove()
         log_file = "pvgisprototype_{time}.log"
         logger.add(log_file, level=minimum_log_level)  # , compression="tar.gz")
         # logger.info(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
 
-    if log_level > 0:
+    if log_level:
         print(f'Logging to sys.stderr')
         logger.remove()
         import sys
