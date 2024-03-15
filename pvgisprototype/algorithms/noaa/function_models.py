@@ -2,7 +2,9 @@ from pydantic import field_validator
 
 # Generic input/output
 from pvgisprototype.validation.pvis_data_classes import VerbosityModel
+from pvgisprototype.validation.pvis_data_classes import LoggingModel
 from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
+from pvgisprototype.validation.pvis_data_classes import ArrayBackendModel
 
 # When?
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampModel
@@ -46,6 +48,7 @@ class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -54,6 +57,7 @@ class CalculateEquationOfTimeTimeSeriesNOAAInput(
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -63,6 +67,7 @@ class CalculateTimeOffsetTimeSeriesNOAAInput(
     BaseTimeSeriesModel,
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -73,6 +78,7 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     BaseTimeOutputUnitsModel,
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -82,6 +88,7 @@ class CalculateSolarHourAngleTimeSeriesNOAAInput(
     BaseTimeSeriesModel,
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -90,6 +97,7 @@ class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
     BaseTimestampSeriesModel,  # != BaseTimestampModel
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -97,6 +105,7 @@ class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
 class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     SolarZenithModel,
     VerbosityModel,
+    LoggingModel,
 ):
     @field_validator('solar_zenith')
     @classmethod
@@ -109,6 +118,7 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
 class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
     SolarZenithSeriesModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -120,6 +130,7 @@ class CalculateSolarZenithNOAAInput(
     ApplyAtmosphericRefractionModel,
     BaseAngleOutputUnitsModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -131,6 +142,7 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -141,6 +153,7 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -149,6 +162,7 @@ class CalculateSolarAzimuthNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -158,6 +172,7 @@ class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseTimeSeriesModel,
     ArrayTypeModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -166,6 +181,8 @@ class CalculateEventHourAngleNOAAInput(
     LatitudeModel,
     BaseTimestampModel,
     RefractedSolarZenithModel,
+    VerbosityModel,
+    LoggingModel,
 ):
 
     @field_validator('refracted_solar_zenith')
@@ -184,6 +201,8 @@ class CalculateEventHourAngleTimeSeriesNOAAInput(
     LatitudeModel,
     BaseTimestampSeriesModel,
     RefractedSolarZenithModel,
+    VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -194,6 +213,8 @@ class CalculateEventTimeNOAAInput(
     RefractedSolarZenithModel,
     BaseTimeEventModel,
     ApplyAtmosphericRefractionModel,
+    VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -204,6 +225,8 @@ class CalculateEventTimeTimeSeriesNOAAInput(
     RefractedSolarZenithModel,
     BaseTimeEventModel,
     ApplyAtmosphericRefractionModel,
+    VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -212,6 +235,8 @@ class CalculateLocalSolarTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
     RefractedSolarZenithModel,
+    VerbosityModel,
+    LoggingModel,
 ):
     verbose: int = 0
 
@@ -221,6 +246,8 @@ class CalculateSolarPositionNOAAInput(
     BaseTimeModel,
     RefractedSolarZenithModel,
     ApplyAtmosphericRefractionModel,
+    VerbosityModel,
+    LoggingModel,
 ):
 
     @field_validator('refracted_solar_zenith')
@@ -241,5 +268,7 @@ class CalculateTimeserieSolarPositionNOAAInput(
     BaseTimeSeriesModel,
     RefractedSolarZenithModel,
     ApplyAtmosphericRefractionModel,
+    VerbosityModel,
+    LoggingModel,
 ):
     pass

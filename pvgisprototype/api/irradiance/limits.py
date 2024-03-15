@@ -9,6 +9,7 @@ from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import AU
 from pvgisprototype.constants import STEPHAN_BOLTZMANN_CONSTANT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from rich.table import Table
 from rich import box
@@ -130,6 +131,8 @@ def calculate_limits(
     solar_zenith: float,
     air_temperature: float,
     limits_dictionary: dict,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate physically possible and extremely rare limits
 
@@ -160,9 +163,9 @@ def calculate_limits(
             calculated_limits[key]["Max"] = value["Max"]
 
     log_data_fingerprint(
-            calculated_limits,
-            verbosity_level = 7,
-            hash_after_this_verbosity_level = HASH_AFTER_THIS_VERBOSITY_LEVEL,
+            data=calculated_limits,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
     return calculated_limits
 

@@ -202,9 +202,10 @@ def adjust_solar_zenith_for_atmospheric_refraction(
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     solar_zenith_series: SolarZenith,
-    verbose: int = 0,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = 0,
+    log: int = 0,
 ) -> SolarZenith:
     """Adjust solar zenith for atmospheric refraction for a time series of solar zenith angles"""
     # Mask 

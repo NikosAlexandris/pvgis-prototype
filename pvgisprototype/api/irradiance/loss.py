@@ -1,5 +1,7 @@
 from devtools import debug
 from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 import typer
 from typing import Annotated
 from typing import List
@@ -20,9 +22,6 @@ from pvgisprototype.constants import ANGULAR_LOSS_COEFFICIENT
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 import numpy as np
 from rich import print
-from pvgisprototype.log import log_function
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 
 
 app = typer.Typer(

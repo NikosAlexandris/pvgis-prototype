@@ -91,13 +91,16 @@ typer_option_version = typer.Option(
     is_eager=True,
     # default_factory=None,
 )
+from pvgisprototype.log import initialize_logger
 typer_option_log = typer.Option(
     '--log',
     '-l',
     help="Enable logging",
     # help="Specify a log file to write logs to, or omit for stderr.")] = None,
-    is_flag=True,
-    # default_factory=False,
+    count=True,
+    is_flag=False,
+    callback=initialize_logger,
+    default_factory=0,
 )
 typer_option_log_rich_handler = typer.Option(
     "--log-rich-handler",
@@ -316,8 +319,6 @@ typer_option_solar_declination_model = typer.Option(
     show_choices=True,
     case_sensitive=False,
     # callback=_parse_model,  # This did not work!
-    # help="Model(s) to calculate solar declination."
-    # rich_help_panel=rich_help_panel_solar_declination,
     rich_help_panel=rich_help_panel_solar_position,
 )
 
@@ -354,7 +355,13 @@ def surface_tilt_callback(
     # param: typer.CallbackParam,
     surface_tilt: float,
 ) -> float:
-    """Set the default surface tilt equal to the latitude"""
+    """Set the default surface tilt equal to the latitude
+
+    Notes
+    -----
+    Redesign Me ?
+
+    """
     if ctx.resilient_parsing:
         return
     # if type(latitude) != float:
@@ -455,8 +462,17 @@ typer_option_solar_position_model = typer.Option(
     show_choices=True,
     case_sensitive=False,
     # callback=_parse_model,  # This did not work!
-    # help="Model(s) to calculate solar position."
     rich_help_panel=rich_help_panel_solar_position,
+)
+
+typer_option_photovoltaic_module_model = typer.Option(
+    '--photovoltaic-module',
+    help='Technology and type of the photovoltaic module',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    # callback=_parse_model,  # This did not work!
+    rich_help_panel=rich_help_panel_efficiency,
 )
 
 typer_argument_solar_altitude = typer.Argument(
@@ -546,9 +562,13 @@ def validate_path(path: Path) -> Path:
 
 
 def parse_temperature_series(
-    temperature_input: Union[str, int, Path]
-):     # FIXME: Re-design ?
+    temperature_input: Union[str, int, Path], 
+):
     """
+    Notes
+    -----
+    FIXME: Re-design ?
+
     """
     try:
         if isinstance(temperature_input, int):
@@ -558,9 +578,8 @@ def parse_temperature_series(
             return Path(temperature_input)
 
         if isinstance(temperature_input, str):
-            temperature_input = np.fromstring(temperature_input, sep=',', dtype=float)
+            temperature_input = np.fromstring(temperature_input, sep=',')
 
-        print(f'{type(temperature_input)}')
         return temperature_input
 
     except ValueError as e:  # conversion to float failed
@@ -593,6 +612,9 @@ def temperature_series_argument_callback(
                 timezone=ctx.params.get('timezone'),
                 name=ctx.params.get('datetimeindex_name', None)
             )
+        else:
+            from pvgisprototype.log import logger
+            logger.error(f'Did you provide both a start and an end time ?')
 
     # How to use print(ctx.get_parameter_source('temperature_series')) ?
     # See : class click.core.ParameterSource(value)
@@ -613,8 +635,9 @@ def temperature_series_option_callback(
     temperature_series: TemperatureSeries,
 ):
     reference_series = ctx.params.get('irradiance_series')
-    if temperature_series == TEMPERATURE_DEFAULT:
-        temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=float)
+    if temperature_series.size == 1 and temperature_series == TEMPERATURE_DEFAULT:
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=dtype)
 
     if temperature_series.size != len(reference_series):
         raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
@@ -646,12 +669,22 @@ typer_option_temperature_series = typer.Option(
 )
 
 
-def parse_wind_speed_series(wind_speed_input: int):     # FIXME: Re-design ?
+def parse_wind_speed_series(
+    wind_speed_input: Union[str, int, Path],
+    dtype: str = DATA_TYPE_DEFAULT,
+    # ctx: Context,  # will not work!
+):
+    """
+    Notes
+    -----
+    FIXME: Re-design ?
+
+    """
     try:
         if isinstance(wind_speed_input, str):
-            wind_speed_input = np.fromstring(wind_speed_input, sep=',', dtype=float)
+            wind_speed_input = np.fromstring(wind_speed_input, sep=',')
         else:
-            wind_speed_input = np.array(wind_speed_input, dtype=float)
+            wind_speed_input = np.array(wind_speed_input)
         return wind_speed_input
 
     except ValueError as e:  # conversion to float failed
@@ -662,14 +695,14 @@ def parse_wind_speed_series(wind_speed_input: int):     # FIXME: Re-design ?
 def wind_speed_series_argument_callback(
     ctx: Context,
     wind_speed_series: WindSpeedSeries,
-    param: typer.CallbackParam,
 ):
     reference_series = ctx.params.get('timestamps')
     # if not reference_series:
     #     reference_series = ctx.params.get('irradiance_series')
 
     if wind_speed_series == WIND_SPEED_DEFAULT:
-        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=float)
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=dtype)
 
     if wind_speed_series.size != len(reference_series):
         raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
@@ -683,7 +716,8 @@ def wind_speed_series_callback(
 ):
     reference_series = ctx.params.get('irradiance_series')
     if wind_speed_series == WIND_SPEED_DEFAULT:
-        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=float)
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=dtype)
 
     if wind_speed_series.size != len(reference_series):
         raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
@@ -710,17 +744,31 @@ typer_option_wind_speed_series = typer.Option(
     # is_eager=True,
     parser=parse_wind_speed_series,
     callback=wind_speed_series_callback,
-    # default_factory=WIND_SPEED_DEFAULT,
+    # default_factory=wind_speed_series_default(WIND_SPEED_DEFAULT), ?
 )
 
 ## Linke turbidity
 
-def parse_linke_turbidity_factor_series(linke_turbidity_factor_input: str):     # FIXME: Re-design ?
+def parse_linke_turbidity_factor_series(
+    ctx: Context,
+    linke_turbidity_factor_input: str,
+):
+    """
+    Notes
+    -----
+    FIXME: Re-design ?
+
+    """
     try:
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
         if isinstance(linke_turbidity_factor_input, str):
-            linke_turbidity_factor_input = np.fromstring(linke_turbidity_factor_input, sep=',', dtype=float)
+            linke_turbidity_factor_input = np.fromstring(
+                linke_turbidity_factor_input, sep=",", dtype=dtype
+            )
         else:
-            linke_turbidity_factor_input = np.array(linke_turbidity_factor_input, dtype=float)
+            linke_turbidity_factor_input = np.array(
+                linke_turbidity_factor_input, dtype=dtype
+            )
 
         return linke_turbidity_factor_input
 
@@ -734,7 +782,10 @@ def linke_turbidity_factor_callback(ctx: Context, value: np.array):
         return LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_UNIT)
     else:
         timestamps = ctx.params.get('timestamps')
-        linke_turbidity = np.array([LINKE_TURBIDITY_DEFAULT for _ in timestamps])
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        linke_turbidity = np.array(
+            [LINKE_TURBIDITY_DEFAULT for _ in timestamps], dtype=dtype
+        )
         return LinkeTurbidityFactor(value=linke_turbidity, unit=LINKE_TURBIDITY_UNIT)
 
 
