@@ -47,8 +47,6 @@ from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from rich import print
-from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
@@ -84,8 +82,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_units
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_statistics
-from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.cli.typer_parameters import typer_option_index
@@ -426,6 +422,7 @@ def calculate_direct_normal_irradiance_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+    fingerprint: bool = False,
     show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct normal irradiance (SID) [W*m-2]
@@ -500,27 +497,37 @@ def calculate_direct_normal_irradiance_time_series(
 
     # Building the output dictionary=========================================
 
-    if verbose > 0:
-        results = {
+    components_container = {
+        'main': lambda: {
             'Title': 'Direct',
             DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
-        }
-    
-    if verbose > 1:
-        extended_results = {
+        },
+
+        'extended': lambda: {
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
             LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME: corrected_linke_turbidity_factor_series.value,
             LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
             RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME: rayleigh_optical_thickness_series.value,
             OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
-        }
-        results = results | extended_results
+        } if verbose > 1 else {},
+
+        # 'more_extended': lambda: {
+        # } if verbose > 2 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(direct_normal_irradiance_series),
+        } if fingerprint else {},
+    }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
-        return results
+        return components
 
     log_data_fingerprint(
         data=direct_normal_irradiance_series,
@@ -555,13 +562,11 @@ def calculate_direct_horizontal_irradiance_time_series(
     time_output_units: str = 'minutes',
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
-    rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
-    statistics: bool = False,
-    csv: Path = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+    fingerprint: bool = False,
     index: bool = False,
     show_progress: bool = True,
 ) -> np.ndarray:
@@ -640,48 +645,51 @@ def calculate_direct_horizontal_irradiance_time_series(
 
     # Building the output dictionary=========================================
 
-    if verbose > 0:
-        results = {
-            'Title': 'Direct',
+    components_container = {
+        'main': lambda: {
+            TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-        }
+        },
 
-    if verbose > 1:
-        extended_results = {
+        'extended': lambda: {
+            TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME + ' & relevant components',
             DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
             LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
             OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
             REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME: refracted_solar_altitude_series.value if apply_atmospheric_refraction else np.full_like(refracted_solar_altitude_series.value, np.nan),#else np.array(["-"]),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
-        }
-        results = results | extended_results
-        results['Title'] += ' & relevant components'
+        } if verbose > 1 else {},
 
-    if verbose > 2:
-        more_extended_results = {
+        'extended': lambda: {
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
             PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
             ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        }
-        results = results | more_extended_results               # FIXME: Only the first raw is printed because of this line. But verbosity is 0 by choice
+        } if verbose > 1 else {},
 
-    if verbose > 3:
-        even_more_extended_results = {
+        'even_more_extended': lambda: {
             IRRADIANCE_SOURCE_COLUMN_NAME: IRRADIANCE_ALGORITHM_HOFIERKA_2002,
             POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
             TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
             # "Shade": in_shade,
-        }
-        results = results | even_more_extended_results
+        } if verbose > 3 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(direct_horizontal_irradiance_series),
+        } if fingerprint else {},
+    }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
+    if verbose > 0:
+        return components
+
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
-
-    if verbose > 0:
-        return results
 
     log_data_fingerprint(
         data=direct_horizontal_irradiance_series,
@@ -729,8 +737,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
-    statistics: bool = False,
-    csv: Path = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -892,7 +898,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-            rounding_places=rounding_places,
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
@@ -965,7 +970,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         'main': lambda: {
             TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
-        },# if verbose > 0 else {},
+        },
 
         'extended': lambda: {
             LOSS_COLUMN_NAME: 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
