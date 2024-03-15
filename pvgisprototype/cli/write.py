@@ -63,9 +63,18 @@ def write_irradiance_csv(
     latitude=None,
     timestamps=[],
     dictionary={},
-    filename='irradiance.csv'
+    index: bool = False,
+    filename='irradiance.csv',
 ):
+    """
+    """
+    # remove the 'Title' entry! ---------------------------------------------
+    dictionary.pop('Title', NOT_AVAILABLE)
+    # ------------------------------------------------------------- Important
+
     header = []
+    if index:
+        header.insert(0, 'Index')
     if longitude:
         header.append('Longitude')
     if latitude:
@@ -73,20 +82,24 @@ def write_irradiance_csv(
     header.append('Time')
     header.extend(dictionary.keys())
 
-    rows = []
     # Convert single float or int values to arrays of the same length as timestamps
     for key, value in dictionary.items():
         if isinstance(value, (float, int)):
             dictionary[key] = np.full(len(timestamps), value)
+        if isinstance(value, str):
+            dictionary[key] = np.full(len(timestamps), str(value))
     
     # Zip series and timestamps
     zipped_series = zip(*dictionary.values())
     zipped_data = zip(timestamps, zipped_series)
     
-    for timestamp, values in zipped_data:
+    rows = []
+    for idx, (timestamp, values) in enumerate(zipped_data):
         row = []
+        if index:
+            row.append(idx)
         if longitude and latitude:
-            row = [longitude, latitude]
+            row.extend([longitude, latitude])
         row.append(timestamp.strftime('%Y-%m-%d %H:%M:%S'))
         row.extend(values)
         rows.append(row)
