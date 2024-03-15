@@ -31,6 +31,7 @@ from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_i
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
@@ -144,6 +145,7 @@ def calculate_photovoltaic_power_output_series(
     efficiency: Optional[float] = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+    fingerprint: bool = False,
     profile: bool = False, 
 ):
     """
@@ -571,6 +573,10 @@ def calculate_photovoltaic_power_output_series(
         'extra': lambda: {
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
         } if verbose > 5 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
+        } if fingerprint else {},
     }
 
     components = {}
