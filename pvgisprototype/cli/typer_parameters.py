@@ -319,8 +319,6 @@ typer_option_solar_declination_model = typer.Option(
     show_choices=True,
     case_sensitive=False,
     # callback=_parse_model,  # This did not work!
-    # help="Model(s) to calculate solar declination."
-    # rich_help_panel=rich_help_panel_solar_declination,
     rich_help_panel=rich_help_panel_solar_position,
 )
 
@@ -464,7 +462,6 @@ typer_option_solar_position_model = typer.Option(
     show_choices=True,
     case_sensitive=False,
     # callback=_parse_model,  # This did not work!
-    # help="Model(s) to calculate solar position."
     rich_help_panel=rich_help_panel_solar_position,
 )
 
@@ -475,7 +472,6 @@ typer_option_photovoltaic_module_model = typer.Option(
     show_choices=True,
     case_sensitive=False,
     # callback=_parse_model,  # This did not work!
-    # help="Model(s) to calculate solar position."
     rich_help_panel=rich_help_panel_efficiency,
 )
 
@@ -566,8 +562,7 @@ def validate_path(path: Path) -> Path:
 
 
 def parse_temperature_series(
-    ctx: Context,
-    temperature_input: Union[str, int, Path] = TEMPERATURE_DEFAULT,
+    temperature_input: Union[str, int, Path], 
 ):
     """
     Notes
@@ -583,10 +578,8 @@ def parse_temperature_series(
             return Path(temperature_input)
 
         if isinstance(temperature_input, str):
-            dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
-            temperature_input = np.fromstring(temperature_input, sep=',', dtype=dtype)
+            temperature_input = np.fromstring(temperature_input, sep=',')
 
-        print(f'{type(temperature_input)}')
         return temperature_input
 
     except ValueError as e:  # conversion to float failed
