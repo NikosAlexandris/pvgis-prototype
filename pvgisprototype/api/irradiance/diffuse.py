@@ -31,6 +31,7 @@ from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_t
 from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
 
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -78,6 +79,7 @@ from pvgisprototype.constants import EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLU
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import OUT_OF_RANGE_INDICES_COLUMN_NAME
 from pvgisprototype.constants import TERM_N_COLUMN_NAME
 from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
@@ -162,24 +164,27 @@ def calculate_diffuse_horizontal_component_from_sarah(
         )
         logger.warning(warning)
 
-    results = {
-        TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
-        DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.to_numpy(),
-    }
-
-    if verbose > 1 :
-        extended_results = {
-            
+    components_container = {
+        'main': lambda: {
+            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.to_numpy(),
+        },# if verbose > 0 else {},
+        
+        'extended': lambda: {
+            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE + " & other horizontal components",
             GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series.to_numpy(),
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.to_numpy(),
-        }
-        results = results | extended_results
+        } if verbose > 1 else {},
+    }
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
-        return results
+        return components
 
     return diffuse_horizontal_irradiance_series
 
@@ -388,6 +393,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+    fingerprint: bool = False,
 ) -> np.array:
     """Calculate the diffuse irradiance incident on a solar surface
 
@@ -688,56 +694,62 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
     # Building the output dictionary ========================================
 
-    if verbose > 0:
-        results = {
+    components_container = {
+        'main': lambda: {
             TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
-        }
-
-    if verbose > 1 :
-        extended_results = {
+        },# if verbose > 0 else {},
+        'extended': lambda: {
             LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series / diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
-        }
-        results = results | extended_results
+        } if verbose > 1 else {},
 
-    if verbose > 2:
-        more_extended_results = {
+        'more_extended': lambda: {
+            TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE + ' & relevant components',
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
             DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_sky_irradiance_series,
-        }
-        results = results | more_extended_results
-        results[TITLE_KEY_NAME] += ' & relevant components'
+        } if verbose > 2 else {},
 
-    if verbose > 3:
-        even_more_extended_results = {
+        'even_more_extended': lambda: {
             TERM_N_COLUMN_NAME: n_series,
             KB_RATIO_COLUMN_NAME: kb_series,
             AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(azimuth_difference_series_array, angle_output_units, NOT_AVAILABLE),
             AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series_array, angle_output_units, NOT_AVAILABLE),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,
-        }
-        results = results | even_more_extended_results
+        } if verbose > 3 else {},
 
-    if verbose > 4:
-        plus_even_more_extended_results = {
+        'and_even_more_extended': lambda: {
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_horizontal_irradiance_series,
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
             LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+        } if verbose > 4 else {},
+
+        'extra': lambda: {
             INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units) if solar_incidence_series else None,
-        }
-        if out_of_range_indices[0].size > 0:
-            plus_even_more_extended_results[OUT_OF_RANGE_INDICES_COLUMN_NAME] = out_of_range_indices
-        results = results | plus_even_more_extended_results
+            INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
+        } if verbose > 5 else {},
+
+        'out-of-range': lambda: {
+            OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range_indices,
+        } if out_of_range_indices[0].size > 0 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
+        } if fingerprint else {},
+    }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
-        return results
+        return components
 
     log_data_fingerprint(
         data=diffuse_inclined_irradiance_series,

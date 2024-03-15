@@ -89,6 +89,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_csv
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.cli.typer_parameters import typer_option_index
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
+from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -154,6 +156,7 @@ from pvgisprototype import Elevation
 from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.validation.hashing import generate_hash
 
 
 @log_function_call
@@ -732,6 +735,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+    fingerprint: bool = False,
     index: bool = False,
     show_progress: bool = True,
 ) -> np.array:
@@ -956,45 +960,54 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if np.any(direct_inclined_irradiance_series < 0):
         logger.info("\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
 
-    if verbose > 0:
-        results = {
+    components_container = {
+        'main': lambda: {
+            TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
-        }
-        title = 'Direct'
+        },# if verbose > 0 else {},
 
-    if verbose > 1:
-        extended_results = {
+        'extended': lambda: {
             LOSS_COLUMN_NAME: 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
-        }
-        results = results | extended_results
+        } if verbose > 1 else {},
 
-    if verbose > 2:
-        more_extended_results = {
+        'more_extended': lambda: {
+            TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME + ' & relevant components',
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
-        }
-        results = results | more_extended_results
-        title += ' & relevant components'
+        } if verbose > 2 else {},
 
-    if verbose > 3:
-        even_more_extended_results = {
+        'even_more_extended': lambda: {
             'Irradiance source': 'External data' if direct_horizontal_component else IRRADIANCE_ALGORITHM_HOFIERKA_2002,
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
             INCIDENCE_DEFINITION: 'Sun-to-Plane' if complementary_incidence_angle else 'Sun-to-Surface-Normal',
             POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
             TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
             # "Shade": in_shade,
-        }
-        results = results | even_more_extended_results
+        } if verbose > 3 else {},
+
+        'and_even_more_extended': lambda: {
+        } if verbose > 4 else {},
+        
+        'extra': lambda: {
+        } if verbose > 5 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(direct_inclined_irradiance_series),
+        } if fingerprint else {},
+    }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if verbose > 0:
-        return results
+        return components
 
     log_data_fingerprint(
         data=direct_inclined_irradiance_series,
