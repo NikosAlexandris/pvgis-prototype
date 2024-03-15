@@ -137,6 +137,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             random_days=random_days,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
         )
     )
@@ -158,6 +160,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
 
@@ -224,7 +228,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         } if verbose > 5 else {},
 
         'fingerprint': lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(direct_inclined_irradiance_series),
+            FINGERPRINT_COLUMN_NAME: generate_hash(ground_reflected_inclined_irradiance_series),
         } if fingerprint else {},
     }
 
