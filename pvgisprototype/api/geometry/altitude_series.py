@@ -78,9 +78,10 @@ def model_solar_altitude_time_series(
         pass
 
     log_data_fingerprint(
-            solar_altitude_series.value,
-            log,
-            HASH_AFTER_THIS_VERBOSITY_LEVEL,
+            data=solar_altitude_series.value,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+            output=solar_altitude_series,
     )
 
     return solar_altitude_series
