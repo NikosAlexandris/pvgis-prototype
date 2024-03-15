@@ -774,9 +774,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
 
     """
-    if verbose > 0:
-        verbosity = ''
-
     solar_incidence_series = model_solar_incidence_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -868,7 +865,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     if not direct_horizontal_component:
         if verbose > 0:
-            verbosity += f':information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...'
+            logger.info(':information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...')
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
             longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
@@ -900,7 +897,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         )
     else:  # read from a time series dataset
         if verbose > 0:
-            verbosity += f':information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...'
+            logger.info(':information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...')
         direct_horizontal_irradiance_series = select_time_series(
             time_series=direct_horizontal_component,
             # longitude=longitude_for_selection,
@@ -923,7 +920,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     try:
         # the number of timestamps should match the number of "x" values
         if verbose > 0:
-            verbosity += f'\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] ..'
+            logger.info('\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] ..')
         compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
@@ -957,7 +954,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             raise ValueError
 
     if np.any(direct_inclined_irradiance_series < 0):
-        verbosity += f"\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]"
+        logger.info("\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
 
     if verbose > 0:
         results = {
