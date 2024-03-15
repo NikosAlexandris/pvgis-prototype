@@ -9,6 +9,7 @@ from rich import box
 from typing import List
 import numpy as np
 from pvgisprototype.constants import (
+    FINGERPRINT_COLUMN_NAME,
     TITLE_KEY_NAME,
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
@@ -684,6 +685,10 @@ def print_irradiance_table_2(
     if solar_incidence_algorithm is not None:
         caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow]"
 
+    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
+    if fingerprint is not None:
+        caption += f"\n{FINGERPRINT_COLUMN_NAME}: [bold yellow]{fingerprint}[/bold yellow]"
+
     caption += f"\n⌁ : Power, "
     caption += f"⭍ : Effective component, "
     caption += f"🗤 : Diffuse, "
@@ -718,6 +723,7 @@ def print_irradiance_table_2(
             SURFACE_TILT_COLUMN_NAME,
             ALGORITHM_COLUMN_NAME,
             INCIDENCE_ALGORITHM_COLUMN_NAME,
+            FINGERPRINT_COLUMN_NAME,
     }
 
     # additional columns based dictionary keys
