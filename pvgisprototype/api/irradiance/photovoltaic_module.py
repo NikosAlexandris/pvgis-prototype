@@ -38,6 +38,4 @@ def get_coefficients_for_photovoltaic_module(
 ) -> List[float]:
     """Retrieve model coefficients based on the selected PhotovoltaicModuleModel Enum."""
     coefficients = PHOTOVOLTAIC_MODULE_COEFFICIENTS_MAP.get(photovoltaic_module, [])
-    print(f"Module: {photovoltaic_module}, Coefficients: {coefficients}")  # Debug print
     return coefficients
-
