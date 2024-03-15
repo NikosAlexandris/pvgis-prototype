@@ -23,7 +23,7 @@ import numpy as np
 # ⌖ ⯐ # position
 # ⭸ ⭹
 
-
+FINGERPRINT_COLUMN_NAME = ' Fingerprint'
 DATA_TYPE_DEFAULT = 'float32'  # takes halve of the time to process than float64
 ARRAY_BACKEND_DEFAULT = 'NUMPY'
 VERBOSE_LEVEL_DEFAULT = 0

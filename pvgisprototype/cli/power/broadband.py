@@ -163,6 +163,7 @@ def photovoltaic_power_output_series(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
     profile: Annotated[bool, typer_option_profiling] = False,
 ):
     """
@@ -235,6 +236,7 @@ def photovoltaic_power_output_series(
         efficiency=efficiency,
         verbose=verbose,
         log=log,
+        fingerprint=fingerprint,
         profile=profile,
     )  # Re-Design Me ! ------------------------------------------------
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
