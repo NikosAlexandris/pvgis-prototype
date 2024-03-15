@@ -72,6 +72,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import PHOTOVOLTAIC_POWER
 from pvgisprototype.constants import PHOTOVOLTAIC_POWER_COLUMN_NAME
+from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
 from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
@@ -97,6 +98,7 @@ from pvgisprototype import PhotovoltaicPower
 from pandas import DatetimeIndex
 from pvgisprototype import SurfaceTilt
 from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
 
 
 @log_function_call
@@ -141,6 +143,7 @@ def calculate_photovoltaic_power_output_series(
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float] = None,
+    photovoltaic_module: PhotovoltaicModuleModel = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PVModuleEfficiencyAlgorithm = None,
     temperature_model: ModuleTemperatureAlgorithm = None,
@@ -516,7 +519,8 @@ def calculate_photovoltaic_power_output_series(
                 spectral_factor=spectral_factor,
                 irradiance_series=global_irradiance_series,
                 temperature_series=temperature_series,
-                model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
+                # model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
+                photovoltaic_module=photovoltaic_module,
                 standard_test_temperature=TEMPERATURE_DEFAULT,
                 wind_speed_series=wind_speed_series,
                 power_model=power_model,
