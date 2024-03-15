@@ -23,7 +23,7 @@ import numpy as np
 # ⌖ ⯐ # position
 # ⭸ ⭹
 
-
+FINGERPRINT_COLUMN_NAME = ' Fingerprint'
 DATA_TYPE_DEFAULT = 'float32'  # takes halve of the time to process than float64
 ARRAY_BACKEND_DEFAULT = 'NUMPY'
 VERBOSE_LEVEL_DEFAULT = 0
@@ -125,6 +125,7 @@ WIND_SPEED_COLUMN_NAME = 'Wind speed 🌬'
 ALBEDO_DEFAULT = 0.2
 ALBEDO_COLUMN_NAME = 'Albedo'
 
+PHOTOVOLTAIC_MODULE_DEFAULT = 'cSi:Free standing'
 SYSTEM_EFFICIENCY_DEFAULT = 0.86
 EFFICIENCY_DEFAULT = 0.86
 EFFICIENCY = 'Efficiency'

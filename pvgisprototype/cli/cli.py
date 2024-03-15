@@ -34,7 +34,7 @@ from pvgisprototype.cli import time
 from pvgisprototype.cli import surface
 from pvgisprototype.cli import utilities
 from pvgisprototype.cli import manual
-from pvgisprototype.log import initialize_logger, logger
+# from pvgisprototype.log import logger, initialize_logger
 
 
 state = {"verbose": False}
@@ -140,7 +140,7 @@ app.add_typer(
 def main(
     version: Annotated[Optional[bool], typer_option_version] = None,
     verbose: Annotated[int, typer_option_verbose] = 0,
-    log: Annotated[Optional[bool], typer_option_log] = False,
+    log: Annotated[Optional[int], typer_option_log] = 0,
     log_rich_handler: Annotated[Optional[bool], typer_option_log_rich_handler] = False,
     log_file: Annotated[Optional[Path], typer_option_logfile] = None,
 ) -> None:
@@ -150,14 +150,9 @@ def main(
     if verbose:
         print("Will write verbose output")
         state["verbose"] = True
-    if log or log_file:
-        initialize_logger(
-                log_file=log_file,
-                verbosity_level=verbose,
-                rich_handler=log_rich_handler,
-        )
-        logger.info("Logging initialized")
-    pass
+
+    if log:
+        print(f'Log = {log}')
 
 
 if __name__ == "__main__":

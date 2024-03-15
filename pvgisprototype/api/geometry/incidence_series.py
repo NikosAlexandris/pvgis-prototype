@@ -50,6 +50,7 @@ def model_solar_incidence_time_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> SolarIncidence:
 
     if solar_incidence_model.value == SolarIncidenceModel.jenco:
@@ -65,6 +66,7 @@ def model_solar_incidence_time_series(
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
+            log=log,
         )
 
     if solar_incidence_model.value == SolarIncidenceModel.pvis:

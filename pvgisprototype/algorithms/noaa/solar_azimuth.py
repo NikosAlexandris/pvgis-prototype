@@ -212,6 +212,7 @@ def calculate_solar_azimuth_time_series_noaa(
         dtype=dtype,
         backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
@@ -220,6 +221,7 @@ def calculate_solar_azimuth_time_series_noaa(
         dtype=dtype,
         backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
         latitude=latitude,
@@ -229,6 +231,7 @@ def calculate_solar_azimuth_time_series_noaa(
         dtype=dtype,
         backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     numerator_series = sin(latitude.radians) * np.cos(solar_zenith_series.radians) - np.sin(solar_declination_series.radians)
     denominator_series = cos(latitude.radians) * np.sin(solar_zenith_series.radians)
