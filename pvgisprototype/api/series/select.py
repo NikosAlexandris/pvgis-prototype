@@ -17,9 +17,12 @@ from pvgisprototype.api.series.utilities import get_scale_and_offset
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.hardcodings import check_mark
 from pvgisprototype.api.series.hardcodings import x_mark
+from cachetools import cached
+from pvgisprototype.algorithms.caching import custom_hashkey
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 def select_time_series(
     time_series: Path,
     longitude: Longitude,
