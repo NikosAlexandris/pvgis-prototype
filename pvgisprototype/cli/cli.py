@@ -140,7 +140,7 @@ app.add_typer(
 def main(
     version: Annotated[Optional[bool], typer_option_version] = None,
     verbose: Annotated[int, typer_option_verbose] = 0,
-    log: Annotated[Optional[int], typer_option_log] = 0,
+    log: Annotated[Optional[int], typer_option_log] = None,
     log_rich_handler: Annotated[Optional[bool], typer_option_log_rich_handler] = False,
     log_file: Annotated[Optional[Path], typer_option_logfile] = None,
 ) -> None:
