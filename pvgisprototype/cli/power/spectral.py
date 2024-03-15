@@ -15,7 +15,6 @@ from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.irradiance.power import calculate_photovoltaic_power_output_series
 from pvgisprototype.algorithms.pvis.power import calculate_spectral_photovoltaic_power_output
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance

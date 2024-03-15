@@ -462,6 +462,17 @@ typer_option_solar_position_model = typer.Option(
     rich_help_panel=rich_help_panel_solar_position,
 )
 
+typer_option_photovoltaic_module_model = typer.Option(
+    '--photovoltaic-module',
+    help='Technology and type of the photovoltaic module',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    # callback=_parse_model,  # This did not work!
+    # help="Model(s) to calculate solar position."
+    rich_help_panel=rich_help_panel_efficiency,
+)
+
 typer_argument_solar_altitude = typer.Argument(
     help='Solar altitude',
     rich_help_panel=rich_help_panel_solar_position,
