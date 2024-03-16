@@ -1,5 +1,6 @@
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance_toolbox
 from pvgisprototype.cli.power.introduction import photovoltaic_power_introduction
@@ -20,6 +21,12 @@ app = typer.Typer(
     # help=f":electric_plug: Estimate the photovoltaic power or aggregated energy production of a PV system over a time series based on solar irradiance and ambient temperature [bold green]Prototype[/bold green]",
     help=f":electric_plug: Estimate the performance of a photovoltaic system over a time series",
 )
+app.command(
+    name='introduction',
+    help='A short primer on the performance of a photovoltaic system',
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_introduction,
+)(photovoltaic_power_introduction)
 app.command(
     name="broadband",
     # help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
@@ -58,9 +65,3 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance_toolbox,
 )(spectral_mismatch)
-app.command(
-    name='intro',
-    help='A short primer on the performance of a photovoltaic system',
-    no_args_is_help=False,
-    rich_help_panel=rich_help_panel_performance_toolbox,
-)(photovoltaic_power_introduction)

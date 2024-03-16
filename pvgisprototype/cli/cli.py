@@ -34,7 +34,6 @@ from pvgisprototype.cli import time
 from pvgisprototype.cli import surface
 from pvgisprototype.cli import utilities
 from pvgisprototype.cli import manual
-# from pvgisprototype.log import logger, initialize_logger
 
 
 state = {"verbose": False}
