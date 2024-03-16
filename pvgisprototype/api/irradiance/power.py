@@ -125,6 +125,7 @@ def calculate_photovoltaic_power_output_series(
     in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
