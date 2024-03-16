@@ -269,7 +269,6 @@ def overview(
     no_args_is_help=True,
     help='⦩⦬📈 Calculate series of solar position parameters',
  )
-# @debug_if_needed(app)
 def overview_series(
     ctx: typer.Context,
     longitude: Annotated[float, typer_argument_longitude],
@@ -298,119 +297,122 @@ def overview_series(
     group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
-    dtype: str = DEFAULT_ARRAY_DTYPE,
-    array_backend: str = DEFAULT_ARRAY_BACKEND,
+    dtype: str = ARRAY_DTYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
     ):
     """
     """
-    # print(f'Context: {ctx}')
-    # print(f'Context: {ctx.params}')
-    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
+    from rich.console import Console
+    console = Console()
+    with console.status("Processing ..", spinner="arc"):
+        # print(f'Context: {ctx}')
+        # print(f'Context: {ctx.params}')
+        # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
 
-    # if ctx.invoked_subcommand is not None:
-    #     print("Skipping default command to run sub-command.")
-    #     return
+        # if ctx.invoked_subcommand is not None:
+        #     print("Skipping default command to run sub-command.")
+        #     return
 
-    # elif ctx.invoked_subcommand in ['altitude', 'azimuth']:
-    #     print('Execute subcommand')
+        # elif ctx.invoked_subcommand in ['altitude', 'azimuth']:
+        #     print('Execute subcommand')
 
-    # else:
-    #     print('Yay')
-    #     return
+        # else:
+        #     print('Yay')
+        #     return
 
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamps = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-    
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tzinfo != utc_zoneinfo:
+        # Initialize with None ---------------------------------------------------
+        user_requested_timestamps = None
+        user_requested_timezone = None
+        # -------------------------------------------- Smarter way to do this? ---
+        
+        utc_zoneinfo = ZoneInfo("UTC")
+        if timestamps.tzinfo != utc_zoneinfo:
 
-        # Note the input timestamp and timezone
-        user_requested_timestamps = timestamps
-        user_requested_timezone = timezone
+            # Note the input timestamp and timezone
+            user_requested_timestamps = timestamps
+            user_requested_timezone = timezone
 
-        # timestamps = timestamps.tz_convert(utc_zoneinfo)
-        from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
-        timezone_aware_timestamps = [
-            attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
-        ]
-        timezone = utc_zoneinfo
-        # print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
+            # timestamps = timestamps.tz_convert(utc_zoneinfo)
+            from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
+            timezone_aware_timestamps = [
+                attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
+            ]
+            timezone = utc_zoneinfo
+            # print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
-    # Why does the callback function `_parse_model` not work? 
-    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
-    solar_position_series = calculate_solar_geometry_overview_time_series(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
-        surface_tilt=surface_tilt,
-        surface_orientation=surface_orientation,
-        solar_position_models=solar_position_models,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # refracted_solar_zenith=refracted_solar_zenith,
-        solar_time_model=solar_time_model,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_offset_global=time_offset_global,
-        # hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        angle_output_units=angle_output_units,
-        array_backend=array_backend,
-        dtype=dtype,
-        complementary_incidence_angle=complementary_incidence_angle,
-        verbose=verbose,
-    )
-    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
-    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    from pvgisprototype.cli.print import print_solar_position_series_table
-    if not csv:
-        print_solar_position_series_table(
+        # Why does the callback function `_parse_model` not work? 
+        solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
+        solar_position_series = calculate_solar_geometry_overview_time_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            table=solar_position_series,
-            timing=True,
-            declination=True,
-            hour_angle=True,
-            zenith=True,
-            altitude=True,
-            azimuth=True,
-            surface_tilt=True,
-            surface_orientation=True,
-            incidence=True,
-            user_requested_timestamps=user_requested_timestamps, 
-            user_requested_timezone=user_requested_timezone,
-            rounding_places=rounding_places,
-            group_models=group_models,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+            solar_position_models=solar_position_models,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            # refracted_solar_zenith=refracted_solar_zenith,
+            solar_time_model=solar_time_model,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            # time_offset_global=time_offset_global,
+            # hour_offset=hour_offset,
+            # time_output_units=time_output_units,
+            # angle_units=angle_units,
+            angle_output_units=angle_output_units,
+            array_backend=array_backend,
+            dtype=dtype,
+            complementary_incidence_angle=complementary_incidence_angle,
+            verbose=verbose,
         )
-    if csv:
-        write_solar_position_series_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
-            table=solar_position_series,
-            timing=True,
-            declination=True,
-            hour_angle=True,
-            zenith=True,
-            altitude=True,
-            azimuth=True,
-            surface_tilt=True,
-            surface_orientation=True,
-            incidence=True,
-            user_requested_timestamps=user_requested_timestamps, 
-            user_requested_timezone=user_requested_timezone,
-            # rounding_places=rounding_places,
-            # group_models=group_models,
-            filename=csv,
-        )
+        longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+        latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+        from pvgisprototype.cli.print import print_solar_position_series_table
+        if not csv:
+            print_solar_position_series_table(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                timezone=timezone,
+                table=solar_position_series,
+                timing=True,
+                declination=True,
+                hour_angle=True,
+                zenith=True,
+                altitude=True,
+                azimuth=True,
+                surface_tilt=True,
+                surface_orientation=True,
+                incidence=True,
+                user_requested_timestamps=user_requested_timestamps, 
+                user_requested_timezone=user_requested_timezone,
+                rounding_places=rounding_places,
+                group_models=group_models,
+            )
+        if csv:
+            write_solar_position_series_csv(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                timezone=timezone,
+                table=solar_position_series,
+                timing=True,
+                declination=True,
+                hour_angle=True,
+                zenith=True,
+                altitude=True,
+                azimuth=True,
+                surface_tilt=True,
+                surface_orientation=True,
+                incidence=True,
+                user_requested_timestamps=user_requested_timestamps, 
+                user_requested_timezone=user_requested_timezone,
+                # rounding_places=rounding_places,
+                # group_models=group_models,
+                filename=csv,
+            )
 
 
 @app.command('declination', no_args_is_help=True, help='∢ Calculate the solar declination')
