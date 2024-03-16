@@ -316,7 +316,6 @@ def photovoltaic_power_output_series(
             # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
             # unit = getattr(photovoltaic_power_output_series, 'units', None)
             unit = POWER_UNIT
-            print(f'{type(photovoltaic_power_output_series)}')
             plot(
                 # xs=timestamps,
                 # xs=photovoltaic_power_output_series,
