@@ -70,6 +70,8 @@ from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_p
 from pvgisprototype import Latitude
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SolarDeclination
+from pvgisprototype.constants import ARRAY_DTYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -88,6 +90,7 @@ from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.cli.documentation import A_PRIMER_ON_SOLAR_GEOMETRY
+from .rich_help_panel_names import rich_help_panel_introduction
 from .rich_help_panel_names import rich_help_panel_geometry_noaa
 from .print import print_solar_position_table
 from .print import print_noaa_solar_position_table
@@ -132,23 +135,21 @@ def main(
 
 
 @app.command(
-    'intro',
-    no_args_is_help=False,
+    name='introduction',
     help='A short primer on solar geometry',
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_introduction,
  )
 # @debug_if_needed(app)
-def intro():
+def introduction():
     """A short introduction on solar geometry"""
     introduction = """
     [underline]Solar geometry[/underline] consists of a series of angular
     measurements between the position of the sun in the sky and a location on
-    the surface of the earth for a moment or series of moments in time.
+    the surface of the earth for a moment or a period in time.
     """
 
-    note = """
-    Internally,
-        - [bold]timestamps[/bold] are converted to [magenta]UTC[/magenta]
-        - angles are measured in radians!
+    note = """Internally, [bold]timestamps[/bold] are converted to [magenta]UTC[/magenta] and [bold]angles[/bold] are measured in [magenta]radians[/magenta] !
     """
     from rich.panel import Panel
     note_in_a_panel = Panel(
@@ -261,8 +262,6 @@ def overview(
     )
 
 
-DEFAULT_ARRAY_BACKEND = 'NUMPY'  # OR 'CUPY', 'DASK'
-DEFAULT_ARRAY_DTYPE = 'float32'
 
 
 @app.command(
