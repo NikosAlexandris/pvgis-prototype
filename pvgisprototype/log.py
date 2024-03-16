@@ -66,17 +66,22 @@ def initialize_logger(
     return log_level
 
 
-def log_function_call(func):
-    @wraps(func)
+def log_function_call(function):
+    @wraps(function)
     def wrapper(*args, **kwargs):
         verbosity_level = kwargs.get('log', 0) or 0
         if verbosity_level > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             data_type = kwargs.get('dtype', None)
+            import inspect
+            parent_frame = inspect.stack()[1]
+            parent_function_name = parent_frame.function
+            parent_file_name = parent_frame.filename
+            parent_line_number = parent_frame.lineno
             logger.info(
-                    f"> Call : {func.__name__}(), Requested data type : {data_type}",
-                    alt=f"> Call {func.__name__}(), Requested data type : [reverse]{data_type}[/reverse]"
+                f"> Call : {function.__name__}() from {parent_function_name}() in {parent_file_name}:{parent_line_number}, Requested : {data_type}",
+                alt=f"> Call {function.__name__}() from [reverse]{parent_function_name}()[/reverse] in {parent_file_name}:{parent_line_number}, Requested : [reverse]{data_type}[/reverse]"
                 )
-        return func(*args, **kwargs)
+        return function(*args, **kwargs)
 
         # if verbosity_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         #     logger.debug(f"Function {func.__name__} completed with locals: {locals()}")
