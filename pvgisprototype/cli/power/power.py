@@ -4,10 +4,11 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance_toolbox
 from pvgisprototype.cli.power.introduction import photovoltaic_power_introduction
 from pvgisprototype.cli.power.broadband import photovoltaic_power_output_series
+from pvgisprototype.cli.power.efficiency import photovoltaic_efficiency_time_series
 from pvgisprototype.cli.power.spectral import spectral_photovoltaic_power_output_series
 from pvgisprototype.cli.power.spectral_effect import spectral_factor
 from pvgisprototype.cli.power.spectral_effect import spectral_mismatch
-from pvgisprototype.cli.power.average_photon_energy import app as average_photon_energy
+from pvgisprototype.cli.power.average_photon_energy import average_photon_energy
 
 
 app = typer.Typer(
@@ -32,13 +33,19 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance,
 )(spectral_photovoltaic_power_output_series)
-app.add_typer(
-    average_photon_energy,
-    name="photon-energy",
-    # name="ape",
+app.command(
+    name="efficiency",
+    help=f"Calculate the efficiency of a photovoltaic system",
+    no_args_is_help=True,
+    # context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+    rich_help_panel=rich_help_panel_performance_toolbox,
+)(photovoltaic_efficiency_time_series)
+app.command(
+    name="photon-energy",  # "ape",
+    help=f":electric_plug: Estimate the average photon energy (APE)",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance_toolbox,
-)
+)(average_photon_energy)
 app.command(
     name='spectral-factor',
     help=f"Estimate the spectral factor",
