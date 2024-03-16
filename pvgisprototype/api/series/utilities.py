@@ -1,4 +1,5 @@
 from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
 from devtools import debug
 from rich import print
 import warnings
@@ -193,6 +194,7 @@ def select_coordinates(
     return data_array
 
 
+@log_function_call
 def select_location_time_series(
     time_series: Path = None,
     longitude: Longitude = None,
