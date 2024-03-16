@@ -70,7 +70,7 @@ from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_p
 from pvgisprototype import Latitude
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SolarDeclination
-from pvgisprototype.constants import ARRAY_DTYPE_DEFAULT
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -262,8 +262,6 @@ def overview(
     )
 
 
-
-
 @app.command(
     'overview-series',
     no_args_is_help=True,
@@ -298,8 +296,8 @@ def overview_series(
     group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
-    dtype: str = DEFAULT_ARRAY_DTYPE,
-    array_backend: str = DEFAULT_ARRAY_BACKEND,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
     ):
