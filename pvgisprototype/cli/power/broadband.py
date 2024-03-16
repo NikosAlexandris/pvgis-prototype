@@ -136,6 +136,7 @@ def photovoltaic_power_output_series(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
@@ -218,6 +219,7 @@ def photovoltaic_power_output_series(
         in_memory=in_memory,
         dtype=dtype,
         array_backend=array_backend,
+        multi_thread=multi_thread,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
