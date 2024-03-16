@@ -635,7 +635,7 @@ def temperature_series_option_callback(
     temperature_series: TemperatureSeries,
 ):
     reference_series = ctx.params.get('irradiance_series')
-    if temperature_series.size == 1 and temperature_series == TEMPERATURE_DEFAULT:
+    if isinstance(temperature_series, int) and temperature_series == TEMPERATURE_DEFAULT:
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
         temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=dtype)
 
