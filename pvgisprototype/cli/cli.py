@@ -29,7 +29,7 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
 from pvgisprototype.cli.power import power
 from pvgisprototype.cli import series
 from pvgisprototype.cli.irradiance import irradiance
-from pvgisprototype.cli import position
+from pvgisprototype.cli.position import position
 from pvgisprototype.cli import time
 from pvgisprototype.cli import surface
 from pvgisprototype.cli import utilities
