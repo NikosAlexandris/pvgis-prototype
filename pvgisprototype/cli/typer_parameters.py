@@ -46,7 +46,6 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_MINIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_MAXIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT_MINIMUM
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -529,11 +528,6 @@ typer_option_hour_offset = typer.Option(
 
 # Earth orbit
 
-typer_option_days_in_a_year = typer.Option(
-    help='Number of days in a year',
-    rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=DAYS_IN_A_YEAR,
-)
 typer_option_perigee_offset = typer.Option(
     help='Perigee offset',
     rich_help_panel=rich_help_panel_earth_orbit,
@@ -618,6 +612,7 @@ def temperature_series_argument_callback(
 
     # How to use print(ctx.get_parameter_source('temperature_series')) ?
     # See : class click.core.ParameterSource(value)
+
     if isinstance(temperature_series, int) and temperature_series == TEMPERATURE_DEFAULT:
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
         temperature_series = np.full(len(timestamps), TEMPERATURE_DEFAULT, dtype=dtype)
@@ -635,7 +630,7 @@ def temperature_series_option_callback(
     temperature_series: TemperatureSeries,
 ):
     reference_series = ctx.params.get('irradiance_series')
-    if temperature_series.size == 1 and temperature_series == TEMPERATURE_DEFAULT:
+    if isinstance(temperature_series, int) and temperature_series == TEMPERATURE_DEFAULT:
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
         temperature_series = np.full(len(reference_series), TEMPERATURE_DEFAULT, dtype=dtype)
 
@@ -671,7 +666,6 @@ typer_option_temperature_series = typer.Option(
 
 def parse_wind_speed_series(
     wind_speed_input: Union[str, int, Path],
-    dtype: str = DATA_TYPE_DEFAULT,
     # ctx: Context,  # will not work!
 ):
     """
@@ -681,10 +675,18 @@ def parse_wind_speed_series(
 
     """
     try:
-        if isinstance(wind_speed_input, str):
+        if isinstance(wind_speed_input, int):
+            return wind_speed_input
+
+        if isinstance(wind_speed_input, (str, Path)) and Path(wind_speed_input).exists():
+            return Path(wind_speed_input)
+
+        if isinstance(wind_speed_input, str) and wind_speed_input == '0':
+            wind_speed_input = np.array([int(wind_speed_input)])
+
+        elif isinstance(wind_speed_input, str):
             wind_speed_input = np.fromstring(wind_speed_input, sep=',')
-        else:
-            wind_speed_input = np.array(wind_speed_input)
+
         return wind_speed_input
 
     except ValueError as e:  # conversion to float failed
@@ -696,16 +698,43 @@ def wind_speed_series_argument_callback(
     ctx: Context,
     wind_speed_series: WindSpeedSeries,
 ):
-    reference_series = ctx.params.get('timestamps')
-    # if not reference_series:
-    #     reference_series = ctx.params.get('irradiance_series')
+    """
+    """
+    if isinstance(wind_speed_series, Path):
+        return validate_path(wind_speed_series)
 
-    if wind_speed_series == WIND_SPEED_DEFAULT:
+    timestamps = ctx.params.get('timestamps', None)
+    if timestamps is None:
+        start_time=ctx.params.get('start_time')
+        end_time=ctx.params.get('end_time')
+        periods=ctx.params.get('periods', None) 
+        from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
+        frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
+        if start_time is not None and end_time is not None:
+            timestamps = generate_datetime_series(
+                start_time=start_time,
+                end_time=end_time,
+                periods=periods,
+                frequency=frequency,
+                timezone=ctx.params.get('timezone'),
+                name=ctx.params.get('datetimeindex_name', None)
+            )
+        else:
+            from pvgisprototype.log import logger
+            logger.error(f'Did you provide both a start and an end time ?')
+
+    # How to use print(ctx.get_parameter_source('temperature_series')) ?
+    # See : class click.core.ParameterSource(value)
+
+    if isinstance(wind_speed_series, int) and wind_speed_series == WIND_SPEED_DEFAULT:
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
-        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=dtype)
+        wind_speed_series = np.full(len(timestamps), WIND_SPEED_DEFAULT, dtype=dtype)
 
-    if wind_speed_series.size != len(reference_series):
-        raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
+    # at this point, wind_speed_series should be an array !
+    if wind_speed_series.size != len(timestamps):
+        # Improve error message with useful hint/s ?
+        raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(timestamps)}).")
+
     return WindSpeedSeries(value=wind_speed_series, unit=WIND_SPEED_UNIT)
 
 

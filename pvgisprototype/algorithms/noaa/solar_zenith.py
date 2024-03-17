@@ -1,4 +1,5 @@
 from rich import print
+from pandas import Timestamp, DatetimeIndex
 from devtools import debug
 from typing import Union
 from typing import Sequence
@@ -293,7 +294,7 @@ def calculate_solar_zenith_noaa(
 @validate_with_pydantic(CalculateSolarZenithTimeSeriesNOAAInput)
 def calculate_solar_zenith_time_series_noaa(
     latitude: Latitude,  # radians
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: Union[Timestamp, DatetimeIndex],
     solar_hour_angle_series: SolarHourAngle,
     apply_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,

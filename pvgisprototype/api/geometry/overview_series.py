@@ -61,6 +61,7 @@ def model_solar_geometry_overview_time_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """
     """
@@ -71,7 +72,7 @@ def model_solar_geometry_overview_time_series(
     solar_azimuth_series = None
     solar_incidence_series = None
 
-    if verbose > 6:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     if solar_position_model.value == SolarPositionModel.noaa:
@@ -80,12 +81,15 @@ def model_solar_geometry_overview_time_series(
             timestamps=timestamps,
             dtype=dtype,
             array_backend=array_backend,
+            verbose=verbose,
+            log=log,
         )
         solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
             longitude=longitude,
             timestamps=timestamps,
             timezone=timezone,
             verbose=verbose,
+            log=log,
         )
         solar_zenith_series = calculate_solar_zenith_time_series_noaa(
             latitude=latitude,
@@ -93,6 +97,7 @@ def model_solar_geometry_overview_time_series(
             solar_hour_angle_series=solar_hour_angle_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             verbose=verbose,
+            log=log,
         )
         solar_altitude_series = calculate_solar_altitude_time_series_noaa(
             longitude=longitude,
@@ -101,6 +106,7 @@ def model_solar_geometry_overview_time_series(
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             verbose=verbose,
+            log=log,
         )
         solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
             longitude=longitude,
@@ -109,6 +115,7 @@ def model_solar_geometry_overview_time_series(
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             verbose=verbose,
+            log=log,
         )
         solar_incidence_series = calculate_solar_incidence_time_series_jenco(
             longitude=longitude,
@@ -119,6 +126,7 @@ def model_solar_geometry_overview_time_series(
             surface_orientation=surface_orientation,
             complementary_incidence_angle=complementary_incidence_angle,
             verbose=verbose,
+            log=log,
         )
 
     if solar_position_model.value == SolarPositionModel.skyfield:
@@ -157,8 +165,8 @@ def calculate_solar_geometry_overview_time_series(
     latitude: Latitude,
     timestamps: datetime,
     timezone: ZoneInfo,
-    surface_tilt: float,
     surface_orientation: float,
+    surface_tilt: float,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = True,
@@ -169,6 +177,7 @@ def calculate_solar_geometry_overview_time_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """Calculates the solar geometry overview for a time series
 
@@ -199,16 +208,16 @@ def calculate_solar_geometry_overview_time_series(
                 solar_zenith_series,
                 solar_altitude_series,
                 solar_azimuth_series,
-                surface_tilt,
                 surface_orientation,
+                surface_tilt,
                 solar_incidence_series,
             ) = model_solar_geometry_overview_time_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
                 timezone=timezone,
-                surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
                 solar_position_model=solar_position_model,
                 complementary_incidence_angle=complementary_incidence_angle,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
@@ -218,6 +227,7 @@ def calculate_solar_geometry_overview_time_series(
                 backend=array_backend,
                 dtype=dtype,
                 verbose=verbose,
+                log=log,
             )
             results = {
                     solar_position_model.name: {

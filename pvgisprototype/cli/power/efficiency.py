@@ -1,4 +1,5 @@
-import typer
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
 from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
 from typing import Annotated
 from typing import Optional
@@ -33,26 +34,11 @@ from pvgisprototype.constants import EFFICIENCY
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.cli.print import print_quantity_table
 from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
+import typer
 
 
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=True,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"Calculate the efficiency of a photovoltaic system",
-)
-
-
-from typing import Any
-import numpy as np
-@app.command(
-    'efficiency',
-    no_args_is_help=True,
-    help=f"Calculate the efficiency of a photovoltaic system",
-    context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
-)
-def get_pv_efficiency_time_series(
+@log_function_call
+def photovoltaic_efficiency_time_series(
     irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
     spectral_factor=None,
     temperature_series: Annotated[TemperatureSeries, typer_option_temperature_series] = TEMPERATURE_DEFAULT,
