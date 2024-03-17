@@ -1,5 +1,5 @@
 """
-PV electricity generation potential for different technologies & configurations
+Photovoltaic electricity generation potential for different technologies & configurations
 """
 
 from importlib.metadata import version
@@ -39,16 +39,29 @@ from pvgisprototype.cli import manual
 state = {"verbose": False}
 
 
+def show(
+    ctx: typer.Context,
+    shell: Shells,
+) -> None:
+    typer.completion.show_callback(ctx, None, shell)
+
+
+def install(
+    ctx: typer.Context,
+    shell: Shells,
+) -> None:
+    typer.completion.install_callback(ctx, None, shell)
+
+
 typer.rich_utils.Panel = Panel.fit
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
+    # pretty_exceptions_enable=False,
     help=f"PVGIS Command Line Interface [bold][magenta]prototype[/magenta][/bold]",
 )
-
-
 app_completion = typer.Typer(
     help="Generate and install completion scripts.",
     hidden=True,
@@ -57,27 +70,14 @@ app.add_typer(
     app_completion,
     name="completion",
 )
-
-@app_completion.command(
+app_completion.command(
     no_args_is_help=True,
     help="Show completion for the specified shell, to copy or customize it.",
-)
-def show(
-    ctx: typer.Context,
-    shell: Shells,
-) -> None:
-    typer.completion.show_callback(ctx, None, shell)
-
-@app_completion.command(
+)(show)
+app_completion.command(
     no_args_is_help=True,
     help="Install completion for the specified shell.",
-)
-def install(
-    ctx: typer.Context,
-    shell: Shells,
-) -> None:
-    typer.completion.install_callback(ctx, None, shell)
-
+)(install)
 
 app.add_typer(
     power.app,
