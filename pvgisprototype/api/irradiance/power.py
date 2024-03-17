@@ -40,6 +40,7 @@ from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_UNIT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.constants import WIND_SPEED_UNIT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
@@ -482,6 +483,26 @@ def calculate_photovoltaic_power_output_series(
                             log=log,
                             ).to_numpy().astype(dtype=dtype),
                         unit=TEMPERATURE_UNIT)
+            if isinstance(wind_speed_series, Path):
+                wind_speed_series = TemperatureSeries(
+                        value=select_time_series(
+                            time_series=wind_speed_series,
+                            # longitude=longitude_for_selection,
+                            # latitude=latitude_for_selection,
+                            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                            timestamps=timestamps,
+                            start_time=start_time,
+                            end_time=end_time,
+                            # convert_longitude_360=convert_longitude_360,
+                            neighbor_lookup=neighbor_lookup,
+                            tolerance=tolerance,
+                            mask_and_scale=mask_and_scale,
+                            in_memory=in_memory,
+                            verbose=0,  # no verbosity here by choice!
+                            log=log,
+                            ).to_numpy().astype(dtype=dtype),
+                        unit=WIND_SPEED_UNIT)
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
                 spectral_factor=spectral_factor,
                 irradiance_series=global_irradiance_series,
@@ -533,7 +554,7 @@ def calculate_photovoltaic_power_output_series(
             # DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: 
             # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME:
             TEMPERATURE_COLUMN_NAME: temperature_series.value,
-            WIND_SPEED_COLUMN_NAME: NOT_AVAILABLE,
+            WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
         } if verbose > 3 else {},
         
         'and_even_more_extended': lambda: {
