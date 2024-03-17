@@ -282,7 +282,7 @@ def photovoltaic_power_output_series(
 
     if statistics:
         print_series_statistics(
-            data_array=photovoltaic_power_output_series,
+            data_array=photovoltaic_power_output_series.value,
             timestamps=timestamps,
             groupby=groupby,
             title="Photovoltaic power output",
