@@ -782,12 +782,12 @@ def print_irradiance_table_2(
     if verbose:
         console.print(table)
 
-    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)[0]
+    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
     if fingerprint is not None:
         from rich.text import Text
         fingerprint_panel = Panel.fit(
             Text(
-                f"{fingerprint}",
+                f"{fingerprint[0]}",
                 justify="center",
                 style="bold yellow"),
                 # subtitle="[bold]Fingerprint[/bold]",
