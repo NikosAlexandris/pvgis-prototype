@@ -612,6 +612,7 @@ def temperature_series_argument_callback(
 
     # How to use print(ctx.get_parameter_source('temperature_series')) ?
     # See : class click.core.ParameterSource(value)
+
     if isinstance(temperature_series, int) and temperature_series == TEMPERATURE_DEFAULT:
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
         temperature_series = np.full(len(timestamps), TEMPERATURE_DEFAULT, dtype=dtype)
@@ -665,7 +666,6 @@ typer_option_temperature_series = typer.Option(
 
 def parse_wind_speed_series(
     wind_speed_input: Union[str, int, Path],
-    dtype: str = DATA_TYPE_DEFAULT,
     # ctx: Context,  # will not work!
 ):
     """
@@ -681,7 +681,10 @@ def parse_wind_speed_series(
         if isinstance(wind_speed_input, (str, Path)) and Path(wind_speed_input).exists():
             return Path(wind_speed_input)
 
-        if isinstance(wind_speed_input, str):
+        if isinstance(wind_speed_input, str) and wind_speed_input == '0':
+            wind_speed_input = np.array([int(wind_speed_input)])
+
+        elif isinstance(wind_speed_input, str):
             wind_speed_input = np.fromstring(wind_speed_input, sep=',')
 
         return wind_speed_input
@@ -695,6 +698,8 @@ def wind_speed_series_argument_callback(
     ctx: Context,
     wind_speed_series: WindSpeedSeries,
 ):
+    """
+    """
     if isinstance(wind_speed_series, Path):
         return validate_path(wind_speed_series)
 
@@ -725,8 +730,11 @@ def wind_speed_series_argument_callback(
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
         wind_speed_series = np.full(len(timestamps), WIND_SPEED_DEFAULT, dtype=dtype)
 
+    # at this point, wind_speed_series should be an array !
     if wind_speed_series.size != len(timestamps):
+        # Improve error message with useful hint/s ?
         raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(timestamps)}).")
+
     return WindSpeedSeries(value=wind_speed_series, unit=WIND_SPEED_UNIT)
 
 
