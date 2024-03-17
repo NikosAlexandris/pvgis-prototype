@@ -46,7 +46,6 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_MINIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_MAXIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT_MINIMUM
-from pvgisprototype.constants import DAYS_IN_A_YEAR
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -529,11 +528,6 @@ typer_option_hour_offset = typer.Option(
 
 # Earth orbit
 
-typer_option_days_in_a_year = typer.Option(
-    help='Number of days in a year',
-    rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=DAYS_IN_A_YEAR,
-)
 typer_option_perigee_offset = typer.Option(
     help='Perigee offset',
     rich_help_panel=rich_help_panel_earth_orbit,
