@@ -74,12 +74,9 @@ def log_function_call(function):
             data_type = kwargs.get('dtype', None)
             import inspect
             parent_frame = inspect.stack()[1]
-            parent_function_name = parent_frame.function
-            parent_file_name = parent_frame.filename
-            parent_line_number = parent_frame.lineno
             logger.info(
-                f"> Call : {function.__name__}() from {parent_function_name}() in {parent_file_name}:{parent_line_number}, Requested : {data_type}",
-                alt=f"> Call {function.__name__}() from [reverse]{parent_function_name}()[/reverse] in {parent_file_name}:{parent_line_number}, Requested : [reverse]{data_type}[/reverse]"
+                f"> Call : {function.__name__}() from {parent_frame.function}() in {parent_frame.filename}:{parent_frame.lineno}, Requested : {data_type}",
+                alt=f"> Call {function.__name__}() from [reverse]{parent_frame.function}()[/reverse] in {parent_frame.filename}:{parent_frame.lineno}, Requested : [reverse]{data_type}[/reverse]"
                 )
         return function(*args, **kwargs)
 
@@ -105,7 +102,7 @@ def log_data_fingerprint(
         data_hash = generate_hash(data)
         logger.info(
                 f"< Output {caller_name}() : {type(data)}, {data.dtype}, Hash {data_hash}",
-                # alt = f"< [bold]Output[/bold] of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]",
+                alt = f"< [bold]Output[/bold] of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]",
         )
     if log_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         from devtools import debug
