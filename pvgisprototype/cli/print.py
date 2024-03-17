@@ -685,9 +685,6 @@ def print_irradiance_table_2(
     if solar_incidence_algorithm is not None:
         caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow]"
 
-    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
-    if fingerprint is not None:
-        caption += f"\n{FINGERPRINT_COLUMN_NAME}: [bold yellow]{fingerprint}[/bold yellow]"
 
     caption += f"\n⌁ : Power, "
     caption += f"⭍ : Effective component, "
@@ -779,3 +776,22 @@ def print_irradiance_table_2(
 
     if verbose:
         console.print(table)
+
+    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)[0]
+    if fingerprint is not None:
+        from rich.text import Text
+        fingerprint_panel = Panel.fit(
+            Text(
+                f"{fingerprint}",
+                justify="center",
+                style="bold yellow"),
+                # subtitle="[bold]Fingerprint[/bold]",
+                subtitle="[reverse]Fingerprint[/reverse]",
+                subtitle_align="right",
+                # box=box.SIMPLE,
+                border_style="dim",
+                style="dim",
+            )
+
+        # Print the fingerprint panel
+        console.print(fingerprint_panel)
