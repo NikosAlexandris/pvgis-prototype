@@ -86,6 +86,37 @@ from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 from pvgisprototype.validation.hashing import generate_hash
 
 
+
+# def safe_select_time_series(*args, **kwargs):
+#     try:
+#         # Your existing select_time_series function call
+#         return select_time_series(*args, **kwargs).to_numpy().astype(dtype=kwargs.get('dtype'))
+#     except Exception as e:
+#         # Handle or log the exception as needed
+#         print(f"Error during task execution: {e}")
+#         return None
+
+
+# def read_horizontal_irradiance_components_from_sarah(...):
+#     if multi_thread:
+#         with ThreadPoolExecutor(max_workers=2) as executor:
+#             futures = {
+#                 executor.submit(safe_select_time_series, time_series=shortwave, longitude=longitude, latitude=latitude, timestamps=timestamps, mask_and_scale=mask_and_scale, neighbor_lookup=neighbor_lookup, tolerance=tolerance, in_memory=in_memory, log=log, dtype=dtype): "global",
+#                 executor.submit(safe_select_time_series, time_series=direct, longitude=longitude, latitude=latitude, timestamps=timestamps, mask_and_scale=mask_and_scale, neighbor_lookup=neighbor_lookup, tolerance=tolerance, in_memory=in_memory, log=log, dtype=dtype): "direct"
+#             }
+#             from concurrent.futures import as_completed
+#             for future in as_completed(futures):
+#                 try:
+#                     result = future.result()
+#                     if futures[future] == "global":
+#                         global_horizontal_irradiance_series = result
+#                     else:
+#                         direct_horizontal_irradiance_series = result
+#                 except Exception as e:
+#                     # Handle or log the exception
+#                     print(f"Error retrieving task result: {e}")
+
+
 @log_function_call
 def read_horizontal_irradiance_components_from_sarah(
     shortwave: Path,
