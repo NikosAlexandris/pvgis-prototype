@@ -675,10 +675,15 @@ def parse_wind_speed_series(
 
     """
     try:
+        if isinstance(wind_speed_input, int):
+            return wind_speed_input
+
+        if isinstance(wind_speed_input, (str, Path)) and Path(wind_speed_input).exists():
+            return Path(wind_speed_input)
+
         if isinstance(wind_speed_input, str):
             wind_speed_input = np.fromstring(wind_speed_input, sep=',')
-        else:
-            wind_speed_input = np.array(wind_speed_input)
+
         return wind_speed_input
 
     except ValueError as e:  # conversion to float failed
@@ -690,16 +695,38 @@ def wind_speed_series_argument_callback(
     ctx: Context,
     wind_speed_series: WindSpeedSeries,
 ):
-    reference_series = ctx.params.get('timestamps')
-    # if not reference_series:
-    #     reference_series = ctx.params.get('irradiance_series')
+    if isinstance(wind_speed_series, Path):
+        return validate_path(wind_speed_series)
 
-    if wind_speed_series == WIND_SPEED_DEFAULT:
+    timestamps = ctx.params.get('timestamps', None)
+    if timestamps is None:
+        start_time=ctx.params.get('start_time')
+        end_time=ctx.params.get('end_time')
+        periods=ctx.params.get('periods', None) 
+        from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
+        frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
+        if start_time is not None and end_time is not None:
+            timestamps = generate_datetime_series(
+                start_time=start_time,
+                end_time=end_time,
+                periods=periods,
+                frequency=frequency,
+                timezone=ctx.params.get('timezone'),
+                name=ctx.params.get('datetimeindex_name', None)
+            )
+        else:
+            from pvgisprototype.log import logger
+            logger.error(f'Did you provide both a start and an end time ?')
+
+    # How to use print(ctx.get_parameter_source('temperature_series')) ?
+    # See : class click.core.ParameterSource(value)
+
+    if isinstance(wind_speed_series, int) and wind_speed_series == WIND_SPEED_DEFAULT:
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
-        wind_speed_series = np.full(len(reference_series), WIND_SPEED_DEFAULT, dtype=dtype)
+        wind_speed_series = np.full(len(timestamps), WIND_SPEED_DEFAULT, dtype=dtype)
 
-    if wind_speed_series.size != len(reference_series):
-        raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
+    if wind_speed_series.size != len(timestamps):
+        raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(timestamps)}).")
     return WindSpeedSeries(value=wind_speed_series, unit=WIND_SPEED_UNIT)
 
 
