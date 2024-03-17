@@ -231,6 +231,12 @@ def print_series_statistics(
                     table.add_row(month_name, str(value))
                 table.add_row("", "")
 
+                from termcharts import bar
+                from rich.panel import Panel
+                # from rich.columns import Columns
+                barchart = bar(statistics[key].tolist(), title='Monthly', rich=True)
+                barchart_panel = Panel(barchart, expand=True)
+
             elif key == 'Seasonal means':
                 seasons = ['DJF', 'MAM', 'JJA', 'SON']
                 for season, value in zip(seasons, statistics[key]):
@@ -258,6 +264,11 @@ def print_series_statistics(
             period_count += 1
         table.add_row("", "")
 
+        from termcharts import bar
+        from rich.panel import Panel
+        # from rich.columns import Columns
+        barchart = bar(custom_freq_data.tolist(), title='Periods', rich=True)
+        barchart_panel = Panel(barchart, expand=True)
 
     # Index of
     for key, value in statistics.items():
@@ -267,6 +278,10 @@ def print_series_statistics(
 
     console = Console()
     console.print(table)
+    console.print(barchart_panel)
+    if custom_freq_label and custom_freq_label in statistics:
+        console.print(barchart_panel)
+        # console.print(Columns(barchart_panels))  # for many !
 
 
 def export_statistics_to_csv(data_array, filename):
