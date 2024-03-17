@@ -163,6 +163,7 @@ def calculate_time_offset_time_series_noaa(
     else:
         timestamps = timestamps.tz_convert(timezone)
 
+    # ------------------------------------------------- Further Optimisation ? 
     # Optimisation : calculate unique offsets
     unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
     unique_offsets = {tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)}
@@ -178,6 +179,7 @@ def calculate_time_offset_time_series_noaa(
         verbose=verbose,
     )
     time_offset_series = longitude.as_minutes - timezone_offset_minutes_series + equation_of_time_series.minutes
+    # ------------------------------------------------- Further Optimisation ? 
 
     if not np.all((TimeOffset().min_minutes <= time_offset_series) & (time_offset_series <= TimeOffset().max_minutes)):
         raise ValueError("At least one calculated time offset is out of the expected range [{TimeOffset().min_minutes, TimeOffset().max_minutes] minutes!")
