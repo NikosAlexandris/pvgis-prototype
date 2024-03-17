@@ -14,7 +14,6 @@ from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 # from pvgisprototype.cli.irradiance.effective import app as effective_irradiance
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
-from pvgisprototype.cli.irradiance.efficiency import app as pv_efficiency
 from pvgisprototype.api.irradiance.limits import app as limits
 from pvgisprototype.cli.irradiance.shortwave import app as global_irradiance
 from pvgisprototype.cli.irradiance.direct import app as direct_irradiance
@@ -89,13 +88,6 @@ def intro():
 #     no_args_is_help=True,
 #     rich_help_panel=rich_help_panel_series_irradiance,
 # )
-app.add_typer(
-    pv_efficiency,
-    name="pv-efficiency",
-    no_args_is_help=True,
-    # rich_help_panel=rich_help_panel_efficiency,
-    rich_help_panel=rich_help_panel_toolbox,
-)
 app.add_typer(
     global_irradiance,
     name="global",

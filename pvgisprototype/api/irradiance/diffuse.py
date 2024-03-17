@@ -86,8 +86,39 @@ from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 from pvgisprototype.validation.hashing import generate_hash
 
 
+
+# def safe_select_time_series(*args, **kwargs):
+#     try:
+#         # Your existing select_time_series function call
+#         return select_time_series(*args, **kwargs).to_numpy().astype(dtype=kwargs.get('dtype'))
+#     except Exception as e:
+#         # Handle or log the exception as needed
+#         print(f"Error during task execution: {e}")
+#         return None
+
+
+# def read_horizontal_irradiance_components_from_sarah(...):
+#     if multi_thread:
+#         with ThreadPoolExecutor(max_workers=2) as executor:
+#             futures = {
+#                 executor.submit(safe_select_time_series, time_series=shortwave, longitude=longitude, latitude=latitude, timestamps=timestamps, mask_and_scale=mask_and_scale, neighbor_lookup=neighbor_lookup, tolerance=tolerance, in_memory=in_memory, log=log, dtype=dtype): "global",
+#                 executor.submit(safe_select_time_series, time_series=direct, longitude=longitude, latitude=latitude, timestamps=timestamps, mask_and_scale=mask_and_scale, neighbor_lookup=neighbor_lookup, tolerance=tolerance, in_memory=in_memory, log=log, dtype=dtype): "direct"
+#             }
+#             from concurrent.futures import as_completed
+#             for future in as_completed(futures):
+#                 try:
+#                     result = future.result()
+#                     if futures[future] == "global":
+#                         global_horizontal_irradiance_series = result
+#                     else:
+#                         direct_horizontal_irradiance_series = result
+#                 except Exception as e:
+#                     # Handle or log the exception
+#                     print(f"Error retrieving task result: {e}")
+
+
 @log_function_call
-def calculate_diffuse_horizontal_component_from_sarah(
+def read_horizontal_irradiance_components_from_sarah(
     shortwave: Path,
     direct: Path,
     longitude: float,
@@ -99,11 +130,14 @@ def calculate_diffuse_horizontal_component_from_sarah(
     in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ):
-    """Calculate the diffuse irradiance incident on a solar surface from SARAH
-    time series.
+    """Read horizontal irradiance components from SARAH time series.
+
+    Read the global and direct horizontal irradiance components incident on a
+    solar surface from SARAH time series.
 
     Parameters
     ----------
@@ -118,35 +152,102 @@ def calculate_diffuse_horizontal_component_from_sarah(
     diffuse_irradiance: float
         The diffuse radiant flux incident on a surface per unit area in W/m².
     """
-    global_horizontal_irradiance_series = select_time_series(
-        time_series=shortwave,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        mask_and_scale=mask_and_scale,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        in_memory=in_memory,
-        log=log,
-    ).astype(dtype=dtype)
+    if multi_thread:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            future_global_horizontal_irradiance_series = executor.submit(
+                select_time_series,
+                time_series=shortwave,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                mask_and_scale=mask_and_scale,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                in_memory=in_memory,
+                log=log,
+            )
+            future_direct_horizontal_irradiance_series = executor.submit(
+                select_time_series,
+                time_series=shortwave,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                mask_and_scale=mask_and_scale,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                in_memory=in_memory,
+                log=log,
+            )
+            global_horizontal_irradiance_series = (
+                future_global_horizontal_irradiance_series.result().to_numpy().astype(dtype=dtype)
+            )
+            direct_horizontal_irradiance_series = (
+                future_direct_horizontal_irradiance_series.result().to_numpy().astype(dtype=dtype)
+            )
+    else:
+        global_horizontal_irradiance_series = select_time_series(
+            time_series=shortwave,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            mask_and_scale=mask_and_scale,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
+            log=log,
+        ).to_numpy().astype(dtype=dtype)
+        direct_horizontal_irradiance_series = select_time_series(
+            time_series=direct,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            mask_and_scale=mask_and_scale,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
+            log=log,
+        ).to_numpy().astype(dtype=dtype)
 
-    direct_horizontal_irradiance_series = select_time_series(
-        time_series=direct,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        mask_and_scale=mask_and_scale,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        in_memory=in_memory,
-        log=log,
-    ).astype(dtype=dtype)
+    horizontal_irradiance_components = {
+        GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
+        DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+    }
 
+    return horizontal_irradiance_components
+
+
+@log_function_call
+def calculate_diffuse_horizontal_component_from_sarah(
+    global_horizontal_irradiance_series,
+    direct_horizontal_irradiance_series,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
+    fingerprint: bool = False,
+):
+    """Calculate the diffuse horizontal irradiance from SARAH time series.
+
+    Calculate the diffuse horizontal irradiance incident on a solar surface
+    from SARAH time series.
+
+    Parameters
+    ----------
+    shortwave: Path
+        Filename of surface short-wave (solar) radiation downwards time series
+        (short name : `ssrd`) from ECMWF which is the solar radiation that
+        reaches a horizontal plane at the surface of the Earth. This parameter
+        comprises both direct and diffuse solar radiation.
+
+    Returns
+    -------
+    diffuse_irradiance: float
+        The diffuse radiant flux incident on a surface per unit area in W/m².
+    """
     diffuse_horizontal_irradiance_series = (
-        global_horizontal_irradiance_series
-        - direct_horizontal_irradiance_series
+        global_horizontal_irradiance_series - direct_horizontal_irradiance_series
     ).astype(dtype=dtype)
-    print(f'direct horizontal type : {direct_horizontal_irradiance_series.dtype}')
 
     if diffuse_horizontal_irradiance_series.size == 1:
         single_value = float(diffuse_horizontal_irradiance_series.values)
@@ -161,15 +262,20 @@ def calculate_diffuse_horizontal_component_from_sarah(
     components_container = {
         'main': lambda: {
             TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.to_numpy(),
-        },# if verbose > 0 else {},
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+        },
         
         'extended': lambda: {
             TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE + " & other horizontal components",
             GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series.to_numpy(),
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.to_numpy(),
         } if verbose > 1 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(diffuse_horizontal_irradiance_series),
+        } if fingerprint else {},
     }
+
     components = {}
     for key, component in components_container.items():
         components.update(component())
@@ -179,6 +285,12 @@ def calculate_diffuse_horizontal_component_from_sarah(
 
     if verbose > 0:
         return components
+
+    log_data_fingerprint(
+        data=diffuse_horizontal_irradiance_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return diffuse_horizontal_irradiance_series
 
@@ -207,7 +319,15 @@ def calculate_term_n_time_series(
         debug(locals())
 
     kb_series = np.array(kb_series, dtype=dtype)
-    return 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2, dtype=dtype)
+    term_n_series = 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2, dtype=dtype)
+
+    log_data_fingerprint(
+        data=term_n_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+
+    return term_n_series
 
 
 @log_function_call
@@ -403,11 +523,12 @@ def calculate_diffuse_inclined_irradiance_time_series(
     in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     fingerprint: bool = False,
 ) -> np.array:
-    """Calculate the diffuse irradiance incident on a solar surface
+    """Calculate the diffuse irradiance incident on a solar surface.
 
     Notes
     -----
@@ -437,19 +558,44 @@ def calculate_diffuse_inclined_irradiance_time_series(
     - surface_orientation :
     - diffuse_irradiance
     """
-    # 1. Calculate the direct horizontal irradiance
-    if direct_horizontal_component:  # read from external dataset
-        direct_horizontal_irradiance_series = select_time_series(
-            time_series=direct_horizontal_component,
-            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-            timestamps=timestamps,
-            mask_and_scale=mask_and_scale,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            in_memory=in_memory,
-            log=log,
-        ).to_numpy().astype(dtype)
+    # 1. calculate diffuse based on external global and direct irradiance components
+    if global_horizontal_component and direct_horizontal_component:
+        horizontal_irradiance_components = (
+            read_horizontal_irradiance_components_from_sarah(
+                shortwave=global_horizontal_component,
+                direct=direct_horizontal_component,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                timestamps=timestamps,
+                mask_and_scale=mask_and_scale,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                in_memory=in_memory,
+                multi_thread=multi_thread,
+                verbose=verbose,
+                log=log,
+            )
+        )
+        global_horizontal_irradiance_series = horizontal_irradiance_components[
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        direct_horizontal_irradiance_series = horizontal_irradiance_components[
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        diffuse_horizontal_irradiance_series = (
+            calculate_diffuse_horizontal_component_from_sarah(
+                global_horizontal_irradiance_series=global_horizontal_irradiance_series,
+                direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
+                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                # timestamps=timestamps,
+                # neighbor_lookup=neighbor_lookup,
+                dtype=dtype,
+                array_backend=array_backend,
+                verbose=0,
+                log=log,
+            )
+        )
 
     else:  # from the model
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
@@ -486,6 +632,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             log=log,
         )
     )
+
     # extraterrestrial on a horizontal surface requires the solar altitude
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
@@ -512,34 +659,15 @@ def calculate_diffuse_inclined_irradiance_time_series(
         extraterrestrial_normal_irradiance_series
         * np.sin(solar_altitude_series.radians)
     )
-    print(f'extraterrestrial_horizontal_irradiance_series : {extraterrestrial_horizontal_irradiance_series.dtype}')
-    # calculate based on external global and direct irradiance series
-    if global_horizontal_component and direct_horizontal_component:
-        diffuse_horizontal_irradiance_series = (
-            calculate_diffuse_horizontal_component_from_sarah(
-                shortwave=global_horizontal_component,
-                direct=direct_horizontal_component,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                timestamps=timestamps,
-                neighbor_lookup=neighbor_lookup,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=0,
-                log=log,
-            )
-        ).to_numpy()  # We need NumPy!
-
-    else:  # model it
-        diffuse_horizontal_irradiance_series = (
-            extraterrestrial_normal_irradiance_series
-            * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
-            * diffuse_solar_altitude_function_time_series(
-                solar_altitude_series, linke_turbidity_factor_series
-            )
+    diffuse_horizontal_irradiance_series = (
+        extraterrestrial_normal_irradiance_series
+        * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
+        * diffuse_solar_altitude_function_time_series(
+            solar_altitude_series, linke_turbidity_factor_series
         )
+    )
 
-    if surface_tilt == 0:  # horizontal surface
+    if surface_tilt == 0:  # horizontal surface however ..
         diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series
 
     else:  # tilted (or inclined) surface
@@ -700,6 +828,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
         },# if verbose > 0 else {},
+
         'extended': lambda: {
             LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series / diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,

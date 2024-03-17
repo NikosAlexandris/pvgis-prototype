@@ -78,13 +78,15 @@ def calculate_event_hour_angle_noaa(
 
 @validate_with_pydantic(CalculateEventHourAngleTimeSeriesNOAAInput)
 def calculate_event_hour_angle_time_series_noaa(
-        latitude: Latitude, # radians
-        timestamps: Union[float, Sequence[float]],
-        refracted_solar_zenith: RefractedSolarZenith,
-    ) -> EventHourAngle:
+    latitude: Latitude, # radians
+    timestamps: Union[float, Sequence[float]],
+    refracted_solar_zenith: RefractedSolarZenith,
+) -> EventHourAngle:
+    """
+    """
     solar_declination = calculate_solar_declination_time_series_noaa(
-            timestamps=timestamps,
-            )  # radians
+        timestamps=timestamps,
+    )  # radians
     cosine_event_hour_angle = np.cos(refracted_solar_zenith.radians) / (
         np.cos(latitude.radians) * np.cos(solar_declination.radians)
     ) - np.tan(latitude.radians) * np.tan(solar_declination.radians)

@@ -105,7 +105,7 @@ def calculate_series_statistics(
     elif groupby:  # custom frequencies like '3H', '2W', etc.
         custom_label = f'{groupby} means'
         statistics[custom_label] = data_xarray.resample(time=groupby).mean().values
-        statistics['Sum of Group Means'] = statistics[custom_label].sum()
+        statistics['Sum of Group Means'] = data_xarray.resample(time=groupby).mean().sum().values
 
     return statistics
 
@@ -167,6 +167,7 @@ def print_series_statistics(
         'Weekly means',
         'Daily means',
         'Hourly means',
+        groupby + ' means' if groupby else None,  # do not print custom frequency means
         ]
 
     if yearly_overview:
@@ -256,7 +257,6 @@ def print_series_statistics(
             table.add_row(label, str(value))
             period_count += 1
         table.add_row("", "")
-
 
     # Index of
     for key, value in statistics.items():

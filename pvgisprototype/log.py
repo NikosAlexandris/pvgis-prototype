@@ -51,32 +51,34 @@ def initialize_logger(
 
     log_file = ctx.params.get('log_file')
     if log_file:
-        # print(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
+        print(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
         log_file = "pvgisprototype_{time}.log"
         logger.add(log_file, level=minimum_log_level)  # , compression="tar.gz")
         # logger.info(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
 
-    if log_level:
+    if log_level and not rich_handler:
         print(f'Logging to sys.stderr')
-        logger.remove()
         import sys
         # logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
-        logger.add(sys.stderr, level=minimum_log_level)
+        fmt = "{time} | {level: <8} | {name: ^15} | {function: ^15} | {line: >3} | {message}"
+        logger.add(sys.stderr, format=fmt, level=minimum_log_level)
 
     return log_level
 
 
-def log_function_call(func):
-    @wraps(func)
+def log_function_call(function):
+    @wraps(function)
     def wrapper(*args, **kwargs):
         verbosity_level = kwargs.get('log', 0) or 0
         if verbosity_level > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             data_type = kwargs.get('dtype', None)
+            import inspect
+            parent_frame = inspect.stack()[1]
             logger.info(
-                    f"> Call : {func.__name__}(), Requested data type : {data_type}",
-                    alt=f"> Call {func.__name__}(), Requested data type : [reverse]{data_type}[/reverse]"
+                f"> Call : {function.__name__}() from {parent_frame.function}() in {parent_frame.filename}:{parent_frame.lineno}, Requested : {data_type}",
+                alt=f"> Call {function.__name__}() from [reverse]{parent_frame.function}()[/reverse] in {parent_frame.filename}:{parent_frame.lineno}, Requested : [reverse]{data_type}[/reverse]"
                 )
-        return func(*args, **kwargs)
+        return function(*args, **kwargs)
 
         # if verbosity_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         #     logger.debug(f"Function {func.__name__} completed with locals: {locals()}")
@@ -100,7 +102,7 @@ def log_data_fingerprint(
         data_hash = generate_hash(data)
         logger.info(
                 f"< Output {caller_name}() : {type(data)}, {data.dtype}, Hash {data_hash}",
-                # alt = f"< [bold]Output[/bold] of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]",
+                alt = f"< [bold]Output[/bold] of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]",
         )
     if log_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         from devtools import debug
