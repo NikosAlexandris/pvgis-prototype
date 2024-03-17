@@ -394,6 +394,7 @@ def calculate_photovoltaic_power_output_series(
             neighbor_lookup=neighbor_lookup,
             dtype=dtype,
             array_backend=array_backend,
+            multi_thread=multi_thread,
             verbose=0,  # no verbosity here by choice!
             log=log,
         )[
