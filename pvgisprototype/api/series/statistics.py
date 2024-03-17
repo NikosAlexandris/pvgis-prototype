@@ -278,7 +278,6 @@ def print_series_statistics(
 
     console = Console()
     console.print(table)
-    console.print(barchart_panel)
     if custom_freq_label and custom_freq_label in statistics:
         console.print(barchart_panel)
         # console.print(Columns(barchart_panels))  # for many !
