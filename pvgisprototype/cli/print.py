@@ -685,18 +685,23 @@ def print_irradiance_table_2(
     if solar_incidence_algorithm is not None:
         caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow]"
 
-
-    caption += f"\n⌁ : Power, "
-    caption += f"⭍ : Effective component, "
-    caption += f"🗤 : Diffuse, "
-    caption += f"☈ : Reflected, "
-    caption += f"∡ : On inclined plane, "
-    # caption += f"↻ : Orientation\n"
+    symbol_descriptions = {
+        "⌁": "Power",
+        "⭍": "Effective component",
+        "🗤": "Diffuse",
+        "☈": "Reflected",
+        "∡": "On inclined plane",
+        # "↻": "Orientation",
+    }
+    # add a caption for symbols found in the input dictionary
+    for symbol, description in symbol_descriptions.items():
+        if any(symbol in key for key in dictionary.keys()):
+            caption += f"{symbol} : {description}, "
 
     table = Table(
             title=title,
             # caption=caption,
-            caption=caption.rstrip(', '),  # Remove trailing comma
+            caption=caption.rstrip(', '),  # Remove trailing comma + space
             box=box.SIMPLE_HEAD,
             )
     
