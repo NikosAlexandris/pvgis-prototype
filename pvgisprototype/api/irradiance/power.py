@@ -568,8 +568,8 @@ def calculate_photovoltaic_power_output_series(
         
         'extra': lambda: {
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
-            ALTITUDE_COLUMN_NAME: solar_altitude_series,
-            AZIMUTH_COLUMN_NAME: solar_azimuth_series,
+            ALTITUDE_COLUMN_NAME: solar_altitude_series.value,
+            AZIMUTH_COLUMN_NAME: solar_azimuth_series.value,
         } if verbose > 5 else {},
 
         'fingerprint': lambda: {
