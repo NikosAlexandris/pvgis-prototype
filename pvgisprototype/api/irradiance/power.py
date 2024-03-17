@@ -483,8 +483,9 @@ def calculate_photovoltaic_power_output_series(
                             log=log,
                             ).to_numpy().astype(dtype=dtype),
                         unit=TEMPERATURE_UNIT)
+            from pvgisprototype import WindSpeedSeries
             if isinstance(wind_speed_series, Path):
-                wind_speed_series = TemperatureSeries(
+                wind_speed_series = WindSpeedSeries(
                         value=select_time_series(
                             time_series=wind_speed_series,
                             # longitude=longitude_for_selection,
