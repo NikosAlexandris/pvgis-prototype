@@ -1,0 +1,200 @@
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+import typer
+from typing import Annotated
+from typing import Optional
+from typing import List
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from pathlib import Path
+
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.geometry.models import select_models
+
+from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
+from pvgisprototype.cli.typer_parameters import typer_option_start_time
+from pvgisprototype.cli.typer_parameters import typer_option_frequency
+from pvgisprototype.cli.typer_parameters import typer_option_end_time
+from pvgisprototype.cli.typer_parameters import typer_option_timezone
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_random_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_random_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
+from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
+from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
+from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
+from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
+from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
+from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
+from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+from pvgisprototype.cli.typer_parameters import typer_option_statistics
+from pvgisprototype.cli.typer_parameters import typer_option_csv
+from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_index
+
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.geometry.overview_series import calculate_solar_geometry_overview_time_series
+from pvgisprototype.cli.write import write_solar_position_series_csv
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
+from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
+from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+
+
+def overview_series(
+    ctx: typer.Context,
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_time_series: bool = False,
+    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
+    complementary_incidence_angle: Annotated[bool, 'Measure angle between sun-vector and surface-plane'] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = TIME_OFFSET_GLOBAL_DEFAULT,
+    hour_offset: Annotated[float, typer_option_hour_offset] = HOUR_OFFSET_DEFAULT,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = None,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = False,
+    ):
+    """
+    """
+    # print(f'Context: {ctx}')
+    # print(f'Context: {ctx.params}')
+    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
+
+    # if ctx.invoked_subcommand is not None:
+    #     print("Skipping default command to run sub-command.")
+    #     return
+
+    # elif ctx.invoked_subcommand in ['altitude', 'azimuth']:
+    #     print('Execute subcommand')
+
+    # else:
+    #     print('Yay')
+    #     return
+
+    # Initialize with None ---------------------------------------------------
+    user_requested_timestamps = None
+    user_requested_timezone = None
+    # -------------------------------------------- Smarter way to do this? ---
+    
+    utc_zoneinfo = ZoneInfo("UTC")
+    if timestamps.tzinfo != utc_zoneinfo:
+
+        # Note the input timestamp and timezone
+        user_requested_timestamps = timestamps
+        user_requested_timezone = timezone
+
+        # timestamps = timestamps.tz_convert(utc_zoneinfo)
+        from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
+        timezone_aware_timestamps = [
+            attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
+        ]
+        timezone = utc_zoneinfo
+        # print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
+
+    # Why does the callback function `_parse_model` not work? 
+    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
+    solar_position_series = calculate_solar_geometry_overview_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        surface_tilt=surface_tilt,
+        surface_orientation=surface_orientation,
+        solar_position_models=solar_position_models,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        # refracted_solar_zenith=refracted_solar_zenith,
+        solar_time_model=solar_time_model,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        # time_offset_global=time_offset_global,
+        # hour_offset=hour_offset,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        array_backend=array_backend,
+        dtype=dtype,
+        complementary_incidence_angle=complementary_incidence_angle,
+        verbose=verbose,
+    )
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    from pvgisprototype.cli.print import print_solar_position_series_table
+    if not csv:
+        print_solar_position_series_table(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_position_series,
+            timing=True,
+            declination=True,
+            hour_angle=True,
+            zenith=True,
+            altitude=True,
+            azimuth=True,
+            surface_tilt=True,
+            surface_orientation=True,
+            incidence=True,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            rounding_places=rounding_places,
+            group_models=group_models,
+        )
+    if csv:
+        write_solar_position_series_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_position_series,
+            timing=True,
+            declination=True,
+            hour_angle=True,
+            zenith=True,
+            altitude=True,
+            azimuth=True,
+            surface_tilt=True,
+            surface_orientation=True,
+            incidence=True,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            # rounding_places=rounding_places,
+            # group_models=group_models,
+            filename=csv,
+        )
