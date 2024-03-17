@@ -540,6 +540,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
                 in_memory=in_memory,
+                multi_thread=multi_thread,
+                verbose=verbose,
                 log=log,
             )
         )
