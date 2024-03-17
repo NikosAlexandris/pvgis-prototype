@@ -51,17 +51,18 @@ def initialize_logger(
 
     log_file = ctx.params.get('log_file')
     if log_file:
-        # print(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
+        print(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
+        # logger.remove()
         log_file = "pvgisprototype_{time}.log"
         logger.add(log_file, level=minimum_log_level)  # , compression="tar.gz")
         # logger.info(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
 
-    if log_level:
+    if log_level and not rich_handler:
         print(f'Logging to sys.stderr')
-        logger.remove()
         import sys
         # logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
-        logger.add(sys.stderr, level=minimum_log_level)
+        fmt = "{time} | {level: <8} | {name: ^15} | {function: ^15} | {line: >3} | {message}"
+        logger.add(sys.stderr, format=fmt, level=minimum_log_level)
 
     return log_level
 
