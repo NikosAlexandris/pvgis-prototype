@@ -728,19 +728,18 @@ def print_irradiance_table_2(
             FINGERPRINT_COLUMN_NAME,
     }
 
-    # additional columns based dictionary keys
-    for key in dictionary.keys():
+    # add and process additional columns
+    for key, value in dictionary.items():
         if key not in keys_to_exclude:
+
             if dictionary[key] is not None:
                 table.add_column(key)
-    
-    # Convert single float, int or str values to arrays of the same length as timestamps
-    for key, value in dictionary.items():
-        if isinstance(value, (float, int)):
-            dictionary[key] = np.full(len(timestamps), value)
 
-        if isinstance(value, str):
-            dictionary[key] = np.full(len(timestamps), str(value))
+            if isinstance(value, (float, int)):
+                dictionary[key] = np.full(len(timestamps), value)
+
+            if isinstance(value, str):
+                dictionary[key] = np.full(len(timestamps), str(value))
     
     # Zip series and timestamps
     filtered_dictionary = {key: value for key, value in dictionary.items() if key not in keys_to_exclude}
@@ -782,21 +781,20 @@ def print_irradiance_table_2(
     if verbose:
         console.print(table)
 
+
+def print_finger_hash(dictionary: dict):
+    """ """
     fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
     if fingerprint is not None:
         from rich.text import Text
         fingerprint_panel = Panel.fit(
-            Text(
-                f"{fingerprint[0]}",
-                justify="center",
-                style="bold yellow"),
-                # subtitle="[bold]Fingerprint[/bold]",
-                subtitle="[reverse]Fingerprint[/reverse]",
-                subtitle_align="right",
-                # box=box.SIMPLE,
-                border_style="dim",
-                style="dim",
-            )
-
-        # Print the fingerprint panel
+            Text(f"{fingerprint}", justify="center", style="bold yellow"),
+            # subtitle="[bold]Fingerprint[/bold]",
+            subtitle="[reverse]Fingerprint[/reverse]",
+            subtitle_align="right",
+            # box=box.SIMPLE,
+            border_style="dim",
+            style="dim",
+        )
+        console = Console()
         console.print(fingerprint_panel)
