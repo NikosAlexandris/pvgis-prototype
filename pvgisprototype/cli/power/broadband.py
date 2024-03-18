@@ -287,6 +287,7 @@ def photovoltaic_power_output_series(
             timestamps=timestamps,
             groupby=groupby,
             title="Photovoltaic power output",
+            verbose=verbose,
         )
     if uniplot:
         print(f'[reverse]Uniplot[/reverse]')
