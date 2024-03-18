@@ -454,10 +454,8 @@ def calculate_photovoltaic_power_output_series(
     # -----------------------------------------------------------------------
     if not power_model:
         if not efficiency:  # user-set  -- RenameMe ?  FIXME
-            # print(f'Using preset system efficiency {system_efficiency}')
             efficiency_coefficient_series = system_efficiency
         else:
-            # print(f'Efficiency set to {efficiency}')
             efficiency_coefficient_series = efficiency
     else:
         if not efficiency:
@@ -594,7 +592,7 @@ def calculate_photovoltaic_power_output_series(
         # write profiling statistics to file
         profile_filename = "profiling_stats.prof"
         pr.dump_stats(profile_filename)
-        print(f"Profiling stats saved to {profile_filename}")
+        print(f"Profiling statistics saved to {profile_filename}")
 
         s = io.StringIO()
         sortby = pstats.SortKey.CUMULATIVE
