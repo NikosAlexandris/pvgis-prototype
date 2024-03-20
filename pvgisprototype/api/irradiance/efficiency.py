@@ -21,6 +21,7 @@ from pvgisprototype.constants import EFFICIENCY
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import EFFICIENCY_FACTOR
 from pvgisprototype.constants import EFFICIENCY_FACTOR_COLUMN_NAME
+from pvgisprototype.constants import SPECTRAL_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_CURRENT_COLUMN_NAME
 from pvgisprototype.constants import VOLTAGE_COLUMN_NAME
 from pvgisprototype.constants import POWER_ALGORITHM_COLUMN_NAME
@@ -86,15 +87,18 @@ def add_unequal_arrays(array_1, array_2):
         array_1 = np.pad(array_1, (0, -length_difference), 'constant')
     return array_1 + array_2
 
+from pvgisprototype import SpectralFactorSeries
+from pvgisprototype import TemperatureSeries
+from pvgisprototype import WindSpeedSeries
 
 @log_function_call
 def calculate_pv_efficiency_time_series(
     irradiance_series: List[float],
-    spectral_factor: List[float],
-    temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
+    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=1),
+    temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
-    wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
+    wind_speed_series: WindSpeedSeries = np.array(WIND_SPEED_DEFAULT),
     power_model: PVModuleEfficiencyAlgorithm = PVModuleEfficiencyAlgorithm.king,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
@@ -113,7 +117,7 @@ def calculate_pv_efficiency_time_series(
     ----------
     irradiance_series : List[float]
         List of irradiance values over time.
-    spectral_factor : List[float]
+    spectral_factor_series: SpectralFactorSeries
         List of spectral factors corresponding to the irradiance series.
     temperature_series : np.ndarray, optional
         Numpy array of temperature values over time. Default is np.array(TEMPERATURE_DEFAULT).
@@ -157,25 +161,16 @@ def calculate_pv_efficiency_time_series(
     efficiency of a PV module under varying conditions.
 
     """
-    # model_constants = np.array(EFFICIENCY_MODEL_COEFFICIENTS['cSi']['Free standing'])
-    photovoltaic_module_efficiency_coefficients = get_coefficients_for_photovoltaic_module(photovoltaic_module)
-
-    # or add standard plus selected?
-    # model_constants = np.array(STANDARD_EFFICIENCY_MODEL_COEFFICIENTS)
-    # selected_model_constants = np.array(EFFICIENCY_MODEL_COEFFICIENTS['cSi']['Free standing'])
-    # model_constants = add_unequal_arrays(model_constants, selected_model_constants) 
-
-    if len(photovoltaic_module_efficiency_coefficients) < 7:
-        raise ValueError("Insufficient number of model constants!")
-    
+    photovoltaic_module_efficiency_coefficients = (
+        get_coefficients_for_photovoltaic_module(photovoltaic_module)
+    )
     irradiance_series = np.array(irradiance_series)
     relative_irradiance_series = 0.001 * irradiance_series
-    if spectral_factor:
-        spectral_factor = np.array(spectral_factor)
-        relative_irradiance_series *= spectral_factor
-    log_relative_irradiance_series = np.where(relative_irradiance_series > 0, 
-                                              np.log(relative_irradiance_series), 
-                                              0)
+    if np.any(spectral_factor_series):
+        relative_irradiance_series *= spectral_factor_series.value
+    log_relative_irradiance_series = np.where(
+        relative_irradiance_series > 0, np.log(relative_irradiance_series), 0
+    )
 
     negative_relative_irradiance = relative_irradiance_series <= radiation_cutoff_threshold
     efficiency_series = np.zeros_like(irradiance_series)
@@ -205,7 +200,6 @@ def calculate_pv_efficiency_time_series(
     temperature_deviation_series = temperature_series.value - standard_test_temperature
     
     if power_model.value  == PVModuleEfficiencyAlgorithm.king:
-        # temperature_deviation_series = temperature_series_adjusted - standard_test_temperature
         efficiency_factor_series = (
             photovoltaic_module_efficiency_coefficients[0]
             + log_relative_irradiance_series
@@ -270,6 +264,7 @@ def calculate_pv_efficiency_time_series(
         } if verbose > 2 else {},
 
         'even_more_extended': lambda: {
+            SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor_series.value,
             RELATIVE_IRRADIANCE_COLUMN_NAME: relative_irradiance_series,
             NEGATIVE_RELATIVE_IRRADIANCE_COLUMN_NAME: negative_relative_irradiance,
             IRRADIANCE_COLUMN_NAME: irradiance_series,
