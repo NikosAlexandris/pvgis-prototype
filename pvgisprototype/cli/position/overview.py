@@ -113,6 +113,7 @@ def overview(
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         solar_position_models=solar_position_models,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
         solar_time_model=solar_time_model,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
