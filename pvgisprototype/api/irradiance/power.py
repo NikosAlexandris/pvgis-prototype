@@ -37,10 +37,12 @@ from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
+from pvgisprototype.constants import UNITLESS
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_UNIT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_UNIT
+from pvgisprototype.constants import SPECTRAL_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
@@ -97,10 +99,11 @@ from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import PhotovoltaicPower
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, to_datetime
 from pvgisprototype import SurfaceTilt
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype import SpectralFactorSeries
 
 
 @log_function_call
@@ -117,7 +120,7 @@ def calculate_photovoltaic_power_output_series(
     random_time_series: bool = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
-    spectral_factor=None,
+    spectral_factor_series: np.ndarray = SpectralFactorSeries(value=1),
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
@@ -379,8 +382,12 @@ def calculate_photovoltaic_power_output_series(
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
-            global_horizontal_component=global_horizontal_irradiance,
+            global_horizontal_component=global_horizontal_irradiance,  # time series optional
             direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            mask_and_scale=mask_and_scale,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
@@ -392,7 +399,6 @@ def calculate_photovoltaic_power_output_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-            neighbor_lookup=neighbor_lookup,
             dtype=dtype,
             array_backend=array_backend,
             multi_thread=multi_thread,
@@ -419,7 +425,12 @@ def calculate_photovoltaic_power_output_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             albedo=albedo,
-            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            global_horizontal_component=global_horizontal_irradiance,  # time series optional
+            # direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            mask_and_scale=mask_and_scale,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
@@ -454,10 +465,8 @@ def calculate_photovoltaic_power_output_series(
     # -----------------------------------------------------------------------
     if not power_model:
         if not efficiency:  # user-set  -- RenameMe ?  FIXME
-            # print(f'Using preset system efficiency {system_efficiency}')
             efficiency_coefficient_series = system_efficiency
         else:
-            # print(f'Efficiency set to {efficiency}')
             efficiency_coefficient_series = efficiency
     else:
         if not efficiency:
@@ -505,8 +514,30 @@ def calculate_photovoltaic_power_output_series(
                             log=log,
                             ).to_numpy().astype(dtype=dtype),
                         unit=WIND_SPEED_UNIT)
+
+            if isinstance(spectral_factor_series, Path):
+                spectral_factor_series = SpectralFactorSeries(
+                        value = select_time_series(
+                            time_series=spectral_factor_series,
+                            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                            timestamps=timestamps,
+                            start_time=start_time,
+                            end_time=end_time,
+                            remap_to_month_start=True,
+                            # convert_longitude_360=convert_longitude_360,
+                            neighbor_lookup=neighbor_lookup,
+                            tolerance=tolerance,
+                            mask_and_scale=mask_and_scale,
+                            in_memory=in_memory,
+                            verbose=0,  # no verbosity here by choice!
+                            log=log,
+                            ).to_numpy().astype(dtype=dtype),
+                        unit=UNITLESS)
+
+            # spectral_factor_series = np.full(len(timestamps), 0.9, dtype=dtype)
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
-                spectral_factor=spectral_factor,
+                spectral_factor_series=spectral_factor_series,
                 irradiance_series=global_irradiance_series,
                 temperature_series=temperature_series,
                 # model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
@@ -557,6 +588,7 @@ def calculate_photovoltaic_power_output_series(
             # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME:
             TEMPERATURE_COLUMN_NAME: temperature_series.value,
             WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
+            SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor_series.value,
         } if verbose > 3 else {},
         
         'and_even_more_extended': lambda: {
@@ -594,7 +626,7 @@ def calculate_photovoltaic_power_output_series(
         # write profiling statistics to file
         profile_filename = "profiling_stats.prof"
         pr.dump_stats(profile_filename)
-        print(f"Profiling stats saved to {profile_filename}")
+        print(f"Profiling statistics saved to {profile_filename}")
 
         s = io.StringIO()
         sortby = pstats.SortKey.CUMULATIVE

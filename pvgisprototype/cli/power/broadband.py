@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.print import print_irradiance_table_2
+from pvgisprototype.cli.print import print_finger_hash
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
@@ -26,6 +27,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype import SpectralFactorSeries
 from pvgisprototype import TemperatureSeries
 from pvgisprototype.cli.typer_parameters import typer_argument_temperature_series
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
@@ -113,6 +115,7 @@ from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModule
 import typer
 
 from pvgisprototype.cli.typer_parameters import typer_option_log
+from pvgisprototype.cli.typer_parameters import typer_argument_spectral_factor_series
 
 @log_function_call
 def photovoltaic_power_output_series(
@@ -128,6 +131,7 @@ def photovoltaic_power_output_series(
     random_time_series: bool = False,
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    spectral_factor_series: Annotated[Path|SpectralFactorSeries, typer_argument_spectral_factor_series] = None,  # Accept also list of float values ?
     temperature_series: Annotated[Path|TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[Path|WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
@@ -211,6 +215,7 @@ def photovoltaic_power_output_series(
         random_time_series=random_time_series,
         global_horizontal_irradiance=global_horizontal_irradiance,
         direct_horizontal_irradiance=direct_horizontal_irradiance,
+        spectral_factor_series=spectral_factor_series,
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
         mask_and_scale=mask_and_scale,
@@ -326,3 +331,5 @@ def photovoltaic_power_output_series(
                 title=title if title else supertitle,
                 y_unit=' ' + str(unit),
             )
+    if fingerprint:
+        print_finger_hash(dictionary=photovoltaic_power_output_series.components)

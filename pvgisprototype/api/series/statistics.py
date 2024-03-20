@@ -1,6 +1,5 @@
 from devtools import debug
 from rich.console import Console
-import xarray as xr
 import numpy as np
 from scipy.stats import mode
 from rich.table import Table
@@ -60,27 +59,38 @@ def calculate_series_statistics(
     data_xarray.attrs['units'] = 'W/m^2'
     data_xarray.attrs['long_name'] = 'Photovoltaic power'
     data_xarray.load()
-    statistics = {
-        'Start': data_xarray.time.values[0],
-        'End': data_xarray.time.values[-1],
-        'Count': data_xarray.count().values,
-        'Min': data_xarray.min().values,
-        '25th Percentile': np.percentile(data_xarray, 25),
-        'Mean': data_xarray.mean().values,
-        'Median': data_xarray.median().values,
-        'Mode': mode(data_xarray.values.flatten())[0],
-        'Max': data_xarray.max().values,
-        'Sum': data_xarray.sum().values,
-        'Variance': data_xarray.var().values,
-        'Standard deviation': data_xarray.std().values,
-        'Time of Min': data_xarray.idxmin('time').values,
-        'Index of Min': data_xarray.argmin().values,
-        'Time of Max': data_xarray.idxmax('time').values,
-        'Index of Max': data_xarray.argmax().values,
+    statistics_container = {
+        'basic': lambda: {
+            'Start': data_xarray.time.values[0],
+            'End': data_xarray.time.values[-1],
+            'Count': data_xarray.count().values,
+            'Min': data_xarray.min().values,
+            'Mean': data_xarray.mean().values,
+            'Max': data_xarray.max().values,
+            'Sum': data_xarray.sum().values,
+        },
+        'extended': lambda: {
+            '25th Percentile': np.percentile(data_xarray, 25),
+            'Median': data_xarray.median().values,
+            'Mode': mode(data_xarray.values.flatten())[0],
+            'Variance': data_xarray.var().values,
+            'Standard deviation': data_xarray.std().values,
+        },# if verbose > 1 else {},
+        'timestamps': lambda: {
+            'Time of Min': data_xarray.idxmin('time').values,
+            'Index of Min': data_xarray.argmin().values,
+            'Time of Max': data_xarray.idxmax('time').values,
+            'Index of Max': data_xarray.argmax().values,
+        },# if verbose > 2 else {},
+        'groupby_summary': lambda: {
+            'Sum of Group Means': None } if groupby else {},
         # 'Longitude of Max': data_xarray.argmax('lon').values,
         # 'Latitude of Max': data_xarray.argmax('lat').values,
-        'Sum of Group Means': float,
     }
+    statistics = {}
+    for key, func in statistics_container.items():
+        statistics.update(func())
+
     time_groupings = {
         'Y': ('year', 'Yearly means'),
         'S': ('season', 'Seasonal means'),
@@ -89,7 +99,6 @@ def calculate_series_statistics(
         'D': ('1D', 'Daily means'),
         'H': ('1H', 'Hourly means'),
     }
-    print(f'Groupby : {groupby}')
     if groupby in time_groupings:
         freq, label = time_groupings[groupby]
         if groupby in ['Y', 'M', 'S']:
@@ -117,7 +126,7 @@ def print_series_statistics(
     groupby: str = None,
     yearly_overview: bool = False,
     rounding_places: int = None,
-    verbose=1,
+    verbose=0,
 ) -> None:
     """
     """
@@ -148,13 +157,22 @@ def print_series_statistics(
         statistics = calculate_series_statistics(data_array, timestamps, groupby)
 
     # Basic metadata
-    if not yearly_overview:
-        basic_metadata = ["Start", "End", "Count"]
-    else:
-        basic_metadata = ["Start", "End"]
+    basic_metadata = (
+        ["Start", "End", "Count"] if not yearly_overview else ["Start", "End"]
+    )
+    
     for key in basic_metadata:
         if key in statistics:
             table.add_row(key, str(statistics[key]))
+
+    # grouping_labels = {
+    #     'Y': 'Yearly means',
+    #     'S': 'Seasonal means',
+    #     'M': 'Monthly means',
+    #     'W': 'Weekly means',
+    #     'D': 'Daily means',
+    #     'H': 'Hourly means',
+    # }
 
     # Separate!
     table.add_row("", "")
@@ -182,18 +200,11 @@ def print_series_statistics(
             ]
 
     # Index of items
-    if not yearly_overview:
-        index_metadata = [
-            'Time of Min',
-            'Index of Min',
-            'Time of Max',
-            'Index of Max', 
-            ]
-    else:
-        index_metadata = [
-            # 'Time of Min',
-            # 'Time of Max',
-            ]
+    index_metadata = (
+        ["Time of Min", "Index of Min", "Time of Max", "Index of Max"]
+        if not yearly_overview
+        else []  # 'Time of Min', 'Time of Max',
+    )
 
     # Add statistics
     for key, value in statistics.items():
