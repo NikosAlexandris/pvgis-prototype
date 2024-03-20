@@ -29,7 +29,6 @@ def calculate_series_statistics(
     data_array: np.array,
     timestamps: DatetimeIndex,
     groupby: str = None,
-    verbose: int = 0,
 ) -> dict:
     """ """
     import xarray as xr
@@ -76,13 +75,13 @@ def calculate_series_statistics(
             'Mode': mode(data_xarray.values.flatten())[0],
             'Variance': data_xarray.var().values,
             'Standard deviation': data_xarray.std().values,
-        } if verbose > 1 else {},
+        },# if verbose > 1 else {},
         'timestamps': lambda: {
             'Time of Min': data_xarray.idxmin('time').values,
             'Index of Min': data_xarray.argmin().values,
             'Time of Max': data_xarray.idxmax('time').values,
             'Index of Max': data_xarray.argmax().values,
-        } if verbose > 2 else {},
+        },# if verbose > 2 else {},
         'groupby_summary': lambda: {
             'Sum of Group Means': None } if groupby else {},
         # 'Longitude of Max': data_xarray.argmax('lon').values,
@@ -151,11 +150,11 @@ def print_series_statistics(
         table.add_column("Statistic", justify="right", style="bright_blue", no_wrap=True)
         table.add_column("Value", style="cyan")
         # get monthly mean values
-        statistics = calculate_series_statistics(data_array, timestamps, 'M', verbose=verbose)
+        statistics = calculate_series_statistics(data_array, timestamps, 'M')
     else:
         table.add_column("Statistic", justify="right", style="magenta", no_wrap=True)
         table.add_column("Value", style="cyan")
-        statistics = calculate_series_statistics(data_array, timestamps, groupby, verbose=verbose)
+        statistics = calculate_series_statistics(data_array, timestamps, groupby)
 
     # Basic metadata
     basic_metadata = (
