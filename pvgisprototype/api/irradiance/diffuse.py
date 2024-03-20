@@ -499,6 +499,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
     random_time_series: bool = False,
     global_horizontal_component: Optional[Path] = None,
     direct_horizontal_component: Optional[Path] = None,
+    mask_and_scale: bool = False,
+    neighbor_lookup: MethodsForInexactMatches = None,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    in_memory: bool = False,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
@@ -517,10 +521,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
     time_output_units: str = "minutes",
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
-    mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
-    in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     multi_thread: bool = True,
@@ -558,67 +558,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
     - surface_orientation :
     - diffuse_irradiance
     """
-    # 1. calculate diffuse based on external global and direct irradiance components
-    if global_horizontal_component and direct_horizontal_component:
-        horizontal_irradiance_components = (
-            read_horizontal_irradiance_components_from_sarah(
-                shortwave=global_horizontal_component,
-                direct=direct_horizontal_component,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                timestamps=timestamps,
-                mask_and_scale=mask_and_scale,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                in_memory=in_memory,
-                multi_thread=multi_thread,
-                verbose=verbose,
-                log=log,
-            )
-        )
-        global_horizontal_irradiance_series = horizontal_irradiance_components[
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-        direct_horizontal_irradiance_series = horizontal_irradiance_components[
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-        diffuse_horizontal_irradiance_series = (
-            calculate_diffuse_horizontal_component_from_sarah(
-                global_horizontal_irradiance_series=global_horizontal_irradiance_series,
-                direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
-                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                # timestamps=timestamps,
-                # neighbor_lookup=neighbor_lookup,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=0,
-                log=log,
-            )
-        )
-
-    else:  # from the model
-        direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
-        longitude=longitude,
-        latitude=latitude,
-        elevation=elevation,
-        timestamps=timestamps,
-        timezone=timezone,
-        linke_turbidity_factor_series=linke_turbidity_factor_series,
-        solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
-        solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        angle_output_units=angle_output_units,
-        dtype=dtype,
-        array_backend=array_backend,
-        verbose=0,  # no verbosity here by choice!
-        log=log,
-    )
-
-    # 2. Get quantities to calculate the diffuse horizontal irradiance
+    # Calculate quantities required : ---------------------------- >>> >>> >>>
+    # 1. to model the diffuse horizontal irradiance [optional]
+    # 2. to calculate the diffuse sky ... to consider shaded, sunlit and potentially sunlit surfaces
+    #
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
@@ -632,7 +575,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
             log=log,
         )
     )
-
     # extraterrestrial on a horizontal surface requires the solar altitude
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
@@ -659,13 +601,80 @@ def calculate_diffuse_inclined_irradiance_time_series(
         extraterrestrial_normal_irradiance_series
         * np.sin(solar_altitude_series.radians)
     )
-    diffuse_horizontal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series
-        * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
-        * diffuse_solar_altitude_function_time_series(
-            solar_altitude_series, linke_turbidity_factor_series
+    # Calculate quantities required : ---------------------------- <<< <<< <<<
+
+    # ----------------------------------- Diffuse Horizontal Irradiance -- >>>
+    # Based on external global and direct irradiance components
+    if global_horizontal_component and direct_horizontal_component:
+        horizontal_irradiance_components = (
+            read_horizontal_irradiance_components_from_sarah(
+                shortwave=global_horizontal_component,
+                direct=direct_horizontal_component,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                timestamps=timestamps,
+                mask_and_scale=mask_and_scale,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                in_memory=in_memory,
+                multi_thread=multi_thread,
+                verbose=verbose,
+                log=log,
+            )
         )
-    )
+        global_horizontal_irradiance_series = horizontal_irradiance_components[
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        direct_horizontal_irradiance_series = horizontal_irradiance_components[
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        diffuse_horizontal_irradiance_series = calculate_diffuse_horizontal_component_from_sarah(
+            global_horizontal_irradiance_series=global_horizontal_irradiance_series,
+            direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
+            # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+            # timestamps=timestamps,
+            # neighbor_lookup=neighbor_lookup,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            log=log,
+        )
+
+    else:  # OR from the model
+        # we still need the direct component, if NOT read fom external series!
+        direct_horizontal_irradiance_series = (
+            calculate_direct_horizontal_irradiance_time_series(
+                longitude=longitude,
+                latitude=latitude,
+                elevation=elevation,
+                timestamps=timestamps,
+                timezone=timezone,
+                linke_turbidity_factor_series=linke_turbidity_factor_series,
+                solar_time_model=solar_time_model,
+                time_offset_global=time_offset_global,
+                hour_offset=hour_offset,
+                solar_constant=solar_constant,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
+                angle_output_units=angle_output_units,
+                dtype=dtype,
+                array_backend=array_backend,
+                verbose=0,  # no verbosity here by choice!
+                log=log,
+            )
+        )
+        diffuse_horizontal_irradiance_series = (
+            extraterrestrial_normal_irradiance_series
+            * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
+            * diffuse_solar_altitude_function_time_series(
+                solar_altitude_series, linke_turbidity_factor_series
+            )
+        )
+    # ----------------------------------- Diffuse Horizontal Irradiance -- <<<
+    
+    # At this point, the diffuse_horizontal_irradiance_series are either :
+    # calculated from external time series  Or  modelled 
 
     if surface_tilt == 0:  # horizontal surface however ..
         diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series
