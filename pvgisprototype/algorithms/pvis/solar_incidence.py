@@ -29,6 +29,7 @@ def calculate_solar_incidence_pvis(
     surface_orientation: float = 180,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    log: int = 0,
 ) -> SolarIncidence:
     """Calculate the angle of incidence (θ) between the direction of the sun
     ray and the line normal to the surface measured in radian.

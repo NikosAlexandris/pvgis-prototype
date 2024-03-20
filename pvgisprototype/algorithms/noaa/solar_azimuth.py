@@ -45,6 +45,7 @@ def calculate_solar_azimuth_noaa(
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     verbose: int = 0,
+    log: int = 0,
 )-> SolarAzimuth:
     """Calculate the solar azimuth angle (θ) in radians
 

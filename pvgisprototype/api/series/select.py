@@ -19,6 +19,7 @@ from pvgisprototype.api.series.hardcodings import check_mark
 from pvgisprototype.api.series.hardcodings import x_mark
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
+from pandas import DatetimeIndex
 
 
 @log_function_call
@@ -27,9 +28,10 @@ def select_time_series(
     time_series: Path,
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: Optional[Any],
+    timestamps: DatetimeIndex,
     start_time: Optional[datetime] = None,
     end_time: Optional[datetime] = None,
+    remap_to_month_start: Optional[bool] = False,
     # convert_longitude_360: bool = False,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
@@ -67,7 +69,7 @@ def select_time_series(
         # log=log,
     )
     # ------------------------------------------------------------------------
-    if start_time or end_time:
+    if (start_time or end_time) and not remap_to_month_start:
         timestamps = None  # we don't need a timestamp anymore!
 
         if start_time and not end_time:  # set `end_time` to end of series
@@ -86,6 +88,17 @@ def select_time_series(
             )
         except Exception as e:
             print(f"No data found for the given period {start_time} and {end_time}.")
+
+    if remap_to_month_start:
+        month_start_timestamps = timestamps.map(
+            lambda timestamp: timestamp.replace(day=1, hour=0, minute=0, second=0)
+        )
+        try:
+            location_time_series = location_time_series.sel(
+                time=month_start_timestamps, method=neighbor_lookup
+            )
+        except Exception as e:
+            print(f"No data found for the given 'month start' timestamps {month_start_timestamps}.")
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
