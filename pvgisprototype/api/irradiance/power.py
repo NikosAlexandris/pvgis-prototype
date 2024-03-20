@@ -382,8 +382,12 @@ def calculate_photovoltaic_power_output_series(
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
-            global_horizontal_component=global_horizontal_irradiance,
+            global_horizontal_component=global_horizontal_irradiance,  # time series optional
             direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            mask_and_scale=mask_and_scale,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
@@ -395,7 +399,6 @@ def calculate_photovoltaic_power_output_series(
             time_output_units=time_output_units,
             angle_units=angle_units,
             angle_output_units=angle_output_units,
-            neighbor_lookup=neighbor_lookup,
             dtype=dtype,
             array_backend=array_backend,
             multi_thread=multi_thread,
@@ -422,7 +425,12 @@ def calculate_photovoltaic_power_output_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             albedo=albedo,
-            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            global_horizontal_component=global_horizontal_irradiance,  # time series optional
+            # direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            mask_and_scale=mask_and_scale,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
@@ -506,6 +514,7 @@ def calculate_photovoltaic_power_output_series(
                             log=log,
                             ).to_numpy().astype(dtype=dtype),
                         unit=WIND_SPEED_UNIT)
+
             if isinstance(spectral_factor_series, Path):
                 spectral_factor_series = SpectralFactorSeries(
                         value = select_time_series(
@@ -525,6 +534,8 @@ def calculate_photovoltaic_power_output_series(
                             log=log,
                             ).to_numpy().astype(dtype=dtype),
                         unit=UNITLESS)
+
+            # spectral_factor_series = np.full(len(timestamps), 0.9, dtype=dtype)
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
                 spectral_factor_series=spectral_factor_series,
                 irradiance_series=global_irradiance_series,
