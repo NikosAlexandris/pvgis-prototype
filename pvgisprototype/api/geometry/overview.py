@@ -74,6 +74,7 @@ def model_solar_geometry_overview(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """Model solar geometry parameters for a position and moment in time.
 
@@ -353,6 +354,7 @@ def calculate_solar_geometry_overview(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
     """
     Calculates the solar position using all models and returns the results in a table.
@@ -385,6 +387,7 @@ def calculate_solar_geometry_overview(
                 dtype=dtype,
                 backend=array_backend,
                 verbose=verbose,
+                log=log,
             )
             results.append({
                 TIME_ALGORITHM_NAME: solar_azimuth.timing_algorithm if solar_altitude.timing_algorithm == solar_azimuth.timing_algorithm else NOT_AVAILABLE,

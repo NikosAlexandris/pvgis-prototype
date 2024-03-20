@@ -40,7 +40,7 @@ import typer
 @log_function_call
 def photovoltaic_efficiency_time_series(
     irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
-    spectral_factor=None,
+    spectral_factor_series=1,
     temperature_series: Annotated[TemperatureSeries, typer_option_temperature_series] = TEMPERATURE_DEFAULT,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
@@ -59,7 +59,7 @@ def photovoltaic_efficiency_time_series(
     # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
     photovoltaic_efficiency_time_series = calculate_pv_efficiency_time_series(
         irradiance_series=irradiance_series,
-        spectral_factor=spectral_factor,
+        spectral_factor_series=spectral_factor_series,
         temperature_series=temperature_series,
         photovoltaic_module=photovoltaic_module,
         standard_test_temperature=standard_test_temperature,

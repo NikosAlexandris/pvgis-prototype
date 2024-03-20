@@ -107,12 +107,13 @@ class AdjustSolarZenithForAtmosphericRefractionNOAAInput(
     VerbosityModel,
     LoggingModel,
 ):
-    @field_validator('solar_zenith')
-    @classmethod
-    def solar_zenith_range(cls, v):
-        if not (0 <= v.radians <= pi):
-            raise ValueError('solar_zenith must range within [0, π]')
-        return v
+    # @field_validator('solar_zenith')
+    # @classmethod
+    # def solar_zenith_range(cls, v):
+    #     if not (0 <= v.radians <= pi):
+    #         raise ValueError('solar_zenith must range within [0, π]')
+    #     return v
+    pass
 
 
 class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
