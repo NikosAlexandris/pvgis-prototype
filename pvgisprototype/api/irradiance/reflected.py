@@ -58,6 +58,7 @@ from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.constants import DEGREES
 
 
 @log_function_call
@@ -112,8 +113,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     if global_horizontal_component:
         global_horizontal_irradiance_series = select_time_series(
             time_series=global_horizontal_component,
-            longitude=longitude,
-            latitude=latitude,
+            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
             timestamps=timestamps,
             mask_and_scale=mask_and_scale,
             neighbor_lookup=neighbor_lookup,
