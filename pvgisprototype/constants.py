@@ -131,6 +131,7 @@ EFFICIENCY = 'Efficiency'
 EFFICIENCY_COLUMN_NAME = 'Efficiency %'
 EFFICIENCY_FACTOR = 'Factor'
 EFFICIENCY_FACTOR_COLUMN_NAME = 'Factor %'
+SPECTRAL_FACTOR_COLUMN_NAME = 'Spectral factor %'
 LOSS_NAME = 'Loss'
 
 LONGITUDE = 'Longitude'
