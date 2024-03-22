@@ -65,6 +65,7 @@ from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -113,7 +114,7 @@ def get_global_irradiance_time_series(
     in_memory: Annotated[bool, typer_option_in_memory] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
-    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,

@@ -57,6 +57,8 @@ from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
@@ -132,7 +134,7 @@ def calculate_photovoltaic_power_output_series(
     multi_thread: bool = True,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: LinkeTurbidityFactor = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = ALBEDO_DEFAULT,

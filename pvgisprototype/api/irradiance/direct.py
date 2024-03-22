@@ -419,7 +419,7 @@ def calculate_direct_normal_irradiance_time_series(
     start_time: Optional[datetime] = None,
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT, # REVIEW-ME + Typer Parser
     optical_air_mass_series: OpticalAirMass = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
