@@ -902,7 +902,6 @@ typer_option_wind_speed_series = typer.Option(
 ## Linke turbidity
 
 def parse_linke_turbidity_factor_series(
-    ctx: Context,
     linke_turbidity_factor_input: str,
 ):
     """
@@ -912,15 +911,14 @@ def parse_linke_turbidity_factor_series(
 
     """
     try:
-        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
-        if isinstance(linke_turbidity_factor_input, str):
-            linke_turbidity_factor_input = np.fromstring(
-                linke_turbidity_factor_input, sep=",", dtype=dtype
-            )
-        else:
-            linke_turbidity_factor_input = np.array(
-                linke_turbidity_factor_input, dtype=dtype
-            )
+        if isinstance(linke_turbidity_factor_input, int):
+            return linke_turbidity_factor_input
+
+        if isinstance(linke_turbidity_factor_input, str) and linke_turbidity_factor_input == '0':
+            linke_turbidity_factor_input = np.array([int(linke_turbidity_factor_input)])
+
+        elif isinstance(linke_turbidity_factor_input, str):
+            linke_turbidity_factor_input = np.fromstring(linke_turbidity_factor_input, sep=',')
 
         return linke_turbidity_factor_input
 
@@ -929,16 +927,24 @@ def parse_linke_turbidity_factor_series(
         return None
 
 
-def linke_turbidity_factor_callback(ctx: Context, value: np.array):
-    if np.any(value):
-        return LinkeTurbidityFactor(value=value, unit=LINKE_TURBIDITY_UNIT)
+def linke_turbidity_factor_callback(
+    ctx: Context,
+    linke_turbidity_factor_series: np.array,
+):
+    if linke_turbidity_factor_series is None:
+        return np.ndarray([]) 
+
+    if linke_turbidity_factor_series is not None:
+        return LinkeTurbidityFactor(linke_turbidity_factor_series=linke_turbidity_factor_series, unit=LINKE_TURBIDITY_UNIT)
+
     else:
         timestamps = ctx.params.get('timestamps')
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
         linke_turbidity = np.array(
             [LINKE_TURBIDITY_DEFAULT for _ in timestamps], dtype=dtype
         )
-        return LinkeTurbidityFactor(value=linke_turbidity, unit=LINKE_TURBIDITY_UNIT)
+
+        return LinkeTurbidityFactor(linke_turbidity_factor_series=linke_turbidity, unit=LINKE_TURBIDITY_UNIT)
 
 
 linke_turbidity_factor_typer_help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
