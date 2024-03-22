@@ -15,6 +15,7 @@ from rich import print
 from datetime import datetime
 from pvgisprototype.validation.arrays import create_array
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
@@ -403,7 +404,7 @@ def calculate_global_irradiance_time_series(
                 end_time=end_time,
                 timezone=timezone,
                 random_time_series=random_time_series,
-                direct_horizontal_component=direct_horizontal_irradiance,  # external time series, optional
+                direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
                 mask_and_scale=mask_and_scale,
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
@@ -450,8 +451,8 @@ def calculate_global_irradiance_time_series(
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
-            global_horizontal_component=global_horizontal_irradiance,
-            direct_horizontal_component=direct_horizontal_irradiance,  # external time series, optional
+            global_horizontal_component=global_horizontal_irradiance,  # time series optional
+            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
