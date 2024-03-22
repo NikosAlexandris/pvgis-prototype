@@ -3,6 +3,7 @@ from typing import Optional
 from pathlib import Path
 from datetime import datetime
 import numpy as np
+from pvgisprototype.api.irradiance.shortwave import calculate_global_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.shortwave import calculate_global_irradiance_time_series
 from pvgisprototype.algorithms.pvis.power import calculate_spectrally_resolved_global_irradiance_series
 import typer
@@ -79,6 +80,7 @@ from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from rich import print
 
 
 app = typer.Typer(
@@ -88,6 +90,119 @@ app = typer.Typer(
     rich_markup_mode="rich",
     help=f"Estimate the global irradiance incident on a surface over a time series ",
 )
+@app.command(
+    'horizontal',
+    no_args_is_help=True,
+    help=f'Calculate the broadband global horizontal irradiance over a time series',
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
+def get_global_horizontal_irradiance_time_series(
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_time_series: bool = False,
+    global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,
+    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
+    # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    verbose: Annotated[int, typer_option_verbose] = False,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
+    index: Annotated[bool, typer_option_index] = False,
+):
+    """Calculate the global horizontal irradiance (GHI)
+
+    The global horizontal irradiance represents the total amount of shortwave
+    radiation received from above by a surface horizontal to the ground. It
+    includes both the direct and the diffuse solar radiation.
+    """
+    results = calculate_global_horizontal_irradiance_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        timestamps=timestamps,
+        start_time=start_time,
+        frequency=frequency,
+        end_time=end_time,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        albedo=albedo,
+        apply_angular_loss_factor=apply_angular_loss_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        verbose=verbose,
+        log=log,
+    )
+    if verbose > 0:
+        print_irradiance_table_2(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=results,
+            title=results['Title'] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
+            rounding_places=rounding_places,
+            index=index,
+            verbose=verbose,
+        )
+        if statistics:
+            print_series_statistics(
+                data_array=results[GLOBAL_INCLINED_IRRADIANCE],
+                timestamps=timestamps,
+                title="Global irradiance",
+                rounding_places=rounding_places,
+            )
+        if csv:
+            write_irradiance_csv(
+                longitude=None,
+                latitude=None,
+                timestamps=timestamps,
+                dictionary=results,
+                filename=csv,
+            )
+    else:
+        print(results)
 
 
 @app.command(
