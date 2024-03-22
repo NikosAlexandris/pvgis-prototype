@@ -114,8 +114,9 @@ theme:
     - search.highlight
     - search.share
     - content.tooltips
-    - content.action.edit
+    - content.code.copy
     - content.action.view
+    - content.action.edit
     - navigation.top
     - navigation.instant
     - navigation.instant.progress
