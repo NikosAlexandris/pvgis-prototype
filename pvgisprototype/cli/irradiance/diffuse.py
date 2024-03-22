@@ -36,14 +36,14 @@ from pvgisprototype.cli.typer_parameters import typer_argument_direct_horizontal
 from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_term_n_series
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_linke_turbidity_factor
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude_series
-from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
+from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
@@ -257,8 +257,8 @@ def diffuse_inclined_irradiance_time_series(
     random_time_series: bool = False,
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
-    surface_tilt: Annotated[float, typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[float, typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT, # REVIEW-ME + Typer Parser
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -295,8 +295,8 @@ def diffuse_inclined_irradiance_time_series(
         random_time_series=random_time_series,
         global_horizontal_component=global_horizontal_irradiance,
         direct_horizontal_component=direct_horizontal_irradiance,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,

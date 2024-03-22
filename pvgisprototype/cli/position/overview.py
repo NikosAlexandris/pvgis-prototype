@@ -10,8 +10,6 @@ from zoneinfo import ZoneInfo
 from rich import print
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
@@ -55,10 +53,10 @@ def overview(
     latitude: Annotated[float, typer_argument_latitude],
     timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
-    random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.pvlib],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -110,8 +108,8 @@ def overview(
         latitude=latitude,
         timestamp=timestamp,
         timezone=timezone,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         solar_time_model=solar_time_model,

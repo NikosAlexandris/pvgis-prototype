@@ -24,8 +24,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_met
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
@@ -112,8 +112,8 @@ def get_global_irradiance_time_series(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -160,8 +160,8 @@ def get_global_irradiance_time_series(
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         in_memory=in_memory,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
@@ -233,8 +233,8 @@ def get_spectrally_resolved_global_irradiance_series(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -286,8 +286,8 @@ def get_spectrally_resolved_global_irradiance_series(
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         in_memory=in_memory,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,

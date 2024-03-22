@@ -34,10 +34,10 @@ from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lo
 from pvgisprototype.cli.typer_parameters import typer_option_tolerance
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_in_memory
-from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
@@ -327,8 +327,8 @@ def get_direct_inclined_irradiance_time_series_pvgis(
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         in_memory=in_memory,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
