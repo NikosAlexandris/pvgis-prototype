@@ -18,8 +18,8 @@ Documentation for all command line tools.
 
 # ::: pvgisprototype.cli.time
 
-# ::: pvgisprototype.cli.position
+<!-- # ::: pvgisprototype.cli.position -->
 
-# ::: pvgisprototype.cli.surface
+<!-- # ::: pvgisprototype.cli.surface -->
 
-# ::: pvgisprototype.cli.utilities
+<!-- # ::: pvgisprototype.cli.utilities -->
