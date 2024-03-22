@@ -124,8 +124,8 @@ def write_solar_position_series_csv(
     zenith=None,
     altitude=None,
     azimuth=None,
-    surface_tilt=None,
     surface_orientation=None,
+    surface_tilt=None,
     incidence=None,
     user_requested_timestamps=None,
     user_requested_timezone=None,
@@ -253,8 +253,8 @@ def write_solar_position_series_csv(
     zenith=None,
     altitude=None,
     azimuth=None,
-    surface_tilt=None,
     surface_orientation=None,
+    surface_tilt=None,
     incidence=None,
     user_requested_timestamps=None,
     user_requested_timezone=None,
@@ -314,8 +314,8 @@ def write_solar_position_series_csv(
             zenith_value = safe_get_value(model_result, ZENITH_NAME, _index) if zenith else None
             altitude_value = safe_get_value(model_result, ALTITUDE_NAME, _index) if altitude else None
             azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, _index) if azimuth else None
-            surface_tilt = safe_get_value(model_result, SURFACE_TILT_NAME, _index) if surface_tilt else None
             surface_orientation = safe_get_value(model_result, SURFACE_ORIENTATION_NAME, _index) if surface_orientation else None
+            surface_tilt = safe_get_value(model_result, SURFACE_TILT_NAME, _index) if surface_tilt else None
             incidence_value = safe_get_value(model_result, INCIDENCE_NAME, _index) if incidence else None
             units = safe_get_value(model_result, UNITS_NAME, UNITLESS)
 
@@ -361,10 +361,10 @@ def write_solar_position_series_csv(
             if azimuth_value is not None:
                 row.append(str(azimuth_value))
             if incidence_value is not None:
-                if surface_tilt is not None:
-                    row.append(str(surface_tilt))
                 if surface_orientation is not None:
                     row.append(str(surface_orientation))
+                if surface_tilt is not None:
+                    row.append(str(surface_tilt))
                 row.append(str(incidence_value))
             row.append(str(units))
             rows.append(row)

@@ -58,10 +58,10 @@ def incidence(
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     random_time: Annotated[bool, typer_option_random_time] = RANDOM_DAY_FLAG_DEFAULT,
     hour_angle: Annotated[Optional[float], typer_argument_hour_angle] = None,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
-    random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -101,13 +101,13 @@ def incidence(
     # if not given, optimise tilt and orientation... ?
     # ------------------------------------------------------------------------
 
-    if random_surface_tilt:
-        import random
-        surface_tilt = random.uniform(0, pi/2)  # radians
-
     if random_surface_orientation:
         import random
         surface_tilt = random.vonmisesvariate(pi, kappa=0)  # radians
+
+    if random_surface_tilt:
+        import random
+        surface_tilt = random.uniform(0, pi/2)  # radians
 
     solar_incidence_models = select_models(SolarIncidenceModel, solar_incidence_model)  # Using a callback fails!
     solar_incidence = calculate_solar_incidence(
@@ -117,8 +117,8 @@ def incidence(
         timezone=timezone,
         solar_incidence_models=solar_incidence_models,
         complementary_incidence_angle=complementary_incidence_angle,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         solar_time_model=solar_time_model,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,

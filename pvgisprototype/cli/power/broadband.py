@@ -25,8 +25,6 @@ from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype import TemperatureSeries
 from pvgisprototype.cli.typer_parameters import typer_argument_temperature_series
@@ -226,8 +224,8 @@ def photovoltaic_power_output_series(
         dtype=dtype,
         array_backend=array_backend,
         multi_thread=multi_thread,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,

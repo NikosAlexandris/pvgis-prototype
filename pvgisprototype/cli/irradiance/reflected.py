@@ -19,8 +19,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
@@ -91,8 +91,8 @@ def get_ground_reflected_inclined_irradiance_time_series(
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = None,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = None,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT, # REVIEW-ME + Typer Parser
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -141,8 +141,8 @@ def get_ground_reflected_inclined_irradiance_time_series(
         frequency=frequency,
         end_time=end_time,
         timezone=timezone,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,

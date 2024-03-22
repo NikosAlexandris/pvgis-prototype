@@ -25,9 +25,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_end_time
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pvgisprototype.cli.typer_parameters import typer_option_local_time
 from pvgisprototype.cli.typer_parameters import typer_option_random_time
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_option_random_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_option_random_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_argument_hour_angle
 from pvgisprototype.cli.typer_parameters import typer_argument_true_solar_time
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
