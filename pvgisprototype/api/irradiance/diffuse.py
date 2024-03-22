@@ -250,10 +250,9 @@ def calculate_diffuse_horizontal_component_from_sarah(
     ).astype(dtype=dtype)
 
     if diffuse_horizontal_irradiance_series.size == 1:
-        single_value = float(diffuse_horizontal_irradiance_series.values)
+        single_value = float(diffuse_horizontal_irradiance_series)
         warning = (
             f"{exclamation_mark} The selected timestamp "
-            + f"{diffuse_horizontal_irradiance_series.time.values}"
             + f" matches the single value "
             + f"{single_value}"
         )

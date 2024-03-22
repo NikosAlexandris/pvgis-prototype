@@ -187,6 +187,7 @@ def calculate_solar_incidence_jenco(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> SolarIncidence:
     """Calculate the solar incidence angle 
 
