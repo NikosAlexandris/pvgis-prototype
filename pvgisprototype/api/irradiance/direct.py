@@ -68,8 +68,8 @@ from pvgisprototype.cli.typer_parameters import typer_option_optical_air_mass_se
 from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
+from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
 from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
@@ -655,7 +655,6 @@ def calculate_direct_horizontal_irradiance_time_series(
     # Initialize the direct irradiance series to zeros
     direct_horizontal_irradiance_series = np.zeros_like(solar_altitude_series.radians)
     if np.any(mask):
-        # direct_horizontal_irradiance_series = direct_normal_irradiance_series * np.sin(solar_altitude_series_array)
         direct_horizontal_irradiance_series[mask] = (
             direct_normal_irradiance_series * np.sin(solar_altitude_series.radians)
         )[mask]
@@ -735,8 +734,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -808,8 +807,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         timezone=timezone,
         random_time_series=random_time_series,
         solar_incidence_model=solar_incidence_model,
-        surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         time_output_units=time_output_units,
