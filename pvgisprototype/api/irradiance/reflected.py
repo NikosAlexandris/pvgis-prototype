@@ -53,6 +53,7 @@ from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.api.series.select import select_time_series
@@ -109,109 +110,122 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     albedo ρg and a fraction of the ground viewed by an inclined surface
     rg(γN).
     """
-    # - based on external global and direct irradiance components
-    if global_horizontal_component:
-        global_horizontal_irradiance_series = select_time_series(
-            time_series=global_horizontal_component,
-            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-            timestamps=timestamps,
-            mask_and_scale=mask_and_scale,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            in_memory=in_memory,
-            log=log,
-        ).to_numpy().astype(dtype=dtype)
-    else:  # or from the model
-        direct_horizontal_irradiance_series = (
-            calculate_direct_horizontal_irradiance_time_series(
+    # if surface_tilt == 0:  # horizontally flat surface
+    surface_tilt_threshold = 0.0001
+    if surface_tilt <= surface_tilt_threshold:
+        ground_reflected_inclined_irradiance_series = 0
+        global_horizontal_irradiance_series = ground_view_fraction = (
+            direct_horizontal_irradiance_series
+        ) = diffuse_horizontal_irradiance_series = (
+            extraterrestrial_normal_irradiance_series
+        ) = solar_altitude_series = ground_reflected_irradiance_loss_factor = (
+            NOT_AVAILABLE
+        )
+
+    else:
+        # - based on external global and direct irradiance components
+        if global_horizontal_component:
+            global_horizontal_irradiance_series = select_time_series(
+                time_series=global_horizontal_component,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                timestamps=timestamps,
+                mask_and_scale=mask_and_scale,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                in_memory=in_memory,
+                log=log,
+            ).to_numpy().astype(dtype=dtype)
+        else:  # or from the model
+            direct_horizontal_irradiance_series = (
+                calculate_direct_horizontal_irradiance_time_series(
+                    longitude=longitude,
+                    latitude=latitude,
+                    elevation=elevation,
+                    timestamps=timestamps,
+                    start_time=start_time,
+                    frequency=frequency,
+                    end_time=end_time,
+                    timezone=timezone,
+                    linke_turbidity_factor_series=linke_turbidity_factor_series,
+                    solar_time_model=solar_time_model,
+                    time_offset_global=time_offset_global,
+                    hour_offset=hour_offset,
+                    solar_constant=solar_constant,
+                    perigee_offset=perigee_offset,
+                    eccentricity_correction_factor=eccentricity_correction_factor,
+                    angle_output_units=angle_output_units,
+                    dtype=dtype,
+                    array_backend=array_backend,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                )
+            )
+            extraterrestrial_normal_irradiance_series = (
+                calculate_extraterrestrial_normal_irradiance_time_series(
+                    timestamps=timestamps,
+                    solar_constant=solar_constant,
+                    perigee_offset=perigee_offset,
+                    eccentricity_correction_factor=eccentricity_correction_factor,
+                    random_days=random_days,
+                    dtype=dtype,
+                    array_backend=array_backend,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                )
+            )
+            # extraterrestrial on a horizontal surface requires the solar altitude
+            solar_altitude_series = model_solar_altitude_time_series(
                 longitude=longitude,
                 latitude=latitude,
-                elevation=elevation,
                 timestamps=timestamps,
-                start_time=start_time,
-                frequency=frequency,
-                end_time=end_time,
                 timezone=timezone,
-                linke_turbidity_factor_series=linke_turbidity_factor_series,
+                solar_position_model=solar_position_model,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                refracted_solar_zenith=refracted_solar_zenith,
                 solar_time_model=solar_time_model,
                 time_offset_global=time_offset_global,
                 hour_offset=hour_offset,
-                solar_constant=solar_constant,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
+                time_output_units=time_output_units,
+                angle_units=angle_units,
                 angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
-                verbose=0,  # no verbosity here by choice!
+                verbose=0,
                 log=log,
             )
-        )
-        extraterrestrial_normal_irradiance_series = (
-            calculate_extraterrestrial_normal_irradiance_time_series(
-                timestamps=timestamps,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                random_days=random_days,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=0,  # no verbosity here by choice!
-                log=log,
+            diffuse_horizontal_irradiance_series = (
+                extraterrestrial_normal_irradiance_series
+                * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
+                * diffuse_solar_altitude_function_time_series(
+                    solar_altitude_series, linke_turbidity_factor_series
+                )
             )
-        )
-        # extraterrestrial on a horizontal surface requires the solar altitude
-        solar_altitude_series = model_solar_altitude_time_series(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
-            solar_position_model=solar_position_model,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
-            solar_time_model=solar_time_model,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
-            dtype=dtype,
-            array_backend=array_backend,
-            verbose=0,
-            log=log,
-        )
-        diffuse_horizontal_irradiance_series = (
-            extraterrestrial_normal_irradiance_series
-            * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
-            * diffuse_solar_altitude_function_time_series(
-                solar_altitude_series, linke_turbidity_factor_series
+            global_horizontal_irradiance_series = (
+                direct_horizontal_irradiance_series + diffuse_horizontal_irradiance_series
             )
-        )
-        global_horizontal_irradiance_series = (
-            direct_horizontal_irradiance_series + diffuse_horizontal_irradiance_series
+
+        # At this point, the global_horizontal_irradiance_series are either :
+        # calculated from external time series  Or  modelled 
+
+        # clear-sky ground reflected irradiance
+        ground_view_fraction = (1 - cos(surface_tilt)) / 2
+        ground_reflected_inclined_irradiance_series = (
+            albedo * global_horizontal_irradiance_series * ground_view_fraction
         )
 
-    # At this point, the global_horizontal_irradiance_series are either :
-    # calculated from external time series  Or  modelled 
-
-    # clear-sky ground reflected irradiance
-    ground_view_fraction = (1 - cos(surface_tilt)) / 2
-    ground_reflected_inclined_irradiance_series = (
-        albedo * global_horizontal_irradiance_series * ground_view_fraction
-    )
-
-    if apply_angular_loss_factor:
-        ground_reflected_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
-            surface_tilt - sin(surface_tilt)
-        ) / (1 - cos(surface_tilt))
-        ground_reflected_irradiance_loss_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
-            indirect_angular_loss_coefficient=ground_reflected_irradiance_angular_loss_coefficient,
-        )
-        ground_reflected_inclined_irradiance_series *= (
-            ground_reflected_irradiance_loss_factor
-        )
+        if apply_angular_loss_factor:
+            ground_reflected_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
+                surface_tilt - sin(surface_tilt)
+            ) / (1 - cos(surface_tilt))
+            ground_reflected_irradiance_loss_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
+                indirect_angular_loss_coefficient=ground_reflected_irradiance_angular_loss_coefficient,
+            )
+            ground_reflected_inclined_irradiance_series *= (
+                ground_reflected_irradiance_loss_factor
+            )
 
     components_container = {
         'main': lambda: {
@@ -220,7 +234,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
         },
 
         'extended': lambda: {
-            LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor if apply_angular_loss_factor else '-',
+            LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor if apply_angular_loss_factor and not all(ground_reflected_inclined_irradiance_series == 0) else 0 if all(ground_reflected_inclined_irradiance_series == 0) else '-',
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
         } if verbose > 1 else {},
@@ -233,14 +247,13 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
 
         'even_more_extended': lambda: {
             TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE + " & horizontal components",
-            LOSS_COLUMN_NAME: 1 - ground_reflected_irradiance_loss_factor,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
         } if verbose > 3 else {},
 
         'and_even_more_extended': lambda: {
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
+            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE),
         } if verbose > 4 else {},
 
         'extra': lambda: {
