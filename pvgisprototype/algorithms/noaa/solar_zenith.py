@@ -314,19 +314,18 @@ def calculate_solar_zenith_time_series_noaa(
         sin(latitude.radians) * np.sin(solar_declination_series.radians)
         + cos(latitude.radians) * np.cos(solar_declination_series.radians) * np.cos(solar_hour_angle_series.radians)
     )
-    solar_zenith_series = np.arccos(cosine_solar_zenith)
-
-    if apply_atmospheric_refraction:
-        solar_zenith_series = (
-            adjust_solar_zenith_for_atmospheric_refraction_time_series(
-                SolarZenith(
-                    value=solar_zenith_series,
+    solar_zenith_series = SolarZenith(
+                    value=np.arccos(cosine_solar_zenith),  # Important !
                     unit=RADIANS,
                     timing_algorithm="NOAA",
                     position_algorithm="NOAA",
                 )
+    if apply_atmospheric_refraction:
+        solar_zenith_series = (
+            adjust_solar_zenith_for_atmospheric_refraction_time_series(
+                    solar_zenith_series,
+                )
             )
-        )
 
     if not np.all(np.isfinite(solar_zenith_series.radians)) or not np.all(
         (SolarZenith().min_radians <= solar_zenith_series.radians)
