@@ -538,7 +538,6 @@ def calculate_photovoltaic_power_output_series(
                             ).to_numpy().astype(dtype=dtype),
                         unit=UNITLESS)
 
-            # spectral_factor_series = np.full(len(timestamps), 0.9, dtype=dtype)
             efficiency_coefficient_series = calculate_pv_efficiency_time_series(
                 spectral_factor_series=spectral_factor_series,
                 irradiance_series=global_irradiance_series,
