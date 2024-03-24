@@ -1,4 +1,7 @@
 """
+This Python module is part of PVGIS' API. It implements functions to calculate
+the direct solar irradiance.
+
 _Direct_ or _beam_ irradiance is one of the main components of solar
 irradiance. It comes perpendicular from the Sun and is not scattered before it
 irradiates a surface.
@@ -398,14 +401,14 @@ def calculate_rayleigh_optical_thickness_time_series(
         10.4 + 0.718 * optical_air_mass_series.value[larger_than_20]
     )
 
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
         data=rayleigh_thickness_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
     return RayleighThickness(
         value=rayleigh_thickness_series,
         unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
@@ -643,7 +646,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=verbose,
+        verbose=0,
         show_progress=show_progress,
     )
 
@@ -670,17 +673,17 @@ def calculate_direct_horizontal_irradiance_time_series(
         'extended': lambda: {
             TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME + ' & relevant components',
             DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
-            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-            OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
-            REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME: refracted_solar_altitude_series.value if apply_atmospheric_refraction else np.full_like(refracted_solar_altitude_series.value, np.nan),#else np.array(["-"]),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
         } if verbose > 1 else {},
 
-        'extended': lambda: {
+        'more_extended': lambda: {
+            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+            OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
+            REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME: refracted_solar_altitude_series.value if apply_atmospheric_refraction else np.full_like(refracted_solar_altitude_series.value, np.nan),#else np.array(["-"]),
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
             PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
             ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        } if verbose > 1 else {},
+        } if verbose > 2 else {},
 
         'even_more_extended': lambda: {
             IRRADIANCE_SOURCE_COLUMN_NAME: IRRADIANCE_ALGORITHM_HOFIERKA_2002,
@@ -698,14 +701,14 @@ def calculate_direct_horizontal_irradiance_time_series(
     for key, component in components_container.items():
         components.update(component())
 
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
     if verbose > 0:
         return components
-
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
 
     log_data_fingerprint(
         data=direct_horizontal_irradiance_series,
@@ -963,7 +966,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
         try:
             # per Martin & Ruiz 2005,
-            # expects the typical sun-vector-to-normal-of-surface incidence angles
+            # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
             # which is the _complementary_ of the incidence angle per Hofierka 2002
             angular_loss_factor_series = (
                 calculate_angular_loss_factor_for_direct_irradiance_time_series(
