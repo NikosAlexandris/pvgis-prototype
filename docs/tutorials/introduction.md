@@ -190,7 +190,7 @@ python
 
 ```pycon exec="true" session="dni"
 >>> from math import cos
->>> sid / math.cos(solar_zenith_angle) 
+>>> sid / cos(solar_zenith_angle) 
 ```
  
 Let's compare with PVGIS' model :
