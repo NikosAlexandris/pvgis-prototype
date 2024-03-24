@@ -39,16 +39,17 @@ from pvgisprototype.constants import ELEVATION_MINIMUM
 from pvgisprototype.constants import ELEVATION_MAXIMUM
 from pvgisprototype.constants import SOLAR_DECLINATION_MINIMUM
 from pvgisprototype.constants import SOLAR_DECLINATION_MAXIMUM
-from pvgisprototype.constants import SURFACE_TILT_MINIMUM
-from pvgisprototype.constants import SURFACE_TILT_MAXIMUM
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_MINIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_MAXIMUM
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_MINIMUM
+from pvgisprototype.constants import SURFACE_TILT_MAXIMUM
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT_MINIMUM
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import UNITLESS
+from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_UNIT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
@@ -365,8 +366,7 @@ def surface_tilt_callback(
     """
     if ctx.resilient_parsing:
         return
-    # if type(latitude) != float:
-    #     raise typer.BadParameter("Input should be a float!")
+    
     if not surface_tilt:
         surface_tilt = ctx.params.get('latitude')
         from rich import print
@@ -558,7 +558,7 @@ def validate_path(path: Path) -> Path:
 
 
 def parse_spectral_factor_series(
-    spectral_factor_input: Path, 
+    spectral_factor_input: Union[str, Path],
 ):
     """
     Notes
@@ -567,10 +567,6 @@ def parse_spectral_factor_series(
 
     """
     try:
-        if not Path(spectral_factor_input).is_file():
-            print(f"[red][code]{spectral_factor_input}[/code] is not a file![/red].")
-            raise typer.Exit()
-
         if isinstance(spectral_factor_input, (str, Path)) and Path(spectral_factor_input).exists():
             return Path(spectral_factor_input)
 
@@ -589,41 +585,12 @@ def parse_spectral_factor_series(
         return None
 
 
-def parse_temperature_series(
-    temperature_input: Union[str, int, Path], 
-):
-    """
-    Notes
-    -----
-    FIXME: Re-design ?
-
-    """
-    try:
-        if isinstance(temperature_input, int):
-            return temperature_input
-
-        if isinstance(temperature_input, (str, Path)) and Path(temperature_input).exists():
-            return Path(temperature_input)
-
-        if isinstance(temperature_input, str):
-            temperature_input = np.fromstring(temperature_input, sep=',')
-
-        return temperature_input
-
-    except ValueError as e:  # conversion to float failed
-        print(f"Error parsing input: {e}")
-        return None
-
-
 def spectral_factor_series_argument_callback(
     ctx: Context,
     spectral_factor_series: SpectralFactorSeries,
 ):
     """
     """
-    if spectral_factor_series is None:
-        return np.ndarray([]) 
-
     if isinstance(spectral_factor_series, Path):
         return validate_path(spectral_factor_series)
 
@@ -650,17 +617,69 @@ def spectral_factor_series_argument_callback(
     # How to use print(ctx.get_parameter_source('spectral_factor_series')) ?
     # See : class click.core.ParameterSource(value)
 
+    if isinstance(spectral_factor_series, int) and spectral_factor_series == SPECTRAL_FACTOR_DEFAULT:
+        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        spectral_factor_series = np.full(len(timestamps), SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
+
     # at this point, spectral_factor_series should be an array of size =12 or =timestamps !
-    if spectral_factor_series is not None and any(
-        spectral_factor_series.size
-        != 12 | spectral_factor_series.size
-        != len(timestamps)
-    ):
+    if spectral_factor_series is not None and not any([
+            spectral_factor_series.size == 12,
+            spectral_factor_series.size == timestamps.size
+        ]):
         message = f"The number of `spectral_factor` values ({spectral_factor_series.size}) is neither 12 (monthly values) nor does it match the number of timestamps ({timestamps.size})."
         logger.error(message)
         raise ValueError(message)
 
     return SpectralFactorSeries(value=spectral_factor_series, unit=UNITLESS)
+
+
+def spectral_factor_series_option_callback(
+    ctx: Context,
+    spectral_factor_series: SpectralFactorSeries,
+):
+    """
+    """
+    if spectral_factor_series is None:
+        return np.ndarray([]) 
+
+    reference_series = ctx.params.get('irradiance_series')
+    from pvgisprototype.log import logger
+    if spectral_factor_series is not None and any(
+        spectral_factor_series.size
+        != 12 | spectral_factor_series.size
+        != len(reference_series)
+    ):
+        message = f"The number of `spectral_factor` values ({spectral_factor_series.size}) is neither 12 (monthly values) nor does it match the number of irradiance values ({reference_series.size})."
+        logger.error(message)
+        raise ValueError(message)
+
+    return SpectralFactorSeries(value=spectral_factor_series, unit=UNITLESS)
+
+
+def parse_temperature_series(
+    temperature_input: Union[str, int, Path], 
+):
+    """
+    Notes
+    -----
+    FIXME: Re-design ?
+
+    """
+    try:
+        # if isinstance(temperature_input, int):
+        #     return temperature_input
+
+        if isinstance(temperature_input, (str, Path)) and Path(temperature_input).exists():
+            return Path(temperature_input)
+
+        if isinstance(temperature_input, str):
+            temperature_input = np.fromstring(temperature_input, sep=',')
+
+        return temperature_input
+
+    except ValueError as e:  # conversion to float failed
+        print(f"Error parsing input: {e}")
+        return None
 
 
 def temperature_series_argument_callback(
@@ -705,29 +724,6 @@ def temperature_series_argument_callback(
         raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(timestamps)}).")
 
     return TemperatureSeries(value=temperature_series, unit=TEMPERATURE_UNIT)
-
-
-def spectral_factor_series_option_callback(
-    ctx: Context,
-    spectral_factor_series: SpectralFactorSeries,
-):
-    """
-    """
-    if spectral_factor_series is None:
-        return np.ndarray([]) 
-
-    reference_series = ctx.params.get('irradiance_series')
-    from pvgisprototype.log import logger
-    if spectral_factor_series is not None and any(
-        spectral_factor_series.size
-        != 12 | spectral_factor_series.size
-        != len(reference_series)
-    ):
-        message = f"The number of `spectral_factor` values ({spectral_factor_series.size}) is neither 12 (monthly values) nor does it match the number of irradiance values ({reference_series.size})."
-        logger.error(message)
-        raise ValueError(message)
-
-    return SpectralFactorSeries(value=spectral_factor_series, unit=UNITLESS)
 
 
 def temperature_series_option_callback(

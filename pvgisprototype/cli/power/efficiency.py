@@ -19,6 +19,8 @@ from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype import WindSpeedSeries
 from pvgisprototype.cli.typer_parameters import typer_option_wind_speed_series
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype import SpectralFactorSeries
+from pvgisprototype.cli.typer_parameters import typer_argument_spectral_factor_series
 from pvgisprototype.cli.typer_parameters import typer_option_pv_power_algorithm
 from pvgisprototype.cli.typer_parameters import typer_option_module_temperature_algorithm
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
@@ -32,6 +34,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_photovoltaic_module
 from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
 from pvgisprototype.constants import EFFICIENCY
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
+from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.cli.print import print_quantity_table
 from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
 import typer
@@ -40,7 +43,7 @@ import typer
 @log_function_call
 def photovoltaic_efficiency_time_series(
     irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
-    spectral_factor_series=1,
+    spectral_factor_series: Annotated[Path|SpectralFactorSeries, typer_argument_spectral_factor_series] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[TemperatureSeries, typer_option_temperature_series] = TEMPERATURE_DEFAULT,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
@@ -55,8 +58,6 @@ def photovoltaic_efficiency_time_series(
     index: Annotated[bool, typer_option_index] = False,
     ctx: typer.Context = typer.Context,
 ):
-    # print(f'Context: {ctx.params}')
-    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
     photovoltaic_efficiency_time_series = calculate_pv_efficiency_time_series(
         irradiance_series=irradiance_series,
         spectral_factor_series=spectral_factor_series,
@@ -72,7 +73,7 @@ def photovoltaic_efficiency_time_series(
         print_quantity_table(
             dictionary=photovoltaic_efficiency_time_series,
             title=photovoltaic_efficiency_time_series['Title'],
-            main_key = EFFICIENCY_COLUMN_NAME,
+            main_key=EFFICIENCY_COLUMN_NAME,
             rounding_places=rounding_places,
             index=index,
             verbose=verbose,
