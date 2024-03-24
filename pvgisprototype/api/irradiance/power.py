@@ -106,6 +106,7 @@ from pvgisprototype import SurfaceTilt
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype import SpectralFactorSeries
+from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 
 
 @log_function_call
@@ -122,7 +123,7 @@ def calculate_photovoltaic_power_output_series(
     random_time_series: bool = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
-    spectral_factor_series: np.ndarray = SpectralFactorSeries(value=1),
+    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,

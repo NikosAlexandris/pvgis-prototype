@@ -21,6 +21,7 @@ from pvgisprototype.constants import EFFICIENCY
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import EFFICIENCY_FACTOR
 from pvgisprototype.constants import EFFICIENCY_FACTOR_COLUMN_NAME
+from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.constants import SPECTRAL_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_CURRENT_COLUMN_NAME
 from pvgisprototype.constants import VOLTAGE_COLUMN_NAME
@@ -46,7 +47,6 @@ from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MOD
 from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-import numpy as np
 from pvgisprototype.validation.hashing import generate_hash
 from typing import List
 import numpy as np
@@ -94,7 +94,7 @@ from pvgisprototype import WindSpeedSeries
 @log_function_call
 def calculate_pv_efficiency_time_series(
     irradiance_series: List[float],
-    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=1),
+    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
@@ -175,9 +175,6 @@ def calculate_pv_efficiency_time_series(
     negative_relative_irradiance = relative_irradiance_series <= radiation_cutoff_threshold
     efficiency_series = np.zeros_like(irradiance_series)
     efficiency_series[negative_relative_irradiance] = 0
-
-    # temperature_series = temperature_series.value  # the array in the custom data class TemperatureSeries
-    # wind_speed_series = wind_speed_series.value
 
     # temperature_series_adjusted = np.copy(temperature_series)  # Safer! ----
 
