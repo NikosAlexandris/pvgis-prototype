@@ -359,6 +359,9 @@ SolarIncidence:
   timing_algorithm:
     type: str
     initial:
+  desription:
+    type: str
+    initial: "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination angle of a surface (surface-plane), contrasting typical definitions of the incidence angle between the sun-vector and the normal to the surface in question."
 
 # How ?
 
