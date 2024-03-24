@@ -10,5 +10,5 @@ hide:
 ---
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power intro
+pvgis-prototype power introduction
 ```
