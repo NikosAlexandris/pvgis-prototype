@@ -63,8 +63,8 @@ from pvgisprototype.algorithms.caching import custom_hashkey
 @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
 def calculate_relative_longitude(
     latitude: Latitude,
-    surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -178,8 +178,8 @@ def calculate_solar_incidence_jenco(
     latitude: Latitude,
     timestamp: datetime,
     timezone: ZoneInfo = None,
-    surface_tilt: SurfaceTilt = None,
     surface_orientation: SurfaceOrientation = None,
+    surface_tilt: SurfaceTilt = None,
     shadow_indicator: Path = None,
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
@@ -204,10 +204,10 @@ def calculate_solar_incidence_jenco(
         Longitude in degrees
     latitude : float
         Latitude in degrees
-    surface_tilt : float
-        Tilt of the surface in degrees
     surface_orientation : float
         Orientation of the surface (azimuth angle in degrees)
+    surface_tilt : float
+        Tilt of the surface in degrees
     # shadow_indicator : int, optional
     #     Shadow data indicating presence of shadow, by default None.
     # horizon_heights : list of float, optional
@@ -337,8 +337,8 @@ def calculate_solar_incidence_jenco(
         )
         relative_longitude = calculate_relative_longitude(
             latitude=latitude,
-            surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
         )
         sine_solar_incidence = (
             c_inclined_31 * cos(solar_hour_angle.radians - relative_longitude.radians)
@@ -366,8 +366,8 @@ def calculate_solar_incidence_time_series_jenco(
     latitude: Latitude,
     timestamps: np.array,
     timezone: Optional[ZoneInfo] = None,
-    surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     apply_atmospheric_refraction: bool = True,
     shadow_indicator: Path = None,
     horizon_heights: Optional[List[float]] = None,
@@ -393,10 +393,10 @@ def calculate_solar_incidence_time_series_jenco(
         Longitude in degrees
     latitude : float
         Latitude in degrees
-    surface_tilt : float
-        Tilt of the surface in degrees
     surface_orientation : float
         Orientation of the surface (azimuth angle in degrees)
+    surface_tilt : float
+        Tilt of the surface in degrees
 
     Returns
     -------
@@ -507,8 +507,8 @@ def calculate_solar_incidence_time_series_jenco(
         )
         relative_longitude = calculate_relative_longitude(
             latitude=latitude,
-            surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
             dtype=dtype,
             log=log,
         )
@@ -518,8 +518,10 @@ def calculate_solar_incidence_time_series_jenco(
         )
         solar_incidence_series = np.arcsin(sine_solar_incidence_series)
 
-    if not complementary_incidence_angle:  # derive the 'tyical' incidence angle
+    description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination angle of a surface (surface-plane)."
+    if not complementary_incidence_angle:  # derive the 'typical' incidence angle
         solar_incidence_series = np.pi/2 - solar_incidence_series
+        description='Incidence angle between sun-vector and surface-normal'
 
     solar_incidence_series[solar_incidence_series < 0] = NO_SOLAR_INCIDENCE
 
@@ -537,5 +539,5 @@ def calculate_solar_incidence_time_series_jenco(
         unit=RADIANS,
         positioning_algorithm='Jenco',
         timing_algorithm='Jenco',
-        description='Incidence angle between sun-vector and surface-plane'
+        description=description,
     )

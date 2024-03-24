@@ -267,10 +267,10 @@ def print_solar_position_series_table(
     first_model = next(iter(rounded_table))
 
     surface_orientation = rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
-    caption += f"Orientation : [bold]{surface_orientation}[/bold], "
+    caption += f"Orientation : [bold blue]{surface_orientation}[/bold blue], "
 
     surface_tilt = rounded_table[first_model].get(SURFACE_TILT_NAME, None) if surface_tilt else None
-    caption += f"Tilt : [bold]{surface_tilt}[/bold], "
+    caption += f"Tilt : [bold blue]{surface_tilt}[/bold blue] "
 
     units = rounded_table[first_model].get(UNITS_NAME, UNITLESS)
     caption += f"Units : {units}"
