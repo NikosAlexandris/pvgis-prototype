@@ -273,7 +273,7 @@ def print_solar_position_series_table(
     caption += f"Tilt : [bold blue]{surface_tilt}[/bold blue] "
 
     units = rounded_table[first_model].get(UNITS_NAME, UNITLESS)
-    caption += f"Units : {units}"
+    caption += f"\[{units}]"
 
     caption += f"\n[underline]Algorithms[/underline]  "
 
