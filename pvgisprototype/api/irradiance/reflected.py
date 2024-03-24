@@ -113,7 +113,13 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     # if surface_tilt == 0:  # horizontally flat surface
     surface_tilt_threshold = 0.0001
     if surface_tilt <= surface_tilt_threshold:
-        ground_reflected_inclined_irradiance_series = 0
+        from pvgisprototype.validation.arrays import create_array
+        shape_of_array = (
+            timestamps.shape
+        )
+        ground_reflected_inclined_irradiance_series = create_array(
+            shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+        )
         global_horizontal_irradiance_series = ground_view_fraction = (
             direct_horizontal_irradiance_series
         ) = diffuse_horizontal_irradiance_series = (
