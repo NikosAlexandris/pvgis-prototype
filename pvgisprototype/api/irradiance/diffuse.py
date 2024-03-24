@@ -304,6 +304,8 @@ def calculate_term_n_time_series(
 ):
     """Define the N term for a period of time
 
+    N = 0.00263 − 0.712 × kb − 0.6883 × kb2
+
     Parameters
     ----------
     kb_series: float
@@ -318,7 +320,7 @@ def calculate_term_n_time_series(
         debug(locals())
 
     kb_series = np.array(kb_series, dtype=dtype)
-    term_n_series = 0.00263 - 0.712 * kb_series - 0.6883 * np.power(kb_series, 2, dtype=dtype)
+    term_n_series = 0.00263 - (0.712 * kb_series) - (0.6883 * np.power(kb_series, 2, dtype=dtype))
 
     log_data_fingerprint(
         data=term_n_series,
@@ -326,6 +328,8 @@ def calculate_term_n_time_series(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
     return term_n_series
 
 
@@ -358,17 +362,6 @@ def calculate_diffuse_sky_irradiance_time_series(
     sky dome viewed by a tilted (or inclined) surface `ri(γN)`.
     """
     sky_view_fraction = (1 + cos(surface_tilt)) / 2
-    # -----------------------------------------------------------------------
-    # Verify the following : does it work ?
-    # diffuse_sky_irradiance_series = sky_view_fraction
-    # +(
-    #     sin(surface_tilt)
-    #     - surface_tilt
-    #     * cos(surface_tilt)
-    #     - pi
-    #     * sin(surface_tilt / 2) ** 2
-    # ) * n_series
-    # -----------------------------------------------------------------------
     diffuse_sky_irradiance_series = sky_view_fraction
     + (
         sin(surface_tilt)
@@ -675,11 +668,18 @@ def calculate_diffuse_inclined_irradiance_time_series(
     # At this point, the diffuse_horizontal_irradiance_series are either :
     # calculated from external time series  Or  modelled 
 
-    if surface_tilt == 0:  # horizontal surface however ..
+    # if surface_tilt == 0:  # horizontally flat surface
+    surface_tilt_threshold = 0.0001
+    if surface_tilt <= surface_tilt_threshold:
         diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series
+        # to not break the output !
+        diffuse_sky_irradiance_series = n_series = kb_series = (
+            azimuth_difference_series_array
+        ) = solar_azimuth_series_array = solar_incidence_series = NOT_AVAILABLE
 
     else:  # tilted (or inclined) surface
     # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
+        # print(f'{surface_tilt=} should NOT be zero!, hence {diffuse_horizontal_irradiance_series=}')
 
         kb_series = ( # proportion between direct and extraterrestrial
             direct_horizontal_irradiance_series
@@ -689,6 +689,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             kb_series,
             dtype=dtype,
             array_backend=array_backend,
+            verbose=verbose,
         )
         diffuse_sky_irradiance_series = calculate_diffuse_sky_irradiance_time_series(
             n_series=n_series,
@@ -821,13 +822,16 @@ def calculate_diffuse_inclined_irradiance_time_series(
         )
         diffuse_inclined_irradiance_series *= diffuse_irradiance_loss_factor
 
-    out_of_range_indices = np.where(
+    out_of_range = (
         (diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
         | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     )
-    if out_of_range_indices[0].size > 0:
+    if out_of_range.size:
         warning = f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
         logger.warning(warning)
+        stub_array = np.full(out_of_range.shape, -1, dtype=int)
+        index_array = np.arange(len(out_of_range))
+        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
 
     # Building the output dictionary ========================================
 
@@ -871,7 +875,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
         } if verbose > 5 else {},
 
         'out-of-range': lambda: {
-            OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range_indices,
+            OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range,
+            OUT_OF_RANGE_INDICES_COLUMN_NAME + ' i': out_of_range_indices,
         } if out_of_range_indices[0].size > 0 else {},
 
         'fingerprint': lambda: {
