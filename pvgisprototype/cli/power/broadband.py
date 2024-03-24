@@ -321,15 +321,21 @@ def photovoltaic_power_output_series(
             # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
             # unit = getattr(photovoltaic_power_output_series, 'units', None)
             unit = POWER_UNIT
-            plot(
-                # xs=timestamps,
-                # xs=photovoltaic_power_output_series,
-                # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
-                ys=photovoltaic_power_output_series.value,
-                legend_labels=label,
-                lines=lines,
-                title=title if title else supertitle,
-                y_unit=' ' + str(unit),
-            )
+            try:
+                plot(
+                    # xs=timestamps,
+                    # xs=photovoltaic_power_output_series,
+                    # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
+                    ys=photovoltaic_power_output_series.value,
+                    legend_labels=label,
+                    lines=lines,
+                    title=title if title else supertitle,
+                    y_unit=' ' + str(unit),
+                )
+            except IOError as e:
+                raise IOError(
+                    f"Could not _uniplot_ {photovoltaic_power_output_series.value=}"
+                ) from e
+
     if fingerprint:
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
