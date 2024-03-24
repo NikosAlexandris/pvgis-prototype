@@ -45,7 +45,7 @@ def photovoltaic_efficiency_time_series(
     irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
     spectral_factor_series: Annotated[Path|SpectralFactorSeries, typer_argument_spectral_factor_series] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[TemperatureSeries, typer_option_temperature_series] = TEMPERATURE_DEFAULT,
-    photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT,
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[WindSpeedSeries, typer_option_wind_speed_series] = WIND_SPEED_DEFAULT,
     power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
@@ -93,5 +93,6 @@ def photovoltaic_efficiency_time_series(
         #         dictionary=photovoltaic_efficiency_time_series,
         #         filename=csv,
         #     )
+        #   
     else:
         print(photovoltaic_efficiency_time_series)
