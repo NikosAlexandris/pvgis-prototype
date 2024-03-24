@@ -14,5 +14,5 @@ at a location and a moment in time,
 depends primarily on the Solar Incidence angle.
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype position intro
+pvgis-prototype position introduction
 ```

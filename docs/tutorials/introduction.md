@@ -24,6 +24,69 @@ and sun-to-surface angles,
 analysing the solar irradiance components
 and the derivation of the _effective_ amount of global irradiance.
 
+Before we walk through the tutorial,
+let's get straight the result we are aiming at !
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8 45 214 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    --surface-tilt 0.0001 \
+    --global-horizontal-irradiance sarah3_sis_12_076.nc \
+    --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+    --neighbor-lookup nearest \
+    --no-multi-thread \
+    --quiet \
+    --uniplot
+```
+
+We want to have an estimation of
+the photovoltaic power output
+for a specific location
+and a short period of time.
+
+!!! tip
+
+    Just copy-and-paste the command and follow along.
+    This is one way you can practice through this tutorial!
+
+Let's break-down the result :
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8 45 214 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    --surface-tilt 0.0001 \
+    --global-horizontal-irradiance sarah3_sis_12_076.nc \
+    --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+    --neighbor-lookup nearest \
+    -vv
+```
+
+For each hour during the period in question,
+we calculated the photovoltaic power output
+based on satellite-based observations of the terrestrial radiation
+and a predefined efficiency and other parameters.
+
+The `Power ⌁` column is the results of the 
+`Global ∡` inclined irradiance multiplied by the overall `Efficiency %`.
+In fact, the global inclined irradiance
+can be broken down in its _inclined_ irradiance components
+`Direct ∡`, `Diffuse ∡` and `Reflected ∡`.
+
+!!! quote
+
+    So,
+    the aim of this tutorial
+    is to explain the calculations
+    that lead to the estimation of the photovoltaic power output
+    for a given location and period of time.
+
+    Alright,
+    let's go through this step-by-step
+    and overview some theoretical concepts too.
 
 ## Location & Panel Geometry
 
@@ -48,7 +111,7 @@ Next, let us consider the basic _geometry_ of a solar panel :
     - The albedo is set to 0.2
     - The Linke Turbidity is set to 2
  
-!!! note "On the Linke Turbidity"
+!!! warning "On the Linke Turbidity"
 
     By default, PVGIS does _not_ use any Linke Turbidity input
     when it gets to read solar irradiance components from external datasets,
@@ -74,6 +137,22 @@ Starting with the basics,
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype position overview-series 8.628 45.812 33 33 '2010-01-17 12:00' -aou degrees
 ```
+
+!!! info
+
+    **The command**
+    
+    ```
+    pvgis-prototype position overview-series 8.628 45.812 170 44 '2010-01-17 12:00' -aou degrees
+    ```
+
+    **reads** :
+
+    - execute `pvgis-prototype` command `position` and sub-command `overview-series`
+    - set the longitude to `8.628` and the latitude to `45.812`
+    - set the surface (panel) orientation to `170` and the tilt to `44` degrees
+    - for the timestamp `2010-01-17 12:00`
+    - output the angle quantities in `degrees`
 
 !!! warning "Degrees or radians ?"
 
@@ -181,14 +260,14 @@ python
 
 2. set the direct horizontal irradiance reported in SARAH3 
 
-```pycon exec="true" session="dni"
+```pycon exec="true" session="dni" source="above"
 >>> sid = 431.00000
 >>> solar_zenith_angle = 1.10481
 ```
 
 3. then do the math
 
-```pycon exec="true" session="dni"
+```pycon exec="true" session="dni" source="above"
 >>> from math import cos
 >>> sid / cos(solar_zenith_angle) 
 ```
@@ -222,7 +301,7 @@ pvgis-prototype irradiance direct horizontal 8 45 214 '2010-01-27 12:00:00'
 
 Next, the simulated Direct Inclined Irradiance component : 
 
-``` bash exec="true" result="ansi" source="above"
+``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance direct inclined 8 45 214 '2010-01-27 12:00:00'
 ```
 <!-- returns -->
@@ -230,7 +309,7 @@ pvgis-prototype irradiance direct inclined 8 45 214 '2010-01-27 12:00:00'
 
 And the simulated Global Inclined component is :
 
-``` bash exec="true" result="ansi" source="above"
+``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global broadband 8 45 210 '2010-01-27 12:00:00'
 ```
 <!-- returns -->
@@ -238,17 +317,22 @@ pvgis-prototype irradiance global broadband 8 45 210 '2010-01-27 12:00:00'
 
 Analytically, the above figure is broken down to its inclined components as :
 
-``` bash exec="true" result="ansi" source="above"
+``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global broadband 8 45 210 '2010-01-27 12:00:00' -vvv
 ```
 
 !!! attention "EXTRA" 
 
-    If we read the SIS and SID SARAH3 components
+    If we read the _SIS_ and _SID_ SARAH3 components
     to get the Global Inclined Irradiance :
 
     ``` bash exec="true" result="ansi" source="above"
-    pvgis-prototype irradiance global broadband 8 45 210 '2010-01-27 12:00:00' --global-horizontal-irradiance sarah3_sis_12_076.nc --direct-horizontal-irradiance sarah3_sid_12_076.nc --neighbor-lookup nearest
+    pvgis-prototype irradiance global broadband \
+        8 45 210 \
+        '2010-01-27 12:00:00' \
+        --global-horizontal-irradiance sarah3_sis_12_076.nc \
+        --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+        --neighbor-lookup nearest
     ```
     <!-- returns 511.11603 -->
 
@@ -268,17 +352,16 @@ SARAH3 SIS and SID and goes through the math to derive to 69.61911.
 
 Direct Horizontal Irradiance = Direct Normal Irradiance * sin(Solar Altitude)
 
-!!! note "For verification !"
+!!! tip "For verification !"
 
     ```pycon exec="true" session="normal-to-horizontal" source="material-block"
-    from math import sin
-    dni = 1353.22228247
-    altitude = 0.45729
-    dni * math.sin(altitude)
+    >>> from math import sin
+    >>> dni = 1353.22228247
+    >>> altitude = 0.45729
+    >>> dni * math.sin(altitude)
     ```
 
 ## Efficiency
-
 
 ## Photovoltaic power
 
@@ -292,28 +375,42 @@ pvgis-prototype power broadband 8 45 214 '2010-01-27 12:00:00'
 or estimated via :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 '2010-01-27 12:00:00' --global-horizontal-irradiance tests/data/input/sarah3_sis_12_076.nc --direct-horizontal-irradiance tests/data/input/sarah3_sid_12_076.nc --neighbor-lookup nearest
+pvgis-prototype power broadband \
+    8 45 214 \
+    '2010-01-27 12:00:00' \
+    --global-horizontal-irradiance sarah3_sis_12_076.nc \
+    --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+    --neighbor-lookup nearest
 ```
 <!-- which returns 414.64826220232 -->
 
 ## Panel tilt
 
-The default tilt angle for a sular surface placed in the location in question,
-is 45 degrees. So, in order to get the calculations done for a horizontally
-flat panel, we need to request this via the `--surface-tilt 0.0001` option.
+The default tilt angle for a solar surface is 45 degrees.
+In order to get the calculations done for a _horizontally flat_ panel,
+we need to request this via the `--surface-tilt 0.0001` option.
 
 Let's add it to the power commands :
 
-Finally, the PV power output is simulated via :
+- simulating the PV power output :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 '2010-01-27 12:00:00' --surface-tilt 0.0001
+pvgis-prototype power broadband \
+    8 45 214 \
+    '2010-01-27 12:00:00' \
+    --surface-tilt 0.0001
 ```
 <!-- - simulated : 414.2163163268762 -->
 
-Using SARAH3 data :
+- using SARAH3 data :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 '2010-01-27 12:00:00' --global-horizontal-irradiance tests/data/input/sarah3_sis_12_076.nc --direct-horizontal-irradiance tests/data/input/sarah3_sid_12_076.nc --neighbor-lookup nearest
+pvgis-prototype power broadband \
+    8 45 214 \
+    '2010-01-27 12:00:00' \
+    --surface-tilt 0.0001 \
+    --global-horizontal-irradiance sarah3_sis_12_076.nc \
+    --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+    --neighbor-lookup nearest
 ```
 <!-- - using SARAH3 data : 408.63105278021305. -->
