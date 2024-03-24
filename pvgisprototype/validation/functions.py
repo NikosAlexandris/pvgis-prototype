@@ -447,7 +447,6 @@ class CalculateSolarIncidenceJencoInputModel(
     SurfaceOrientationModel,
     EarthOrbitModel,
     ComplementaryIncidenceAngleModel,
-    ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
 ):
