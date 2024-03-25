@@ -25,7 +25,7 @@ from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.constants import SPECTRAL_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_CURRENT_COLUMN_NAME
 from pvgisprototype.constants import VOLTAGE_COLUMN_NAME
-from pvgisprototype.constants import POWER_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import POWER_MODEL_COLUMN_NAME
 from pvgisprototype.constants import TEMPERATURE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import RELATIVE_IRRADIANCE_COLUMN_NAME
@@ -244,7 +244,7 @@ def calculate_pv_efficiency_time_series(
 
         'extended': lambda: {
             EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME: photovoltaic_module_efficiency_coefficients[0],
-            POWER_ALGORITHM_COLUMN_NAME: power_model.value,
+            POWER_MODEL_COLUMN_NAME: power_model.value,
             TEMPERATURE_ALGORITHM_COLUMN_NAME: temperature_model.value,
         } if verbose > 1 else {},
 
