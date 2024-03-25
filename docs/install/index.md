@@ -24,14 +24,59 @@ tags:
 ## Environment setup
 
 To begin with,
-**create a [virtual environment][venv]!**
+**create a Python [virtual environment][venv]!**
+and activate it:
+
+``` bash
+python -m venv venv
+source venv/bin/activate
+```
 
 [venv]: https://docs.python.org/3/library/venv.html
+
+!!! tip
+
+    Forgetting to activate a virtual environment will install various packages 
+    outside virtual environments at a system-wide level
+    which, over time, will likely lead to errors.
+
+    By setting for example in `.bashrc` or `.zshrc`
+    the environment variable `PIP_REQUIRE_VIRTUALENV` to `true`
+    and re-starting your shell,
+    `pip` will refuse to install anything outside a virtual environment.
+
+    ``` bash
+    export PIP_REQUIRE_VIRTUALENV=true
+    ```
+
+???+ tip
+
+    Regardless of our favourite programming language
+    or tool to manage environments,
+    chances are high we'd benefit from using [`direnv`][direnv].
+    In the context of a Python package, like [`rekx`][rekx],
+    `direnv` supports all such well known tools
+    from standard `venv`, `pyenv` and `pipenv`,
+    to `anaconda`, `Poetry`, `Hatch`, `Rye`
+    and `PDM`.
+    Have a look at [direnv's Wiki page for Python][direnv-wiki-python].
+
+    `rekx` is developed inside a virtual environment
+    (re-)created and (re-)activated via `direnv`.
+    The following `.envrc` does all of it :
+    
+    ``` title=".envrc"
+    --8<-- ".envrc"
+    ```
+
+    Find more about `layout python` in
+    [direnv/wiki/Python#venv-stdlib-module](https://github.com/direnv/direnv/wiki/Python#venv-stdlib-module).
 
 ## Install
 
 Next,
-you can install PVIS in the following way :
+and once inside a dedicated virtual environment,
+we can install PVIS in the following way :
 
 1. Clone the source code repository
 2. Step in the source code directory
