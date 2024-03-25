@@ -81,7 +81,7 @@ from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
-from pvgisprototype.constants import ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import POWER_MODEL_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
@@ -571,7 +571,7 @@ def calculate_photovoltaic_power_output_series(
         'extended': lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & in-plane components",
             EFFICIENCY_COLUMN_NAME: efficiency_coefficient_series,
-            ALGORITHM_COLUMN_NAME: power_model.value if power_model else NOT_AVAILABLE,
+            POWER_MODEL_COLUMN_NAME: power_model.value if power_model else NOT_AVAILABLE,
             GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,
