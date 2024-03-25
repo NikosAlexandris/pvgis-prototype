@@ -133,7 +133,10 @@ pvgis-prototype position introduction
 Starting with the basics,
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype position overview-series 8.628 45.812 33 33 '2010-01-17 12:00' -aou degrees
+pvgis-prototype position overview-series \
+    8.628 45.812 180 45 \
+    '2010-01-17 12:00' \
+    -aou degrees
 ```
 
 !!! info
@@ -141,14 +144,17 @@ pvgis-prototype position overview-series 8.628 45.812 33 33 '2010-01-17 12:00' -
     **The command**
     
     ```
-    pvgis-prototype position overview-series 8.628 45.812 170 44 '2010-01-17 12:00' -aou degrees
+    pvgis-prototype position overview-series \
+    8.628 45.812 180 45 \
+    '2010-01-17 12:00' \
+    -aou degrees
     ```
 
     **reads** :
 
     - execute `pvgis-prototype` command `position` and sub-command `overview-series`
     - set the longitude to `8.628` and the latitude to `45.812`
-    - set the surface (panel) orientation to `170` and the tilt to `44` degrees
+    - set the surface (panel) orientation to `180` and the tilt to `45` degrees
     - for the timestamp `2010-01-17 12:00`
     - output the angle quantities in `degrees`
 
@@ -158,7 +164,9 @@ pvgis-prototype position overview-series 8.628 45.812 33 33 '2010-01-17 12:00' -
     of `-aou` is required to get the reported numbers in degrees. Without it :
 
     ``` bash exec="true" result="ansi" source="material-block"
-    pvgis-prototype position overview-series 8.628 45.812 33 33 '2010-01-17 12:00'
+    pvgis-prototype position overview-series \
+    8.628 45.812 180 45 \
+    '2010-01-17 12:00'
     ```
 
     Let's note down the solar zenith angle (in radians) : **1.16802**
@@ -180,11 +188,13 @@ These are, after all,
 the ones we will compare against the SARAH3 satellite-based observations.
 
 As a first step,
-we can simulate the global horizontal irradiance
+we can simulate the global _horizontal_ irradiance
 over our location of interest and moment in time :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global horizontal 8 45 214 '2010-01-27 12:00:00'
+pvgis-prototype irradiance global horizontal \
+    8 45 214 \
+    '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 583.6711 -->
@@ -192,18 +202,23 @@ pvgis-prototype irradiance global horizontal 8 45 214 '2010-01-27 12:00:00'
 We can see how this simulated quantity breaks down in its sub-components too :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global horizontal 8 45 214 '2010-01-27 12:00:00' -vvv
+pvgis-prototype irradiance global horizontal \
+    8 45 214 \
+    '2010-01-27 12:00:00' \
+    -vvv
 ```
 <!-- returns -->
   <!-- Time                  Global ⭸   Direct ⭸    Diffuse ⭸ -->
  <!-- ──────────────────────────────────────────────────────── -->
   <!-- 2010-01-27 12:00:00   583.6711   595.97107   -12.30002 -->
 
-We will get the same simulated direct horizontal estimation
+We will get the same simulated direct _horizontal_ estimation
 by using the `direct horizontal` commands :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance direct horizontal 8 45 214 '2010-01-27 12:00:00'
+pvgis-prototype irradiance direct horizontal \
+    8 45 214 \
+    '2010-01-27 12:00:00'
 ```
 
 ## External solar irradiance time series
@@ -215,7 +230,12 @@ from the SARAH3 data collection :
 - Read the SIS component from SARAH3 :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype series select sarah3_sis_12_076.nc 8 45 --neighbor-lookup nearest -v --mask-and-scale '2010-01-27 12:00:00'
+pvgis-prototype series select \
+    sarah3_sis_12_076.nc 8 45 \
+    '2010-01-27 12:00:00' \
+    --neighbor-lookup nearest \
+    --mask-and-scale \
+    -v
 ```
 <!-- returns -->
 <!-- 475.00000 -->
@@ -223,10 +243,25 @@ pvgis-prototype series select sarah3_sis_12_076.nc 8 45 --neighbor-lookup neares
 - Read the SID component from SARAH3 :
  
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype series select sarah3_sid_12_076.nc 8 45 --neighbor-lookup nearest -v --mask-and-scale '2010-01-27 12:00:00'
+pvgis-prototype series select \
+    sarah3_sid_12_076.nc 8 45 \
+    --neighbor-lookup nearest \
+    -v \
+    --mask-and-scale \
+    '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 431.00000 -->
+
+!!! tip "Optional and required parameters"
+
+    The latter command differs from the one before in that the order of the
+    optional and required input parameters is not the same. The message here is
+    that : indeed, we can mix the order of optional parameters in-between as
+    long as we _keep_ strictly the order of the required ones, as indicated in
+    the help section of a command.
+
+    Just run `pvgis-prototype series select` and read the help text.
 
 Indeed,
 the simulated values differ from the satellite-based observations
@@ -242,7 +277,10 @@ the solar radiation component with the greates impact,
 is the direct normal irradiance.
 
 From the theory,
-we know that `DNI` = `SID / cos(Solar Zenith Angle)`
+we know that 
+$$
+DNI = SID / cos(Solar Zenith Angle)
+$$
 
 !!! seealso
 
@@ -252,23 +290,23 @@ Let's get the DNI using simple Python
 
 1. open a Python interpreter
 
-```
-python 
-```
+    ``` bash
+    python 
+    ```
 
 2. set the direct horizontal irradiance reported in SARAH3 
 
-```pycon exec="true" session="dni" source="above"
->>> sid = 431.00000
->>> solar_zenith_angle = 1.10481
-```
+    ```pycon exec="true" session="dni" source="above"
+    >>> sid = 431.00000
+    >>> solar_zenith_angle = 1.10481
+    ```
 
 3. then do the math
 
-```pycon exec="true" session="dni" source="above"
->>> from math import cos
->>> sid / cos(solar_zenith_angle) 
-```
+    ```pycon exec="true" session="dni" source="above"
+    >>> from math import cos
+    >>> sid / cos(solar_zenith_angle) 
+    ```
  
 Let's compare with PVGIS' model :
 
@@ -356,7 +394,7 @@ Direct Horizontal Irradiance = Direct Normal Irradiance * sin(Solar Altitude)
     >>> from math import sin
     >>> dni = 1353.22228247
     >>> altitude = 0.45729
-    >>> dni * math.sin(altitude)
+    >>> dni * sin(altitude)
     ```
 
 ## Efficiency
