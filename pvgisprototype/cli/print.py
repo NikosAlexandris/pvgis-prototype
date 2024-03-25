@@ -17,7 +17,7 @@ from pvgisprototype.constants import (
     SURFACE_TILT_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
-    ALGORITHM_COLUMN_NAME,
+    POWER_MODEL_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     SOLAR_TIME_COLUMN_NAME,
@@ -273,7 +273,7 @@ def print_solar_position_series_table(
     caption += f"Tilt : [bold blue]{surface_tilt}[/bold blue] "
 
     units = rounded_table[first_model].get(UNITS_NAME, UNITLESS)
-    caption += f"\[{units}]"
+    caption += f"\[[dim]{units}[/dim]]"
 
     caption += f"\n[underline]Algorithms[/underline]  "
 
@@ -665,7 +665,8 @@ def print_irradiance_table_2(
     rounded_table = round_float_values(dictionary, rounding_places)
 
     console = Console()
-    caption = f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
+    caption = f"[underline]Position[/underline]  "
+    caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
 
     # Extract specific values for the caption if they exist
 
@@ -675,11 +676,16 @@ def print_irradiance_table_2(
 
     surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
     if surface_tilt is not None:
-        caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold], "
+        caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold] "
+
+    units = dictionary.get(UNITS_NAME, UNITLESS)
+    if units is not None:
+        caption += f"\[[dim]{units}[/dim]]"
     
-    algorithm = dictionary.get(ALGORITHM_COLUMN_NAME, None)
+    algorithm = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     if algorithm is not None:
-        caption += f"{ALGORITHM_COLUMN_NAME}: [bold]{algorithm}[/bold], "
+        caption += f"\n[underline]Algorithms[/underline]  "
+        caption += f"{POWER_MODEL_COLUMN_NAME}: [bold]{algorithm}[/bold], "
 
     solar_incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
     if solar_incidence_algorithm is not None:
@@ -694,9 +700,12 @@ def print_irradiance_table_2(
         # "↻": "Orientation",
     }
     # add a caption for symbols found in the input dictionary
+    caption += '\n[underline]Legend[/underline] '
     for symbol, description in symbol_descriptions.items():
         if any(symbol in key for key in dictionary.keys()):
-            caption += f"{symbol} : {description}, "
+            caption += f"[yellow]{symbol}[/yellow] is {description}, "
+    caption=caption.rstrip(', ')  # Remove trailing comma + space
+
 
     table = Table(
             title=title,
@@ -723,7 +732,7 @@ def print_irradiance_table_2(
     keys_to_exclude = {
             SURFACE_ORIENTATION_COLUMN_NAME,
             SURFACE_TILT_COLUMN_NAME,
-            ALGORITHM_COLUMN_NAME,
+            POWER_MODEL_COLUMN_NAME,
             INCIDENCE_ALGORITHM_COLUMN_NAME,
             FINGERPRINT_COLUMN_NAME,
     }
