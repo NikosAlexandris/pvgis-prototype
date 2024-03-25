@@ -7,10 +7,14 @@ tags:
   - Spectral Mismatch
 ---
 
+!!! danger
+
+    Incomplete
+
 # Photon energy
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power ape
+pvgis-prototype power photon-energy
 ```
 
 # Spectral Effect
@@ -18,11 +22,11 @@ pvgis-prototype power ape
 ## Spectral Factor
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power spectral-effect factor
+pvgis-prototype power spectral-factor
 ```
 
 ## Spectral Mismatch
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power spectral-effect mismatch
+pvgis-prototype power spectral-mismatch
 ```

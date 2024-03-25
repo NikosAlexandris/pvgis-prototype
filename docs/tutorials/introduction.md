@@ -13,15 +13,15 @@ tags:
 # A gentle introduction to elements of photovoltaic performance using PVGIS
 
 Are you curious about photovoltaic performance ?
-This is a gentle introduction into the estimation of photovoltaic power
-over a location and a moment in time.
+This is an introduction into the estimation of photovoltaic power
+over a location and a moment or period in time.
 
 We will explore solar radiation components
 and photovoltaic power estimates,
-by stepping through the calculations
-of the position of the sun in the sky
-and sun-to-surface angles,
-analysing the solar irradiance components
+by stepping through :
+the calculation of the position of the sun in the sky,
+the measurement of sun-to-surface angles
+the analysis of solar irradiance components
 and the derivation of the _effective_ amount of global irradiance.
 
 Before we walk through the tutorial,
@@ -41,15 +41,13 @@ pvgis-prototype power broadband \
     --uniplot
 ```
 
-We want to have an estimation of
-the photovoltaic power output
-for a specific location
-and a short period of time.
+We want to estimate the photovoltaic power output
+for a specific location and a short period of time.
 
 !!! tip
 
-    Just copy-and-paste the command and follow along.
-    This is one way you can practice through this tutorial!
+    Just copy-and-paste the commands and follow along.
+    This is one way to practice through this tutorial!
 
 Let's break-down the result :
 
