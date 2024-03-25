@@ -294,8 +294,8 @@ def photovoltaic_power_output_series(
         )
     if uniplot:
         print(f'[reverse]Uniplot[/reverse]')
-        import os 
-        terminal_columns, _ = os.get_terminal_size() # we don't need lines!
+        import shutil
+        terminal_columns, _ = shutil.get_terminal_size()  # we don't need lines!
         terminal_length = int(terminal_columns * terminal_width_fraction)
         from functools import partial
         from uniplot import plot as default_plot
