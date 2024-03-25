@@ -25,24 +25,24 @@ the analysis of solar irradiance components
 and the derivation of the _effective_ amount of global irradiance.
 
 Before we walk through the tutorial,
-let's get straight the result we are aiming at !
+let's get straight a/the result we are aiming at !
+We want to estimate the photovoltaic power output
+for a specific location and a short period of time.
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
     8 45 214 \
     --start-time '2010-01-27' \
     --end-time '2010-01-28' \
-    --surface-tilt 0.0001 \
-    --global-horizontal-irradiance sarah3_sis_12_076.nc \
-    --direct-horizontal-irradiance sarah3_sid_12_076.nc \
-    --neighbor-lookup nearest \
-    --no-multi-thread \
     --quiet \
     --uniplot
 ```
 
-We want to estimate the photovoltaic power output
-for a specific location and a short period of time.
+!!! danger "Update-Me!"
+
+    The above command will simulate the radiation components. An update is
+    needed with a minimal dataset that will enable running the same commands,
+    albeit, by reading the irradiance time series from SARAH3 products!
 
 !!! tip
 
