@@ -58,9 +58,8 @@ from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 import numpy as np
-from math import cos
-from math import sin
-from math import pi
+from math import cos, sin, pi
+from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import LOSS_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
@@ -84,6 +83,7 @@ from pvgisprototype.constants import TERM_N_COLUMN_NAME
 from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype import Irradiance
 
 
 
@@ -846,6 +846,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series / diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
+            ANGLE_UNITS_COLUMN_NAME: angle_output_units,
         } if verbose > 1 else {},
 
         'more_extended': lambda: {
@@ -891,13 +892,19 @@ def calculate_diffuse_inclined_irradiance_time_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    if verbose > 0:
-        return components
-
     log_data_fingerprint(
         data=diffuse_inclined_irradiance_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return diffuse_inclined_irradiance_series
+    return Irradiance(
+            value=diffuse_inclined_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=elevation,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            components=components,
+            )
