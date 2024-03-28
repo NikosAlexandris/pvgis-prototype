@@ -423,6 +423,43 @@ SpectralFactorSeries:
     type: str
     initial: unitless
 
+Irradiance:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial: W/m^2
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial: "A solar irradiance component such as global, direct, diffuse, reflected or extraterrestrial and any of normal, horizontal or inclined, is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). Except for the extraterrestrial and direct normal components, the values concern a specicif location and a moment or period in time."
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial: (0.0, 0.0)
+  elevation:
+    type: Elevation
+  surface_orientation:
+    type: SurfaceOrientation
+  surface_tilt:
+    type: SurfaceTilt
+  solar_positioning_algorithm:
+    type: str
+    initial:
+  solar_timing_algorithm:
+    type: str
+    initial:
+  data_source:
+    type: str
+    description: The solar radiation database used for calculations, e.g., PVGIS-SARAH2.
+    initial: PVGIS-SARAH2
+  components:
+    type: dict
+    initial: {}
+
 # Photovoltaic Power
 
 PhotovoltaicPower:
