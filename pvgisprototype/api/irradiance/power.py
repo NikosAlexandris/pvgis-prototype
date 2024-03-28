@@ -407,7 +407,7 @@ def calculate_photovoltaic_power_output_series(
             multi_thread=multi_thread,
             verbose=0,  # no verbosity here by choice!
             log=log,
-        )[
+        ).value[  # Important !
             mask_above_horizon
         ]
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
