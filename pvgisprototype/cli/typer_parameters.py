@@ -930,17 +930,13 @@ def linke_turbidity_factor_callback(
     if linke_turbidity_factor_series is None:
         return np.ndarray([]) 
 
-    if linke_turbidity_factor_series is not None:
-        return LinkeTurbidityFactor(linke_turbidity_factor_series=linke_turbidity_factor_series, unit=LINKE_TURBIDITY_UNIT)
-
     else:
         timestamps = ctx.params.get('timestamps')
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
-        linke_turbidity = np.array(
-            [LINKE_TURBIDITY_DEFAULT for _ in timestamps], dtype=dtype
+        return LinkeTurbidityFactor(
+            value=np.array([LINKE_TURBIDITY_DEFAULT for _ in timestamps], dtype=dtype),
+            unit=LINKE_TURBIDITY_UNIT,
         )
-
-        return LinkeTurbidityFactor(linke_turbidity_factor_series=linke_turbidity, unit=LINKE_TURBIDITY_UNIT)
 
 
 linke_turbidity_factor_typer_help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
