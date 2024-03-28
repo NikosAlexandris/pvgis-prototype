@@ -6,10 +6,7 @@ from typing import Optional
 from datetime import datetime
 from pathlib import Path
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.cli.print import print_finger_hash
-from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SolarPositionModel
@@ -258,6 +255,7 @@ def photovoltaic_power_output_series(
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
         if verbose > 0:
+            from pvgisprototype.cli.print import print_irradiance_table_2
             print_irradiance_table_2(
                 longitude=longitude,
                 latitude=latitude,
@@ -276,6 +274,7 @@ def photovoltaic_power_output_series(
             print(csv_str)
 
     if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
         write_irradiance_csv(
             longitude=longitude,
             latitude=latitude,
@@ -286,56 +285,26 @@ def photovoltaic_power_output_series(
         )
 
     if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
         print_series_statistics(
             data_array=photovoltaic_power_output_series.value,
             timestamps=timestamps,
             groupby=groupby,
             title="Photovoltaic power output",
         )
-    if uniplot:
-        print(f'[reverse]Uniplot[/reverse]')
-        import shutil
-        terminal_columns, _ = shutil.get_terminal_size()  # we don't need lines!
-        terminal_length = int(terminal_columns * terminal_width_fraction)
-        from functools import partial
-        from uniplot import plot as default_plot
-        plot = partial(default_plot, width=terminal_length)
-        from pvgisprototype.api.series.hardcodings import exclamation_mark
-        title="Photovoltaic power output"
-        lines = True
 
-        if isinstance(photovoltaic_power_output_series, float):
-            logger.error(f"{exclamation_mark} Aborting as I cannot plot the single float value {float}!", alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
-            return
-        import numpy as np
-        
-        # if verbose > 0:
-        #     photovoltaic_power_output_series = list(photovoltaic_power_output_series.value)[0]
-        #     print(f'{type(photovoltaic_power_output_series)}')
-        
-        if isinstance(photovoltaic_power_output_series.value, np.ndarray):
-            # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
-            supertitle = 'Photovoltaic Power Output Series'
-            # label = getattr(photovoltaic_power_output_series, 'name', None)
-            label = 'Photovoltaic Power'
-            # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
-            # unit = getattr(photovoltaic_power_output_series, 'units', None)
-            unit = POWER_UNIT
-            try:
-                plot(
-                    # xs=timestamps,
-                    # xs=photovoltaic_power_output_series,
-                    # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
-                    ys=photovoltaic_power_output_series.value,
-                    legend_labels=label,
-                    lines=lines,
-                    title=title if title else supertitle,
-                    y_unit=' ' + str(unit),
-                )
-            except IOError as e:
-                raise IOError(
-                    f"Could not _uniplot_ {photovoltaic_power_output_series.value=}"
-                ) from e
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=photovoltaic_power_output_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Photovoltaic Power Output Series',
+            title="Photovoltaic power output",
+            label = 'Photovoltaic Power',
+            label_2 = None,
+            unit = POWER_UNIT,
+        )
 
     if fingerprint:
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
