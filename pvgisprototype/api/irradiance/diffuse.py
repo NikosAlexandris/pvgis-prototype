@@ -169,7 +169,7 @@ def read_horizontal_irradiance_components_from_sarah(
             )
             future_direct_horizontal_irradiance_series = executor.submit(
                 select_time_series,
-                time_series=shortwave,
+                time_series=direct,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
