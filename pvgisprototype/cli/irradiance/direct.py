@@ -14,6 +14,7 @@ from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
@@ -119,7 +120,7 @@ def get_direct_normal_irradiance_time_series(
     index: Annotated[bool, typer_option_index] = False,
 ) -> None:
     # with progress:
-    results = calculate_direct_normal_irradiance_time_series(
+    direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
         timestamps=timestamps,
         start_time=start_time,
         frequency=frequency,
@@ -136,15 +137,15 @@ def get_direct_normal_irradiance_time_series(
     if verbose > 0:
         print_irradiance_table_2(
             timestamps=timestamps,
-            dictionary=results,
-            title=results['Title'] + f" normal irradiance series {IRRADIANCE_UNITS}",
+            dictionary=direct_normal_irradiance_series,
+            title=direct_normal_irradiance_series['Title'] + f" normal irradiance series {IRRADIANCE_UNITS}",
             rounding_places=rounding_places,
             index=index,
             verbose=verbose,
         )
         if statistics:
             print_series_statistics(
-                data_array=results['Normal'],
+                data_array=direct_normal_irradiance_series[DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME],
                 timestamps=timestamps,
                 title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
                 rounding_places=rounding_places,
@@ -154,11 +155,11 @@ def get_direct_normal_irradiance_time_series(
                 longitude=None,
                 latitude=None,
                 timestamps=timestamps,
-                dictionary=results,
+                dictionary=direct_normal_irradiance_series,
                 filename=csv,
             )
     else:
-        print(results)
+        print(direct_normal_irradiance_series)
 
 
 @app.command(
@@ -234,6 +235,7 @@ def get_direct_horizontal_irradiance_time_series(
         print_irradiance_table_2(
             longitude=longitude,
             latitude=latitude,
+            elevation=elevation,
             timestamps=timestamps,
             dictionary=results,
             title=results['Title'] + f" horizontal irradiance series {IRRADIANCE_UNITS}",
@@ -356,6 +358,7 @@ def get_direct_inclined_irradiance_time_series_pvgis(
         print_irradiance_table_2(
             longitude=longitude,
             latitude=latitude,
+            elevation=elevation,
             timestamps=timestamps,
             dictionary=direct_inclined_irradiance_series,
             title=f'Direct inclined irradiance series {IRRADIANCE_UNITS}',
