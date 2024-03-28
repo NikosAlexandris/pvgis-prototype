@@ -11,6 +11,7 @@ from rich import print
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.hardcodings import check_mark
 from pvgisprototype.api.series.hardcodings import x_mark
+from pandas import DatetimeIndex
 
 
 def get_coordinates(data_array: xr.DataArray) -> tuple:
@@ -32,14 +33,14 @@ def get_coordinates(data_array: xr.DataArray) -> tuple:
 
 def plot_series(
     data_array,
-    time,
-    figure_name,
-    add_offset=False,
-    variable_name_as_suffix=None,
-    tufte_style=None,
-    width=16,
-    height=9,
-    resample_large_series=False,
+    time: DatetimeIndex,
+    figure_name: str,
+    add_offset: bool = False,
+    variable_name_as_suffix: bool = None,
+    tufte_style: bool = None,
+    width: int = 16,
+    height: int = 9,
+    resample_large_series: bool = False,
 ):
     """
     Plot series over a location
