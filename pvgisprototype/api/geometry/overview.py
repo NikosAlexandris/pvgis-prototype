@@ -27,6 +27,7 @@ from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
+from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_jenco
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_hour_angle_declination_skyfield
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_pvlib
@@ -159,6 +160,16 @@ def model_solar_geometry_overview(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             verbose=verbose,
         )
+        solar_incidence = calculate_solar_incidence_jenco(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            verbose=verbose,
+        )
+
     
     if solar_position_model.value == SolarPositionModel.skyfield:
 
