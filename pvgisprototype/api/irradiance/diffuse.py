@@ -389,6 +389,16 @@ def diffuse_transmission_function_time_series(
     From r.pv's source code:
     tn = -0.015843 + locLinke * (0.030543 + 0.0003797 * locLinke);
     
+    From Hofierka (2002) :
+
+        The estimate of the transmission function Tn(TLK) gives a theoretical
+        diffuse irradiance on a horizontal surface with the sun vertically
+        overhead for the air mass 2 Linke turbidity factor. The following
+        second order polynomial expression is used:
+
+        Tn(TLK) = -0.015843 + 0.030543 TLK + 0.0003797 TLK^2
+
+
     """
     linke_turbidity_factor_series_squared_array = np.power(
         linke_turbidity_factor_series.value, 2, dtype=dtype
