@@ -1,15 +1,15 @@
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
-from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
 from typing import Annotated
 from typing import Optional
 from typing import List
 from pathlib import Path
 from rich import print
 from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.api.irradiance.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.api.power.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.cli.typer_parameters import typer_argument_irradiance_series
@@ -36,7 +36,7 @@ from pvgisprototype.constants import EFFICIENCY
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.cli.print import print_quantity_table
-from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 import typer
 
 
