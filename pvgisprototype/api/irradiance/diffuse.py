@@ -84,8 +84,8 @@ from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype import Irradiance
-
-
+from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
+from pvgisprototype.constants import HOFIERKA_2002
 
 # def safe_select_time_series(*args, **kwargs):
 #     try:
@@ -266,8 +266,9 @@ def calculate_diffuse_horizontal_component_from_sarah(
         
         'extended': lambda: {
             TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE + " & other horizontal components",
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series.to_numpy(),
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.to_numpy(),
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,#.to_numpy(),
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,#.to_numpy(),
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         } if verbose > 1 else {},
 
         'fingerprint': lambda: {
@@ -282,16 +283,22 @@ def calculate_diffuse_horizontal_component_from_sarah(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    if verbose > 0:
-        return components
-
     log_data_fingerprint(
         data=diffuse_horizontal_irradiance_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return diffuse_horizontal_irradiance_series
+    return Irradiance(
+            value=diffuse_horizontal_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=None,
+            surface_orientation=None,
+            surface_tilt=None,
+            components=components,
+            )
 
 
 @log_function_call
@@ -330,6 +337,7 @@ def calculate_term_n_time_series(
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
+
     return term_n_series
 
 
@@ -652,8 +660,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -812,7 +820,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 verbose=0,  # no verbosity here by choice!
                 log=log,
             )
-        )
+        ).value  # Important !
         diffuse_horizontal_irradiance_series = (
             extraterrestrial_normal_irradiance_series
             * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
@@ -1004,6 +1012,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             ANGLE_UNITS_COLUMN_NAME: angle_output_units,
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         } if verbose > 1 else {},
 
         'more_extended': lambda: {
