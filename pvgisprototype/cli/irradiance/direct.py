@@ -76,9 +76,6 @@ from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_wi
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 import numpy as np
-from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress
@@ -146,6 +143,7 @@ def get_direct_normal_irradiance_time_series(
         if statistics:
             print_series_statistics(
                 data_array=direct_normal_irradiance_series[DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME],
+            from pvgisprototype.cli.print import print_irradiance_table_2
                 timestamps=timestamps,
                 title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
                 rounding_places=rounding_places,
@@ -160,6 +158,8 @@ def get_direct_normal_irradiance_time_series(
             )
     else:
         print(direct_normal_irradiance_series)
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.cli.write import write_irradiance_csv
 
 
 @app.command(

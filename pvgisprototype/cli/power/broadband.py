@@ -6,7 +6,6 @@ from typing import Optional
 from datetime import datetime
 from pathlib import Path
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.cli.print import print_finger_hash
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.geometry.models import SolarPositionModel
@@ -109,10 +108,9 @@ from pvgisprototype import LinkeTurbidityFactor
 from rich import print
 from pandas import DatetimeIndex
 from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
-
 import typer
-
 from pvgisprototype.cli.typer_parameters import typer_option_log
+
 
 @log_function_call
 def photovoltaic_power_output_series(
@@ -307,4 +305,5 @@ def photovoltaic_power_output_series(
         )
 
     if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
