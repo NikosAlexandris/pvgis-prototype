@@ -30,8 +30,8 @@ Latitude:
 
 Elevation:
   value:
-    type: float
-    initial:
+    type: Optional[float]
+    initial: null
   unit:
     type: str
     initial: meters
@@ -399,7 +399,7 @@ HorizonHeight:
 
 SurfaceOrientation:
   value:
-    type: float
+    type: Optional[float]
     initial: 180.0
   unit:
     type: str
@@ -407,7 +407,7 @@ SurfaceOrientation:
 
 SurfaceTilt:
   value:
-    type: float
+    type: Optional[float]
     initial: 45
   unit:
     type: str
@@ -441,11 +441,11 @@ Irradiance:
     description: Geographic coordinates (latitude, longitude) of the PV installation.
     initial: (0.0, 0.0)
   elevation:
-    type: Elevation
+    type: Optional[Elevation]
   surface_orientation:
-    type: SurfaceOrientation
+    type: Optional[SurfaceOrientation]
   surface_tilt:
-    type: SurfaceTilt
+    type: Optional[SurfaceTilt]
   solar_positioning_algorithm:
     type: str
     initial:
