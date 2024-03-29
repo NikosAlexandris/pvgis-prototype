@@ -128,6 +128,7 @@ from pvgisprototype.constants import LONGITUDE_COLUMN_NAME
 from pvgisprototype.constants import LATITUDE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE
 from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import LOSS_COLUMN_NAME
@@ -158,6 +159,7 @@ from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype import Irradiance
 
 
 @log_function_call
@@ -516,21 +518,27 @@ def calculate_direct_normal_irradiance_time_series(
 
     components_container = {
         'main': lambda: {
-            'Title': 'Direct',
+            TITLE_KEY_NAME: DIRECT_NORMAL_IRRADIANCE,
             DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
         },
 
         'extended': lambda: {
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+        } if verbose > 1 else {},
+
+        'more_extended': lambda: {
             LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME: corrected_linke_turbidity_factor_series.value,
             LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
             RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME: rayleigh_optical_thickness_series.value,
             OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        } if verbose > 1 else {},
+        } if verbose > 2 else {},
 
-        # 'more_extended': lambda: {
-        # } if verbose > 2 else {},
+        'even_more_extended': lambda: {
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+        } if verbose > 3 else {},
 
         'fingerprint': lambda: {
             FINGERPRINT_COLUMN_NAME: generate_hash(direct_normal_irradiance_series),
@@ -544,16 +552,22 @@ def calculate_direct_normal_irradiance_time_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    if verbose > 0:
-        return components
-
     log_data_fingerprint(
         data=direct_normal_irradiance_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return direct_normal_irradiance_series
+    return Irradiance(
+            value=direct_normal_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=None,
+            surface_orientation=None,
+            surface_tilt=None,
+            components=components,
+            )
 
 
 @log_function_call
@@ -662,7 +676,7 @@ def calculate_direct_horizontal_irradiance_time_series(
     direct_horizontal_irradiance_series = np.zeros_like(solar_altitude_series.radians)
     if np.any(mask):
         direct_horizontal_irradiance_series[mask] = (
-            direct_normal_irradiance_series * np.sin(solar_altitude_series.radians)
+            direct_normal_irradiance_series.value * np.sin(solar_altitude_series.radians)
         )[mask]
 
     # Building the output dictionary=========================================
@@ -675,7 +689,7 @@ def calculate_direct_horizontal_irradiance_time_series(
 
         'extended': lambda: {
             TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME + ' & relevant components',
-            DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
+            DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series.value,  # Important
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
             ANGLE_UNITS_COLUMN_NAME: angle_output_units,
         } if verbose > 1 else {},
@@ -711,16 +725,22 @@ def calculate_direct_horizontal_irradiance_time_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    if verbose > 0:
-        return components
-
     log_data_fingerprint(
         data=direct_horizontal_irradiance_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return direct_horizontal_irradiance_series
+    return Irradiance(
+            value=direct_horizontal_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=elevation,
+            surface_orientation=None,
+            surface_tilt=None,
+            components=components,
+            )
 
 
 @log_function_call
@@ -926,7 +946,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             verbose=0,  # no verbosity here by choice!
             log=log,
             show_progress=show_progress,
-        )
+        ).value  # Important
     else:  # read from a time series dataset
         if verbose > 0:
             logger.info(':information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...')
@@ -952,7 +972,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         # the number of timestamps should match the number of "x" values
         if verbose > 0:
             logger.info('\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] ..')
-        compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
+        compare_temporal_resolution(
+            timestamps, direct_horizontal_irradiance_series
+        )
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
             * np.sin(solar_incidence_series.radians)
@@ -991,6 +1013,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         'main': lambda: {
             TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
+            RADIATION_MODEL_COLUMN_NAME: 'External data' if direct_horizontal_component else HOFIERKA_2002,
         },
 
         'extended': lambda: {
@@ -1006,7 +1029,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         'even_more_extended': lambda: {
             TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME + ' & relevant components',
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            RADIATION_MODEL_COLUMN_NAME: 'External data' if direct_horizontal_component else HOFIERKA_2002,
             # "Shade": in_shade,
         } if verbose > 3 else {},
 
@@ -1014,12 +1036,15 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units),
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
             INCIDENCE_DEFINITION: 'Sun-to-Plane' if complementary_incidence_angle else 'Sun-to-Surface-Normal',
+            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
         } if verbose > 4 else {},
         
         'extra': lambda: {
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
             POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
             TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
         } if verbose > 5 else {},
 
         'fingerprint': lambda: {
@@ -1034,13 +1059,19 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    if verbose > 0:
-        return components
-
     log_data_fingerprint(
         data=direct_inclined_irradiance_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return direct_inclined_irradiance_series
+    return Irradiance(
+            value=direct_inclined_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=elevation,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            components=components,
+            )
