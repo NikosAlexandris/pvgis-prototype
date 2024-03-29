@@ -265,37 +265,64 @@ def get_direct_horizontal_irradiance_time_series(
         angle_output_units=angle_output_units,
         verbose=verbose,
         log=log,
+        fingerprint=fingerprint,
     )
-    # Reporting =============================================================
-    if verbose > 0:
-        print_irradiance_table_2(
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            timestamps=timestamps,
-            dictionary=results,
-            title=results['Title'] + f" horizontal irradiance series {IRRADIANCE_UNITS}",
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
-        )
-        if statistics:
-            print_series_statistics(
-                data_array=results['Normal'],
-                timestamps=timestamps,
-                title="Direct horizontal irradiance",
-                rounding_places=rounding_places,
-            )
-        if csv:
-            write_irradiance_csv(
+    if not quiet:
+        if verbose > 0:
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            from pvgisprototype.constants import TITLE_KEY_NAME
+            print_irradiance_table_2(
                 longitude=longitude,
                 latitude=latitude,
+                elevation=elevation,
                 timestamps=timestamps,
-                dictionary=results,
-                filename=csv,
+                dictionary=direct_horizontal_irradiance_series.components,
+                title = (
+                    direct_horizontal_irradiance_series.components[TITLE_KEY_NAME]
+                        + f" horizontal irradiance series {IRRADIANCE_UNITS}"
+                ),
+                rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
             )
-    else:
-        print(results)
+        else:
+            flat_list = direct_horizontal_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=direct_horizontal_irradiance_series.value,
+            timestamps=timestamps,
+            title="Direct horizontal irradiance",
+            rounding_places=rounding_places,
+        )
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=direct_horizontal_irradiance_series.components,
+            filename=csv,
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=direct_horizontal_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Direct Horizontal Irradiance Series',
+            title = 'Direct Horizontal Irradiance Series',
+            label = 'Direct Horizontal Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+            # terminal_width_fraction=terminal_width_fraction,
+        )
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=direct_horizontal_irradiance_series.components)
 
 
 @app.command(
