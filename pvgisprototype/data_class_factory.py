@@ -1,20 +1,21 @@
 from pydantic import BaseModel
 from pvgisprototype.constants import RADIANS, DEGREES
-from datetime import datetime
-from datetime import time
-from typing import Union
-from typing import Tuple
+from datetime import datetime, time
+from typing import Optional, Union, Tuple
+from numpy import ndarray
 import numpy as np
 
 
 type_mapping = {
+    'None': None,
     'int': int,
     'float': float,
+    'Optional[float]': Optional[float],
     'str': str,
     'list': list,
     'dict': dict,
-    'ndarray': np.ndarray,
-    'Union[ndarray, float]': Union[np.ndarray, float],
+    'ndarray': ndarray,
+    'Union[ndarray, float]': Union[ndarray, float],
     'Tuple[Longitude, Latitude]': Tuple[float, float],
     'Elevation': float,
     'SurfaceOrientation': float,
