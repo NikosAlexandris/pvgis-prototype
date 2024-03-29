@@ -9,6 +9,7 @@ from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_sky_irradian
 from pvgisprototype.api.irradiance.diffuse import diffuse_transmission_function_time_series
 from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_coefficients_time_series
 from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_function_time_series
+from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_horizontal_component_from_sarah
 from pvgisprototype.cli.print import print_finger_hash
@@ -239,11 +240,146 @@ def get_diffuse_solar_altitude_function_time_series(
 
     print(diffuse_solar_altitude_series)
 
+@app.command(
+    'horizontal',
+    no_args_is_help=True,
+    help=f'☀∡ Estimate the diffuse horizontal irradiance over a period of time [red]Not Complete[/red]',
+    rich_help_panel=rich_help_panel_series_irradiance,
+)
+def get_diffuse_horizontal_irradiance_time_series(
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_time_series: bool = False,
+    global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[float, typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT, # REVIEW-ME + Typer Parser
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = 0,
+    index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
+) -> None:
+    diffuse_horizontal_irradiance_time_series = calculate_diffuse_horizontal_irradiance_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_angular_loss_factor=apply_angular_loss_factor,
+        solar_position_model=solar_position_model,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        random_days=random_days,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
+        multi_thread=multi_thread,
+        verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
+    )
+    if not quiet:
+        if verbose > 0:
             from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
+                longitude=convert_float_to_degrees_if_requested(
+                    longitude, angle_output_units
+                ),
+                latitude=convert_float_to_degrees_if_requested(
+                    latitude, angle_output_units
+                ),
+                timestamps=timestamps,
+                dictionary=diffuse_horizontal_irradiance_time_series.components,
+                title = (
+                    DIFFUSE_HORIZONTAL_IRRADIANCE
+                    + f" in-plane irradiance series {IRRADIANCE_UNITS}"
+                ),
+                rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
+            )
+        else:
+            flat_list = diffuse_horizontal_irradiance_time_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=diffuse_horizontal_irradiance_time_series.components,
+            filename=csv,
+        )
+    if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=diffuse_horizontal_irradiance_time_series.value,
+            timestamps=timestamps,
+            title="Diffuse horizontal irradiance",
+        )
+    if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=diffuse_horizontal_irradiance_time_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Diffuse Horizontal Irradiance Series',
+            title = 'Diffuse Horizontal Irradiance Series',
+            label = 'Diffuse Horizontal Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+        )
+    if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=diffuse_horizontal_irradiance_time_series.components)
+
 
 @app.command(
     'inclined',
@@ -350,6 +486,7 @@ def diffuse_inclined_irradiance_time_series(
             flat_list = diffuse_inclined_irradiance_time_series.value.flatten().astype(str)
             csv_str = ','.join(flat_list)
             print(csv_str)
+
     if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
         write_irradiance_csv(
