@@ -4,6 +4,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 from pvgisprototype.api.utilities.conversions import round_float_values
 from rich.console import Console
 from rich.table import Table
+from rich.columns import Columns
 from rich.panel import Panel
 from rich import box
 from typing import List
@@ -839,3 +840,43 @@ def print_finger_hash(dictionary: dict):
             style="dim",
         )
         Console().print(fingerprint_panel)
+
+
+def print_solar_position_series_in_columns(
+    longitude,
+    latitude,
+    timestamps,
+    timezone,
+    table,
+    rounding_places=ROUNDING_PLACES_DEFAULT,
+    index: bool = False,
+):
+    panels = []
+
+    # Iterating through each timestamp
+    for i, timestamp in enumerate(timestamps):
+        table_panel = Table(title=f"Time: {timestamp}", box=box.SIMPLE)
+        table_panel.add_column("Parameter", justify="right")
+        table_panel.add_column("Value", justify="left")
+
+        # Optionally add an index column
+        if index:
+            table_panel.add_column("Index", style="dim")
+            table_panel.add_row("Index", str(i))
+
+        # Add longitude, latitude, and other non-time-varying parameters
+        table_panel.add_row("Longitude", str(longitude))
+        table_panel.add_row("Latitude", str(latitude))
+
+        # For each parameter of interest, aggregate across models for this timestamp
+        parameters = ["Declination", "Hour Angle", "Zenith", "Altitude", "Azimuth", "Incidence"]
+        for param in parameters:
+            # Assume `table` is a dictionary of models, each containing a list of values for each parameter
+            values = [round_float_values(model_result[param][i], rounding_places) for model_name, model_result in table.items() if param in model_result]
+            value_str = ", ".join(map(str, values))  # Combine values from all models
+            table_panel.add_row(param, value_str)
+
+        panel = Panel(table_panel, expand=True)
+        panels.append(panel)
+
+    Console().print(Columns(panels))
