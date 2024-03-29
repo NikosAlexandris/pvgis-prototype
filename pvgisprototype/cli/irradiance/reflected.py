@@ -3,10 +3,8 @@ from typing import Annotated
 from typing import Optional
 from datetime import datetime
 from pathlib import Path
-from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.cli.typer_parameters import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
@@ -168,6 +166,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
     if verbose > 0:
         longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
         latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+        from pvgisprototype.cli.print import print_irradiance_table_2
         print_irradiance_table_2(
             longitude=longitude,
             latitude=latitude,
@@ -179,6 +178,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
             verbose=verbose,
         )
         if statistics:
+            from pvgisprototype.api.series.statistics import print_series_statistics
             print_series_statistics(
                 data_array=ground_reflected_inclined_irradiance_series[REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME],
                 timestamps=timestamps,

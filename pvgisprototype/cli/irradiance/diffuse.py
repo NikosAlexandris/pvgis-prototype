@@ -239,6 +239,11 @@ def get_diffuse_solar_altitude_function_time_series(
 
     print(diffuse_solar_altitude_series)
 
+            from pvgisprototype.cli.print import print_irradiance_table_2
+        from pvgisprototype.cli.write import write_irradiance_csv
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        from pvgisprototype.cli.print import print_finger_hash
 
 @app.command(
     'inclined',
@@ -375,6 +380,7 @@ def diffuse_inclined_irradiance_time_series(
         )
 
     if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=diffuse_inclined_irradiance_time_series.components)
 
 
@@ -453,6 +459,7 @@ def get_diffuse_horizontal_component_from_sarah(
         if csv:
             from pvgisprototype.cli.write import write_irradiance_csv
             write_irradiance_csv(
+            from pvgisprototype.cli.print import print_irradiance_table_2
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -461,3 +468,7 @@ def get_diffuse_horizontal_component_from_sarah(
             )
     else:
         print(diffuse_horizontal_irradiance_series)
+        from pvgisprototype.cli.write import write_irradiance_csv
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        from pvgisprototype.cli.print import print_finger_hash
