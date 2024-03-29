@@ -374,6 +374,8 @@ def get_direct_inclined_irradiance_time_series_pvgis(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
     show_progress: bool = True,
 ) -> np.array:
     direct_inclined_irradiance_series = calculate_direct_inclined_irradiance_time_series_pvgis(
@@ -413,74 +415,59 @@ def get_direct_inclined_irradiance_time_series_pvgis(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        fingerprint=fingerprint,
         show_progress=show_progress,
     )
-    if verbose > 0:
-        longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
-        latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-        print_irradiance_table_2(
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            timestamps=timestamps,
-            dictionary=direct_inclined_irradiance_series,
-            title=f'Direct inclined irradiance series {IRRADIANCE_UNITS}',
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
-        )
-        if statistics:
-            print_series_statistics(
-                # data_array=results[DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME],
-                data_array=direct_inclined_irradiance_series,
-                timestamps=timestamps,
-                title="Direct inclined irradiance",
-            )
-        if uniplot:
-            print(f'[reverse]Uniplot[/reverse]')
-            import os 
-            terminal_columns, _ = os.get_terminal_size() # we don't need lines!
-            terminal_length = int(terminal_columns * terminal_width_fraction)
-            from functools import partial
-            from uniplot import plot as default_plot
-            plot = partial(default_plot, width=terminal_length)
-            from pvgisprototype.api.series.hardcodings import exclamation_mark
-            title="Direct inclined irradiance"
-            lines = True
-
-            if isinstance(direct_inclined_irradiance_series, float):
-                print(f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
-                return
-
-            import numpy as np
-            if verbose > 0:
-                direct_inclined_irradiance_series = list(direct_inclined_irradiance_series.values())[0]
-
-            if isinstance(direct_inclined_irradiance_series, np.ndarray):
-                # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
-                supertitle = 'Photovoltaic Power Output Series'
-                # label = getattr(photovoltaic_power_output_series, 'name', None)
-                label = 'Photovoltaic Power'
-                # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
-                # unit = getattr(photovoltaic_power_output_series, 'units', None)
-                unit = IRRADIANCE_UNITS
-                plot(
-                    # xs=timestamps,
-                    # xs=photovoltaic_power_output_series,
-                    # ys=[photovoltaic_power_output_series, photovoltaic_power_output_series_2] if photovoltaic_power_output_series_2 is not None else photovoltaic_power_output_series,
-                    ys=direct_inclined_irradiance_series,
-                    legend_labels=label,
-                    lines=lines,
-                    title=title if title else supertitle,
-                    y_unit=' ' + str(unit),
-                )
-        if csv:
-            write_irradiance_csv(
+    if not quiet:
+        if verbose > 0:
+            longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+            latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
                 longitude=longitude,
                 latitude=latitude,
+                elevation=elevation,
                 timestamps=timestamps,
-                dictionary=direct_inclined_irradiance_series,
-                filename=csv,
+                dictionary=direct_inclined_irradiance_series.components,
+                title=f'Direct inclined irradiance series {IRRADIANCE_UNITS}',
+                rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
             )
-    else:
-        print(direct_inclined_irradiance_series)
+        else:
+            flat_list = direct_inclined_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=direct_inclined_irradiance_series.components,
+            filename=csv,
+        )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=direct_inclined_irradiance_series.value,
+            timestamps=timestamps,
+            title="Direct inclined irradiance",
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=direct_inclined_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Direct Inclined Irradiance Series',
+            title = 'Direct Inclined Irradiance Series',
+            label = 'Direct Inclined Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+            # terminal_width_fraction=terminal_width_fraction,
+        )
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=direct_inclined_irradiance_series.components)
