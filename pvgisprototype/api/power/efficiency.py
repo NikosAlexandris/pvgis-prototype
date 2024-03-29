@@ -40,19 +40,19 @@ from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
-from pvgisprototype.api.irradiance.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.api.power.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.validation.hashing import generate_hash
 from typing import List
 import numpy as np
 from enum import Enum, auto
-from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.irradiance.photovoltaic_module import get_coefficients_for_photovoltaic_module
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.power.photovoltaic_module import get_coefficients_for_photovoltaic_module
 
 
 def add_unequal_arrays(array_1, array_2):

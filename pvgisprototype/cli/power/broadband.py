@@ -14,7 +14,7 @@ from pvgisprototype.api.geometry.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.irradiance.power import calculate_photovoltaic_power_output_series
+from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.typer_parameters import typer_argument_elevation
@@ -107,7 +107,7 @@ from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype import LinkeTurbidityFactor
 from rich import print
 from pandas import DatetimeIndex
-from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 import typer
 from pvgisprototype.cli.typer_parameters import typer_option_log
 

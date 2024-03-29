@@ -64,12 +64,12 @@ from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
@@ -104,7 +104,7 @@ from pvgisprototype import PhotovoltaicPower
 from pandas import DatetimeIndex, to_datetime
 from pvgisprototype import SurfaceTilt
 from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.api.irradiance.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 
@@ -363,7 +363,7 @@ def calculate_photovoltaic_power_output_series(
                 array_backend=array_backend,
                 verbose=0,  # no verbosity here by choice!
                 log=log,
-            )
+            ).value  # Important !
         )[mask_above_horizon_not_in_shade]
 
     # Calculate diffuse and reflected irradiance for sun above horizon
@@ -449,7 +449,7 @@ def calculate_photovoltaic_power_output_series(
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
-        )[
+        ).value[  # Important !
             mask_above_horizon
         ]
 

@@ -13,7 +13,7 @@ from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_t
 from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 # from pvgisprototype.cli.irradiance.effective import app as effective_irradiance
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.api.irradiance.limits import app as limits
 from pvgisprototype.cli.irradiance.shortwave import app as global_irradiance
 from pvgisprototype.cli.irradiance.direct import app as direct_irradiance

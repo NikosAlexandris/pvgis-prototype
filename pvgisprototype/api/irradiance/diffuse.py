@@ -796,7 +796,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             array_backend=array_backend,
             verbose=0,
             log=log,
-        )
+        ).value  # Important !
 
     else:  # OR from the model
         # we still need the direct component, if NOT read fom external series!
