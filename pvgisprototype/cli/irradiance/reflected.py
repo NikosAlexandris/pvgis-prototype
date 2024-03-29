@@ -171,7 +171,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=ground_reflected_inclined_irradiance_series,
+            dictionary=ground_reflected_inclined_irradiance_series.components,
             title=REFLECTED_INCLINED_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
             rounding_places=rounding_places,
             index=index,
@@ -180,7 +180,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
         if statistics:
             from pvgisprototype.api.series.statistics import print_series_statistics
             print_series_statistics(
-                data_array=ground_reflected_inclined_irradiance_series[REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME],
+                data_array=ground_reflected_inclined_irradiance_series.value,
                 timestamps=timestamps,
                 title="Reflected inclined irradiance",
             )
@@ -189,8 +189,10 @@ def get_ground_reflected_inclined_irradiance_time_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=ground_reflected_inclined_irradiance_series,
+                dictionary=ground_reflected_inclined_irradiance_series.components,
                 filename=csv,
             )
     else:
-        print(ground_reflected_inclined_irradiance_series)
+        flat_list = ground_reflected_inclined_irradiance_series.value.flatten().astype(str)
+        csv_str = ','.join(flat_list)
+        print(csv_str)
