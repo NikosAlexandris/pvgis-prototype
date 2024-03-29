@@ -83,8 +83,7 @@ def print_table(headers: List[str], data: List[List[str]]) -> None:
     for row_data in data:
         table.add_row(*row_data)
 
-    console = Console()
-    console.print(table)
+    Console().print(table)
 
 
 def print_solar_position_table(
@@ -201,8 +200,7 @@ def print_solar_position_table(
         style = style_map.get(position_algorithm.lower(), None)
         table.add_row(*row, style=style)
 
-    console = Console()
-    console.print(table)
+    Console().print(table)
 
 
 def print_solar_position_series_table(
@@ -383,8 +381,7 @@ def print_solar_position_series_table(
         if group_models:
             table.add_row()
 
-    console = Console()
-    console.print(table)
+    Console().print(table)
 
 
 def print_hour_angle_table_2(
@@ -417,8 +414,7 @@ def print_hour_angle_table_2(
     # table.add_row(*row, style=style)
     table.add_row(*row)
 
-    console = Console()
-    console.print(table)
+    Console().print(table)
 
 
 def print_hour_angle_table(
@@ -430,8 +426,6 @@ def print_hour_angle_table(
     units=None,
 ) -> None:
     """ """
-    console = Console()
-
     latitude = round_float_values(latitude, rounding_places)
     # rounded_table = round_float_values(table, rounding_places)
     surface_tilt = round_float_values(surface_tilt, rounding_places)
@@ -466,7 +460,7 @@ def print_hour_angle_table(
     # table.add_row(*row, style=style)
     table.add_row(*row)
 
-    console.print(table)
+    Console().print(table)
 
 
 def print_noaa_solar_position_table(
@@ -481,8 +475,6 @@ def print_noaa_solar_position_table(
     angle_output_units: str = RADIANS,
     verbose: bool = False,  # New verbose argument
 ) -> None:
-    console = Console()
-
     # Round off longitude, latitude and solar position calculations
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
@@ -568,7 +560,7 @@ def print_noaa_solar_position_table(
             str(solar_position_calculations['sunset_time']),
         )
 
-    console.print(solar_position_table)
+    Console().print(solar_position_table)
 
     if verbose:
         verbose_info = f"""
@@ -579,7 +571,7 @@ def print_noaa_solar_position_table(
             True Solar Time: {solar_position_calculations['true_solar_time']}
             Solar Hour Angle: {solar_position_calculations['solar_hour_angle']}
             Solar Zenith: {solar_position_calculations['solar_zenith']} """
-        console.print(Panel(verbose_info, title="Verbose Information"))
+        Console().print(Panel(verbose_info, title="Verbose Information"))
 
 
 def print_quantity_table(
@@ -590,7 +582,6 @@ def print_quantity_table(
     verbose=1,
     index: bool = False,
 ) -> None:
-    console = Console()
     table = Table(title=title, box=box.SIMPLE_HEAD)
     
     if index:
@@ -648,7 +639,7 @@ def print_quantity_table(
         table.add_row(*row)
 
     if verbose:
-        console.print(table)
+        Console().print(table)
 
 
 def print_irradiance_table_2(
@@ -830,8 +821,7 @@ def print_irradiance_table_2(
         table.add_row(*row)
 
     if verbose:
-        console = Console()
-        console.print(table)
+        Console().print(table)
 
 
 def print_finger_hash(dictionary: dict):
@@ -848,5 +838,4 @@ def print_finger_hash(dictionary: dict):
             border_style="dim",
             style="dim",
         )
-        console = Console()
-        console.print(fingerprint_panel)
+        Console().print(fingerprint_panel)
