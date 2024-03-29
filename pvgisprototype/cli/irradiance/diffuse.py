@@ -11,8 +11,10 @@ from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_coeffic
 from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_function_time_series
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.diffuse import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_horizontal_component_from_sarah
-from pvgisprototype.cli.print import print_finger_hash
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
@@ -89,6 +91,10 @@ import numpy as np
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.cli.typer_parameters import typer_option_log
+from pvgisprototype.constants import DEGREES
+from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 
 
 app = typer.Typer(
@@ -387,7 +393,7 @@ def get_diffuse_horizontal_irradiance_time_series(
     help=f'☀∡ Calculate the diffuse irradiance incident on a surface over a period of time',
     rich_help_panel=rich_help_panel_series_irradiance,
 )
-def diffuse_inclined_irradiance_time_series(
+def get_diffuse_inclined_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -420,12 +426,16 @@ def diffuse_inclined_irradiance_time_series(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
     uniplot: Annotated[bool, typer_option_uniplot] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = 0,
     index: Annotated[bool, typer_option_index] = False,
     fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
     quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
@@ -441,6 +451,10 @@ def diffuse_inclined_irradiance_time_series(
         random_time_series=random_time_series,
         global_horizontal_component=global_horizontal_irradiance,
         direct_horizontal_component=direct_horizontal_irradiance,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
@@ -458,11 +472,12 @@ def diffuse_inclined_irradiance_time_series(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
-        mask_and_scale=mask_and_scale,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        in_memory=in_memory,
+        dtype=dtype,
+        array_backend=array_backend,
+        multi_thread=multi_thread,
         verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
     )
     if not quiet:
         if verbose > 0:
@@ -476,8 +491,10 @@ def diffuse_inclined_irradiance_time_series(
                 ),
                 timestamps=timestamps,
                 dictionary=diffuse_inclined_irradiance_time_series.components,
-                title=DIFFUSE_INCLINED_IRRADIANCE
-                + f" in-plane irradiance series {IRRADIANCE_UNITS}",
+                title = (
+                    DIFFUSE_INCLINED_IRRADIANCE
+                    + f" in-plane irradiance series {IRRADIANCE_UNITS}"
+                ),
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -515,7 +532,6 @@ def diffuse_inclined_irradiance_time_series(
             label_2 = None,
             unit = IRRADIANCE_UNITS,
         )
-
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=diffuse_inclined_irradiance_time_series.components)
@@ -539,14 +555,21 @@ def get_diffuse_horizontal_component_from_sarah(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
 ):
-    """Calculate the diffuse irradiance incident on a solar surface from SARAH
-    time series.
+    """Calculate the diffuse horizontal irradiance from SARAH time series.
 
     Parameters
     ----------
@@ -556,56 +579,98 @@ def get_diffuse_horizontal_component_from_sarah(
         reaches a horizontal plane at the surface of the Earth. This parameter
         comprises both direct and diffuse solar radiation.
 
+    direct: Path
+        Filename of surface .. time series
+        (short name : ``) from ECMWF which is the solar radiation that
+        reaches a horizontal plane at the surface of the Earth. 
+
     Returns
     -------
-    diffuse_irradiance: float
-        The diffuse radiant flux incident on a surface per unit area in W/m².
+    diffuse_horizontal_irradiance: float
+        The diffuse radiant flux incident on a horizontal surface per unit area in W/m².
     """
-    diffuse_horizontal_irradiance_series = calculate_diffuse_horizontal_component_from_sarah(
-        shortwave=shortwave,
-        direct=direct,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        mask_and_scale=mask_and_scale,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        in_memory=in_memory,
-        verbose=verbose,
-    )
-    if verbose > 0:
-        from pvgisprototype.cli.print import print_irradiance_table_2
-        print_irradiance_table_2(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=diffuse_horizontal_irradiance_series,
-            title=DIFFUSE_HORIZONTAL_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
-        )
-        if statistics:
-            from pvgisprototype.api.series.statistics import print_series_statistics
-            print_series_statistics(
-                data_array=diffuse_horizontal_irradiance_series[DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME],
-                timestamps=timestamps,
-                title="Diffuse horizontal irradiance",
-                # title=DIFFUSE_HORIZONTAL_IRRADIANCE,
-            )
-        if csv:
-            from pvgisprototype.cli.write import write_irradiance_csv
-            write_irradiance_csv(
-            from pvgisprototype.cli.print import print_irradiance_table_2
+    if shortwave and direct:
+        horizontal_irradiance_components = (
+            read_horizontal_irradiance_components_from_sarah(
+                shortwave=shortwave,
+                direct=direct,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=diffuse_horizontal_irradiance_series,
-                filename=csv,
+                mask_and_scale=mask_and_scale,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                in_memory=in_memory,
+                multi_thread=multi_thread,
+                verbose=verbose,
+                log=log,
             )
-    else:
-        print(diffuse_horizontal_irradiance_series)
+        )
+        global_horizontal_irradiance_series = horizontal_irradiance_components[
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        direct_horizontal_irradiance_series = horizontal_irradiance_components[
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        diffuse_horizontal_irradiance_series = calculate_diffuse_horizontal_component_from_sarah(
+            global_horizontal_irradiance_series=global_horizontal_irradiance_series,
+            direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
+            # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+            # timestamps=timestamps,
+            # neighbor_lookup=neighbor_lookup,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
+        )
+
+    if not quiet:
+        if verbose > 0:
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                dictionary=diffuse_horizontal_irradiance_series.components,
+                title=DIFFUSE_HORIZONTAL_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
+                rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
+            )
+        else:
+            flat_list = diffuse_horizontal_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+    if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=diffuse_horizontal_irradiance_series.components,
+            filename=csv,
+        )
+    if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=diffuse_horizontal_irradiance_series.value,
+            timestamps=timestamps,
+            title="Diffuse horizontal irradiance",
+        )
+    if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=diffuse_horizontal_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Diffuse Horizontal Irradiance Series',
+            title = 'Diffuse Horizontal Irradiance Series',
+            label = 'Diffuse Horizontal Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+        )
+    if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=diffuse_horizontal_irradiance_series.components)
