@@ -61,6 +61,7 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import DEGREES
+from pvgisprototype import Irradiance
 
 
 @log_function_call
@@ -279,13 +280,19 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    if verbose > 0:
-        return components
-
     log_data_fingerprint(
         data=ground_reflected_inclined_irradiance_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return ground_reflected_inclined_irradiance_series
+    return Irradiance(
+            value=ground_reflected_inclined_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=elevation,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            components=components,
+            )
