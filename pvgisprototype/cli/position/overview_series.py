@@ -176,6 +176,14 @@ def overview_series(
             rounding_places=rounding_places,
             group_models=group_models,
         )
+        # from pvgisprototype.cli.print import print_solar_position_series_in_columns
+        # print_solar_position_series_in_columns(
+        #         longitude=longitude,
+        #         latitude=latitude,
+        #         timestamps=timestamps,
+        #         timezone=timezone,
+        #         table=solar_position_series,
+        #         )
     if csv:
         write_solar_position_series_csv(
             longitude=longitude,
