@@ -79,6 +79,7 @@ import numpy as np
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress
+from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pandas import DatetimeIndex
 from rich import print
@@ -112,9 +113,14 @@ def get_direct_normal_irradiance_time_series(
     random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
 ) -> None:
     # with progress:
     direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
@@ -129,37 +135,63 @@ def get_direct_normal_irradiance_time_series(
         eccentricity_correction_factor=eccentricity_correction_factor,
         random_days=random_days,
         verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
     )
     # Reporting =============================================================
-    if verbose > 0:
-        print_irradiance_table_2(
-            timestamps=timestamps,
-            dictionary=direct_normal_irradiance_series,
-            title=direct_normal_irradiance_series['Title'] + f" normal irradiance series {IRRADIANCE_UNITS}",
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
-        )
-        if statistics:
-            print_series_statistics(
-                data_array=direct_normal_irradiance_series[DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME],
+    if not quiet:
+        if verbose > 0:
             from pvgisprototype.cli.print import print_irradiance_table_2
+            from pvgisprototype.constants import TITLE_KEY_NAME
+            print_irradiance_table_2(
                 timestamps=timestamps,
-                title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
+                dictionary=direct_normal_irradiance_series.components,
+                title = (
+                    direct_normal_irradiance_series.components[TITLE_KEY_NAME]
+                    + f" normal irradiance series {IRRADIANCE_UNITS}"
+                ),
                 rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
             )
-        if csv:
-            write_irradiance_csv(
-                longitude=None,
-                latitude=None,
-                timestamps=timestamps,
-                dictionary=direct_normal_irradiance_series,
-                filename=csv,
-            )
-    else:
-        print(direct_normal_irradiance_series)
+        else:
+            flat_list = direct_normal_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=direct_normal_irradiance_series[DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME],
+            timestamps=timestamps,
+            title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
+            rounding_places=rounding_places,
+        )
+    if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=None,
+            latitude=None,
+            timestamps=timestamps,
+            dictionary=direct_normal_irradiance_series.components,
+            filename=csv,
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=direct_normal_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Direct Normal Irradiance Series',
+            title = 'Direct Normal Irradiance Series',
+            label = 'Direct Normal Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+            # terminal_width_fraction=terminal_width_fraction,
+        )
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=direct_normal_irradiance_series.components)
 
 
 @app.command(
@@ -193,9 +225,13 @@ def get_direct_horizontal_irradiance_time_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
 ) -> None:
     """Calculate the direct horizontal irradiance (SID) [W*m-2]
 
@@ -205,7 +241,7 @@ def get_direct_horizontal_irradiance_time_series(
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
     """
-    results = calculate_direct_horizontal_irradiance_time_series(
+    direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
