@@ -26,8 +26,8 @@ from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_i
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.irradiance.efficiency import calculate_pv_efficiency_time_series
-from pvgisprototype.api.irradiance.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.algorithms.pvis.read import read_spectral_response
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
