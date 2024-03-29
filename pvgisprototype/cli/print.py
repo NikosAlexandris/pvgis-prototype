@@ -719,21 +719,12 @@ def print_irradiance_table_2(
     if solar_incidence_definition is not None:
         caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow]"
 
-    symbol_descriptions = {
-        "⌁": "Power",
-        "⭍": "Effective",
-        "🗤": "Diffuse",
-        "☈": "Reflected",
-        "∡": "Inclined",
-        "⤓": "Horizontal",
-        # "↻": "Orientation",
-        "⦜": "Normal",
-        "☀": "Clear-Sky",
-        "′": "Adjusted",
-    }
+    
+
+    from pvgisprototype.constants import SYMBOL_DESCRIPTIONS
     # add a caption for symbols found in the input dictionary
     caption += '\n[underline]Legend[/underline] '
-    for symbol, description in symbol_descriptions.items():
+    for symbol, description in SYMBOL_DESCRIPTIONS.items():
         if any(symbol in key for key in dictionary.keys()):
             caption += f"[yellow]{symbol}[/yellow] is {description}, "
     caption=caption.rstrip(', ')  # Remove trailing comma + space
