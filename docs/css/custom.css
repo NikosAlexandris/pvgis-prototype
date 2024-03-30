@@ -1,11 +1,21 @@
+h1 {
+  font-weight: bold;
+  color: #3555f6;
+}
+
 h2 {
   font-weight: bold;
-  color: #b0c4de; /* Light Steel Blue; adjust as needed for desired pale blue */
+  color: #3555f6;
 }
 
 h3 {
   font-weight: bold;
-  color: #b0c4de; /* Example for sub-sections; adjust selector and color as needed */
+  color: #3555f6;
+}
+
+h4 {
+  font-weight: bold;
+  color: #3555f6;
 }
 
 .termynal-comment {
