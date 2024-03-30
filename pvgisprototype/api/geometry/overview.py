@@ -55,6 +55,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED
 
 
@@ -342,7 +343,7 @@ def model_solar_geometry_overview(
             surface_tilt if surface_tilt is not None else None,
             solar_incidence if solar_incidence is not None else None,
     )
-    if verbose == 3:
+    if verbose == DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return position
@@ -408,7 +409,7 @@ def calculate_solar_geometry_overview(
                 ZENITH_NAME: getattr(solar_zenith, angle_output_units, NOT_AVAILABLE) if solar_zenith else None,
                 ALTITUDE_NAME: getattr(solar_altitude, angle_output_units, NOT_AVAILABLE) if solar_altitude else None,
                 AZIMUTH_NAME: getattr(solar_azimuth, angle_output_units, NOT_AVAILABLE) if solar_azimuth else None,
-                SURFACE_ORIENTATION_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
+                SURFACE_ORIENTATION_NAME: getattr(surface_orientation, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
                 SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
                 INCIDENCE_NAME: getattr(solar_incidence, angle_output_units, NOT_AVAILABLE) if solar_incidence else NOT_IMPLEMENTED,
                 UNITS_NAME: angle_output_units,
