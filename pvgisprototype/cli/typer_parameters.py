@@ -1166,6 +1166,12 @@ typer_option_rounding_places = typer.Option(
     rich_help_panel=rich_help_panel_output,
     # default_factory=5,
 )
+typer_option_panels_output = typer.Option(
+    '--panels',
+    help='Print output in panels',
+    show_default=True,
+    rich_help_panel=rich_help_panel_output,
+)
 
 
 # Output units
