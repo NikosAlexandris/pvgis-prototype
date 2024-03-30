@@ -6,29 +6,28 @@ from rich.console import Console
 from rich.table import Table
 from rich.columns import Columns
 from rich.panel import Panel
-from rich import box
+from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 from typing import List
 import numpy as np
 from pvgisprototype.constants import (
-    FINGERPRINT_COLUMN_NAME,
     TITLE_KEY_NAME,
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
-    SURFACE_TILT_COLUMN_NAME,
-    SURFACE_TILT_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
+    SURFACE_TILT_COLUMN_NAME,
+    SURFACE_TILT_NAME,
     POWER_MODEL_COLUMN_NAME,
     RADIATION_MODEL_COLUMN_NAME,
-    TIME_ALGORITHM_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
+    TIME_ALGORITHM_NAME,
     SOLAR_TIME_COLUMN_NAME,
     DECLINATION_COLUMN_NAME,
     DECLINATION_NAME,
     HOUR_ANGLE_COLUMN_NAME,
     HOUR_ANGLE_NAME,
-    POSITION_ALGORITHM_COLUMN_NAME,
-    POSITION_ALGORITHM_NAME,
+    POSITIONING_ALGORITHM_COLUMN_NAME,
+    POSITIONING_ALGORITHM_NAME,
     SOLAR_CONSTANT_COLUMN_NAME,
     PERIGEE_OFFSET_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
@@ -39,16 +38,20 @@ from pvgisprototype.constants import (
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_NAME,
     INCIDENCE_ALGORITHM_COLUMN_NAME,
+    INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
     INCIDENCE_DEFINITION,
     UNITS_COLUMN_NAME,
     UNITLESS,
     UNITS_NAME,
+    ANGLE_UNITS_NAME,
     ANGLE_UNITS_COLUMN_NAME,
     NOT_AVAILABLE,
     ROUNDING_PLACES_DEFAULT,
     RADIANS,
+    FINGERPRINT_NAME,
+    FINGERPRINT_COLUMN_NAME,
 )
 
 
@@ -77,7 +80,7 @@ def safe_get_value(dictionary, key, index, default='NA'):
 
 def print_table(headers: List[str], data: List[List[str]]) -> None:
     """Create and print a table with provided headers and data."""
-    table = Table(show_header=True, header_style="bold magenta", box=box.SIMPLE_HEAD)
+    table = Table(show_header=True, header_style="bold magenta", box=SIMPLE_HEAD)
     for header in headers:
         table.add_column(header)
 
@@ -129,7 +132,7 @@ def print_solar_position_table(
     if hour_angle is not None:
         columns.append(HOUR_ANGLE_COLUMN_NAME)
     if any(quantity is not None for quantity in quantities):
-        columns.append(POSITION_ALGORITHM_COLUMN_NAME)
+        columns.append(POSITIONING_ALGORITHM_COLUMN_NAME)
     if zenith is not None:
         columns.append(ZENITH_COLUMN_NAME)
     if altitude is not None:
@@ -140,7 +143,7 @@ def print_solar_position_table(
         columns.append(INCIDENCE_COLUMN_NAME)
     columns.append(UNITS_COLUMN_NAME)
 
-    table = Table(*columns, box=box.SIMPLE_HEAD)
+    table = Table(*columns, box=SIMPLE_HEAD)
 
     get_value_or_default = (
         lambda dictionary, key, default="-", not_available=NOT_AVAILABLE: default
@@ -152,7 +155,7 @@ def print_solar_position_table(
         declination_value = get_value_or_default(model_result, DECLINATION_NAME)
         hour_angle_value = get_value_or_default(model_result, HOUR_ANGLE_NAME)
         timing_algorithm = get_value_or_default(model_result, TIME_ALGORITHM_NAME)
-        position_algorithm = get_value_or_default(model_result, POSITION_ALGORITHM_NAME)
+        position_algorithm = get_value_or_default(model_result, POSITIONING_ALGORITHM_NAME)
         zenith_value = get_value_or_default(model_result, ZENITH_NAME)
         altitude_value = get_value_or_default(model_result, ALTITUDE_NAME)
         azimuth_value = get_value_or_default(model_result, AZIMUTH_NAME)
@@ -225,6 +228,8 @@ def print_solar_position_series_table(
     rounding_places=ROUNDING_PLACES_DEFAULT,
     group_models=False,
 ) -> None:
+    """
+    """
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
@@ -251,7 +256,7 @@ def print_solar_position_series_table(
     if hour_angle is not None:
         columns.append(HOUR_ANGLE_COLUMN_NAME)
     # if any(quantity is not None for quantity in quantities):
-    #     columns.append(POSITION_ALGORITHM_COLUMN_NAME)
+    #     columns.append(POSITIONING_ALGORITHM_COLUMN_NAME)
     if zenith is not None:
         columns.append(ZENITH_COLUMN_NAME)
     if altitude is not None:
@@ -295,7 +300,7 @@ def print_solar_position_series_table(
            #     str(user_requested_timezone),
            # ]
 
-    position_algorithm = rounded_table[first_model].get(POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
+    position_algorithm = rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
     caption += f"Positioning : [bold]{position_algorithm}[/bold], "
 
     incidence_angle_definition = rounded_table[first_model].get(INCIDENCE_DEFINITION, None) if incidence else None
@@ -305,7 +310,7 @@ def print_solar_position_series_table(
         *columns,
         title=title,
         caption=caption,
-        box=box.SIMPLE_HEAD,
+        box=SIMPLE_HEAD,
     )
 
     # Iterate over each timestamp and its corresponding result
@@ -314,7 +319,7 @@ def print_solar_position_series_table(
             # timing_algorithm = safe_get_value(model_result, TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
             declination_value = safe_get_value(model_result, DECLINATION_NAME, _index) if declination else None
             hour_angle_value = safe_get_value(model_result, HOUR_ANGLE_NAME, _index) if hour_angle else None
-            # position_algorithm = safe_get_value(model_result, POSITION_ALGORITHM_NAME, NOT_AVAILABLE)
+            # position_algorithm = safe_get_value(model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
             zenith_value = safe_get_value(model_result, ZENITH_NAME, _index) if zenith else None
             altitude_value = safe_get_value(model_result, ALTITUDE_NAME, _index) if altitude else None
             azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, _index) if azimuth else None
@@ -438,6 +443,7 @@ def print_solar_position_table_panels(
             padding=(0, 2),
             )
     panels.append(position_panel)
+
     # solar position Panel/s
     for model in rounded_table:
         table = Table(box=None, show_header=False, show_edge=False, pad_edge=False)
@@ -784,7 +790,7 @@ def print_irradiance_table_2(
     algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
     timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
-    position_algorithm = dictionary.get(POSITION_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
+    position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
 
     if algorithms or radiation_model or timing_algorithm or position_algorithm:
         caption += f"\n[underline]Algorithms[/underline]  "
@@ -818,7 +824,6 @@ def print_irradiance_table_2(
         caption += f'{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, '
         caption += f'{PERIGEE_OFFSET_COLUMN_NAME} : {perigee_offset}, '
         caption += f'{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_correction_factor}, '
-    
 
     from pvgisprototype.constants import SYMBOL_DESCRIPTIONS
     # add a caption for symbols found in the input dictionary
@@ -855,7 +860,7 @@ def print_irradiance_table_2(
             SURFACE_TILT_COLUMN_NAME,
             ANGLE_UNITS_COLUMN_NAME,
             TIME_ALGORITHM_COLUMN_NAME,
-            POSITION_ALGORITHM_COLUMN_NAME,
+            POSITIONING_ALGORITHM_COLUMN_NAME,
             INCIDENCE_ALGORITHM_COLUMN_NAME,
             INCIDENCE_DEFINITION,
             RADIATION_MODEL_COLUMN_NAME,
