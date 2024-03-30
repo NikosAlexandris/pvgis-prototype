@@ -74,6 +74,7 @@ def write_irradiance_csv(
     dictionary.pop('Title', NOT_AVAILABLE)
     fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
+    print(f'{dictionary=}')
 
     header = []
     if index:
