@@ -81,6 +81,8 @@ from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype import Irradiance
+from pvgisprototype.constants import IRRADIANCE_UNITS
 
 
 @log_function_call
@@ -160,7 +162,7 @@ def calculate_global_horizontal_irradiance_time_series(
         array_backend=array_backend,
         verbose=0,  # no verbosity here by choice!
         log=log,
-    )
+    ).value  # Important !
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
@@ -232,8 +234,6 @@ def calculate_global_horizontal_irradiance_time_series(
         'more_extended': lambda: {
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-            # "Temperature": temperature_series,
-            # "Wind speed": wind_speed_series,
         } if verbose > 2 else {},
 
         'fingerprint': lambda: {
@@ -245,9 +245,6 @@ def calculate_global_horizontal_irradiance_time_series(
     for key, component in components_container.items():
         components.update(component())
 
-    if verbose > 0:
-        return components
-
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -257,11 +254,20 @@ def calculate_global_horizontal_irradiance_time_series(
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return global_horizontal_irradiance_series
+    return Irradiance(
+            value=global_horizontal_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=elevation,
+            surface_orientation=None,
+            surface_tilt=None,
+            components=components,
+            )
 
 
 @log_function_call
-def calculate_global_irradiance_time_series(
+def calculate_global_inclined_irradiance_time_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -273,8 +279,6 @@ def calculate_global_irradiance_time_series(
     random_time_series: bool = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
-    # temperature_series: float = 25,
-    # wind_speed_series: float = 0,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
@@ -373,28 +377,28 @@ def calculate_global_irradiance_time_series(
     shape_of_array = (
         solar_altitude_series.value.shape
     )  # Borrow shape from solar_altitude_series
-    direct_irradiance_series = create_array(
+    direct_inclined_irradiance_series = create_array(
         shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
     )
-    diffuse_irradiance_series = create_array(
+    diffuse_inclined_irradiance_series = create_array(
         shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
     )
-    reflected_irradiance_series = create_array(
+    reflected_inclined_irradiance_series = create_array(
         shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
     )
 
     # For very low sun angles
-    direct_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
+    direct_inclined_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
 
     # For sun below the horizon
-    direct_irradiance_series[mask_below_horizon] = 0
-    diffuse_irradiance_series[mask_below_horizon] = 0
-    reflected_irradiance_series[mask_below_horizon] = 0
+    direct_inclined_irradiance_series[mask_below_horizon] = 0
+    diffuse_inclined_irradiance_series[mask_below_horizon] = 0
+    reflected_inclined_irradiance_series[mask_below_horizon] = 0
 
     # For sun above horizon and not in shade
     if np.any(mask_above_horizon_not_shade):
         # if given, will read from external time series
-        direct_irradiance_series[mask_above_horizon_not_shade] = (
+        direct_inclined_irradiance_series[mask_above_horizon_not_shade] = (
             calculate_direct_inclined_irradiance_time_series_pvgis(
                 longitude=longitude,
                 latitude=latitude,
@@ -430,13 +434,13 @@ def calculate_global_irradiance_time_series(
                 array_backend=array_backend,
                 verbose=0,  # no verbosity here by choice!
                 log=log,
-            )
+            ).value  # Important !
         )[mask_above_horizon_not_shade]
 
     # Calculate diffuse and reflected irradiance for sun above horizon
     if np.any(mask_above_horizon):
         # if given, will read from external time series
-        diffuse_irradiance_series[
+        diffuse_inclined_irradiance_series[
             mask_above_horizon
         ] = calculate_diffuse_inclined_irradiance_time_series(
             longitude=longitude,
@@ -469,10 +473,10 @@ def calculate_global_irradiance_time_series(
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
-        )[
+        ).value[  # Important !
             mask_above_horizon
         ]
-        reflected_irradiance_series[
+        reflected_inclined_irradiance_series[
             mask_above_horizon
         ] = calculate_ground_reflected_inclined_irradiance_time_series(
             longitude=longitude,
@@ -504,24 +508,24 @@ def calculate_global_irradiance_time_series(
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
-        )[
+        ).value[  # Important !
             mask_above_horizon
         ]
 
     # sum components
-    global_irradiance_series = (
-        direct_irradiance_series
-        + diffuse_irradiance_series
-        + reflected_irradiance_series
+    global_inclined_irradiance_series = (
+        direct_inclined_irradiance_series
+        + diffuse_inclined_irradiance_series
+        + reflected_inclined_irradiance_series
     )
     # Warning
     out_of_range_indices = np.where(
-        (global_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
-        | (global_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+        (global_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
+        | (global_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     )
     if out_of_range_indices[0].size > 0:
         print(
-                f"{WARNING_OUT_OF_RANGE_VALUES} in `global_irradiance_series` : {out_of_range_indices[0]}!"
+                f"{WARNING_OUT_OF_RANGE_VALUES} in `global_inclined_irradiance_series` : {out_of_range_indices[0]}!"
         )
 
     # Building the output dictionary ========================================
@@ -529,7 +533,7 @@ def calculate_global_irradiance_time_series(
     components_container = {
         'main': lambda: {
             TITLE_KEY_NAME: GLOBAL_INCLINED_IRRADIANCE,
-            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
+            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series,
         },# if verbose > 0 else {},
 
         'extended': lambda: {
@@ -539,11 +543,9 @@ def calculate_global_irradiance_time_series(
         } if verbose > 1 else {},
 
         'more_extended': lambda: {
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
-            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,
-            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
-            # "Temperature": temperature_series,
-            # "Wind speed": wind_speed_series,
+            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
+            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
+            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_inclined_irradiance_series,
         } if verbose > 2 else {},
 
         'even_more_extended': lambda: {
@@ -554,7 +556,7 @@ def calculate_global_irradiance_time_series(
         } if verbose > 3 else {},
 
         'fingerprint': lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(global_irradiance_series),
+            FINGERPRINT_COLUMN_NAME: generate_hash(global_inclined_irradiance_series),
         } if fingerprint else {},
     }
 
@@ -562,16 +564,22 @@ def calculate_global_irradiance_time_series(
     for key, component in components_container.items():
         components.update(component())
 
-    if verbose > 0:
-        return components
-
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     log_data_fingerprint(
-            data=global_irradiance_series,
+            data=global_inclined_irradiance_series,
             log_level=log,
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return global_irradiance_series
+    return Irradiance(
+            value=global_inclined_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=elevation,
+            surface_orientation=None,
+            surface_tilt=None,
+            components=components,
+            )
