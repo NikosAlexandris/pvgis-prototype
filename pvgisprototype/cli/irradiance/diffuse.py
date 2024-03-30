@@ -628,13 +628,14 @@ def get_diffuse_horizontal_component_from_sarah(
 
     if not quiet:
         if verbose > 0:
+            from pvgisprototype.constants import TITLE_KEY_NAME
             from pvgisprototype.cli.print import print_irradiance_table_2
             print_irradiance_table_2(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
                 dictionary=diffuse_horizontal_irradiance_series.components,
-                title=DIFFUSE_HORIZONTAL_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
+                title=diffuse_horizontal_irradiance_series.components[TITLE_KEY_NAME] + f' in-plane irradiance series {IRRADIANCE_UNITS}',
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
