@@ -42,6 +42,7 @@ def model_solar_azimuth(
     apply_atmospheric_refraction: bool = True,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
 ) -> SolarAzimuth:
     """
     The solar azimuth angle measures horizontally around the horizon from north
