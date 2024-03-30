@@ -1,4 +1,5 @@
 import csv
+from pathlib import Path
 import numpy as np
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
@@ -32,6 +33,7 @@ from pvgisprototype.constants import (
     NOT_AVAILABLE,
     ROUNDING_PLACES_DEFAULT,
     RADIANS,
+    FINGERPRINT_COLUMN_NAME,
 )
 
 
@@ -59,18 +61,21 @@ def safe_get_value(dictionary, key, index, default='NA'):
 
 
 def write_irradiance_csv(
-    longitude=None,
-    latitude=None,
-    timestamps=[],
-    dictionary={},
+    longitude = None,
+    latitude = None,
+    timestamps = [],
+    dictionary = {},
     index: bool = False,
-    filename='irradiance.csv',
+    filename: Path = 'irradiance.csv',
 ):
     """
     """
+    print(f'{dictionary=}')
     # remove the 'Title' entry! ---------------------------------------------
     dictionary.pop('Title', NOT_AVAILABLE)
+    fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
+    print(f'{dictionary=}')
 
     header = []
     if index:
@@ -105,10 +110,12 @@ def write_irradiance_csv(
         rows.append(row)
     
     # Write to CSV
-    with open(filename, 'w', newline='') as file:
+    if fingerprint:
+        filename = filename.with_stem(filename.stem + f'_{fingerprint}')
+    with filename.open('w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(header)
-        writer.writerows(rows)
+        writer.writerow(header)  # assuming a list of column names
+        writer.writerows(rows)  # a list of rows, each row a list of values
 
 
 def write_solar_position_series_csv(
