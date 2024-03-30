@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime
 import numpy as np
 from pvgisprototype.api.irradiance.shortwave import calculate_global_horizontal_irradiance_time_series
-from pvgisprototype.api.irradiance.shortwave import calculate_global_irradiance_time_series
+from pvgisprototype.api.irradiance.shortwave import calculate_global_inclined_irradiance_time_series
 from pvgisprototype.algorithms.pvis.power import calculate_spectrally_resolved_global_irradiance_series
 import typer
 from pvgisprototype.cli.typer_parameters import OrderCommands
@@ -48,6 +48,8 @@ from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_statistics
 from pvgisprototype.cli.typer_parameters import typer_option_csv
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot
+from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_index
 
@@ -55,9 +57,6 @@ from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.api.geometry.models import SolarIncidenceModel
-from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -81,6 +80,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from rich import print
+from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 
 
 app = typer.Typer(
@@ -132,9 +132,13 @@ def get_global_horizontal_irradiance_time_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = False,
     log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
 ):
     """Calculate the global horizontal irradiance (GHI)
 
@@ -142,7 +146,7 @@ def get_global_horizontal_irradiance_time_series(
     radiation received from above by a surface horizontal to the ground. It
     includes both the direct and the diffuse solar radiation.
     """
-    results = calculate_global_horizontal_irradiance_time_series(
+    global_horizontal_irradiance_series = calculate_global_horizontal_irradiance_time_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -175,34 +179,61 @@ def get_global_horizontal_irradiance_time_series(
         verbose=verbose,
         log=log,
     )
-    if verbose > 0:
-        print_irradiance_table_2(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=results,
-            title=results['Title'] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
-        )
-        if statistics:
-            print_series_statistics(
-                data_array=results[GLOBAL_INCLINED_IRRADIANCE],
+    if not quiet:
+        if verbose > 0:
+            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
+                longitude=longitude,
+                latitude=latitude,
                 timestamps=timestamps,
-                title="Global irradiance",
+                dictionary=global_horizontal_irradiance_series.components,
+                title = (
+                    global_horizontal_irradiance_series.components[TITLE_KEY_NAME]
+                    + f" in-plane irradiance series {IRRADIANCE_UNITS}"
+                ),
                 rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
             )
-        if csv:
-            write_irradiance_csv(
-                longitude=None,
-                latitude=None,
-                timestamps=timestamps,
-                dictionary=results,
-                filename=csv,
-            )
-    else:
-        print(results)
+        else:
+            flat_list = global_horizontal_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=None,
+            latitude=None,
+            timestamps=timestamps,
+            dictionary=global_horizontal_irradiance_series.components,
+            filename=csv,
+        )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=global_horizontal_irradiance_series.value,
+            timestamps=timestamps,
+            title="Global irradiance",
+            rounding_places=rounding_places,
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=global_horizontal_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Global Horizontal Irradiance Series',
+            title = 'Global Horizontal Irradiance Series',
+            label = 'Global Horizontal Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+            # terminal_width_fraction=terminal_width_fraction,
+        )
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=global_horizontal_irradiance_series.components)
 
 
 @app.command(
@@ -211,7 +242,7 @@ def get_global_horizontal_irradiance_time_series(
     help=f'Calculate the broadband global inclined irradiance over a time series',
     rich_help_panel=rich_help_panel_series_irradiance,
 )
-def get_global_irradiance_time_series(
+def get_global_inclined_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -249,9 +280,13 @@ def get_global_irradiance_time_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = False,
     log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
 ):
     """Calculate the global horizontal irradiance (GHI)
 
@@ -259,7 +294,7 @@ def get_global_irradiance_time_series(
     radiation received from above by a surface horizontal to the ground. It
     includes both the direct and the diffuse solar radiation.
     """
-    results = calculate_global_irradiance_time_series(
+    global_inclined_irradiance_series = calculate_global_inclined_irradiance_time_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -296,34 +331,58 @@ def get_global_irradiance_time_series(
         verbose=verbose,
         log=log,
     )
-    if verbose > 0:
-        print_irradiance_table_2(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=results,
-            title=results['Title'] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
-        )
-        if statistics:
-            print_series_statistics(
-                data_array=results[GLOBAL_INCLINED_IRRADIANCE],
+    if not quiet:
+        if verbose > 0:
+            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
+                longitude=longitude,
+                latitude=latitude,
                 timestamps=timestamps,
-                title="Global irradiance",
+                dictionary=global_inclined_irradiance_series,
+                title=global_inclined_irradiance_series[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
                 rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
             )
-        if csv:
-            write_irradiance_csv(
-                longitude=None,
-                latitude=None,
-                timestamps=timestamps,
-                dictionary=results,
-                filename=csv,
-            )
-    else:
-        print(results)
+        else:
+            flat_list = global_inclined_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=None,
+            latitude=None,
+            timestamps=timestamps,
+            dictionary=global_inclined_irradiance_series.components,
+            filename=csv,
+        )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=global_inclined_irradiance_series.value,
+            timestamps=timestamps,
+            title="Global irradiance",
+            rounding_places=rounding_places,
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=global_inclined_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Global Inclined Irradiance Series',
+            title = 'Global Inclined Irradiance Series',
+            label = 'Global Inclined Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+            # terminal_width_fraction=terminal_width_fraction,
+        )
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=global_inclined_irradiance_series.components)
 
 
 @app.command(
@@ -332,7 +391,7 @@ def get_global_irradiance_time_series(
     help=f'Calculate the spectrally resolved global inclined irradiance over a time series',
     rich_help_panel=rich_help_panel_series_irradiance,
 )
-def get_spectrally_resolved_global_irradiance_series(
+def get_spectrally_resolved_global_inclined_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -373,9 +432,13 @@ def get_spectrally_resolved_global_irradiance_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = 'series_in',
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = 0,
     log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
 ):
     """
     Calculate the spectrally resolved global irradiance series over a location
@@ -385,7 +448,7 @@ def get_spectrally_resolved_global_irradiance_series(
     Considering shadowing effects of the local topography are optionally
     incorporated.
     """
-    results = calculate_spectrally_resolved_global_irradiance_series(
+    spectrally_resolved_global_inclined_irradiance_series = calculate_spectrally_resolved_global_inclined_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -426,32 +489,60 @@ def get_spectrally_resolved_global_irradiance_series(
         verbose=verbose,
         log=log,
     )
-
-    if verbose > 0:
-        print_irradiance_table_2(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=results,
-            title=results['Title'] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
-        )
-        if statistics:
-            print_series_statistics(
-                data_array=results[GLOBAL_INCLINED_IRRADIANCE],
+    if not quiet:
+        if verbose > 0:
+            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
+                longitude=longitude,
+                latitude=latitude,
                 timestamps=timestamps,
-                title="Spectrally resolved global irradiance",
+                dictionary=spectrally_resolved_global_inclined_irradiance_series.components,
+                title = (
+                    spectrally_resolved_global_inclined_irradiance_series[
+                        TITLE_KEY_NAME
+                    ]
+                    + f" in-plane irradiance series {IRRADIANCE_UNITS}"
+                ),
                 rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
             )
-        if csv:
-            write_irradiance_csv(
-                longitude=None,
-                latitude=None,
-                timestamps=timestamps,
-                dictionary=results,
-                filename=csv,
-            )
-    else:
-        print(results)
+        else:
+            flat_list = spectrally_resolved_global_inclined_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=None,
+            latitude=None,
+            timestamps=timestamps,
+            dictionary=spectrally_resolved_global_inclined_irradiance_series.components,
+            filename=csv,
+        )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=spectrally_resolved_global_inclined_irradiance_series.value,
+            timestamps=timestamps,
+            title="Spectrally resolved global irradiance",
+            rounding_places=rounding_places,
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=spectrally_resolved_global_inclined_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Global Horizontal Irradiance Series',
+            title = 'Global Horizontal Irradiance Series',
+            label = 'Global Horizontal Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+            # terminal_width_fraction=terminal_width_fraction,
+        )
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=spectrally_resolved_global_inclined_irradiance_series.components)
