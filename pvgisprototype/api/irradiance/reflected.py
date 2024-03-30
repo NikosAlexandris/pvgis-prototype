@@ -168,7 +168,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
                     verbose=0,  # no verbosity here by choice!
                     log=log,
                 )
-            )
+            ).value  # Important !
             extraterrestrial_normal_irradiance_series = (
                 calculate_extraterrestrial_normal_irradiance_time_series(
                     timestamps=timestamps,
