@@ -567,7 +567,7 @@ def print_noaa_solar_position_table(
         'Noon',
         'Local solar time',
         "Sunset",
-        box=box.SIMPLE_HEAD,
+        box=SIMPLE_HEAD,
     )
     solar_position_table.add_row(
         str(longitude),
@@ -608,7 +608,7 @@ def print_noaa_solar_position_table(
             'Noon',
             'Local solar time',
             "Sunset",
-            box=box.SIMPLE_HEAD,
+            box=SIMPLE_HEAD,
         )
         solar_position_table.add_row(
             str(longitude),
@@ -649,7 +649,7 @@ def print_quantity_table(
     verbose=1,
     index: bool = False,
 ) -> None:
-    table = Table(title=title, box=box.SIMPLE_HEAD)
+    table = Table(title=title, box=SIMPLE_HEAD)
     
     if index:
         table.add_column("Index")
@@ -801,7 +801,7 @@ def print_irradiance_table_2(
     table = Table(
             title=title,
             caption=caption.rstrip(', '),  # Remove trailing comma + space
-            box=box.SIMPLE_HEAD,
+            box=SIMPLE_HEAD,
             )
     
     if index:
