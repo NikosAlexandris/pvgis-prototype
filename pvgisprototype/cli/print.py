@@ -385,6 +385,101 @@ def print_solar_position_series_table(
     Console().print(table)
 
 
+def print_solar_position_table_panels(
+    longitude,
+    latitude,
+    timestamp,
+    timezone,
+    table,
+    rounding_places=ROUNDING_PLACES_DEFAULT,
+    surface_orientation=True,
+    surface_tilt=True,
+    timing=None,
+    declination=None,
+    hour_angle=None,
+    zenith=None,
+    altitude=None,
+    azimuth=None,
+    incidence=None,
+    user_requested_timestamp=None,
+    user_requested_timezone=None,
+) -> None:
+    """
+    """
+    rounded_table = round_float_values(table, rounding_places)
+    first_model = next(iter(rounded_table))
+    panels = []
+
+    # surface position Panel
+    table = Table(box=None, show_header=False, show_edge=False, pad_edge=False)
+    table.add_column(justify="right", style="none", no_wrap=True)
+    table.add_column(justify="left")
+    table.add_row(f"{LATITUDE_COLUMN_NAME} :", f"[bold]{latitude}[/bold]")
+    table.add_row(f"{LONGITUDE_COLUMN_NAME} :", f"[bold]{longitude}[/bold]")
+    table.add_row("Time :", f"{timestamp}")
+    table.add_row("Time zone :", f"{timezone}")
+    latitude = round_float_values(latitude, rounding_places)
+    longest_label_length = max(len(key) for key in first_model.keys())
+    surface_position_keys = {
+            SURFACE_ORIENTATION_NAME,
+            SURFACE_TILT_NAME,
+            ANGLE_UNITS_NAME,
+            }
+    for key, value in first_model.items():
+        if key in surface_position_keys:
+            padded_key = f"{key} :".ljust(longest_label_length + 3, ' ')
+            table.add_row(padded_key, str(value))
+    position_panel = Panel(
+            table,
+            title="Surface Position",
+            box=HORIZONTALS,
+            style='',
+            expand=False,
+            padding=(0, 2),
+            )
+    panels.append(position_panel)
+    # solar position Panel/s
+    for model in rounded_table:
+        table = Table(box=None, show_header=False, show_edge=False, pad_edge=False)
+        table.add_column(justify="right", style="none", no_wrap=True)
+        table.add_column(justify="left")
+
+        longest_label_length = max(len(key) for key in model.keys())
+        keys_to_exclude = {
+                SURFACE_ORIENTATION_NAME,
+                SURFACE_TILT_NAME,
+                UNITS_NAME,
+                TIME_ALGORITHM_NAME,
+                POSITIONING_ALGORITHM_NAME,
+                INCIDENCE_DEFINITION,
+                FINGERPRINT_NAME,
+        }
+        for key, value in model.items():
+            if key not in keys_to_exclude:
+                padded_key = f"{key} :".ljust(longest_label_length + 3, ' ')
+                table.add_row(padded_key, str(value))
+        
+        get_value_or_default = (
+            lambda dictionary, key, default="-", not_available=NOT_AVAILABLE: default
+            if dictionary.get(key, not_available) is None
+            else dictionary.get(key, not_available)
+        )
+        # title = f"{POSITIONING_ALGORITHM_COLUMN_NAME}: {get_value_or_default(model, POSITIONING_ALGORITHM_NAME)}"
+        title = f"[bold]{get_value_or_default(model, POSITIONING_ALGORITHM_NAME)}[/bold]"
+        # panel_style = Style(dim=False)  # Use this style to dim the text and box
+        panel = Panel(
+                table,
+                title=title,
+                box=ROUNDED,
+                # style=panel_style,
+                padding=(0, 2),
+                )
+        panels.append(panel)
+
+    columns = Columns(panels, expand=True, equal=True, padding=2)
+    Console().print(columns)
+
+
 def print_hour_angle_table_2(
     solar_time,
     rounding_places,
