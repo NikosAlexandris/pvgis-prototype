@@ -27,6 +27,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correc
 from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer_parameters import typer_option_panels_output
 
 from pvgisprototype.api.geometry.models import SolarPositionModel
 from pvgisprototype.api.geometry.models import SolarTimeModel
@@ -68,6 +69,7 @@ def overview(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    panels: Annotated[bool, typer_option_panels_output] = False,
     ):
     """
     """
@@ -120,20 +122,41 @@ def overview(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    print_solar_position_table(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        table=solar_position,
-        rounding_places=rounding_places,
-        timing=True,
-        declination=True,
-        hour_angle=True,
-        zenith=True,
-        altitude=True,
-        azimuth=True,
-        incidence=False,  # Add Me ?
-        user_requested_timestamp=user_requested_timestamp, 
-        user_requested_timezone=user_requested_timezone
-    )
+    if not panels:
+        print_solar_position_table(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            table=solar_position,
+            rounding_places=rounding_places,
+            timing=True,
+            declination=True,
+            hour_angle=True,
+            zenith=True,
+            altitude=True,
+            azimuth=True,
+            incidence=False,  # Add Me ?
+            user_requested_timestamp=user_requested_timestamp, 
+            user_requested_timezone=user_requested_timezone
+        )
+    else:
+        from pvgisprototype.cli.print import print_solar_position_table_panels
+        print_solar_position_table_panels(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            table=solar_position,
+            rounding_places=rounding_places,
+            timing=True,
+            declination=True,
+            hour_angle=True,
+            zenith=True,
+            altitude=True,
+            azimuth=True,
+            incidence=False,  # Add Me ?
+            user_requested_timestamp=user_requested_timestamp, 
+            user_requested_timezone=user_requested_timezone
+        )
+
