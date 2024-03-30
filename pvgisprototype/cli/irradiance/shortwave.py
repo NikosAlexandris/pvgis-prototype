@@ -81,6 +81,8 @@ from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from rich import print
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 
 
 app = typer.Typer(
@@ -131,7 +133,7 @@ def get_global_horizontal_irradiance_time_series(
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = None,
     uniplot: Annotated[bool, typer_option_uniplot] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = False,
@@ -178,6 +180,7 @@ def get_global_horizontal_irradiance_time_series(
         angle_output_units=angle_output_units,
         verbose=verbose,
         log=log,
+        fingerprint=fingerprint,
     )
     if not quiet:
         if verbose > 0:
@@ -258,6 +261,8 @@ def get_global_inclined_irradiance_time_series(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
@@ -279,7 +284,7 @@ def get_global_inclined_irradiance_time_series(
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
     statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series_in',
+    csv: Annotated[Path, typer_option_csv] = None,
     uniplot: Annotated[bool, typer_option_uniplot] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = False,
@@ -328,8 +333,12 @@ def get_global_inclined_irradiance_time_series(
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
+        # multi_thread=multi_thread,
         verbose=verbose,
         log=log,
+        fingerprint=fingerprint,
     )
     if not quiet:
         if verbose > 0:
@@ -339,8 +348,8 @@ def get_global_inclined_irradiance_time_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=global_inclined_irradiance_series,
-                title=global_inclined_irradiance_series[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
+                dictionary=global_inclined_irradiance_series.components,
+                title=global_inclined_irradiance_series.components[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -407,6 +416,8 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = 180,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = 45,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
