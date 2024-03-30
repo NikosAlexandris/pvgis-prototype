@@ -70,8 +70,7 @@ def write_irradiance_csv(
 ):
     """
     """
-    print(f'{dictionary=}')
-    # remove the 'Title' entry! ---------------------------------------------
+    # remove 'Title' and 'Fingerprint' : we don't want repeated values ! ----
     dictionary.pop('Title', NOT_AVAILABLE)
     fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
