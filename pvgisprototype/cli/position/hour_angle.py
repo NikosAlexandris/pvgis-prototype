@@ -7,7 +7,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
-from pvgisprototype.api.geometry.hour_angle import calculate_solar_hour_angle
+from pvgisprototype.api.position.hour_angle import calculate_solar_hour_angle
 from pvgisprototype.cli.print import print_hour_angle_table_2
 
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT

@@ -8,9 +8,9 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pathlib import Path
 
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import select_models
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import select_models
 
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
@@ -39,7 +39,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_index
 
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.geometry.overview_series import calculate_solar_geometry_overview_time_series
+from pvgisprototype.api.position.overview_series import calculate_solar_geometry_overview_time_series
 from pvgisprototype.cli.write import write_solar_position_series_csv
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT

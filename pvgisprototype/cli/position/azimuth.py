@@ -4,9 +4,9 @@ from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import select_models
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import select_models
 
 from pvgisprototype.cli.typer_parameters import typer_argument_longitude
 from pvgisprototype.cli.typer_parameters import typer_argument_latitude
@@ -34,7 +34,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.geometry.azimuth import calculate_solar_azimuth
+from pvgisprototype.api.position.azimuth import calculate_solar_azimuth
 from pvgisprototype.cli.print import print_solar_position_table
 
 
