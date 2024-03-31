@@ -11,28 +11,34 @@ import math
 import numpy as np
 from enum import Enum
 from rich import print
+from pandas import DatetimeIndex, to_datetime
 from datetime import datetime
-from pvgisprototype.api.geometry.models import SolarDeclinationModel
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
+from pvgisprototype import SurfaceTilt
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import SpectralFactorSeries
+from pvgisprototype import PhotovoltaicPower
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.print import print_irradiance_table_2
+from pvgisprototype.api.position.models import SolarDeclinationModel
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
-from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -64,12 +70,10 @@ from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
@@ -98,15 +102,9 @@ from pvgisprototype.constants import SHADE_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype import PhotovoltaicPower
-from pandas import DatetimeIndex, to_datetime
-from pvgisprototype import SurfaceTilt
-from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype import SpectralFactorSeries
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
+from pvgisprototype.cli.print import print_irradiance_table_2
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @log_function_call

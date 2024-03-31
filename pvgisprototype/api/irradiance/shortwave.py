@@ -13,19 +13,20 @@ from enum import Enum
 from rich import print
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pvgisprototype.validation.arrays import create_array
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
-from pvgisprototype.api.geometry.solar_time_series import model_solar_time_time_series
-from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.solar_time_series import model_solar_time_time_series
+from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
+from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse import diffuse_transmission_function_time_series
@@ -94,7 +95,7 @@ def calculate_global_horizontal_irradiance_time_series(
     start_time: Optional[datetime] = None,
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
-    timezone: Optional[str] = None,
+    timezone: ZoneInfo | None = None,
     random_time_series: bool = False,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
@@ -275,7 +276,7 @@ def calculate_global_inclined_irradiance_time_series(
     start_time: Optional[datetime] = None,
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
-    timezone: Optional[str] = None,
+    timezone: ZoneInfo | None = None,
     random_time_series: bool = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
