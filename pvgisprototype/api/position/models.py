@@ -17,22 +17,8 @@ def validate_model(enum_type: Type[Enum], model: List[Enum]) -> Enum:
     """Check that one and only one model from an Enum class is selected"""
     if model == enum_type.all:  # or len(model) > 1: will not work! -- ReviewMe
         raise typer.BadParameter(f"You can select only one model for [code]solar_time_model[/code]. Multiple or all are not a meaningful option.")
+
     return model
-
-
-class SolarIncidenceModel(str, Enum):
-    all = 'all'
-    pvis = 'PVIS'
-    jenco = 'Jenco'
-
-
-class SolarDeclinationModel(str, Enum):
-    all = 'all'
-    # pvgis = 'PVGIS'
-    hargreaves = 'Hargreaves'
-    noaa = 'NOAA'
-    pvis = 'PVIS'
-    pvlib = 'pvlib'
 
 
 class SolarTimeModel(str, Enum):
@@ -42,6 +28,15 @@ class SolarTimeModel(str, Enum):
     noaa = 'NOAA'
     pvgis = 'PVGIS'
     skyfield = 'Skyfield'
+
+
+class SolarDeclinationModel(str, Enum):
+    all = 'all'
+    # pvgis = 'PVGIS'
+    hargreaves = 'Hargreaves'
+    noaa = 'NOAA'
+    pvis = 'PVIS'
+    pvlib = 'pvlib'
 
 
 class SolarPositionModel(str, Enum):
@@ -55,7 +50,13 @@ class SolarPositionModel(str, Enum):
     suncalc = 'suncalc'
 
 
-SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.jenco
-SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
+class SolarIncidenceModel(str, Enum):
+    all = 'all'
+    pvis = 'PVIS'
+    jenco = 'Jenco'
+
+
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
+SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
 SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa
+SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.jenco

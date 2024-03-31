@@ -13,8 +13,8 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarGeometryOverviewTimeSeriesInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype import SolarAltitude
 from datetime import datetime
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL

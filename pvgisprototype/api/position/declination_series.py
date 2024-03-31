@@ -1,20 +1,10 @@
-
 from devtools import debug
 from typing import Union
 from typing import Sequence
-# from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
-# from math import pi
-# from math import sin
-# from math import asin
-
-# from pvgisprototype.validation.functions import validate_with_pydantic
-# from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
-# from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
-# from pvgisprototype import FractionalYear
 from pvgisprototype import SolarDeclination
-from .models import SolarDeclinationModels
+from pvgisprototype.api.geometry.models import SolarDeclinationModels
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
