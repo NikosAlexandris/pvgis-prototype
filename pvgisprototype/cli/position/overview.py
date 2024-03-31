@@ -29,10 +29,10 @@ from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.typer_parameters import typer_option_panels_output
 
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import select_models
-from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import select_models
+from pvgisprototype.api.position.overview import calculate_solar_geometry_overview
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.print import print_solar_position_table
 
@@ -47,6 +47,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
+
 
 def overview(
     ctx: typer.Context,

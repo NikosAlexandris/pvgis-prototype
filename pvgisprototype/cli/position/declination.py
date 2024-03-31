@@ -5,8 +5,8 @@ from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from pvgisprototype.api.geometry.models import SolarDeclinationModel
-from pvgisprototype.api.geometry.models import select_models
+from pvgisprototype.api.position.models import SolarDeclinationModel
+from pvgisprototype.api.position.models import select_models
 
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
 from pvgisprototype.cli.typer_parameters import typer_option_timezone
@@ -20,7 +20,7 @@ from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
 from pvgisprototype.api.utilities.timestamp import random_datetimezone
-from pvgisprototype.api.geometry.declination import calculate_solar_declination
+from pvgisprototype.api.position.declination import calculate_solar_declination
 from pvgisprototype.cli.print import print_solar_position_table
 
 from pvgisprototype.constants import RADIANS

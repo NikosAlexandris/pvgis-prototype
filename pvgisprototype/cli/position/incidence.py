@@ -26,10 +26,10 @@ from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import select_models
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import select_models
 
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
@@ -45,7 +45,7 @@ from math import radians
 from math import pi
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.timestamp import random_datetimezone
-from pvgisprototype.api.geometry.incidence import calculate_solar_incidence
+from pvgisprototype.api.position.incidence import calculate_solar_incidence
 from pvgisprototype.cli.print import print_solar_position_table
 
 
