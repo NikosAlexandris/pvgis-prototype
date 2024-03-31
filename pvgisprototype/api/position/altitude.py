@@ -2,24 +2,25 @@ from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import isfinite
+
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeInputModel
+
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype import SolarAltitude
-from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
-from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
-import suncalc
-import pysolar
-from pvgisprototype.api.utilities.timestamp import attach_timezone
 
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype import SolarAltitude
+
+from pvgisprototype.api.utilities.timestamp import attach_timezone
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_altitude_noaa
-import suncalc
-import pysolar
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_pvlib
+import pysolar
+from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
+import suncalc
+
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT

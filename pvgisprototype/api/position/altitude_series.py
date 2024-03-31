@@ -1,16 +1,19 @@
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from typing import List, Union, Sequence
+from pandas import DatetimeIndex
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype import SolarAltitude
-from datetime import datetime
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
+from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
+from pvgisprototype.algorithms.caching import custom_hashkey
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -22,13 +25,8 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from rich import print
-from pandas import DatetimeIndex
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
+from rich import print
 
 
 @log_function_call
@@ -86,6 +84,7 @@ def model_solar_altitude_time_series(
     return solar_altitude_series
 
 
+@log_function_call
 def calculate_solar_altitude_time_series(
     longitude: Longitude,
     latitude: Latitude,

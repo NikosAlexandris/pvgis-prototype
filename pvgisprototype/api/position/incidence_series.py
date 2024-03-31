@@ -8,8 +8,8 @@ from typing import Union
 from zoneinfo import ZoneInfo
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SurfaceOrientation
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
