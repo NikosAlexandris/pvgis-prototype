@@ -16,78 +16,55 @@ from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from math import sin
 from math import asin
 from math import cos
 from math import atan
 import numpy as np
-from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
-from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.api.geometry.models import validate_model
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
-from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from numpy import ndarray
 from typing import Annotated
 from typing import Optional
 from typing import Union
 from typing import Sequence
 from typing import List
-from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
-# from pvgisprototype.api.utilities.progress import progress
-# from rich.progress import Progress
+from pathlib import Path
+from pvgisprototype import SolarAltitude
+from pvgisprototype import RefractedSolarAltitude
+from pvgisprototype import OpticalAirMass
+from pvgisprototype import RayleighThickness
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import Elevation
+from pvgisprototype import Irradiance
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import AdjustElevationInputModel
+from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
+from pvgisprototype.api.position.models import validate_model
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
+from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from rich import print
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
+# from pvgisprototype.api.utilities.progress import progress
+# from rich.progress import Progress
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-from pvgisprototype.cli.typer_parameters import typer_argument_elevation
-from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
-from pvgisprototype.cli.typer_parameters import typer_option_start_time
-from pvgisprototype.cli.typer_parameters import typer_option_frequency
-from pvgisprototype.cli.typer_parameters import typer_option_end_time
-from pvgisprototype.cli.typer_parameters import typer_option_convert_longitude_360
-from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
-from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
-from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
-from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
-from pvgisprototype.cli.typer_parameters import typer_option_tolerance
-from pvgisprototype.cli.typer_parameters import typer_option_in_memory
-from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
-from pvgisprototype.cli.typer_parameters import typer_option_optical_air_mass_series
-from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
-from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
-from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
-from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
-from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_angle_units
-from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.cli.typer_parameters import typer_option_index
+from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -140,32 +117,17 @@ from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from zoneinfo import ZoneInfo
-from pvgisprototype import SolarAltitude
-from pvgisprototype import RefractedSolarAltitude
-from pvgisprototype import OpticalAirMass
-from pvgisprototype import RayleighThickness
-from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.api.series.select import select_time_series
-from pathlib import Path
-from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.validation.functions import AdjustElevationInputModel
-from pvgisprototype import Elevation
 from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype import Irradiance
+from rich import print
 
 
 @log_function_call
 def compare_temporal_resolution(
-    timestamps,
-    array,
+    timestamps: DatetimeIndex = None,
+    array: ndarray = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ):
@@ -192,7 +154,7 @@ def compare_temporal_resolution(
 @log_function_call
 @validate_with_pydantic(AdjustElevationInputModel)
 def adjust_elevation(
-    elevation: Annotated[float, typer_argument_elevation],
+    elevation: float,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -576,11 +538,11 @@ def calculate_direct_horizontal_irradiance_time_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: BaseTimestampSeriesModel = None,
+    timestamps: DatetimeIndex = None,
     start_time: Optional[datetime] = None,  # reuse callback inside function?
     frequency: Optional[str] = None,  # reuse callback inside function?
     end_time: Optional[datetime] = None,  # reuse callback inside function?
-    timezone: Optional[str] = None,#Annotated[Optional[ZoneInfo], typer_option_timezone] = None,
+    timezone: Optional[str] = None,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
