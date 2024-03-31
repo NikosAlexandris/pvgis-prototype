@@ -74,6 +74,7 @@ dev = [
 ]
 test = [
   "pytest",
+  "pytest-cov",
   "bokeh",
   "openpyxl",
 ]
@@ -92,28 +93,7 @@ docs = [
   "mkdocs-badges",
   "mkdocs-coverage",
 ]
-all = [
-  "black",
-  "bokeh",
-  "devtools",
-  "cachetools",
-  "flake8",
-  "isort",
-  "markdown-exec[ansi]",
-  "mkdocs-bibtex",
-  "mkdocs-exclude",
-  "mkdocs-git-revision-date-localized-plugin",
-  "mkdocs-material",
-  "mkdocs-minify-plugin",
-  "mkdocs-table-reader-plugin",
-  "mkdocstrings[python]",
-  "pre-commit",
-  "pytest",
-  "towncrier",
-  "pytest",
-  "bokeh",
-  "openpyxl",
-]
+all = ["pvgisprototype[web, dev, test, docs]"]
 
 [project.urls]
 homepage = "https://pvgis.jrc.it"
