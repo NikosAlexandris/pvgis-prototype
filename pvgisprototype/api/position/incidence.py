@@ -6,8 +6,8 @@ from pvgisprototype import Longitude
 from pvgisprototype import RefractedSolarZenith
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
 from typing import List
 from pvgisprototype import SolarIncidence
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT

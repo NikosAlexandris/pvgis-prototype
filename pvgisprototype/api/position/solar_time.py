@@ -6,8 +6,8 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarTimeInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.api.geometry.models import select_models
-from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.position.models import select_models
+from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.algorithms.milne1921.solar_time import calculate_apparent_solar_time_milne1921
 from pvgisprototype.algorithms.pyephem.solar_time import calculate_solar_time_ephem
 from pvgisprototype.algorithms.pvgis.solar_time import calculate_solar_time_pvgis
