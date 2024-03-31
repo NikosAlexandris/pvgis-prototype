@@ -29,7 +29,7 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_plotting
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import LATITUDE_MINIMUM
 from pvgisprototype.constants import LATITUDE_MAXIMUM
@@ -1136,17 +1136,23 @@ typer_option_module_temperature_algorithm = typer.Option(
 typer_option_verbose = typer.Option(
     '--verbose',
     '-v',
+    help='Show details while executing commands',
     count=True,
     is_flag=False,
-    help='Show details while executing commands',
+    show_default=True,
     rich_help_panel=rich_help_panel_output,
-    # default_factory=0,
+)
+typer_option_quiet = typer.Option(
+    '--quiet',
+    help='Do not print out the output',
+    is_flag=True,
+    show_default=True,
+    rich_help_panel=rich_help_panel_output,
 )
 typer_option_profiling = typer.Option(
     "--profile",
     "--prfl",
     help="Enable profiling",
-    # default=False,
 )
 typer_option_index = typer.Option(
     '--index',
@@ -1156,7 +1162,6 @@ typer_option_index = typer.Option(
     show_default=True,
     show_choices=True,
     rich_help_panel=rich_help_panel_output,
-    # default_factory=False,
 )
 typer_option_rounding_places = typer.Option(
     '--rounding-places',
@@ -1164,7 +1169,13 @@ typer_option_rounding_places = typer.Option(
     help='Number of digits to round results to',
     show_default=True,
     rich_help_panel=rich_help_panel_output,
-    # default_factory=5,
+)
+typer_option_fingerprint = typer.Option(
+    '--fingerprint',
+    '--fp',
+    help='Fingerprint the photovoltaic power output time series',
+    show_default=True,
+    rich_help_panel=rich_help_panel_output,
 )
 typer_option_panels_output = typer.Option(
     '--panels',
