@@ -3,6 +3,25 @@ from typing import Optional
 from datetime import datetime
 
 import numpy as np
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
+from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
+from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.algorithms.pvis.read import read_spectral_response
+from pvgisprototype.algorithms.pvis.spectral_factor import calculate_spectral_factor
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
+from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
 from pvgisprototype.algorithms.pvis.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE  # why not calculate it?
 from pvgisprototype.algorithms.pvis.constants import BAND_LIMITS
@@ -19,31 +38,11 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-# from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
-from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
-from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
-from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
-from pvgisprototype.algorithms.pvis.read import read_spectral_response
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
-from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.algorithms.pvis.spectral_factor import calculate_spectral_factor
 
 
-def calculate_spectrally_resolved_global_irradiance_series(
+def calculate_spectrally_resolved_global_inclined_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -360,7 +359,7 @@ def calculate_spectral_photovoltaic_power_output(
     (e.g.sunrise and sunset, declination, extraterrestrial irradiance, daylight
     length) can be optionally saved in a file.
     """
-    spectrally_resolved_global_irradiance_series = calculate_spectrally_resolved_global_irradiance_series(
+    spectrally_resolved_global_irradiance_series = calculate_spectrally_resolved_global_inclined_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
