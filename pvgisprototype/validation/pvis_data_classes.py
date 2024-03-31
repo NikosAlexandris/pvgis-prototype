@@ -25,15 +25,15 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarDeclination
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import Elevation
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.api.geometry.models import SolarTimeModel
 from pvgisprototype.validation.arrays import ArrayDType
 from pvgisprototype.validation.arrays import NDArrayBackend
 from pvgisprototype.validation.arrays import CUPY_ENABLED
