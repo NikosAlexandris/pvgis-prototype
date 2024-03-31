@@ -1,0 +1,50 @@
+from typing import Annotated
+from typing import List
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.cli.typer_parameters import typer_argument_linke_turbidity_factor
+from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
+from pvgisprototype.cli.typer_parameters import typer_argument_solar_altitude_series
+from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_coefficients_time_series
+from pvgisprototype.api.irradiance.diffuse import diffuse_solar_altitude_function_time_series
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+
+
+@log_function_call
+def get_diffuse_solar_altitude_coefficients_series(
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_argument_linke_turbidity_factor],#: np.ndarray,
+    verbose: int = 0,
+):
+    """
+    Vectorized function to calculate the diffuse solar altitude coefficients over a period of time.
+
+    Parameters
+    ----------
+    - linke_turbidity_factor_series (List[LinkeTurbidityFactor] or LinkeTurbidityFactor): 
+      The Linke turbidity factors as a list of LinkeTurbidityFactor objects or a single object.
+
+    Returns
+    -------
+    """
+    diffuse_solar_altitude_coefficients_series = diffuse_solar_altitude_coefficients_time_series(
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        verbose=verbose,
+    )
+
+    print('a1, a2, a3')
+    print(diffuse_solar_altitude_coefficients_series)
+
+
+@log_function_call
+def get_diffuse_solar_altitude_function_time_series(
+    solar_altitude_series: Annotated[List[float], typer_argument_solar_altitude_series],
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series],#: np.ndarray,
+    verbose: int = 0,
+):
+    """Diffuse solar altitude function Fd"""
+    diffuse_solar_altitude_series = diffuse_solar_altitude_function_time_series(
+        solar_altitude_series=solar_altitude_series,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+    )
+
+    print(diffuse_solar_altitude_series)
