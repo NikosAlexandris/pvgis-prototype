@@ -6,12 +6,12 @@ from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_pvis
-from pvgisprototype.api.geometry.solar_time import model_solar_time
+from pvgisprototype.api.position.solar_time import model_solar_time
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
 from math import sin
 from math import cos
