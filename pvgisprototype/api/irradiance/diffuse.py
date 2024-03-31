@@ -1,36 +1,40 @@
 from pvgisprototype.log import logger
+from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
+from pandas import DatetimeIndex
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 from typing import List
 from rich import print
-from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.api.series.statistics import print_series_statistics
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarIncidenceModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import SOLAR_TIME_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.geometry.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+import numpy as np
+from math import cos, sin, pi
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import Irradiance
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.api.geometry.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
-from pvgisprototype.api.geometry.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.geometry.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
-
+from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -48,17 +52,12 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import TERM_N_IN_SHADE
-from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
-from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.series.models import MethodsForInexactMatches
-import numpy as np
-from math import cos, sin, pi
 from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import LOSS_COLUMN_NAME
@@ -82,8 +81,6 @@ from pvgisprototype.constants import OUT_OF_RANGE_INDICES_COLUMN_NAME
 from pvgisprototype.constants import TERM_N_COLUMN_NAME
 from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
-from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype import Irradiance
 from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
 
@@ -123,7 +120,7 @@ def read_horizontal_irradiance_components_from_sarah(
     direct: Path,
     longitude: float,
     latitude: float,
-    timestamps: Optional[datetime] = None,
+    timestamps: DatetimeIndex = None,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
@@ -500,7 +497,7 @@ def diffuse_solar_altitude_function_time_series(
 def calculate_diffuse_horizontal_irradiance_time_series(
     longitude: float,
     latitude: float,
-    timestamps: BaseTimestampSeriesModel = None,
+    timestamps: DatetimeIndex = None,
     start_time: Optional[datetime] = None,
     end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
@@ -649,7 +646,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: BaseTimestampSeriesModel = None,
+    timestamps: DatetimeIndex = None,
     start_time: Optional[datetime] = None,
     end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
