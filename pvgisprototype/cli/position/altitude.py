@@ -19,9 +19,9 @@ from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
 from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
 from pvgisprototype.cli.typer_parameters import typer_option_verbose
 
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
-from pvgisprototype.api.geometry.models import select_models
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import select_models
 
 from pvgisprototype.constants import RADIANS, DEGREES
 from pvgisprototype.constants import ZENITH_NAME
@@ -37,7 +37,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.geometry.altitude import calculate_solar_altitude
+from pvgisprototype.api.position.altitude import calculate_solar_altitude
 from pvgisprototype.cli.print import print_solar_position_table
 
 
