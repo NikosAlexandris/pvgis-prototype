@@ -28,8 +28,8 @@ To begin with,
 and activate it:
 
 ``` bash
-python -m venv venv
-source venv/bin/activate
+python -m venv pvgis-virtual-environment
+source pvgis-virtual-environment/bin/activate
 ```
 
 [venv]: https://docs.python.org/3/library/venv.html
@@ -111,6 +111,49 @@ Successfully installed pvis
     <a href="https://rich.readthedocs.io/" class="external-link" target="_blank">Rich</a>.
     Rich is a library to *display* visually pleasing information on the terminal.
     It is deeply integrated into **PVIS**.
+
+## For Developers and Power Users
+
+Curious to explore the latest (non-released development) version ?
+Want to modify some function or add a new one and contribute to PVGIS ?
+
+Using [PDM][PDM],
+you can seamlessly establish a virtual environment
+and install PVGIS in an editable mode.
+
+[PDM]: https://pdm-project.org/latest/
+
+The inclusion of a `pdm.lock` file in the source code repository,
+ensures the installation of the exact dependencies needed
+to setup a development environment.
+
+1. Clone the latest version from the source repository :
+
+``` bash
+git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
+cd pvis-be-prototype
+```
+
+2. Install PVGIS using PDM
+
+``` bash
+pdm install
+```
+This will create a virtual environment
+and install PVGIS along with its dependencies.
+
+3. Activate the virtual environment
+
+``` bash
+$ eval $(pdm venv activate in-project)
+```
+
+* Alternatively, it is possible to run 
+
+[Run a command in a virtual environment without activating it](https://pdm-project.org/latest/usage/venv/#run-a-command-in-a-virtual-environment-without-activating-it)
+
+Happy coding!
+
 
 ## CLI
 
