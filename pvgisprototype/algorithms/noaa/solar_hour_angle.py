@@ -92,6 +92,24 @@ def calculate_solar_hour_angle_noaa(
     measurement in radians, reflecting the Earth's rotation and the position of
     the sun in the sky relative to a given location on Earth.
 
+    In NREL's SPA ... , equation 32:
+
+        Η = ν + σ − α 
+
+        Where :
+            - σ the observer geographical longitude, positive or negative
+              for east or west of Greenwich, respectively.
+
+        Limit Η to the range from 0 to 360 degrees using step 3.2.6 and note that it
+        is measured westward from south in this algorithm.
+
+        Step 3.2.6 :
+
+            Limit L to the range from 0 to 360 degrees. That can be
+            accomplished by dividing L by 360 and recording the decimal
+            fraction of the division as F. If L is positive, then the limited L
+            = 360 * F. If L is negative, then the limited L = 360 - 360 * F.
+
     """
     true_solar_time = calculate_true_solar_time_noaa(
         longitude=longitude,
