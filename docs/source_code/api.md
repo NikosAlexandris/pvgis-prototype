@@ -43,7 +43,7 @@ Longitude(value=None, unit=None, symbol='Λ', desription="The angle between a po
 ## API Reference
 
 
-### Solar position geometry
+### Solar position
 
 <!-- - Fractional year
        ⊂ Equation of time
@@ -55,19 +55,19 @@ Longitude(value=None, unit=None, symbol='Λ', desription="The angle between a po
        ⊂ Solar altitude
        ⊂ Solar azimuth -->
 
-::: pvgisprototype.api.geometry.fractional_year
-::: pvgisprototype.api.geometry.solar_time
-::: pvgisprototype.api.geometry.solar_time_series
-::: pvgisprototype.api.geometry.hour_angle
-::: pvgisprototype.api.geometry.declination
-::: pvgisprototype.api.geometry.declination_series
-::: pvgisprototype.api.geometry.zenith
-::: pvgisprototype.api.geometry.altitude
-::: pvgisprototype.api.geometry.altitude_series
-::: pvgisprototype.api.geometry.azimuth
-::: pvgisprototype.api.geometry.azimuth_series
-::: pvgisprototype.api.geometry.overview
-::: pvgisprototype.api.geometry.overview_series
-::: pvgisprototype.api.geometry.incidence
-::: pvgisprototype.api.geometry.incidence_series
-::: pvgisprototype.api.geometry.models
+::: pvgisprototype.api.position.fractional_year
+::: pvgisprototype.api.position.solar_time
+::: pvgisprototype.api.position.solar_time_series
+::: pvgisprototype.api.position.hour_angle
+::: pvgisprototype.api.position.declination
+::: pvgisprototype.api.position.declination_series
+::: pvgisprototype.api.position.zenith
+::: pvgisprototype.api.position.altitude
+::: pvgisprototype.api.position.altitude_series
+::: pvgisprototype.api.position.azimuth
+::: pvgisprototype.api.position.azimuth_series
+::: pvgisprototype.api.position.overview
+::: pvgisprototype.api.position.overview_series
+::: pvgisprototype.api.position.incidence
+::: pvgisprototype.api.position.incidence_series
+::: pvgisprototype.api.position.models
