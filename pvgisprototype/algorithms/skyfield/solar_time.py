@@ -1,4 +1,4 @@
-import typer
+from pvgisprototype.log import logger
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
@@ -13,6 +13,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarTimeSkyfieldInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
+from rich import print
 
 
 @validate_with_pydantic(CalculateSolarTimeSkyfieldInputModel)
@@ -29,7 +30,7 @@ def calculate_solar_time_skyfield(
         try:
             timestamp = timestamp.astimezone(timezone)
         except Exception as e:
-            logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
+            logger.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # Handle Me during input validation? -------------------------------------
 
     midnight = timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -84,12 +85,12 @@ def calculate_solar_time_skyfield(
     # local_solar_time = previous_solar_noon.utc_datetime() + timedelta(hours=hours_since_solar_noon)
 
     if verbose:
-        typer.echo(f'Local solar time: {local_solar_time}')
+        print(f'Local solar time: {local_solar_time}')
 
         previous_solar_noon_string = previous_solar_noon.astimezone(timezone).strftime('%Y-%m-%d %H:%M:%S')
-        typer.echo(f'Previous solar noon: {previous_solar_noon_string}')
+        print(f'Previous solar noon: {previous_solar_noon_string}')
         
         next_solar_noon_string = next_solar_noon.astimezone(timezone).strftime('%Y-%m-%d %H:%M:%S')
-        typer.echo(f'Next solar noon: {next_solar_noon_string}')
+        print(f'Next solar noon: {next_solar_noon_string}')
 
     return local_solar_time
