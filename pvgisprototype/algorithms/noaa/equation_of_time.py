@@ -31,7 +31,11 @@ from pvgisprototype.log import log_data_fingerprint
 def calculate_equation_of_time_noaa(
     timestamp: datetime,
 ) -> EquationOfTime:
-    """Calculate the equation of time in minutes."""
+    """Calculate the Equation of Time in minutes.
+
+    The Equation of Time is the difference between solar apparent and mean time.
+
+    """
     fractional_year = calculate_fractional_year_noaa(
         timestamp=timestamp,
     )
