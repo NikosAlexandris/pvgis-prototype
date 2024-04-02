@@ -14,12 +14,12 @@ from typing import Optional
 from rich import print
 from rich.panel import Panel
 
-from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
-from pvgisprototype.cli.typer_parameters import typer_option_version
-from pvgisprototype.cli.typer_parameters import typer_option_log
-from pvgisprototype.cli.typer_parameters import typer_option_log_rich_handler
-from pvgisprototype.cli.typer_parameters import typer_option_logfile
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.typer.version import typer_option_version
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.cli.typer.log import typer_option_log_rich_handler
+from pvgisprototype.cli.typer.log import typer_option_logfile
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry

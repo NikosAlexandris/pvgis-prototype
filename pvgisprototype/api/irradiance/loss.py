@@ -11,10 +11,10 @@ from math import pi
 from math import sin
 from math import cos
 from math import pow
-from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.cli.typer_parameters import typer_argument_solar_incidence
-from pvgisprototype.cli.typer_parameters import typer_argument_solar_incidence_series
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.cli.typer.position import typer_argument_solar_incidence
+from pvgisprototype.cli.typer.position import typer_argument_solar_incidence_series
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL

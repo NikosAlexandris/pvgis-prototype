@@ -3,8 +3,7 @@ import numpy as np
 import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from rich import print
-# from pvgisprototype.api.utilities.conversions import round_float_values
-from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import SOLAR_CONSTANT 
 from pvgisprototype.constants import AU
 from pvgisprototype.constants import STEPHAN_BOLTZMANN_CONSTANT

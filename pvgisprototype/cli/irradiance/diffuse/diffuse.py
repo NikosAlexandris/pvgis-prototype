@@ -1,7 +1,7 @@
 import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.irradiance.diffuse.term_n import get_term_n_series
 from pvgisprototype.cli.irradiance.diffuse.sky_irradiance import get_diffuse_sky_irradiance_series
 from pvgisprototype.cli.irradiance.diffuse.transmission_function import get_diffuse_transmission_function_series

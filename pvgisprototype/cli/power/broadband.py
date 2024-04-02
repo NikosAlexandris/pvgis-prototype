@@ -5,6 +5,9 @@ from typing import List
 from typing import Optional
 from datetime import datetime
 from pathlib import Path
+from pvgisprototype import TemperatureSeries
+from pvgisprototype import WindSpeedSeries
+from pvgisprototype import SpectralFactorSeries
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
@@ -16,63 +19,59 @@ from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
+from pvgisprototype.cli.typer.location import typer_argument_latitude
+from pvgisprototype.cli.typer.location import typer_argument_longitude
+from pvgisprototype.cli.typer.location import typer_argument_elevation
+# from pvgisprototype.cli.typer.location import typer_argument_horizon_heights
+from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
+from pvgisprototype.cli.typer.timestamps import typer_option_timezone
+from pvgisprototype.cli.typer.timestamps import typer_option_start_time
+from pvgisprototype.cli.typer.timestamps import typer_option_end_time
+from pvgisprototype.cli.typer.timestamps import typer_option_periods
+from pvgisprototype.cli.typer.timestamps import typer_option_frequency
+from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_irradiance
+from pvgisprototype.cli.typer.irradiance import typer_option_global_horizontal_irradiance
+from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
+from pvgisprototype.cli.typer.timing import typer_option_global_time_offset
+from pvgisprototype.cli.typer.timing import typer_option_hour_offset
+from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
+from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
+from pvgisprototype.cli.typer.time_series import typer_option_tolerance
+from pvgisprototype.cli.typer.time_series import typer_option_in_memory
+from pvgisprototype.cli.typer.temperature import typer_argument_temperature_series
+from pvgisprototype.cli.typer.wind_speed import typer_argument_wind_speed_series
+from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
+from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
+from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
+from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
+from pvgisprototype.cli.typer.position import typer_option_solar_position_model
+from pvgisprototype.cli.typer.position import typer_option_surface_orientation
+from pvgisprototype.cli.typer.position import typer_option_surface_tilt
+from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
+from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor
+from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor_series
+from pvgisprototype.cli.typer.albedo import typer_option_albedo
+from pvgisprototype.cli.typer.photovoltaic import typer_option_photovoltaic_module_model
+from pvgisprototype.cli.typer.efficiency import typer_option_pv_power_algorithm
+from pvgisprototype.cli.typer.efficiency import typer_option_module_temperature_algorithm
+from pvgisprototype.cli.typer.efficiency import typer_option_efficiency
+from pvgisprototype.cli.typer.efficiency import typer_option_system_efficiency
+from pvgisprototype.cli.typer.spectral_factor import typer_argument_spectral_factor_series
+from pvgisprototype.cli.typer.output import typer_option_angle_output_units
+from pvgisprototype.cli.typer.output import typer_option_angle_units
+from pvgisprototype.cli.typer.output import typer_option_statistics
+from pvgisprototype.cli.typer.output import typer_option_groupby
+from pvgisprototype.cli.typer.output import typer_option_time_output_units
+from pvgisprototype.cli.typer.output import typer_option_rounding_places
+from pvgisprototype.cli.typer.output import typer_option_index
+from pvgisprototype.cli.typer.output import typer_option_csv
+from pvgisprototype.cli.typer.plot import typer_option_uniplot
+from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
-from pvgisprototype.cli.typer_parameters import typer_argument_elevation
-from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype import SpectralFactorSeries
-from pvgisprototype.cli.typer_parameters import typer_argument_spectral_factor_series
-from pvgisprototype import TemperatureSeries
-from pvgisprototype.cli.typer_parameters import typer_argument_temperature_series
-from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
-from pvgisprototype import WindSpeedSeries
-from pvgisprototype.cli.typer_parameters import typer_argument_wind_speed_series
-from pvgisprototype.cli.typer_parameters import typer_option_albedo
-from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_angle_units
-from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
-from pvgisprototype.cli.typer_parameters import typer_option_csv
-from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
-from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer_parameters import typer_option_efficiency
-from pvgisprototype.cli.typer_parameters import typer_option_end_time
-from pvgisprototype.cli.typer_parameters import typer_option_periods
-from pvgisprototype.cli.typer_parameters import typer_option_frequency
-from pvgisprototype.cli.typer_parameters import typer_option_groupby
-from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
-from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
-from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
-from pvgisprototype.cli.typer_parameters import typer_option_in_memory
-from pvgisprototype.cli.typer_parameters import typer_option_inexact_matches_method
-from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor
-from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
-from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
-from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
-from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.cli.typer_parameters import typer_option_pv_power_algorithm
-from pvgisprototype.cli.typer_parameters import typer_option_module_temperature_algorithm
-from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
-from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
-from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
-from pvgisprototype.cli.typer_parameters import typer_option_start_time
-from pvgisprototype.cli.typer_parameters import typer_option_statistics
-from pvgisprototype.cli.typer_parameters import typer_option_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_option_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_option_system_efficiency
-from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_option_tolerance
-from pvgisprototype.cli.typer_parameters import typer_option_uniplot
-from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_width
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
-from pvgisprototype.cli.typer_parameters import typer_option_profiling
-from pvgisprototype.cli.typer_parameters import typer_option_index
-from pvgisprototype.cli.typer_parameters import typer_option_photovoltaic_module_model
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import ALBEDO_DEFAULT
@@ -109,7 +108,7 @@ from rich import print
 from pandas import DatetimeIndex
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 import typer
-from pvgisprototype.cli.typer_parameters import typer_option_log
+from pvgisprototype.cli.typer.log import typer_option_log
 
 
 @log_function_call
@@ -281,7 +280,6 @@ def photovoltaic_power_output_series(
             filename=csv,
             index=index,
         )
-
     if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
         print_series_statistics(
@@ -290,7 +288,6 @@ def photovoltaic_power_output_series(
             groupby=groupby,
             title="Photovoltaic power output",
         )
-
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         uniplot_data_array_time_series(
@@ -303,7 +300,6 @@ def photovoltaic_power_output_series(
             label_2 = None,
             unit = POWER_UNIT,
         )
-
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)

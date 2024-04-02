@@ -1,70 +1,109 @@
-from typing import Annotated
-from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-from pvgisprototype.cli.typer_parameters import typer_argument_elevation
-from typing import Optional
+from typing import Annotated, Optional
 from datetime import datetime
-from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
-from pvgisprototype.cli.typer_parameters import typer_option_start_time
-from pvgisprototype.cli.typer_parameters import typer_option_frequency
-from pvgisprototype.cli.typer_parameters import typer_option_end_time
-from pvgisprototype.cli.typer_parameters import typer_option_timezone
 from pathlib import Path
-from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
-from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
-from pvgisprototype.cli.typer_parameters import typer_option_tolerance
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_option_in_memory
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
-from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
-from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import ALBEDO_DEFAULT
-from pvgisprototype.cli.typer_parameters import typer_option_albedo
-from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
+from pvgisprototype.algorithms.pvis.power import calculate_spectrally_resolved_global_inclined_irradiance_series
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
-from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
-from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
-from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
-from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
-from pvgisprototype.constants import MINUTES
-from pvgisprototype.cli.typer_parameters import typer_option_angle_units
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
-from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_statistics
-from pvgisprototype.cli.typer_parameters import typer_option_csv
-from pvgisprototype.cli.typer_parameters import typer_option_uniplot
-from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_width
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+# from pvgisprototype.cli.typer_parameters import typer_argument_longitude
+# from pvgisprototype.cli.typer_parameters import typer_argument_latitude
+# from pvgisprototype.cli.typer_parameters import typer_argument_elevation
+# from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
+# from pvgisprototype.cli.typer_parameters import typer_option_start_time
+# from pvgisprototype.cli.typer_parameters import typer_option_frequency
+# from pvgisprototype.cli.typer_parameters import typer_option_end_time
+# from pvgisprototype.cli.typer_parameters import typer_option_timezone
+# from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
+# from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
+# from pvgisprototype.cli.typer_parameters import typer_option_tolerance
+# from pvgisprototype.cli.typer_parameters import typer_option_in_memory
+# from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
+# from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
+# from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
+# from pvgisprototype.cli.typer_parameters import typer_option_albedo
+# from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
+# from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
+# from pvgisprototype.cli.typer_parameters import typer_option_solar_incidence_model
+# from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
+# from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
+# from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
+# from pvgisprototype.cli.typer_parameters import typer_option_solar_constant
+# from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
+# from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
+# from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
+# from pvgisprototype.cli.typer_parameters import typer_option_angle_units
+# from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
+# from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
+# from pvgisprototype.cli.typer_parameters import typer_option_statistics
+# from pvgisprototype.cli.typer_parameters import typer_option_csv
+# from pvgisprototype.cli.typer_parameters import typer_option_uniplot
+# from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_width
+# from pvgisprototype.cli.typer_parameters import typer_option_verbose
+# from pvgisprototype.cli.typer_parameters import typer_option_log
+# from pvgisprototype.cli.typer_parameters import typer_option_index
+# from pvgisprototype.cli.typer_parameters import typer_option_fingerprint
+# from pvgisprototype.cli.typer_parameters import typer_option_quiet
+from pvgisprototype.cli.typer.location import typer_argument_longitude
+from pvgisprototype.cli.typer.location import typer_argument_latitude
+from pvgisprototype.cli.typer.location import typer_argument_elevation
+from pvgisprototype.cli.typer.position import typer_argument_surface_orientation
+from pvgisprototype.cli.typer.position import typer_argument_surface_tilt
+from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
+from pvgisprototype.cli.typer.timestamps import typer_option_start_time
+from pvgisprototype.cli.typer.timestamps import typer_option_frequency
+from pvgisprototype.cli.typer.timestamps import typer_option_end_time
+from pvgisprototype.cli.typer.timestamps import typer_option_timezone
+from pvgisprototype.cli.typer.irradiance import typer_option_global_horizontal_irradiance
+from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_irradiance
+from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
+from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
+from pvgisprototype.cli.typer.time_series import typer_option_tolerance
+from pvgisprototype.cli.typer.time_series import typer_option_in_memory
+from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor_series
+from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
+from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
+from pvgisprototype.cli.typer.albedo import typer_option_albedo
+from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer.position import typer_option_solar_position_model
+from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
+from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
+from pvgisprototype.cli.typer.timing import typer_option_global_time_offset
+from pvgisprototype.cli.typer.timing import typer_option_hour_offset
+from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
+from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
+from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
+from pvgisprototype.cli.typer.output import typer_option_time_output_units
+from pvgisprototype.cli.typer.output import typer_option_angle_units
+from pvgisprototype.cli.typer.output import typer_option_angle_output_units
+from pvgisprototype.cli.typer.output import typer_option_rounding_places
+from pvgisprototype.cli.typer.output import typer_option_statistics
+from pvgisprototype.cli.typer.output import typer_option_csv
+from pvgisprototype.cli.typer.plot import typer_option_uniplot
+from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.cli.typer.output import typer_option_index
+from pvgisprototype.cli.typer.output import typer_option_fingerprint
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet
+from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ALBEDO_DEFAULT
+from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import MINUTES
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
-from pvgisprototype.cli.typer_parameters import typer_option_log
-from pvgisprototype.cli.typer_parameters import typer_option_index
-from pvgisprototype.cli.typer_parameters import typer_option_fingerprint
-from pvgisprototype.cli.typer_parameters import typer_option_quiet
-from pvgisprototype.algorithms.pvis.power import calculate_spectrally_resolved_global_inclined_irradiance_series
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call

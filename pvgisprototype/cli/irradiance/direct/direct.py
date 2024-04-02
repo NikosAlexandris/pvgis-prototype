@@ -1,5 +1,5 @@
 import typer
-from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.irradiance.direct.normal import get_direct_normal_irradiance_time_series
 from pvgisprototype.cli.irradiance.direct.horizontal import get_direct_horizontal_irradiance_time_series
 from pvgisprototype.cli.irradiance.direct.inclined import get_direct_inclined_irradiance_time_series
