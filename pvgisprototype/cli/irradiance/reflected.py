@@ -116,11 +116,15 @@ def get_ground_reflected_inclined_irradiance_time_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = False,
     csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
+    log: Annotated[int, typer_option_log] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = False,
+    quiet: Annotated[bool, typer_option_quiet] = False,
 ):
     """Calculate the clear-sky diffuse ground reflected irradiance on an
 
@@ -168,36 +172,54 @@ def get_ground_reflected_inclined_irradiance_time_series(
         verbose=verbose,
         log=log,
     )
-    if verbose > 0:
-        longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
-        latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-        from pvgisprototype.cli.print import print_irradiance_table_2
-        print_irradiance_table_2(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=ground_reflected_inclined_irradiance_series.components,
-            title=REFLECTED_INCLINED_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
-        )
-        if statistics:
-            from pvgisprototype.api.series.statistics import print_series_statistics
-            print_series_statistics(
-                data_array=ground_reflected_inclined_irradiance_series.value,
-                timestamps=timestamps,
-                title="Reflected inclined irradiance",
-            )
-        if csv:
-            write_irradiance_csv(
+    if not quiet:
+        if verbose > 0:
+            longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+            latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
                 dictionary=ground_reflected_inclined_irradiance_series.components,
-                filename=csv,
+                title=REFLECTED_INCLINED_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
+                rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
             )
-    else:
-        flat_list = ground_reflected_inclined_irradiance_series.value.flatten().astype(str)
-        csv_str = ','.join(flat_list)
-        print(csv_str)
+        else:
+            flat_list = ground_reflected_inclined_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=ground_reflected_inclined_irradiance_series.components,
+            filename=csv,
+        )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=ground_reflected_inclined_irradiance_series.value,
+            timestamps=timestamps,
+            title="Reflected inclined irradiance",
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=ground_reflected_inclined_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Global Horizontal Irradiance Series',
+            title = 'Global Horizontal Irradiance Series',
+            label = 'Global Horizontal Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+            # terminal_width_fraction=terminal_width_fraction,
+        )
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=ground_reflected_inclined_irradiance_series.components)
