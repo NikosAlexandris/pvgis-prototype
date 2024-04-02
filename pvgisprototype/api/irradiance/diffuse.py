@@ -562,7 +562,7 @@ def calculate_diffuse_horizontal_irradiance_time_series(
         log=log,
     )
     diffuse_horizontal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series
+        extraterrestrial_normal_irradiance_series.value
         * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
         * diffuse_solar_altitude_function_time_series(
             solar_altitude_series, linke_turbidity_factor_series
@@ -592,7 +592,7 @@ def calculate_diffuse_horizontal_irradiance_time_series(
 
         'more_extended': lambda: {
             TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE + ' & relevant components',
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,
             LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
         } if verbose > 2 else {},
@@ -752,7 +752,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         log=log,
     )
     extraterrestrial_horizontal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series
+        extraterrestrial_normal_irradiance_series.value
         * np.sin(solar_altitude_series.radians)
     )
     # Calculate quantities required : ---------------------------- <<< <<< <<<
@@ -819,7 +819,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             )
         ).value  # Important !
         diffuse_horizontal_irradiance_series = (
-            extraterrestrial_normal_irradiance_series
+            extraterrestrial_normal_irradiance_series.value
             * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
             * diffuse_solar_altitude_function_time_series(
                 solar_altitude_series, linke_turbidity_factor_series
@@ -1029,7 +1029,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         'and_even_more_extended': lambda: {
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_horizontal_irradiance_series,
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
             LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
         } if verbose > 4 else {},
 
