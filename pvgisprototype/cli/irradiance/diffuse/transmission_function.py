@@ -1,6 +1,6 @@
 from typing import Annotated
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.cli.typer_parameters import typer_argument_linke_turbidity_factor
+from pvgisprototype.cli.typer.linke_turbidity import typer_argument_linke_turbidity_factor
 from pvgisprototype.api.irradiance.diffuse import diffuse_transmission_function_time_series
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call

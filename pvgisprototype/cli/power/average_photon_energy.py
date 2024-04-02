@@ -1,6 +1,6 @@
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
-from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.algorithms.pvis.average_photon_energy import calculate_average_photon_energy
 from pvgisprototype.algorithms.pvis.constants import ELECTRON_CHARGE
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance_toolbox

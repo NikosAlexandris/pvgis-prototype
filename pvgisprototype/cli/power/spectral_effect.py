@@ -1,4 +1,4 @@
-from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.algorithms.pvis.spectral_factor import calculate_minimum_spectral_mismatch
 from pvgisprototype.algorithms.pvis.spectral_factor import calculate_spectral_factor
 from pvgisprototype.algorithms.pvis.constants import ELECTRON_CHARGE

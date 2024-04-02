@@ -1,12 +1,12 @@
 import typer
-from pvgisprototype.cli.typer_parameters import OrderCommands
+from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.irradiance.introduction import solar_irradiance_introduction
 # from pvgisprototype.cli.irradiance.effective import app as effective_irradiance
 from pvgisprototype.cli.irradiance.shortwave.shortwave import app as global_irradiance
 from pvgisprototype.cli.irradiance.direct.direct import app as direct_irradiance
 from pvgisprototype.cli.irradiance.diffuse.diffuse import app as diffuse_irradiance
 from pvgisprototype.cli.irradiance.reflected import app as reflected_irradiance
-from pvgisprototype.cli.irradiance.extraterrestrial import app as extraterrestrial_irradiance
+from pvgisprototype.cli.irradiance.extraterrestrial import get_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.loss import app as angular_loss_factor
 from pvgisprototype.api.irradiance.limits import app as limits
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI

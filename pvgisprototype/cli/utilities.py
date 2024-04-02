@@ -3,11 +3,11 @@ from typing_extensions import Annotated
 from typing import Optional
 from rich import print
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-from pvgisprototype.cli.typer_parameters import typer_argument_area
-from pvgisprototype.cli.typer_parameters import typer_argument_conversion_efficiency
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.cli.typer.location import typer_argument_longitude
+from pvgisprototype.cli.typer.location import typer_argument_latitude
+from pvgisprototype.cli.typer.photovoltaic import typer_argument_area
+from pvgisprototype.cli.typer.efficiency import typer_argument_conversion_efficiency
 
 
 app = typer.Typer(

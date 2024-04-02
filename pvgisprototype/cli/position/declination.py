@@ -8,16 +8,21 @@ from zoneinfo import ZoneInfo
 from pvgisprototype.api.position.models import SolarDeclinationModel
 from pvgisprototype.api.position.models import select_models
 
-from pvgisprototype.cli.typer_parameters import typer_argument_timestamp
-from pvgisprototype.cli.typer_parameters import typer_option_timezone
-from pvgisprototype.cli.typer_parameters import typer_option_local_time
-from pvgisprototype.cli.typer_parameters import typer_option_random_time
-from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
-from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
+
+from pvgisprototype.cli.typer.timestamps import typer_argument_timestamp
+from pvgisprototype.cli.typer.timestamps import typer_option_timezone
+from pvgisprototype.cli.typer.timestamps import typer_option_local_time
+from pvgisprototype.cli.typer.timestamps import typer_option_random_time
+from pvgisprototype.cli.typer.position import typer_option_solar_position_model
+from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
+from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
+from pvgisprototype.cli.typer.timing import typer_option_global_time_offset
+from pvgisprototype.cli.typer.timing import typer_option_hour_offset
+from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
+from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
+from pvgisprototype.cli.typer.output import typer_option_angle_output_units
+from pvgisprototype.cli.typer.output import typer_option_rounding_places
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 
 from pvgisprototype.api.utilities.timestamp import random_datetimezone
 from pvgisprototype.api.position.declination import calculate_solar_declination
