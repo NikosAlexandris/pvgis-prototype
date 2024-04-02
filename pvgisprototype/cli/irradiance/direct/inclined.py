@@ -164,10 +164,10 @@ def get_direct_inclined_irradiance_time_series(
     uniplot: Annotated[bool, typer_option_uniplot] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
+    log: Annotated[int, typer_option_log] = 0,
     index: Annotated[bool, typer_option_index] = False,
-    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
-    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = False,
+    quiet: Annotated[bool, typer_option_quiet] = False,
     show_progress: bool = True,
 ) -> np.array:
     direct_inclined_irradiance_series = calculate_direct_inclined_irradiance_time_series_pvgis(
