@@ -73,13 +73,12 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series_irradiance,
 )
-app.add_typer(
-    extraterrestrial_irradiance,
+app.command(
     name="extraterrestrial",
-    help=f"Calculate the extraterrestial irradiance for a time series",
+    help=f"Calculate the extraterrestrial normal irradiance over a time series",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series_irradiance,
-)
+)(get_extraterrestrial_normal_irradiance_time_series)
 app.add_typer(
     angular_loss_factor,
     name="angular-loss",

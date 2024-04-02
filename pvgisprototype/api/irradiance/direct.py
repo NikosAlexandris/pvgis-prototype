@@ -442,7 +442,7 @@ def calculate_direct_normal_irradiance_time_series(
 
     # Calculate
     direct_normal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series
+        extraterrestrial_normal_irradiance_series.value
         * np.exp(
             corrected_linke_turbidity_factor_series.value
             * optical_air_mass_series.value

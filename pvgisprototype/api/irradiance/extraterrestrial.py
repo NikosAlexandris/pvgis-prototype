@@ -47,6 +47,7 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+    fingerprint: bool = False,
 ) -> Union[np.ndarray, dict]:
     """
     Calculate the normal extraterrestrial irradiance over a period of time
@@ -72,24 +73,29 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(position_of_earth_series - perigee_offset)
     extraterrestrial_normal_irradiance_series = solar_constant * distance_correction_factor_series
 
+    components_container = {
+        'main': lambda: {
+            TITLE_KEY_NAME: EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+        },
+
+        'extended': lambda: {
+            DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
+            POSITION_OF_EARTH_SERIES: position_of_earth_series,
+            DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
+        } if verbose > 1 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(extraterrestrial_normal_irradiance_series),
+        } if fingerprint else {},
+    }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
+
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
-
-    if verbose > 0:
-        results = {
-            'Title': EXTRATERRESTRIAL_NORMAL_IRRADIANCE,  # + Units : W / m*m REVIEWME
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series
-        }
-
-    if verbose > 1:
-        extended_results = {
-            DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
-            DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
-        }
-        results = results | extended_results
-
-    if verbose > 0:
-        return results
 
     log_data_fingerprint(
         data=extraterrestrial_normal_irradiance_series,
@@ -97,4 +103,13 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return extraterrestrial_normal_irradiance_series
+    return Irradiance(
+            value=extraterrestrial_normal_irradiance_series,
+            unit=IRRADIANCE_UNITS,
+            position_algorithm="",
+            timing_algorithm="",
+            elevation=None,
+            surface_orientation=None,
+            surface_tilt=None,
+            components=components,
+            )

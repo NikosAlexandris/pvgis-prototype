@@ -205,7 +205,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
                 log=log,
             )
             diffuse_horizontal_irradiance_series = (
-                extraterrestrial_normal_irradiance_series
+                extraterrestrial_normal_irradiance_series.value
                 * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
                 * diffuse_solar_altitude_function_time_series(
                     solar_altitude_series, linke_turbidity_factor_series

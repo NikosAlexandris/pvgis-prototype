@@ -37,21 +37,7 @@ from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 
 
-app = typer.Typer(
-    # cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"Calculate the extraterrestrial normal irradiance over a time series",
-)
-
-
-@app.callback(
-    'extraterrestrial-series',
-    invoke_without_command=True,
-    no_args_is_help=True,
-    help=f"Calculate the extraterrestrial normal irradiance over a time series",
-)
+@log_function_call
 def get_extraterrestrial_normal_irradiance_time_series(
     timestamps: Annotated[datetime, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
@@ -62,29 +48,81 @@ def get_extraterrestrial_normal_irradiance_time_series(
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     random_days: Annotated[bool, typer_option_random_days] = RANDOM_DAY_SERIES_FLAG_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = 0,
     index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = False,
+    quiet: Annotated[bool, typer_option_quiet] = False,
 ) -> None:
-    """ """
-    results = calculate_extraterrestrial_normal_irradiance_time_series(
+    """
+    """
+    extraterrestrial_normal_irradiance_series = calculate_extraterrestrial_normal_irradiance_time_series(
         timestamps=timestamps,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         random_days=random_days,
+        dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
     )
-    if verbose > 0:
-        print_irradiance_table_2(
+    if not quiet:
+        if verbose > 0:
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
+                longitude=None,
+                latitude=None,
+                timestamps=timestamps,
+                dictionary=extraterrestrial_normal_irradiance_series.components,
+                title = (
+                    extraterrestrial_normal_irradiance_series.components[TITLE_KEY_NAME]
+                        + f" horizontal irradiance series {IRRADIANCE_UNITS}"
+                ),
+                rounding_places=rounding_places,
+                index=index,
+                verbose=verbose,
+            )
+        else:
+            flat_list = extraterrestrial_normal_irradiance_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            dictionary=results,
-            title=results['Title'] + f'Extraterrestrial normal irradiance series {IRRADIANCE_UNITS}',
-            rounding_places=rounding_places,
-            index=index,
-            verbose=verbose,
+            dictionary=extraterrestrial_normal_irradiance_series.components,
+            filename=csv,
         )
-    else:
-        print(results)
-
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=extraterrestrial_normal_irradiance_series.value,
+            timestamps=timestamps,
+            title="Extraterrestrial normal irradiance",
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=extraterrestrial_normal_irradiance_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Extraterrestrial Normal Irradiance Series',
+            title = 'Extraterrestrial Normal Irradiance Series',
+            label = 'Extraterrestrial Normal Irradiance',
+            label_2 = None,
+            unit = IRRADIANCE_UNITS,
+            # terminal_width_fraction=terminal_width_fraction,
+        )
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=extraterrestrial_normal_irradiance_series.components)
