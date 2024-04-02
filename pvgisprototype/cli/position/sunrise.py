@@ -3,12 +3,12 @@ from typing import Optional
 
 from pvgisprototype import Latitude
 
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-from pvgisprototype.cli.typer_parameters import typer_argument_solar_declination
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer.location import typer_argument_latitude
+from pvgisprototype.cli.typer.position import typer_argument_solar_declination
+from pvgisprototype.cli.typer.position import typer_argument_surface_tilt
+from pvgisprototype.cli.typer.output import typer_option_angle_output_units
+from pvgisprototype.cli.typer.output import typer_option_rounding_places
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 
 from pvgisprototype.api.position.hour_angle import calculate_solar_hour_angle
 from pvgisprototype.cli.print import print_hour_angle_table_2

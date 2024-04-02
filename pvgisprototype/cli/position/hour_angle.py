@@ -2,10 +2,10 @@ from rich import print
 from typing import Annotated
 from typing import Optional
 
-from pvgisprototype.cli.typer_parameters import typer_argument_true_solar_time
-from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
-from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer.timing import typer_argument_true_solar_time
+from pvgisprototype.cli.typer.output import typer_option_angle_output_units
+from pvgisprototype.cli.typer.output import typer_option_rounding_places
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 
 from pvgisprototype.api.position.hour_angle import calculate_solar_hour_angle
 from pvgisprototype.cli.print import print_hour_angle_table_2

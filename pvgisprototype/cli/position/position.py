@@ -6,8 +6,8 @@ import typer
 from rich import print
 from typing import Annotated
 from typing import Optional
-from pvgisprototype.cli.typer_parameters import OrderCommands
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_overview
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position

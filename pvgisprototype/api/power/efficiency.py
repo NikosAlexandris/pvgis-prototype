@@ -37,7 +37,7 @@ from pvgisprototype.constants import TEMPERATURE_DEVIATION_COLUMN_NAME
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
 from pvgisprototype.constants import NOT_AVAILABLE
-from pvgisprototype.cli.typer_parameters import typer_option_verbose
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.power.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
