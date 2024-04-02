@@ -131,7 +131,7 @@ def select(
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
+    log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Select location series"""
     if convert_longitude_360:
