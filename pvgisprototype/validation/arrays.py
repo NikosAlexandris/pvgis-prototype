@@ -103,10 +103,10 @@ def supported_array_types() -> cabc.Collection[type]:
 
 def create_array(
     shape,
-    dtype=DATA_TYPE_DEFAULT,
-    init_method='zeros',
-    backend='numpy',
-    use_gpu=False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    init_method: int | float | str ='zeros',
+    backend: str ='numpy',
+    use_gpu: bool =False,
 ):
     """
     Create an array with given shape, data type, initialization method, backend, and optional GPU usage.
@@ -138,13 +138,15 @@ def create_array(
     array_module = array_backend.module()
 
     # Select the initialization method
-    if init_method == 'zeros':
+    if isinstance(init_method, (int, float)):  # User-requested value !
+        array = array_module.full(shape, init_method, dtype=dtype_obj)
+    elif init_method == 'zeros':
         array = array_module.zeros(shape, dtype=dtype_obj)
     elif init_method == 'ones':
         array = array_module.ones(shape, dtype=dtype_obj)
     elif init_method == 'empty':
         array = array_module.empty(shape, dtype=dtype_obj)
     else:
-        raise ValueError("Invalid initialization method. Choose 'zeros', 'ones', or 'empty'.")
+        raise ValueError("Invalid initialization method. Choose 'zeros', 'ones', 'empty', or provide a specific value.")
 
     return array
