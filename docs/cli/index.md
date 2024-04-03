@@ -1,15 +1,15 @@
 ---
-icon: material/eye
-description: A collection of How-To recipes on the use of PVGIS
 icon: material/console-line
+description: A collection of How-To recipes on the use of PVGIS
+title: How to work with PVGIS
+subtitle: Learn how to work with PVGIS interactively
 tags:
   - How-To
   - CLI
-hide:
-  - toc
 ---
 
-# Learn how to use PVGIS tools
+PVGIS is also a collection of command line tools.
+Following is an overview of the tools available.
 
 !!! abstract "Estimate photovoltaic performance"
 
