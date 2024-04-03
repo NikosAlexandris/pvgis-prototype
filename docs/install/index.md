@@ -10,22 +10,24 @@ tags:
 |Git clone|pvis-be-prototype|link:https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype|copy:git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git|
 |Install via pip|pip install git+|link:https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype|copy:pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git|
 
-# Install
-
 !!! danger "Under Development"
 
     **Everything is under development and subject to change!**
 
-## Requirements
+# Requirements
 
-- An operating system that supports Python
-- A Python virtual environment
+- An [operating system that supports Python][python-operating-systems]
+- A [Python virtual environment][python-virtual-environment]
 
-## Environment setup
+[python-operating-systems]: https://www.python.org/downloads/operating-systems/
+[python-virtual-environment]: https://peps.python.org/pep-0405/
+
+
+# Environment setup
 
 To begin with,
 **create a Python [virtual environment][venv]!**
-and activate it:
+and activate it :
 
 ``` bash
 python -m venv pvgis-virtual-environment
@@ -34,7 +36,7 @@ source pvgis-virtual-environment/bin/activate
 
 [venv]: https://docs.python.org/3/library/venv.html
 
-!!! tip
+??? tip "Disallow to install outside a virtual environment"
 
     Forgetting to activate a virtual environment will install various packages 
     outside virtual environments at a system-wide level
@@ -49,7 +51,7 @@ source pvgis-virtual-environment/bin/activate
     export PIP_REQUIRE_VIRTUALENV=true
     ```
 
-???+ tip
+??? tip "Use `direnv` to work seamlessly with virtual environments"
 
     Regardless of our favourite programming language
     or tool to manage environments,
@@ -72,27 +74,73 @@ source pvgis-virtual-environment/bin/activate
     Find more about `layout python` in
     [direnv/wiki/Python#venv-stdlib-module](https://github.com/direnv/direnv/wiki/Python#venv-stdlib-module).
 
-## Install
 
-Next,
-and once inside a dedicated virtual environment,
-we can install PVIS in the following way :
+# Simple install
 
-1. Clone the source code repository
-2. Step in the source code directory
-3. Install the Python package
+Once inside a dedicated virtual environment,
+we can install PVIS with a single command
+using [pip][pip],
+Python's standard package installer :
+
+[pip]: pip
 
 <div class="termy">
 
 ```console
-$ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
-$ cd pvis-be-prototype
-$ pip install ."[all]"
+$ pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git@v0.8.3
 ---> 100%
-Successfully installed pvis
+..
+Building wheels for collected packages: pvgisprototype
+  Building wheel for pvgisprototype (pyproject.toml) ... done
+  Created wheel for pvgisprototype: filename=pvgisprototype-0.8.3-py3-none-any.whl size=32225753 sha256=3c658cf43ab6e7913bbacabd51344948e420b7b875a0fa7e174b00f9fc98a50e
+  Stored in directory: /tmp/pip-ephem-wheel-cache-ra_n3wre/wheels/a6/36/0f/97514dbae676105e1d4f6f9581498547b769a5fbd3afe74ca9
+Successfully built pvgisprototype
+..
 ```
 
 </div>
+
+!!! info
+
+    The above is a one-step installation of a specific tagged/release version
+
+
+# For Developers
+
+Are you a developer or a Power-User ?
+Curious to explore the latest (non-released development) version ?
+Want to modify some function or add a new one and contribute to PVGIS ?
+You can install PVIS in an [editable mode][editable-installs].
+
+## pip install -e
+
+[editable-installs]: https://pip.pypa.io/en/latest/topics/local-project-installs/#editable-installs
+
+1. Clone the source code repository
+
+    <div class="termy">
+    ```console
+    $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
+    ```
+    </div>
+
+2. Step in the source code directory
+
+    <div class="termy">
+    ```console
+    $ cd pvis-be-prototype
+    ```
+    </div>
+
+3. Install in editable mode
+
+    <div class="termy">
+    ```console
+    $ pip install -e ."[all]"
+    ---> 100%
+    Successfully installed pvis
+    ```
+    </div>
 
 !!! warning
 
@@ -112,14 +160,12 @@ Successfully installed pvis
     Rich is a library to *display* visually pleasing information on the terminal.
     It is deeply integrated into **PVIS**.
 
-## For Developers and Power Users
 
-Curious to explore the latest (non-released development) version ?
-Want to modify some function or add a new one and contribute to PVGIS ?
+## PDM
 
 Using [PDM][PDM],
 you can seamlessly establish a virtual environment
-and install PVGIS in an editable mode.
+and install PVGIS in an _editable mode_.
 
 [PDM]: https://pdm-project.org/latest/
 
@@ -129,100 +175,53 @@ to setup a development environment.
 
 1. Clone the latest version from the source repository :
 
-``` bash
-git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
-cd pvis-be-prototype
-```
+    <div class="termy">
+    ```console
+    $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
+    $ cd pvis-be-prototype
+    ```
+    </div>
 
 2. Install PVGIS using PDM
 
-``` bash
-pdm install
-```
+    <div class="termy">
+    ```console
+    $ pdm install
+    ```
+    </div>
+
 This will create a virtual environment
 and install PVGIS along with its dependencies.
 
 3. Activate the virtual environment
 
-``` bash
-$ eval $(pdm venv activate in-project)
-```
-
-* Alternatively, it is possible to run 
-
-[Run a command in a virtual environment without activating it](https://pdm-project.org/latest/usage/venv/#run-a-command-in-a-virtual-environment-without-activating-it)
-
-Happy coding!
-
-
-## CLI
-
-Hello and welcome yourself in the PVGIS command line interface (CLI) : 
-
-``` bash exec="true" result="ansi" source="above"
-pvgis-prototype
-```
-
-!!! hint
-
-    All commands run _without_ arguments,
-    will display the help overview,
-    just as if we run them with `--help`.
-
-!!! tip "Auto-completion in the command line"
-
-    Auto-completion in the command line can be installed optionally.
-    This is offered via the _hidden_ command `completion` :
-
-    ``` bash exec="true" result="ansi" source="above"
-    pvgis-prototype completion show --help
+    <div class="termy">
+    ```console
+    $ eval $(pdm venv activate in-project)
     ```
+    </div>
 
-## Web API
+* Alternatively, PDM can 
+[run a command in a virtual environment without activating it](https://pdm-project.org/latest/usage/venv/#run-a-command-in-a-virtual-environment-without-activating-it)
 
-If you wish to test/run the Web API, you can run it locally as follows :
+**Happy coding!**
 
-<div class="termy">
+# Verify
 
-``` console
-$ cd pvgisprototype
-$ uvicorn pvgisprototype.webapi:app --reload
-INFO:     Will watch for changes in these directories: ['pvgis-prototype']
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [134186] using StatReload
-INFO:     Started server process [134188]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-```
-
-</div>
-
-By default, the server will run on http://127.0.0.1:8000.
-We can run on another address, like so :
+We can verify the installation was successful,
+for example by asking for the version of the installed package :
 
 <div class="termy">
-
-``` console
-$ cd pvgisprototype
-$ uvicorn pvgisprototype.webapi:app --reload --host 127.0.0.2
-INFO:     Will watch for changes in these directories: ['pvgis-prototype']
-INFO:     Uvicorn running on http://127.0.0.2:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [134186] using StatReload
-INFO:     Started server process [134188]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
+```console
+❯ pvgis-prototype --version
+PVGIS prototype version: 0.8.3.dev75+g35aa8211
 ```
-
 </div>
 
+**That was it!**
 
-Click on the URL and you should be landing in a page like
+# After the installation ..
 
-<!-- <figure markdown> -->
-  ![PVGIS Web API](../images/pvgis-prototype_web_api_uvicorn_2024-01-26.png)
-  <!-- <figcaption>Image caption</figcaption> -->
-<!-- </figure> -->
-
-## Help ?
-
-Check the dedicated [help](help.md) page.
+- Interact with PVIS through the command line : CLI
+- Run the Web API server
+- Use the API in your scripts
