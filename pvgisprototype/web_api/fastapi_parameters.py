@@ -5,7 +5,6 @@ from fastapi import Depends
 from datetime import datetime
 from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
-from pvgisprototype.api.utilities.timestamp import callback_generate_datetime_series
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import now_local_datetimezone
 from pvgisprototype.constants import LATITUDE_MINIMUM
@@ -55,6 +54,9 @@ power_model_help = "Photovoltaic power model"
 efficiency_help = "Efficiency value"
 rounding_places_help = "Number of decimal places for rounding"
 verbose_help = "Verbose level"
+log_help = "Log level"
+fingerprint_help='Fingerprint the photovoltaic power output time series'
+module_temperature_algorithm_description='Algorithms for calculation of the effect of temperature on the power output of a photovoltaic system as a function of temperature and optionally wind speed',
 
 
 fastapi_query_longitude = Query(
@@ -225,4 +227,16 @@ fastapi_query_rounding_places = Query(
 fastapi_query_verbose = Query(
     # VERBOSE_LEVEL_DEFAULT,
     description=verbose_help,
+)
+fastapi_query_log = Query(
+    description=log_help,
+)
+fastapi_query_fingerprint = Query(
+    description=fingerprint_help,
+)
+fastapi_query_module_temperature_algorithm = Query(
+    description=module_temperature_algorithm_description,
+)
+fastapi_query_photovoltaic_module_model = Query(
+    description='Photovoltaic module' 
 )

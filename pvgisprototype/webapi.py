@@ -14,14 +14,14 @@ from fastapi.templating import Jinja2Templates
 from bokeh.resources import INLINE
 
 from pvgisprototype.web_api.series.select import select
-from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
-from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
-from pvgisprototype.web_api.geometry.overview_series import overview_series
-from pvgisprototype.web_api.irradiance.power import get_photovoltaic_power_output_series
+# from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
+# from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
+# from pvgisprototype.web_api.geometry.overview_series import overview_series
+from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series
 
-from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
-from pvgisprototype.web_api.plot.plot_example import plot_example
-from pvgisprototype.web_api.plot.plot_example import graph_example
+# from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
+# from pvgisprototype.web_api.plot.plot_example import plot_example
+# from pvgisprototype.web_api.plot.plot_example import graph_example
 from pvgisprototype.constants import RADIANS
 from pathlib import Path
 
@@ -301,45 +301,45 @@ class SolarTimeResult(BaseModel):
 # series
 app.get("/calculate/series/select")(select)
 
-# geometry
-app.get("/calculate/geometry/solar_time/")(get_calculate_solar_time)
-app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)
-app.get("/calculate/geometry/overview_series")(overview_series)
+# # geometry
+# app.get("/calculate/geometry/solar_time/")(get_calculate_solar_time)
+# app.get("/calculate/geometry/overview")(get_calculate_solar_geometry_overview)
+# app.get("/calculate/geometry/overview_series")(overview_series)
 
 # irradiance
-app.get("/calculate/irradiance/power")(get_photovoltaic_power_output_series)
+app.get("/calculate/power/broadband")(get_photovoltaic_power_output_series)
 
-# plot
-app.get("/plot/example", response_class=HTMLResponse)(plot_example)
-app.get("/plot/graph", response_class=HTMLResponse)(graph_example)
+# # plot
+# app.get("/plot/example", response_class=HTMLResponse)(plot_example)
+# app.get("/plot/graph", response_class=HTMLResponse)(graph_example)
 
 
-@app.get("/plot/solar_declination_one_year_bokeh", response_class=HTMLResponse)
-async def get_plot(
-        request: Request,
-        year: int,
-        title: Optional[str] = 'Annual Variation of Solar Declination',
-        output_units: Optional[str] = RADIANS,
-        inline: Optional[bool] = True
-        ):
-    js_resources = INLINE.render_js()
-    css_resources = INLINE.render_css()
-    script, div = plot_solar_declination_one_year_bokeh(
-            year,
-            title,
-            output_units
-            )
+# @app.get("/plot/solar_declination_one_year_bokeh", response_class=HTMLResponse)
+# async def get_plot(
+#         request: Request,
+#         year: int,
+#         title: Optional[str] = 'Annual Variation of Solar Declination',
+#         output_units: Optional[str] = RADIANS,
+#         inline: Optional[bool] = True
+#         ):
+#     js_resources = INLINE.render_js()
+#     css_resources = INLINE.render_css()
+#     script, div = plot_solar_declination_one_year_bokeh(
+#             year,
+#             title,
+#             output_units
+#             )
 
-    return templates.TemplateResponse(
-            "plot.html",
-            {
-                "request": request,
-                "plot_script": script,
-                "plot_div": div,
-                "js_resources":js_resources,
-                "css_resources":css_resources,
-                }
-            )
+#     return templates.TemplateResponse(
+#             "plot.html",
+#             {
+#                 "request": request,
+#                 "plot_script": script,
+#                 "plot_div": div,
+#                 "js_resources":js_resources,
+#                 "css_resources":css_resources,
+#                 }
+#             )
 
 
 if __name__ == "__main__":
