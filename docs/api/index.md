@@ -7,8 +7,8 @@ tags:
   - Reference
 ---
 
-# Getting Started
+This section is all about the API.
 
-!!! seealso
+!!! seealso "Install me first!"
 
     [Installation instructions](../install/index.md)
