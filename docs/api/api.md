@@ -14,6 +14,7 @@ tags:
 ```pycon exec="1" source="console" session="pvgis-location"
 >>> from pvgisprototype import Longitude, Latitude
 ```
+
 and
 
 ```pycon exec="1" source="console" session="pvgis-location"
