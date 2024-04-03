@@ -34,9 +34,12 @@ for a specific location and a short period of time_.
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
-    8 45 214 \
+    8.628 45.812 214 \
     --start-time '2010-01-27' \
     --end-time '2010-01-28' \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+    --neighbor-lookup nearest \
     --quiet \
     --uniplot
 ```
@@ -56,12 +59,12 @@ Let's break-down the result :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
-    8 45 214 \
+    8.628 45.812 214 \
     --start-time '2010-01-27' \
     --end-time '2010-01-28' \
     --surface-tilt 0.0001 \
-    --global-horizontal-irradiance sarah3_sis_12_076.nc \
-    --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
     --neighbor-lookup nearest \
     -vv
 ```
@@ -285,7 +288,7 @@ over our location of interest and moment in time :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global horizontal \
-    8 45 214 \
+    8.628 45.812 214 \
     '2010-01-27 12:00:00'
 ```
 <!-- returns -->
@@ -295,7 +298,7 @@ We can see how this simulated quantity breaks down in its sub-components too :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global horizontal \
-    8 45 214 \
+    8.628 45.812 214 \
     '2010-01-27 12:00:00' \
     -vvv
 ```
@@ -311,7 +314,7 @@ by using the `direct horizontal` commands :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance direct horizontal \
-    8 45 214 \
+    8.628 45.812 214 \
     '2010-01-27 12:00:00'
 ```
 <!-- returns -->
@@ -325,7 +328,7 @@ we can derive the *diffuse* ***horizontal*** component via :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance diffuse horizontal \
-    8 45 214 \
+    8.628 45.812 214 \
     '2010-01-27 12:00:00'
 ```
 <!-- returns -->
@@ -343,7 +346,7 @@ from the SARAH3 data collection :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype series select \
-    sarah3_sis_12_076.nc 8 45 \
+    sarah2_sis_over_esti_jrc.nc 8.628 45.812 \
     '2010-01-27 12:00:00' \
     --neighbor-lookup nearest \
     --mask-and-scale \
@@ -358,7 +361,7 @@ pvgis-prototype series select \
  
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype series select \
-    sarah3_sid_12_076.nc 8 45 \
+    sarah2_sid_over_esti_jrc.nc 8.628 45.812 \
     --neighbor-lookup nearest \
     -v \
     --mask-and-scale \
@@ -456,7 +459,7 @@ it _should_ be close to the SARAH3 observation.
 Is it ? Let's find out ...
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype irradiance direct horizontal 8 45 214 '2010-01-27 12:00:00'
+pvgis-prototype irradiance direct horizontal 8.628 45.812 214 '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 422.45524071. -->
@@ -470,7 +473,7 @@ pvgis-prototype irradiance direct horizontal 8 45 214 '2010-01-27 12:00:00'
 Next, the simulated *direct* ***inclined*** component : 
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance direct inclined 8 45 214 '2010-01-27 12:00:00'
+pvgis-prototype irradiance direct inclined 8.628 45.812 214 '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 420.03229235 -->
@@ -478,7 +481,7 @@ pvgis-prototype irradiance direct inclined 8 45 214 '2010-01-27 12:00:00'
 And the simulated *global* ***inclined*** component is :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 210 '2010-01-27 12:00:00'
+pvgis-prototype irradiance global inclined 8.628 45.812 210 '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 517.2263 -->
@@ -486,7 +489,7 @@ pvgis-prototype irradiance global inclined 8 45 210 '2010-01-27 12:00:00'
 Analytically, the above figure is broken down to its inclined components as :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 210 '2010-01-27 12:00:00' -vvv
+pvgis-prototype irradiance global inclined 8.628 45.812 210 '2010-01-27 12:00:00' -vvv
 ```
 
 !!! attention "EXTRA" 
@@ -496,10 +499,10 @@ pvgis-prototype irradiance global inclined 8 45 210 '2010-01-27 12:00:00' -vvv
 
     ``` bash exec="true" result="ansi" source="above"
     pvgis-prototype irradiance global inclined \
-        8 45 210 \
+        8.628 45.812 210 \
         '2010-01-27 12:00:00' \
-        --global-horizontal-irradiance sarah3_sis_12_076.nc \
-        --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+        --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+        --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
         --neighbor-lookup nearest
     ```
     <!-- returns -->
@@ -540,7 +543,7 @@ Direct Horizontal Irradiance = Direct Normal Irradiance * sin(Solar Altitude)
 Finally, the photovoltaic power output is simulated via :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 '2010-01-27 12:00:00'
+pvgis-prototype power broadband 8.628 45.812 214 '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 692.26776 -->
@@ -549,10 +552,10 @@ or estimated via :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
-    8 45 214 \
+    8.628 45.812 214 \
     '2010-01-27 12:00:00' \
-    --global-horizontal-irradiance sarah3_sis_12_076.nc \
-    --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
     --neighbor-lookup nearest
 ```
 <!-- returns -->
@@ -570,7 +573,7 @@ Let's add it to the power commands :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
-    8 45 214 \
+    8.628 45.812 214 \
     '2010-01-27 12:00:00' \
     --surface-tilt 0.0001
 ```
@@ -581,11 +584,11 @@ pvgis-prototype power broadband \
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
-    8 45 214 \
+    8.628 45.812 214 \
     '2010-01-27 12:00:00' \
     --surface-tilt 0.0001 \
-    --global-horizontal-irradiance sarah3_sis_12_076.nc \
-    --direct-horizontal-irradiance sarah3_sid_12_076.nc \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
     --neighbor-lookup nearest
 ```
 <!-- returns -->

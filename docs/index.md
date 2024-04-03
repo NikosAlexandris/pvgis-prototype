@@ -4,10 +4,14 @@ tags:
   - PVGIS
   - Overview
 ---
+
 [![pipeline status](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/badges/mkdocs/pipeline.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/commits/mkdocs) 
 [![coverage report](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/badges/mkdocs/coverage.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/commits/mkdocs) 
 [![Latest Release](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/badges/release.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/releases) 
 ---
+
+# Welcome
+
 :material-human-greeting-variant: Welcome to the documentation of
 the Photovoltaic Geographical Information System (PVGIS).
 
@@ -23,7 +27,7 @@ or even its core API[^0].
         The former _consumes_ the latter
         to produce a FastAPI-based Web API interface.
 
-## What is PVGIS ?
+# What is PVGIS ?
 
 [PVGIS][PVGIS]
 is an open [web application][PVGIS Web Application]
@@ -36,7 +40,7 @@ Transport and Climate directorate.
 
 [JRC]: https://joint-research-centre.ec.europa.eu/index_en
 
-### Features & Capabilities
+## Features & Capabilities
 
 PVGIS
 offers cost-free public service insights
@@ -128,7 +132,7 @@ we offer in-depth guides and discussions on more complex aspects of PVGIS API:
 - [Performance Optimization](development/performance_optimisation.md)
 - [Adding New Features](development/adding_new_features.md)
 
-## Contributing
+### Contributing
 
 If you're interested in contributing,
 please read our [Contribution Guidelines](development/contribution_guidelines.md).
@@ -138,7 +142,7 @@ please read our [Contribution Guidelines](development/contribution_guidelines.md
     PVGIS aims to become an open-source project.
     It will welcome contributions of all forms.
 
-## Support & Community
+# Support & Community
 
 If you have questions or need support,
 join our [Community Forum](support/community_forum.md)
