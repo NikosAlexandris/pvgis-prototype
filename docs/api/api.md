@@ -1,13 +1,15 @@
 ---
 icon: material/language-python
+title: How-To
+summary: How to use the API
+authors:
+    - Nikos Alexandris
 tags:
   - API
   - Core API
   - Python API
   - Example
 ---
-
-# Examples
 
 ```pycon exec="1" source="console" session="pvgis-location"
 >>> from pvgisprototype import Longitude, Latitude

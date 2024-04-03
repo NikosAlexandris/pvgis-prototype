@@ -27,6 +27,7 @@ nav:
     - api/api.md
   - CLI:
     - cli/index.md
+    - cli/welcome.md
     - cli/help.md
     - Power:
       - Introduction: cli/power/intro.md
