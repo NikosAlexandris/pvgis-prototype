@@ -220,6 +220,7 @@ plugins:
   - search
   - badges
   - pagetree
+  - section-index
   - mermaid2
   - bibtex:
       bib_file: "references.bib"

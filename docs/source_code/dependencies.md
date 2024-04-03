@@ -7,7 +7,7 @@ tags:
   - Dependency Tree
 ---
 
-# Dependency flowchart
+# Tree
 
 ```bash exec="1" result="mermaid"
 pipdeptree -p pvgisprototype --mermaid 2>/dev/null |
@@ -15,7 +15,7 @@ pipdeptree -p pvgisprototype --mermaid 2>/dev/null |
     sed 's/\.dev.+"\]$/"]/;s/\+d.*"\]$/"]/'
 ```
 
-## Alternative flowchart
+# Wide format
 
 ```bash exec="1" result="mermaid"
 pipdeptree -p pvgisprototype --mermaid 2>/dev/null

@@ -5,8 +5,6 @@ tags:
   - Reference
 ---
 
-# Algorithms
-
 PVGIS features an algorithmic repository,
 independent from the core API, the CLI and the Web API components.
 
