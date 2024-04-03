@@ -27,8 +27,6 @@ async def process_series_timestamp(
     """
     """
     timezone = convert_to_timezone(timezone)
-    from devtools import debug
-    debug(locals())
     if timestamps is not None and not start_time and not end_time:
         timestamps = parse_timestamp_series(timestamps=timestamps)
 
@@ -42,7 +40,7 @@ async def process_series_timestamp(
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
-    debug(locals())
+
     return timestamps
 
 

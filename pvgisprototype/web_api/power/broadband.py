@@ -190,7 +190,5 @@ async def get_photovoltaic_power_output_series(
         fingerprint=fingerprint,
         profile=profile,
     )  # Re-Design Me ! ------------------------------------------------
-    from devtools import debug
-    debug(locals())
 
     return {"Photovoltaic power output series": photovoltaic_power_output_series.value.tolist()}
