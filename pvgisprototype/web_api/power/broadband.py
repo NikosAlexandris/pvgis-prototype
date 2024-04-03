@@ -71,9 +71,8 @@ from pvgisprototype.web_api.fastapi_parameters import fastapi_query_log
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_module_temperature_algorithm
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_fingerprint
-
-
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+
 
 async def get_photovoltaic_power_output_series(
     longitude: Annotated[float, fastapi_dependable_longitude],
