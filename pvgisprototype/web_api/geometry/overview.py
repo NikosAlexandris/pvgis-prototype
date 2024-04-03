@@ -3,7 +3,7 @@ from fastapi import Depends, Query
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
 from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_timeseries_solar_position
-from pvgisprototype.api.geometry.overview import calculate_solar_geometry_overview
+from pvgisprototype.api.position.overview import calculate_solar_geometry_overview
 from typing import Optional
 from typing import List
 from pvgisprototype.constants import RADIANS
@@ -11,9 +11,9 @@ from pvgisprototype.web_api.dependencies import process_series_timestamp
 from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
 from pvgisprototype.web_api.dependencies import process_single_timestamp
-from pvgisprototype.api.geometry.models import select_models
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.models import SolarTimeModel
+from pvgisprototype.api.position.models import select_models
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
