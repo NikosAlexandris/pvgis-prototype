@@ -11,8 +11,6 @@ tags:
   - Web API
 ---
 
-# Source Code Reference
-
 This page documents the source code of PVGIS.
 
 - [Algorithms](algorithms.md)
