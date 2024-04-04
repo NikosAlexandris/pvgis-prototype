@@ -1,5 +1,6 @@
 ---
-icon: material/developer-board
+icon: simple/conventionalcommits
+title: Conventions
 tags:
   - Development
   - Convention
@@ -10,15 +11,21 @@ tags:
   - GitLab Issues
 ---
 
-# Overview
+# Git Commit Message
+
+..
+
+# Branch Naming
+
+## Overview
 
 Branches are a fundamental component of version control with Git. They allow for development of features, fixes, and experiments in isolated environments. While Git-based services like [GitLab](https://gitlab.com) and [GitHub](https://github.com) are essentially feature-full repository and software project management tool, branches are, nonetheless, a feature of Git itself, not these hosting services. This distinction becomes particularly important when considering repository portability between different Git-based services.
 
-# Convention
+## Convention
 
 To ensure clarity, consistency, and ease of navigation across different platforms, we agreed on a branch naming convention that emphasizes readability, understandability, and practicality. The approach aids in the quick identification of branches, their purposes, and associated issues or features.
 
-## Format
+### Format
 
 ```
 <issue number>-gitlab-<describe issue>
@@ -30,12 +37,12 @@ To ensure clarity, consistency, and ease of navigation across different platform
 
 - **Issue Description**: Following the _issue number_ and _git host name_ with a short keyword-style description of the issue, should give an insight into the purpose of the branch.
 
-# Examples
+### Examples
 
 - [129-add-different-panel-orientation-tilt](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/compare/main...129-add-different-panel-orientation-tilt)`
 - ..
 
-# Rationale
+## Rationale
 
 The adopted naming convention offers :
 
@@ -45,7 +52,10 @@ The adopted naming convention offers :
 
 - **Portability**: Including a service-specific prefix mitigates confusion when migrating projects between Git-based platforms, preserving the context of issue tracking.
 
-# Discussion
+## Discussion
 
-Dialogue on branch naming practices, as in just about every aspect of our software project, is encouraged.
-A flexible yet structured approach to branch naming will support our collective effort, even more so ahead of a potential transition to other Git Hosts.
+Dialogue on branch naming practices,
+as in just about every aspect of our software project, is encouraged.
+A flexible yet structured approach to branch naming
+will support our collective effort,
+even more so ahead of a potential transition to other Git Hosts.
