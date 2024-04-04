@@ -82,6 +82,7 @@ test = [
 ]
 docs = [
   "markdown-exec[ansi]",
+  "mkdocs-section-index",
   "mkdocs-bibtex",
   "mkdocs-exclude",
   "mkdocs-git-revision-date-localized-plugin",
