@@ -1,5 +1,6 @@
 ---
 icon: material/help
+title: Help ?
 tags:
   - How-To
   - Help
@@ -9,8 +10,6 @@ tags:
 hide:
   - toc
 ---
-
-# Help ?
 
 For each and every command,
 there is a `--help` option.
