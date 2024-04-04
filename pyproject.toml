@@ -95,6 +95,7 @@ docs = [
   "mkdocs-pagetree-plugin",
   "mkdocs-badges",
   "mkdocs-coverage",
+  "diagrams",
 ]
 all = ["pvgisprototype[web, dev, test, docs]"]
 
