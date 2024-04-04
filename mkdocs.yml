@@ -64,6 +64,7 @@ nav:
     - development/index.md
     - development/gantt.md
     - development/roadmap_and_progress.md
+    - development/conventions.md
     - development/optimisation.md
     - development/photovoltaic_performance.md
     - development/solar_irradiance.md
