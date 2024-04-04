@@ -13,47 +13,77 @@ tags:
 If you wish to test/run the Web API,
 you can run it locally as follows :
 
-<div class="termy">
+1. Ensure you got FastAPI and uvicorn installed
 
-``` console
-$ cd pvgisprototype
-$ uvicorn pvgisprototype.webapi:app --reload
-INFO:     Will watch for changes in these directories: ['pvgis-prototype']
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [134186] using StatReload
-INFO:     Started server process [134188]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-```
 
-</div>
+    <div class="termy">
 
-By default, the server will run on http://127.0.0.1:8000.
-We can run on another address, like so :
+    ``` console
+    pip install uvicorn fastapi
+    ```
 
-<div class="termy">
+2. Run the server
 
-``` console
-$ cd pvgisprototype
-$ uvicorn pvgisprototype.webapi:app --reload --host 127.0.0.2
-INFO:     Will watch for changes in these directories: ['pvgis-prototype']
-INFO:     Uvicorn running on http://127.0.0.2:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [134186] using StatReload
-INFO:     Started server process [134188]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-```
+    <div class="termy">
 
-</div>
+    ``` console
+    $ cd pvgisprototype
+    $ uvicorn pvgisprototype.webapi:app --reload
+    INFO:     Will watch for changes in these directories: ['pvgis-prototype']
+    INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+    INFO:     Started reloader process [134186] using StatReload
+    INFO:     Started server process [134188]
+    INFO:     Waiting for application startup.
+    INFO:     Application startup complete.
+    ```
 
-Click on the URL and you should be landing in a page like
+    </div>
 
-<!-- <figure markdown> -->
-  ![PVGIS Web API](../images/pvgis-prototype_web_api_uvicorn_2024-01-26.png)
-  <!-- <figcaption>Image caption</figcaption> -->
-<!-- </figure> -->
+    By default, the server will run on http://127.0.0.1:8000.
+    We can run on another address, like so :
+
+    <div class="termy">
+
+    ``` console
+    $ cd pvgisprototype
+    $ uvicorn pvgisprototype.webapi:app --reload --host 127.0.0.2
+    INFO:     Will watch for changes in these directories: ['pvgis-prototype']
+    INFO:     Uvicorn running on http://127.0.0.2:8000 (Press CTRL+C to quit)
+    INFO:     Started reloader process [134186] using StatReload
+    INFO:     Started server process [134188]
+    INFO:     Waiting for application startup.
+    INFO:     Application startup complete.
+    ```
+
+    </div>
+
+    Click on the URL and you should be landing in a page like
+
+    <!-- <figure markdown> -->
+      ![PVGIS Web API](../images/pvgis-prototype_web_api_uvicorn_2024-01-26.png)
+      <!-- <figcaption>Image caption</figcaption> -->
+    <!-- </figure> -->
 
 # Request examples
+
+## Photovoltaic power time series
+
+### In the browser
+
+``` html
+http://localhost:8000/calculate/power/broadband?elevation=214&start_time=2010-01-27&frequency=h&end_time=2010-01-28&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812
+```
+
+### In the command line
+
+
+``` bash
+curl -X 'GET' \
+  'http://localhost:8000/calculate/power/broadband?elevation=214&start_time=2010-01-27&frequency=h&end_time=2010-01-28&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812' \
+  -H 'accept: application/json'
+```
+
+## Other examples
 
 Then, demonstration of an endpoint
 

@@ -82,7 +82,7 @@ we can install PVIS with a single command
 using [pip][pip],
 Python's standard package installer :
 
-[pip]: pip
+[pip]: https://pip.pypa.io
 
 <div class="termy">
 
@@ -208,8 +208,9 @@ and install PVGIS along with its dependencies.
 
 # Verify
 
-We can verify the installation was successful,
-for example by asking for the version of the installed package :
+We can verify the installation was successful
+by running any command (i.e. `pvgis-prototype`)
+or asking for the version of the installed package :
 
 <div class="termy">
 ```console
