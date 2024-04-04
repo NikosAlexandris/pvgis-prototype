@@ -49,14 +49,12 @@ with suppress(FileNotFoundError):
         with Cluster(""):
             API = Python("API")
 
-        with Cluster("Interface"):
+        with Cluster("Command Line Interface"):
+            CLI = Python("CLI")
+            Typer = Custom("Typer", typer_icon)
+            Rich = Custom("Rich", rich_icon)
 
-            with Cluster("Command Line Interface"):
-                CLI = Python("CLI")
-                Typer = Custom("Typer", typer_icon)
-                Rich = Custom("Rich", rich_icon)
-
-            WebAPI = FastAPI("WebAPI")
+        WebAPI = FastAPI("WebAPI")
 
         NumPy >> Solar_Geometry, Solar_Irradiance, Photovoltaic_Performance
         Photovoltaic_Performance << Solar_Irradiance << Solar_Geometry
