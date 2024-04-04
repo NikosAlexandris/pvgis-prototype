@@ -18,6 +18,7 @@ from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
+from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series_multi
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_longitude
@@ -48,6 +49,8 @@ from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.position import typer_option_surface_orientation
 from pvgisprototype.cli.typer.position import typer_option_surface_tilt
+from pvgisprototype.cli.typer.position import typer_option_surface_tilt_multi
+from pvgisprototype.cli.typer.position import typer_option_surface_orientation_multi
 from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor
@@ -303,3 +306,152 @@ def photovoltaic_power_output_series(
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
+
+@log_function_call
+def photovoltaic_power_output_series_multi(
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamps: Annotated[Optional[DatetimeIndex], typer_argument_timestamps] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_time_series: bool = False,
+    global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
+    direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
+    spectral_factor_series: Annotated[Path|SpectralFactorSeries, typer_argument_spectral_factor_series] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
+    temperature_series: Annotated[Path|TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
+    wind_speed_series: Annotated[Path|WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
+    surface_orientation: Annotated[Optional[list], typer_option_surface_orientation_multi] = [float(SURFACE_ORIENTATION_DEFAULT)],
+    surface_tilt: Annotated[Optional[list], typer_option_surface_tilt_multi] = [SURFACE_TILT_DEFAULT],
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT],
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
+    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
+    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
+    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
+    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
+    photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
+    power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
+    temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
+    statistics: Annotated[bool, typer_option_statistics] = False,
+    groupby: Annotated[Optional[str], typer_option_groupby] = None,
+    csv: Annotated[Path, typer_option_csv] = None,
+    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = 0,
+    index: Annotated[bool, typer_option_index] = False,
+    fingerprint: Annotated[bool, typer.Option('--fingerprint', '--fp', help='Fingerprint the photovoltaic power output time series')] = False,
+    quiet: Annotated[bool, typer.Option('--quiet', help='Do not print out the output')] = False,
+    profile: Annotated[bool, typer_option_profiling] = False,
+    ):
+    """
+    Estimate the photovoltaic power over a time series or an arbitrarily
+    aggregated energy production of systems PV system in different tilts and orientations connected 
+    to the electricity grid (without battery storage) based on broadband solar irradiance, ambient
+    temperature and wind speed.
+
+    Notes
+    -----
+    The optional input parameters `global_horizontal_irradiance` and
+    `direct_horizontal_irradiance` accept any Xarray-support data file format
+    and mean the global and direct irradiance on the horizontal plane.
+
+    Inside the API, however, and for legibility, the same parameters in the
+    functions that calculate the diffuse and direct components, are defined as
+    `global_horizontal_component` and `direct_horizontal_component`. This is to
+    avoid confusion at the function level. For example, the function
+    `calculate_diffuse_inclined_irradiance_time_series()` can read the direct
+    horizontal component (thus the name of it `direct_horizontal_component` as
+    well as simulate it.  The point is to make it clear that if the
+    `direct_horizontal_component` parameter is True (which means the user has
+    provided an external dataset), then read it using the
+    `select_time_series()` function.
+    """
+
+    if len(surface_tilt) != len(surface_orientation):
+        from pvgisprototype.api.series.hardcodings import exclamation_mark
+        logger.error(f"{exclamation_mark} Aborting as length of --surface orientation and --surface_tilt is not the same!",
+                    alt=f"{exclamation_mark} [red]Aborting[/red] as [red]length[/red] [code]--surface-orientation[/code] and [code]--surface-tilt[/code] [red]is not the same[/red]!")
+        return
+
+    photovoltaic_power_output_series = calculate_photovoltaic_power_output_series_multi(
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        periods=periods,
+        frequency=frequency,
+        timezone=timezone,
+        random_time_series=random_time_series,
+        global_horizontal_irradiance=global_horizontal_irradiance,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
+        spectral_factor_series=spectral_factor_series,
+        temperature_series=temperature_series,
+        wind_speed_series=wind_speed_series,
+        mask_and_scale=mask_and_scale,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        in_memory=in_memory,
+        dtype=dtype,
+        array_backend=array_backend,
+        multi_thread=multi_thread,
+        surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        albedo=albedo,
+        apply_angular_loss_factor=apply_angular_loss_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        solar_time_model=solar_time_model,
+        time_offset_global=time_offset_global,
+        hour_offset=hour_offset,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        time_output_units=time_output_units,
+        angle_units=angle_units,
+        angle_output_units=angle_output_units,
+        # horizon_heights=horizon_heights,
+        photovoltaic_module=photovoltaic_module,
+        system_efficiency=system_efficiency,
+        power_model=power_model,
+        temperature_model=temperature_model,
+        efficiency=efficiency,
+        verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
+        profile=profile,
+    )
+    
+    if fingerprint:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=photovoltaic_power_output_series.components)
+
