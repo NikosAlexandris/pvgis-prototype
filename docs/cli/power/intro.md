@@ -1,5 +1,5 @@
 ---
-icon: material/eye
+icon: material/location-enter
 tags:
   - How-To
   - CLI
