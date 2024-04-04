@@ -4,78 +4,93 @@
 
 # Photovoltaic Information System
 
+[PVGIS][PVGIS]
+is an open [web application][PVGIS Web Application]
+of the European Commission.
+Is it developed and maintained
+in the [Joint Research Centre (JRC)][JRC]
+for over two decades
+by the Energy Efficiency and Renewables Unit (Ispra) of the Energy,
+Transport and Climate directorate.
+
 <!-- vim-markdown-toc GitLab -->
 
 * [Installation](#installation)
-        * [Install PVGIS](#install-pvgis)
-* [Examples](#examples)
-    * [CLI](#cli)
-    * [API](#api)
-        * [Examples](#examples-1)
-    * [Contact and Support](#contact-and-support)
-    * [Acknowledgments and Credits](#acknowledgments-and-credits)
+    * [Requirements](#requirements)
+    * [Environment setup](#environment-setup)
+    * [Simple install](#simple-install)
+* [Contact and Support](#contact-and-support)
+* [Acknowledgments and Credits](#acknowledgments-and-credits)
 
 <!-- vim-markdown-toc -->
 
 # Installation
 
-PVGIS can be installed relatively simply using `pip`.
-However,
-it is strongly recommended to [create a virtual environment][] first
-and install PVGIS there-in.
+## Requirements
 
-### Install PVGIS
+- An [operating system that supports Python][python-operating-systems]
+- A [Python virtual environment][python-virtual-environment]
 
-- Install PVGIS using pip
-
-    - While inside the virtual environment, install `pvgis` using pip:
-      ``` bash
-      pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
-      ```
-
-- Verify Installation
-
-    - After installation, you can verify that the package is installed
-      correctly by checking its version or running a basic command, if
-      available.
-
-# Examples
-
-- Step-by-step examples
-- Cover typical and advanced use cases
+[python-operating-systems]: https://www.python.org/downloads/operating-systems/
+[python-virtual-environment]: https://peps.python.org/pep-0405/
 
 
-## CLI
+## Environment setup
 
-> Too long to document here !
-
-![pvgis-prototype](pvgis-prototype-cli-2023-12-03.png)
-
-
-## API 
-
-First, run the server:
+To begin with,
+**create a Python [virtual environment][venv]!**
+and activate it :
 
 ``` bash
-cd pvgisprototype
-uvicorn pvgisprototype.webapi:app --reload
+python -m venv pvgis-virtual-environment
+source pvgis-virtual-environment/bin/activate
 ```
 
-Then, test some endpoints!
+[venv]: https://docs.python.org/3/library/venv.html
 
-### Examples
+> **Disallow to install outside a virtual environment !**
+> 
+> Forgetting to activate a virtual environment will install various packages 
+> outside virtual environments at a system-wide level
+> which, over time, will likely lead to errors.
+> 
+> By setting for example in `.bashrc` or `.zshrc`
+> the environment variable `PIP_REQUIRE_VIRTUALENV` to `true`
+> and re-starting your shell,
+> `pip` will refuse to install anything outside a virtual environment.
+> 
+> ``` bash
+> export PIP_REQUIRE_VIRTUALENV=true
+> ```
 
+## Simple install
+
+Once inside a dedicated virtual environment,
+we can install PVIS with a single command
+using [pip][pip],
+Python's standard package installer :
+
+[pip]: https://pip.pypa.io
+
+``` bash
+$ pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
 ```
-http://localhost:8001/calculate/geometry/overview?solar_position_models=Skyfield&solar_time_model=Skyfield&apply_atmospheric_refraction=true&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&angle_output_units=radians&verbose=0&longitude=8&latitude=45&timestamp=2006-12-28
-```
 
-## Contact and Support
+# Contact and Support
 
-- Information on how to get help or support.
-- Contact details for reporting bugs or giving feedback.
+- Questions and comments can be sent to our mailbox:
+  
+  [JRC-PVGIS@ec.europa.eu](JRC-PVGIS@ec.europa.eu)
 
+- __Postal Address__
 
-## Acknowledgments and Credits
+  European Commission, Joint Research Centre
+  Energy Efficiency and Renewables Unit
+  via E. Fermi 2749, TP 450
+  I-21027 Ispra (VA)
+  Italy
+
+# Acknowledgments and Credits
 
 - Credit to the EU Commission or any other partners or contributors.
 - Acknowledgments of the original PVGIS and its impact.
