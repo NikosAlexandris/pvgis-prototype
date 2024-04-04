@@ -1,4 +1,5 @@
 ---
+title: PVGIS 5.2
 tags:
   - Reference
   - PVGIS v5.2
@@ -7,8 +8,6 @@ tags:
   - Capabilities
   - Archived notes
 ---
-
-# PVGIS 5.2
 
 Functions 
 
