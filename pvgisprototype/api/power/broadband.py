@@ -17,6 +17,7 @@ from pvgisprototype import SurfaceTilt
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype import PhotovoltaicPower
+from pvgisprototype import PhotovoltaicPowerMultipleModules
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
@@ -652,3 +653,403 @@ def calculate_photovoltaic_power_output_series(
             irradiance=global_irradiance_series,
             components=components,
             )
+
+@log_function_call
+def calculate_photovoltaic_power_output_series_multi(
+    longitude: float,
+    latitude: float,
+    elevation: float,
+    timestamps: Optional[DatetimeIndex] = None,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
+    periods: Optional[int] = None,
+    frequency: Optional[str] = TIMESTAMPS_FREQUENCY_DEFAULT,
+    timezone: Optional[str] = None,
+    random_time_series: bool = False,
+    global_horizontal_irradiance: Optional[Path] = None,
+    direct_horizontal_irradiance: Optional[Path] = None,
+    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
+    temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
+    wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
+    mask_and_scale: bool = False,
+    neighbor_lookup: MethodsForInexactMatches = None,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    in_memory: bool = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = True,
+    surface_orientation: list[float] = [SURFACE_ORIENTATION_DEFAULT],
+    surface_tilt: list[float] = [SURFACE_TILT_DEFAULT],
+    linke_turbidity_factor_series: LinkeTurbidityFactor = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
+    apply_atmospheric_refraction: Optional[bool] = True,
+    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: Optional[float] = ALBEDO_DEFAULT,
+    apply_angular_loss_factor: Optional[bool] = True,
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
+    time_offset_global: float = 0,
+    hour_offset: float = 0,
+    solar_constant: float = SOLAR_CONSTANT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    time_output_units: str = "minutes",
+    angle_units: str = RADIANS,
+    angle_output_units: str = RADIANS,
+    photovoltaic_module: PhotovoltaicModuleModel = PHOTOVOLTAIC_MODULE_DEFAULT, 
+    system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
+    power_model: PVModuleEfficiencyAlgorithm = None,
+    temperature_model: ModuleTemperatureAlgorithm = None,
+    efficiency: Optional[float] = None,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
+    fingerprint: bool = False,
+    profile: bool = False):
+    
+    """
+    Estimate the photovoltaic power under diffenent orientation and tilt over a time series or an arbitrarily
+    aggregated energy production of a PV system based on the effective solar
+    irradiance incident on a solar surface, the ambient temperature and
+    optionally wind speed.
+
+    Parameters
+    ----------
+    longitude : float
+        The longitude of the location for which the energy production is calculated.
+    latitude : float
+        The latitude of the location.
+    elevation : float
+        Elevation of the location in meters.
+    timestamps : Optional[DatetimeIndex], optional
+        Specific timestamps for which to calculate the irradiance, by default None
+    start_time : Optional[datetime], optional
+        Start time for the calculation period, by default None
+    end_time : Optional[datetime], optional
+        End time for the calculation period, by default None
+    periods : Optional[int], optional
+        Period, by default None
+    frequency : Optional[str], optional
+       Frequency for time series data generation, by default TIMESTAMPS_FREQUENCY_DEFAULT
+    timezone : Optional[str], optional
+         Timezone of the location, by default None
+    random_time_series : bool, optional
+        If True, generates a random time series, by default False
+    global_horizontal_irradiance : Optional[Path], optional
+        Path to global horizontal irradiance, by default None
+    direct_horizontal_irradiance : Optional[Path], optional
+        Path to direct horizontal irradiance, by default None
+    spectral_factor_series : SpectralFactorSeries, optional
+        Spectral factor values, by default SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT)
+    temperature_series : np.ndarray, optional
+        Series of temperature values, by default np.array(TEMPERATURE_DEFAULT)
+    wind_speed_series : np.ndarray, optional
+        Series of wind speed values, by default np.array(WIND_SPEED_DEFAULT)
+    mask_and_scale : bool, optional
+         If True, applies masking and scaling to the input data, by default False
+    neighbor_lookup : MethodsForInexactMatches, optional
+        Coordinates proximity setting, by default None
+    tolerance : Optional[float], optional
+        Tolerance, by default TOLERANCE_DEFAULT
+    in_memory : bool, optional
+        In memory option, by default False
+    dtype : str, optional
+        Datatype, by default DATA_TYPE_DEFAULT
+    array_backend : str, optional
+        Array backend option, by default ARRAY_BACKEND_DEFAULT
+    multi_thread : bool, optional
+        Calculations with multithread, by default True
+    surface_orientation : list[float], optional
+        List of orientation values, by default [SURFACE_ORIENTATION_DEFAULT]
+    surface_tilt : list[float], optional
+        List of tilt values, by default [SURFACE_TILT_DEFAULT]
+    linke_turbidity_factor_series : LinkeTurbidityFactor, optional
+        Linke turbidity factor values, by default [LINKE_TURBIDITY_TIME_SERIES_DEFAULT]
+    refracted_solar_zenith : Optional[float], optional
+        Apply atmospheric refraction option, by default REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+    albedo : Optional[float], optional
+        Albedo, by default ALBEDO_DEFAULT
+    apply_angular_loss_factor : Optional[bool], optional
+        Apply angular loss fator, by default True
+    solar_position_model : SolarPositionModel, optional
+        Solar position model, by default SOLAR_POSITION_ALGORITHM_DEFAULT
+    solar_incidence_model : SolarIncidenceModel, optional
+        Solar incidence model, by default SolarIncidenceModel.jenco
+    solar_time_model : SolarTimeModel, optional
+        Solar time model, by default SOLAR_TIME_ALGORITHM_DEFAULT
+    time_offset_global : float, optional
+        Time offset value, by default 0
+    hour_offset : float, optional
+        Hour offset value, by default 0
+    solar_constant : float, optional
+        Solar constant, by default SOLAR_CONSTANT
+    perigee_offset : float, optional
+        Perigee offset value, by default PERIGEE_OFFSET
+    eccentricity_correction_factor : float, optional
+        Eccentricity correction factor, by default ECCENTRICITY_CORRECTION_FACTOR
+    time_output_units : str, optional
+        Time output units, by default "minutes"
+    angle_units : str, optional
+        Angle units, by default RADIANS
+    angle_output_units : str, optional
+        Angle output units, by default RADIANS
+    photovoltaic_module : PhotovoltaicModuleModel, optional
+        Photovoltaic module, by default PHOTOVOLTAIC_MODULE_DEFAULT
+    system_efficiency : Optional[float], optional
+        System efficiency, by default SYSTEM_EFFICIENCY_DEFAULT
+    power_model : PVModuleEfficiencyAlgorithm, optional
+        Power model, by default None
+    temperature_model : ModuleTemperatureAlgorithm, optional
+        Temperature model, by default None
+    efficiency : Optional[float], optional
+        Module efficiency value, by default None
+    verbose : int, optional
+        Verbosing level, by default VERBOSE_LEVEL_DEFAULT
+    log : int, optional
+        Logging level, by default 0
+    fingerprint : bool, optional
+        Include output fingerprint, by default False
+    profile : bool, optional
+        Include profile, by default False
+
+    Returns
+    -------
+    PhotovoltaicPowerMultipleModules
+        Summary of array of effective irradiance values.
+    """
+    
+    if profile:
+        import cProfile
+        pr = cProfile.Profile()
+        pr.enable()
+
+    if multi_thread:
+        from multiprocessing.pool import ThreadPool as Pool
+        from functools import partial
+
+        pool = Pool()
+
+        _call_calculate_photovoltaic_power_output_series = partial(calculate_photovoltaic_power_output_series,
+            longitude = longitude,
+            latitude = latitude,
+            elevation = elevation,
+            timestamps = timestamps,
+            start_time = start_time,
+            end_time = end_time,
+            periods = periods,
+            frequency = frequency,
+            timezone = timezone,
+            random_time_series = random_time_series,
+            global_horizontal_irradiance = global_horizontal_irradiance,
+            direct_horizontal_irradiance = direct_horizontal_irradiance,
+            spectral_factor_series = spectral_factor_series,
+            temperature_series = temperature_series,
+            wind_speed_series = wind_speed_series,
+            mask_and_scale = mask_and_scale,
+            neighbor_lookup = neighbor_lookup,
+            tolerance = tolerance,
+            in_memory = in_memory,
+            dtype = dtype,
+            array_backend = array_backend,
+            multi_thread = False,
+            linke_turbidity_factor_series = linke_turbidity_factor_series,
+            apply_atmospheric_refraction = apply_atmospheric_refraction,
+            refracted_solar_zenith = refracted_solar_zenith,
+            albedo = albedo,
+            apply_angular_loss_factor = apply_angular_loss_factor,
+            solar_position_model = solar_position_model,
+            solar_incidence_model = solar_incidence_model,
+            solar_time_model = solar_time_model,
+            time_offset_global = time_offset_global,
+            hour_offset = hour_offset,
+            solar_constant = solar_constant,
+            perigee_offset = perigee_offset,
+            eccentricity_correction_factor = eccentricity_correction_factor,
+            time_output_units = time_output_units,
+            angle_units = angle_units,
+            angle_output_units = angle_output_units,
+            photovoltaic_module = photovoltaic_module,
+            system_efficiency = system_efficiency,
+            power_model = power_model,
+            temperature_model = temperature_model,
+            efficiency = efficiency,
+            verbose = 6,
+            log = log,
+            fingerprint = False,
+            profile = profile,)
+                
+        different_setups = [{"surface_tilt": tilt, "surface_orientation": orientation} 
+                    for tilt, orientation in zip(surface_tilt, surface_orientation)]
+
+        output_photovoltaic_power_objects_list = pool.map(lambda args: _call_calculate_photovoltaic_power_output_series(**args), different_setups)
+        pool.close()
+    else:
+        output_photovoltaic_power_objects_list = []
+        for surface_tilt_value, surface_orientation_value in zip(surface_tilt, surface_orientation):
+            output_photovoltaic_power_objects_list.append(calculate_photovoltaic_power_output_series(
+                longitude = longitude,
+                latitude = latitude,
+                elevation = elevation,
+                timestamps = timestamps,
+                start_time = start_time,
+                end_time = end_time,
+                periods = periods,
+                frequency = frequency,
+                timezone = timezone,
+                surface_orientation = surface_orientation_value,
+                surface_tilt = surface_tilt_value,
+                random_time_series = random_time_series,
+                global_horizontal_irradiance = global_horizontal_irradiance,
+                direct_horizontal_irradiance = direct_horizontal_irradiance,
+                spectral_factor_series = spectral_factor_series,
+                temperature_series = temperature_series,
+                wind_speed_series = wind_speed_series,
+                mask_and_scale = mask_and_scale,
+                neighbor_lookup = neighbor_lookup,
+                tolerance = tolerance,
+                in_memory = in_memory,
+                dtype = dtype,
+                array_backend = array_backend,
+                multi_thread = False,
+                linke_turbidity_factor_series = linke_turbidity_factor_series,
+                apply_atmospheric_refraction = apply_atmospheric_refraction,
+                refracted_solar_zenith = refracted_solar_zenith,
+                albedo = albedo,
+                apply_angular_loss_factor = apply_angular_loss_factor,
+                solar_position_model = solar_position_model,
+                solar_incidence_model = solar_incidence_model,
+                solar_time_model = solar_time_model,
+                time_offset_global = time_offset_global,
+                hour_offset = hour_offset,
+                solar_constant = solar_constant,
+                perigee_offset = perigee_offset,
+                eccentricity_correction_factor = eccentricity_correction_factor,
+                time_output_units = time_output_units,
+                angle_units = angle_units,
+                angle_output_units = angle_output_units,
+                photovoltaic_module = photovoltaic_module,
+                system_efficiency = system_efficiency,
+                power_model = power_model,
+                temperature_model = temperature_model,
+                efficiency = efficiency,
+                verbose = 6,
+                log = log,
+                fingerprint = fingerprint,
+                profile = profile,
+                ))
+
+    # =======================================================================
+    from pvgisprototype.validation.arrays import create_array
+    shape_of_array = (
+        timestamps.shape
+    )  # Borrow shape from solar_altitude_series
+    photovoltaic_power_output_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    global_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    direct_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    diffuse_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    reflected_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    effective_direct_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    effective_diffuse_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    effective_reflected_irradiance_series = create_array(
+        shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+    )
+    # =======================================================================
+    
+    for single_output_photovoltaic_power in output_photovoltaic_power_objects_list:
+        photovoltaic_power_output_series += single_output_photovoltaic_power.value
+        global_irradiance_series += single_output_photovoltaic_power.components[DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME]
+        direct_irradiance_series += single_output_photovoltaic_power.components[DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME]
+        diffuse_irradiance_series += single_output_photovoltaic_power.components[DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME]
+        reflected_irradiance_series += single_output_photovoltaic_power.components[REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME]
+        effective_direct_irradiance_series += single_output_photovoltaic_power.components[EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME]
+        effective_diffuse_irradiance_series += single_output_photovoltaic_power.components[EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME]
+        effective_reflected_irradiance_series += single_output_photovoltaic_power.components[EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME]
+
+    components_container = {
+        'main': lambda: {
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
+            PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
+        },
+        
+        'extended': lambda: {
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & in-plane components",
+            POWER_MODEL_COLUMN_NAME: power_model.value if power_model else NOT_AVAILABLE,
+            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
+            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
+            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,
+            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
+        } if verbose > 1 else {},
+        
+        'more_extended': lambda: {
+            EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: effective_direct_irradiance_series,
+            EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: effective_diffuse_irradiance_series,
+            EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: effective_reflected_irradiance_series,
+        } if verbose > 2 else {},
+        
+        'even_more_extended': lambda: {
+            TEMPERATURE_COLUMN_NAME: temperature_series.value,
+            WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
+            SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor_series.value,
+        } if verbose > 3 else {},
+
+        'fingerprint': lambda: {
+            FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
+        } if fingerprint else {},
+        }
+
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    if profile:
+        import pstats
+        import io
+        pr.disable()
+
+        # write profiling statistics to file
+        profile_filename = "profiling_stats.prof"
+        pr.dump_stats(profile_filename)
+        print(f"Profiling statistics saved to {profile_filename}")
+
+        s = io.StringIO()
+        sortby = pstats.SortKey.CUMULATIVE
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+
+        if verbose > 6:
+            print(s.getvalue())
+
+    log_data_fingerprint(
+            data=photovoltaic_power_output_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+
+    return PhotovoltaicPowerMultipleModules(
+        value = photovoltaic_power_output_series,
+        unit=POWER_UNIT,
+        position_algorithm="",
+        timing_algorithm="",
+        elevation=elevation,
+        surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
+        irradiance=global_irradiance_series,
+        modules = output_photovoltaic_power_objects_list,
+        components = components,
+    )

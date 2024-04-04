@@ -194,3 +194,65 @@ typer_option_random_surface_orientation = typer.Option(
     rich_help_panel=rich_help_panel_geometry_surface,
     # default_factory = SURFACE_ORIENTATION_DEFAULT,
 )
+
+def parse_surface_tilt_multi(
+   surface_tilt_multi_input: str,
+):
+    if isinstance(surface_tilt_multi_input, str):
+        return list(map(float, surface_tilt_multi_input.split(","))) 
+    
+    return surface_tilt_multi_input
+
+
+def surface_tilt_multi_callback(
+    ctx: typer.Context,
+    surface_tilt_multi: list[float],
+):
+    if len(surface_tilt_multi) == 1:
+        from pvgisprototype.log import logger
+        logger.warning(
+            f'Attention ! You are running {ctx.command.name} which expected multiple surface tilt angles!',
+            alt=f'Attention ! You are running [code]{ctx.command.name}[/code] which expected multiple surface tilt angles!',
+        )
+    surface_tilt_multi_output = [convert_to_radians(ctx, None, surface_tilt) for surface_tilt in surface_tilt_multi]
+    return surface_tilt_multi_output       
+
+surface_tilt_multi_help='Multiple solar surface tilt angles from the horizontal plane.'
+typer_option_surface_tilt_multi = typer.Option(
+    help=surface_tilt_multi_help,
+    rich_help_panel=rich_help_panel_geometry_surface,
+    parser=parse_surface_tilt_multi,
+    callback=surface_tilt_multi_callback,
+    show_default=False,
+)
+
+def parse_surface_orientation_multi(
+   surface_orientation_multi_input: str,
+):
+    if isinstance(surface_orientation_multi_input, str):
+        return list(map(float, surface_orientation_multi_input.split(","))) 
+    
+    return surface_orientation_multi_input
+
+def surface_orientation_multi_callback(
+    ctx: typer.Context,
+    surface_orientation_multi: list[float],
+):
+    if len(surface_orientation_multi) == 1:
+        from pvgisprototype.log import logger
+        logger.warning(
+            f'Attention ! You are running {ctx.command.name} which expected multiple surface orientation angles!',
+            alt=f'Attention ! You are running [code]{ctx.command.name}[/code] which expected multiple surface orientation angles!',
+        )
+    # Change to convert to radians if requested
+    surface_orientation_multi_output = [convert_to_radians(ctx, None, surface_orientation) for surface_orientation in surface_orientation_multi]
+    return surface_orientation_multi_output     
+
+surface_orientation_multi_help='Multiple solar surface orientation angles.'
+typer_option_surface_orientation_multi = typer.Option(
+    help=surface_orientation_multi_help,
+    rich_help_panel=rich_help_panel_geometry_surface,
+    parser=parse_surface_orientation_multi,
+    callback=surface_orientation_multi_callback,
+    show_default=False,
+)
