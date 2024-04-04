@@ -22,6 +22,9 @@ nav:
   - Tutorials:
     - tutorials/index.md
     - tutorials/introduction.md
+    - tutorials/solar_position.md
+    - tutorials/solar_irradiance.md
+    - tutorials/photovoltaic_performance.md
   - API:
     - api/index.md
     - api/api.md
@@ -29,8 +32,9 @@ nav:
     - cli/index.md
     - cli/welcome.md
     - cli/help.md
+    - cli/fingerprint.md
     - Power:
-      - Introduction: cli/power/intro.md
+      - Introduction: cli/power/introduction.md
       - Broadband: cli/power/broadband.md
       - Spectrally Resolved: cli/power/spectral.md
       - Toolbox: cli/power/tools.md
@@ -62,6 +66,7 @@ nav:
     - API: source_code/api.md
     - CLI: source_code/cli.md
     - Web API: source_code/web_api.md
+    - Logger: source_code/logger.md
   - Development:
     - development/index.md
     - development/gantt.md
