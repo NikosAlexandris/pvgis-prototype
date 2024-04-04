@@ -35,7 +35,7 @@ The implementations concern NOAA's solar geometry equations, listed _in dependen
 | :material-checkbox-marked-circle:{.checked} | Fractional year       | fractional_year.py     | Timestamp (+ time zone ? ) [^*]                               | Equation of time, solar declination           |                  | :material-checkbox-marked-circle:{.checked} |                |
 | :material-checkbox-marked-circle:{.checked} | Equation of time      | equation_of_time.py    | Fractional year                                               | Time offset                                   |                  | :material-checkbox-marked-circle:{.checked} |                |
 | :material-checkbox-marked-circle:{.checked} | Time offset           | time_offset.py         | Equation of time                                              | True solar time                               |                  | :material-checkbox-marked-circle:{.checked} |                |
-| :material-checkbox-marked-circle:{.checked} | True solar time [^**] | solar_time.py          | Time offset                                                   | Solar hour angle                              |                  | :material-checkbox-marked-circle:{.checked} |                |
+| :material-checkbox-marked-circle:{.checked} | True solar time | solar_time.py          | Time offset                                                   | Solar hour angle                              |                  | :material-checkbox-marked-circle:{.checked} |                |
 | :material-checkbox-marked-circle:{.checked} | Solar hour angle      | solar_hour_angle.py    | True solar time                                               | Solar zenith, Solar altitude, Solar azimuth   |                  | :material-checkbox-marked-circle:{.checked} |                |
 | :material-checkbox-marked-circle:{.checked} | Solar declination     | solar_declination.py   | Fractional year                                               | Solar zenith                                  |                  | :material-checkbox-marked-circle:{.checked} |                |
 | :material-checkbox-marked-circle:{.checked} | Solar zenith          | solar_zenith.py        | Solar declination, Solar hour angle, Atmospheric refraction   | Solar altitude                                |                  | :material-checkbox-marked-circle:{.checked} |                |
@@ -56,6 +56,4 @@ Also to support ?
 |        | Local time       | local_time.py       |          |             |           |             |              |
 
 
-[^*]: Is the timezone is such that after conversion to UTC it changes the day, then this is indeed required ?
-
-[^**]: partially since time offset is not yet vectorised!**
+[^*]: If the timezone is such that after conversion to UTC it changes the day, then is this required ?
