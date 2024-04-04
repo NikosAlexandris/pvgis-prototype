@@ -1,6 +1,16 @@
-# PVGIS 5.2 main function
+---
+title: PVGIS 5.2 backend
+tags:
+  - Reference
+  - PVGIS v5.2
+  - Features
+  - Functionality
+  - Capabilities
+  - Archived notes
+---
 
-The main function of `rsun_standalone_hourly_opt.c` :
+PVGIS 5.2 is powered by `rsun_standalone_hourly_opt.c`.
+The structure of its `main()` function is :
 
 1.  Define  `main()`
    ``` c

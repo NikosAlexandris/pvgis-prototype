@@ -8,7 +8,7 @@ tags:
   - CLI
 ---
 
-PVGIS is also a collection of command line tools.
+PVGIS is _also_ a collection of command line tools.
 Following is an overview of the tools available.
 
 !!! abstract "Estimate photovoltaic performance"

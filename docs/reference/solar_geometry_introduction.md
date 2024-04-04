@@ -1,4 +1,5 @@
 ---
+title: Solar Geometry
 tags:
   - Reference
   - Solar Geometry
