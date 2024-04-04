@@ -43,7 +43,9 @@ nav:
       - Incidence: cli/position/incidence.md
   - Web API:
     - web_api/index.md
-    - web_api/web_api.md
+    - web_api/install.md
+    - web_api/run.md
+    - web_api/examples.md
   - Reference:
     - reference/index.md
     - reference/solar_geometry_introduction.md
