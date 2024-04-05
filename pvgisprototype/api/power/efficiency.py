@@ -53,7 +53,7 @@ import numpy as np
 from enum import Enum, auto
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.power.photovoltaic_module import get_coefficients_for_photovoltaic_module
-
+from copy import deepcopy
 
 def add_unequal_arrays(array_1, array_2):
     """
@@ -176,7 +176,8 @@ def calculate_pv_efficiency_time_series(
     efficiency_series = np.zeros_like(irradiance_series)
     efficiency_series[negative_relative_irradiance] = 0
 
-    # temperature_series_adjusted = np.copy(temperature_series)  # Safer! ----
+
+    temperature_series_adjusted = deepcopy(temperature_series)  # Safer! ----
 
     # Adjust temperature based on conditions
     if temperature_model.value  == ModuleTemperatureAlgorithm.faiman:
@@ -184,17 +185,15 @@ def calculate_pv_efficiency_time_series(
             if len(photovoltaic_module_efficiency_coefficients) < 9:
                 return "Insufficient number of model constants for Faiman model with wind speed."
             # temperature_series_adjusted = ... # safer !
-            temperature_series.value += irradiance_series / (
+            temperature_series_adjusted.value += irradiance_series / (
                 photovoltaic_module_efficiency_coefficients[7] + photovoltaic_module_efficiency_coefficients[8] * wind_speed_series.value
             )
         else:
             if len(photovoltaic_module_efficiency_coefficients) < 8:
                 return "Insufficient number of model constants for Faiman model."
-            # temperature_series_adjusted = ...  # safer !
-            temperature_series += photovoltaic_module_efficiency_coefficients[7] * irradiance_series
-        temperature_series_adjusted = temperature_series  # for the output dictionary!
+            temperature_series_adjusted += photovoltaic_module_efficiency_coefficients[7] * irradiance_series
 
-    temperature_deviation_series = temperature_series.value - standard_test_temperature
+    temperature_deviation_series = temperature_series_adjusted.value - standard_test_temperature
     
     if power_model.value  == PVModuleEfficiencyAlgorithm.king:
         efficiency_factor_series = (
