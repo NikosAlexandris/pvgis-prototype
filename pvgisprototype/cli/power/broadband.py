@@ -451,6 +451,57 @@ def photovoltaic_power_output_series_multi(
         profile=profile,
     )
     
+    if not quiet:
+        if verbose > 0:
+            from pvgisprototype.cli.print import print_irradiance_table_2
+            print_irradiance_table_2(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                dictionary=photovoltaic_power_output_series.components,
+                # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
+                rounding_places=rounding_places,
+                index=index,
+                surface_orientation=True,
+                surface_tilt=True,
+                verbose=verbose,
+            )
+        else:
+            flat_list = photovoltaic_power_output_series.value.flatten().astype(str)
+            csv_str = ','.join(flat_list)
+            print(csv_str)
+
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=photovoltaic_power_output_series.components,
+            filename=csv,
+            index=index,
+        )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=photovoltaic_power_output_series.value,
+            timestamps=timestamps,
+            groupby=groupby,
+            title="Photovoltaic power output",
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=photovoltaic_power_output_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Photovoltaic Power Output Series',
+            title="Photovoltaic power output",
+            label = 'Photovoltaic Power',
+            label_2 = None,
+            unit = POWER_UNIT,
+        )
+
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
