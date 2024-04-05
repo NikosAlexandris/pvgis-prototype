@@ -1,6 +1,6 @@
 ---
 icon: material/help
-title: Help ?
+title: Help
 tags:
   - How-To
   - Help
