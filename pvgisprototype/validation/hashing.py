@@ -1,6 +1,6 @@
 import numpy as np
 import hashlib
-import orjson
+import json
 
 
 def ndarray_to_list(obj):
@@ -10,7 +10,8 @@ def ndarray_to_list(obj):
 
 
 def generate_hash(output):
-    output_str = orjson.dumps(output, default=ndarray_to_list, sort_keys=True)
+    output_str = json.dumps(output, default=ndarray_to_list, sort_keys=True)
+    # instead of _dumping_ : do read the file  directly without loading in-memory first !!!
     hash_object = hashlib.sha256(output_str.encode())
     hash_hex = hash_object.hexdigest()
 
