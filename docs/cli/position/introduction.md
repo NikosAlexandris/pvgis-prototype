@@ -1,10 +1,11 @@
 ---
-icon: material/eye
+icon: material/location-enter
+title: Introduction
 tags:
   - How-To
   - CLI
-  - Solar Geometry
   - Introduction
+  - Solar Position
 hide:
   - toc
 ---

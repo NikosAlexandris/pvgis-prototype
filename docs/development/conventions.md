@@ -13,7 +13,15 @@ tags:
 
 # Git Commit Message
 
-..
+``` mermaid
+    gitGraph
+       commit
+       commit
+```
+
+See [conventionalcommits.org][conventionalcommits]
+
+[conventionalcommits]: https://www.conventionalcommits.org/en/v1.0.0/
 
 # Branch Naming
 
@@ -41,6 +49,13 @@ To ensure clarity, consistency, and ease of navigation across different platform
 
 - [129-add-different-panel-orientation-tilt](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/compare/main...129-add-different-panel-orientation-tilt)`
 - ..
+
+``` mermaid
+    gitGraph
+       commit
+       branch 129-add-different-panel-orientation-tilt
+       commit
+```
 
 ## Rationale
 
