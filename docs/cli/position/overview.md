@@ -8,11 +8,9 @@ hide:
   - toc
 ---
 
-# Solar Geometry Overview
-
 ## Time series
 
-To get a time series of solar geometry parameters over a location,
+To get a time series of solar position parameters over a location,
 you can use the `pvgis-prototype position overview-series` command.
 
 ``` bash exec="true" result="ansi" source="above"

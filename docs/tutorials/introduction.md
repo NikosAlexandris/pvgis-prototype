@@ -4,8 +4,8 @@ title: Introduction
 subtitle: A gentle introduction to elements of photovoltaic performance using PVGIS
 tags:
   - Tutorial
-  - Introduction
   - CLI
+  - Introduction
   - Photovoltaic Performance
   - Broadband Irradiance
 ---
