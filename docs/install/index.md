@@ -1,10 +1,15 @@
 ---
 icon: material/tools
 tags:
+  - Install
   - Python
-  - install
+  - Git
+  - Python virtual environment
+  - venv
+  - direnv
   - pip
-  - virtual environment
+  - PDM
+  - Dependencies
 ---
 
 |Git clone|pvis-be-prototype|link:https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype|copy:git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git|
@@ -103,6 +108,7 @@ Successfully built pvgisprototype
 !!! info
 
     The above is a one-step installation of a specific tagged/release version
+    of the software from its source code Git repository.
 
 
 # For Developers
