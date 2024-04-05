@@ -3,8 +3,8 @@ icon: material/location-enter
 tags:
   - How-To
   - CLI
-  - Solar Geometry
   - Introduction
+  - Solar Position
 hide:
   - toc
 ---
