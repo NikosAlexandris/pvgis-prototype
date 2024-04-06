@@ -15,12 +15,10 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_op
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_surface_geometry
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 
 
@@ -43,41 +41,41 @@ app.command(
 #     name="effective",
 #     help="Estimate the effective irradiance over a time series",
 #     no_args_is_help=True,
-#     rich_help_panel=rich_help_panel_series_irradiance,
+#     rich_help_panel=rich_help_panel_irradiance_series,
 # )
 app.add_typer(
     global_irradiance,
     name="global",
     help=f"Estimate the global irradiance over a time series",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )
 app.add_typer(
     direct_irradiance,
     name="direct",
     help=f'Estimate the direct irradiance over a period of time',
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )
 app.add_typer(
     diffuse_irradiance,
     name="diffuse",
     help=f'Estimate the diffuse irradiance over a period of time',
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )
 app.add_typer(
     reflected_irradiance,
     name="reflected",
     help=f'Calculate the clear-sky ground reflected irradiance over a period of time',
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )
 app.command(
     name="extraterrestrial",
     help=f"Calculate the extraterrestrial normal irradiance over a time series",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )(get_extraterrestrial_normal_irradiance_time_series)
 app.add_typer(
     angular_loss_factor,

@@ -3,7 +3,7 @@ from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.irradiance.direct.normal import get_direct_normal_irradiance_time_series
 from pvgisprototype.cli.irradiance.direct.horizontal import get_direct_horizontal_irradiance_time_series
 from pvgisprototype.cli.irradiance.direct.inclined import get_direct_inclined_irradiance_time_series
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
 
 
 app = typer.Typer(
@@ -17,17 +17,17 @@ app.command(
     name='normal',
     help=f"Estimate the direct normal irradiance over a period of time",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )(get_direct_normal_irradiance_time_series)
 app.command(
     name='horizontal',
     help=f"Estimate the direct horizontal irradiance over a period of time",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )(get_direct_horizontal_irradiance_time_series)
 app.command(
     'inclined',
     help=f"Estimate the direct inclined irradiance over a period of time",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )(get_direct_inclined_irradiance_time_series)

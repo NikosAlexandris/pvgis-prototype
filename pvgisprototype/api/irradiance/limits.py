@@ -1,7 +1,7 @@
 import numpy as np
 
 import typer
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
 from rich import print
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import SOLAR_CONSTANT 
@@ -172,7 +172,7 @@ def calculate_limits(
 @app.command(
     'physical',
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )
 def calculate_physical_limits(
     solar_zenith: float,
@@ -188,7 +188,7 @@ def calculate_physical_limits(
 @app.command(
     'rare',
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )
 def calculate_rare_limits(
     solar_zenith: float,

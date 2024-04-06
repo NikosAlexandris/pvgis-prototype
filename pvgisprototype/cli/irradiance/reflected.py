@@ -6,7 +6,7 @@ from pathlib import Path
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.typer.group import OrderCommands
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_elevation
@@ -83,7 +83,7 @@ app = typer.Typer(
     'inclined',
     no_args_is_help=True,
     help=f'☀ Calculate the clear-sky ground reflected irradiance',
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )
 def get_ground_reflected_inclined_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],

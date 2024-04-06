@@ -16,7 +16,7 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_surface
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_surface_geometry
 
 
 typer_argument_solar_declination = typer.Argument(
@@ -139,7 +139,7 @@ typer_argument_surface_tilt = typer.Argument(
     min=SURFACE_TILT_MINIMUM,
     max=SURFACE_TILT_MAXIMUM,
     callback=surface_tilt_callback,
-    rich_help_panel=rich_help_panel_geometry_surface,
+    rich_help_panel=rich_help_panel_surface_geometry,
     # default_factory = SURFACE_TILT_DEFAULT,
     show_default=False,
 )
@@ -148,7 +148,7 @@ typer_option_surface_tilt = typer.Option(
     min=SURFACE_TILT_MINIMUM,
     max=SURFACE_TILT_MAXIMUM,
     callback=surface_tilt_callback,
-    rich_help_panel=rich_help_panel_geometry_surface,
+    rich_help_panel=rich_help_panel_surface_geometry,
     # default_factory = SURFACE_TILT_DEFAULT,
 )
 typer_option_random_surface_tilt = typer.Option(
@@ -156,7 +156,7 @@ typer_option_random_surface_tilt = typer.Option(
     # min=SURFACE_TILT_MINIMUM,
     # max=SURFACE_TILT_MAXIMUM,
     # callback=random_surface_tilt,
-    rich_help_panel=rich_help_panel_geometry_surface,
+    rich_help_panel=rich_help_panel_surface_geometry,
     # default_factory = SURFACE_TILT_DEFAULT,
 )
 typer_option_optimise_surface_tilt = typer.Option(
@@ -174,7 +174,7 @@ typer_argument_surface_orientation = typer.Argument(
     min=SURFACE_ORIENTATION_MINIMUM,
     max=SURFACE_ORIENTATION_MAXIMUM,
     callback=convert_to_radians,
-    rich_help_panel=rich_help_panel_geometry_surface,
+    rich_help_panel=rich_help_panel_surface_geometry,
     # default_factory = SURFACE_ORIENTATION_DEFAULT,
     show_default=False,
 )
@@ -183,7 +183,7 @@ typer_option_surface_orientation = typer.Option(
     min=SURFACE_ORIENTATION_MINIMUM,
     max=SURFACE_ORIENTATION_MAXIMUM,
     callback=convert_to_radians,
-    rich_help_panel=rich_help_panel_geometry_surface,
+    rich_help_panel=rich_help_panel_surface_geometry,
     # default_factory = SURFACE_ORIENTATION_DEFAULT,
 )
 typer_option_random_surface_orientation = typer.Option(
@@ -191,7 +191,7 @@ typer_option_random_surface_orientation = typer.Option(
     # min=SURFACE_ORIENTATION_MINIMUM,
     # max=SURFACE_ORIENTATION_MAXIMUM,
     # callback=random_surface_orientation,
-    rich_help_panel=rich_help_panel_geometry_surface,
+    rich_help_panel=rich_help_panel_surface_geometry,
     # default_factory = SURFACE_ORIENTATION_DEFAULT,
 )
 
@@ -220,7 +220,7 @@ def surface_tilt_multi_callback(
 surface_tilt_multi_help='Multiple solar surface tilt angles from the horizontal plane.'
 typer_option_surface_tilt_multi = typer.Option(
     help=surface_tilt_multi_help,
-    rich_help_panel=rich_help_panel_geometry_surface,
+    rich_help_panel=rich_help_panel_surface_geometry,
     parser=parse_surface_tilt_multi,
     callback=surface_tilt_multi_callback,
     show_default=False,
@@ -251,7 +251,7 @@ def surface_orientation_multi_callback(
 surface_orientation_multi_help='Multiple solar surface orientation angles.'
 typer_option_surface_orientation_multi = typer.Option(
     help=surface_orientation_multi_help,
-    rich_help_panel=rich_help_panel_geometry_surface,
+    rich_help_panel=rich_help_panel_surface_geometry,
     parser=parse_surface_orientation_multi,
     callback=surface_orientation_multi_callback,
     show_default=False,

@@ -1,31 +1,53 @@
-rich_help_panel_introduction = 'Introduction'                       # 1
-rich_help_panel_overview = 'Overview'                               # level 2
-rich_help_panel_output = 'Input / Output'                           # 1
-rich_help_panel_advanced_options = 'Advanced'                       # 3
+"""
+Structural components of the command line interface
+"""
 
-rich_help_panel_performance = 'Performance'
-rich_help_panel_performance_toolbox = 'Tools'
+# Generic
 
-rich_help_panel_series = 'Series'                                   # 1
-rich_help_panel_time_series = 'Time series'                         # 1
-rich_help_panel_time_series_selection = 'Selection'                 # 1
-rich_help_panel_series_irradiance = 'Solar irradiance'              # level 2
-rich_help_panel_series_meteorology = 'Meteorology'                  # level 2
-
-rich_help_panel_geometry = 'Solar geometry'                         # 1
-rich_help_panel_geometry_noaa = 'Solar geometry NOAA'               # 1
-rich_help_panel_geometry_time = 'Solar time'                        # level 2
-rich_help_panel_solar_time = 'Solar time'                           # 3
-rich_help_panel_geometry_position = 'Solar position'                # level 2
-rich_help_panel_solar_position = 'Solar position'                   # level 2
-rich_help_panel_geometry_refraction = 'Atmospheric refraction'      # level 2
-rich_help_panel_atmospheric_properties = 'Atmospheric properties'   # level 2
-rich_help_panel_geometry_surface = 'Solar surface'                  # level 2
-
-rich_help_panel_toolbox = 'Toolbox'                                 # 1
-rich_help_panel_reference = 'Reference'                             # 1
-
-rich_help_panel_efficiency = 'Efficiency'                           # 3
-rich_help_panel_earth_orbit = 'Earth orbit'                         # 3
-
+rich_help_panel_output = 'Input > < Output'
+rich_help_panel_output_metadata = 'Output metadata'
+rich_help_panel_advanced_options = 'Advanced options'
 rich_help_panel_plotting = 'Plotting'
+
+rich_help_panel_introduction = 'Introduction'
+rich_help_panel_overview = 'Overview'
+rich_help_panel_toolbox = 'Toolbox'
+rich_help_panel_reference = 'Reference'
+
+# Where and when ?
+
+rich_help_panel_surface_location = 'Location of solar surface'
+rich_help_panel_surface_geometry = 'Geometry of solar surface'
+rich_help_panel_time_series = 'Time series'  # timestamps
+
+# Solar position
+
+rich_help_panel_position = 'Position'
+rich_help_panel_earth_orbit = 'Earth orbit'
+rich_help_panel_atmospheric_properties = 'Atmospheric properties'
+rich_help_panel_solar_time = 'Solar time'
+rich_help_panel_solar_position = 'Solar position'
+
+# Solar irradiance
+
+rich_help_panel_irradiance_series = 'Solar irradiance time series'
+
+# Ancillary data
+
+rich_help_panel_meteorological_series = 'Meteorological time series'
+
+# Data selection options
+
+rich_help_panel_series = 'Series'
+rich_help_panel_time_series_data = 'External time series data'
+rich_help_panel_time_series_data_selection = 'Data selection options'
+
+# Data processing options
+
+rich_help_panel_data_processing = 'Data processing options'
+
+# Photovoltaic Performance
+
+rich_help_panel_efficiency = 'Efficiency'
+rich_help_panel_performance = 'Performance'
+rich_help_panel_performance_toolbox = rich_help_panel_performance + ' toolbox'
