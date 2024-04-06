@@ -1,4 +1,6 @@
 ---
+icon: material/format-vertical-align-bottom
+title: Direct irradiance
 tags:
   - How-To
   - CLI
@@ -6,8 +8,6 @@ tags:
 hide:
   - toc
 ---
-
-# Direct solar irradiance
 
 This page overviews how-to work with `irradiance` commands,
 To begin with,
@@ -17,7 +17,7 @@ let's see the available subcommands by running
 pvgis-prototype irradiance direct
 ```
 
-## Direct inclined solar irradiance
+## Direct inclined solar irradiance :material:format-vertical-align-bottom:
 
 Let's calculate the direct inclined irradiance over the location at 
 (longitude, latitude, elevation) = $$8.627626 45.812233 200$$
