@@ -22,7 +22,7 @@ from pvgisprototype.cli.typer.log import typer_option_log_rich_handler
 from pvgisprototype.cli.typer.log import typer_option_logfile
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_position
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
 
@@ -107,19 +107,19 @@ app.add_typer(
     time.app,
     name="time",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_geometry,
+    rich_help_panel=rich_help_panel_position,
 )
 app.add_typer(
     position.app,
     name="position",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_geometry,
+    rich_help_panel=rich_help_panel_position,
 )
 app.add_typer(
     surface.app,
     name="surface",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_geometry,
+    rich_help_panel=rich_help_panel_position,
 )
 app.add_typer(
     utilities.app,

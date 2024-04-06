@@ -23,7 +23,6 @@ from pvgisprototype.cli.typer.time_series import typer_option_data_variable
 from pvgisprototype.cli.typer.time_series import typer_option_time_series
 from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
-from pvgisprototype.cli.typer.time_series import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer.time_series import typer_option_tolerance
 from pvgisprototype.cli.typer.time_series import typer_option_in_memory
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
@@ -156,7 +155,6 @@ def select(
         # convert_longitude_360=convert_longitude_360,
         mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
-        # inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,
@@ -173,7 +171,6 @@ def select(
         # convert_longitude_360=convert_longitude_360,
         mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
-        # inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,

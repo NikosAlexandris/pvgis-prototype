@@ -53,6 +53,7 @@ from pvgisprototype.cli.typer.location import typer_argument_elevation
 from pvgisprototype.cli.typer.position import typer_argument_surface_orientation
 from pvgisprototype.cli.typer.position import typer_argument_surface_tilt
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
+from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
@@ -119,7 +120,7 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_time_series: bool = False,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
     spectrally_resolved_global_horizontal_irradiance_series: Optional[Path] = None,
     spectrally_resolved_direct_horizontal_irradiance_series: Optional[Path] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
@@ -178,7 +179,7 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         frequency=frequency,
         end_time=end_time,
         timezone=timezone,
-        random_time_series=random_time_series,
+        random_timestamps=random_timestamps,
         spectrally_resolved_global_horizontal_irradiance_series=spectrally_resolved_global_horizontal_irradiance_series,
         spectrally_resolved_direct_horizontal_irradiance_series=spectrally_resolved_direct_horizontal_irradiance_series,
         mask_and_scale=mask_and_scale,
