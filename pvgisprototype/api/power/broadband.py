@@ -119,7 +119,7 @@ def calculate_photovoltaic_power_output_series(
     end_time: Optional[datetime] = None,
     periods: Optional[int] = None,
     timezone: Optional[str] = None,
-    random_time_series: bool = False,
+    random_timestamps: bool | None = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
@@ -185,7 +185,7 @@ def calculate_photovoltaic_power_output_series(
         End time for the calculation period. Default is None.
     timezone : Optional[str], optional
         Timezone of the location. Default is None.
-    random_time_series : bool, default False
+    random_timestamps : bool, default False
         If True, generates a random time series.
     global_horizontal_component : Optional[Path], optional
         Path to data file for global horizontal irradiance. Default is None.
@@ -335,7 +335,7 @@ def calculate_photovoltaic_power_output_series(
                 start_time=start_time,
                 end_time=end_time,
                 timezone=timezone,
-                random_time_series=random_time_series,
+                random_timestamps=random_timestamps,
                 direct_horizontal_component=direct_horizontal_irradiance,
                 mask_and_scale=mask_and_scale,
                 neighbor_lookup=neighbor_lookup,
@@ -665,7 +665,7 @@ def calculate_photovoltaic_power_output_series_multi(
     periods: Optional[int] = None,
     frequency: Optional[str] = TIMESTAMPS_FREQUENCY_DEFAULT,
     timezone: Optional[str] = None,
-    random_time_series: bool = False,
+    random_time_series: bool | None = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),

@@ -15,7 +15,9 @@ from pvgisprototype.api.position.models import select_models
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
+from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
+from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
@@ -66,11 +68,12 @@ def overview_series(
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
     timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_time_series: bool = False,
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
     complementary_incidence_angle: Annotated[bool, 'Measure angle between sun-vector and surface-plane'] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -132,10 +135,11 @@ def overview_series(
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
+        timestamps=timestamps,
+        random_timestamps=random_timestamps,
+        timezone=timezone,
         solar_position_models=solar_position_models,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         # refracted_solar_zenith=refracted_solar_zenith,
