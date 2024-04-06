@@ -4,8 +4,8 @@ title: Introduction
 tags:
   - How-To
   - CLI
-  - Introduction
   - Solar Position
+  - Introduction
 hide:
   - toc
 ---
