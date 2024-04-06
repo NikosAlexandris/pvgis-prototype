@@ -62,7 +62,6 @@ from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_ti
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
@@ -717,7 +716,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     end_time: Optional[datetime] = None,
     convert_longitude_360: bool = False,
     timezone: Optional[str] = None,
-    random_time_series: bool = False,
+    random_timestamps: bool = False,
     direct_horizontal_component: Optional[Path] = None,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
@@ -794,7 +793,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        random_time_series=random_time_series,
+        random_timestamps=random_timestamps,
         solar_incidence_model=solar_incidence_model,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,

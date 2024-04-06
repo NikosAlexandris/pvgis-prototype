@@ -10,49 +10,13 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_horizontal_irradiance_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-# from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-# from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-# from pvgisprototype.cli.typer_parameters import typer_argument_elevation
-# from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
-# from pvgisprototype.cli.typer_parameters import typer_option_start_time
-# from pvgisprototype.cli.typer_parameters import typer_option_frequency
-# from pvgisprototype.cli.typer_parameters import typer_option_end_time
-# from pvgisprototype.cli.typer_parameters import typer_option_timezone
-# from pvgisprototype.cli.typer_parameters import typer_option_global_horizontal_irradiance
-# from pvgisprototype.cli.typer_parameters import typer_option_direct_horizontal_irradiance
-# from pvgisprototype.cli.typer_parameters import typer_option_linke_turbidity_factor_series
-# from pvgisprototype.cli.typer_parameters import typer_option_apply_atmospheric_refraction
-# from pvgisprototype.cli.typer_parameters import typer_option_refracted_solar_zenith
-# from pvgisprototype.cli.typer_parameters import typer_option_apply_angular_loss_factor
-# from pvgisprototype.cli.typer_parameters import typer_option_solar_position_model
-# from pvgisprototype.cli.typer_parameters import typer_option_solar_time_model
-# from pvgisprototype.cli.typer_parameters import typer_option_global_time_offset
-# from pvgisprototype.cli.typer_parameters import typer_option_hour_offset
-# from pvgisprototype.cli.typer_parameters import typer_option_perigee_offset
-# from pvgisprototype.cli.typer_parameters import typer_option_eccentricity_correction_factor
-# from pvgisprototype.cli.typer_parameters import typer_option_angle_units
-# from pvgisprototype.cli.typer_parameters import typer_option_time_output_units
-# from pvgisprototype.cli.typer_parameters import typer_option_angle_output_units
-# from pvgisprototype.cli.typer_parameters import typer_option_mask_and_scale
-# from pvgisprototype.cli.typer_parameters import typer_option_nearest_neighbor_lookup
-# from pvgisprototype.cli.typer_parameters import typer_option_tolerance
-# from pvgisprototype.cli.typer_parameters import typer_option_in_memory
-# from pvgisprototype.cli.typer_parameters import typer_option_rounding_places
-# from pvgisprototype.cli.typer_parameters import typer_option_statistics
-# from pvgisprototype.cli.typer_parameters import typer_option_csv
-# from pvgisprototype.cli.typer_parameters import typer_option_uniplot
-# from pvgisprototype.cli.typer_parameters import typer_option_uniplot_terminal_width
-# from pvgisprototype.cli.typer_parameters import typer_option_verbose
-# from pvgisprototype.cli.typer_parameters import typer_option_log
-# from pvgisprototype.cli.typer_parameters import typer_option_index
-# from pvgisprototype.cli.typer_parameters import typer_option_fingerprint
-# from pvgisprototype.cli.typer_parameters import typer_option_quiet
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_elevation
 from pvgisprototype.cli.typer.position import typer_option_surface_orientation
 from pvgisprototype.cli.typer.position import typer_option_surface_tilt
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
+from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
@@ -122,7 +86,7 @@ def get_diffuse_horizontal_irradiance_time_series(
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_time_series: bool = False,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
@@ -167,7 +131,7 @@ def get_diffuse_horizontal_irradiance_time_series(
         start_time=start_time,
         end_time=end_time,
         timezone=timezone,
-        random_time_series=random_time_series,
+        random_timestamps=random_timestamps,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
