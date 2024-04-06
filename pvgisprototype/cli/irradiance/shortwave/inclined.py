@@ -13,7 +13,9 @@ from pvgisprototype.cli.typer.location import typer_argument_elevation
 from pvgisprototype.cli.typer.position import typer_argument_surface_orientation
 from pvgisprototype.cli.typer.position import typer_argument_surface_tilt
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
+from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
+from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
@@ -75,10 +77,11 @@ def get_global_inclined_irradiance_time_series(
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_time_series: bool = False,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
@@ -127,20 +130,21 @@ def get_global_inclined_irradiance_time_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
+        surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         timestamps=timestamps,
+        random_timestamps=random_timestamps,
         start_time=start_time,
+        periods=periods,
         frequency=frequency,
         end_time=end_time,
         timezone=timezone,
-        random_time_series=random_time_series,
         global_horizontal_irradiance=global_horizontal_irradiance,
         direct_horizontal_irradiance=direct_horizontal_irradiance,
         mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         in_memory=in_memory,
-        surface_orientation=surface_orientation,
-        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,

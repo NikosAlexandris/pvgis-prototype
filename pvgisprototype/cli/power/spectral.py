@@ -22,11 +22,12 @@ from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_elevation
 # from pvgisprototype.cli.typer.location import typer_argument_horizon_heights
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
-from pvgisprototype.cli.typer.timestamps import typer_option_timezone
+from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
-from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
+from pvgisprototype.cli.typer.timestamps import typer_option_end_time
+from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.timing import typer_option_global_time_offset
 from pvgisprototype.cli.typer.timing import typer_option_hour_offset
@@ -34,7 +35,6 @@ from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_i
 from pvgisprototype.cli.typer.irradiance import typer_option_global_horizontal_irradiance
 from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer.time_series import typer_option_in_memory
-from pvgisprototype.cli.typer.time_series import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer.time_series import typer_option_tolerance
@@ -70,7 +70,6 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.cli.write import write_irradiance_csv
 from pvgisprototype.constants import ALBEDO_DEFAULT
@@ -104,12 +103,14 @@ def spectral_photovoltaic_power_output_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
+    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_time_series: bool = False,
     spectrally_resolved_global_horizontal_irradiance_series: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     spectrally_resolved_direct_horizontal_irradiance_series: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     number_of_junctions: int = 1,
@@ -123,8 +124,6 @@ def spectral_photovoltaic_power_output_series(
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = False,
-    surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -171,7 +170,7 @@ def spectral_photovoltaic_power_output_series(
         frequency=frequency,
         end_time=end_time,
         timezone=timezone,
-        random_time_series=random_time_series,
+        random_timestamps=random_timestamps,
         spectrally_resolved_global_horizontal_irradiance_series=spectrally_resolved_global_horizontal_irradiance_series,
         spectrally_resolved_direct_horizontal_irradiance_series=spectrally_resolved_direct_horizontal_irradiance_series,
         spectral_response_data=spectral_response_data,
