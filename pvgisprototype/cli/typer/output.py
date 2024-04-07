@@ -7,6 +7,13 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output_metadata
 
 
+# Command metadata
+
+typer_option_command_metadata = typer.Option(
+    help='Print command metadata',
+    rich_help_panel=rich_help_panel_output,
+)
+
 # Index 
 
 typer_option_index = typer.Option(
