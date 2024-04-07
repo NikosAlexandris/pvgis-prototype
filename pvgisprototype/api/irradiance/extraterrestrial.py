@@ -15,7 +15,7 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -42,7 +42,7 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    random_timestamps: bool = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -62,7 +62,7 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     days_per_year = get_days_per_year(years).astype(dtype)
     days_in_years = days_per_year[indices]
 
-    if random_days:
+    if random_timestamps:
         day_of_year_series = np.random.randint(1, days_in_years + 1)
         day_of_year_series = np.random.randint(1, days_in_years.max() + 1, size=timestamps.size).astype(dtype)
 
