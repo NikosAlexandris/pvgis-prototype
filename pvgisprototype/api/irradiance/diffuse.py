@@ -4,7 +4,6 @@ from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pandas import DatetimeIndex
-from datetime import datetime
 from pathlib import Path
 from typing import Optional
 from typing import List
@@ -83,6 +82,9 @@ from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
+from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
+
 
 # def safe_select_time_series(*args, **kwargs):
 #     try:
@@ -127,7 +129,7 @@ def read_horizontal_irradiance_components_from_sarah(
     in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = True,
+    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ):
@@ -219,7 +221,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     global_horizontal_irradiance_series,
     direct_horizontal_irradiance_series,
     dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,  # Not yet integrated !
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     fingerprint: bool = False,
@@ -487,21 +489,21 @@ def diffuse_solar_altitude_function_time_series(
     a1_series, a2_series, a3_series = diffuse_solar_altitude_coefficients_time_series(
         linke_turbidity_factor_series
     )
+
     return (
         a1_series
         + a2_series * np.sin(solar_altitude_series.radians)
         + a3_series * np.power(np.sin(solar_altitude_series.radians), 2)
     )
 
+
 @log_function_call
 def calculate_diffuse_horizontal_irradiance_time_series(
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex = None,
-    start_time: Optional[datetime] = None,
-    end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
-    random_time_series: bool = False,
+    random_timestamps: bool = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -516,14 +518,12 @@ def calculate_diffuse_horizontal_irradiance_time_series(
     time_output_units: str = "minutes",
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
-    random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = True,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     fingerprint: bool = False,
-        ):
+):
     """
     """
     extraterrestrial_normal_irradiance_series = (
@@ -532,7 +532,7 @@ def calculate_diffuse_horizontal_irradiance_time_series(
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            random_days=random_days,
+            random_timestamps=random_timestamps,
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
@@ -647,10 +647,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex = None,
-    start_time: Optional[datetime] = None,
-    end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
-    random_time_series: bool = False,
+    random_timestamps: bool = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     global_horizontal_component: Optional[Path] = None,
     direct_horizontal_component: Optional[Path] = None,
     mask_and_scale: bool = False,
@@ -722,7 +720,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            random_days=random_days,
+            random_timestamps=random_timestamps,
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
@@ -862,7 +860,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            random_time_series=random_time_series,
+            random_timestamps=random_timestamps,
             solar_incidence_model=solar_incidence_model,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
