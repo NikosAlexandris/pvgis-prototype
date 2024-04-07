@@ -68,6 +68,28 @@ from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
+from pandas import DatetimeIndex
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
+from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
+from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
+from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
+from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
+from pvgisprototype.constants import GROUPBY_DEFAULT
+from pvgisprototype.constants import CSV_PATH_DEFAULT
+from pvgisprototype.constants import UNIPLOT_FLAG_DEFAULT
+from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
+from pvgisprototype.constants import QUIET_FLAG_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.constants import METADATA_FLAG_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_groupby
+from pvgisprototype.cli.typer.output import typer_option_command_metadata
 
 
 @log_function_call
@@ -75,7 +97,9 @@ def get_global_inclined_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
+    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
@@ -84,16 +108,12 @@ def get_global_inclined_irradiance_time_series(
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
-    in_memory: Annotated[bool, typer_option_in_memory] = False,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
-    surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
-    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
@@ -109,16 +129,21 @@ def get_global_inclined_irradiance_time_series(
     angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = None,
-    uniplot: Annotated[bool, typer_option_uniplot] = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
+    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
+    uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
-    verbose: Annotated[int, typer_option_verbose] = False,
-    log: Annotated[int, typer_option_log] = 0,
-    index: Annotated[bool, typer_option_index] = False,
-    fingerprint: Annotated[bool, typer_option_fingerprint] = False,
-    quiet: Annotated[bool, typer_option_quiet] = False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ):
     """Calculate the global horizontal irradiance (GHI)
 
@@ -134,10 +159,8 @@ def get_global_inclined_irradiance_time_series(
         surface_tilt=surface_tilt,
         timestamps=timestamps,
         random_timestamps=random_timestamps,
-        start_time=start_time,
-        periods=periods,
-        frequency=frequency,
-        end_time=end_time,
+        # start_time=start_time,
+        # end_time=end_time,
         timezone=timezone,
         global_horizontal_irradiance=global_horizontal_irradiance,
         direct_horizontal_irradiance=direct_horizontal_irradiance,
@@ -163,7 +186,7 @@ def get_global_inclined_irradiance_time_series(
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
-        # multi_thread=multi_thread,
+        multi_thread=multi_thread,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,
@@ -220,3 +243,7 @@ def get_global_inclined_irradiance_time_series(
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=global_inclined_irradiance_series.components)
+    if metadata:
+        from pvgisprototype.cli.print import print_command_metadata
+        import click
+        print_command_metadata(context = click.get_current_context())
