@@ -74,6 +74,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
+    random_timestamps: bool = RANDOM_DAY_FLAG_DEFAULT,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,  # Changed this to np.ndarray
@@ -94,7 +95,6 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
     time_output_units: str = MINUTES,
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
@@ -175,7 +175,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
                     solar_constant=solar_constant,
                     perigee_offset=perigee_offset,
                     eccentricity_correction_factor=eccentricity_correction_factor,
-                    random_days=random_days,
+                    random_timestamps=random_timestamps,
                     dtype=dtype,
                     array_backend=array_backend,
                     verbose=0,  # no verbosity here by choice!
