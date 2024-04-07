@@ -97,6 +97,26 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.cli.typer.output import typer_option_command_metadata
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
+from pvgisprototype.constants import GROUPBY_DEFAULT
+from pvgisprototype.constants import CSV_PATH_DEFAULT
+from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.constants import QUIET_FLAG_DEFAULT
+from pvgisprototype.constants import UNIPLOT_FLAG_DEFAULT
+from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
+from pvgisprototype.cli.typer.output import typer_option_fingerprint
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import MINUTES
+from pvgisprototype.constants import RADIANS
+from pandas import DatetimeIndex
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
+from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 
 
 def spectral_photovoltaic_power_output_series(
@@ -105,12 +125,13 @@ def spectral_photovoltaic_power_output_series(
     elevation: Annotated[float, typer_argument_elevation],
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_option_surface_tilt] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
-    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     spectrally_resolved_global_horizontal_irradiance_series: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     spectrally_resolved_direct_horizontal_irradiance_series: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     number_of_junctions: int = 1,
@@ -120,12 +141,15 @@ def spectral_photovoltaic_power_output_series(
     minimum_spectral_mismatch = MINIMUM_SPECTRAL_MISMATCH,
     temperature_series: Annotated[TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
-    in_memory: Annotated[bool, typer_option_in_memory] = False,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    # dtype: str = DATA_TYPE_DEFAULT,
+    # array_backend: str = ARRAY_BACKEND_DEFAULT,
+    # multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = True,
+    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
@@ -137,20 +161,26 @@ def spectral_photovoltaic_power_output_series(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
+    time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
+    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Annotated[Optional[float], typer_option_efficiency] = None,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = 5,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    groupby: Annotated[Optional[str], typer_option_groupby] = None,
-    csv: Annotated[Path, typer_option_csv] = None,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
+    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
+    uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    index: Annotated[bool, typer_option_index] = False,
+    index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = False,
 ):
     """
     This method accounts for the effects of the solar spectrum's varying
@@ -209,34 +239,54 @@ def spectral_photovoltaic_power_output_series(
     )
     # longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    if verbose > 0:
-        pass
-    #     print_irradiance_table_2(
+    if not quiet:
+        if verbose > 0:
+            pass
+        #     print_irradiance_table_2(
+        #         longitude=longitude,
+        #         latitude=latitude,
+        #         timestamps=timestamps,
+        #         dictionary=results,
+        #         title=title + f' irradiance series {IRRADIANCE_UNITS}',
+        #         rounding_places=rounding_places,
+        #         index=index,
+        #         verbose=verbose,
+        #     )
+        else:
+            flat_list = spectrally_resolved_photovoltaic_power.flatten().astype(str)
+            csv_str = ",".join(flat_list)
+            print(csv_str)
+    # if statistics:
+    #     print_series_statistics(
+    #         data_array=spectrally_resolved_photovoltaic_power,
+    #         timestamps=timestamps,
+    #         groupby=groupby,
+    #         title="Spectrally resolved photovoltaic power",
+    #     )
+    # if csv:
+    #     write_irradiance_csv(
     #         longitude=longitude,
     #         latitude=latitude,
     #         timestamps=timestamps,
     #         dictionary=results,
-    #         title=title + f' irradiance series {IRRADIANCE_UNITS}',
-    #         rounding_places=rounding_places,
-    #         index=index,
-    #         verbose=verbose,
+    #         filename=csv,
     #     )
-    #     if statistics:
-    #         print_series_statistics(
-    #             data_array=spectrally_resolved_photovoltaic_power,
-    #             timestamps=timestamps,
-    #             groupby=groupby,
-    #             title="Spectrally resolved photovoltaic power",
-    #         )
-    #     if csv:
-    #         write_irradiance_csv(
-    #             longitude=longitude,
-    #             latitude=latitude,
-    #             timestamps=timestamps,
-    #             dictionary=results,
-    #             filename=csv,
-    #         )
-    else:
-        flat_list = spectrally_resolved_photovoltaic_power.flatten().astype(str)
-        csv_str = ",".join(flat_list)
-        print(csv_str)
+    # if uniplot:
+    #     from pvgisprototype.api.plot import uniplot_data_array_time_series
+    #     uniplot_data_array_time_series(
+    #         data_array=photovoltaic_power_output_series.value,
+    #         data_array_2=None,
+    #         lines=True,
+    #         supertitle = 'Photovoltaic Power Output Series',
+    #         title="Photovoltaic power output",
+    #         label = 'Photovoltaic Power',
+    #         label_2 = None,
+    #         unit = POWER_UNIT,
+    #     )
+    # if fingerprint:
+    #     from pvgisprototype.cli.print import print_finger_hash
+    #     print_finger_hash(dictionary=photovoltaic_power_output_series.components)
+    # if metadata:
+    #     from pvgisprototype.cli.print import print_command_metadata
+    #     import click
+    #     print_command_metadata(context = click.get_current_context())
