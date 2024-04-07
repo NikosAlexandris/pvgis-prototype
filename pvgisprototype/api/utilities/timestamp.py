@@ -108,6 +108,15 @@ def random_datetimezone() -> tuple:
 
 # Time
 
+def now_datetime() -> datetime:
+    """Returns the current datetime in UTC.
+
+    Return an aware timestamp using the local system time, however defaulting
+    to UTC timezone. 
+    """
+    return datetime.now()
+
+
 def now_local_datetimezone():
     """Get current local date and time and zone
     """
@@ -543,8 +552,6 @@ def callback_generate_datetime_series(
     end_time=ctx.params.get('end_time')
     periods=ctx.params.get('periods', None) 
     frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
-    # print(f'  Input [yellow]start, end time[/yellow] : {start_time}, {end_time}')
-    # print(f"  Input [yellow]frequency[/yellow] : {ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT)}")
     if start_time is not None and end_time is not None:
         timestamps = generate_datetime_series(
             start_time=start_time,
@@ -562,4 +569,24 @@ def callback_generate_datetime_series(
     # ]
     # return to_datetime(timezone_aware_timestamps, format="mixed")
     # -----------------------------------------------------------------------
+    return timestamps
+
+
+def callback_generate_naive_datetime_series(
+    ctx: typer.Context,
+    timestamps: str,
+):
+    start_time=ctx.params.get('start_time')
+    end_time=ctx.params.get('end_time')
+    periods=ctx.params.get('periods', None) 
+    frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
+    if start_time is not None and end_time is not None:
+        timestamps = generate_datetime_series(
+            start_time=start_time,
+            end_time=end_time,
+            periods=periods,
+            frequency=frequency,
+            timezone=None,
+            name=ctx.params.get('datetimeindex_name', None)
+        )
     return timestamps
