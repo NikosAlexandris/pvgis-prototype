@@ -158,8 +158,10 @@ async def read_root():
                 ul.links a {
                     color: #003399; /* EC Blue */
                     text-decoration: none;
-                    font-size: 18px;
+                    font-size: 20px;
+                    font-weight: bold;
                     margin-right: 30px;
+                    padding: 5px 0; /* Add padding for better spacing */
                 }
                 ul.links a:hover {
                     text-decoration: underline;
@@ -175,7 +177,13 @@ async def read_root():
                     display: flex;
                     align-items: center; /* Align items vertically */
                     justify-content: center; /* Center items horizontally */
-                    /* Other styling as required */
+                    background-color: #f4f4f4; /* Light grey background */
+                    color: #333; /* Dark text for readability */
+                    font-size: 14px;
+                    text-align: center;
+                    padding: 20px;
+                    margin-top: 30px; /* Space above the footer */
+                    border-top: 1px solid #ddd; /* A subtle top border */
                 }
                 .footer-logo {
                     width: 100px; /* Adjust as needed */
@@ -185,15 +193,6 @@ async def read_root():
                 .footer-text {
                     text-align: left;
                     /* Additional styling for the text */
-                }
-                .footer {
-                    background-color: #f4f4f4; /* Light grey background */
-                    color: #333; /* Dark text for readability */
-                    font-size: 14px;
-                    text-align: center;
-                    padding: 20px;
-                    margin-top: 30px; /* Space above the footer */
-                    border-top: 1px solid #ddd; /* A subtle top border */
                 }
                 .footer a {
                     color: #003399; /* EC Blue */
