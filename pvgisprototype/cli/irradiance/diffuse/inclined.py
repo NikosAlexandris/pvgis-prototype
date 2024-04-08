@@ -6,6 +6,7 @@ from pvgisprototype.cli.typer_parameters import typer_argument_elevation
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from datetime import datetime
 from pvgisprototype.cli.typer_parameters import typer_argument_timestamps
+from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer_parameters import typer_option_start_time
 from pvgisprototype.cli.typer_parameters import typer_option_frequency
 from pvgisprototype.cli.typer_parameters import typer_option_end_time
@@ -81,7 +82,7 @@ def get_diffuse_inclined_irradiance_time_series(
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_time_series: bool = False,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     surface_orientation: Annotated[Optional[float], typer_option_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
@@ -127,7 +128,7 @@ def get_diffuse_inclined_irradiance_time_series(
         start_time=start_time,
         end_time=end_time,
         timezone=timezone,
-        random_time_series=random_time_series,
+        random_timestamps=random_timestamps,
         global_horizontal_component=global_horizontal_irradiance,
         direct_horizontal_component=direct_horizontal_irradiance,
         mask_and_scale=mask_and_scale,

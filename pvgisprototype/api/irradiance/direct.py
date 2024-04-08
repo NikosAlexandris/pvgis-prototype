@@ -62,7 +62,6 @@ from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_ti
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
@@ -80,7 +79,6 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import PERIGEE_OFFSET_COLUMN_NAME
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
-from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
@@ -122,6 +120,7 @@ from cachetools import cached
 from pvgisprototype.algorithms.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
 from rich import print
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 
 
 @log_function_call
@@ -385,15 +384,15 @@ def calculate_rayleigh_optical_thickness_time_series(
 @cached(cache={}, key=custom_hashkey)
 def calculate_direct_normal_irradiance_time_series(
     timestamps: DatetimeIndex = None,
-    start_time: Optional[datetime] = None,
-    frequency: Optional[str] = None,
-    end_time: Optional[datetime] = None,
+    # start_time: Optional[datetime] = None,
+    # frequency: Optional[str] = None,
+    # end_time: Optional[datetime] = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT, # REVIEW-ME + Typer Parser
     optical_air_mass_series: OpticalAirMass = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    random_days: bool = RANDOM_DAY_SERIES_FLAG_DEFAULT,
+    random_timestamps: bool = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -426,7 +425,7 @@ def calculate_direct_normal_irradiance_time_series(
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            random_days=random_days,
+            random_timestamps=random_timestamps,
             dtype=dtype,
             array_backend=array_backend,
         )
@@ -482,10 +481,10 @@ def calculate_direct_normal_irradiance_time_series(
         'main': lambda: {
             TITLE_KEY_NAME: DIRECT_NORMAL_IRRADIANCE,
             DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },
 
         'extended': lambda: {
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
         } if verbose > 1 else {},
 
@@ -712,16 +711,16 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex = None,
-    start_time: Optional[datetime] = None,
-    frequency: Optional[str] = None,
-    end_time: Optional[datetime] = None,
-    convert_longitude_360: bool = False,
+    # start_time: Optional[datetime] = None,
+    # frequency: Optional[str] = None,
+    # end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
-    random_time_series: bool = False,
+    random_timestamps: bool = False,
+    convert_longitude_360: bool = False,
     direct_horizontal_component: Optional[Path] = None,
-    mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    mask_and_scale: bool = False,
     in_memory: bool = False,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
@@ -794,7 +793,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        random_time_series=random_time_series,
+        random_timestamps=random_timestamps,
         solar_incidence_model=solar_incidence_model,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
@@ -886,9 +885,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             latitude=latitude,
             elevation=elevation,
             timestamps=timestamps,
-            start_time=start_time,
-            frequency=frequency,
-            end_time=end_time,
+            # start_time=start_time,
+            # frequency=frequency,
+            # end_time=end_time,
             timezone=timezone,
             solar_position_model=solar_position_model,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
@@ -919,8 +918,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
             latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
             timestamps=timestamps,
-            start_time=start_time,
-            end_time=end_time,
+            # start_time=start_time,
+            # end_time=end_time,
             # convert_longitude_360=convert_longitude_360,
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,

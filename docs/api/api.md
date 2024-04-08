@@ -38,7 +38,7 @@ Longitude()
 ## Solar altitude
 
 ``` pycon exec="1" source="console" session="solar-altitude"
->>> from pvgisprototype.api.geometry.altitude import calculate_solar_altitude
+>>> from pvgisprototype.api.position.altitude import calculate_solar_altitude
 >>> calculate_solar_altitude
 ```
 

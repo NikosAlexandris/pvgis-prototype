@@ -4,7 +4,15 @@ Output options
 
 import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output_metadata
 
+
+# Command metadata
+
+typer_option_command_metadata = typer.Option(
+    help='Print command metadata',
+    rich_help_panel=rich_help_panel_output,
+)
 
 # Index 
 
@@ -49,7 +57,6 @@ typer_option_time_output_units = typer.Option(
     help="Time units for output and internal calculations (seconds, minutes or hours) - :warning: [bold red]Keep fingers away![/bold red]",
     show_default=True,
     case_sensitive=False,
-    # help="Time units for output and internal calculations (seconds, minutes or hours)"
     rich_help_panel=rich_help_panel_output,
 )
 typer_option_angle_units = typer.Option(
@@ -58,18 +65,15 @@ typer_option_angle_units = typer.Option(
     help="Angular units for internal solar geometry calculations. :warning: [bold red]Keep fingers away![/bold red]",
     show_default=True,
     case_sensitive=False,
-    # help="Angular units for internal calculations (degrees or radians)"
     rich_help_panel=rich_help_panel_output,
 )
 typer_option_angle_output_units = typer.Option(
     '--angle-ouput-units',
     '-aou',
     help="Angular units for solar geometry calculations (degrees or radians). :warning: [bold red]Under development[/red bold]",
-    # help="Angular units for the calculated solar azimuth output (degrees or radians)"
     show_default=True,
     case_sensitive=False,
     rich_help_panel=rich_help_panel_output,
-    # default_factory=ANGLE_OUTPUT_UNITS_DEFAULT,
 )
 
 # Fingerprint
@@ -77,9 +81,9 @@ typer_option_angle_output_units = typer.Option(
 typer_option_fingerprint = typer.Option(
     '--fingerprint',
     '--fp',
-    help='Fingerprint the photovoltaic power output time series',
+    help='Fingerprint the output time series',
     show_default=True,
-    rich_help_panel=rich_help_panel_output,
+    rich_help_panel=rich_help_panel_output_metadata,
 )
 
 # Layout
@@ -96,15 +100,12 @@ typer_option_panels_output = typer.Option(
 typer_option_output_filename = typer.Option(
     help='Output filename for the generated figure',
     rich_help_panel=rich_help_panel_output,
-    # default=Path(),
 )
 typer_option_variable_name_as_suffix = typer.Option(
     help='Suffix the output filename with the variable name',
     rich_help_panel=rich_help_panel_output,
-    # default=False
 )
 typer_option_csv = typer.Option(
     help='CSV output filename',
     rich_help_panel=rich_help_panel_output,
-    # default_factory='series_in',
 )
