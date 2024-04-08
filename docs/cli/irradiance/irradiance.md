@@ -1,4 +1,6 @@
 ---
+icon: material/sun-wireless
+title: Irradiance
 tags:
   - How-To
   - CLI
@@ -6,8 +8,6 @@ tags:
 hide:
   - toc
 ---
-
-# Solar irradiance
 
 With PVGIS,
 you can calculate individual solar irradiance components at will. Almost!

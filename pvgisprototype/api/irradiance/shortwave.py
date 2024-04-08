@@ -73,17 +73,24 @@ from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
+from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
+from pvgisprototype.constants import HOFIERKA_2002
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 from pvgisprototype.constants import SHADE_COLUMN_NAME
 from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
 from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
 from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
+from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype import Irradiance
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
 
 
 @log_function_call
@@ -92,11 +99,11 @@ def calculate_global_horizontal_irradiance_time_series(
     latitude: float,
     elevation: float,
     timestamps: Optional[datetime] = None,
-    start_time: Optional[datetime] = None,
-    frequency: Optional[str] = None,
-    end_time: Optional[datetime] = None,
+    # start_time: Optional[datetime] = None,
+    # frequency: Optional[str] = None,
+    # end_time: Optional[datetime] = None,
     timezone: ZoneInfo | None = None,
-    random_time_series: bool = False,
+    random_timestamps: bool = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
@@ -142,9 +149,9 @@ def calculate_global_horizontal_irradiance_time_series(
         latitude=latitude,
         elevation=elevation,
         timestamps=timestamps,
-        start_time=start_time,
-        frequency=frequency,
-        end_time=end_time,
+        # start_time=start_time,
+        # frequency=frequency,
+        # end_time=end_time,
         timezone=timezone,
         solar_position_model=solar_position_model,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
@@ -170,7 +177,7 @@ def calculate_global_horizontal_irradiance_time_series(
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            random_days=random_time_series,
+            random_timestamps=random_timestamps,
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
@@ -226,15 +233,19 @@ def calculate_global_horizontal_irradiance_time_series(
         'main': lambda: {
             TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE,
             GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },# if verbose > 0 else {},
 
         'extended': lambda: {
             TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + ' & relevant components',
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
         } if verbose > 1 else {},
 
         'more_extended': lambda: {
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
+            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,
+            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
         } if verbose > 2 else {},
 
         'fingerprint': lambda: {
@@ -274,18 +285,15 @@ def calculate_global_inclined_irradiance_time_series(
     elevation: float,
     timestamps: Optional[datetime] = None,
     start_time: Optional[datetime] = None,
-    frequency: Optional[str] = None,
     end_time: Optional[datetime] = None,
     timezone: ZoneInfo | None = None,
-    random_time_series: bool = False,
+    random_timestamps: bool = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
-    mask_and_scale: bool = False,
     neighbor_lookup: MethodsForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    mask_and_scale: bool = False,
     in_memory: bool = False,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
     surface_tilt: Optional[float] = 45,
     surface_orientation: Optional[float] = 180,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
@@ -305,6 +313,9 @@ def calculate_global_inclined_irradiance_time_series(
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float]="Array of horizon elevations.")] = None,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     rounding_places: Optional[int] = 5,
     statistics: bool = False,
     csv: Path = "series_in",
@@ -404,18 +415,18 @@ def calculate_global_inclined_irradiance_time_series(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
-                timestamps=timestamps,
-                start_time=start_time,
-                end_time=end_time,
-                timezone=timezone,
-                random_time_series=random_time_series,
-                direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
-                mask_and_scale=mask_and_scale,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                in_memory=in_memory,
                 surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
+                timestamps=timestamps,
+                # start_time=start_time,
+                # end_time=end_time,
+                timezone=timezone,
+                random_timestamps=random_timestamps,
+                direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
@@ -447,12 +458,12 @@ def calculate_global_inclined_irradiance_time_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
-            timestamps=timestamps,
-            start_time=start_time,
-            end_time=end_time,
-            timezone=timezone,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
+            timestamps=timestamps,
+            # start_time=start_time,
+            # end_time=end_time,
+            timezone=timezone,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
@@ -472,6 +483,7 @@ def calculate_global_inclined_irradiance_time_series(
             neighbor_lookup=neighbor_lookup,
             dtype=dtype,
             array_backend=array_backend,
+            multi_thread=multi_thread,
             verbose=0,  # no verbosity here by choice!
             log=log,
         ).value[  # Important !
@@ -483,12 +495,12 @@ def calculate_global_inclined_irradiance_time_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
-            timestamps=timestamps,
-            start_time=start_time,
-            end_time=end_time,
-            timezone=timezone,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
+            timestamps=timestamps,
+            # start_time=start_time,
+            # end_time=end_time,
+            timezone=timezone,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
@@ -535,6 +547,7 @@ def calculate_global_inclined_irradiance_time_series(
         'main': lambda: {
             TITLE_KEY_NAME: GLOBAL_INCLINED_IRRADIANCE,
             GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series,
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },# if verbose > 0 else {},
 
         'extended': lambda: {
