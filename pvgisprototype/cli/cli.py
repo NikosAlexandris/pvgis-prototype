@@ -85,12 +85,6 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance,
 )
-app.add_typer(
-    series.app,
-    name="series",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series,
-)
 # app.add_typer(
 #     uniplot.app,
 #     name="uniplot",
@@ -100,6 +94,12 @@ app.add_typer(
 app.add_typer(
     irradiance.app,
     name="irradiance",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series,
+)
+app.add_typer(
+    series.app,
+    name="series",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series,
 )
