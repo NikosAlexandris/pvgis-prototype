@@ -1,6 +1,6 @@
 import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series_irradiance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.irradiance.diffuse.term_n import get_term_n_series
 from pvgisprototype.cli.irradiance.diffuse.sky_irradiance import get_diffuse_sky_irradiance_series
@@ -52,16 +52,16 @@ app.command(
     name='horizontal',
     no_args_is_help=True,
     help=f'☀∡ Estimate the diffuse horizontal irradiance over a period of time [red]Not Complete[/red]',
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )(get_diffuse_horizontal_irradiance_time_series)
 app.command(
     name='inclined',
     no_args_is_help=True,
     help=f'☀∡ Calculate the diffuse irradiance incident on a surface over a period of time',
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )
 app.command(
     name='from-sarah',
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series_irradiance,
+    rich_help_panel=rich_help_panel_irradiance_series,
 )(get_diffuse_horizontal_component_from_sarah)

@@ -2,8 +2,6 @@ from devtools import debug
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-import typer
-from typing import Annotated
 from typing import List
 import math
 from math import exp
@@ -11,33 +9,20 @@ from math import pi
 from math import sin
 from math import cos
 from math import pow
-from pvgisprototype.cli.typer.group import OrderCommands
-from pvgisprototype.cli.typer.position import typer_argument_solar_incidence
-from pvgisprototype.cli.typer.position import typer_argument_solar_incidence_series
-from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import ANGULAR_LOSS_COEFFICIENT
-from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 import numpy as np
 from rich import print
 
 
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    help=f"Angular loss factor {NOT_IMPLEMENTED_CLI}",
-)
-
-
-# @app.callback(invoke_without_command=True)
 @log_function_call
 def calculate_angular_loss_factor_for_direct_irradiance(
-    solar_incidence: Annotated[float, typer_argument_solar_incidence],
+    solar_incidence: float,
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the angular loss factor for the direct horizontal radiation
     based on the solar incidence angle
@@ -138,10 +123,10 @@ def calculate_angular_loss_factor_for_direct_irradiance(
 
 @log_function_call
 def calculate_angular_loss_factor_for_direct_irradiance_time_series(
-    solar_incidence_series: Annotated[List[float], typer_argument_solar_incidence_series],
+    solar_incidence_series: List[float],
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    log: Annotated[int, typer.Option('--log', help='Log internal operations')] = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ):
     """
     Notes
@@ -181,7 +166,7 @@ def calculate_angular_loss_factor_for_direct_irradiance_time_series(
 def calculate_angular_loss_factor_for_nondirect_irradiance(
     indirect_angular_loss_coefficient,
     angular_loss_coefficient = ANGULAR_LOSS_COEFFICIENT,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the effect of reflectivity at small angles of incidence
 
@@ -212,5 +197,7 @@ def calculate_angular_loss_factor_for_nondirect_irradiance(
         )
         / angular_loss_coefficient
     )
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
         
     return loss_factor
