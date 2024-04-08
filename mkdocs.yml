@@ -30,19 +30,25 @@ nav:
     - api/api.md
   - CLI:
     - cli/index.md
-    - cli/welcome.md
-    - cli/help.md
+    - cli/features.md
+    - cli/basics.md
+    - cli/verbosity.md
+    - cli/timestamps.md
+    - cli/plots.md
     - cli/fingerprint.md
+    - cli/metadata.md
+    - cli/logging.md
     - Power:
       - Introduction: cli/power/introduction.md
       - Broadband: cli/power/broadband.md
       - Spectrally Resolved: cli/power/spectral.md
       - Toolbox: cli/power/tools.md
     - Irradiance:
+      - Overview: cli/irradiance/introduction.md
       - Overview: cli/irradiance/irradiance.md
       - Direct: cli/irradiance/direct.md
     - Solar Geometry:
-      - Introduction: cli/position/intro.md
+      - Introduction: cli/position/introduction.md
       - Overview: cli/position/overview.md
       - Incidence: cli/position/incidence.md
   - Web API:

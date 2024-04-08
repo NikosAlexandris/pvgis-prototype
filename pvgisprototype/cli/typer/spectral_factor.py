@@ -51,9 +51,9 @@ def spectral_factor_series_argument_callback(
 
     from pvgisprototype.log import logger
     timestamps = ctx.params.get('timestamps', None)
-    if timestamps is None:
-        start_time=ctx.params.get('start_time')
-        end_time=ctx.params.get('end_time')
+    start_time=ctx.params.get('start_time')
+    end_time=ctx.params.get('end_time')
+    if timestamps is None and start_time is not None and end_time is not None:
         periods=ctx.params.get('periods', None) 
         from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
         frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
@@ -74,7 +74,12 @@ def spectral_factor_series_argument_callback(
 
     if isinstance(spectral_factor_series, int) and spectral_factor_series == SPECTRAL_FACTOR_DEFAULT:
         dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
-        spectral_factor_series = np.full(len(timestamps), SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
+        if timestamps is None:  # This is to get photovoltaic_efficiency_time_series() going !
+            from pandas import DatetimeIndex
+            timestamps = DatetimeIndex([]) if timestamps is None else timestamps
+            spectral_factor_series = np.full(12, SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
+        else:
+            spectral_factor_series = np.full(len(timestamps), SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
 
     # at this point, spectral_factor_series should be an array of size =12 or =timestamps !
     if spectral_factor_series is not None and not any([

@@ -15,4 +15,22 @@ def generate_hash(output):
     hash_object = hashlib.sha256(output_str.encode())
     hash_hex = hash_object.hexdigest()
 
-    return hash_hex
+
+def generate_hash(output, person="PVGIS"):
+    hash = hashlib.blake2b(
+        digest_size=32,
+        # key=b'',
+        # salt=b'',
+        person=b"{person}",
+        # fanout=1,
+        # depth=1,
+        # leaf_size=0,
+        # node_offset=0,
+        # node_depth=0,
+        # inner_size=0,
+        # last_node=False,
+        usedforsecurity=False,
+    )
+    hash.update(output.tobytes())
+
+    return hash.hexdigest()

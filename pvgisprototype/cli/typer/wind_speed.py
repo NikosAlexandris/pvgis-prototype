@@ -12,7 +12,7 @@ from pvgisprototype import WindSpeedSeries
 from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_meteorological_series
 from pvgisprototype.cli.typer.path import validate_path
 import numpy as np
 
@@ -103,7 +103,6 @@ def wind_speed_series_argument_callback(
 def wind_speed_series_callback(
     ctx: Context,
     wind_speed_series: WindSpeedSeries,
-    param: typer.CallbackParam,
 ):
     reference_series = ctx.params.get('irradiance_series')
     if wind_speed_series == WIND_SPEED_DEFAULT:
@@ -129,27 +128,24 @@ wind_speed_typer_help='Ambient wind_speed time series'
 # typer_argument_wind_speed_time_series = typer.Argument(
 #     help="Wind speed in meters per second.",
 #     rich_help_panel=rich_help_panel_time_series,
-#     # default_factory=0,
 # )
 
 typer_argument_wind_speed_series = typer.Option(
     help=wind_speed_typer_help,
     # min=WIND_SPEED_MINIMUM,
     # max=WIND_SPEED_MAXIMUM,
-    rich_help_panel=rich_help_panel_atmospheric_properties,
+    rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
     parser=parse_wind_speed_series,
     callback=wind_speed_series_argument_callback,
-    # default_factory=WIND_SPEED_DEFAULT,
     show_default=False,
 )
 typer_option_wind_speed_series = typer.Option(
     help=wind_speed_typer_help,
     # min=WIND_SPEED_MINIMUM,
     # max=WIND_SPEED_MAXIMUM,
-    rich_help_panel=rich_help_panel_atmospheric_properties,
+    rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
     parser=parse_wind_speed_series,
     callback=wind_speed_series_callback,
-    # default_factory=wind_speed_series_default(WIND_SPEED_DEFAULT), ?
 )

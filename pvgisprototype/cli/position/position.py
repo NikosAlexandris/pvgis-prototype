@@ -11,7 +11,6 @@ from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_overview
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_geometry_noaa
 from pvgisprototype.cli.position.introduction import introduction
 from pvgisprototype.cli.position.overview import overview
 from pvgisprototype.cli.position.overview_series import overview_series
@@ -116,12 +115,6 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(incidence)
-# app.command(
-#     'noaa',
-#     help=':sun: :clock12: :triangular_ruler: NOAA\'s general solar position calculations',
-#     no_args_is_help=True,
-#     rich_help_panel=rich_help_panel_geometry_noaa,
-# )(noaa)
 
 
 if __name__ == "__main__":

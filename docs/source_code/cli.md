@@ -12,9 +12,9 @@ Documentation for all command line tools.
 
 # ::: pvgisprototype.cli.power
 
-# ::: pvgisprototype.cli.series
-
 # ::: pvgisprototype.cli.irradiance
+
+# ::: pvgisprototype.cli.series
 
 # ::: pvgisprototype.cli.time
 

@@ -3,6 +3,8 @@ from typing import Annotated
 from typing import Optional
 from pathlib import Path
 from datetime import datetime
+from pandas import DatetimeIndex
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
@@ -11,7 +13,7 @@ from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer.timestamps import typer_option_random_days
+from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.output import typer_option_statistics
@@ -26,7 +28,7 @@ from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
@@ -35,30 +37,50 @@ from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.log import log_function_call
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.cli.typer.timestamps import typer_option_periods
+from pvgisprototype.cli.typer.timestamps import typer_option_timezone
+from pvgisprototype.cli.typer.output import typer_option_groupby
+from pvgisprototype.cli.typer.output import typer_option_command_metadata
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
+from pvgisprototype.constants import GROUPBY_DEFAULT
+from pvgisprototype.constants import CSV_PATH_DEFAULT
+from pvgisprototype.constants import UNIPLOT_FLAG_DEFAULT
+from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
+from pvgisprototype.constants import QUIET_FLAG_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.constants import METADATA_FLAG_DEFAULT
 
 
 @log_function_call
 def get_extraterrestrial_normal_irradiance_time_series(
-    timestamps: Annotated[datetime, typer_argument_timestamps] = None,
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    random_days: Annotated[bool, typer_option_random_days] = RANDOM_DAY_SERIES_FLAG_DEFAULT,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = None,
-    uniplot: Annotated[bool, typer_option_uniplot] = False,
-    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
+    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
+    uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    log: Annotated[int, typer_option_log] = 0,
-    index: Annotated[bool, typer_option_index] = False,
-    fingerprint: Annotated[bool, typer_option_fingerprint] = False,
-    quiet: Annotated[bool, typer_option_quiet] = False,
+    index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ) -> None:
     """
     """
@@ -67,7 +89,7 @@ def get_extraterrestrial_normal_irradiance_time_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        random_days=random_days,
+        random_timestamps=random_timestamps,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -126,3 +148,7 @@ def get_extraterrestrial_normal_irradiance_time_series(
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=extraterrestrial_normal_irradiance_series.components)
+    if metadata:
+        from pvgisprototype.cli.print import print_command_metadata
+        import click
+        print_command_metadata(context = click.get_current_context())
