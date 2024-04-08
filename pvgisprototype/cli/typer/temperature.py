@@ -12,7 +12,7 @@ from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_UNIT
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_meteorological_series
 import numpy as np
 
 
@@ -113,21 +113,18 @@ typer_argument_temperature_series = typer.Option(
     help=temperature_typer_help,
     # min=TEMPERATURE_MINIMUM,
     # max=TEMPERATURE_MAXIMUM,
-    rich_help_panel=rich_help_panel_atmospheric_properties,
+    rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
     parser=parse_temperature_series,
     callback=temperature_series_argument_callback,
-    # default_factory=TEMPERATURE_DEFAULT,
     show_default=False,
 )
 typer_option_temperature_series = typer.Option(
     help=temperature_typer_help,
     # min=TEMPERATURE_MINIMUM,
     # max=TEMPERATURE_MAXIMUM,
-    rich_help_panel=rich_help_panel_atmospheric_properties,
+    rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
     parser=parse_temperature_series,
     callback=temperature_series_option_callback,
-    # default_factory=TEMPERATURE_DEFAULT,
 )
-

@@ -2,7 +2,8 @@ from devtools import debug
 
 import typer
 from typing_extensions import Annotated
-from typing import Any
+from pandas import DatetimeIndex
+from pvgisprototype.api.utilities.timestamp import now_datetime
 from typing import Optional
 from typing import List
 from typing import Tuple
@@ -15,6 +16,7 @@ from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude_in_degrees
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamp
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
+from pvgisprototype.cli.typer.timestamps import typer_argument_naive_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
@@ -23,7 +25,6 @@ from pvgisprototype.cli.typer.time_series import typer_option_data_variable
 from pvgisprototype.cli.typer.time_series import typer_option_time_series
 from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
-from pvgisprototype.cli.typer.time_series import typer_option_inexact_matches_method
 from pvgisprototype.cli.typer.time_series import typer_option_tolerance
 from pvgisprototype.cli.typer.time_series import typer_option_in_memory
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
@@ -78,6 +79,7 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype import Longitude
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
+from pvgisprototype.cli.typer.timestamps import typer_option_periods
 
 
 app = typer.Typer(
@@ -115,8 +117,9 @@ def select(
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
     time_series_2: Annotated[Path, typer_option_time_series] = None,
-    timestamps: Annotated[Optional[Any], typer_argument_timestamps] = None,
+    timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(now_datetime()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Optional[str] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
@@ -156,7 +159,6 @@ def select(
         # convert_longitude_360=convert_longitude_360,
         mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
-        # inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,
@@ -173,7 +175,6 @@ def select(
         # convert_longitude_360=convert_longitude_360,
         mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
-        # inexact_matches_method=inexact_matches_method,
         tolerance=tolerance,
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,

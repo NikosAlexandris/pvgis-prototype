@@ -7,7 +7,6 @@ from rich.table import Table
 from rich.columns import Columns
 from rich.panel import Panel
 from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
-
 from typing import List
 import numpy as np
 from pvgisprototype.constants import (
@@ -893,6 +892,33 @@ def print_finger_hash(dictionary: dict):
             style="dim",
         )
         Console().print(fingerprint_panel)
+
+
+from click import Context
+def print_command_metadata(context: Context):
+    """
+    """
+    command_parameters = {}
+    command_parameters['command'] = context.command_path
+    command_parameters = command_parameters | context.params
+    from rich.panel import Panel
+    from rich.text import Text
+    from rich.pretty import Pretty
+    command_parameters_panel = Panel.fit(
+        Pretty(command_parameters, no_wrap=True),
+        subtitle="[reverse]Command Metadata[/reverse]",
+        subtitle_align="right",
+        border_style="dim",
+        style="dim",
+    )
+    from rich.console import Console
+    Console().print(command_parameters_panel)
+
+    # write to file ?
+    import json
+    from pvgisprototype.validation.serialisation import CustomEncoder
+    with open('command_parameters.json', 'w') as json_file:
+        json.dump(command_parameters, json_file, cls=CustomEncoder, indent=4)
 
 
 def print_solar_position_series_in_columns(
