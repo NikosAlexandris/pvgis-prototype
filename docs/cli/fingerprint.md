@@ -9,7 +9,7 @@ tags:
   - Fingerprint
 ---
 
-### Fingerprint of output time series
+### Unique outputs
 
 We can _time_ the duration of a command that processes a long time series using
 the terminal's built-in function `time` :

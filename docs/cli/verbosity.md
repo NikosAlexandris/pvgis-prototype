@@ -1,4 +1,13 @@
-
+---
+icon: material/chat-processing
+title: Verbosity
+subtitle: Show what is going-on
+description: Multiple levels of verbosity for each command line tool
+tags:
+  - How-To
+  - CLI
+  - Verbosity
+---
 ## Verbosity :material-details:
 
 !!! danger

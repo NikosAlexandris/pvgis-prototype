@@ -115,21 +115,29 @@ For a full list of features, see the [Features](overview/features.md) page.
 
 ## Getting Started
 
+### Web API
+
 If you're new to PVGIS' Web API,
-start with our entry level [Basic Usage](tutorial/basic_usage.md) guide
+start with our entry level [Web API](web_api/index.md) guide
 to get up and running quickly.
+
+### CLI
+
+Interested to work interactively ?  Check ouy the [collection of command line
+tools][cli/index.md]
+
 
 ## Advanced Topics
 
 For advanced users,
 we offer in-depth guides and discussions on more complex aspects of PVGIS API:
 
-- [Advanced Use](tutorial/advanced_use.md)
+- [API](api/index.md)
 
 ## Development
 
 - [Roadmap & Progress](development/roadmap_and_progress.md)
-- [Performance Optimization](development/performance_optimisation.md)
+- [Performance Optimization](development/optimisation.md)
 - [Adding New Features](development/adding_new_features.md)
 
 ### Contributing
