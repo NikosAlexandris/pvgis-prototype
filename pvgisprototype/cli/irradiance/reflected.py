@@ -91,21 +91,6 @@ from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
 from pvgisprototype.constants import MINUTES
 
 
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=False,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"Calculate reflected solar irradiance",
-)
-
-
-@app.command(
-    'inclined',
-    no_args_is_help=True,
-    help=f'☀ Calculate the clear-sky ground reflected irradiance',
-    rich_help_panel=rich_help_panel_irradiance_series,
-)
 def get_ground_reflected_inclined_irradiance_time_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
