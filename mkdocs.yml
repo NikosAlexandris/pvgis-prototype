@@ -31,7 +31,13 @@ nav:
   - CLI:
     - cli/index.md
     - cli/features.md
+    - cli/basics.md
+    - cli/verbosity.md
+    - cli/timestamps.md
+    - cli/plots.md
     - cli/fingerprint.md
+    - cli/metadata.md
+    - cli/logging.md
     - Power:
       - Introduction: cli/power/introduction.md
       - Broadband: cli/power/broadband.md

@@ -9,9 +9,16 @@ tags:
 ---
 
 PVGIS is _also_ a collection of command line tools.
+
+Welcome yourself in the PVGIS command line interface (CLI) 
+
+``` bash exec="true" result="ansi" source="above"
+pvgis-prototype
+```
+
 Following is an overview of the tools available.
 
-## Overview
+## Toolbox Overview
 
 !!! abstract "Estimate photovoltaic performance"
 
