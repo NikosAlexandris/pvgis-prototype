@@ -13,8 +13,6 @@ from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
 from pvgisprototype.api.irradiance.direct import calculate_direct_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress
@@ -145,15 +143,11 @@ def get_direct_normal_irradiance_time_series(
     # with progress:
     direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
         timestamps=timestamps,
-        start_time=start_time,
-        frequency=frequency,
-        end_time=end_time,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         optical_air_mass_series=optical_air_mass_series,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        random_timestamps=random_timestamps,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,

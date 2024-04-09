@@ -114,10 +114,7 @@ def calculate_photovoltaic_power_output_series(
     latitude: float,
     elevation: float,
     timestamps: Optional[DatetimeIndex] = None,
-    # start_time: Optional[datetime] = None,
-    # end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
-    random_timestamps: bool | None = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
@@ -175,14 +172,8 @@ def calculate_photovoltaic_power_output_series(
         Elevation of the location in meters.
     timestamps : Optional[DatetimeIndex], optional
         Specific timestamps for which to calculate the irradiance. Default is None.
-    start_time : Optional[datetime], optional
-        Start time for the calculation period. Default is None.
-    end_time : Optional[datetime], optional
-        End time for the calculation period. Default is None.
     timezone : Optional[str], optional
         Timezone of the location. Default is None.
-    random_timestamps : bool, default False
-        If True, generates a random time series.
     global_horizontal_component : Optional[Path], optional
         Path to data file for global horizontal irradiance. Default is None.
     direct_horizontal_component : Optional[Path], optional
@@ -207,7 +198,7 @@ def calculate_photovoltaic_power_output_series(
 
     Examples
     --------
-    >>> calculate_photovoltaic_power_output_series(10.0, 20.0, 100.0, start_time="2023-01-01", end_time="2023-01-31")
+    >>> calculate_photovoltaic_power_output_series(10.0, 20.0, 100.0)
     # This will return the effective irradiance series, results, and title for the specified parameters.
 
     Notes
@@ -328,10 +319,7 @@ def calculate_photovoltaic_power_output_series(
                 latitude=latitude,
                 elevation=elevation,
                 timestamps=timestamps,
-                # start_time=start_time,
-                # end_time=end_time,
                 timezone=timezone,
-                random_timestamps=random_timestamps,
                 direct_horizontal_component=direct_horizontal_irradiance,
                 mask_and_scale=mask_and_scale,
                 neighbor_lookup=neighbor_lookup,
@@ -372,8 +360,6 @@ def calculate_photovoltaic_power_output_series(
             latitude=latitude,
             elevation=elevation,
             timestamps=timestamps,
-            # start_time=start_time,
-            # end_time=end_time,
             timezone=timezone,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
@@ -414,8 +400,6 @@ def calculate_photovoltaic_power_output_series(
             latitude=latitude,
             elevation=elevation,
             timestamps=timestamps,
-            # start_time=start_time,
-            # end_time=end_time,
             timezone=timezone,
             surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
@@ -480,8 +464,6 @@ def calculate_photovoltaic_power_output_series(
                             longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
                             latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
                             timestamps=timestamps,
-                            # start_time=start_time,
-                            # end_time=end_time,
                             # convert_longitude_360=convert_longitude_360,
                             neighbor_lookup=neighbor_lookup,
                             tolerance=tolerance,
@@ -501,8 +483,6 @@ def calculate_photovoltaic_power_output_series(
                             longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
                             latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
                             timestamps=timestamps,
-                            # start_time=start_time,
-                            # end_time=end_time,
                             # convert_longitude_360=convert_longitude_360,
                             neighbor_lookup=neighbor_lookup,
                             tolerance=tolerance,
@@ -520,8 +500,6 @@ def calculate_photovoltaic_power_output_series(
                             longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
                             latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
                             timestamps=timestamps,
-                            # start_time=start_time,
-                            # end_time=end_time,
                             remap_to_month_start=True,
                             # convert_longitude_360=convert_longitude_360,
                             neighbor_lookup=neighbor_lookup,
@@ -656,10 +634,7 @@ def calculate_photovoltaic_power_output_series_multi(
     latitude: float,
     elevation: float,
     timestamps: Optional[DatetimeIndex] = None,
-    # start_time: Optional[datetime] = None,
-    # end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
-    random_timestamps: bool | None = False,
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
@@ -716,14 +691,8 @@ def calculate_photovoltaic_power_output_series_multi(
         Elevation of the location in meters.
     timestamps : Optional[DatetimeIndex], optional
         Specific timestamps for which to calculate the irradiance. Default is None.
-    start_time : Optional[datetime], optional
-        Start time for the calculation period, by default None
-    end_time : Optional[datetime], optional
-        End time for the calculation period, by default None
     timezone : Optional[str], optional
          Timezone of the location, by default None
-    random_timestamps : bool, optional
-        If True, generates a random time series, by default False
     global_horizontal_irradiance : Optional[Path], optional
         Path to global horizontal irradiance, by default None
     direct_horizontal_irradiance : Optional[Path], optional
@@ -823,10 +792,7 @@ def calculate_photovoltaic_power_output_series_multi(
             latitude = latitude,
             elevation = elevation,
             timestamps = timestamps,
-            # start_time = start_time,
-            # end_time = end_time,
             timezone = timezone,
-            random_timestamps = random_timestamps,
             global_horizontal_irradiance = global_horizontal_irradiance,
             direct_horizontal_irradiance = direct_horizontal_irradiance,
             spectral_factor_series = spectral_factor_series,
@@ -878,12 +844,9 @@ def calculate_photovoltaic_power_output_series_multi(
                 latitude = latitude,
                 elevation = elevation,
                 timestamps = timestamps,
-                # start_time = start_time,
-                # end_time = end_time,
                 timezone = timezone,
                 surface_orientation = surface_orientation_value,
                 surface_tilt = surface_tilt_value,
-                random_timestamps = random_timestamps,
                 global_horizontal_irradiance = global_horizontal_irradiance,
                 direct_horizontal_irradiance = direct_horizontal_irradiance,
                 spectral_factor_series = spectral_factor_series,

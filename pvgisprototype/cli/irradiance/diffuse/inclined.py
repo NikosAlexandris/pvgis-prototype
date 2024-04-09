@@ -70,6 +70,7 @@ from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
+from pvgisprototype.cli.typer.timestamps import typer_option_periods
 
 
 @log_function_call
@@ -79,6 +80,7 @@ def get_diffuse_inclined_irradiance_time_series(
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[BaseTimestampSeriesModel, typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
@@ -98,7 +100,6 @@ def get_diffuse_inclined_irradiance_time_series(
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    random_days: bool = RANDOM_DAY_FLAG_DEFAULT,
     time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
     angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
@@ -125,10 +126,7 @@ def get_diffuse_inclined_irradiance_time_series(
         latitude=latitude,
         elevation=elevation,
         timestamps=timestamps,
-        start_time=start_time,
-        end_time=end_time,
         timezone=timezone,
-        random_timestamps=random_timestamps,
         global_horizontal_component=global_horizontal_irradiance,
         direct_horizontal_component=direct_horizontal_irradiance,
         mask_and_scale=mask_and_scale,
@@ -148,7 +146,6 @@ def get_diffuse_inclined_irradiance_time_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        random_days=random_days,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,

@@ -139,7 +139,6 @@ def get_diffuse_horizontal_irradiance_time_series(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        random_timestamps=random_timestamps,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
