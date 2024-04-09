@@ -4,6 +4,8 @@ from typing import Optional
 from typing import List
 from fastapi import Query
 from fastapi import Depends
+import orjson
+from fastapi.responses import Response
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pathlib import Path
@@ -32,8 +34,10 @@ from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
+from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series_multi
 from pvgisprototype.web_api.dependencies import fastapi_dependable_longitude
 from pvgisprototype.web_api.dependencies import fastapi_dependable_latitude
 from pvgisprototype.web_api.dependencies import fastapi_dependable_timestamps
@@ -72,7 +76,12 @@ from pvgisprototype.web_api.fastapi_parameters import fastapi_query_module_tempe
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_fingerprint
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_temperature_series
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_wind_speed_series
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_csv
 
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_surface_tilt_list 
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_surface_orientation_list
 
 async def get_photovoltaic_power_output_series(
     longitude: Annotated[float, fastapi_dependable_longitude],
@@ -82,7 +91,6 @@ async def get_photovoltaic_power_output_series(
     start_time: Annotated[datetime, fastapi_query_start_time] = None,
     frequency: Annotated[str, fastapi_query_frequency] = 'h',
     end_time: Annotated[datetime, fastapi_query_end_time] = None,
-    # timezone: Annotated[Optional[str], Depends(ctx_convert_to_timezone)] = 'UTC',
     timezone: Annotated[Optional[str], fastapi_query_timezone] = ZoneInfo('UTC'),
     random_time_series: Annotated[Optional[bool], fastapi_query_random_time_series] = False,
     global_horizontal_irradiance: Optional[Path] = Query(None),
@@ -92,8 +100,8 @@ async def get_photovoltaic_power_output_series(
     wind_speed_series: Optional[Path] = Query(0),
     # global_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_global_horizontal_irradiance] = None,
     # direct_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_direct_horizontal_irradiance] = None,
-    # temperature_series: Annotated[float, fastapi_query_temperature_series] = 25,
-    # wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = 0,
+    #temperature_series: Annotated[float, fastapi_query_temperature_series] = 25,
+    #wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = 0,
     mask_and_scale: Annotated[Optional[bool], fastapi_query_mask_and_scale] = False,
     neighbor_lookup: Annotated[MethodsForInexactMatches, fastapi_query_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], fastapi_query_tolerance] = TOLERANCE_DEFAULT,
@@ -116,24 +124,19 @@ async def get_photovoltaic_power_output_series(
     solar_constant: Annotated[float, fastapi_query_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, fastapi_query_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, fastapi_query_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    # time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    # angle_units: Annotated[str, typer_option_angle_units] = 'radians',
-    # angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
-    # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
+    #time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
+    #angle_units: Annotated[str, typer_option_angle_units] = 'radians',
+    #angle_output_units: Annotated[str, typer_option_angle_output_units] = 'radians',
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Annotated[Optional[float], fastapi_query_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[Optional[PVModuleEfficiencyAlgorithm], fastapi_query_power_model] = None,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], fastapi_query_efficiency] = None,
-    # rounding_places: Annotated[Optional[int], fastapi_query_rounding_places] = 5,
-    # statistics: Annotated[bool, typer_option_statistics] = False,
-    # groupby: Annotated[Optional[str], typer_option_groupby] = None,
-    # csv: Annotated[Path, typer_option_csv] = None,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
     log: Annotated[int, fastapi_query_log] = 0,
-    # index: Annotated[bool, typer_option_index] = False,
     fingerprint: Annotated[bool, fastapi_query_fingerprint] = False,
-    profile: bool = False, 
+    profile: bool = False,
+    csv: bool = False,
 ):
     surface_tilt = np.radians(surface_tilt)
     surface_orientation = np.radians(surface_orientation)
@@ -148,9 +151,9 @@ async def get_photovoltaic_power_output_series(
         # periods=periods,
         # frequency=frequency,
         timezone=timezone,
-        # random_time_series=random_time_series,
-        global_horizontal_irradiance=global_horizontal_irradiance,
-        direct_horizontal_irradiance=direct_horizontal_irradiance,
+        random_time_series=random_time_series,
+        #global_horizontal_irradiance=global_horizontal_irradiance,
+        #direct_horizontal_irradiance=direct_horizontal_irradiance,
         spectral_factor_series=spectral_factor_series,
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
@@ -176,10 +179,9 @@ async def get_photovoltaic_power_output_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
-        # horizon_heights=horizon_heights,
+        #time_output_units=time_output_units,
+        #angle_units=angle_units,
+        #angle_output_units=angle_output_units,
         photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
         power_model=power_model,
@@ -187,8 +189,32 @@ async def get_photovoltaic_power_output_series(
         efficiency=efficiency,
         verbose=verbose,
         log=log,
-        fingerprint=fingerprint,
+        fingerprint=True,
         profile=profile,
-    )  # Re-Design Me ! ------------------------------------------------
+    )
 
-    return {"Photovoltaic power output series": photovoltaic_power_output_series.value.tolist()}
+    response = {
+        "Photovoltaic power output series": photovoltaic_power_output_series.value.tolist(),
+        }
+
+    if fingerprint:
+        response["fingerprint"] = photovoltaic_power_output_series.components[FINGERPRINT_COLUMN_NAME]
+
+    if csv:
+        from fastapi.responses import StreamingResponse
+        from datetime import datetime
+        streaming_data = [(str(timestamp), photovoltaic_power) for timestamp, photovoltaic_power in zip(timestamps.tolist(), photovoltaic_power_output_series.value.tolist())]
+        filename = f"photovoltaic_power_output_{photovoltaic_power_output_series.components[FINGERPRINT_COLUMN_NAME]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+        csv_content = ','.join(['Timestamp', 'Photovoltaic Power']) + '\n'
+        csv_content += '\n'.join([','.join([timestamp, str(photovoltaic_power)]) for timestamp, photovoltaic_power in streaming_data]) + '\n'
+
+        response_csv = StreamingResponse(
+            iter([csv_content]),
+            media_type="text/csv",
+            headers = {"Content-Disposition": f"attachment; filename={filename}"}
+            )
+        
+        return response_csv
+
+    headers = {'Content-Disposition': 'attachment; filename="data.json"'}
+    return Response(orjson.dumps(response), headers=headers, media_type="application/json")
