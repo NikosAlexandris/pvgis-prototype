@@ -57,6 +57,8 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pandas import DatetimeIndex
 
 
 def overview_series(
@@ -67,13 +69,13 @@ def overview_series(
     random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
-    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
     complementary_incidence_angle: Annotated[bool, 'Measure angle between sun-vector and surface-plane'] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -132,13 +134,13 @@ def overview_series(
 
     # Why does the callback function `_parse_model` not work? 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
+    print(f'{solar_position_models=}')
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         timestamps=timestamps,
-        random_timestamps=random_timestamps,
         timezone=timezone,
         solar_position_models=solar_position_models,
         apply_atmospheric_refraction=apply_atmospheric_refraction,

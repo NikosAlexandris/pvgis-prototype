@@ -47,18 +47,19 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 
 
 def overview(
     ctx: typer.Context,
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
+    timestamp: Annotated[Optional[datetime], typer_argument_timestamp] = str(now_utc_datetimezone()),
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.pvlib],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
