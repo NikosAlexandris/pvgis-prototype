@@ -12,7 +12,7 @@ PVGIS is _also_ a collection of command line tools.
 
 Welcome yourself in the PVGIS command line interface (CLI) 
 
-``` bash exec="true" result="ansi" source="above"
+``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype
 ```
 
