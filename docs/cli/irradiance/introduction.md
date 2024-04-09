@@ -11,3 +11,7 @@ hide:
 ---
 
 Introduction in to solar irradiance.
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance introduction
+```

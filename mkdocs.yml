@@ -33,6 +33,7 @@ nav:
     - cli/features.md
     - cli/basics.md
     - cli/verbosity.md
+    - cli/symbols.md
     - cli/timestamps.md
     - cli/plots.md
     - cli/fingerprint.md
