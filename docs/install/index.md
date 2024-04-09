@@ -196,8 +196,8 @@ to setup a development environment.
     ```
     </div>
 
-This will create a virtual environment
-and install PVGIS along with its dependencies.
+    This will create a virtual environment
+    and install PVGIS along with its dependencies.
 
 3. Activate the virtual environment
 
@@ -210,25 +210,20 @@ and install PVGIS along with its dependencies.
 * Alternatively, PDM can 
 [run a command in a virtual environment without activating it](https://pdm-project.org/latest/usage/venv/#run-a-command-in-a-virtual-environment-without-activating-it)
 
-**Happy coding!**
-
 # Verify
 
 We can verify the installation was successful
 by running any command (i.e. `pvgis-prototype`)
 or asking for the version of the installed package :
 
-<div class="termy">
-```console
-❯ pvgis-prototype --version
-PVGIS prototype version: 0.8.3.dev75+g35aa8211
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype --version
 ```
-</div>
 
-**That was it!**
+**That was it!** **Happy coding!**
 
 # After the installation ..
 
-- Interact with PVIS through the command line : CLI
-- Run the Web API server
-- Use the API in your scripts
+- Interact with PVIS through the [command line interface (CLI)](cli/index.md)
+- Run the [Web API](web_api/index.md) server
+- Use the [API](api/index.md) in your scripts

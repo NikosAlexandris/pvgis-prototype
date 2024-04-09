@@ -47,11 +47,16 @@ features a sub-command `introduction`
 which explains the flow of calculations of the position of the sun
 and the agle between sun-rays and the solar collector surface.
 
-Go ahead, try it out and skim through the text :
+Go ahead, try it out and skim through the text !
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash
 pvgis-prototype position introduction
 ```
+
+!!! seealso
+
+    Refer to the [introduction to solar position](cli/position/introduction.md)
+    how-to section.
 
 Now that we have an overview,
 let's start with the basics :

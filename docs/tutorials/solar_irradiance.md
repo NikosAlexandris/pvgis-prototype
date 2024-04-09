@@ -217,7 +217,9 @@ pvgis-prototype irradiance direct horizontal 8.628 45.812 214 '2010-01-27 12:00:
 Next, the simulated *direct* ***inclined*** component : 
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance direct inclined 8.628 45.812 214 '2010-01-27 12:00:00'
+pvgis-prototype irradiance direct inclined \
+    8.628 45.812 214 180 45 \
+    '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 420.03229235 -->
@@ -225,7 +227,9 @@ pvgis-prototype irradiance direct inclined 8.628 45.812 214 '2010-01-27 12:00:00
 And the simulated *global* ***inclined*** component is :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8.628 45.812 210 '2010-01-27 12:00:00'
+pvgis-prototype irradiance global inclined \
+    8.628 45.812 210 180 45 \
+    '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 517.2263 -->
@@ -233,7 +237,10 @@ pvgis-prototype irradiance global inclined 8.628 45.812 210 '2010-01-27 12:00:00
 Analytically, the above figure is broken down to its inclined components as :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8.628 45.812 210 '2010-01-27 12:00:00' -vvv
+pvgis-prototype irradiance global inclined \
+    8.628 45.812 210 180 45 \
+    '2010-01-27 12:00:00' \
+    -vvv
 ```
 
 !!! attention "EXTRA" 
@@ -241,9 +248,9 @@ pvgis-prototype irradiance global inclined 8.628 45.812 210 '2010-01-27 12:00:00
     If we read the _SIS_ and _SID_ SARAH3 components
     to get the Global Inclined Irradiance :
 
-    ``` bash exec="true" result="ansi" source="above"
+    ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype irradiance global inclined \
-        8.628 45.812 210 \
+        8.628 45.812 210 180 45 \
         '2010-01-27 12:00:00' \
         --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
         --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
@@ -269,7 +276,7 @@ Direct Horizontal Irradiance = Direct Normal Irradiance * sin(Solar Altitude)
 
 !!! tip "For verification !"
 
-    ```pycon exec="true" session="normal-to-horizontal" source="material-block"
+    ```pycon exec="true" session="normal-to-horizontal" source="above"
     >>> from math import sin
     >>> dni = 1353.22228247
     >>> altitude = 0.45729
