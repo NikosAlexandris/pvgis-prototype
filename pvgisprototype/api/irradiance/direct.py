@@ -392,7 +392,6 @@ def calculate_direct_normal_irradiance_time_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    random_timestamps: bool = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -425,7 +424,6 @@ def calculate_direct_normal_irradiance_time_series(
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            random_timestamps=random_timestamps,
             dtype=dtype,
             array_backend=array_backend,
         )
@@ -538,9 +536,9 @@ def calculate_direct_horizontal_irradiance_time_series(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex = None,
-    start_time: Optional[datetime] = None,  # reuse callback inside function?
-    frequency: Optional[str] = None,  # reuse callback inside function?
-    end_time: Optional[datetime] = None,  # reuse callback inside function?
+    # start_time: Optional[datetime] = None,  # reuse callback inside function?
+    # frequency: Optional[str] = None,  # reuse callback inside function?
+    # end_time: Optional[datetime] = None,  # reuse callback inside function?
     timezone: Optional[str] = None,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
@@ -715,7 +713,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     # frequency: Optional[str] = None,
     # end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
-    random_timestamps: bool = False,
     convert_longitude_360: bool = False,
     direct_horizontal_component: Optional[Path] = None,
     neighbor_lookup: MethodsForInexactMatches = None,
@@ -793,7 +790,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        random_timestamps=random_timestamps,
         solar_incidence_model=solar_incidence_model,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,

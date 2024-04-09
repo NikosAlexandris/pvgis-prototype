@@ -22,7 +22,7 @@ typer_argument_timestamp = typer.Argument(
     help=timestamp_typer_help,
     callback=ctx_attach_requested_timezone,
     # rich_help_panel=rich_help_panel_time_series,
-    default_factory=now_utc_datetimezone,
+    # default_factory=now_utc_datetimezone,
     show_default=False,
 )
 typer_argument_timestamps = typer.Argument(
