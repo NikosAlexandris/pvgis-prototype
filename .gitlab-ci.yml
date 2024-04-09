@@ -78,7 +78,6 @@ gemnasium-dependency_scanning:
 
 gemnasium-python-dependency_scanning:
   before_script: !reference ['.gemnasium-fix', before_script]
->>>>>>> 114a6a78 (docs: Update .gitlab-ci.yml to let the docs build)
 
 pages:
   stage: deploy
