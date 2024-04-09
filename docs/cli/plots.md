@@ -1,8 +1,8 @@
 ---
-icon: material/alphabetical
-description: Introduction to the basic CLI structure
-title: Basics
-subtitle: Learn how to work with PVGIS interactively
+icon: octicons/graph-16
+description: Plotting time series data
+title: Plots
+subtitle: Plot time series data
 tags:
   - How-To
   - CLI
