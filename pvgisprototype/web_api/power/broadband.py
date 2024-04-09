@@ -37,7 +37,6 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
-from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series_multi
 from pvgisprototype.web_api.dependencies import fastapi_dependable_longitude
 from pvgisprototype.web_api.dependencies import fastapi_dependable_latitude
 from pvgisprototype.web_api.dependencies import fastapi_dependable_timestamps
@@ -75,13 +74,6 @@ from pvgisprototype.web_api.fastapi_parameters import fastapi_query_log
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_module_temperature_algorithm
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_fingerprint
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_temperature_series
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_wind_speed_series
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_csv
-
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_surface_tilt_list 
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_surface_orientation_list
 
 async def get_photovoltaic_power_output_series(
     longitude: Annotated[float, fastapi_dependable_longitude],
@@ -92,7 +84,7 @@ async def get_photovoltaic_power_output_series(
     frequency: Annotated[str, fastapi_query_frequency] = 'h',
     end_time: Annotated[datetime, fastapi_query_end_time] = None,
     timezone: Annotated[Optional[str], fastapi_query_timezone] = ZoneInfo('UTC'),
-    random_time_series: Annotated[Optional[bool], fastapi_query_random_time_series] = False,
+    #random_time_series: Annotated[Optional[bool], fastapi_query_random_time_series] = False,
     global_horizontal_irradiance: Optional[Path] = Query(None),
     direct_horizontal_irradiance: Optional[Path] = Query(None),
     spectral_factor_series: Optional[Path] = Query(None),
@@ -151,7 +143,7 @@ async def get_photovoltaic_power_output_series(
         # periods=periods,
         # frequency=frequency,
         timezone=timezone,
-        random_time_series=random_time_series,
+        #random_time_series=random_time_series,
         #global_horizontal_irradiance=global_horizontal_irradiance,
         #direct_horizontal_irradiance=direct_horizontal_irradiance,
         spectral_factor_series=spectral_factor_series,
