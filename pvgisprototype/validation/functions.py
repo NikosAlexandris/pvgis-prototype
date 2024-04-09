@@ -28,7 +28,6 @@ from pvgisprototype.validation.pvis_data_classes import SolarTimeModel
 from pvgisprototype.validation.pvis_data_classes import TimeOffsetModel
 from pvgisprototype.validation.pvis_data_classes import HourOffsetModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimeOutputUnitsModel
-from pvgisprototype.validation.pvis_data_classes import RandomTimeSeriesModel
 
 # Solar geometry
 from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeModel

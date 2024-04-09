@@ -70,6 +70,7 @@ from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
+from pvgisprototype.cli.typer.timestamps import typer_option_periods
 
 
 @log_function_call
@@ -79,6 +80,7 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
@@ -137,11 +139,7 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         latitude=latitude,
         elevation=elevation,
         timestamps=timestamps,
-        start_time=start_time,
-        frequency=frequency,
-        end_time=end_time,
         timezone=timezone,
-        random_timestamps=random_timestamps,
         spectrally_resolved_global_horizontal_irradiance_series=spectrally_resolved_global_horizontal_irradiance_series,
         spectrally_resolved_direct_horizontal_irradiance_series=spectrally_resolved_direct_horizontal_irradiance_series,
         mask_and_scale=mask_and_scale,
