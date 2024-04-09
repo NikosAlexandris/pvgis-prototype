@@ -13,230 +13,239 @@ from pvgisprototype.constants import LONGITUDE_MINIMUM
 from pvgisprototype.constants import LONGITUDE_MAXIMUM
 from pvgisprototype.constants import ELEVATION_MINIMUM
 from pvgisprototype.constants import ELEVATION_MAXIMUM
-
-
-longitude_help = "Longitude in decimal degrees ranging in [-180, 360]. If ranging in [0, 360], consider the `convert_longitude_360` option."
-latitude_help = "Latitude in decimal degrees ranging in [-90, 90]"
-elevation_help = "Topographical elevation"
-timestamp_help = "Quoted date-time string of data to extract from series, example: '2112-12-21 21:12:12'"
-timestamps_help = "Quoted date-time strings of data to extract from series, example: '2112-12-21, 2112-12-21 12:21:21, 2112-12-21 21:12:12'"
-start_time_help = "Start timestamp of the period."
-frequency_help = "Frequency for timestamp generation, ex. 30m. A number and date/time unit."
-end_time_help = "End timestamp of the period."
-timezone_help = "Timezone (e.g., 'Europe/Athens')."
-local_time_help = "Use the system's local time zone."
-random_time_help = "Generate a random date, time, and timezone."
-random_day_help = "Generate a random day."
-random_days_help = "Generate random days."
-time_series_help = "A time series dataset (any format supported by Xarray)"
-mask_and_scale_help = "Mask and scale the series"
-nearest_neighbor_lookup_help = "Enable nearest neighbor (inexact) lookups. Read Xarray manual on nearest-neighbor-lookups"
-inexact_matches_method_help = "Method for nearest neighbor (inexact) lookups. Read Xarray manual on nearest-neighbor-lookups"
-tolerance_help = "Maximum distance between original & new labels for inexact matches. Read Xarray manual on nearest-neighbor-lookups"
-in_memory_help = "Whether to process data in memory"
-surface_tilt_help = "Surface tilt angle in degrees"
-surface_orientation_help = "Surface orientation angle in degrees"
-linke_turbidity_help = "Linke turbidity factor"
-atmospheric_refraction_help = "Apply atmospheric refraction correction"
-solar_zenith_help = "Refracted solar zenith angle in degrees"
-albedo_help = "Albedo value for the surface"
-angular_loss_factor_help = "Apply angular loss factor"
-solar_position_help = "Model used for solar position calculation"
-solar_incidence_help = "Model used for solar incidence calculation"
-solar_time_help = "Model used for solar time calculation"
-time_offset_global_help = "Global time offset in hours"
-hour_offset_help = "Hour offset"
-solar_constant_help = "Solar constant value"
-perigee_offset_help = "Perigee offset value"
-eccentricity_correction_help = "Eccentricity correction factor"
-system_efficiency_help = "System efficiency"
-power_model_help = "Photovoltaic power model"
-efficiency_help = "Efficiency value"
-rounding_places_help = "Number of decimal places for rounding"
-verbose_help = "Verbose level"
-log_help = "Log level"
-fingerprint_help='Fingerprint the photovoltaic power output time series'
-module_temperature_algorithm_description='Algorithms for calculation of the effect of temperature on the power output of a photovoltaic system as a function of temperature and optionally wind speed',
-
+from pvgisprototype.web_api.descriptions import longitude_description
+from pvgisprototype.web_api.descriptions import latitude_description
+from pvgisprototype.web_api.descriptions import elevation_description
+from pvgisprototype.web_api.descriptions import timestamp_description
+from pvgisprototype.web_api.descriptions import timestamps_description
+from pvgisprototype.web_api.descriptions import start_time_description
+from pvgisprototype.web_api.descriptions import frequency_description
+from pvgisprototype.web_api.descriptions import end_time_description
+from pvgisprototype.web_api.descriptions import timezone_description
+from pvgisprototype.web_api.descriptions import local_time_description
+from pvgisprototype.web_api.descriptions import random_time_description
+from pvgisprototype.web_api.descriptions import random_day_description
+from pvgisprototype.web_api.descriptions import random_days_description
+from pvgisprototype.web_api.descriptions import time_series_description
+from pvgisprototype.web_api.descriptions import mask_and_scale_description
+from pvgisprototype.web_api.descriptions import nearest_neighbor_lookup_description
+from pvgisprototype.web_api.descriptions import inexact_matches_method_description
+from pvgisprototype.web_api.descriptions import tolerance_description
+from pvgisprototype.web_api.descriptions import in_memory_description
+from pvgisprototype.web_api.descriptions import surface_tilt_description
+from pvgisprototype.web_api.descriptions import surface_orientation_description
+from pvgisprototype.web_api.descriptions import linke_turbidity_description
+from pvgisprototype.web_api.descriptions import atmospheric_refraction_description
+from pvgisprototype.web_api.descriptions import solar_zenith_description
+from pvgisprototype.web_api.descriptions import albedo_description
+from pvgisprototype.web_api.descriptions import angular_loss_factor_description
+from pvgisprototype.web_api.descriptions import solar_position_description
+from pvgisprototype.web_api.descriptions import solar_incidence_description
+from pvgisprototype.web_api.descriptions import solar_time_description
+from pvgisprototype.web_api.descriptions import time_offset_global_description
+from pvgisprototype.web_api.descriptions import hour_offset_description
+from pvgisprototype.web_api.descriptions import solar_constant_description
+from pvgisprototype.web_api.descriptions import perigee_offset_description
+from pvgisprototype.web_api.descriptions import eccentricity_correction_description
+from pvgisprototype.web_api.descriptions import system_efficiency_description
+from pvgisprototype.web_api.descriptions import power_model_description
+from pvgisprototype.web_api.descriptions import efficiency_description
+from pvgisprototype.web_api.descriptions import rounding_places_description
+from pvgisprototype.web_api.descriptions import verbose_description
+from pvgisprototype.web_api.descriptions import log_description
+from pvgisprototype.web_api.descriptions import fingerprint_description
+from pvgisprototype.web_api.descriptions import module_temperature_algorithm_description
+from pvgisprototype.web_api.descriptions import photovoltaic_module_description
+from pvgisprototype.web_api.descriptions import temperature_series_description
+from pvgisprototype.web_api.descriptions import wind_speed_series_description
+from pvgisprototype.web_api.descriptions import csv_description
 
 fastapi_query_longitude = Query(
     title="Longitude",
-    description=longitude_help,
+    description=longitude_description,
     ge=LONGITUDE_MINIMUM,
     le=LONGITUDE_MAXIMUM,
 )
 fastapi_query_longitude_in_degrees = Query(
     ...,
     title="Longitude",
-    description=longitude_help,
+    description=longitude_description,
     ge=LONGITUDE_MINIMUM,
     le=LONGITUDE_MAXIMUM,
 )
 fastapi_query_latitude = Query(
     ...,
     title="Latitude",
-    description=latitude_help,
+    description=latitude_description,
     ge=LATITUDE_MINIMUM,
     le=LATITUDE_MAXIMUM,
 )
 fastapi_query_latitude_in_degrees = Query(
     ...,
     title="Latitude",
-    description=latitude_help,
+    description=latitude_description,
     ge=LATITUDE_MINIMUM,
     le=LATITUDE_MAXIMUM,
 )
 fastapi_query_elevation = Query(
     ...,
     title="Elevation",
-    description=elevation_help,
+    description=elevation_description,
     ge=ELEVATION_MINIMUM,
     le=ELEVATION_MAXIMUM,
 )
 fastapi_query_timestamp = Query(
     default_factory=now_utc_datetimezone,
-    description=timestamp_help,
+    description=timestamp_description,
     # Depends(ctx_attach_requested_timezone)
 )
 fastapi_query_timestamps = Query(
-    None,
-    description=timestamps_help,
+    description=timestamps_description,
     # Depends(parse_timestamp_series)
 )
 fastapi_query_start_time = Query(
-    description=start_time_help,
+    description=start_time_description,
 )
 fastapi_query_frequency = Query(
-    description=frequency_help,
+    description=frequency_description,
 )
 fastapi_query_end_time = Query(
-    description=end_time_help,
+    description=end_time_description,
 )
 fastapi_query_timezone = Query(
-    description=timezone_help,
+    description=timezone_description,
     # Depends on ctx_convert_to_timezone
 )
 fastapi_query_local_time = Query(
-    description=local_time_help,
+    description=local_time_description,
     # Depends on now_local_datetimezone
 )
 fastapi_query_random_time = Query(
-    description=random_time_help,
+    description=random_time_description,
 )
 fastapi_query_random_time_series = Query(
-    description=random_time_help,
+    description=random_time_description,
 )
 fastapi_query_random_day = Query(
-    description=random_day_help,
+    description=random_day_description,
 )
 fastapi_query_random_days = Query(
-    description=random_days_help,
+    description=random_days_description,
 )
 fastapi_query_time_series_query = Query(
-    description=time_series_help,
+    description=time_series_description,
 )
 fastapi_query_mask_and_scale = Query(
-    description=mask_and_scale_help,
+    description=mask_and_scale_description,
 )
 fastapi_query_neighbor_lookup = Query(
-    description=nearest_neighbor_lookup_help,
+    description=nearest_neighbor_lookup_description,
 )
 fastapi_query_tolerance = Query(
-    description=tolerance_help,
+    description=tolerance_description,
 )
 fastapi_query_in_memory = Query(
     # False,
-    description=in_memory_help,
+    description=in_memory_description,
 )
 fastapi_query_surface_tilt = Query(
     # SURFACE_TILT_DEFAULT,
-    description=surface_tilt_help,
+    description=surface_tilt_description,
 )
 fastapi_query_surface_orientation = Query(
     # SURFACE_ORIENTATION_DEFAULT,
-    description=surface_orientation_help,
+    description=surface_orientation_description,
 )
 fastapi_query_linke_turbidity_factor_series = Query(
     # LINKE_TURBIDITY_DEFAULT,
-    description=linke_turbidity_help,
+    description=linke_turbidity_description,
 )
 fastapi_query_apply_atmospheric_refraction = Query(
     # True,
-    description=atmospheric_refraction_help,
+    description=atmospheric_refraction_description,
 )
 fastapi_query_refracted_solar_zenith = Query(
     # REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    description=solar_zenith_help,
+    description=solar_zenith_description,
 )
 fastapi_query_albedo = Query(
     # 2,
-    description=albedo_help,
+    description=albedo_description,
 )
 fastapi_query_apply_angular_loss_factor = Query(
     # True,
-    description=angular_loss_factor_help,
+    description=angular_loss_factor_description,
 )
 fastapi_query_solar_position_model = Query(
     # SOLAR_POSITION_ALGORITHM_DEFAULT,
-    description=solar_position_help,
+    description=solar_position_description,
 )
 fastapi_query_solar_incidence_model = Query(
     # SolarIncidenceModel.jenco,
-    description=solar_incidence_help,
+    description=solar_incidence_description,
 )
 fastapi_query_solar_time_model = Query(
     # SOLAR_TIME_ALGORITHM_DEFAULT,
-    description=solar_time_help,
+    description=solar_time_description,
 )
 fastapi_query_time_offset_global = Query(
     # 0,
-    description=time_offset_global_help,
+    description=time_offset_global_description,
 )
 fastapi_query_hour_offset = Query(
     # 0,
-    description=hour_offset_help,
+    description=hour_offset_description,
 )
 fastapi_query_solar_constant = Query(
     # SOLAR_CONSTANT,
-    description=solar_constant_help,
+    description=solar_constant_description,
 )
 fastapi_query_perigee_offset = Query(
     # PERIGEE_OFFSET,
-    description=perigee_offset_help,
+    description=perigee_offset_description,
 )
 fastapi_query_eccentricity_correction_factor = Query(
     # ECCENTRICITY_CORRECTION_FACTOR,
-    description=eccentricity_correction_help,
+    description=eccentricity_correction_description,
 )
 fastapi_query_system_efficiency = Query(
     # SYSTEM_EFFICIENCY_DEFAULT,
-    description=system_efficiency_help,
+    description=system_efficiency_description,
 )
 fastapi_query_power_model = Query(
     # None,
-    description=power_model_help,
+    description=power_model_description,
 )
 fastapi_query_efficiency = Query(
     # None,
-    description=efficiency_help,
+    description=efficiency_description,
 )
 fastapi_query_rounding_places = Query(
     # 5,
-    description=rounding_places_help,
+    description=rounding_places_description,
 )
 fastapi_query_verbose = Query(
     # VERBOSE_LEVEL_DEFAULT,
-    description=verbose_help,
+    description=verbose_description,
 )
 fastapi_query_log = Query(
-    description=log_help,
+    description=log_description,
 )
 fastapi_query_fingerprint = Query(
-    description=fingerprint_help,
+    description=fingerprint_description,
 )
 fastapi_query_module_temperature_algorithm = Query(
     description=module_temperature_algorithm_description,
 )
 fastapi_query_photovoltaic_module_model = Query(
-    description='Photovoltaic module' 
+    description=photovoltaic_module_description
+)
+fastapi_query_temperature_series = Query(
+    description=temperature_series_description
+)
+fastapi_query_wind_speed_series = Query(
+    description=wind_speed_series_description
+)
+fastapi_query_csv = Query(
+    description=csv_description
 )
