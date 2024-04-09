@@ -1,5 +1,84 @@
+# image: python:3.11.6
+
+# before_script:
+#   - pip install --upgrade pip
+#   - pip install .[docs]
+
+# test:
+#   stage: test
+#   script:
+#   - mkdocs build --verbose --site-dir test
+#   artifacts:
+#     paths:
+#     - test
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+
+# pages:
+#   stage: deploy
+#   image: python:3.11.6
+#   script:
+#     - mkdocs build --site-dir public
+#   artifacts:
+#     paths:
+#       - public
+#   rules:
+#     # - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+#     - if: $CI_COMMIT_REF_NAME == 'main'
+#
+# GitLab pages image for MkDocs ?
 stages:
+  - test
   - deploy
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - local: 'gitlab/dependency-scans.yaml'
+
+semgrep-sast:
+  variables:
+    SECURE_LOG_LEVEL: "debug"
+    HOME: "/tmp"
+  tags:
+    - openshift-test
+
+sast:
+  tags:
+    - openshift-test
+
+secret_detection:
+  rules:
+    - if: $SAST_DISABLED == 'true' || $SAST_DISABLED == '1'
+      when: never
+    - when: always
+  tags:
+    - openshift-test
+
+dependency_scanning:
+  tags:
+    - openshift-test
+  variables:
+    HTTPS_PROXY: $PROXY
+    NO_PROXY: $NOPROXY
+    PROXY_JAVA: "-Dhttps.proxyHost=proxy.jrc.it -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy.jrc.it -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts='localhost|*.jrc.ec.europa.eu|*.jrc.it|*.jrc.org|*.jrc|*.cluster.local'" 
+    SECURE_LOG_LEVEL: debug
+    GRADLE_CLI_OPTS: $PROXY_JAVA
+    MAVEN_CLI_OPTS: "-DproxySet=true $PROXY_JAVA"
+
+.gemnasium-fix:
+  before_script:
+    - git config --global --add safe.directory '*'
+
+gemnasium-maven-dependency_scanning:
+  before_script: !reference ['.gemnasium-fix', before_script]
+
+gemnasium-dependency_scanning:
+  before_script: !reference ['.gemnasium-fix', before_script]
+
+gemnasium-python-dependency_scanning:
+  before_script: !reference ['.gemnasium-fix', before_script]
+>>>>>>> 114a6a78 (docs: Update .gitlab-ci.yml to let the docs build)
 
 pages:
   stage: deploy
