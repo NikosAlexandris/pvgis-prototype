@@ -89,7 +89,6 @@ def get_extraterrestrial_normal_irradiance_time_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        random_timestamps=random_timestamps,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
