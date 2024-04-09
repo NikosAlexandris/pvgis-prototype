@@ -1,27 +1,25 @@
-image: python:3.11.6
-
-before_script:
-  - pip install --upgrade pip
-  - pip install .[docs]
-
-test:
-  stage: test
-  script:
-  - mkdocs build --verbose --site-dir test
-  artifacts:
-    paths:
-    - test
-  rules:
-    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+stages:
+  - deploy
 
 pages:
   stage: deploy
-  image: python:3.11.6
+  tags:
+    - openshift-test
+  image: quay.apps.ocpt.jrc.ec.europa.eu/public/dockerhub/python:3.10
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME == "main"
+      exists:
+        - mkdocs.yml
+  variables:
+    HOME: /tmp
   script:
-    - mkdocs build --site-dir public
+    - export http_proxy=$PROXY https_proxy=$PROXY no_proxy=$NOPROXY
+    - pip install --upgrade pip
+    - pip install --user -r requirements.txt
+    - pip install --user .
+    - export PATH=$PATH:$HOME/.local/bin
+    - mkdocs build --verbose --site-dir public
+  allow_failure: true
   artifacts:
     paths:
       - public
-  rules:
-    # - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == 'mkdocs'
