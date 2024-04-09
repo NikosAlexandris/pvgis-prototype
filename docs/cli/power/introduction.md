@@ -9,6 +9,6 @@ hide:
   - toc
 ---
 
-``` bash exec="true" result="ansi" source="above"
+``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power introduction
 ```
