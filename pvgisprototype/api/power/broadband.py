@@ -459,7 +459,6 @@ def calculate_photovoltaic_power_output_series(
             efficiency_coefficient_series = efficiency
 
     else:
-        debug(locals())
         if efficiency:
             efficiency_coefficient_series = efficiency
         else:
