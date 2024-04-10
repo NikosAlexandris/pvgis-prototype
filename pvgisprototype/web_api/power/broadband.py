@@ -74,33 +74,61 @@ from pvgisprototype.web_api.fastapi_parameters import fastapi_query_log
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_module_temperature_algorithm
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_fingerprint
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_global_horizontal_irradiance
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_direct_horizontal_irradiance
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_temperature_series
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_wind_speed_series
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_rounding_places
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_statistics
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_groupby
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_uniplot
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_uniplot_terminal_width
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_index
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quiet
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_command_metadata
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_profiling
+
+from pvgisprototype.constants import cPROFILE_FLAG_DEFAULT
+from pvgisprototype.constants import TEMPERATURE_DEFAULT
+from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
+from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.constants import EFFICIENCY_DEFAULT
+from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
+from pvgisprototype.constants import GROUPBY_DEFAULT
+from pvgisprototype.constants import UNIPLOT_FLAG_DEFAULT
+from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
+from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
+from pvgisprototype.constants import QUIET_FLAG_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.constants import METADATA_FLAG_DEFAULT
+from pvgisprototype.constants import POWER_UNIT
+from pandas import DatetimeIndex
+
 
 async def get_photovoltaic_power_output_series(
     longitude: Annotated[float, fastapi_dependable_longitude],
     latitude: Annotated[float, fastapi_dependable_latitude],
     elevation: Annotated[float, fastapi_query_elevation],
-    timestamps: Annotated[str, fastapi_dependable_timestamps] = None, 
+    timestamps: Annotated[DatetimeIndex, fastapi_dependable_timestamps] = None, 
     start_time: Annotated[datetime, fastapi_query_start_time] = None,
     frequency: Annotated[str, fastapi_query_frequency] = 'h',
     end_time: Annotated[datetime, fastapi_query_end_time] = None,
     timezone: Annotated[Optional[str], fastapi_query_timezone] = ZoneInfo('UTC'),
     #random_time_series: Annotated[Optional[bool], fastapi_query_random_time_series] = False,
-    global_horizontal_irradiance: Optional[Path] = Query(None),
-    direct_horizontal_irradiance: Optional[Path] = Query(None),
-    spectral_factor_series: Optional[Path] = Query(None),
-    temperature_series: Optional[Path] = Query(25),
-    wind_speed_series: Optional[Path] = Query(0),
-    # global_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_global_horizontal_irradiance] = None,
-    # direct_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_direct_horizontal_irradiance] = None,
-    #temperature_series: Annotated[float, fastapi_query_temperature_series] = 25,
-    #wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = 0,
-    mask_and_scale: Annotated[Optional[bool], fastapi_query_mask_and_scale] = False,
+    # global_horizontal_irradiance: Optional[Path] = Query(None),
+    global_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_global_horizontal_irradiance] = None,
+    # direct_horizontal_irradiance: Optional[Path] = Query(None),
+    direct_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_direct_horizontal_irradiance] = None,
+    spectral_factor_series: Optional[Path] = Query(SPECTRAL_FACTOR_DEFAULT),
+    temperature_series: Annotated[float, fastapi_query_temperature_series] = TEMPERATURE_DEFAULT,
+    wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[MethodsForInexactMatches, fastapi_query_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], fastapi_query_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[Optional[bool], fastapi_query_mask_and_scale] = False,
     in_memory: Annotated[bool, fastapi_query_in_memory] = False,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = True,
     surface_orientation: Annotated[Optional[float], fastapi_query_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[Optional[float], fastapi_query_surface_tilt] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: Annotated[float, fastapi_query_linke_turbidity_factor_series] = LINKE_TURBIDITY_DEFAULT,
@@ -123,12 +151,23 @@ async def get_photovoltaic_power_output_series(
     system_efficiency: Annotated[Optional[float], fastapi_query_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[Optional[PVModuleEfficiencyAlgorithm], fastapi_query_power_model] = None,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Annotated[Optional[float], fastapi_query_efficiency] = None,
-    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-    log: Annotated[int, fastapi_query_log] = 0,
-    fingerprint: Annotated[bool, fastapi_query_fingerprint] = False,
-    profile: bool = False,
+    efficiency: Annotated[Optional[float], fastapi_query_efficiency] = EFFICIENCY_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
+    rounding_places: Annotated[Optional[int], fastapi_query_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
+    groupby: Annotated[Optional[str], fastapi_query_groupby] = GROUPBY_DEFAULT,
     csv: bool = False,
+    uniplot: Annotated[bool, fastapi_query_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    terminal_width_fraction: Annotated[float, fastapi_query_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, fastapi_query_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
+    log: Annotated[int, fastapi_query_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, fastapi_query_command_metadata] = METADATA_FLAG_DEFAULT,
+    profile: Annotated[bool, fastapi_query_profiling] = cPROFILE_FLAG_DEFAULT,
 ):
     surface_tilt = np.radians(surface_tilt)
     surface_orientation = np.radians(surface_orientation)
@@ -184,10 +223,28 @@ async def get_photovoltaic_power_output_series(
         fingerprint=True,
         profile=profile,
     )
+    response = {}
+    if not quiet:
+        if verbose > 0:
+            response = {
+                "Photovoltaic power output series": photovoltaic_power_output_series.value.tolist(),
+                }
+        else:
+            flat_list = photovoltaic_power_output_series.value.flatten().astype(str)
+            response = ','.join(flat_list)
 
-    response = {
-        "Photovoltaic power output series": photovoltaic_power_output_series.value.tolist(),
-        }
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        uniplot_data_array_time_series(
+            data_array=photovoltaic_power_output_series.value,
+            data_array_2=None,
+            lines=True,
+            supertitle = 'Photovoltaic Power Output Series',
+            title="Photovoltaic power output",
+            label = 'Photovoltaic Power',
+            label_2 = None,
+            unit = POWER_UNIT,
+        )
 
     if fingerprint:
         response["fingerprint"] = photovoltaic_power_output_series.components[FINGERPRINT_COLUMN_NAME]
@@ -199,14 +256,21 @@ async def get_photovoltaic_power_output_series(
         filename = f"photovoltaic_power_output_{photovoltaic_power_output_series.components[FINGERPRINT_COLUMN_NAME]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
         csv_content = ','.join(['Timestamp', 'Photovoltaic Power']) + '\n'
         csv_content += '\n'.join([','.join([timestamp, str(photovoltaic_power)]) for timestamp, photovoltaic_power in streaming_data]) + '\n'
-
         response_csv = StreamingResponse(
             iter([csv_content]),
             media_type="text/csv",
             headers = {"Content-Disposition": f"attachment; filename={filename}"}
             )
-        
         return response_csv
+
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=photovoltaic_power_output_series.value,
+            timestamps=timestamps,
+            groupby=groupby,
+            title="Photovoltaic power output",
+        )
 
     headers = {'Content-Disposition': 'attachment; filename="data.json"'}
     return Response(orjson.dumps(response), headers=headers, media_type="application/json")
