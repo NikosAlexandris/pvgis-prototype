@@ -238,14 +238,44 @@ fastapi_query_module_temperature_algorithm = Query(
     description=module_temperature_algorithm_description,
 )
 fastapi_query_photovoltaic_module_model = Query(
-    description=photovoltaic_module_description
+    description=photovoltaic_module_description,
 )
 fastapi_query_temperature_series = Query(
-    description=temperature_series_description
+    description=temperature_series_description,
 )
 fastapi_query_wind_speed_series = Query(
-    description=wind_speed_series_description
+    description=wind_speed_series_description,
 )
 fastapi_query_csv = Query(
-    description=csv_description
+    description=csv_description,
+)
+fastapi_query_global_horizontal_irradiance = Query(
+    description='Global horizontal irradiance',
+)
+fastapi_query_direct_horizontal_irradiance = Query(
+    description='Direct horizontal irradiance',
+)
+fastapi_query_statistics = Query(
+    description='Statistics',
+)
+fastapi_query_groupby = Query(
+    description='Group by',
+)
+fastapi_query_uniplot = Query(
+    description='Uniplot',
+)
+fastapi_query_uniplot_terminal_width = Query(
+    description='Terminal width for Uniplot',
+)
+fastapi_query_index = Query(
+    description='Index',
+)
+fastapi_query_quiet = Query(
+    description='Quiet',
+)
+fastapi_query_command_metadata = Query(
+    description='Command metadata',
+)
+fastapi_query_profiling = Query(
+    description='Profiling',
 )
