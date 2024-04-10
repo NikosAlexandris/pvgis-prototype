@@ -29,60 +29,39 @@ from pathlib import Path
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
 
+summary = """
+PVGIS
+offers open-access insights
+on solar radiation ☀
+and location-specific estimates of
+photovoltaic performance 📈,
+for various technologies 🔌🔋
+over Europe & Africa 🌍, largely Asia 🌏 and the Americas 🌎.
+"""
+
 description = """
-PVGISAPI is a public service supported by the European Commission. 🇪🇺
-
-### Photovoltaic Potential 
-
-Various technologies
-
-- Grid-connected 🔌
-- Stand-alone 🔋
-- Models available in [PVMAPS](https://ec.europa.eu/jrc/en/PVGIS/downloads/PVMAPS) 
-
-### Hourly series of
-
-- Solar radiation
-- PV performance 📈
-- Temperature 🌡️
-- Typical Meteorological Year for 9 climate variables
-
-### Print Ready
-
-Country/regional maps of
-
-- Solar resource
-- Photovoltaic potential 🗺️
-
-### Coverage
-
-- Europe & Africa 🌍
-- Largely Asia 🌏
-- America 🌎
-
-### Languages
-
-/media/svg/languages-in-pvgis.svg
-
-### Public Service
-
-/media/svg/european-flag-edit.svg
-
-- Cost free
-- Open access ✨
+The **PVGIS Web API**
+is a public service
+supported by the
+[Joint Research Centre (JRC)](https://joint-research-centre.ec.europa.eu/index_en)
+European Commission. 🇪🇺
+For detailed information and structured content,
+please refer to the
+[PVGIS Documentation](https://jrc-projects.apps.ocp.jrc.ec.europa.eu/pvgis/pvis-be-prototype/).
 """
 
 app = FastAPI(
-    title="PVGISAPI",
+    title="PVGIS Web API",
     description=description,
-    summary="PVGIS public API",
-    version="0.0.1",
+    summary=summary,
+    version="6",
     terms_of_service="https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-background-information/data-protection_en",
     contact={
         "name": "PVGIS, Joint Research Centre, European Commission",
         "url": "https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-background-information/pvgis-contact-points_en",
         "email": "JRC-PVGIS@ec.europa.eu",
     },
+    swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
     # license_info={
     #     "name": "",
     #     "url": "",
