@@ -459,7 +459,11 @@ def calculate_photovoltaic_power_output_series(
             efficiency_coefficient_series = efficiency
 
     else:
-        if not efficiency:
+        debug(locals())
+        if efficiency:
+            efficiency_coefficient_series = efficiency
+        else:
+            # debug(locals())
             from pvgisprototype.api.series.select import select_time_series
             from pvgisprototype.constants import DEGREES
             from pvgisprototype import TemperatureSeries
