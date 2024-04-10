@@ -18,6 +18,7 @@ from pvgisprototype.web_api.series.select import select
 # from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 # from pvgisprototype.web_api.geometry.overview_series import overview_series
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
+from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_monthly_average
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_advanced
 
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
@@ -289,6 +290,7 @@ app.get("/calculate/series/select")(select)
 
 # irradiance
 app.get("/calculate/power/broadband")(get_photovoltaic_power_series)
+app.get("/calculate/power/broadband_monthly_average")(get_photovoltaic_power_series_monthly_average)
 app.get("/calculate/power/broadband-advanced")(get_photovoltaic_power_series_advanced)
 app.get("/calculate/power/broadband-multi")(get_photovoltaic_power_output_series_multi)
 
