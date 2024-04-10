@@ -25,6 +25,7 @@ from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output
 from pvgisprototype.constants import RADIANS
 from pathlib import Path
 
+from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series_multi
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -340,6 +341,7 @@ app.get("/calculate/power/broadband")(get_photovoltaic_power_output_series)
 #                 }
 #             )
 
+app.get("/calculate/power/broadband-multi")(get_photovoltaic_power_output_series_multi)
 
 if __name__ == "__main__":
     import uvicorn
