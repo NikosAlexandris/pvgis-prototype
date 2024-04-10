@@ -106,6 +106,13 @@ from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.constants import cPROFILE_FLAG_DEFAULT
+from pvgisprototype.constants import MINUTES
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
+from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
+from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
 
 
 @log_function_call
@@ -113,6 +120,8 @@ def calculate_photovoltaic_power_output_series(
     longitude: float,
     latitude: float,
     elevation: float,
+    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
     timestamps: Optional[DatetimeIndex] = None,
     timezone: Optional[str] = None,
     global_horizontal_irradiance: Optional[Path] = None,
@@ -120,20 +129,18 @@ def calculate_photovoltaic_power_output_series(
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
-    mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
+    neighbor_lookup: MethodsForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
-    in_memory: bool = False,
+    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = True,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
-    apply_atmospheric_refraction: Optional[bool] = True,
+    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Optional[bool] = True,
+    apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -142,19 +149,19 @@ def calculate_photovoltaic_power_output_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = "minutes",
+    time_output_units: str = MINUTES,
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float] = None,
     photovoltaic_module: PhotovoltaicModuleModel = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: PVModuleEfficiencyAlgorithm = None,
-    temperature_model: ModuleTemperatureAlgorithm = None,
-    efficiency: Optional[float] = None,
+    power_model: PVModuleEfficiencyAlgorithm = PVModuleEfficiencyAlgorithm.king,
+    temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
+    efficiency: Optional[float] = EFFICIENCY_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
-    fingerprint: bool = False,
-    profile: bool = False, 
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
+    profile: bool = cPROFILE_FLAG_DEFAULT, 
 ):
     """
     Estimate the photovoltaic power over a time series or an arbitrarily
