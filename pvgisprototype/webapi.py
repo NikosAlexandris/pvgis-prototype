@@ -17,14 +17,17 @@ from pvgisprototype.web_api.series.select import select
 # from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
 # from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
 # from pvgisprototype.web_api.geometry.overview_series import overview_series
-from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series
+from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
+from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_advanced
 
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 # from pvgisprototype.web_api.plot.plot_example import plot_example
 # from pvgisprototype.web_api.plot.plot_example import graph_example
+
 from pvgisprototype.constants import RADIANS
 from pathlib import Path
 
+from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series_multi
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -285,7 +288,9 @@ app.get("/calculate/series/select")(select)
 # app.get("/calculate/geometry/overview_series")(overview_series)
 
 # irradiance
-app.get("/calculate/power/broadband")(get_photovoltaic_power_output_series)
+app.get("/calculate/power/broadband")(get_photovoltaic_power_series)
+app.get("/calculate/power/broadband-advanced")(get_photovoltaic_power_series_advanced)
+app.get("/calculate/power/broadband-multi")(get_photovoltaic_power_output_series_multi)
 
 # # plot
 # app.get("/plot/example", response_class=HTMLResponse)(plot_example)
