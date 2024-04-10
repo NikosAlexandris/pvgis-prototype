@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Optional
@@ -15,6 +16,15 @@ from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_longitude
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_latitude
 from typing import Annotated
+
+from pvgisprototype import TemperatureSeries
+from pvgisprototype import WindSpeedSeries
+from pvgisprototype import SpectralFactorSeries
+from pvgisprototype.constants import TEMPERATURE_DEFAULT
+from pvgisprototype.constants import TEMPERATURE_UNIT
+from pvgisprototype.constants import WIND_SPEED_DEFAULT
+from pvgisprototype.constants import WIND_SPEED_UNIT
+from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 
 
 async def process_series_timestamp(
@@ -83,7 +93,42 @@ async def process_latitude(
 ) -> float:
     return convert_to_radians_fastapi(latitude)
 
+async def create_temperature_series(temperature_series: Optional[float] = None) -> TemperatureSeries:
+    
+    if isinstance(temperature_series, float):
+        return TemperatureSeries(
+            value=np.array(temperature_series),
+            unit=TEMPERATURE_UNIT)
+    
+    return TemperatureSeries(
+        value=np.array(TEMPERATURE_DEFAULT),
+        unit=TEMPERATURE_UNIT)
+
+async def create_wind_speed_series(wind_speed_series: Optional[float] = None) -> WindSpeedSeries:
+    
+    if isinstance(wind_speed_series, float):
+        return WindSpeedSeries(
+            value=np.array(wind_speed_series),
+            unit=WIND_SPEED_UNIT)
+    
+    return WindSpeedSeries(
+        value=np.array(WIND_SPEED_DEFAULT),
+        unit=WIND_SPEED_UNIT)
+
+async def create_spectral_factor_series(spectral_factor_series: Optional[float] = None) -> SpectralFactorSeries:
+    
+    if isinstance(spectral_factor_series, float):
+        return SpectralFactorSeries(
+            value=np.array(spectral_factor_series)
+            )
+    
+    return SpectralFactorSeries(
+        value=np.array(SPECTRAL_FACTOR_DEFAULT)
+        )
 
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_timestamps = Depends(process_series_timestamp)
+fastapi_dependable_temperature_series = Depends(create_temperature_series)
+fastapi_dependable_wind_speed_series = Depends(create_wind_speed_series)
+fastapi_dependable_spectral_factor_series = Depends(create_spectral_factor_series)
