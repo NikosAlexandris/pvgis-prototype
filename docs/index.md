@@ -32,7 +32,7 @@ or even its core API[^0].
 [PVGIS][PVGIS]
 is an open [web application][PVGIS Web Application]
 of the :flag_eu: European Commission.
-Is it developed and maintained
+It is developed and maintained
 in the [Joint Research Centre (JRC)][JRC]
 for over two decades
 by the Energy Efficiency and Renewables Unit (Ispra) of the Energy,
