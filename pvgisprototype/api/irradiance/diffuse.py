@@ -74,6 +74,9 @@ from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
+from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
 from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import OUT_OF_RANGE_INDICES_COLUMN_NAME
@@ -83,7 +86,12 @@ from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
+from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
+from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 
 
 # def safe_select_time_series(*args, **kwargs):
@@ -503,10 +511,9 @@ def calculate_diffuse_horizontal_irradiance_time_series(
     latitude: float,
     timestamps: DatetimeIndex = None,
     timezone: Optional[str] = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Optional[bool] = True,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
@@ -514,14 +521,14 @@ def calculate_diffuse_horizontal_irradiance_time_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = "minutes",
+    time_output_units: str = MINUTES,
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
-    fingerprint: bool = False,
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """
     """
@@ -648,16 +655,16 @@ def calculate_diffuse_inclined_irradiance_time_series(
     timezone: Optional[str] = None,
     global_horizontal_component: Optional[Path] = None,
     direct_horizontal_component: Optional[Path] = None,
-    mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
+    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
+    neighbor_lookup: MethodsForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
-    in_memory: bool = False,
+    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Optional[bool] = True,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_angular_loss_factor: Optional[bool] = True,
+    apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -666,15 +673,15 @@ def calculate_diffuse_inclined_irradiance_time_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = "minutes",
+    time_output_units: str = MINUTES,
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = True,
+    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
-    fingerprint: bool = False,
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ) -> np.array:
     """Calculate the diffuse irradiance incident on a solar surface.
 
