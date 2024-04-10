@@ -153,6 +153,38 @@ def convert_numpy_arrays_to_lists(dictionary: Dict[str, Any]) -> Dict[str, Any]:
     return output_dict
 
 
+def plot_monthly_means(statistics: dict, figure_name: str = "monthly_means_plot"):
+    """
+    Plot the monthly means series and save the plot to a file.
+
+    Parameters:
+        statistics (dict): The statistics dictionary containing "Monthly means".
+        figure_name (str): The base name for the output plot file.
+
+    Returns:
+        str: The path to the saved plot file.
+    """
+    import matplotlib.pyplot as plt
+    monthly_means = statistics["Monthly means"]
+    months = np.arange(1, 13)  # Assuming the data covers 12 months
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(months, monthly_means, marker='o', linestyle='-', color='b')
+    plt.title("Monthly Means of Photovoltaic Power Output")
+    plt.xlabel("Month")
+    plt.ylabel("Mean Output")
+    plt.xticks(months)
+    plt.grid(True)
+
+    # Save the plot to a file
+    output_file = f"{figure_name}.png"
+    plt.savefig(output_file)
+    plt.close()  # Close the plot to free up memory
+
+    return output_file
+
+
 async def get_photovoltaic_power_series_advanced(
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
@@ -470,6 +502,7 @@ async def get_photovoltaic_power_series_monthly_average(
     # statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     # groupby: Annotated[Optional[str], fastapi_query_groupby] = GROUPBY_DEFAULT,
     csv: bool = False,
+    plot_statistics: bool = False,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
     # quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
     # log: Annotated[int, fastapi_query_log] = LOG_LEVEL_DEFAULT,
@@ -546,6 +579,13 @@ async def get_photovoltaic_power_series_monthly_average(
             groupby="M",
         )
         response["statistics"] = convert_numpy_arrays_to_lists(series_statistics)
+
+        if plot_statistics:
+            print(f'{series_statistics=}')
+            plot_file = plot_monthly_means(series_statistics, "monthly_means_plot")
+
+            from fastapi.responses import FileResponse
+            return FileResponse(path=plot_file, filename=Path(plot_file).name, media_type='image/png')
 
     headers = {
         "Content-Disposition": 'attachment; filename="pvgis_photovoltaic_power_series.json"'
