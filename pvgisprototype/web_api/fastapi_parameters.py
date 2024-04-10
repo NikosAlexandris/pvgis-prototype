@@ -249,7 +249,6 @@ fastapi_query_wind_speed_series = Query(
 fastapi_query_csv = Query(
     description=csv_description
 )
-
 fastapi_query_surface_tilt_list = Query(
     description=surface_tilt_description,
 )
