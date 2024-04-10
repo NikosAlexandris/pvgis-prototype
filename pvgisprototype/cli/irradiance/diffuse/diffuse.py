@@ -9,6 +9,7 @@ from pvgisprototype.cli.irradiance.diffuse.altitude import get_diffuse_solar_alt
 from pvgisprototype.cli.irradiance.diffuse.altitude import get_diffuse_solar_altitude_function_time_series
 from pvgisprototype.cli.irradiance.diffuse.horizontal import get_diffuse_horizontal_irradiance_time_series
 from pvgisprototype.cli.irradiance.diffuse.horizontal_from_sarah import get_diffuse_horizontal_component_from_sarah
+from pvgisprototype.cli.irradiance.diffuse.inclined import get_diffuse_inclined_irradiance_time_series
 
 
 app = typer.Typer(
@@ -59,7 +60,7 @@ app.command(
     no_args_is_help=True,
     help=f'☀∡ Calculate the diffuse irradiance incident on a surface over a period of time',
     rich_help_panel=rich_help_panel_irradiance_series,
-)
+)(get_diffuse_inclined_irradiance_time_series)
 app.command(
     name='from-sarah',
     no_args_is_help=True,
