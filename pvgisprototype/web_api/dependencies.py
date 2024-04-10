@@ -114,19 +114,18 @@ async def process_single_timestamp(
 
 
 async def process_longitude(
-    longitude: Annotated[float, fastapi_query_longitude],
+    longitude: Annotated[float, fastapi_query_longitude] = 8.628,
 ) -> float:
     return convert_to_radians_fastapi(longitude)
 
 
 async def process_latitude(
-    latitude: Annotated[float, fastapi_query_latitude],
+    latitude: Annotated[float, fastapi_query_latitude] = 45.812,
 ) -> float:
     return convert_to_radians_fastapi(latitude)
 
 
 async def create_temperature_series(temperature_series: Optional[float] = None) -> TemperatureSeries:
-    
     if isinstance(temperature_series, float):
         return TemperatureSeries(
             value=np.array(temperature_series),
