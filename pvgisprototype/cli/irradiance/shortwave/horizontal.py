@@ -213,6 +213,7 @@ def get_global_horizontal_irradiance_time_series(
         print_series_statistics(
             data_array=global_horizontal_irradiance_series.value,
             timestamps=timestamps,
+            groupby=groupby,
             title="Global irradiance",
             rounding_places=rounding_places,
         )
@@ -227,7 +228,7 @@ def get_global_horizontal_irradiance_time_series(
             label = 'Global Horizontal Irradiance',
             label_2 = None,
             unit = IRRADIANCE_UNITS,
-            # terminal_width_fraction=terminal_width_fraction,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
