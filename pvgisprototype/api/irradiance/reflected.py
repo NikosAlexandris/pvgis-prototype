@@ -92,7 +92,6 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = MINUTES,
-    angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -192,7 +191,6 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 time_output_units=time_output_units,
-                angle_units=angle_units,
                 angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
@@ -211,7 +209,8 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
             )
 
         # At this point, the global_horizontal_irradiance_series are either :
-        # calculated from external time series  Or  modelled 
+        # _read_ from external time series  Or estimated from the solar
+        # radiation model by Hofierka (2002)
 
         # clear-sky ground reflected irradiance
         ground_view_fraction = (1 - cos(surface_tilt)) / 2
