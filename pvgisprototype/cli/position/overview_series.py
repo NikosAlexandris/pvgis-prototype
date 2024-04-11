@@ -63,6 +63,8 @@ from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
 from pvgisprototype.constants import CSV_PATH_DEFAULT
 from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
+from pvgisprototype.cli.typer.data_processing import typer_option_dtype
+from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 def overview_series(
@@ -94,8 +96,8 @@ def overview_series(
     group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     ):
