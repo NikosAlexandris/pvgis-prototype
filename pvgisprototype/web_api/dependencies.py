@@ -128,11 +128,11 @@ async def process_latitude(
 async def create_temperature_series(temperature_series: Optional[float] = None) -> TemperatureSeries:
     if isinstance(temperature_series, float):
         return TemperatureSeries(
-            value=np.array(temperature_series),
+            value=np.array(temperature_series, dtype=np.float32),
             unit=TEMPERATURE_UNIT)
     
     return TemperatureSeries(
-        value=np.array(TEMPERATURE_DEFAULT),
+        value=np.array(TEMPERATURE_DEFAULT, dtype=np.float32),
         unit=TEMPERATURE_UNIT)
 
 
