@@ -493,8 +493,6 @@ class ModelSolarIncidenceTimeSeriesInputModel(
     SurfaceTiltModel,
     SurfaceOrientationModel,
     EarthOrbitModel,
-    BaseTimeOutputUnitsModel,
-    BaseAngleOutputUnitsModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
