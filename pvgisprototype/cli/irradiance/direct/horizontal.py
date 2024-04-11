@@ -207,6 +207,7 @@ def get_direct_horizontal_irradiance_time_series(
         print_series_statistics(
             data_array=direct_horizontal_irradiance_series.value,
             timestamps=timestamps,
+            groupby=groupby,
             title="Direct horizontal irradiance",
             rounding_places=rounding_places,
         )
@@ -230,7 +231,7 @@ def get_direct_horizontal_irradiance_time_series(
             label = 'Direct Horizontal Irradiance',
             label_2 = None,
             unit = IRRADIANCE_UNITS,
-            # terminal_width_fraction=terminal_width_fraction,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash

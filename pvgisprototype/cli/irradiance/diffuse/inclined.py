@@ -125,8 +125,6 @@ def get_diffuse_inclined_irradiance_time_series(
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
-    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
@@ -174,8 +172,6 @@ def get_diffuse_inclined_irradiance_time_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
@@ -218,7 +214,9 @@ def get_diffuse_inclined_irradiance_time_series(
         print_series_statistics(
             data_array=diffuse_inclined_irradiance_time_series.value,
             timestamps=timestamps,
+            groupby=groupby,
             title="Diffuse inclined irradiance",
+            rounding_places=rounding_places,
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
@@ -231,6 +229,7 @@ def get_diffuse_inclined_irradiance_time_series(
             label = 'Diffuse Inclined Irradiance',
             label_2 = None,
             unit = IRRADIANCE_UNITS,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
