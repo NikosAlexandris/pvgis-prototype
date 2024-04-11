@@ -121,6 +121,9 @@ from pvgisprototype.algorithms.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
 from rich import print
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
+from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 
 @log_function_call
@@ -159,21 +162,21 @@ def adjust_elevation(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ):
-    """Some correction for the given solar altitude 
+    """Modifier component for the solar altitude as per Hofierka, 2002
 
-    [1]_
+    This function implements a modifier component for the solar altitude for
+    the given elevation described by Hofierka, 2002 [1]_
 
     Notes
     -----
-
     In PVGIS C source code:
 
-	elevationCorr = exp(-sunVarGeom->z_orig / 8434.5);
+        elevationCorr = exp(-sunVarGeom->z_orig / 8434.5);
 
     References
     ----------
+    .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
 
-    .. [1] Hofierka, 2002
     """
     adjusted_elevation = np.array(np.exp(-elevation.value / 8434.5), dtype=dtype)
 
@@ -384,10 +387,7 @@ def calculate_rayleigh_optical_thickness_time_series(
 @cached(cache={}, key=custom_hashkey)
 def calculate_direct_normal_irradiance_time_series(
     timestamps: DatetimeIndex = None,
-    # start_time: Optional[datetime] = None,
-    # frequency: Optional[str] = None,
-    # end_time: Optional[datetime] = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT, # REVIEW-ME + Typer Parser
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     optical_air_mass_series: OpticalAirMass = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -406,7 +406,7 @@ def calculate_direct_normal_irradiance_time_series(
     rays that come in a straight line from the direction of the sun at its
     current position in the sky.
 
-    This function implements the algorithm described by Hofierka [1]_.
+    This function implements the algorithm described by Hofierka, 2002. [1]_
 
     Notes
     -----
@@ -536,29 +536,23 @@ def calculate_direct_horizontal_irradiance_time_series(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex = None,
-    # start_time: Optional[datetime] = None,  # reuse callback inside function?
-    # frequency: Optional[str] = None,  # reuse callback inside function?
-    # end_time: Optional[datetime] = None,  # reuse callback inside function?
     timezone: Optional[str] = None,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: float = 0,
     hour_offset: float = 0,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None, # [LINKE_TURBIDITY_TIME_SERIES_DEFAULT], # REVIEW-ME + Typer Parser
-    apply_atmospheric_refraction: Optional[bool] = True,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = 'minutes',
-    angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
-    fingerprint: bool = False,
-    index: bool = False,
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_COLUMN_NAME,
     show_progress: bool = True,
 ) -> np.ndarray:
     """Calculate the direct horizontal irradiance
@@ -588,9 +582,6 @@ def calculate_direct_horizontal_irradiance_time_series(
         hour_offset=hour_offset,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -709,9 +700,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex = None,
-    # start_time: Optional[datetime] = None,
-    # frequency: Optional[str] = None,
-    # end_time: Optional[datetime] = None,
     timezone: Optional[str] = None,
     convert_longitude_360: bool = False,
     direct_horizontal_component: Optional[Path] = None,
@@ -721,7 +709,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     in_memory: bool = False,
     surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: LinkeTurbidityFactor = None,
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_angular_loss_factor: Optional[bool] = True,
@@ -734,21 +722,17 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: str = 'minutes',
-    angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
-    rounding_places: Optional[int] = ROUNDING_PLACES_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
-    fingerprint: bool = False,
-    index: bool = False,
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_COLUMN_NAME,
     show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
-    This function implements the algorithm described by Hofierka [1]_.
+    This function implements the algorithm described by Hofierka, 2002. [1]_
 
     Notes
     -----
@@ -795,9 +779,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         surface_tilt=surface_tilt,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
-        angle_output_units=angle_output_units,
         complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
         dtype=dtype,
         array_backend=array_backend,
@@ -817,9 +798,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         # hour_offset=hour_offset,
         # perigee_offset=perigee_offset,
         # eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
@@ -838,9 +816,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         # hour_offset=hour_offset,
         # perigee_offset=perigee_offset,
         # eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
-        # angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
@@ -881,9 +856,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             latitude=latitude,
             elevation=elevation,
             timestamps=timestamps,
-            # start_time=start_time,
-            # frequency=frequency,
-            # end_time=end_time,
             timezone=timezone,
             solar_position_model=solar_position_model,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
@@ -895,9 +867,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            time_output_units=time_output_units,
-            angle_units=angle_units,
-            angle_output_units=angle_output_units,
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
@@ -914,8 +883,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
             latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
             timestamps=timestamps,
-            # start_time=start_time,
-            # end_time=end_time,
             # convert_longitude_360=convert_longitude_360,
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
