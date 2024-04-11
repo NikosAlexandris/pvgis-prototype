@@ -19,6 +19,8 @@ from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_argument_naive_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
+from pvgisprototype.cli.typer.timestamps import typer_option_periods
+from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.time_series import typer_argument_time_series
 from pvgisprototype.cli.typer.time_series import typer_option_data_variable
@@ -33,7 +35,7 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot_title
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_unit
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.plot import typer_option_tufte_style
-from pvgisprototype.cli.typer.output import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.output import typer_option_output_filename
@@ -79,7 +81,6 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype import Longitude
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
-from pvgisprototype.cli.typer.timestamps import typer_option_periods
 
 
 app = typer.Typer(
@@ -119,8 +120,8 @@ def select(
     time_series_2: Annotated[Path, typer_option_time_series] = None,
     timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(now_datetime()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Optional[str] = None,
+    periods: Annotated[Optional[int], typer_option_periods] = None,  # Used by a callback function
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,  # Used by a callback function
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     variable: Annotated[Optional[str], typer_option_data_variable] = None,
