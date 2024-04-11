@@ -149,7 +149,7 @@ are part of the solar radiation model.
 ## Direct normal irradiance
 
 In estimating the photovoltaic power output,
-the solar radiation component with the greates impact,
+the solar radiation component with the greatest impact,
 is the *direct* ***normal*** irradiance.
 
 From the theory,

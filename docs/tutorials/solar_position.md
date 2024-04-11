@@ -44,7 +44,8 @@ Next, let us consider the basic _geometry_ of a solar panel :
 As a starting point,
 the command `position`,
 features a sub-command `introduction`
-which explains the flow of calculations of the position of the sun
+which returns a text
+explaining the flow of calculations of the position of the sun
 and the agle between sun-rays and the solar collector surface.
 
 Go ahead, try it out and skim through the text !
@@ -72,7 +73,7 @@ pvgis-prototype position overview-series \
 
     **The command**
     
-    ```
+    ``` bash
     pvgis-prototype position overview-series \
     8.628 45.812 180 45 \
     '2010-01-17 12:00' \
@@ -110,7 +111,10 @@ and the **solar azimuth**.
 We can identify them individually :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype position altitude 8.628 45.812 '2010-01-17 12:00:00' -aou degrees
+pvgis-prototype position altitude \
+    8.628 45.812 \
+    '2010-01-17 12:00:00' \
+    -aou degrees
 ```
 
 and
@@ -178,3 +182,42 @@ pvgis-prototype position overview-series \
 <!-- Position  Longitude ϑ, Latitude ϕ = 8.62800, 45.81200, Orientation : 180.00000, Tilt : 45.00000 [degrees] -->
 <!--      Algorithms  Timing : NOAA, Zone : UTC, Local zone : UTC, Positioning : NOAA, Incidence angle : -->
 <!--                                           Sun-to-Surface-Normal -->
+
+## Time series
+
+The power of `overview-series`
+is exactly its capability to generate time series.
+
+It suffices to provide a `start-time` and an `end-time` :
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype position overview-series \
+    8.628 45.812 180 45 \
+    --start-time '2010-01-17 06:00:00' \
+    --end-time '2010-01-17 18:00:00' \
+    -aou degrees
+```
+
+And what about every 30 minutes ?
+Ask this via the `--frequency` option :
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype position overview-series \
+    8.628 45.812 180 45 \
+    --start-time '2010-01-17 06:00:00' \
+    --end-time '2010-01-17 18:00:00' \
+    -aou degrees \
+    --frequency 30min
+```
+
+Maybe we want shorter figures ?
+We can limit the output numbers to 2 decimals :
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype position overview-series \
+    8.628 45.812 180 45 \
+    --start-time '2010-01-17 06:00:00' \
+    --end-time '2010-01-17 18:00:00' \
+    -aou degrees \
+    -r 2
+```
