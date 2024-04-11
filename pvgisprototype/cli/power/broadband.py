@@ -64,7 +64,6 @@ from pvgisprototype.cli.typer.efficiency import typer_option_efficiency
 from pvgisprototype.cli.typer.efficiency import typer_option_system_efficiency
 from pvgisprototype.cli.typer.spectral_factor import typer_argument_spectral_factor_series
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
-from pvgisprototype.cli.typer.output import typer_option_angle_units
 from pvgisprototype.cli.typer.output import typer_option_statistics
 from pvgisprototype.cli.typer.output import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_time_output_units
@@ -172,8 +171,6 @@ def photovoltaic_power_output_series(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
-    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
@@ -257,8 +254,6 @@ def photovoltaic_power_output_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
         angle_output_units=angle_output_units,
         # horizon_heights=horizon_heights,
         photovoltaic_module=photovoltaic_module,
@@ -370,8 +365,6 @@ def photovoltaic_power_output_series_multi(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
-    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
@@ -462,8 +455,6 @@ def photovoltaic_power_output_series_multi(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
         angle_output_units=angle_output_units,
         # horizon_heights=horizon_heights,
         photovoltaic_module=photovoltaic_module,
