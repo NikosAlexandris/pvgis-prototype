@@ -60,8 +60,8 @@ from pvgisprototype.cli.typer.efficiency import typer_option_system_efficiency
 from pvgisprototype.cli.typer.spectral_factor import typer_argument_spectral_factor_series
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_angle_units
-from pvgisprototype.cli.typer.output import typer_option_statistics
-from pvgisprototype.cli.typer.output import typer_option_groupby
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_time_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_index
@@ -117,6 +117,8 @@ from pandas import DatetimeIndex
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
+from pvgisprototype.cli.typer.data_processing import typer_option_dtype
+from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 def spectral_photovoltaic_power_output_series(
@@ -145,9 +147,9 @@ def spectral_photovoltaic_power_output_series(
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
-    # dtype: str = DATA_TYPE_DEFAULT,
-    # array_backend: str = ARRAY_BACKEND_DEFAULT,
-    # multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
+    # dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    # array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    # multi_thread: Annotated[bool, typer_option_multi_thread] = MULTI_THREAD_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
