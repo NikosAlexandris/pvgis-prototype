@@ -16,7 +16,8 @@ from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_corre
 from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_csv
-from pvgisprototype.cli.typer.output import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
@@ -39,7 +40,6 @@ from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
-from pvgisprototype.cli.typer.output import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
@@ -53,6 +53,8 @@ from pvgisprototype.constants import QUIET_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import METADATA_FLAG_DEFAULT
+from pvgisprototype.cli.typer.data_processing import typer_option_dtype
+from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 @log_function_call
@@ -67,8 +69,8 @@ def get_extraterrestrial_normal_irradiance_time_series(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,

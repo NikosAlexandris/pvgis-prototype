@@ -64,8 +64,8 @@ from pvgisprototype.cli.typer.efficiency import typer_option_efficiency
 from pvgisprototype.cli.typer.efficiency import typer_option_system_efficiency
 from pvgisprototype.cli.typer.spectral_factor import typer_argument_spectral_factor_series
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
-from pvgisprototype.cli.typer.output import typer_option_statistics
-from pvgisprototype.cli.typer.output import typer_option_groupby
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_time_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_index
@@ -133,6 +133,9 @@ import typer
 from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
+from pvgisprototype.cli.typer.data_processing import typer_option_dtype
+from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
+from pvgisprototype.cli.typer.data_processing import typer_option_multi_thread
 
 
 @log_function_call
@@ -178,9 +181,9 @@ def photovoltaic_power_output_series(
     power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    multi_thread: Annotated[bool, typer_option_multi_thread] = MULTI_THREAD_FLAG_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
@@ -238,9 +241,6 @@ def photovoltaic_power_output_series(
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         in_memory=in_memory,
-        dtype=dtype,
-        array_backend=array_backend,
-        multi_thread=multi_thread,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
@@ -261,6 +261,9 @@ def photovoltaic_power_output_series(
         power_model=power_model,
         temperature_model=temperature_model,
         efficiency=efficiency,
+        dtype=dtype,
+        array_backend=array_backend,
+        multi_thread=multi_thread,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,
@@ -372,9 +375,9 @@ def photovoltaic_power_output_series_multi(
     power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    multi_thread: Annotated[bool, typer_option_multi_thread] = MULTI_THREAD_FLAG_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
