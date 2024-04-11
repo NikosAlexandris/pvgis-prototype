@@ -23,7 +23,6 @@ from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
-# from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
@@ -178,6 +177,7 @@ def get_direct_normal_irradiance_time_series(
         print_series_statistics(
             data_array=direct_normal_irradiance_series[DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME],
             timestamps=timestamps,
+            groupby=groupby,
             title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
             rounding_places=rounding_places,
         )
@@ -201,7 +201,7 @@ def get_direct_normal_irradiance_time_series(
             label = 'Direct Normal Irradiance',
             label_2 = None,
             unit = IRRADIANCE_UNITS,
-            # terminal_width_fraction=terminal_width_fraction,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
