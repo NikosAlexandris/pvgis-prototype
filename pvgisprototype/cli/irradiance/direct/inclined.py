@@ -49,8 +49,6 @@ from pvgisprototype.cli.typer.timing import typer_option_hour_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer.output import typer_option_time_output_units
-from pvgisprototype.cli.typer.output import typer_option_angle_units
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_statistics
@@ -118,12 +116,12 @@ def get_direct_inclined_irradiance_time_series(
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,  # Used by a callback function
+    periods: Annotated[Optional[int], typer_option_periods] = None,  # Used by a callback function
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,  # Used by a callback function
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,  # Used by a callback function
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -142,8 +140,6 @@ def get_direct_inclined_irradiance_time_series(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
-    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -187,8 +183,6 @@ def get_direct_inclined_irradiance_time_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
@@ -232,7 +226,9 @@ def get_direct_inclined_irradiance_time_series(
         print_series_statistics(
             data_array=direct_inclined_irradiance_series.value,
             timestamps=timestamps,
+            groupby=groupby,
             title="Direct inclined irradiance",
+            rounding_places=rounding_places,
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
@@ -245,7 +241,7 @@ def get_direct_inclined_irradiance_time_series(
             label = 'Direct Inclined Irradiance',
             label_2 = None,
             unit = IRRADIANCE_UNITS,
-            # terminal_width_fraction=terminal_width_fraction,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash

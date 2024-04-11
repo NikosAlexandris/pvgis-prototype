@@ -210,7 +210,9 @@ def get_ground_reflected_inclined_irradiance_time_series(
         print_series_statistics(
             data_array=ground_reflected_inclined_irradiance_series.value,
             timestamps=timestamps,
+            groupby=groupby,
             title="Reflected inclined irradiance",
+            rounding_places=rounding_places,
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
@@ -223,7 +225,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
             label = 'Global Horizontal Irradiance',
             label_2 = None,
             unit = IRRADIANCE_UNITS,
-            # terminal_width_fraction=terminal_width_fraction,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
