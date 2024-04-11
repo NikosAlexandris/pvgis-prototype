@@ -46,6 +46,10 @@ rich_help_panel_time_series_data_selection = 'Data selection options'
 
 rich_help_panel_data_processing = 'Data processing options'
 
+# Statistics
+
+rich_help_panel_statistics = 'Statistics'
+
 # Photovoltaic Performance
 
 rich_help_panel_efficiency = 'Efficiency'
