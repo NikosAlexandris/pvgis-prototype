@@ -176,7 +176,6 @@ def calculate_pv_efficiency_time_series(
     efficiency_series = np.zeros_like(irradiance_series)
     efficiency_series[negative_relative_irradiance] = 0
 
-
     temperature_series_adjusted = deepcopy(temperature_series)  # Safer! ----
 
     # Adjust temperature based on conditions
