@@ -87,6 +87,8 @@ from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import METADATA_FLAG_DEFAULT
 from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
 from pvgisprototype.constants import MINUTES
+from pvgisprototype.cli.typer.data_processing import typer_option_dtype
+from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 def get_ground_reflected_inclined_irradiance_time_series(
@@ -116,8 +118,8 @@ def get_ground_reflected_inclined_irradiance_time_series(
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
