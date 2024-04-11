@@ -58,8 +58,8 @@ from pvgisprototype.cli.typer.efficiency import typer_option_system_efficiency
 from pvgisprototype.cli.typer.spectral_factor import typer_argument_spectral_factor_series
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_angle_units
-from pvgisprototype.cli.typer.output import typer_option_statistics
-from pvgisprototype.cli.typer.output import typer_option_groupby
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_time_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_index
