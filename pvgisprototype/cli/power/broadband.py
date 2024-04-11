@@ -198,7 +198,7 @@ def photovoltaic_power_output_series(
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
 ):
-    """Estimate the photovoltaic output for a location and a moment or period
+    """Estimate the photovoltaic power output for a location and a moment or period
     in time.
 
     Estimate the photovoltaic power over a time series or an arbitrarily
@@ -228,6 +228,8 @@ def photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
+        surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         timestamps=timestamps,
         timezone=timezone,
         global_horizontal_irradiance=global_horizontal_irradiance,
@@ -242,8 +244,6 @@ def photovoltaic_power_output_series(
         dtype=dtype,
         array_backend=array_backend,
         multi_thread=multi_thread,
-        surface_orientation=surface_orientation,
-        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,

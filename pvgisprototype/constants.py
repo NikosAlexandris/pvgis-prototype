@@ -175,7 +175,8 @@ ANGLE_UNITS_COLUMN_NAME = ANGLE_UNITS_NAME
 
 IN_MEMORY_FLAG_DEFAULT = False
 MASK_AND_SCALE_FLAG_DEFAULT = False
-NEIGHBOR_LOOKUP_DEFAULT = None
+from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+NEIGHBOR_LOOKUP_DEFAULT = MethodsForInexactMatches.nearest
 TERMINAL_WIDTH_FRACTION = 0.9
 
 LATITUDE_MINIMUM = -90
