@@ -38,6 +38,18 @@ pvgis-prototype irradiance global horizontal \
 <!-- returns -->
 <!-- 583.6711 -->
 
+??? tip "Consult the help text!"
+
+    It's always a good idea to consult the help for a command. While effort has
+    been given to keep the same order for the input parameters,
+    not all commands share the exact same required positional parameters!
+
+    For the above command, we can get the help via 
+    ``` bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype irradiance global horizontal
+    ```
+
+
 We can see how this simulated quantity breaks down in its sub-components too :
 
 ``` bash exec="true" result="ansi" source="material-block"
@@ -90,7 +102,8 @@ from the SARAH3 data collection :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype series select \
-    sarah2_sis_over_esti_jrc.nc 8.628 45.812 \
+    sarah2_sis_over_esti_jrc.nc \
+    8.628 45.812 \
     '2010-01-27 12:00:00' \
     --neighbor-lookup nearest \
     --mask-and-scale \
@@ -105,7 +118,8 @@ pvgis-prototype series select \
  
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype series select \
-    sarah2_sid_over_esti_jrc.nc 8.628 45.812 \
+    sarah2_sid_over_esti_jrc.nc \
+    8.628 45.812 \
     --neighbor-lookup nearest \
     -v \
     --mask-and-scale \
@@ -242,6 +256,17 @@ pvgis-prototype irradiance global inclined \
     '2010-01-27 12:00:00' \
     -vvv
 ```
+
+!!! hint "Default orientation and tilt angles"
+
+    The default values for the orientation and tilt angles of a solar surface
+    are (currently) set to 180 and 45 degrees respectively.
+    Hence, we'd get the same result if we 
+    ``` bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype irradiance global horizontal \
+        8.628 45.812 214 \
+        '2010-01-27 12:00:00'
+    ```
 
 !!! attention "EXTRA" 
 
