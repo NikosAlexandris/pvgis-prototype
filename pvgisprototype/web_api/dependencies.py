@@ -30,6 +30,7 @@ from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 async def process_series_timestamp(
     timestamps: Optional[str] = Query(None),
     start_time: Optional[str] = Query(None),
+    periods: Optional[str] = Query(None),
     frequency: Optional[str] = Query('h'),
     end_time: Optional[str] = Query(None),
     timezone: Optional[str] = None,
@@ -44,9 +45,39 @@ async def process_series_timestamp(
         try:
             timestamps = generate_datetime_series(
                 start_time=start_time,
-                frequency=frequency,
                 end_time=end_time,
+                periods=periods,
+                frequency=frequency,
                 timezone=timezone,
+            )
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    return timestamps
+
+
+async def process_series_naive_timestamp(
+    timestamps: Optional[str] = Query(None),
+    start_time: Optional[str] = Query(None),
+    periods: Optional[str] = Query(None),
+    frequency: Optional[str] = Query('h'),
+    end_time: Optional[str] = Query(None),
+    timezone: Optional[str] = None,
+):
+    """
+    """
+    timezone = convert_to_timezone(timezone)
+    if timestamps is not None and not start_time and not end_time:
+        timestamps = parse_timestamp_series(timestamps=timestamps)
+
+    if start_time is not None and end_time is not None:
+        try:
+            timestamps = generate_datetime_series(
+                start_time=start_time,
+                end_time=end_time,
+                periods=periods,
+                frequency=frequency,
+                timezone=None,
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
@@ -83,13 +114,13 @@ async def process_single_timestamp(
 
 
 async def process_longitude(
-    longitude: Annotated[float, fastapi_query_longitude],
+    longitude: Annotated[float, fastapi_query_longitude] = 8.628,
 ) -> float:
     return convert_to_radians_fastapi(longitude)
 
 
 async def process_latitude(
-    latitude: Annotated[float, fastapi_query_latitude],
+    latitude: Annotated[float, fastapi_query_latitude] = 45.812,
 ) -> float:
     return convert_to_radians_fastapi(latitude)
 
@@ -126,9 +157,45 @@ async def create_spectral_factor_series(spectral_factor_series: Optional[float] 
         value=np.array(SPECTRAL_FACTOR_DEFAULT)
         )
 
+async def create_temperature_series(temperature_series: Optional[float] = None) -> TemperatureSeries:
+    if isinstance(temperature_series, float):
+        return TemperatureSeries(
+            value=np.array(temperature_series, dtype=np.float32),
+            unit=TEMPERATURE_UNIT)
+    
+    return TemperatureSeries(
+        value=np.array(TEMPERATURE_DEFAULT, dtype=np.float32),
+        unit=TEMPERATURE_UNIT)
+
+
+async def create_wind_speed_series(wind_speed_series: Optional[float] = None) -> WindSpeedSeries:
+    
+    if isinstance(wind_speed_series, float):
+        return WindSpeedSeries(
+            value=np.array(wind_speed_series),
+            unit=WIND_SPEED_UNIT)
+    
+    return WindSpeedSeries(
+        value=np.array(WIND_SPEED_DEFAULT),
+        unit=WIND_SPEED_UNIT)
+
+
+async def create_spectral_factor_series(spectral_factor_series: Optional[float] = None) -> SpectralFactorSeries:
+    
+    if isinstance(spectral_factor_series, float):
+        return SpectralFactorSeries(
+            value=np.array(spectral_factor_series)
+            )
+    
+    return SpectralFactorSeries(
+        value=np.array(SPECTRAL_FACTOR_DEFAULT)
+        )
+
+
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_timestamps = Depends(process_series_timestamp)
+fastapi_dependable_naive_timestamps = Depends(process_series_naive_timestamp)
 fastapi_dependable_temperature_series = Depends(create_temperature_series)
 fastapi_dependable_wind_speed_series = Depends(create_wind_speed_series)
 fastapi_dependable_spectral_factor_series = Depends(create_spectral_factor_series)
