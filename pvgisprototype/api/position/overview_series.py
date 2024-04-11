@@ -42,13 +42,14 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED
+from pandas import DatetimeIndex
 
 
 @validate_with_pydantic(ModelSolarGeometryOverviewTimeSeriesInputModel)
 def model_solar_geometry_overview_time_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     surface_orientation: None | float,
     surface_tilt: None | float,
