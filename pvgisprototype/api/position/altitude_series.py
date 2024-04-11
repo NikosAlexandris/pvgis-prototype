@@ -123,8 +123,8 @@ def calculate_solar_altitude_time_series(
             results.append({
                 TIME_ALGORITHM_NAME: solar_altitude.timing_algorithm,
                 POSITION_ALGORITHM_NAME: solar_position_model.value,
-                ALTITUDE_NAME: getattr(solar_altitude, angle_output_units, None) if solar_altitude else None,
-                UNITS_NAME: angle_output_units,
+                ALTITUDE_NAME: getattr(solar_altitude, None) if solar_altitude else None,
+                UNITS_NAME: None,
             })
 
     return results
