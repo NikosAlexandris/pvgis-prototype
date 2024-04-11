@@ -12,7 +12,7 @@ tags:
 
 ## Overview
 
-Are you curious about photovoltaic performance ?
+Curious about photovoltaic performance ?
 This is an introduction into the estimation of photovoltaic power
 over a location and a moment or period in time.
 
