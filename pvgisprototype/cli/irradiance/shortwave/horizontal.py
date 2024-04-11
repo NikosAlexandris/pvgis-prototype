@@ -36,8 +36,6 @@ from pvgisprototype.cli.typer.timing import typer_option_hour_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer.output import typer_option_time_output_units
-from pvgisprototype.cli.typer.output import typer_option_angle_units
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.statistics import typer_option_statistics
@@ -103,8 +101,6 @@ def get_global_horizontal_irradiance_time_series(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    # global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
-    # direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -122,8 +118,6 @@ def get_global_horizontal_irradiance_time_series(
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_output_units: Annotated[str, typer_option_time_output_units] = 'minutes',
-    angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
@@ -170,8 +164,6 @@ def get_global_horizontal_irradiance_time_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_output_units=time_output_units,
-        angle_units=angle_units,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
