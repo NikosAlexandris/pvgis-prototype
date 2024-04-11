@@ -51,7 +51,8 @@ from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
-from pvgisprototype.cli.typer.output import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
@@ -101,7 +102,6 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import METADATA_FLAG_DEFAULT
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
-from pvgisprototype.cli.typer.output import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.log import log_function_call

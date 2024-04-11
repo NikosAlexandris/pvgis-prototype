@@ -40,7 +40,8 @@ from pvgisprototype.cli.typer.output import typer_option_time_output_units
 from pvgisprototype.cli.typer.output import typer_option_angle_units
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
-from pvgisprototype.cli.typer.output import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
@@ -66,7 +67,6 @@ from pandas import DatetimeIndex
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
-from pvgisprototype.cli.typer.output import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT

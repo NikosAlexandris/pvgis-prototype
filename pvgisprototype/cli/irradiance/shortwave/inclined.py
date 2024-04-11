@@ -40,7 +40,8 @@ from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
-from pvgisprototype.cli.typer.output import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
@@ -86,7 +87,6 @@ from pvgisprototype.constants import QUIET_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import METADATA_FLAG_DEFAULT
-from pvgisprototype.cli.typer.output import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
 
 
@@ -98,12 +98,12 @@ def get_global_inclined_irradiance_time_series(
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,  # Used by a callback function
+    periods: Annotated[Optional[int], typer_option_periods] = None,  # Used by a callback function
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,  # Used by a callback function
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,  # Used by a callback function
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_timestamps: Annotated[bool, typer_option_random_timestamps] = False,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,

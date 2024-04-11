@@ -11,7 +11,7 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output_meta
 
 typer_option_command_metadata = typer.Option(
     help='Print command metadata',
-    rich_help_panel=rich_help_panel_output,
+    rich_help_panel=rich_help_panel_output_metadata,
 )
 
 # Index 
@@ -34,19 +34,6 @@ typer_option_rounding_places = typer.Option(
     help='Number of digits to round results to',
     show_default=True,
     rich_help_panel=rich_help_panel_output,
-)
-
-# Statistics
-
-typer_option_statistics = typer.Option(
-    help='Calculate and display summary statistics',
-    rich_help_panel=rich_help_panel_output,
-    # default=False
-)
-typer_option_groupby = typer.Option(
-    help=f"Group statistics, ex. M or 3H. A number and date/time unit : (Y)ear, (M)onth, (D)ay, (W)eek, (S)eason. See Xarray\'s group-by operations.",
-    rich_help_panel=rich_help_panel_output,
-    # default_factory='h'
 )
 
 # Units

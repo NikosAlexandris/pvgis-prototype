@@ -40,11 +40,10 @@ from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer.time_series import typer_option_tolerance
 from pvgisprototype.cli.typer.time_series import typer_option_in_memory
-from pvgisprototype.cli.typer.output import typer_option_time_output_units
-from pvgisprototype.cli.typer.output import typer_option_angle_units
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
-from pvgisprototype.cli.typer.output import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
@@ -91,7 +90,6 @@ from pvgisprototype.constants import QUIET_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import METADATA_FLAG_DEFAULT
-from pvgisprototype.cli.typer.output import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
 from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
 from pvgisprototype.constants import MINUTES
