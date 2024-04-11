@@ -144,12 +144,12 @@ def photovoltaic_power_output_series(
     surface_orientation: Annotated[Optional[float], typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,  # Used by a callback function
+    periods: Annotated[Optional[int], typer_option_periods] = None,  # Used by a callback function
+    frequency: Annotated[Optional[str], typer_option_frequency] = None,  # Used by a callback function
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,  # Used by a callback function
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     global_horizontal_irradiance: Annotated[Optional[Path], typer_option_global_horizontal_irradiance] = None,
     direct_horizontal_irradiance: Annotated[Optional[Path], typer_option_direct_horizontal_irradiance] = None,
     spectral_factor_series: Annotated[Path|SpectralFactorSeries, typer_argument_spectral_factor_series] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
@@ -310,6 +310,7 @@ def photovoltaic_power_output_series(
             timestamps=timestamps,
             groupby=groupby,
             title="Photovoltaic power output",
+            rounding_places=rounding_places,
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
@@ -322,6 +323,7 @@ def photovoltaic_power_output_series(
             label = 'Photovoltaic Power',
             label_2 = None,
             unit = POWER_UNIT,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
