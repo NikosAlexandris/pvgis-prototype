@@ -30,19 +30,20 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype import SolarIncidence
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
 import numpy as np
+from pandas import DatetimeIndex
 
 
 @validate_with_pydantic(ModelSolarIncidenceTimeSeriesInputModel)
 def model_solar_incidence_time_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: np.array,
+    timestamps: DatetimeIndex,
     timezone: Optional[ZoneInfo] = None,
+    surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Union[float, SurfaceTilt] = SURFACE_TILT_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
-    surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Union[float, SurfaceTilt] = SURFACE_TILT_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: str = TIME_OUTPUT_UNITS_DEFAULT,

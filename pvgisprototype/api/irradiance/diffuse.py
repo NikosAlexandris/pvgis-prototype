@@ -28,12 +28,10 @@ from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodsForInexactMatches
-from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -386,6 +384,7 @@ def calculate_diffuse_sky_irradiance_time_series(
         * sin(surface_tilt / 2) ** 2
     ) * n_series
 
+    # return np.array(diffuse_sky_irradiance_series, dtype=dtype)
     return diffuse_sky_irradiance_series
 
 
@@ -755,6 +754,9 @@ def calculate_diffuse_inclined_irradiance_time_series(
         extraterrestrial_normal_irradiance_series.value
         * np.sin(solar_altitude_series.radians)
     )
+    extraterrestrial_horizontal_irradiance_series[solar_altitude_series.radians < 0] = (
+        0  # In the context of PVGIS, does it make sense to have negative extraterrestrial horizontal irradiance
+    )
     # Calculate quantities required : ---------------------------- <<< <<< <<<
 
     # ----------------------------------- Diffuse Horizontal Irradiance -- >>>
@@ -863,8 +865,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
             timestamps=timestamps,
             timezone=timezone,
             solar_incidence_model=solar_incidence_model,
-            surface_tilt=surface_tilt,
             surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_output_units=time_output_units,
@@ -981,6 +983,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         diffuse_irradiance_loss_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
             indirect_angular_loss_coefficient=diffuse_irradiance_angular_loss_coefficient,
         )
+        diffuse_inclined_irradiance_series_before_loss = np.copy(diffuse_inclined_irradiance_series)
         diffuse_inclined_irradiance_series *= diffuse_irradiance_loss_factor
 
     out_of_range = (
@@ -1004,7 +1007,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
         'extended': lambda: {
             LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
-            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series / diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
+            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series_before_loss if apply_angular_loss_factor else NOT_AVAILABLE,
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             ANGLE_UNITS_COLUMN_NAME: angle_output_units,

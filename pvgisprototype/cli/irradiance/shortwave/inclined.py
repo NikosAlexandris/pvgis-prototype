@@ -161,9 +161,9 @@ def get_global_inclined_irradiance_time_series(
         timezone=timezone,
         global_horizontal_irradiance=global_horizontal_irradiance,
         direct_horizontal_irradiance=direct_horizontal_irradiance,
-        mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
         in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
@@ -195,6 +195,7 @@ def get_global_inclined_irradiance_time_series(
             print_irradiance_table_2(
                 longitude=longitude,
                 latitude=latitude,
+                elevation=elevation,
                 timestamps=timestamps,
                 dictionary=global_inclined_irradiance_series.components,
                 title=global_inclined_irradiance_series.components[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
