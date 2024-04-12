@@ -81,6 +81,14 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype import Longitude
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
+from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
+from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
+from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
+from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
+from pvgisprototype.constants import GROUPBY_DEFAULT
+from pvgisprototype.constants import CSV_PATH_DEFAULT
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 
 
 app = typer.Typer(
@@ -119,18 +127,19 @@ def select(
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
     time_series_2: Annotated[Path, typer_option_time_series] = None,
     timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(now_datetime()),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
+    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,  # Used by a callback function
     periods: Annotated[Optional[int], typer_option_periods] = None,  # Used by a callback function
     frequency: Annotated[Optional[str], typer_option_frequency] = None,  # Used by a callback function
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     variable: Annotated[Optional[str], typer_option_data_variable] = None,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
-    in_memory: Annotated[bool, typer_option_in_memory] = False,
-    statistics: Annotated[bool, typer_option_statistics] = False,
-    csv: Annotated[Path, typer_option_csv] = 'series.csv',
+    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
+    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
@@ -235,7 +244,9 @@ def select(
     if statistics:
         print_series_statistics(
             data_array=location_time_series,
+            groupby=groupby,
             title='Selected series',
+            rounding_places=rounding_places,
         )
 
     if csv:

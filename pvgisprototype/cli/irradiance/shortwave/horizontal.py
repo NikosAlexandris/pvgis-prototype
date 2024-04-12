@@ -84,6 +84,7 @@ from pvgisprototype.constants import UNIPLOT_FLAG_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
+from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
 from pvgisprototype.constants import QUIET_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
@@ -112,7 +113,7 @@ def get_global_horizontal_irradiance_time_series(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
