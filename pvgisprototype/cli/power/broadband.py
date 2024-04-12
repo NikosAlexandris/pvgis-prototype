@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the photovoltaic power output over a
+location for a period in time.
+"""
+
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from typing import Annotated
