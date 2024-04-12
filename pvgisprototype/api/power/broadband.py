@@ -141,8 +141,6 @@ def calculate_photovoltaic_power_output_series(
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -242,8 +240,6 @@ def calculate_photovoltaic_power_output_series(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         # solar_time_model=solar_time_model,
-        # time_offset_global=time_offset_global,
-        # hour_offset=hour_offset,
         # perigee_offset=perigee_offset,
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
@@ -262,8 +258,6 @@ def calculate_photovoltaic_power_output_series(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
-        # time_offset_global=time_offset_global,
-        # hour_offset=hour_offset,
         # perigee_offset=perigee_offset,
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
@@ -334,8 +328,6 @@ def calculate_photovoltaic_power_output_series(
                 solar_position_model=solar_position_model,
                 solar_incidence_model=solar_incidence_model,
                 solar_time_model=solar_time_model,
-                time_offset_global=time_offset_global,
-                hour_offset=hour_offset,
                 solar_constant=solar_constant,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
@@ -373,8 +365,6 @@ def calculate_photovoltaic_power_output_series(
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
@@ -412,8 +402,6 @@ def calculate_photovoltaic_power_output_series(
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
@@ -656,8 +644,6 @@ def calculate_photovoltaic_power_output_series_multi(
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -733,10 +719,6 @@ def calculate_photovoltaic_power_output_series_multi(
         Solar incidence model, by default SolarIncidenceModel.jenco
     solar_time_model : SolarTimeModel, optional
         Solar time model, by default SOLAR_TIME_ALGORITHM_DEFAULT
-    time_offset_global : float, optional
-        Time offset value, by default 0
-    hour_offset : float, optional
-        Hour offset value, by default 0
     solar_constant : float, optional
         Solar constant, by default SOLAR_CONSTANT
     perigee_offset : float, optional
@@ -810,8 +792,6 @@ def calculate_photovoltaic_power_output_series_multi(
             solar_position_model=solar_position_model,
             solar_incidence_model=solar_incidence_model,
             solar_time_model=solar_time_model,
-            time_offset_global=time_offset_global,
-            hour_offset=hour_offset,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
@@ -865,8 +845,6 @@ def calculate_photovoltaic_power_output_series_multi(
                     solar_position_model=solar_position_model,
                     solar_incidence_model=solar_incidence_model,
                     solar_time_model=solar_time_model,
-                    time_offset_global=time_offset_global,
-                    hour_offset=hour_offset,
                     solar_constant=solar_constant,
                     perigee_offset=perigee_offset,
                     eccentricity_correction_factor=eccentricity_correction_factor,
