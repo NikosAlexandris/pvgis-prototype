@@ -28,7 +28,7 @@ from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 import numpy as np
 from pandas import DatetimeIndex
 from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.caching import custom_hashkey
 
 
 def get_days_per_year(years):

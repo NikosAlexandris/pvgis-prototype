@@ -18,7 +18,7 @@ from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.hardcodings import check_mark
 from pvgisprototype.api.series.hardcodings import x_mark
 from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 
 
