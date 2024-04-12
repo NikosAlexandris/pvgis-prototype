@@ -16,7 +16,7 @@ from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import MINUTES
 from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
