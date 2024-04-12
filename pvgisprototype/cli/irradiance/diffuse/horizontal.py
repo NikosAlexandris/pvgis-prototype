@@ -12,8 +12,8 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_horizontal_irradiance_time_series
-from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_time_series
+from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude

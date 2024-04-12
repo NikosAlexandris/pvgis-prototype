@@ -17,7 +17,7 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.irradiance.direct import calculate_direct_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.direct.normal import calculate_direct_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress
