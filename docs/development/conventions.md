@@ -19,7 +19,17 @@ tags:
        commit
 ```
 
-See [conventionalcommits.org][conventionalcommits]
+## Messages
+
+Meaningful git commit messages are _important_!
+Please have a read at [cbea.ms/git-commit](https://cbea.ms/git-commit/)
+
+## Convention
+
+Our commit messages should be both human and machine readable.
+To this end, we follow the lightweight convention on top of commit messages
+specified in [conventionalcommits.org][conventionalcommits].
+The convention follows simple rules to create an explicit commit history.
 
 [conventionalcommits]: https://www.conventionalcommits.org/en/v1.0.0/
 
