@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the diffuse inclined irradiance component over a
+location for a period in time.
+"""
+
 from typing import Annotated
 from typing import Optional
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel

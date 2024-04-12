@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the global horizontal irradiance component over a
+location for a period in time.
+"""
+
 from typing import Annotated, Optional
 from rich import print
 from datetime import datetime
