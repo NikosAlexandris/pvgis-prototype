@@ -1,3 +1,7 @@
+"""
+CLI module to calculate the solar declination angle for a location and moment in time.
+"""
+
 from rich import print
 from typing import Annotated
 from typing import Optional

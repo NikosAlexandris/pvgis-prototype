@@ -1,5 +1,5 @@
 """
-Solar time
+Typer definitions for input parameters related to Solar time
 """
 
 import typer

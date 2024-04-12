@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the solar altitude angle parameters over a
+location and a moment in time.
+"""
+
 from typing import Annotated
 from typing import Optional
 from typing import List
