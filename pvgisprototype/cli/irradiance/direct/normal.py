@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the direct normal irradiance component over a
+location for a period in time.
+"""
+
 from typing import Annotated, Optional
 from pathlib import Path
 from datetime import datetime

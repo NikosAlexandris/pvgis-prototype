@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the global (shortwave) inclined irradiance over a
+location for a period in time.
+"""
+
 from typing import Annotated, Optional
 from datetime import datetime
 from pathlib import Path

@@ -1,3 +1,7 @@
+"""
+CLI module to calculate the solar zenith angle for a location and a single moment in time.
+"""
+
 from typing import Annotated
 from typing import Optional
 from typing import List

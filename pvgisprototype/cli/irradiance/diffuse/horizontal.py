@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the diffuse horizontal irradiance component over a
+location for a period in time.
+"""
+
 from rich import print
 from typing import Annotated
 from typing import Optional

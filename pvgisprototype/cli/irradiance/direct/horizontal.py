@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the direct horizontal irradiance component over a
+location for a period in time.
+"""
+
 import typer
 from pvgisprototype.api.irradiance.direct import calculate_direct_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
