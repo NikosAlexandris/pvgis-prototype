@@ -10,7 +10,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
 from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAzimuthTimeSeriesInputModel
 from pvgisprototype import Longitude

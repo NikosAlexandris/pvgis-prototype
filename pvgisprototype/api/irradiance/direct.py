@@ -117,7 +117,7 @@ from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pandas import DatetimeIndex
 from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
 from rich import print
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
