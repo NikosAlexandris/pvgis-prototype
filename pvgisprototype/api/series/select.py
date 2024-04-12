@@ -12,7 +12,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.api.series.utilities import select_location_time_series
-from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.utilities import get_scale_and_offset
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.hardcodings import check_mark
@@ -34,7 +34,7 @@ def select_time_series(
     remap_to_month_start: Optional[bool] = False,
     # convert_longitude_360: bool = False,
     mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
+    neighbor_lookup: MethodForInexactMatches = None,
     tolerance: Optional[float] = 0.1, # Customize default if needed
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,

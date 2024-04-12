@@ -16,7 +16,7 @@ from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -215,7 +215,7 @@ async def get_photovoltaic_power_series_advanced(
     wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
     spectral_factor_series: Optional[SpectralFactorSeries] = fastapi_dependable_spectral_factor_series,
     # spectral_factor_series: Optional[Path] = Query(SPECTRAL_FACTOR_DEFAULT),
-    neighbor_lookup: Annotated[MethodsForInexactMatches, fastapi_query_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
+    neighbor_lookup: Annotated[MethodForInexactMatches, fastapi_query_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Annotated[Optional[float], fastapi_query_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[Optional[bool], fastapi_query_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
@@ -363,7 +363,7 @@ async def get_photovoltaic_power_series(
     wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
     spectral_factor_series: Optional[SpectralFactorSeries] = fastapi_dependable_spectral_factor_series,
     # spectral_factor_series: Optional[Path] = Query(SPECTRAL_FACTOR_DEFAULT),
-    # neighbor_lookup: Annotated[MethodsForInexactMatches, fastapi_query_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
+    # neighbor_lookup: Annotated[MethodForInexactMatches, fastapi_query_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
     # tolerance: Annotated[Optional[float], fastapi_query_tolerance] = TOLERANCE_DEFAULT,
     # mask_and_scale: Annotated[Optional[bool], fastapi_query_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
     # linke_turbidity_factor_series: Annotated[float, fastapi_query_linke_turbidity_factor_series] = LINKE_TURBIDITY_DEFAULT,
@@ -495,7 +495,7 @@ async def get_photovoltaic_power_series_monthly_average(
     # wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
     spectral_factor_series: Optional[SpectralFactorSeries] = fastapi_dependable_spectral_factor_series,
     # spectral_factor_series: Optional[Path] = Query(SPECTRAL_FACTOR_DEFAULT),
-    # neighbor_lookup: Annotated[MethodsForInexactMatches, fastapi_query_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
+    # neighbor_lookup: Annotated[MethodForInexactMatches, fastapi_query_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
     # tolerance: Annotated[Optional[float], fastapi_query_tolerance] = TOLERANCE_DEFAULT,
     # mask_and_scale: Annotated[Optional[bool], fastapi_query_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
     # linke_turbidity_factor_series: Annotated[float, fastapi_query_linke_turbidity_factor_series] = LINKE_TURBIDITY_DEFAULT,
@@ -627,7 +627,7 @@ async def get_photovoltaic_power_output_series_multi(
     wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
     # global_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_global_horizontal_irradiance] = None,
     # direct_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_direct_horizontal_irradiance] = None,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, fastapi_query_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
+    neighbor_lookup: Annotated[MethodForInexactMatches, fastapi_query_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Annotated[Optional[float], fastapi_query_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[Optional[bool], fastapi_query_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
@@ -757,7 +757,7 @@ async def get_photovoltaic_power_output_series_multi(
     # global_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_global_horizontal_irradiance] = None,
     # direct_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_direct_horizontal_irradiance] = None,
     mask_and_scale: Annotated[Optional[bool], fastapi_query_mask_and_scale] = False,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, fastapi_query_neighbor_lookup] = None,
+    neighbor_lookup: Annotated[MethodForInexactMatches, fastapi_query_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], fastapi_query_tolerance] = TOLERANCE_DEFAULT,
     in_memory: Annotated[bool, fastapi_query_in_memory] = False,
     dtype: str = DATA_TYPE_DEFAULT,

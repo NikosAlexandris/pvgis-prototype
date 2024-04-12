@@ -58,7 +58,7 @@ from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import DEGREES
 from pvgisprototype import Irradiance
@@ -80,7 +80,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
     global_horizontal_component: Optional[Path] = None,
     direct_horizontal_component: Optional[Path] = None,
     mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
+    neighbor_lookup: MethodForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
     apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,

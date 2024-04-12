@@ -11,7 +11,7 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.shortwave import calculate_global_horizontal_irradiance_time_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
@@ -105,7 +105,7 @@ def get_global_horizontal_irradiance_time_series(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    neighbor_lookup: Annotated[MethodsForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
+    neighbor_lookup: Annotated[MethodForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,

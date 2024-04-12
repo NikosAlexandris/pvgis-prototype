@@ -20,7 +20,7 @@ from pvgisprototype import PhotovoltaicPower
 from pvgisprototype import PhotovoltaicPowerMultipleModules
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import SolarDeclinationModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
@@ -129,7 +129,7 @@ def calculate_photovoltaic_power_output_series(
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
-    neighbor_lookup: MethodsForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
+    neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
@@ -628,7 +628,7 @@ def calculate_photovoltaic_power_output_series_multi(
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
+    neighbor_lookup: MethodForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -689,7 +689,7 @@ def calculate_photovoltaic_power_output_series_multi(
         Series of wind speed values, by default np.array(WIND_SPEED_DEFAULT)
     mask_and_scale : bool, optional
          If True, applies masking and scaling to the input data, by default False
-    neighbor_lookup : MethodsForInexactMatches, optional
+    neighbor_lookup : MethodForInexactMatches, optional
         Coordinates proximity setting, by default None
     tolerance : Optional[float], optional
         Tolerance, by default TOLERANCE_DEFAULT

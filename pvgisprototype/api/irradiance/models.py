@@ -7,7 +7,7 @@ class DirectIrradianceComponents(str, Enum):
     on_inclined_surface = 'inclined'
 
 
-class MethodsForInexactMatches(str, Enum):
+class MethodForInexactMatches(str, Enum):
     none = None # only exact matches
     pad = 'pad' # ffill: propagate last valid index value forward
     backfill = 'backfill' # bfill: propagate next valid index value backward
