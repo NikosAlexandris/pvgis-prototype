@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the reflected irradiance component over a
+location for a period in time.
+"""
+
 import typer
 from typing import Annotated
 from typing import Optional

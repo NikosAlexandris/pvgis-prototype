@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the solar incidence angle for a solar surface at a
+location, orientation, tilt and moment in time.
+"""
+
 from typing import Annotated
 from typing import Optional
 from typing import List

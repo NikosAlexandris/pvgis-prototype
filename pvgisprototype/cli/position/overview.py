@@ -1,3 +1,7 @@
+"""
+CLI module for an overview of solar position parameters for a location and a single moment in time.
+"""
+
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 import typer

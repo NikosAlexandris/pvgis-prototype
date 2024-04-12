@@ -1,3 +1,8 @@
+"""
+API module to calculate the global (shortwave) irradiance over a
+location for a period in time.
+"""
+
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -91,6 +96,10 @@ from pvgisprototype import Irradiance
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
+from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 
 
 @log_function_call
@@ -112,9 +121,9 @@ def calculate_global_horizontal_irradiance_time_series(
     # horizon_heights: List[float]="Array of horizon elevations.")] = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = False,
-    log: int = 0,
-    fingerprint: bool = False,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """
     Calculate the global horizontal irradiance (GHI)
@@ -252,6 +261,8 @@ def calculate_global_inclined_irradiance_time_series(
     longitude: float,
     latitude: float,
     elevation: float,
+    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     timestamps: Optional[datetime] = None,
     timezone: ZoneInfo | None = None,
     global_horizontal_irradiance: Optional[Path] = None,
@@ -260,13 +271,11 @@ def calculate_global_inclined_irradiance_time_series(
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
     in_memory: bool = False,
-    surface_tilt: Optional[float] = 45,
-    surface_orientation: Optional[float] = 180,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Optional[float] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Optional[bool] = True,
+    apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
@@ -278,9 +287,9 @@ def calculate_global_inclined_irradiance_time_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
-    verbose: int = False,
-    log: int = 0,
-    fingerprint: bool = False,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """
     Calculate the global horizontal irradiance (GHI)

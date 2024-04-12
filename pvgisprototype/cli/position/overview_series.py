@@ -1,3 +1,8 @@
+"""
+CLI module to calculate and overview the solar position parameters over a
+location for a period in time.
+"""
+
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 import typer
