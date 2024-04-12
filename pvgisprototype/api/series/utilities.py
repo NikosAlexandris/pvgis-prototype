@@ -15,7 +15,7 @@ from enum import Enum
 from pathlib import Path
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.hardcodings import check_mark
 from pvgisprototype.api.series.hardcodings import x_mark
@@ -199,7 +199,7 @@ def select_location_time_series(
     time_series: Path = None,
     longitude: Longitude = None,
     latitude: Latitude = None,
-    neighbor_lookup: MethodsForInexactMatches = MethodsForInexactMatches.nearest,
+    neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
     tolerance: float = 0.1,
     mask_and_scale: bool = False,
     in_memory: bool = False,

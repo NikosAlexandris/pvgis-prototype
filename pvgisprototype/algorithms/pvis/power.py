@@ -13,7 +13,7 @@ from pvgisprototype.api.position.incidence_series import model_solar_incidence_t
 from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_inclined_irradiance_time_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
@@ -51,7 +51,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
     spectrally_resolved_global_horizontal_irradiance_series: Optional[Path] = None, #global_spectral_radiation,  # g_rad_spec
     spectrally_resolved_direct_horizontal_irradiance_series: Optional[Path] = None, # direct_spectral_radiation,  # d_rad_spec,
     mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
+    neighbor_lookup: MethodForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
@@ -293,7 +293,7 @@ def calculate_spectral_photovoltaic_power_output(
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),  # pres_temperature ?
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
-    neighbor_lookup: MethodsForInexactMatches = None,
+    neighbor_lookup: MethodForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
     surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,

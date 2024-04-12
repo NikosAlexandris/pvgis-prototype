@@ -7,7 +7,7 @@ from pathlib import Path
 from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
 from pvgisprototype.web_api.dependencies import process_series_timestamp
-from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.series.select import select_time_series
@@ -26,7 +26,7 @@ async def select(
     frequency: Optional[str] = Query('H'),
     end_time: Optional[datetime] = Query(None),
     mask_and_scale: bool = Query(False),
-    neighbor_lookup: MethodsForInexactMatches = Query(None),
+    neighbor_lookup: MethodForInexactMatches = Query(None),
     tolerance: Optional[float] = Query(TOLERANCE_DEFAULT),
     in_memory: bool = Query(False),
     statistics: bool = Query(False),
