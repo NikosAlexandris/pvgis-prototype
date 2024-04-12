@@ -21,8 +21,6 @@ from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamp
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
-from pvgisprototype.cli.typer.timing import typer_option_global_time_offset
-from pvgisprototype.cli.typer.timing import typer_option_hour_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
@@ -82,8 +80,6 @@ def solar_time(
     solar_time_model: Annotated[List[SolarTimeModel], typer_option_solar_time_model] = [SolarTimeModel.skyfield],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     verbose: Annotated[int, typer_option_verbose]= 0,
 ):
     """Calculate the solar time.
@@ -119,7 +115,6 @@ def solar_time(
         solar_time_models=solar_time_model,  # keep the CLI simple
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
         verbose=verbose,
     ) 
     solar_time_table = Table(
