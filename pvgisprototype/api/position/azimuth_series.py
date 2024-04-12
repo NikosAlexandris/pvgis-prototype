@@ -42,8 +42,6 @@ def model_solar_azimuth_time_series(
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,

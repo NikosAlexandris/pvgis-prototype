@@ -31,8 +31,6 @@ from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
-from pvgisprototype.cli.typer.timing import typer_option_global_time_offset
-from pvgisprototype.cli.typer.timing import typer_option_hour_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_argument_solar_constant
 # from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
@@ -108,8 +106,6 @@ def get_diffuse_horizontal_irradiance_time_series(
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -141,8 +137,6 @@ def get_diffuse_horizontal_irradiance_time_series(
         refracted_solar_zenith=refracted_solar_zenith,
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
