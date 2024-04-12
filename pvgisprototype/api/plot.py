@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 from pandas import DatetimeIndex
 from pandas import Timestamp
-from pvgisprototype.api.series.models import MethodsForInexactMatches
+from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
