@@ -13,7 +13,7 @@ from math import pi
 import numpy as np
 from rich import print
 from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT

@@ -21,7 +21,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from cachetools import cached
-from pvgisprototype.algorithms.caching import custom_hashkey
+from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
