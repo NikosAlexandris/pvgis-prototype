@@ -14,17 +14,6 @@ typer_option_solar_time_model = typer.Option(
     show_choices=True,
     case_sensitive=False,
     rich_help_panel=rich_help_panel_solar_time,
-    # default_factory=[SolarTimeModel.skyfield],
-)
-typer_option_global_time_offset = typer.Option(
-    help='Global time offset',
-    rich_help_panel=rich_help_panel_solar_time,
-    # default_factory=0,
-)
-typer_option_hour_offset = typer.Option(
-    help='Hour offset',
-    rich_help_panel=rich_help_panel_solar_time,
-    # default_factory=0
 )
 typer_argument_true_solar_time = typer.Argument(
     help='The apparent (or true) solar time in decimal hours on a 24 hour base',
@@ -36,6 +25,5 @@ typer_argument_hour_angle = typer.Argument(
     help="Solar hour angle in radians",
     min=0,
     max=1,
-    # default_factory=None,
     show_default=False,
 )

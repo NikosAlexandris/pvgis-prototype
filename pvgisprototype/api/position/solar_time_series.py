@@ -26,8 +26,8 @@ def model_solar_time_time_series(
     refracted_solar_zenith: float = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
+    time_offset_global: float = 0,  # for `pvgis`
+    hour_offset: float = 0,  # for `pvgis`
     time_output_units: str = "minutes",
     angle_units: str = RADIANS,
     verbose: int = 0,
@@ -53,6 +53,8 @@ def model_solar_time_time_series(
         pass
 
     if solar_time_model.value == SolarTimeModel.pvgis:
+
+        # Requires : time_offset_global, hour_offset
 
         pass
 
