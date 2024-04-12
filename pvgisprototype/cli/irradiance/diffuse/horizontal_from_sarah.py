@@ -27,8 +27,8 @@ from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.cli.typer.output import typer_option_index
 from pvgisprototype.cli.typer.output import typer_option_fingerprint
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet
-from pvgisprototype.api.irradiance.diffuse import read_horizontal_irradiance_components_from_sarah
-from pvgisprototype.api.irradiance.diffuse import calculate_diffuse_horizontal_component_from_sarah
+from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
+from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import calculate_diffuse_horizontal_component_from_sarah
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT

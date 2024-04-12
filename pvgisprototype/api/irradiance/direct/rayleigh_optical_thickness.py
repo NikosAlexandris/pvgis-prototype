@@ -1,0 +1,315 @@
+"""
+This Python module is part of PVGIS' API. It implements functions to calculate
+the direct solar irradiance.
+
+_Direct_ or _beam_ irradiance is one of the main components of solar
+irradiance. It comes perpendicular from the Sun and is not scattered before it
+irradiates a surface.
+
+During a cloudy day the sunlight will be partially absorbed and scattered by
+different air molecules. The latter part is defined as the _diffuse_
+irradiance. The remaining part is the _direct_ irradiance.
+"""
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+from devtools import debug
+from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from math import sin
+from math import asin
+from math import cos
+from math import atan
+import numpy as np
+from numpy import ndarray
+from typing import Annotated
+from typing import Optional
+from typing import Union
+from typing import Sequence
+from typing import List
+from pathlib import Path
+from pvgisprototype import SolarAltitude
+from pvgisprototype import RefractedSolarAltitude
+from pvgisprototype import OpticalAirMass
+from pvgisprototype import RayleighThickness
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import Elevation
+from pvgisprototype import Irradiance
+from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import AdjustElevationInputModel
+from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
+from pvgisprototype.api.position.models import validate_model
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
+from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
+from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
+from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
+# from pvgisprototype.api.utilities.progress import progress
+# from rich.progress import Progress
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.cli.print import print_irradiance_table_2
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
+from pvgisprototype.constants import TITLE_KEY_NAME
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import TOLERANCE_DEFAULT
+from pvgisprototype.constants import SURFACE_TILT_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import SOLAR_CONSTANT_COLUMN_NAME
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import PERIGEE_OFFSET_COLUMN_NAME
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
+from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
+from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
+from pvgisprototype.constants import LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME
+from pvgisprototype.constants import OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
+from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
+from pvgisprototype.constants import OPTICAL_AIR_MASS_COLUMN_NAME
+from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
+from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
+from pvgisprototype.constants import DEGREES
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import IRRADIANCE_SOURCE_COLUMN_NAME
+from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
+from pvgisprototype.constants import HOFIERKA_2002
+from pvgisprototype.constants import LONGITUDE_COLUMN_NAME
+from pvgisprototype.constants import LATITUDE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE
+from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import LOSS_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
+from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
+from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import INCIDENCE_DEFINITION
+from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
+from pandas import DatetimeIndex
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.validation.hashing import generate_hash
+from rich import print
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
+from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
+
+
+@log_function_call
+@validate_with_pydantic(AdjustElevationInputModel)
+def adjust_elevation(
+    elevation: float,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
+):
+    """Modifier component for the solar altitude as per Hofierka, 2002
+
+    This function implements a modifier component for the solar altitude for
+    the given elevation described by Hofierka, 2002 [1]_
+
+    Notes
+    -----
+    In PVGIS C source code:
+
+        elevationCorr = exp(-sunVarGeom->z_orig / 8434.5);
+
+    References
+    ----------
+    .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
+
+    """
+    adjusted_elevation = np.array(np.exp(-elevation.value / 8434.5), dtype=dtype)
+
+    log_data_fingerprint(
+        data=adjusted_elevation,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+
+    return Elevation(value=adjusted_elevation, unit="meters")
+
+
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
+def calculate_refracted_solar_altitude_time_series(
+    solar_altitude_series: SolarAltitude,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = 0,
+    log: int = 0,
+) -> RefractedSolarAltitude:
+    """Adjust the solar altitude angle for atmospheric refraction.
+
+    Adjust the solar altitude angle for atmospheric refraction for a time
+    series.
+    
+    Notes
+    -----
+    This function :
+    - requires solar altitude values in degrees.
+    - The output _should_ expectedly be of the same `dtype` as the input
+      `solar_altitude_series` array.
+
+    """
+    atmospheric_refraction = (
+        0.061359
+        * (
+            0.1594
+            + 1.123 * solar_altitude_series.degrees
+            + 0.065656 * np.power(solar_altitude_series.degrees, 2)
+        )
+        / (
+            1
+            + 28.9344 * solar_altitude_series.degrees
+            + 277.3971 * np.power(solar_altitude_series.degrees, 2)
+        )
+    )
+    refracted_solar_altitude_series = (
+        solar_altitude_series.degrees + atmospheric_refraction
+    )
+
+    log_data_fingerprint(
+        data=refracted_solar_altitude_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    return RefractedSolarAltitude(
+        value=refracted_solar_altitude_series,  # ensure output is of input dtype !
+        unit=DEGREES,
+    )
+
+
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
+@validate_with_pydantic(CalculateOpticalAirMassTimeSeriesInputModel)
+def calculate_optical_air_mass_time_series(
+    elevation: float,
+    refracted_solar_altitude_series: RefractedSolarAltitude,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
+) -> OpticalAirMass:
+    """Approximate the relative optical air mass.
+
+    Approximate the relative optical air mass for a time series.
+
+    This function implements the algorithm described by Minzer et al. [1]_ 
+    and Hofierka [2]_ (equation 5) in which the relative optical air mass
+    (unitless) is defined as follows :
+
+        m = (p/p0) / (sin h0_ref + 0.50572 (h0_ref + 6.07995)^(- 1.6364))
+    
+        where :
+
+        - h0_ref is the corrected solar altitude h0 in degrees by the
+          atmospheric refraction component ∆h0_ref:
+
+    References
+    ----------
+    .. [1] Minzer, A., Champion, K. S. W., & Pond, H. L. (1959). 
+           The ARDC Model Atmosphere. Air Force Surveys in Geophysics, 115. AFCRL.
+
+    .. [2] Hofierka, 2002
+
+    """
+    adjusted_elevation = adjust_elevation(elevation.value)
+    degrees_plus_offset = refracted_solar_altitude_series.degrees + 6.07995
+    # Handle negative values subjected to np.power()
+    power_values = np.where(
+        degrees_plus_offset > 0, np.power(degrees_plus_offset, -1.6364), 0
+    )
+    optical_air_mass_series = adjusted_elevation.value / (
+        np.sin(refracted_solar_altitude_series.radians)  # in radians for NumPy
+        + 0.50572 * power_values
+    )
+
+    log_data_fingerprint(
+        data=optical_air_mass_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    return OpticalAirMass(
+        value=optical_air_mass_series,
+        unit=OPTICAL_AIR_MASS_UNIT,
+    )
+
+
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
+def calculate_rayleigh_optical_thickness_time_series(
+    optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = 0,
+) -> RayleighThickness:
+    """Calculate the Rayleigh optical thickness.
+
+    Calculate Rayleigh optical thickness for a time series.
+
+    """
+    rayleigh_thickness_series = np.zeros_like(optical_air_mass_series.value, dtype=dtype)
+    smaller_than_20 = optical_air_mass_series.value <= 20
+    larger_than_20 = optical_air_mass_series.value > 20
+    rayleigh_thickness_series[smaller_than_20] = 1 / (
+        6.6296
+        + 1.7513 * optical_air_mass_series.value[smaller_than_20]
+        - 0.1202 * np.power(optical_air_mass_series.value[smaller_than_20], 2)
+        + 0.0065 * np.power(optical_air_mass_series.value[smaller_than_20], 3)
+        - 0.00013 * np.power(optical_air_mass_series.value[smaller_than_20], 4)
+    )
+    rayleigh_thickness_series[larger_than_20] = 1 / (
+        10.4 + 0.718 * optical_air_mass_series.value[larger_than_20]
+    )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    log_data_fingerprint(
+        data=rayleigh_thickness_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+    return RayleighThickness(
+        value=rayleigh_thickness_series,
+        unit=RAYLEIGH_OPTICAL_THICKNESS_UNIT,
+    )

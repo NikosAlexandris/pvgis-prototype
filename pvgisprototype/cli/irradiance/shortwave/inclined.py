@@ -6,7 +6,7 @@ location for a period in time.
 from typing import Annotated, Optional
 from datetime import datetime
 from pathlib import Path
-from pvgisprototype.api.irradiance.shortwave import calculate_global_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.shortwave.inclined import calculate_global_inclined_irradiance_time_series
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import SolarPositionModel

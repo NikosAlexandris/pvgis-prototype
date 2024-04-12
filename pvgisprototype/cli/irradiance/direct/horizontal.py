@@ -4,9 +4,7 @@ location for a period in time.
 """
 
 import typer
-from pvgisprototype.api.irradiance.direct import calculate_direct_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
+from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype import LinkeTurbidityFactor

@@ -1,5 +1,5 @@
 from typing import List
-from pvgisprototype.api.irradiance.diffuse import calculate_term_n_time_series
+from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_term_n_time_series
 from numpy import array as numpy_array
 
 
