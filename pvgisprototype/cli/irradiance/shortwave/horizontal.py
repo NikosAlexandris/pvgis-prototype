@@ -12,7 +12,7 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shortwave import calculate_global_horizontal_irradiance_time_series
+from pvgisprototype.api.irradiance.shortwave.horizontal import calculate_global_horizontal_irradiance_time_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_elevation
