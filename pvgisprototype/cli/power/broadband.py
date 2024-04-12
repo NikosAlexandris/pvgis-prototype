@@ -39,8 +39,6 @@ from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_i
 from pvgisprototype.cli.typer.irradiance import typer_option_global_horizontal_irradiance
 from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
-from pvgisprototype.cli.typer.timing import typer_option_global_time_offset
-from pvgisprototype.cli.typer.timing import typer_option_hour_offset
 from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer.time_series import typer_option_tolerance
@@ -92,7 +90,6 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
-from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
 from pvgisprototype.constants import ENERGY_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
@@ -104,7 +101,6 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
-from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 
@@ -169,8 +165,6 @@ def photovoltaic_power_output_series(
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -249,8 +243,6 @@ def photovoltaic_power_output_series(
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
         solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
@@ -363,8 +355,6 @@ def photovoltaic_power_output_series_multi(
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
-    time_offset_global: Annotated[float, typer_option_global_time_offset] = 0,
-    hour_offset: Annotated[float, typer_option_hour_offset] = 0,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -453,8 +443,6 @@ def photovoltaic_power_output_series_multi(
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
         solar_time_model=solar_time_model,
-        time_offset_global=time_offset_global,
-        hour_offset=hour_offset,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,

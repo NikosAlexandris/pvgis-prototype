@@ -177,8 +177,6 @@ def calculate_solar_azimuth(
     refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    time_offset_global: float = 0,
-    hour_offset: float = 0,
     angle_output_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ) -> List:
@@ -197,8 +195,6 @@ def calculate_solar_azimuth(
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
                 solar_time_model=solar_time_model,
-                time_offset_global=time_offset_global,
-                hour_offset=hour_offset,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 verbose=verbose,
