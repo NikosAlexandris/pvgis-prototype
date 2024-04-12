@@ -8,7 +8,7 @@ from pvgisprototype.api.irradiance.direct import calculate_direct_normal_irradia
 from pvgisprototype.api.irradiance.direct import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.direct import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
-from pvgisprototype.api.irradiance.models import MethodsForInexactMatches
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import OpticalAirMass
 from pathlib import Path
