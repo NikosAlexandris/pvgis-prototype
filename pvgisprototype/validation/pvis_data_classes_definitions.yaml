@@ -439,7 +439,7 @@ Irradiance:
   location:
     type: Tuple[Longitude, Latitude]
     description: Geographic coordinates (latitude, longitude) of the PV installation.
-    initial: (0.0, 0.0)
+    initial:
   elevation:
     type: Optional[Elevation]
   surface_orientation:
@@ -454,8 +454,8 @@ Irradiance:
     initial:
   data_source:
     type: str
-    description: The solar radiation database used for calculations, e.g., PVGIS-SARAH2.
-    initial: PVGIS-SARAH2
+    description: Source of the solar radiation data
+    initial:
   components:
     type: dict
     initial: {}
@@ -474,7 +474,7 @@ PhotovoltaicPower:
     initial: 
   desription:
     type: str
-    initial: "The height of a geographic point above a fixed reference point, commonly the mean sea level."
+    initial:
   location:
     type: Tuple[Longitude, Latitude]
     description: Geographic coordinates (latitude, longitude) of the PV installation.
@@ -497,8 +497,8 @@ PhotovoltaicPower:
     description: The solar power received per unit area at a given moment, expressed in watts per square meter (W/m²).
   irradiance_data_source:
     type: str
-    description: The solar radiation database used for calculations, e.g., PVGIS-SARAH2.
-    initial: PVGIS-SARAH2
+    description: Source of the solar radiation data
+    initial:
   pv_technology:
     type: str
     description: Type of photovoltaic technology, e.g., Crystalline silicon.
@@ -511,7 +511,7 @@ PhotovoltaicPower:
     initial: {}
 
 PhotovoltaicPowerMultipleModules:
-  value:
+  series:
     type: ndarray
     initial:
   unit:
@@ -522,17 +522,16 @@ PhotovoltaicPowerMultipleModules:
     initial: 
   desription:
     type: str
-    initial: "The height of a geographic point above a fixed reference point, commonly the mean sea level."
+    initial:
   location:
     type: Tuple[Longitude, Latitude]
     description: Geographic coordinates (latitude, longitude) of the PV installation.
-    initial: (0.0, 0.0)
+    initial:
   elevation:
     type: Elevation
-  surface_orientation:
+  surface_position_angle_pairs:
     type: list
-  surface_tilt:
-    type: list
+    desription: Pairs of surface orientation and tilt angles
   solar_positioning_algorithm:
     type: str
     initial:
@@ -545,8 +544,8 @@ PhotovoltaicPowerMultipleModules:
     description: The solar power received per unit area at a given moment, expressed in watts per square meter (W/m²).
   irradiance_data_source:
     type: str
-    description: The solar radiation database used for calculations, e.g., PVGIS-SARAH2.
-    initial: PVGIS-SARAH2
+    description: Source of the solar radiation data
+    initial:
   pv_technology:
     type: str
     description: Type of photovoltaic technology, e.g., Crystalline silicon.
@@ -557,5 +556,6 @@ PhotovoltaicPowerMultipleModules:
   components:
     type: dict
     initial: {}
-  modules:
+  individual_series:
     type: list
+    initial: []
