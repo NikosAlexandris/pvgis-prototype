@@ -49,7 +49,9 @@ def uniplot_data_array_time_series(
     if resample_large_series:
         list_extra_data_arrays = [extra_array.resample(time='1M').mean() for extra_array in list_extra_data_arrays]
 
-    y_series = [data_array] + list_extra_data_arrays
+    y_series = (
+        [data_array] + list_extra_data_arrays if list_extra_data_arrays else data_array
+    )
 
     if isinstance(data_array, float):
         logger.error(f"{exclamation_mark} Aborting as I cannot plot the single float value {float}!", alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
@@ -62,6 +64,7 @@ def uniplot_data_array_time_series(
         # unit = getattr(photovoltaic_power_output_series, 'units', None)
         supertitle = getattr(data_array, 'long_name', 'Untitled')
         label = getattr(data_array, 'name', None)
+        list_extra_data_arrays = list_extra_data_arrays if list_extra_data_arrays is not None else []
         label_2 = [getattr(extra_array, 'name', None) if extra_array is not None else None for extra_array in list_extra_data_arrays]
         unit = getattr(data_array, 'units', None)
         print(f'[reverse]Uniplot[/reverse]')
