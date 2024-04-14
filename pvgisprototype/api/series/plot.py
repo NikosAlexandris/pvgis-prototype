@@ -208,7 +208,7 @@ def plot_series(
                     )
 
     # Identity
-
+    plt.subplots_adjust(bottom=0.18)
     data_source = 'Data Source'
     fig.text(
             0.5,
