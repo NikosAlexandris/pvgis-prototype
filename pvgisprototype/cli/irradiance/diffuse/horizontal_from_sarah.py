@@ -201,7 +201,7 @@ def get_diffuse_horizontal_component_from_sarah(
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         uniplot_data_array_time_series(
             data_array=diffuse_horizontal_irradiance_series.value,
-            data_array_2=None,
+            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Diffuse Horizontal Irradiance Series',
             title = 'Diffuse Horizontal Irradiance Series',
