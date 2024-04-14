@@ -215,7 +215,7 @@ def get_global_horizontal_irradiance_time_series(
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         uniplot_data_array_time_series(
             data_array=global_horizontal_irradiance_series.value,
-            data_array_2=None,
+            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Global Horizontal Irradiance Series',
             title = 'Global Horizontal Irradiance Series',

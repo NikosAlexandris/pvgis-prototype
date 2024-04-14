@@ -226,7 +226,7 @@ def get_global_inclined_irradiance_time_series(
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         uniplot_data_array_time_series(
             data_array=global_inclined_irradiance_series.value,
-            data_array_2=None,
+            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Global Inclined Irradiance Series',
             title = 'Global Inclined Irradiance Series',
