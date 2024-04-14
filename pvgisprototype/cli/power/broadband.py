@@ -503,9 +503,10 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
+        individual_series = [series.value for series in photovoltaic_power_output_series.individual_series]
         uniplot_data_array_time_series(
-            data_array=photovoltaic_power_output_series.value,
-            data_array_2=None,
+            data_array=photovoltaic_power_output_series.series,
+            list_extra_data_arrays=individual_series,
             lines=True,
             supertitle = 'Photovoltaic Power Output Series',
             title="Photovoltaic power output",
