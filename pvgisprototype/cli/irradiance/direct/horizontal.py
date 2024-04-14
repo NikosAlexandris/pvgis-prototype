@@ -217,7 +217,7 @@ def get_direct_horizontal_irradiance_time_series(
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         uniplot_data_array_time_series(
             data_array=direct_horizontal_irradiance_series.value,
-            data_array_2=None,
+            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Direct Horizontal Irradiance Series',
             title = 'Direct Horizontal Irradiance Series',
