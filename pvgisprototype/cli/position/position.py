@@ -24,7 +24,7 @@ from pvgisprototype.cli.position.incidence import incidence
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
-state = {"verbose": False}
+# state = {"verbose": False}
 
 
 app = typer.Typer(

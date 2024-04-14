@@ -25,9 +25,9 @@ from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.time_series import typer_argument_time_series
 from pvgisprototype.cli.typer.time_series import typer_option_data_variable
 from pvgisprototype.cli.typer.time_series import typer_option_time_series
-from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer.time_series import typer_option_tolerance
+from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_in_memory
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_lines
@@ -36,6 +36,7 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot_unit
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.plot import typer_option_tufte_style
 from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.output import typer_option_output_filename
@@ -88,7 +89,6 @@ from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
 from pvgisprototype.constants import GROUPBY_DEFAULT
 from pvgisprototype.constants import CSV_PATH_DEFAULT
-from pvgisprototype.cli.typer.statistics import typer_option_groupby
 
 
 app = typer.Typer(
