@@ -265,7 +265,7 @@ def spectral_photovoltaic_power_output_series(
     #     from pvgisprototype.api.plot import uniplot_data_array_time_series
     #     uniplot_data_array_time_series(
     #         data_array=photovoltaic_power_output_series.value,
-    #         data_array_2=None,
+    #         list_extra_data_arrays=None,
     #         lines=True,
     #         supertitle = 'Photovoltaic Power Output Series',
     #         title="Photovoltaic power output",
