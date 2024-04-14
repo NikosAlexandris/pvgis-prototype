@@ -137,7 +137,6 @@ from pvgisprototype.cli.typer.output import typer_option_command_metadata
 from pvgisprototype.cli.typer.data_processing import typer_option_dtype
 from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 from pvgisprototype.cli.typer.data_processing import typer_option_multi_thread
-from pvgisprototype.cli.typer.output import typer_option_panels_output
 
 
 @log_function_call
@@ -380,7 +379,6 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
-    panels: Annotated[bool, typer_option_panels_output] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -514,32 +512,11 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             label = 'Photovoltaic Power',
             label_2 = None,
             unit = POWER_UNIT,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
-    if panels:
-        from pvgisprototype.cli.print import print_components_in_panels
-        print_components_in_panels(
-            series=photovoltaic_power_output_series.components,
-            individual_series=photovoltaic_power_output_series.individual_series,
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            # timestamp=timestamp,
-            # timezone=timezone,
-            # table=solar_position,
-            # rounding_places=rounding_places,
-            # timing=True,
-            # declination=True,
-            # hour_angle=True,
-            # zenith=True,
-            # altitude=True,
-            # azimuth=True,
-            # incidence=False,  # Add Me ?
-            # user_requested_timestamp=user_requested_timestamp, 
-            # user_requested_timezone=user_requested_timezone
-        )
     if metadata:
         from pvgisprototype.cli.print import print_command_metadata
         import click
