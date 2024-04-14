@@ -16,13 +16,18 @@ tags:
 
 The fundamental structure of the command line interface is
 a `command`
-_following_ the name of the program `pvgis-prototype`
-and a series of _required_ and _optional_ input parameters.
+_following_ the name of the program **`pvgis-prototype`**
+and a series of _required positional_ and _optional_ input parameters.
 Like so :
 
 ```bash
 pvgis-prototype <command> <1> <2> <3> <--option-a 'a'> <--option-b 'b'>
 ```
+
+The numbers `<1>`, `<2>` and `<3>` index the required _positional_ parameters.
+These parameters need no prefixing.
+However,
+they are required to be given strictly in the pre-specified order.
 
 ## Command Structure
 
@@ -31,7 +36,7 @@ the `power`, `irradiance` and `position` commands,
 require _at the very least_
 the three basic input parameters
 that describe the **location of a solar surface**.
-Hence a more descriptive representation of basic command structure is :
+Hence a more descriptive representation of the basic command structure is :
 
 ``` bash
 pvgis-prototype <command> <Longitude> <Latitude> <Elevation>
