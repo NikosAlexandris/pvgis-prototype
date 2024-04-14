@@ -27,8 +27,9 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
 
 from pvgisprototype.cli.power import power
-from pvgisprototype.cli import series
 from pvgisprototype.cli.irradiance import irradiance
+from pvgisprototype.cli.meteo import meteo
+from pvgisprototype.cli import series
 from pvgisprototype.cli.position import position
 from pvgisprototype.cli import time
 from pvgisprototype.cli import surface
@@ -94,6 +95,12 @@ app.add_typer(
 app.add_typer(
     irradiance.app,
     name="irradiance",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series,
+)
+app.add_typer(
+    meteo.app,
+    name="meteo",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series,
 )
