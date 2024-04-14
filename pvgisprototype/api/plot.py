@@ -18,7 +18,7 @@ from pvgisprototype.log import log_function_call
 @log_function_call
 def uniplot_data_array_time_series(
     data_array,
-    data_array_2,
+    list_extra_data_arrays,
     # longitude: float,
     # latitude: float,
     # time_series_2: Path = None,
@@ -47,7 +47,9 @@ def uniplot_data_array_time_series(
         data_array = data_array.resample(time='1M').mean()
 
     if resample_large_series:
-        data_array_2 = data_array_2.resample(time='1M').mean()
+        list_extra_data_arrays = [extra_array.resample(time='1M').mean() for extra_array in list_extra_data_arrays]
+
+    y_series = [data_array] + list_extra_data_arrays
 
     if isinstance(data_array, float):
         logger.error(f"{exclamation_mark} Aborting as I cannot plot the single float value {float}!", alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
@@ -60,13 +62,13 @@ def uniplot_data_array_time_series(
         # unit = getattr(photovoltaic_power_output_series, 'units', None)
         supertitle = getattr(data_array, 'long_name', 'Untitled')
         label = getattr(data_array, 'name', None)
-        label_2 = getattr(data_array_2, 'name', None) if data_array_2 is not None else None
+        label_2 = [getattr(extra_array, 'name', None) if extra_array is not None else None for extra_array in list_extra_data_arrays]
         unit = getattr(data_array, 'units', None)
         print(f'[reverse]Uniplot[/reverse]')
         try:
             plot(
                 # xs=timestamps,
-                ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
+                ys=y_series,
                 legend_labels = [label, label_2] if label_2 else label,
                 lines=lines,
                 title=title if title else supertitle,
