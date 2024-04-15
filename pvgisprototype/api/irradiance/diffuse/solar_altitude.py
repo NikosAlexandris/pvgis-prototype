@@ -136,6 +136,8 @@ def calculate_term_n_time_series(
 def calculate_diffuse_sky_irradiance_time_series(
     n_series: List[float],
     surface_tilt: Optional[float] = np.radians(45),
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     log: int = 0,
 ):
     """Calculate the diffuse sky irradiance
@@ -169,9 +171,8 @@ def calculate_diffuse_sky_irradiance_time_series(
         - pi
         * sin(surface_tilt / 2) ** 2
     ) * n_series
-
-    # return np.array(diffuse_sky_irradiance_series, dtype=dtype)
-    return diffuse_sky_irradiance_series
+    return np.array([diffuse_sky_irradiance_series], dtype=dtype)
+    # return diffuse_sky_irradiance_series
 
 
 @log_function_call
