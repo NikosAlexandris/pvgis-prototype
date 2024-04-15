@@ -62,7 +62,7 @@ class ArrayShapeModel(BaseModel):
 class ArrayInitialisationModel(BaseModel):
     initialisation_method: str = 'zeros' 
 
-    @validator('initialisation_method')
+    @field_validator('initialisation_method')
     def check_init_method(cls, v):
         valid_methods = ['zeros', 'ones', 'empty']
         if v not in valid_methods:
@@ -87,7 +87,7 @@ class ArrayTypeModel(BaseModel):
 class ArrayBackendModel(BaseModel):
     array_backend: str = ARRAY_BACKEND_DEFAULT
 
-    @validator('array_backend')
+    @field_validator('array_backend')
     def check_backend(cls, v, values, **kwargs):
         if values.get('use_gpu') and CUPY_ENABLED:
             return 'CUPY'
@@ -173,9 +173,6 @@ class BaseTimestampSeriesModel(BaseModel):
 
     @field_validator('timestamps')
     def check_type(cls, value):
-        # if isinstance(value, np.ndarray):
-        #     if value.dtype.type != np.datetime64:
-        #         raise ValueError("NumPy array must be of dtype 'datetime64'")
         if not isinstance(value, DatetimeIndex|Timestamp) :
             raise TypeError("Timestamps must be a Pandas DatetimeIndex or Timestamp object")
         return value
