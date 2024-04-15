@@ -14,7 +14,6 @@ throught PVGIS' command line tools.
 Or, vice versa,
 an introduction to the capabilities of PVGIS
 through the basic theory of photovoltaic power output.
-
 Each section is a _stand-alone tutorial_
 yet altogether they form a _theoretical walk-through_
 via hands-on practical examples.
