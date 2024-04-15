@@ -84,17 +84,29 @@ pvgis-prototype <command> <Longitude> <Latitude> <Elevation> <Orientation> <Tilt
 
 ## Examples that work
 
+### Without a timestamp
+
 Example that works with all positional parameters yet without a timestamp:
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined 8 45 214 170 44
 ```
 
+As mentioned above, this command will run with your computer's current local time and zone. We can see for example which timestamp the command ran for by adding some verbosity :
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance global inclined 8 45 214 170 44 -v
+```
+
+### For a single timestamp
+
 Example that works with all positional parameters including a timestamp:
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00'
 ```
+
+### For an arbitrary number of single timestamps
 
 Example that works with all positional parameters including multiple timestamps:
 
@@ -110,36 +122,40 @@ pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00,
 
 ## Examples that fail !
 
-Example that fails :
-
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 170 '2010-01-27 12:00:00'
-```
+It is useful to get a sense of things that don't work too.
+Following are some examples that fail
+and ideally should return meaninfgul error messages.
 
 !!! danger
+
+    Example that fails :
+
+    ``` bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype irradiance global inclined 8 45 214 170 '2010-01-27 12:00:00'
+    ```
 
     In the above example, the surface tilt angle is missing, followed by a
     user-requested timestamp. Due to the nature of the command line positional
     arguments, it is expected to follow strictly their order.
 
-Another example that fails :
-
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 44 '2010-01-27 12:00:00'
-```
-
 !!! danger
+
+    Another example that fails :
+
+    ``` bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype irradiance global inclined 8 45 214 44 '2010-01-27 12:00:00'
+    ```
 
     In the above example, the surface orientation angle is missing,
     followed by a user-requested timestamp.
 
-One more example that fails :
-
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 '2010-01-27 12:00:00'
-```
-
 !!! danger
+
+    One more example that fails :
+
+    ``` bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype irradiance global inclined 8 45 214 '2010-01-27 12:00:00'
+    ```
 
     In the last example that fails,
     both the surface orientation angle and tilt angles are missing followed by
