@@ -93,10 +93,10 @@ pages:
   script:
     - export http_proxy=$PROXY https_proxy=$PROXY no_proxy=$NOPROXY
     - pip install --upgrade pip
-    - pip install --user -r requirements.txt
-    - pip install --user .
-    - export PATH=$PATH:$HOME/.local/bin
-    - mkdocs build --verbose --site-dir public
+    - pip install pdm
+    - pdm install
+    - export FORCE_COLORS=1
+    - pdm run mkdocs build --site-dir public
   allow_failure: true
   artifacts:
     paths:
