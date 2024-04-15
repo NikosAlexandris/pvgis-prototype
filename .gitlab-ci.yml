@@ -95,8 +95,9 @@ pages:
     - pip install --upgrade pip
     - pip install pdm
     - pdm install
+    - export PATH=$PATH:$HOME/.local/bin
     - export FORCE_COLORS=1
-    - pdm run mkdocs build --site-dir public
+    - pdm run mkdocs build --verbose --site-dir public
   allow_failure: true
   artifacts:
     paths:
