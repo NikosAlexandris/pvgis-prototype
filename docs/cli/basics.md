@@ -14,6 +14,8 @@ tags:
     various commands, required arguments and optional parameters
     as well as some insight into generating arbitrary series of Timestamps.
 
+## Generic Structure
+
 The fundamental structure of the command line interface is
 a `command`
 _following_ the name of the program **`pvgis-prototype`**
@@ -24,7 +26,7 @@ and _named optional_ input parameters. Like so :
 pvgis-prototype <command> <1> <2> <3> [4] [5] <--option-a 'a'> <--option-b 'b'>
 ```
 
-## Positional parameters
+### Positional parameters
 
 - The numbers `<1>`, `<2>` and `<3>` enumerate the ***required*** _positional_ parameters.
 - The numbers `[4]` and `[5]` enumerate are ***optional*** positional_ parameters.
@@ -33,7 +35,7 @@ Positional parameters need no prefixing.
 However,
 they are required to be given strictly in the pre-specified order.
 
-## Optional parameters
+### Optional parameters
 
 Optional parameters need
 
@@ -42,7 +44,6 @@ Optional parameters need
 2. **not** to be given in a specific order, i.e. asking for `-v --uniplot` is
    the same as `--uniplot -v`.
 
-## Generic Structure
 
 ### Location
 
