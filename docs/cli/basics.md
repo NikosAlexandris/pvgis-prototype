@@ -17,19 +17,34 @@ tags:
 The fundamental structure of the command line interface is
 a `command`
 _following_ the name of the program **`pvgis-prototype`**
-and a series of _required positional_ and _optional_ input parameters.
-Like so :
+and a series of _required positional_, _optional positional_
+and _named optional_ input parameters. Like so :
 
 ```bash
-pvgis-prototype <command> <1> <2> <3> <--option-a 'a'> <--option-b 'b'>
+pvgis-prototype <command> <1> <2> <3> [4] [5] <--option-a 'a'> <--option-b 'b'>
 ```
 
-The numbers `<1>`, `<2>` and `<3>` index the required _positional_ parameters.
-These parameters need no prefixing.
+## Positional parameters
+
+- The numbers `<1>`, `<2>` and `<3>` enumerate the ***required*** _positional_ parameters.
+- The numbers `[4]` and `[5]` enumerate are ***optional*** positional_ parameters.
+
+Positional parameters need no prefixing.
 However,
 they are required to be given strictly in the pre-specified order.
 
-## Command Structure
+## Optional parameters
+
+Optional parameters need
+
+1. to be _named_, for example `--verbose` or its equivalent simpler form
+  `-v`.
+2. **not** to be given in a specific order, i.e. asking for `-v --uniplot` is
+   the same as `--uniplot -v`.
+
+## Generic Structure
+
+### Location
 
 With a few exceptions,
 the `power`, `irradiance` and `position` commands,
@@ -42,7 +57,7 @@ Hence a more descriptive representation of the basic command structure is :
 pvgis-prototype <command> <Longitude> <Latitude> <Elevation>
 ```
 
-## Orientation and Tilt
+### Orientation and Tilt
 
 What follows after the location parameters
 is the **pair of `orientation` and `tilt` angles**
@@ -55,7 +70,7 @@ pvgis-prototype <command> <Longitude> <Latitude> <Elevation> <Orientation> <Tilt
 If not provided,
 the default pre-set values are `orientation = 180` and `tilt = 45` degrees.
 
-## Time
+### Time
 
 Of course,
 _time_ is the first variable that determines the position of the sun in the sky
@@ -118,6 +133,18 @@ The same as above, with additional verbosity :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' -v
+```
+
+### Mixing optional parameters
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' -v --quiet --uniplot
+```
+
+is the same as
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' --quiet --uniplot --verbose
 ```
 
 ## Examples that fail !
