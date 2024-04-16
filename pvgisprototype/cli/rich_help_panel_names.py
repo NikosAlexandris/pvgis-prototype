@@ -34,6 +34,7 @@ rich_help_panel_irradiance_series = 'External solar irradiance time series'
 
 # Ancillary data
 
+rich_help_panel_meteorology = 'Meteorology'
 rich_help_panel_meteorological_series = 'External meteorological time series'
 
 # Data selection options
