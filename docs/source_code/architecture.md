@@ -23,7 +23,7 @@ from diagrams.programming.framework import FastAPI
 numpy_icon = "docs/logos/numpylogo.png"
 xarray_icon = "docs/logos/Xarray_Logo_RGB_Final.png"
 pydantic_icon = "docs/logos/pydantic_logo.png"
-loguru_icon = "docs/logos/loguru_icon.png"
+loguru_icon = "docs/logos/loguru_logo.png"
 typer_icon = "docs/logos/typer_logo-margin.png"
 rich_icon = "docs/logos/rich_logo.png"
 
