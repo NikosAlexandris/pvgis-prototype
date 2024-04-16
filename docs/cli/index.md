@@ -41,7 +41,7 @@ Following is an overview of the tools available.
       |--------------------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------------------------|
       | :octicons-command-palette-24: [**`time`**]()     |                                                               | :material-sun-clock: Calculate the solar time for a location and moment                    |
       | :octicons-command-palette-24: [**`position`**]() |                                                               | :material-sun-angle: Calculate solar geometry parameters for a location and moment in time |
-      |                                                  | :octicons-command-palette-24: [**`intro`**](position/intro.md) | :fontawesome-solid-info: A short primer on solar geometry
+      |                                                  | :octicons-command-palette-24: [**`intro`**](position/introduction.md) | :fontawesome-solid-info: A short primer on solar geometry
       | :octicons-command-palette-24: [**`surface`**]()  |                                                               | 󰶛  Calculate solar surface geometry parameters for a location and moment in time           |
 
 !!! note "Diagnostics"
