@@ -52,7 +52,6 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
 from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
