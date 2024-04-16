@@ -78,7 +78,7 @@ _time_ is the first variable that determines the position of the sun in the sky
 and therefore impacts each and every calculation that depends on it.
 Nonetheless, in PVGIS, it comes as the last required positional parameter!
 The importance of _time_ is such that we have a dedicated section called
-[Timestamps](cli/timestamps.md) !
+[Timestamps](timestamps.md) !
 
 ``` bash
 pvgis-prototype <command> <Longitude> <Latitude> <Elevation> <Orientation> <Tilt> <Timestamp>
