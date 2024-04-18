@@ -16,6 +16,9 @@ from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import TypicalMeteorologicalMonthWeightingScheme
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import get_typical_meteorological_month_weighting_scheme
 
 
 def calculate_daily_univariate_statistics(data_array):
@@ -42,8 +45,8 @@ def calculate_ecdf(sample):
     """Calculate the empirical cumulative distribution function (CDF) of the data, ensuring unique coordinates."""
     from scipy.stats import ecdf
 
-    values, probabilities = ecdf(sample)
-    return xr.DataArray(probabilities, coords=[values], dims=["quantile"])
+    ecdfs = ecdf(sample)
+    return xr.DataArray(ecdfs.cdf.probabilities, coords=[ecdfs.cdf.quantiles], dims=["quantile"])
 
 
 def calculate_yearly_monthly_cdfs(
@@ -76,7 +79,7 @@ def calculate_long_term_monthly_cdfs(
     )
 
 
-def calculate_finkelstein_schaefer_statistic(
+def calculate_finkelstein_schafer_statistic(
     yearly_monthly_cdfs,
     long_term_monthly_cdfs,
 ):
@@ -84,10 +87,22 @@ def calculate_finkelstein_schaefer_statistic(
     return abs(yearly_monthly_cdfs - long_term_monthly_cdfs).sum(dim="quantile")
 
 
-def calculate_weighted_sum(finkelstein_schaefer_statistic, weights):
-    """Calculate weighted sum of Finkelstein-Schaefer statistics for each variable."""
-    ws = sum(finkelstein_schaefer_statistic[var] * weight for var, weight in weights.items())
+def calculate_weighted_sum(finkelstein_schafer_statistic, weights):
+    """Calculate weighted sum of Finkelstein-Schafer statistics for each variable."""
+    ws = sum(finkelstein_schafer_statistic[var] * weight for var, weight in weights.items())
     return ws
+
+
+import matplotlib.pyplot as plt
+def plot_data_distribution(distribution, variable):
+    plt.figure(figsize=(10, 6))
+    # Flatten the data for simplicity
+    flattened_data = distribution.values.flatten()
+    plt.hist(flattened_data, bins=100, alpha=0.75)
+    plt.title(f'Distribution of {variable}')
+    plt.xlabel('Value')
+    plt.ylabel('Frequency')
+    plt.show()
 
 
 def calculate_tmy(
@@ -105,6 +120,7 @@ def calculate_tmy(
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
+    weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the Typical Meteorological Year.
@@ -201,43 +217,50 @@ def calculate_tmy(
     logger.debug(f'Selected time series data array: {location_series_data_array}')
 
     # 2
-    daily_statistics = calculate_daily_univariate_statistics(location_series_data_array)
+    daily_statistics = calculate_daily_univariate_statistics(
+            data_array=location_series_data_array,
+    )
     logger.debug(f'Daily univariate statistics: {daily_statistics}')
-    print(f'Daily univariate statistics: {daily_statistics}')
 
     # 3
-    yearly_monthly_cdfs = calculate_yearly_monthly_cdfs(daily_statistics, 'mean')
+    yearly_monthly_cdfs = calculate_yearly_monthly_cdfs(
+            dataset=daily_statistics,
+            variable='mean',
+    )
     logger.debug(f'Monthly CDFs: {yearly_monthly_cdfs}')
-    print(f'Monthly CDFs: {yearly_monthly_cdfs}')
 
     # 4
-    long_term_monthly_cdfs = calculate_long_term_monthly_cdfs(daily_statistics, 'mean')
+    long_term_monthly_cdfs = calculate_long_term_monthly_cdfs(
+            dataset=daily_statistics,
+            variable='mean',
+            reference_array=yearly_monthly_cdfs,
+    )
     logger.debug(f'Long term monthly CDF: {long_term_monthly_cdfs}')
-    print(f'Long term monthly CDF: {long_term_monthly_cdfs}')
 
-    finkelstein_schaefer_statistic = calculate_finkelstein_schaefer_statistic(
+    finkelstein_schafer_statistic = calculate_finkelstein_schafer_statistic(
             yearly_monthly_cdfs=yearly_monthly_cdfs,
             long_term_monthly_cdfs=long_term_monthly_cdfs,
             )
-    logger.debug(f'FS scores: {finkelstein_schaefer_statistic}')
-    print(f'FS scores: {finkelstein_schaefer_statistic}')
+    logger.debug(f'Finkelstein-Schafer scores: {finkelstein_schafer_statistic}')
 
-    fs_weights = xr.DataArray([1.23]*12, dims=["month"], coords={"month": range(1, 13)})
-    logger.debug(f'FS weights: {fs_weights}')
-    print(f'FS weights: {fs_weights}')
+    mean_dry_bulb_temperature = "Mean Dry Bulb Temperature"
+    typical_meteorological_month_weights = (
+        get_typical_meteorological_month_weighting_scheme(
+            weighting_scheme, variable=mean_dry_bulb_temperature
+        )
+    )
+    logger.debug(f'FS weights: {typical_meteorological_month_weights}')
     
-    weighted_finkelstein_schaefer_statistic = finkelstein_schaefer_statistic * fs_weights
-    logger.debug(f'Weighted FS scores: {weighted_finkelstein_schaefer_statistic}')
-    print(f'Weighted FS scores: {weighted_finkelstein_schaefer_statistic}')
+    weighted_finkelstein_schafer_statistic = finkelstein_schafer_statistic * typical_meteorological_month_weights
+    logger.debug(f'Weighted FS scores: {weighted_finkelstein_schafer_statistic}')
 
-    typical_months = weighted_finkelstein_schaefer_statistic.argmin(dim='month')
+    typical_months = weighted_finkelstein_schafer_statistic.argmin(dim='month')
     logger.debug(f'Typical months: {typical_months}')
-    print(f'Typical months: {typical_months}')
 
     # Assuming typical_months correctly holds datetime indices now
-    tmy_data = [daily_univariate_statistics.sel(time=month) for month in typical_months]
-    
-    tmy_data = [daily_univariate_statistics.sel(time=typical_months.sel(month=month)) for month in range(1, 13)]
-    tmy = xr.concat(tmy_data, dim='time')
+    # tmy_data = [daily_statistics.sel(time=month) for month in typical_months]
+    # tmy_data = [daily_statistics.sel(time=typical_months.sel(month=month)) for month in range(1, 13)]
+    # tmy = xr.concat(tmy_data, dim='time')
 
-    return tmy 
+    # return tmy 
+    return typical_months
