@@ -44,6 +44,9 @@ from pvgisprototype.constants import CSV_PATH_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.algorithms.tmy.tmy import calculate_tmy
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import TypicalMeteorologicalMonthWeightingScheme
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import get_typical_meteorological_month_weighting_scheme
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
 
 
 def calculate_degree_days(
@@ -101,6 +104,7 @@ def tmy(
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Generate the Typical Meteorological Year
@@ -125,6 +129,7 @@ def tmy(
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         in_memory=in_memory,
+        weighting_scheme=weighting_scheme,
         verbose=verbose,
     )
     print(f'{tmy=}')
