@@ -106,6 +106,7 @@ def tmy(
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
+    plot: bool = False,
 ):
     """Generate the Typical Meteorological Year
 
@@ -131,5 +132,6 @@ def tmy(
         in_memory=in_memory,
         weighting_scheme=weighting_scheme,
         verbose=verbose,
+        plot=plot,
     )
     print(f'{tmy=}')
