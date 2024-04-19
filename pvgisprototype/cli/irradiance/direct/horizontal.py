@@ -149,7 +149,9 @@ def get_direct_horizontal_irradiance_time_series(
 
     References
     ----------
-    .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
+    .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name,
+    vol(issue), pages.
+
     """
     direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
         longitude=longitude,
