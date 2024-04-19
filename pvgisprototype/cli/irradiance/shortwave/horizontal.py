@@ -33,7 +33,6 @@ from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_r
 from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
-from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
@@ -108,7 +107,6 @@ def get_global_horizontal_irradiance_time_series(
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,
-    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -145,9 +143,7 @@ def get_global_horizontal_irradiance_time_series(
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        apply_angular_loss_factor=apply_angular_loss_factor,
         solar_position_model=solar_position_model,
-        solar_incidence_model=solar_incidence_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
