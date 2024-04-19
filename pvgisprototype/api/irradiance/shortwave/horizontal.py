@@ -28,7 +28,6 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.solar_time_series import model_solar_time_time_series
 from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
