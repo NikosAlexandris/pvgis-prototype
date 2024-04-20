@@ -71,6 +71,7 @@ nav:
     - Architecture: source_code/architecture.md
     - Dependencies: source_code/dependencies.md
     - Algorithms: source_code/algorithms.md
+    - Custom Data Classes: source_code/custom_data_classes.md
     - API: source_code/api.md
     - CLI: source_code/cli.md
     - Web API: source_code/web_api.md
