@@ -90,4 +90,4 @@ and a predefined efficiency and other parameters.
     the global inclined irradiance can be broken down in
     its _inclined_ irradiance components
     `Direct ∡`, `Diffuse ∡` and `Reflected ∡`.
-    See the complete list at [Symbols](cli/symbols.md)
+    See the complete list at [Symbols](../cli/symbols.md)
