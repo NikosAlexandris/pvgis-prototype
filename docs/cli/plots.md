@@ -18,8 +18,16 @@ pvgis-prototype series plot \
     --neighbor-lookup nearest \
     --start-time '2001-01-01' \
     --end-time '2020-01-31' \
-    --tufte-style
+    --tufte-style \
+    --output-filename 'example_series_plot' \
+    --no-variable-name-as-suffix
 ```
+
+<figure markdown="span">
+  <!-- ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){ loading=lazy } -->
+  ![Example series plot](example_series_plot_20050101000000_20200131000000.png)
+  <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption>
+</figure>
 
 ## Uniplot
 
