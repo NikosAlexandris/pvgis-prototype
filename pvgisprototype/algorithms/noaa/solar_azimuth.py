@@ -164,48 +164,28 @@ def calculate_solar_azimuth_time_series_noaa(
     Notes
     -----
 
-                   #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-    # cos(180 - θ) = - ----------------------------------------------------------
-                   #            cos(latitude) * sin(solar_zenith)
+                     sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    cos(180 - θ) = - ----------------------------------------------------------
+                              cos(latitude) * sin(solar_zenith)
 
 
-    # or after converting cos(180 - θ) to - cos(θ)
+    or after converting cos(180 - θ) to - cos(θ) :
 
-                   #   sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-        # - cos(θ) = - ------------------------------------------------------------
-                   #              cos(latitude) * sin(solar_zenith)
-
-
-    # or :
-
-                   # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-          # cos(θ) = ----------------------------------------------------------
-                   #             cos(latitude) * sin(solar_zenith)
-
-                          # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-          # θ = arccos(  -------------------------------------------------------------- )
-                            #      cos(latitude) * sin(solar_zenith)
+                 sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    - cos(θ) = - ------------------------------------------------------------
+                            cos(latitude) * sin(solar_zenith)
 
 
-    # or else, from the first equation, after multiplying by -1 :
+    or :
 
-                     # sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-    # - cos(180 - θ) = ----------------------------------------------------------
-                     #          cos(latitude) * sin(solar_zenith)
-
-
-    # or after multiplying by -1 again :
-
-                   # sin(solar_declination) - sin(latitude) * cos(solar_zenith)
-    # cos(180 - θ) = ----------------------------------------------------------
-                   #            cos(latitude) * sin(solar_zenith)
+             sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    cos(θ) = ----------------------------------------------------------
+                         cos(latitude) * sin(solar_zenith)
 
 
-    # or after converting cos(180 - θ) to - cos(θ)
-
-               # sin(solar_declination) - sin(latitude) * cos(solar_zenith)
-    # - cos(θ) = ----------------------------------------------------------
-               #            cos(latitude) * sin(solar_zenith)
+                    sin(latitude) * cos(solar_zenith) - sin(solar_declination)
+    θ = arccos(  -------------------------------------------------------------- )
+                              cos(latitude) * sin(solar_zenith)
 
     """
     solar_declination_series = calculate_solar_declination_time_series_noaa(
