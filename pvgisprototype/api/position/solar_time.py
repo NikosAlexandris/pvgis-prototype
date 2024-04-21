@@ -109,7 +109,6 @@ def calculate_solar_time(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     time_offset_global: float = 0,
-    time_output_units: str = "minutes",
     verbose: int = 0,
 ) -> List:
     """Calculates the solar time using all models and returns the results in a table.
@@ -138,7 +137,6 @@ def calculate_solar_time(
         results.append({
             TIME_ALGORITHM_NAME: solar_time_model.value,
             SOLAR_TIME_NAME: solar_time,
-            UNITS_NAME: time_output_units,  # Don't trust me -- Redesign Me!
         })
 
     return results
