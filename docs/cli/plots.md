@@ -23,14 +23,82 @@ pvgis-prototype series plot \
     --no-variable-name-as-suffix
 ```
 
+![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){height=400px}
 
-<figure markdown="span">
-  <!-- ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){ loading=lazy } -->
-  ![Example series plot](example_series_plot_20050101000000_20200131000000.png){height=400px}
-  <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption>
-</figure>
+<!-- <figure markdown="span"> -->
+<!--   <!-1- ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){ loading=lazy } -1-> -->
+<!--   ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){height=400px} -->
+<!--   <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption> -->
+<!-- </figure> -->
 
 ## Uniplot
+
+### A day of power output
+
+We can plot in the terminal the photovoltaic power for a single day
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    --uniplot
+```
+
+or change slightly the surface tilt
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 180 35 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    --uniplot
+```
+
+### Reading external time series data
+
+We can repeat the same task
+by using SARAH2/3 products
+for the global and direct horizontal irradiance components
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 180 35 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+    --neighbor-lookup nearest \
+    --uniplot
+```
+
+or indeed use also ERA5 time series data for ambient temperature and wind speed
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 180 35 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+    --temperature-series era5_t2m_over_esti_jrc.nc \
+    --wind-speed-series era5_ws2m_over_esti_jrc.nc \
+    --neighbor-lookup nearest \
+    --uniplot
+```
+
+!!! hint "Neighbor lookup ?"
+
+    When reading data from external time series data,
+    it is rather rare that the requested location coordinates truely exist as a
+    data record.  Most likely, we need to ask for the location in the data that
+    is nearest to the coordinates of our interest. There are also other methods
+    for inexact location lookups available through the `--neighbor-lookup`
+    option.
+
+### Multi-year series
+
+Or for 20 years
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
