@@ -40,6 +40,7 @@ nav:
     - cli/plots.md
     - cli/fingerprint.md
     - cli/metadata.md
+    - cli/numpy.md
     - cli/logging.md
     - Power:
       - Introduction: cli/power/introduction.md
