@@ -29,6 +29,7 @@ nav:
     - api/index.md
     - api/api.md
     - api/power.md
+    - api/position.md
   - CLI:
     - cli/index.md
     - cli/features.md
@@ -82,10 +83,13 @@ nav:
     - development/roadmap_and_progress.md
     - development/conventions.md
     - development/optimisation.md
+    - development/contribution_guidelines.md
+    - development/adding_new_features.md
     - development/photovoltaic_performance.md
     - development/solar_irradiance.md
     - development/solar_geometry.md
     - development/topography.md
+    - development/pytest.md
     # - development/state_and_future_of_pvgis.md
     - "<p><i class='fas fa-flask'>&nbsp;</i> Coverage report</p>": coverage.md
   - Tags: includes/tags.md
