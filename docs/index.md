@@ -98,7 +98,7 @@ for systems using various PV (Photo Voltaic) technologies.
 
     ---
 
-    ![](images/languages-in-pvgis.svg)
+    ![](images/languages-in-pvgis.svg){height=100px width=100px}
 
 - __Components__
 
@@ -134,10 +134,15 @@ we offer in-depth guides and discussions on more complex aspects of PVGIS API:
 
 - [API](api/index.md)
 
+
 ## Development
 
-- [Roadmap & Progress](development/roadmap_and_progress.md)
-- [Performance Optimization](development/optimisation.md)
+Interested in contributing or developing new features ?
+Head over to the [Development](development/index.md) section.
+
+- [Conventions](development/conventions.md)
+- [Contribution guidelines](development/contribution_guidelines.md)
+- [Testing](development/pytest.md)
 - [Adding New Features](development/adding_new_features.md)
 
 ### Contributing
@@ -153,7 +158,7 @@ please read our [Contribution Guidelines](development/contribution_guidelines.md
 # Support & Community
 
 If you have questions or need support,
-join our [Community Forum](support/community_forum.md)
+join our [Community Forum](support/forum.md)
 or check out the [FAQ](support/faq.md) section.
 
 Thank you for choosing PVGIS for your solar irradiance calculation needs!
@@ -169,7 +174,7 @@ Thank you for choosing PVGIS for your solar irradiance calculation needs!
 
     Questions and comments can be sent to our mailbox:
 
-    [JRC-PVGIS@ec.europa.eu](JRC-PVGIS@ec.europa.eu)
+    [JRC-PVGIS@ec.europa.eu](mailto:JRC-PVGIS@ec.europa.eu)
 
 - :fontawesome-solid-map-location-dot: __Postal Address__
 
