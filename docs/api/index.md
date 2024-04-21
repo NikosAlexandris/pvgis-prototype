@@ -7,12 +7,11 @@ tags:
   - How-To
 ---
 
-This section contains How-To recipes and simple examples in using the API programmatically.
+This section demonstrates how to use the API programmatically.
 
 !!! seealso "Install me first!"
 
     [Installation instructions](../install/index.md)
-
 
 ## API tree
 
