@@ -194,7 +194,7 @@ and again inspect the `power` output
 >>> print(f'{power=}')
 ```
 
-## Level 2 and 3
+### Level 2 and 3
 
 ```pycon exec="true" session="power-series" source="material-block"
 >>> power_2 = calculate_photovoltaic_power_output_series(
