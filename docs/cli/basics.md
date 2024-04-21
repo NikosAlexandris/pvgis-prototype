@@ -17,23 +17,53 @@ tags:
 ## Generic Structure
 
 The fundamental structure of the command line interface is
-a `command`
+a `command` and a `sub-command`
 _following_ the name of the program **`pvgis-prototype`**
 and a series of _required positional_, _optional positional_
 and _named optional_ input parameters. Like so :
 
 ```bash
-pvgis-prototype <command> <1> <2> <3> [4] [5] <--option-a 'a'> <--option-b 'b'>
+pvgis-prototype <command> <sub-command> <1> <2> <3> [4] [5] <--option-a 'a'> <--option-b 'b'>
 ```
+
+!!! example
+
+    ``` bash
+    pvgis-prototype power broadband 8 45 214 170 44
+    ```
+
+    where :
+
+    - `power` is the command
+    - `broadband` a sub-command
+
+Several commands feature chained `sub-sub-commands`.
+The structure remains the same and a `sub-command` `sub-sub-commands`
+only add up to the `command`
+which indeed follows the generic program name **`pvgis-prototype`** like
+
+```bash
+pvgis-prototype <command> <sub-command> <sub-sub-command> <1> <2> <3> [4] [5] <--option-a 'a'> <--option-b 'b'>
+```
+
+!!! example
+
+    ``` bash
+    pvgis-prototype irradiance global inclined 8 45 214 170 44
+    ```
+    
+    where :
+
+    - `irradiance` is the command
+    - `global` a sub-command
+    - `inclined` a sub-sub-command
 
 ### Positional parameters
 
 - The numbers `<1>`, `<2>` and `<3>` enumerate the ***required*** _positional_ parameters.
-- The numbers `[4]` and `[5]` enumerate are ***optional*** positional_ parameters.
-
-Positional parameters need no prefixing.
-However,
-they are required to be given strictly in the pre-specified order.
+- The numbers `[4]` and `[5]` enumerate two ***optional*** yet _positional_ parameters.
+- Positional parameters need no prefixing. However, they are required to be
+  given strictly in the pre-specified order.
 
 ### Optional parameters
 
@@ -114,7 +144,7 @@ As mentioned above, this command will run with your computer's current local tim
 pvgis-prototype irradiance global inclined 8 45 214 170 44 -v
 ```
 
-### For a single timestamp
+### Single timestamp
 
 Example that works with all positional parameters including a timestamp:
 
@@ -122,7 +152,7 @@ Example that works with all positional parameters including a timestamp:
 pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00'
 ```
 
-### For an arbitrary number of single timestamps
+### Arbitrary number of single timestamps
 
 Example that works with all positional parameters including multiple timestamps:
 
@@ -139,18 +169,28 @@ pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00,
 ### Mixing optional parameters
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' -v --quiet --uniplot
+pvgis-prototype irradiance global inclined \
+    8 45 214 170 44 \
+    '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
+    -v \
+    --quiet \
+    --uniplot
 ```
 
 is the same as
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' --quiet --uniplot --verbose
+pvgis-prototype irradiance global inclined \
+    8 45 214 170 44 \
+    '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
+    --quiet \
+    --uniplot \
+    --verbose
 ```
 
 ## Examples that fail !
 
-It is useful to get a sense of things that don't work too.
+It is useful to get a sense of things that _don't work_ too.
 Following are some examples that fail
 and ideally should return meaninfgul error messages.
 
