@@ -98,7 +98,11 @@ for systems using various PV (Photo Voltaic) technologies.
 
     ---
 
-    ![](images/languages-in-pvgis.svg){height=100px width=100px}
+    ![](images/languages-in-pvgis.svg){align=right height=100px width=100px}
+
+    - English
+    - French  |  German
+    - Spanish  |  Italian
 
 - __Components__
 
