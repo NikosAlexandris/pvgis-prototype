@@ -284,9 +284,17 @@ def photovoltaic_power_output_series(
                 verbose=verbose,
             )
         else:
-            flat_list = photovoltaic_power_output_series.value.flatten().astype(str)
-            csv_str = ','.join(flat_list)
-            print(csv_str)
+            from pvgisprototype.api.utilities.conversions import round_float_values
+            # ------------------------- Better handling of rounding vs dtype ?
+            print(
+                ",".join(
+                    # round_float_values(
+                    #     photovoltaic_power_output_series.value.flatten(),
+                    #     rounding_places,
+                    # ).astype(str)
+                    photovoltaic_power_output_series.value.flatten().astype(str)
+                )
+            )
 
     if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
