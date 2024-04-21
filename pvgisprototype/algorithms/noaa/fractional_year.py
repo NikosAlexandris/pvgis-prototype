@@ -17,6 +17,8 @@ from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.log import logger
@@ -55,8 +57,8 @@ def calculate_fractional_year_time_series_noaa(
     timestamps: Union[datetime, DatetimeIndex],
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> FractionalYear:
     """
     Calculate the fractional year series for a given series of timestamps.
@@ -66,11 +68,17 @@ def calculate_fractional_year_time_series_noaa(
     timestamps : DatetimeIndex
         A Pandas DatetimeIndex representing the timestamps.
 
-    backend : str, optional
-        The backend used for calculations (the default is 'NUMPY').
-    
     dtype : str, optional
         The data type for the calculations (the default is 'float32').
+
+    array_backend : str, optional
+        The backend used for calculations (the default is 'NUMPY').
+
+    verbose: int
+        Verbosity level
+
+    log: int
+        Log level
 
     Returns
     -------
@@ -96,7 +104,7 @@ def calculate_fractional_year_time_series_noaa(
 
     See also
     --------
-    Default data type (`dtype`) and backend for (NumPy) arrays set in
+    Default data type (`dtype`) and backend (`array_backend`) for arrays set in
     `constants.py`.
 
     """

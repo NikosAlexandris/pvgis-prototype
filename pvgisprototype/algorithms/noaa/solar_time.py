@@ -1,3 +1,7 @@
+"""
+The true solar time based on NOAA's General Solar Position Calculations.
+"""
+
 from rich import print
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -16,7 +20,6 @@ from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_tim
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
@@ -24,6 +27,8 @@ from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -45,39 +50,40 @@ def calculate_true_solar_time_noaa(
     ----------
     timestamp: datetime, optional
         The timestamp to calculate offset for
+    
     timezone: str, optional
         The timezone for calculation
-    time_offset: float
-        The time offset for calculation
 
     Returns
     -------
     float: The true solar time
 
-
     Notes
     -----
 
-    Implementation in pysolar:
+    See also
+    --------
+    pysolar
+
+    In pysolar the true solar time is calculated as follows :
 
         ```
         (math.tm_hour(when) * 60 + math.tm_min(when) + 4 * longitude_deg + equation_of_time(math.tm_yday(when)))
         ```
 
-        This means that the time offset is the 
+        in which equation the last part is the time offset
 
         ```
         4 * longitude_deg + equation_of_time(math.tm_yday(when)))
         ```
-        part.
 
     Additional notes:
 
-    From https://gml.noaa.gov/grad/solcalc/solareqns.PDF :
-
-    Next, the true solar time is calculated in the following two equations.
-    First the time offset is found, in minutes, and then the true solar time,
-    in minutes.
+    From NOAA's General Solar Position Calculations
+    
+        "Next, the true solar time is calculated in the following two
+        equations. First the time offset is found, in minutes, and then the
+        true solar time, in minutes."
 
         time_offset = eqtime + 4*longitude – 60*timezone
 
@@ -94,6 +100,11 @@ def calculate_true_solar_time_noaa(
             - hr is the hour (0 - 23),
             - mn is the minute (0 - 59),
             - sc is the second (0 - 59).
+
+    References
+    ----------
+    .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF
+
     """
     time_offset = calculate_time_offset_noaa(
         longitude=longitude,
@@ -123,9 +134,50 @@ def calculate_true_solar_time_time_series_noaa(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> DatetimeIndex:
-    """ """
+    """Calculate the true solar time at a specific geographic locations for a
+
+    Calculate the true solar time at a specific geographic locations for a
+    series of timestamps based on NOAA's General Solar Position Calculations
+    [0]_.
+
+    Parameters
+    ----------
+    timestamp: datetime, optional
+        The timestamp to calculate offset for
+    
+    timezone: str, optional
+        The timezone for calculation
+
+    dtype : str, optional
+        The data type for the calculations (the default is 'float32').
+
+    array_backend : str, optional
+        The backend used for calculations (the default is 'NUMPY').
+
+    verbose: int
+        Verbosity level
+
+    log: int
+        Log level
+
+    Returns
+    -------
+    TrueSolarTime
+
+    Notes
+    -----
+    The true solar time is the sum of the time offset and the true solar time
+    in minutes.
+
+        time_offset = eqtime + 4*longitude – 60*timezone
+
+    References
+    ----------
+    .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF
+
+    """
     time_offset_series = calculate_time_offset_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
