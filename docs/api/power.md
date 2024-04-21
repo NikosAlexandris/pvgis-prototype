@@ -45,13 +45,15 @@ and follow along.
 First, import the `print` function from the `rich` library.
 This will prettify our output !
 
-```pycon exec="true" session="power-series" source="above"
+```pycon exec="true" session="power-series" source="material-block"
 >>> from rich import print
 ```
 
 ## Where ?
 
-```pycon exec="true" session="power-series" source="above"
+Define the geographic location and the positioning of our solar surface
+
+```pycon exec="true" session="power-series" source="material-block"
 >>> latitude = 1
 >>> longitude = 1
 >>> elevation = 214
@@ -64,17 +66,15 @@ This will prettify our output !
 Prepate a series of timestamps as a Pandas DatetimeIndex,
 using _our_ helper function `generate_datetime_series`
 
-```pycon exec="true" session="power-series" source="above"
+```pycon exec="true" session="power-series" source="material-block"
 >>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 
->>> timestamps = generate_datetime_series(
->>> start_time="2010-01-27 08:00:00", end_time="2010-01-27 18:00:00", frequency="h"
->>> )
+>>> timestamps = generate_datetime_series(start_time="2010-01-27 08:00:00", end_time="2010-01-27 18:00:00", frequency="h")
 ```
 
 and the default UTC timezone as a `ZoneInfo` object
 
-```pycon exec="true" session="power-series" source="above"
+```pycon exec="true" session="power-series" source="material-block"
 >>> from zoneinfo import ZoneInfo
 
 >>> utc_zone = ZoneInfo("UTC")
@@ -93,7 +93,7 @@ First, import required modules and custom data classes
 
 Linke turbidity
 
-```pycon exec="true" session="power-series" source="above"
+```pycon exec="true" session="power-series" source="material-block"
 >>> from pvgisprototype import LinkeTurbidityFactor
 
 >>> linke_turbidity_factor_series = LinkeTurbidityFactor(value=1)
@@ -101,7 +101,7 @@ Linke turbidity
 
 Type of the photovoltaic module
 
-```pycon exec="true" session="power-series" source="above"
+```pycon exec="true" session="power-series" source="material-block"
 >>> from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 
 >>> photovoltaic_module = PhotovoltaicModuleModel.CIS_FREE_STANDING
@@ -109,7 +109,7 @@ Type of the photovoltaic module
 
 Temperature and Wind Speed
 
-```pycon exec="true" session="power-series" source="above"
+```pycon exec="true" session="power-series" source="material-block"
 >>> from pvgisprototype import TemperatureSeries, WindSpeedSeries
 
 >>> temperature_series = TemperatureSeries(value=14)
@@ -118,17 +118,17 @@ Temperature and Wind Speed
 
 Spectral factor series
 
-```pycon exec="true" session="power-series" source="above"
+```pycon exec="true" session="power-series" source="material-block"
 >>> from pvgisprototype import SpectralFactorSeries
 >>> spectral_factor_series=SpectralFactorSeries(value=1)
 ```
 
+## Power
+
 Now we can use the API function `calculate_photovoltaic_power_output_series` :
 
-```pycon exec="true" session="power-series" source="above"
->>> from pvgisprototype.api.power.broadband import (
->>>     calculate_photovoltaic_power_output_series,
->>> )
+```pycon exec="true" session="power-series" source="material-block"
+>>> from pvgisprototype.api.power.broadband import (calculate_photovoltaic_power_output_series)
 
 >>> power = calculate_photovoltaic_power_output_series(
 >>>     longitude=longitude,
@@ -146,47 +146,32 @@ Now we can use the API function `calculate_photovoltaic_power_output_series` :
 >>> )
 ```
 
-Inspect the `power` output :
+Inspect the `power` output
 
-```pycon exec="true" session="power-series" source="above"
->>> print(power)
+```pycon exec="true" session="power-series" source="material-block"
+>>> print(f'{power=}')
 ```
 
-or indeed, some of the inner components :
+or indeed, some of the inner components
 
-```pycon exec="true" session="power-series" source="above"
->>> print(f'Photovoltaic power output series : {power.value}')
->>> print()
->>> print(f'Components : {power.components}')
+```pycon exec="true" session="power-series" source="material-block"
+>>> print(f'Photovoltaic power series : {power.value}')
 ```
 
-## CLI
-
-Using the CLI function ?
-
-```pycon exec="true" session="power-series" source="above"
->>> from pvgisprototype.cli.power.broadband import photovoltaic_power_output_series
-
->>> photovoltaic_power_output_series(
->>>     longitude=longitude,
->>>     latitude=latitude,
->>>     elevation=elevation,
->>>     surface_orientation=surface_orientation,
->>>     surface_tilt=surface_tilt,
->>>     timestamps=timestamps,
->>>     timezone=utc_zone,
->>>     linke_turbidity_factor_series=linke_turbidity_factor_series,
->>>     photovoltaic_module=photovoltaic_module,
->>>     spectral_factor_series=spectral_factor_series,
->>>     temperature_series=temperature_series,
->>>     wind_speed_series=wind_speed_series,
->>> )
+```pycon exec="true" session="power-series" source="material-block"
+>>> print(f'Photovoltaic power components : {power.components}')
 ```
+
+## Verbosity
 
 With extra verbosity, which means more details
 
-```pycon exec="true" session="power-series" source="above"
->>> photovoltaic_power_output_series(
+### Level 1
+
+Set `verbosity=1`
+
+```pycon exec="true" session="power-series" source="material-block"
+>>> power = calculate_photovoltaic_power_output_series(
 >>>     longitude=longitude,
 >>>     latitude=latitude,
 >>>     elevation=elevation,
@@ -202,3 +187,56 @@ With extra verbosity, which means more details
 >>>     verbose=1,  # or 2 or 3 and so on...
 >>> )
 ```
+
+and again inspect the `power` output
+
+```pycon exec="true" session="power-series" source="material-block"
+>>> print(f'{power=}')
+```
+
+## Level 2 and 3
+
+```pycon exec="true" session="power-series" source="material-block"
+>>> power_2 = calculate_photovoltaic_power_output_series(
+>>>     longitude=longitude,
+>>>     latitude=latitude,
+>>>     elevation=elevation,
+>>>     surface_orientation=surface_orientation,
+>>>     surface_tilt=surface_tilt,
+>>>     timestamps=timestamps,
+>>>     timezone=utc_zone,
+>>>     linke_turbidity_factor_series=linke_turbidity_factor_series,
+>>>     photovoltaic_module=photovoltaic_module,
+>>>     spectral_factor_series=spectral_factor_series,
+>>>     temperature_series=temperature_series,
+>>>     wind_speed_series=wind_speed_series,
+>>>     verbose=2,  # or 2 or 3 and so on...
+>>> )
+```
+
+```pycon exec="true" session="power-series" source="material-block"
+>>> power_3 = calculate_photovoltaic_power_output_series(
+>>>     longitude=longitude,
+>>>     latitude=latitude,
+>>>     elevation=elevation,
+>>>     surface_orientation=surface_orientation,
+>>>     surface_tilt=surface_tilt,
+>>>     timestamps=timestamps,
+>>>     timezone=utc_zone,
+>>>     linke_turbidity_factor_series=linke_turbidity_factor_series,
+>>>     photovoltaic_module=photovoltaic_module,
+>>>     spectral_factor_series=spectral_factor_series,
+>>>     temperature_series=temperature_series,
+>>>     wind_speed_series=wind_speed_series,
+>>>     verbose=2,  # or 2 or 3 and so on...
+>>> )
+```
+
+```pycon exec="true" session="power-series" source="material-block"
+>>> print(f'{power_2=}')
+>>> print(f'{power_3=}')
+```
+
+!!! seealso "Verbosity"
+
+    [Verbosity](../cli/verbosity.md)
