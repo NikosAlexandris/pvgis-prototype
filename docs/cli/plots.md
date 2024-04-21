@@ -23,9 +23,10 @@ pvgis-prototype series plot \
     --no-variable-name-as-suffix
 ```
 
+
 <figure markdown="span">
   <!-- ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){ loading=lazy } -->
-  ![Example series plot](example_series_plot_20050101000000_20200131000000.png)
+  ![Example series plot](example_series_plot_20050101000000_20200131000000.png){height=400px}
   <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption>
 </figure>
 
