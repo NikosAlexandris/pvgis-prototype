@@ -35,7 +35,6 @@ async def overview_series(
     model: List[SolarTimeModel] = Query([SolarTimeModel.skyfield], description="Model to calculate solar time"),
     apply_atmospheric_refraction: Optional[bool] = Query(True),
     solar_time_model: SolarTimeModel = Query(SolarTimeModel.milne),
-    time_output_units: str = Query('minutes'),
     perigee_offset: float = Query(PERIGEE_OFFSET),
     eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
     angle_output_units: str = Query(RADIANS),
@@ -95,10 +94,6 @@ async def overview_series(
         solar_time_model=solar_time_model,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_offset_global=time_offset_global,
-        # hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )
