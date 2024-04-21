@@ -12,7 +12,9 @@ from typing import List
 from pvgisprototype.constants import RADIANS, DEGREES
 
 
-def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
+def convert_to_radians(
+    ctx: typer.Context, param: typer.CallbackParam, angle: float
+) -> float:
     """Convert floating point angular measurement from degrees to radians."""
     if ctx.resilient_parsing:
         return
@@ -22,12 +24,16 @@ def convert_to_radians(ctx: typer.Context, param: typer.CallbackParam, angle: fl
     return np.radians(angle)
 
 
-def convert_to_degrees(ctx: typer.Context, param: typer.CallbackParam, angle: float) -> float:
+def convert_to_degrees(
+    ctx: typer.Context, param: typer.CallbackParam, angle: float
+) -> float:
     """Convert angle to degrees."""
     if ctx.resilient_parsing:
         return
     if type(angle) != float:
-        raise typer.BadParameter("The input value {angle} for an angular measurement is not of the expected type float!")
+        raise typer.BadParameter(
+            "The input value {angle} for an angular measurement is not of the expected type float!"
+        )
 
     return np.degrees(angle)
 
@@ -48,6 +54,7 @@ def convert_float_to_degrees_if_requested(angle: float, output_units: str) -> fl
 def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
     """Convert angle from radians to degrees if requested"""
     from copy import deepcopy
+
     copy_of_data_class = deepcopy(data_class)
     if output_units == DEGREES and not data_class.unit == DEGREES:
         copy_of_data_class.value = degrees(data_class.value)
@@ -75,6 +82,7 @@ def convert_series_to_degrees_if_requested(
         A list of converted data classes.
     """
     from copy import deepcopy
+
     copy_of_data_class_series = deepcopy(data_class_series)
 
     if angle_output_units == DEGREES:
@@ -127,11 +135,6 @@ def convert_float_to_radians_if_requested(angle: float, output_units: str) -> fl
     return radians(angle) if output_units == RADIANS else angle
 
 
-# def convert_to_radians_if_requested(angle: float, output_units: str) -> float:
-#     """Convert angle from degrees to radians if requested."""
-#     return np.radians(angle) if output_units == 'radians' else angle
-
-
 def convert_to_radians_if_requested(data_input: Any, output_units: str) -> Any:
     """Convert angle from degrees to radians for a single or an array of custom data structures if requested."""
     if output_units != RADIANS:
@@ -147,7 +150,7 @@ def convert_to_radians_if_requested(data_input: Any, output_units: str) -> Any:
             # data_class = replace(data_class, value=radians(data_class.value), unit='radians')
             data_input.value = radians(data_input.value)
             data_input.unit = RADIANS
-            
+
     return data_input
 
 
@@ -193,8 +196,7 @@ def convert_series_to_radians_if_requested(
 
 
 def convert_dictionary_to_table(dictionary):
-    table = Table(show_header=True, header_style="bold magenta",
-                                 box=box.SIMPLE_HEAD)
+    table = Table(show_header=True, header_style="bold magenta", box=box.SIMPLE_HEAD)
     table.add_column("Parameter", style="dim")
     table.add_column("Value")
 
@@ -207,46 +209,21 @@ def convert_dictionary_to_table(dictionary):
 
 
 def round_float_values(obj, decimal_places=3):
+    """Round float values regardless (almost!) of the type of the input object."""
     if isinstance(obj, float):
-        return f"{round(obj, decimal_places):.{decimal_places}f}"
+        return round(obj, decimal_places)
     elif isinstance(obj, dict):
-        for key, value in obj.items():
-            obj[key] = round_float_values(value, decimal_places)
-        return obj
+        return {
+            key: round_float_values(value, decimal_places) for key, value in obj.items()
+        }
     elif isinstance(obj, list):
-        for i, v in enumerate(obj):
-            if isinstance(v, dict):
-                for key, value in v.items():
-                    if isinstance(value, float):
-                        v[key] = f"{round(value, decimal_places):.{decimal_places}f}"
-                    elif isinstance(value, np.ndarray):
-                        v[key] = np.around(value, decimals=decimal_places).astype(str)
-            elif isinstance(v, float):
-                obj[i] = f"{round(v, decimal_places):.{decimal_places}f}"
-        return obj
+        return [round_float_values(item, decimal_places) for item in obj]
     elif isinstance(obj, np.ndarray):
         if obj.dtype == np.bool_:
-            return obj # return as is
-        if obj.dtype.kind in 'if':  # Check for integer ('i') or float ('f') arrays
+            return obj  # Return boolean arrays as is
+        if obj.dtype.kind in "if":  # check for integer ('i') or float ('f') arrays
             return np.around(obj, decimals=decimal_places)
-    else:
-        return obj
-
-
-# def round_float_values(obj, decimal_places=3):
-#     if isinstance(obj, float):
-#         return round(obj, decimal_places)
-#     elif isinstance(obj, list):
-#         for i, v in enumerate(obj):
-#             if isinstance(v, dict):
-#                 for key, value in v.items():
-#                     if isinstance(value, float):
-#                         v[key] = round(value, decimal_places)
-#             elif isinstance(v, float):
-#                 obj[i] = round(v, decimal_places)
-#         return obj
-#     else:
-#         return obj
+    return obj
 
 
 def convert_south_to_north_degrees_convention(azimuth_south_degrees):
