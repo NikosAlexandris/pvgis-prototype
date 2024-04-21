@@ -209,20 +209,23 @@ def convert_dictionary_to_table(dictionary):
 
 
 def round_float_values(obj, decimal_places=3):
-    """Round float values regardless (almost!) of the type of the input object."""
-    if isinstance(obj, float):
+    """Recursively round float attributes in a custom data class or any float."""
+    if isinstance(obj, float) or (isinstance(obj, np.floating)):
         return round(obj, decimal_places)
-    elif isinstance(obj, dict):
-        return {
-            key: round_float_values(value, decimal_places) for key, value in obj.items()
-        }
-    elif isinstance(obj, list):
+
+    if isinstance(obj, np.ndarray) and obj.dtype.kind in "if":
+        return np.around(obj, decimals=decimal_places)
+
+    if isinstance(obj, dict):
+        return {key: round_float_values(value, decimal_places) for key, value in obj.items()}
+    if isinstance(obj, list):
         return [round_float_values(item, decimal_places) for item in obj]
-    elif isinstance(obj, np.ndarray):
-        if obj.dtype == np.bool_:
-            return obj  # Return boolean arrays as is
-        if obj.dtype.kind in "if":  # check for integer ('i') or float ('f') arrays
-            return np.around(obj, decimals=decimal_places)
+
+    if hasattr(obj, "__dict__"):
+        for key, value in vars(obj).items():
+            setattr(obj, key, round_float_values(value, decimal_places))
+        return obj
+
     return obj
 
 
