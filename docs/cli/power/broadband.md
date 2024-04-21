@@ -9,8 +9,6 @@ tags:
   - Broadband Irradiance
 ---
 
-# Broadband irradiance
-
 PVGIS can estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on broadband irradiance, ambient temperature and wind speed.
 
 ## Example
@@ -21,8 +19,6 @@ pvgis-prototype power broadband \
     --start-time '2000-01-01' \
     --end-time '2000-01-02'
 ```
-
-</div>
 
 ### Verbosity levels
 

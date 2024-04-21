@@ -37,6 +37,7 @@ nav:
     - cli/verbosity.md
     - cli/symbols.md
     - cli/timestamps.md
+    - cli/rounding.md
     - cli/plots.md
     - cli/fingerprint.md
     - cli/metadata.md
