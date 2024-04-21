@@ -235,8 +235,8 @@ def plot_series(
             time_string = str(time).replace('-', '')
 
         else:
-            start_time = data_array.time.to_series()[0].strftime('%Y%m%d%H%M%S')
-            end_time = data_array.time.to_series()[-1].strftime('%Y%m%d%H%M%S')
+            start_time = data_array.time.to_series().iloc[0].strftime('%Y%m%d%H%M%S')
+            end_time = data_array.time.to_series().iloc[-1].strftime('%Y%m%d%H%M%S')
             time_string = f'{start_time}_{end_time}'
 
         figure_name = Path(f"{figure_name}_{time_string}")
