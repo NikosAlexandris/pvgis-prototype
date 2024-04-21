@@ -36,7 +36,7 @@ for all operations.
 
     The backend-agnostic array system is yet incomplete!
 
-## Higher precision
+## :material-decimal-increase: Higher precision
 
 While the default output is of type `float32`
 
