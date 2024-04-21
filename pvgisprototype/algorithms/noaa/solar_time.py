@@ -120,8 +120,6 @@ def calculate_true_solar_time_time_series_noaa(
     longitude: Longitude,  # radians
     timestamps: DatetimeIndex,
     timezone: Optional[ZoneInfo],
-    time_output_units: str = "minutes",
-    angle_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
