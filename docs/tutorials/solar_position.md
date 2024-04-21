@@ -56,7 +56,7 @@ pvgis-prototype position introduction
 
 !!! seealso
 
-    Refer to the [introduction to solar position](cli/position/introduction.md)
+    Refer to the [introduction to solar position](../cli/position/introduction.md)
     how-to section.
 
 Now that we have an overview,

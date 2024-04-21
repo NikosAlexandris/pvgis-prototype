@@ -2,6 +2,8 @@
 icon: material/sun-angle
 title: Solar Position
 subtitle: Estimate photovoltaic performance over a time series based on broadband irradiance
+authors:
+    - Nikos Alexandris
 tags:
   - How-To
   - API
@@ -31,13 +33,21 @@ Define the geographic location and the positioning of our solar surface
 
 ### Native objects for coordinates
 
-We can also use PVGIS' native classes for the coordinates
+We can also use PVGIS' native classes `Longitude` and `Latitude`
+for the coordinates. We can import them as every other Python module
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
 from pvgisprototype import Longitude, Latitude
 ```
 
-and 
+inspect them
+
+```pycon exec="true" session="pvgis-objects" source="material-block"
+>>> longitude = Longitude()
+>>> dir(longitude)
+```
+
+and use them as in the following example
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
 >>> from pvgisprototype import Longitude
@@ -45,9 +55,18 @@ and
 >>> longitude = Longitude(value=8.628)
 ```
 
+Let's see what is in the `longitude` variable
+
 ```pycon exec="true" session="pvgis-objects" source="material-block"
 >>> print(longitude)
 ```
+
+!!! danger "Incomplete implementation"
+
+    The `Longitude` and `Latitude` data classes are pending some functionality
+    such as converting from degrees to radians and vice versa just by calling
+    its attribute `.radians` or `.degrees`. Such methods will make it easier to
+    write programs on top of PVGIS and not only.
 
 ## When ?
 
@@ -73,6 +92,52 @@ Let's confirm the generation of the timestamps and the timezone :
 ```pycon exec="true" session="azimuth-series" source="material-block"
 >>> print(f'{timestamps=}')
 >>> print(f'\n{utc_zone=}')
+```
+
+## Solar altitude
+
+``` pycon exec="1" source="console" session="solar-altitude"
+>>> from pvgisprototype.api.position.altitude import calculate_solar_altitude
+>>> calculate_solar_altitude
+```
+
+<!-- ``` python exec="1" source="console" session="solar-altitude" -->
+<!-- helptext = help(calculate_solar_altitude) -->
+<!-- print(helptext) -->
+<!-- ``` -->
+
+We can see the required arguments to run the command
+
+## Error Handling
+
+Let's give it a first try with some _reasonable_ inputs
+
+!!! failure
+
+    ``` pycon exec="1" source="console" session="solar-altitude"
+    >>> calculate_solar_altitude(8, 45, '2001-01-01 10:00:00', 'UTC')
+    ```
+
+PVGIS' API is indeed idiomatic and our _reasonable_ inputs won't work.
+However,
+the input arguments are validated via Pydantic
+and thus we receive informative error messages.
+
+## Speaking PVGIS' API language
+
+Let's import the required modules
+
+```pycon exec="1" source="console" session="solar-altitude"
+>>> from pandas import Timestamp
+>>> from zoneinfo import ZoneInfo
+>>> from pvgisprototype.api.utilities.conversions import convert_float_to_radians_if_requested
+```
+
+And retry again
+
+```pycon exec="1" source="console" session="solar-altitude"
+>>> solar_altitude = calculate_solar_altitude(convert_float_to_radians_if_requested(8, 'radians'), convert_float_to_radians_if_requested(45, 'radians'), Timestamp('2001-01-01 10:00:00+00:00'), ZoneInfo('UTC'))
+>>> print(f"Solar altitude from PVGIS' API : {solar_altitude}")
 ```
 
 ## Solar Azimuth

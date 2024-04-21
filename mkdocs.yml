@@ -27,9 +27,8 @@ nav:
     - tutorials/photovoltaic_performance.md
   - API:
     - api/index.md
-    - api/api.md
-    - api/power.md
     - api/position.md
+    - api/power.md
   - CLI:
     - cli/index.md
     - cli/features.md

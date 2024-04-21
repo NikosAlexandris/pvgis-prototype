@@ -141,7 +141,7 @@ tags:
     | Calculate total radiation                                                  | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |                                             | :material-checkbox-marked-circle:{.checked} |          |         |
     | Calculate system performance                                               | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |                                             | :material-checkbox-marked-circle:{.checked} |          |         |
 
-[^0]: See also detailed Implementation for [Solar Geometry](development/solar_geometry.md)
+[^0]: See also detailed Implementation for [Solar Geometry](solar_geometry.md)
 
 [^slope]: In PVGIS 5.2 and older, `tilt` is referred as `slope` angle
 
