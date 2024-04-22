@@ -231,6 +231,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         'main': lambda: {
             TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },
 
         'extended': lambda: {
@@ -247,7 +248,6 @@ def calculate_direct_horizontal_irradiance_time_series(
         } if verbose > 2 else {},
 
         'even_more_extended': lambda: {
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
             POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
             TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
             # "Shade": in_shade,
