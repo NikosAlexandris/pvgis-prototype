@@ -240,3 +240,47 @@ and again inspect the `power` output
 !!! seealso "Verbosity"
 
     [Verbosity](../cli/verbosity.md)
+
+## All in one
+
+The easier way to replicate the above examples is an all-in-one code-block :
+
+```pycon exec="true" session="power-series-all-in-one" source="material-block"
+>>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+>>> from zoneinfo import ZoneInfo
+>>> from pvgisprototype import LinkeTurbidityFactor
+>>> from pvgisprototype import TemperatureSeries, WindSpeedSeries
+>>> from pvgisprototype import SpectralFactorSeries
+>>> from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+>>> from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
+
+>>> latitude = 1
+>>> longitude = 1
+>>> elevation = 214
+>>> surface_orientation = 1
+>>> surface_tilt = 1
+>>> timestamps = generate_datetime_series(start_time="2010-01-27 08:00:00", end_time="2010-01-27 18:00:00", frequency="h")
+>>> utc_zone = ZoneInfo("UTC")
+
+>>> linke_turbidity_factor_series = LinkeTurbidityFactor(value=1)
+>>> photovoltaic_module = PhotovoltaicModuleModel.CIS_FREE_STANDING
+>>> temperature_series = TemperatureSeries(value=14)
+>>> wind_speed_series = WindSpeedSeries(value=0)
+>>> spectral_factor_series=SpectralFactorSeries(value=1)
+
+>>> power = calculate_photovoltaic_power_output_series(
+>>>     longitude=longitude,
+>>>     latitude=latitude,
+>>>     elevation=elevation,
+>>>     surface_orientation=surface_orientation,
+>>>     surface_tilt=surface_tilt,
+>>>     timestamps=timestamps,
+>>>     timezone=utc_zone,
+>>>     linke_turbidity_factor_series=linke_turbidity_factor_series,
+>>>     photovoltaic_module=photovoltaic_module,
+>>>     spectral_factor_series=spectral_factor_series,
+>>>     temperature_series=temperature_series,
+>>>     wind_speed_series=wind_speed_series,
+>>> )
+>>> print(f'{power=}')
+```

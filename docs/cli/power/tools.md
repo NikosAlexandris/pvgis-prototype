@@ -7,9 +7,9 @@ tags:
   - Spectral Mismatch
 ---
 
-!!! danger
+!!! danger "Incomplete"
 
-    Incomplete
+    This section is yet to be completed.
 
 # Photon energy
 
