@@ -69,11 +69,11 @@ pvgis-prototype <command> <sub-command> <sub-sub-command> <1> <2> <3> [4] [5] <-
 
 Optional parameters need
 
-1. to be _named_, for example `--verbose` or its equivalent simpler form
-  `-v`.
+1. to be _named_, for example [`--verbose`](verbosity) or its equivalent
+   simpler form `-v`.
+
 2. **not** to be given in a specific order, i.e. asking for `-v --uniplot` is
    the same as `--uniplot -v`.
-
 
 ### Location
 
@@ -138,11 +138,20 @@ Example that works with all positional parameters yet without a timestamp:
 pvgis-prototype irradiance global inclined 8 45 214 170 44
 ```
 
-As mentioned above, this command will run with your computer's current local time and zone. We can see for example which timestamp the command ran for by adding some verbosity :
+As mentioned above,
+this command will run with your computer's current local time and zone.
+We can see for example which timestamp the command ran for
+by adding some verbosity :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined 8 45 214 170 44 -v
 ```
+
+!!! question "Where did this timestamp came from?"
+
+    The timestamp is the one of this very example's execution time.
+    It's practically the time the interactive documentation you are reading
+    was build.
 
 ### Single timestamp
 
@@ -194,9 +203,7 @@ It is useful to get a sense of things that _don't work_ too.
 Following are some examples that fail
 and ideally should return meaninfgul error messages.
 
-!!! danger
-
-    Example that fails :
+!!! danger "Example that fails"
 
     ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype irradiance global inclined 8 45 214 170 '2010-01-27 12:00:00'
@@ -206,9 +213,7 @@ and ideally should return meaninfgul error messages.
     user-requested timestamp. Due to the nature of the command line positional
     arguments, it is expected to follow strictly their order.
 
-!!! danger
-
-    Another example that fails :
+!!! danger "Another failing example"
 
     ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype irradiance global inclined 8 45 214 44 '2010-01-27 12:00:00'
@@ -217,9 +222,7 @@ and ideally should return meaninfgul error messages.
     In the above example, the surface orientation angle is missing,
     followed by a user-requested timestamp.
 
-!!! danger
-
-    One more example that fails :
+!!! danger "One more failing example"
 
     ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype irradiance global inclined 8 45 214 '2010-01-27 12:00:00'
