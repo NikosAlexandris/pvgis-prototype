@@ -35,15 +35,16 @@ Define the geographic location and the positioning of our solar surface
 
 We can also use PVGIS' native classes `Longitude` and `Latitude`
 for the coordinates. We can import them as every other Python module
+and create objects
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
 from pvgisprototype import Longitude, Latitude
+>>> longitude = Longitude()
 ```
 
 inspect them
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
->>> longitude = Longitude()
 >>> dir(longitude)
 ```
 
@@ -140,7 +141,7 @@ And retry again
 >>> print(f"Solar altitude from PVGIS' API : {solar_altitude}")
 ```
 
-## Solar Azimuth
+## :material-sun-compass: Solar Azimuth
 
 We can calculate solar azimuth angles
 for a specific geographic location and over a time series
