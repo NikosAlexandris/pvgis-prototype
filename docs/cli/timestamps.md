@@ -105,30 +105,3 @@ pvgis-prototype power broadband 8 45 214 167 --start-time '2010-01-27 06:00:00' 
 
     It is impossible at the moment to re-define the tilt angle only, without
     preceeding it by an orientation angle.
-
-### Quiet (a) long time series
-
-Printing very long time series in the terminal is rather impractical,
-aside that it takes quite some time for the print-out. To work-around this
-limitation, there is a `--quiet` optional flag which will ommit the print out.
-
-This option may be useful for timing the duration of processes or printing a
-plot of the output or metadata of the command itself.
-
-### Duration of command execution
-
-We can _time_ the duration of a command that processes a long time series using
-the terminal's built-in function `time` :
-
-``` bash exec="true" result="ansi" source="material-block"
-time pvgis-prototype power broadband 8 45 214 167 --start-time '2000-01-01' --end-time '2020-12-31' --quiet
-```
-
-### Plot of output time series
-
-We can _time_ the duration of a command that processes a long time series using
-the terminal's built-in function `time` :
-
-``` bash exec="true" result="ansi" source="material-block"
-time pvgis-prototype power broadband 8 45 214 167 --start-time '2000-01-01' --end-time '2020-12-31' --quiet --uniplot
-```
