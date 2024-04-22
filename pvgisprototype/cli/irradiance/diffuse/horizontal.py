@@ -192,7 +192,8 @@ def get_diffuse_horizontal_irradiance_time_series(
             data_array=diffuse_horizontal_irradiance_time_series.value,
             timestamps=timestamps,
             groupby=groupby,
-            title="Diffuse horizontal irradiance",
+            title=f"Diffuse horizontal irradiance {IRRADIANCE_UNITS}",
+            rounding_places=rounding_places,
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
