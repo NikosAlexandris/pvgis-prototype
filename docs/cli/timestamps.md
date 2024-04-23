@@ -1,5 +1,5 @@
 ---
-icon: material/sun-clock
+icon: material/calendar-clock
 description: How to work with time series
 title: Timestamps
 subtitle: Learn how to work with time series

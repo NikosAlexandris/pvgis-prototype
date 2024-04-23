@@ -1,5 +1,5 @@
 ---
-icon: material/format-vertical-align-bottom
+icon: material/sun-wireless
 title: Global irradiance
 tags:
   - How-To
@@ -41,4 +41,3 @@ pvgis-prototype irradiance global horizontal \
 !!! danger "Incomplete"
 
     This section is yet to be completed.
-

@@ -89,6 +89,20 @@ i.e. `--verbose --verbose`.
     pvgis-prototype power broadband 8.628 45.812 214 180 35 -vvvvvv
     ```
 
+## Index
+
+Indexing can make it easier to spot a line of interest in the output table.
+We can ask for it via `--index` or simply `-i` 
+
+``` bash exec="true" result="ansi" source="above"
+pvgis-prototype power broadband \
+    8.628 45.812 214 180 35 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28` \
+    -vv \
+    --index
+```
+
 ## :shushing_face: Quiet
 
 Need to silence (a) long time series output ?
@@ -106,7 +120,12 @@ We can _time_ the duration of a command that processes a long time series using
 the terminal's built-in function `time` :
 
 ``` bash exec="true" result="ansi" source="material-block"
-time pvgis-prototype power broadband 8 45 214 167 --start-time '2000-01-01' --end-time '2020-12-31' --quiet
+time \
+pvgis-prototype power broadband \
+    8 45 214 167 \
+    --start-time '2000-01-01' \
+    --end-time '2020-12-31' \
+    --quiet
 ```
 
 ## :material-bug: Debugging

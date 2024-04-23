@@ -23,13 +23,11 @@ pvgis-prototype series plot \
     --no-variable-name-as-suffix
 ```
 
-![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){height=400px}
 
-<!-- <figure markdown="span"> -->
-<!--   <!-1- ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){ loading=lazy } -1-> -->
-<!--   ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){height=400px} -->
-<!--   <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption> -->
-<!-- </figure> -->
+<figure markdown="span">
+  ![Example series plot](../../../example_series_plot_20050101000000_20200131000000.png){height=400px}
+  <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption>
+</figure>
 
 ## Uniplot
 
