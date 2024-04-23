@@ -25,10 +25,6 @@ nav:
     - tutorials/solar_position.md
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
-  - API:
-    - api/index.md
-    - api/position.md
-    - api/power.md
   - CLI:
     - cli/index.md
     - cli/features.md
@@ -44,24 +40,32 @@ nav:
     - cli/logging.md
     - Power:
       - Introduction: cli/power/introduction.md
+      - Tools: cli/power/tools.md
       - Broadband: cli/power/broadband.md
       - Spectrally Resolved: cli/power/spectral.md
-      - Toolbox: cli/power/tools.md
+      - Spectral Effect: cli/power/spectral_effect.md
     - Irradiance:
       - Introduction: cli/irradiance/introduction.md
+      - Tools: cli/irradiance/tools.md
       - Global: cli/irradiance/global.md
       - Direct: cli/irradiance/direct.md
       - Diffuse: cli/irradiance/diffuse.md
       - Reflected: cli/irradiance/reflected.md
-    - Solar Position:
+    - Position:
       - Introduction: cli/position/introduction.md
+      - Tools: cli/position/tools.md
       - Overview: cli/position/overview.md
+      - Solar Time: cli/position/time.md
       - Incidence: cli/position/incidence.md
   - Web API:
     - web_api/index.md
     - web_api/install.md
     - web_api/run.md
     - web_api/examples.md
+  - API:
+    - api/index.md
+    - api/position.md
+    - api/power.md
   - Reference:
     - reference/index.md
     - reference/solar_geometry_introduction.md
@@ -213,6 +217,7 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - attr_list
+  - md_in_html
   - abbr
   - pymdownx.snippets:
       auto_append:
