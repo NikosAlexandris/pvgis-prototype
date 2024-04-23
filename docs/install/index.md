@@ -61,14 +61,14 @@ source pvgis-virtual-environment/bin/activate
     Regardless of our favourite programming language
     or tool to manage environments,
     chances are high we'd benefit from using [`direnv`][direnv].
-    In the context of a Python package, like [`rekx`][rekx],
+    In the context of a Python package,
     `direnv` supports all such well known tools
     from standard `venv`, `pyenv` and `pipenv`,
     to `anaconda`, `Poetry`, `Hatch`, `Rye`
     and `PDM`.
     Have a look at [direnv's Wiki page for Python][direnv-wiki-python].
 
-    `rekx` is developed inside a virtual environment
+    `pvgisprototype` is developed inside a virtual environment
     (re-)created and (re-)activated via `direnv`.
     The following `.envrc` does all of it :
     
@@ -76,8 +76,11 @@ source pvgis-virtual-environment/bin/activate
     --8<-- ".envrc"
     ```
 
-    Find more about `layout python` in
-    [direnv/wiki/Python#venv-stdlib-module](https://github.com/direnv/direnv/wiki/Python#venv-stdlib-module).
+    Find more about `layout python` in [direnv/wiki/Python#venv-stdlib-module][direnv-wiki-python-venv].
+
+    [direnv-wiki-python]: https://github.com/direnv/direnv/wiki/Python
+
+    [direnv-wiki-python-venv]: https://github.com/direnv/direnv/wiki/Python#venv-stdlib-module
 
 
 # Simple install

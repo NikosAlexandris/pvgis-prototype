@@ -149,9 +149,9 @@ pvgis-prototype irradiance global inclined 8 45 214 170 44 -v
 
 !!! question "Where did this timestamp came from?"
 
-    The timestamp is the one of this very example's execution time.
-    It's practically the time the interactive documentation you are reading
-    was build.
+    The timestamp in the above command
+    is the one of this very example's execution time
+    which ran at build time of the interactive documentation you are reading.
 
 ### Single timestamp
 
@@ -182,8 +182,7 @@ pvgis-prototype irradiance global inclined \
     8 45 214 170 44 \
     '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
     -v \
-    --quiet \
-    --uniplot
+    --quiet
 ```
 
 is the same as
@@ -193,9 +192,20 @@ pvgis-prototype irradiance global inclined \
     8 45 214 170 44 \
     '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
     --quiet \
-    --uniplot \
     --verbose
 ```
+
+One more example _mixing_ the order of options
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance global inclined \
+    8 45 214 170 44 \
+    '2010-01-27 12:00:00, 2010-01-27 13:30:00' \
+    -v \
+    --quiet \
+    -vv
+```
+
 
 ## Examples that fail !
 

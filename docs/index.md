@@ -1,5 +1,7 @@
 ---
 icon: material/eye
+title: PVGIS
+subtitle: Photovoltaic Geographic Information System
 tags:
   - PVGIS
   - Overview
@@ -10,24 +12,10 @@ tags:
 [![Latest Release](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/badges/release.svg)](https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype/-/releases) 
 ---
 
-# Welcome
+# PVGIS
 
 :material-human-greeting-variant: Welcome to the documentation of
 the Photovoltaic Geographical Information System (PVGIS).
-
-The content is designed to help you navigate through
-the features, capabilities, and detailed references
-for the PVGIS command line interface (CLI),
-its Web application programming interface (Web API),
-or even its core API[^0].
-
-[^0]:!!! warning
-
-        The _Web_ API is not the same at the _core_ API.
-        The former _consumes_ the latter
-        to produce a FastAPI-based Web API interface.
-
-# What is PVGIS ?
 
 [PVGIS][PVGIS]
 is an open [web application][PVGIS Web Application]
@@ -40,13 +28,24 @@ Transport and Climate directorate.
 
 [JRC]: https://joint-research-centre.ec.europa.eu/index_en
 
+The content is designed to help you navigate through
+the features, capabilities, and detailed references
+for the PVGIS command line interface (CLI),
+its Web application programming interface (Web API),
+and its core API. (1)
+{ .annotate }
+
+1. The _Web_ API is not the same at the _core_ API.
+   The former _consumes_ the latter
+   to produce a FastAPI-based Web API interface.
+
 ## Features & Capabilities
 
 PVGIS
 offers cost-free public service insights
 on solar radiation and photovoltaic performance,
 providing location-specific estimates of power output
-for systems using various PV (Photo Voltaic) technologies.
+for systems using various PV technologies.
 
 <div class="grid cards" markdown>
 
@@ -69,7 +68,11 @@ for systems using various PV (Photo Voltaic) technologies.
     - :material-thermometer: Temperature & :wind_blowing_face: Wind Speed 
     - :material-weather-partly-cloudy: Typical Meteorological Year for 9 climate variables
     
-- :material-map:{ .lg .middle } __Coverage & Maps__ [^1]
+- :material-map:{ .lg .middle } __Coverage & Maps__ (1)
+{ .annotate }
+
+    1. !!! warning "Printing ?"
+           [:thinking: https://thinkbeforeprinting.org/](https://thinkbeforeprinting.org/)
 
     ---
 
@@ -78,21 +81,27 @@ for systems using various PV (Photo Voltaic) technologies.
     - America :earth_americas:
     - Country/regional maps of solar resource & PV potential
 
-[^1]:!!! warning "Printing ?"
-
-        [:thinking: https://thinkbeforeprinting.org/](https://thinkbeforeprinting.org/)
-
 - :octicons-feed-public-16:{ .lg .middle } __Public Service__
+
+    ---
+
+    - Supported by the 🇪🇺 European Commission
+    - :material-currency-eur-off: Cost free
+    - :material-lock-off: Open access
+    - :material-search-web: > 50K Web API requests / week
+
+
+- __Open Source__
 
     ---
 
     ![](images/Logo_EUPL.svg.png){align=right height=100px width=100px}
 
-    - :material-currency-eur-off: Cost free & Open access
-    - :material-search-web: 50+K Web API requests / week
-    - :material-open-source-initiative: Open Source license EUPL-1.2
+    - :material-language-python: Python [API](#) based on :simple-numpy: NumPy
+    - :material-console: [CLI](#) based on Typer
+    - :material-web: [Web API](#) based on :simple-fastapi: FastAPI
+    - :material-open-source-initiative: Open Source [License](#) EUPL-1.2
 
-    [:octicons-arrow-right-24: License](#)
 
 - :material-translate:{ .lg .middle } __Languages__
 
@@ -104,60 +113,54 @@ for systems using various PV (Photo Voltaic) technologies.
     - French  |  German
     - Spanish  |  Italian
 
-- __Components__
-
-    ---
-
-    - :material-language-python: Python [API](#)
-    - :material-console: [CLI](#) based on Typer
-    - :material-web: [Web API](#)
-    based on :simple-fastapi: FastAPI
-
 </div>
 
 For a full list of features, see the [Features](overview/features.md) page.
 
-## Getting Started
+## Components
 
-### Web API
+<div class="grid cards" markdown>
 
-If you're new to PVGIS' Web API,
-start with our entry level [Web API](web_api/index.md) guide
-to get up and running quickly.
+- :material-web: __[Web API](#)__
 
-### CLI
+    ---
 
-Interested to work interactively ?  Check ouy the [collection of command line
-tools][cli/index.md]
+    **New to PVGIS' Web API ?**
 
+    Start with our entry level [Web API](web_api/index.md) guide
+    to get up and running quickly.
 
-## Advanced Topics
+- :material-console: __[CLI](#)__
 
-For advanced users,
-we offer in-depth guides and discussions on more complex aspects of PVGIS API:
+    ---
 
-- [API](api/index.md)
+    **Interested to work interactively ?**
 
+    Check out the [collection of command line tools](cli/index.md)
 
-## Development
+- :material-language-python: __Python [API](#)__
 
-Interested in contributing or developing new features ?
-Head over to the [Development](development/index.md) section.
+    ---
 
-- [Conventions](development/conventions.md)
-- [Contribution guidelines](development/contribution_guidelines.md)
-- [Testing](development/pytest.md)
-- [Adding New Features](development/adding_new_features.md)
+    **For advanced users and programmers**
 
-### Contributing
+    You may want work directly with the [PVGIS API](api/index.md).
+    to peek over the [source code](source_code/index.md)
 
-If you're interested in contributing,
-please read our [Contribution Guidelines](development/contribution_guidelines.md).
+- Development
 
-!!! note
+    ---
 
-    PVGIS aims to become an open-source project.
-    It will welcome contributions of all forms.
+    **Interested in contributing or developing new features ?**
+
+    Head over to the [Development](development/index.md) section
+    and check out :
+
+    - [Contribution Guidelines](development/contribution_guidelines.md) & [Conventions](development/conventions.md)
+    - [Adding New Features](development/adding_new_features.md)
+    - [Testing](development/pytest.md)
+
+</div>
 
 # Support & Community
 

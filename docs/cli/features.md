@@ -40,7 +40,7 @@ pvgis-prototype --help
     pvgis-prototype --help
     ```
 
-## Version
+## Version :octicons-versions-24:
 
 It might be useful to know which version of the software we have installed :
 
