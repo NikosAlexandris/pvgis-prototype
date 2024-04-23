@@ -39,12 +39,12 @@ and create objects
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
 from pvgisprototype import Longitude, Latitude
->>> longitude = Longitude()
 ```
 
 inspect them
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
+>>> longitude = Longitude()
 >>> dir(longitude)
 ```
 

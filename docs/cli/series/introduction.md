@@ -4,7 +4,7 @@ tags:
   - How-To
   - CLI
   - Introduction
-  - Solar Position
+  - Time Series
 hide:
   - toc
 ---
@@ -15,6 +15,8 @@ hide:
 
 ??? "Introduction in the commmand line"
 
-    ``` bash exec="true" result="ansi" source="material-block"
-    pvgis-prototype power introduction
+    **The `series introduction` command is not yet implemented !**
+
+    ``` bash
+    pvgis-prototype series introduction
     ```
