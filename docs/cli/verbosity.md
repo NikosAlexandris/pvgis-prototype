@@ -98,7 +98,7 @@ We can ask for it via `--index` or simply `-i`
 pvgis-prototype power broadband \
     8.628 45.812 214 180 35 \
     --start-time '2010-01-27' \
-    --end-time '2010-01-28` \
+    --end-time '2010-01-28' \
     -vv \
     --index
 ```
