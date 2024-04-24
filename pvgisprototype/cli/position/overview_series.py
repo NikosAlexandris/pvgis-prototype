@@ -139,7 +139,6 @@ def overview_series(
 
     # Why does the callback function `_parse_model` not work? 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
-    print(f'{solar_position_models=}')
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
