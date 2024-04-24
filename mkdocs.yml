@@ -264,7 +264,8 @@ plugins:
   - coverage:
       html_report_dir: docs/development/coverage_html
       # page_name: coverage  # default
-  - markdown-exec
+  - markdown-exec:
+      ansi: required
   - autorefs
   - git-revision-date-localized:
       type: timeago
