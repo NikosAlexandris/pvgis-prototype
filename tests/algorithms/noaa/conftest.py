@@ -11,8 +11,8 @@ class GenericCheckCustomObjects:
         assert type(in_) == type(expected)
     
     @staticmethod
-    def _check_value(in_, expected, rtol:float):
-        assert isclose(in_.value, expected.value, rtol).all()
+    def _check_value(in_, expected, tolerance:float):
+        assert isclose(in_.value, expected.value, atol = tolerance).all()
 
     @staticmethod
     def _check_unit(in_, expected):
@@ -37,8 +37,8 @@ class GenericCheckCustomObjects:
     def test_type(self, in_, expected):
         self._check_type(in_, expected)
 
-    def test_value(self, in_, expected, rtol:float=1e-3):
-        self._check_value(in_, expected, rtol=rtol)
+    def test_value(self, in_, expected, tolerance:float=1e-2):
+        self._check_value(in_, expected, tolerance=tolerance)
     
     def test_unit(self, in_, expected,):
         self._check_unit(in_, expected)
