@@ -10,6 +10,7 @@ from typing import List
 from typing import Any
 from typing import List
 from pvgisprototype.constants import RADIANS, DEGREES
+from enum import Enum
 
 
 def convert_to_radians(
@@ -217,18 +218,19 @@ def round_float_values(obj, decimal_places=3):
         return np.around(obj, decimals=decimal_places)
 
     if isinstance(obj, dict):
-        return {key: round_float_values(value, decimal_places) for key, value in obj.items()}
-    if isinstance(obj, list):
-        return [round_float_values(item, decimal_places) for item in obj]
+        return {key: round_float_values(value, decimal_places) for key, value in obj.items() if not isinstance(value, Enum)}
 
-    if hasattr(obj, "__dict__"):
+    if isinstance(obj, list):
+        return [round_float_values(item, decimal_places) for item in obj if not isinstance(item, Enum)]
+
+    if hasattr(obj, "__dict__") and not isinstance(obj, Enum):
         for key, value in vars(obj).items():
             setattr(obj, key, round_float_values(value, decimal_places))
         return obj
 
     return obj
 
-
+    
 def convert_south_to_north_degrees_convention(azimuth_south_degrees):
     return (azimuth_south_degrees + 180) % 360
 
