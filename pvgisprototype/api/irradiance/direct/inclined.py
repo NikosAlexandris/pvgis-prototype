@@ -134,6 +134,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     longitude: float,
     latitude: float,
     elevation: float,
+    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = None,
     timezone: Optional[str] = None,
     convert_longitude_360: bool = False,
@@ -142,8 +144,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
     in_memory: bool = False,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -331,7 +331,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             * np.sin(solar_incidence_series.radians)
             / np.sin(solar_altitude_series.radians)
         )
-
     except ZeroDivisionError:
         logger.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
         logger.debug("Is the solar altitude angle zero?")
@@ -368,7 +367,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         },
 
         'extended': lambda: {
-            LOSS_COLUMN_NAME: 1 - angular_loss_factor_series if apply_angular_loss_factor else ['-'],
+            LOSS_COLUMN_NAME: 1 - angular_loss_factor_series if apply_angular_loss_factor else np.nan,
         } if verbose > 1 else {},
 
         'more_extended': lambda: {
