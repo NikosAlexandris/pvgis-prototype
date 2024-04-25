@@ -162,17 +162,15 @@ def calculate_diffuse_sky_irradiance_time_series(
     Internally the function calculates first the dimensionless fraction of the
     sky dome viewed by a tilted (or inclined) surface `ri(γN)`.
     """
-    sky_view_fraction = (1 + cos(surface_tilt)) / 2
-    diffuse_sky_irradiance_series = sky_view_fraction
-    + (
+    # sky_view_fraction = (1 + cos(surface_tilt)) / 2
+    diffuse_sky_irradiance_series = ((1 + cos(surface_tilt)) / 2) + (
         sin(surface_tilt)
         - surface_tilt
         * cos(surface_tilt)
-        - pi
-        * sin(surface_tilt / 2) ** 2
+        - pi * np.power((sin(surface_tilt / 2)), 2)
     ) * n_series
-    return np.array([diffuse_sky_irradiance_series], dtype=dtype)
-    # return diffuse_sky_irradiance_series
+
+    return np.array(diffuse_sky_irradiance_series, dtype=dtype)
 
 
 @log_function_call
