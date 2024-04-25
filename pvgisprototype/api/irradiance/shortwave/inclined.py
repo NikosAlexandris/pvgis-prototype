@@ -135,12 +135,20 @@ def calculate_global_inclined_irradiance_time_series(
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
-    """
-    Calculate the global horizontal irradiance (GHI)
+    """Calculate the global irradiance on an inclined surface [W.m-2]
 
-    The global horizontal irradiance represents the total amount of shortwave
-    radiation received from above by a surface horizontal to the ground. It
-    includes both the direct and the diffuse solar radiation.
+    Calculate the global irradiance on an inclined surface as the sum of the
+    direct, the diffuse and the ground-reflected radiation components.
+    The radiation, selectively attenuated by the atmosphere, which is not
+    reflected or scattered and reaches the surface directly is the direct
+    radiation. The scattered radiation that reaches the ground is the
+    diffuse radiation. In addition, a smaller part of radiation is reflected
+    from the ground onto the inclined surface. Only small percents of reflected
+    radiation contribute to inclined surfaces, thus it is sometimes ignored.
+    PVGIS, however, inherits the solutions adopted in the r.sun solar radiation
+    model in which both the diffuse and reflected radiation components are
+    considered.
+
     """
     solar_altitude_series = model_solar_altitude_time_series(
         longitude=longitude,
