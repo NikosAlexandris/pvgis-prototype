@@ -427,6 +427,7 @@ def calculate_solar_incidence_time_series_jenco(
         if surface_orientation.radians < np.pi and relative_longitude.value < 0:
             print(f'[bold red]Add[/bold red] {np.pi} to relative_longitude {relative_longitude}')
             relative_longitude.value += np.pi
+
         if surface_orientation.radians > np.pi and relative_longitude.value > 0:
             print(f'[bold red]Remove[/bold red] {np.pi} from relative_longitude {relative_longitude}')
             relative_longitude.value -= np.pi
