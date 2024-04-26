@@ -92,11 +92,12 @@ pages:
     HOME: /tmp
   script:
     - export http_proxy=$PROXY https_proxy=$PROXY no_proxy=$NOPROXY
-    - pip install --upgrade pip
-    - pip install --user -r requirements.txt
-    - pip install --user .
     - export PATH=$PATH:$HOME/.local/bin
-    - mkdocs build --verbose --site-dir public
+    - pip install --upgrade pip
+    - pip install pdm
+    - $HOME/.local/bin/pdm install
+    - export COLUMNS=160
+    - $HOME/.local/bin/pdm run mkdocs build --verbose --site-dir public
   allow_failure: true
   artifacts:
     paths:

@@ -9,13 +9,11 @@ tags:
   - Spectrally Resolved Irradiance
 ---
 
-# Spectrally resolved irradiance
-
 PVGIS can estimate the photovoltaic power over a time series
 or an arbitrarily aggregated energy production of a PV system
 based on spectrally resolved irradiance,
 ambient temperature and wind speed.
 
-!!! danger
+!!! danger "Incomplete"
 
-    Incomplete
+    This section is yet to be completed.

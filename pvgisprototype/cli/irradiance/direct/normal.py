@@ -154,7 +154,6 @@ def get_direct_normal_irradiance_time_series(
         log=log,
         fingerprint=fingerprint,
     )
-    # Reporting =============================================================
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print import print_irradiance_table_2
@@ -175,15 +174,6 @@ def get_direct_normal_irradiance_time_series(
             csv_str = ','.join(flat_list)
             print(csv_str)
 
-    if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
-        print_series_statistics(
-            data_array=direct_normal_irradiance_series[DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME],
-            timestamps=timestamps,
-            groupby=groupby,
-            title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
-            rounding_places=rounding_places,
-        )
     if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
         write_irradiance_csv(
@@ -193,11 +183,20 @@ def get_direct_normal_irradiance_time_series(
             dictionary=direct_normal_irradiance_series.components,
             filename=csv,
         )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=direct_normal_irradiance_series.value,
+            timestamps=timestamps,
+            groupby=groupby,
+            title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
+            rounding_places=rounding_places,
+        )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         uniplot_data_array_time_series(
             data_array=direct_normal_irradiance_series.value,
-            data_array_2=None,
+            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Direct Normal Irradiance Series',
             title = 'Direct Normal Irradiance Series',

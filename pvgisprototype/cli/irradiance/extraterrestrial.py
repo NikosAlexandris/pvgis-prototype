@@ -139,7 +139,7 @@ def get_extraterrestrial_normal_irradiance_time_series(
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         uniplot_data_array_time_series(
             data_array=extraterrestrial_normal_irradiance_series.value,
-            data_array_2=None,
+            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Extraterrestrial Normal Irradiance Series',
             title = 'Extraterrestrial Normal Irradiance Series',
