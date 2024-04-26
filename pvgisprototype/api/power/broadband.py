@@ -301,8 +301,7 @@ def calculate_photovoltaic_power_output_series(
     if np.any(mask_above_horizon_not_in_shade):
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             logger.info(f'i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade ..')
-        direct_irradiance_series[mask_above_horizon_not_in_shade] = (
-            calculate_direct_inclined_irradiance_time_series_pvgis(
+        calculated_direct_irradiance_series = calculate_direct_inclined_irradiance_time_series_pvgis(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -328,10 +327,10 @@ def calculate_photovoltaic_power_output_series(
                 angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
-                verbose=0,  # no verbosity here by choice!
+                verbose=verbose,  # no verbosity here by choice!
                 log=log,
-            ).value  # Important !
-        )[mask_above_horizon_not_in_shade]
+            )
+        direct_irradiance_series[mask_above_horizon_not_in_shade] = calculated_direct_irradiance_series.value[mask_above_horizon_not_in_shade]
 
     # Calculate diffuse and reflected irradiance for sun above horizon
     if np.any(mask_above_horizon):
@@ -523,18 +522,18 @@ def calculate_photovoltaic_power_output_series(
         
         'extended': lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & in-plane components",
-            EFFICIENCY_COLUMN_NAME: efficiency_coefficient_series,
             POWER_MODEL_COLUMN_NAME: power_model.value if power_model else NOT_AVAILABLE,
+            EFFICIENCY_COLUMN_NAME: efficiency_coefficient_series,
             GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_irradiance_series,
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
-            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,
-            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
-        } if verbose > 1 else {},
-        
-        'more_extended': lambda: {
             EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_irradiance_series * efficiency_coefficient_series,
             EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series * efficiency_coefficient_series,
             EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series * efficiency_coefficient_series,
+        } if verbose > 1 else {},
+        
+        'more_extended': lambda: {
+            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_irradiance_series,
+            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_irradiance_series,
+            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_irradiance_series,
         } if verbose > 2 else {},
         
         'even_more_extended': lambda: {
@@ -569,6 +568,9 @@ def calculate_photovoltaic_power_output_series(
     components = {}
     for key, component in components_container.items():
         components.update(component())
+
+    # Overwrite the direct irradiance 'components' with the global ones !
+    # components = components | calculated_direct_irradiance_series.components
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

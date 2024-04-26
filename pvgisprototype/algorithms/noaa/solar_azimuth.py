@@ -282,10 +282,15 @@ def calculate_solar_azimuth_time_series_noaa(
     References
     ----------
     .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF 
+
     .. [1] https://en.wikipedia.org/wiki/Solar_azimuth_angle#Conventional_Trigonometric_Formulas
+    
     .. [2] https://github.com/pvlib/pvlib-python
+    
     .. [3] https://github.com/pingswept/pysolar
+    
     .. [4] https://github.com/skyfielders/python-skyfield/
+    
     .. [5] https://github.com/kylebarron/suncalc-py
 
     Examples

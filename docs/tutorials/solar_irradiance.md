@@ -6,7 +6,7 @@ tags:
   - Solar Irradiance
 ---
 
-## Simulating horizontal irradiance components
+## Simulating horizontal irradiance
 
 We can simulate solar irradiance components using PVGIS!
 
