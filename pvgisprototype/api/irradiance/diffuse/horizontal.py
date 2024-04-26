@@ -145,6 +145,9 @@ def calculate_diffuse_horizontal_irradiance_time_series(
         verbose=verbose,  # Is this wanted here ? i.e. not setting = 0 ?
         log=log,
     )
+    # Suppress negative solar altitude, else we get high-negative diffuse output
+    solar_altitude_series.value[solar_altitude_series.value < 0] = np.nan
+
     diffuse_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series.value
         * diffuse_transmission_function_time_series(linke_turbidity_factor_series)

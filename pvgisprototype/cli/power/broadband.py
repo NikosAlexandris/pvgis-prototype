@@ -284,9 +284,17 @@ def photovoltaic_power_output_series(
                 verbose=verbose,
             )
         else:
-            flat_list = photovoltaic_power_output_series.value.flatten().astype(str)
-            csv_str = ','.join(flat_list)
-            print(csv_str)
+            from pvgisprototype.api.utilities.conversions import round_float_values
+            # ------------------------- Better handling of rounding vs dtype ?
+            print(
+                ",".join(
+                    # round_float_values(
+                    #     photovoltaic_power_output_series.value.flatten(),
+                    #     rounding_places,
+                    # ).astype(str)
+                    photovoltaic_power_output_series.value.flatten().astype(str)
+                )
+            )
 
     if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
@@ -311,7 +319,7 @@ def photovoltaic_power_output_series(
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         uniplot_data_array_time_series(
             data_array=photovoltaic_power_output_series.value,
-            data_array_2=None,
+            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Photovoltaic Power Output Series',
             title="Photovoltaic power output",
@@ -378,6 +386,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -504,6 +513,8 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         individual_series = [series.value for series in photovoltaic_power_output_series.individual_series]
+        if resample_large_series:
+            data_array = data_array.resample(time='1M').mean()
         uniplot_data_array_time_series(
             data_array=photovoltaic_power_output_series.series,
             list_extra_data_arrays=individual_series,
