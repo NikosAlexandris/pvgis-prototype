@@ -228,7 +228,8 @@ def calculate_direct_normal_irradiance_time_series(
         },
 
         'extended': lambda: {
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+            TITLE_KEY_NAME: DIRECT_NORMAL_IRRADIANCE + ' & relevant components',
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
         } if verbose > 1 else {},
 
         'more_extended': lambda: {

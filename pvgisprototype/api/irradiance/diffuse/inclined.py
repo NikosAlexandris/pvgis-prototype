@@ -242,7 +242,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         ).value  # Important !
 
     else:  # OR from the model
-        # we still need the direct component, if NOT read fom external series!
+        # in which case : we need the direct component for the kb series, if it's NOT read fom external series!
         direct_horizontal_irradiance_series = (
             calculate_direct_horizontal_irradiance_time_series(
                 longitude=longitude,
@@ -279,9 +279,12 @@ def calculate_diffuse_inclined_irradiance_time_series(
     if surface_tilt <= surface_tilt_threshold:
         diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series
         # to not break the output !
-        diffuse_sky_irradiance_series = n_series = kb_series = (
-            azimuth_difference_series_array
-        ) = solar_azimuth_series_array = solar_incidence_series = NOT_AVAILABLE
+        diffuse_sky_irradiance_series = NOT_AVAILABLE
+        n_series = NOT_AVAILABLE
+        kb_series = NOT_AVAILABLE
+        azimuth_difference_series_array = NOT_AVAILABLE
+        solar_azimuth_series_array = NOT_AVAILABLE
+        solar_incidence_series = NOT_AVAILABLE
 
     else:  # tilted (or inclined) surface
     # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
@@ -320,15 +323,15 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
         # prepare size of output array!
         from pvgisprototype.validation.arrays import create_array
-        shape_of_array = (
-            solar_altitude_series.value.shape
-        )  # Borrow shape from solar_altitude_series
         diffuse_inclined_irradiance_series = create_array(
-            shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
+            timestamps.shape, dtype=dtype, init_method="zeros", backend=array_backend
         )
 
-        # surface in shade, yet there is ambient light
-        mask_surface_in_shade_series = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)
+        # prepare cases : surfaces in shade, sunlit, potentially sunlit
+        mask_surface_in_shade_series = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)  # in shade, yet there is ambient light
+        mask_sunlit_surface_series = solar_altitude_series.radians >= 0.1 
+        mask_potentially_sunlit_surface_series = ~mask_sunlit_surface_series 
+
         if np.any(mask_surface_in_shade_series):
             diffuse_sky_irradiance_series[mask_surface_in_shade_series] = (
                 calculate_diffuse_sky_irradiance_time_series(
@@ -341,77 +344,76 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 * diffuse_sky_irradiance_series[mask_surface_in_shade_series]
             )
 
-        else:  # sunlit surface and non-overcast sky
-            # ----------------------------------------------------------------
-            azimuth_difference_series_array = None  # Avoid UnboundLocalError!
-            solar_azimuth_series_array = None
-            # ----------------------------------------------------------------
+        # else:  # sunlit surface and non-overcast sky
+        #     # ----------------------------------------------------------------
+        #     azimuth_difference_series_array = None  # Avoid UnboundLocalError!
+        #     solar_azimuth_series_array = None
+        #     # ----------------------------------------------------------------
 
-            mask_sunlit_surface_series = solar_altitude_series.radians >= 0.1 
-            if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
-                diffuse_sky_irradiance_series = np.full_like(
-                    diffuse_horizontal_irradiance_series, diffuse_sky_irradiance_series
-                )
-                diffuse_inclined_irradiance_series[
-                    mask_sunlit_surface_series
-                ] = diffuse_horizontal_irradiance_series[mask_sunlit_surface_series] * (
-                    diffuse_sky_irradiance_series[mask_sunlit_surface_series]
-                    * (1 - kb_series[mask_sunlit_surface_series])
-                    + kb_series[mask_sunlit_surface_series]
-                    * np.sin(solar_incidence_series.radians[mask_sunlit_surface_series])
-                    / np.sin(solar_altitude_series.radians[mask_sunlit_surface_series])
-                )
+        if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
+            diffuse_sky_irradiance_series = np.full_like(
+                diffuse_horizontal_irradiance_series, diffuse_sky_irradiance_series
+            )
+            diffuse_inclined_irradiance_series[
+                mask_sunlit_surface_series
+            ] = diffuse_horizontal_irradiance_series[mask_sunlit_surface_series] * (
+                diffuse_sky_irradiance_series[mask_sunlit_surface_series]
+                * (1 - kb_series[mask_sunlit_surface_series])
+                + kb_series[mask_sunlit_surface_series]
+                * np.sin(solar_incidence_series.radians[mask_sunlit_surface_series])
+                / np.sin(solar_altitude_series.radians[mask_sunlit_surface_series])
+            )
 
-            else:  # if solar altitude < 0.1 : potential sunlit surface series
-                mask_potential_sunlit_surface_series = ~mask_sunlit_surface_series 
-                # requires the solar azimuth
-                solar_azimuth_series_array = model_solar_azimuth_time_series(
-                    longitude=longitude,
-                    latitude=latitude,
-                    timestamps=timestamps,
-                    timezone=timezone,
-                    solar_position_model=solar_position_model,
-                    apply_atmospheric_refraction=apply_atmospheric_refraction,
-                    refracted_solar_zenith=refracted_solar_zenith,
-                    solar_time_model=solar_time_model,
-                    perigee_offset=perigee_offset,
-                    eccentricity_correction_factor=eccentricity_correction_factor,
-                    verbose=verbose,
+        # else:  # if solar altitude < 0.1 : potentially sunlit surface series
+        if np.any(mask_potentially_sunlit_surface_series):
+            # requires the solar azimuth
+            solar_azimuth_series_array = model_solar_azimuth_time_series(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                timezone=timezone,
+                solar_position_model=solar_position_model,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                refracted_solar_zenith=refracted_solar_zenith,
+                solar_time_model=solar_time_model,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
+                verbose=verbose,
+            )
+            # Normalize the azimuth difference to be within the range -pi to pi
+            # A0 : solar azimuth _measured from East_ in radians
+            # ALN : angle between the vertical surface containing the normal to the
+            #   surface and vertical surface passing through the centre of the solar
+            #   disc [rad]
+            azimuth_difference_series_array = (
+                solar_azimuth_series_array.value - surface_orientation
+            )
+            azimuth_difference_series_array = np.arctan2(
+                np.sin(azimuth_difference_series_array),
+                np.cos(azimuth_difference_series_array),
+            )
+            diffuse_inclined_irradiance_series[
+                mask_potentially_sunlit_surface_series
+            ] = diffuse_horizontal_irradiance_series[
+                mask_potentially_sunlit_surface_series
+            ] * (
+                diffuse_sky_irradiance_series[mask_potentially_sunlit_surface_series]
+                * (1 - kb_series[mask_potentially_sunlit_surface_series])
+                + kb_series[mask_potentially_sunlit_surface_series]
+                * sin(surface_tilt)
+                * np.cos(
+                    azimuth_difference_series_array[
+                        mask_potentially_sunlit_surface_series
+                    ]
                 )
-                # Normalize the azimuth difference to be within the range -pi to pi
-                # A0 : solar azimuth _measured from East_ in radians
-                # ALN : angle between the vertical surface containing the normal to the
-                #   surface and vertical surface passing through the centre of the solar
-                #   disc [rad]
-                azimuth_difference_series_array = (
-                    solar_azimuth_series_array.value - surface_orientation
+                / (
+                    0.1
+                    - 0.008
+                    * solar_altitude_series.radians[
+                        mask_potentially_sunlit_surface_series
+                    ]
                 )
-                azimuth_difference_series_array = np.arctan2(
-                    np.sin(azimuth_difference_series_array),
-                    np.cos(azimuth_difference_series_array),
-                )
-                diffuse_inclined_irradiance_series[
-                    mask_potential_sunlit_surface_series
-                ] = diffuse_horizontal_irradiance_series[
-                    mask_potential_sunlit_surface_series
-                ] * (
-                    diffuse_sky_irradiance_series[mask_potential_sunlit_surface_series]
-                    * (1 - kb_series[mask_potential_sunlit_surface_series])
-                    + kb_series[mask_potential_sunlit_surface_series]
-                    * sin(surface_tilt)
-                    * np.cos(
-                        azimuth_difference_series_array[
-                            mask_potential_sunlit_surface_series
-                        ]
-                    )
-                    / (
-                        0.1
-                        - 0.008
-                        * solar_altitude_series.radians[
-                            mask_potential_sunlit_surface_series
-                        ]
-                    )
-                )
+            )
 
     if apply_angular_loss_factor:
         diffuse_irradiance_angular_loss_coefficient = sin(surface_tilt) + (

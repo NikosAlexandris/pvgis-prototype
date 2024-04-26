@@ -301,8 +301,8 @@ def write_solar_position_series_csv(
     if azimuth is not None:
         header.append(AZIMUTH_COLUMN_NAME)
     if incidence is not None:
-        header.append(SURFACE_TILT_COLUMN_NAME)
         header.append(SURFACE_ORIENTATION_COLUMN_NAME)
+        header.append(SURFACE_TILT_COLUMN_NAME)
         header.append(INCIDENCE_COLUMN_NAME)
     header.append(UNITS_COLUMN_NAME)
     import re
