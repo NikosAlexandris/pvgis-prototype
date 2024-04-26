@@ -22,7 +22,6 @@ from pvgisprototype.validation.pvis_data_classes import BaseCoordinatesModel
 
 # Units?
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
 
 # What?
@@ -75,7 +74,6 @@ class CalculateTimeOffsetTimeSeriesNOAAInput(
 class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
-    BaseTimeOutputUnitsModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,

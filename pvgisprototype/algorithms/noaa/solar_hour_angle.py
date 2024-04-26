@@ -159,10 +159,67 @@ def calculate_solar_hour_angle_time_series_noaa(
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians for a time series.
 
+    The solar hour angle calculation converts the local solar time (LST) into
+    the number of degrees which the sun moves across the sky. In other words,
+    it reflects the Earth's rotation and indicates the time of the day relative
+    to the position of the Sun. It bases on the longitude and timestamp and by
+    definition, the solar hour angle is :
+
+      - 0° at solar noon
+      - negative in the morning
+      - positive in the afternoon.
+
+    Since the Earth rotates 15° per hour, each hour away from solar noon
+    corresponds to an angular motion of the sun in the sky of 15°.
+    Practically, the calculation converts a timestamp into a solar time.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
     Notes
     -----
+    In the "original" equation, the solar hour angle is measured in degrees.
 
-    # solar_hour_angle_series = (true_solar_time_series_in_minutes - 720) * (np.pi / 720)
+        `hour_angle = true_solar_time / 4 - 180`
+        
+        which is the same as
+
+        `hour_angle = true_solar_time * 0.25 - 180`
+
+    In the present implementation, we calculate the solar hour angle directly
+    in radians. A full circle corresponds to 360 degrees or 2π radians. With
+    1440 minutes in a day, the angular change per minute is calculated as 2π
+    radians divided by 1440 minutes. This results in approximately
+    0.004363323129985824 radians per minute.
+
+    To find the solar hour angle, we first calculate the time difference from
+    solar noon (by subtracting the true solar time in minutes from 720). We
+    then multiply this difference by the angular change per minute
+    (0.004363323129985824) to convert the time difference into radians. This
+    approach (accurately?) represents the solar hour angle as an angular
+    measurement in radians, reflecting the Earth's rotation and the position of
+    the sun in the sky relative to a given location on Earth.
+
+    In NREL's SPA ... , equation 32:
+
+        Η = ν + σ − α 
+
+        Where :
+            - σ the observer geographical longitude, positive or negative
+              for east or west of Greenwich, respectively.
+
+        Limit Η to the range from 0 to 360 degrees using step 3.2.6 and note that it
+        is measured westward from south in this algorithm.
+
+        Step 3.2.6 :
+
+            Limit L to the range from 0 to 360 degrees. That can be
+            accomplished by dividing L by 360 and recording the decimal
+            fraction of the division as F. If L is positive, then the limited L
+            = 360 * F. If L is negative, then the limited L = 360 - 360 * F.
 
     """
     true_solar_time_series = calculate_true_solar_time_time_series_noaa(
