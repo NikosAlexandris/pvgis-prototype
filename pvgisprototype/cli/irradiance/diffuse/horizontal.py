@@ -1,6 +1,5 @@
 """
-CLI module to calculate the diffuse horizontal irradiance component over a
-location for a period in time.
+CLI module to calculate the clear-sky diffuse horizontal irradiance component over a location for a period in time.
 """
 
 from rich import print

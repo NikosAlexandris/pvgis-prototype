@@ -244,7 +244,7 @@ def calculate_photovoltaic_power_output_series(
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=verbose,
+        verbose=0,
         log=log,
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
@@ -262,7 +262,7 @@ def calculate_photovoltaic_power_output_series(
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=verbose,
+        verbose=0,
         log=log,
     )
     # Masks based on the solar altitude series
@@ -327,7 +327,7 @@ def calculate_photovoltaic_power_output_series(
                 angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
-                verbose=verbose,  # no verbosity here by choice!
+                verbose=0,  # no verbosity here by choice!
                 log=log,
             )
         direct_irradiance_series[mask_above_horizon_not_in_shade] = calculated_direct_irradiance_series.value[mask_above_horizon_not_in_shade]
@@ -590,7 +590,7 @@ def calculate_photovoltaic_power_output_series(
         ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
         ps.print_stats()
 
-        if verbose > 6:
+        if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             print(s.getvalue())
 
     log_data_fingerprint(

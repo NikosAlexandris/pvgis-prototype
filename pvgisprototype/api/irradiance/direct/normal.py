@@ -142,7 +142,6 @@ def calculate_direct_normal_irradiance_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     fingerprint: bool = False,
-    show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct normal irradiance.
 
@@ -162,7 +161,6 @@ def calculate_direct_normal_irradiance_time_series(
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
 
     """
-    # with Progress(disable=not show_progress):
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_time_series(
             timestamps=timestamps,
