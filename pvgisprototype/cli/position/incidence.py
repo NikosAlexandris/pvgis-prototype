@@ -61,7 +61,7 @@ def incidence(
     random_surface_orientation: Annotated[Optional[bool], typer_option_random_surface_orientation] = False,
     surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     random_surface_tilt: Annotated[Optional[bool], typer_option_random_surface_tilt] = False,
-    solar_incidence_model: Annotated[List[SolarIncidenceModel], typer_option_solar_incidence_model] = [SolarIncidenceModel.jenco],
+    solar_incidence_model: Annotated[List[SolarIncidenceModel], typer_option_solar_incidence_model] = [SolarIncidenceModel.iqbal],
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     random_time: Annotated[bool, typer_option_random_time] = RANDOM_DAY_FLAG_DEFAULT,
     hour_angle: Annotated[Optional[float], typer_argument_hour_angle] = None,
