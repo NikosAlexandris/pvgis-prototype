@@ -52,8 +52,9 @@ class SolarPositionModel(str, Enum):
 
 class SolarIncidenceModel(str, Enum):
     all = 'all'
-    pvis = 'PVIS'
     jenco = 'Jenco'
+    iqbal = 'Iqbal'  # NREL
+    pvis = 'PVIS'
 
 
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
