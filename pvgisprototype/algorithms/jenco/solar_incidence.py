@@ -522,7 +522,7 @@ def calculate_solar_incidence_time_series_jenco(
         )
         solar_incidence_series = np.arcsin(sine_solar_incidence_series)
 
-    description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination angle of a surface (surface-plane)."
+    description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination of a surface (surface-plane)."
     if not complementary_incidence_angle:  # derive the 'typical' incidence angle
         solar_incidence_series = np.pi/2 - solar_incidence_series
         description='Incidence angle between sun-vector and surface-normal'
