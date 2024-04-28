@@ -516,11 +516,24 @@ def calculate_solar_incidence_time_series_jenco(
             dtype=dtype,
             log=log,
         )
+        print(f'Surface orientation  : {surface_orientation}')
+        print(f'Relative longitude : {relative_longitude}')
+        print(f'Hour angel : {solar_hour_angle_series=}')
+        # from rich import print
+        # if surface_orientation.radians < np.pi and relative_longitude.value < 0:
+        #     print(f'[bold red]Add[/bold red] {np.pi} to relative_longitude {relative_longitude}')
+        #     relative_longitude.value += np.pi
+
+        # if surface_orientation.radians > np.pi and relative_longitude.value > 0:
+        #     print(f'[bold red]Remove[/bold red] {np.pi} from relative_longitude {relative_longitude}')
+        #     relative_longitude.value -= np.pi
+        # print(f'Relative longitude Adjusted ? : {relative_longitude}')
         sine_solar_incidence_series = (
             c_inclined_31_series * np.cos(solar_hour_angle_series.radians - relative_longitude.radians)
             + c_inclined_33_series
         )
         solar_incidence_series = np.arcsin(sine_solar_incidence_series)
+        print(f'{solar_incidence_series=}')
 
     description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination angle of a surface (surface-plane)."
     if not complementary_incidence_angle:  # derive the 'typical' incidence angle
