@@ -30,6 +30,7 @@ from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype.constants import RADIANS
 from pvgisprototype import SolarIncidence
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
+from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_time_series_iqbal
 import numpy as np
 from pandas import DatetimeIndex
 from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
@@ -45,7 +46,7 @@ def model_solar_incidence_time_series(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
-    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -83,6 +84,17 @@ def model_solar_incidence_time_series(
             verbose=verbose,
             log=log,
         )
+
+    if solar_incidence_model.value == SolarIncidenceModel.iqbal:
+
+        solar_incidence_series = calculate_solar_incidence_time_series_iqbal(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,

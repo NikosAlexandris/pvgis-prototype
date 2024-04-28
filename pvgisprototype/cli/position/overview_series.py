@@ -89,6 +89,7 @@ def overview_series(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
+    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: Annotated[bool, 'Measure angle between sun-vector and surface-plane'] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -141,6 +142,7 @@ def overview_series(
 
     # Why does the callback function `_parse_model` not work? 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
+    from devtools import debug
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
@@ -152,6 +154,7 @@ def overview_series(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         # refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
+        solar_incidence_model=solar_incidence_model,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         # time_output_units=time_output_units,
@@ -162,6 +165,7 @@ def overview_series(
         complementary_incidence_angle=complementary_incidence_angle,
         verbose=verbose,
     )
+    debug(locals())
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     from pvgisprototype.cli.print import print_solar_position_series_table
