@@ -111,7 +111,6 @@ typer_argument_surface_orientation = typer.Argument(
     is_eager=True,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_surface_geometry,
-    # default_factory = SURFACE_ORIENTATION_DEFAULT,
     show_default=False,
 )
 typer_option_surface_orientation = typer.Option(
@@ -121,7 +120,6 @@ typer_option_surface_orientation = typer.Option(
     is_eager=True,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_surface_geometry,
-    # default_factory = SURFACE_ORIENTATION_DEFAULT,
 )
 typer_option_random_surface_orientation = typer.Option(
     help='Random solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]',

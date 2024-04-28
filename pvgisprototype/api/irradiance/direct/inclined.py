@@ -161,7 +161,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_COLUMN_NAME,
-    show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
@@ -181,7 +180,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         Direct Inclined = Direct Horizontal * sin( Solar Incidence ) / sin( Solar Altitude )
 
     The implementation by Hofierka (2002) uses the solar incidence angle
-    between the sun-vetor and plance of the reference surface (as per Jenco,
+    between the sun-vector and plane of the reference surface (as per Jenco,
     1992). This is very important and relates to the hardcoded value `True` for
     the `complementary_incidence_angle` input parameter of the function. We
     call this angle (definition) the _complementary_ incidence angle.
@@ -265,7 +264,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     in_shade = is_surface_in_shade_time_series(
             solar_altitude_series,
             solar_azimuth_series,
-            )
+            )  # This is currenrly a stub, will return always False = Not in Shade! 
     mask_not_in_shade = ~in_shade
     mask = np.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
@@ -298,7 +297,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
-            show_progress=show_progress,
         ).value  # Important
     else:  # read from a time series dataset
         if verbose > 0:
