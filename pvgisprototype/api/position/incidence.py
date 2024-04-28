@@ -10,6 +10,7 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from typing import List
 from pvgisprototype import SolarIncidence
+from pvgisprototype import SurfaceOrientation
 from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -26,6 +27,8 @@ from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import INCIDENCE_NAME
 from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
 
 
 def model_solar_incidence(
@@ -49,13 +52,21 @@ def model_solar_incidence(
     """ """
     if solar_incidence_model.value == SolarIncidenceModel.jenco:
 
+        # Jenco / Hofierka measure azimuth angles from East !
+        surface_orientation_east_convention = SurfaceOrientation(
+            value=convert_north_to_east_radians_convention(
+                north_based_angle=surface_orientation
+            ),
+            unit=RADIANS,
+        )
+
         solar_incidence = calculate_solar_incidence_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
             surface_tilt=surface_tilt,
-            surface_orientation=surface_orientation,
+            surface_orientation=surface_orientation_east_convention,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             complementary_incidence_angle=complementary_incidence_angle,
