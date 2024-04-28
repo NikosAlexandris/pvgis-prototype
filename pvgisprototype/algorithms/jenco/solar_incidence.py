@@ -471,7 +471,7 @@ def calculate_solar_incidence_time_series_jenco(
         array_backend=array_backend,
         verbose=0,
         log=log,
-    )
+    )  # Based on NOAA, thus North = 0 degrees
     in_shade = is_surface_in_shade_time_series(
         solar_altitude_series=solar_altitude_series,
         solar_azimuth_series=solar_azimuth_series,
