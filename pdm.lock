@@ -5,7 +5,7 @@
 groups = ["default", "docs", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:c477c94de9cc5bb5e394dcd5befb3f65cc5f52d5bfed4d21e55b12baa6dcb5d7"
+content_hash = "sha256:caab44ca6b20b6d1ee0bcf234a65d8f66b363ff4f1d170a74d430e6159a5657d"
 
 [[package]]
 name = "annotated-types"
@@ -804,7 +804,7 @@ name = "markdown"
 version = "3.5.2"
 requires_python = ">=3.8"
 summary = "Python implementation of John Gruber's Markdown."
-groups = ["default", "docs"]
+groups = ["docs"]
 files = [
     {file = "Markdown-3.5.2-py3-none-any.whl", hash = "sha256:d43323865d89fc0cb9b20c75fc8ad313af307cc087e84b657d9eec768eddeadd"},
     {file = "Markdown-3.5.2.tar.gz", hash = "sha256:e1ac7b3dc550ee80e602e71c1d168002f062e49f1b11e26a36264dafd4df2ef8"},
@@ -815,7 +815,7 @@ name = "markdown-exec"
 version = "1.8.1"
 requires_python = ">=3.8"
 summary = "Utilities to execute code blocks in Markdown files."
-groups = ["default", "docs"]
+groups = ["docs"]
 dependencies = [
     "pymdown-extensions>=9",
 ]
@@ -830,7 +830,7 @@ version = "1.8.1"
 extras = ["ansi"]
 requires_python = ">=3.8"
 summary = "Utilities to execute code blocks in Markdown files."
-groups = ["default", "docs"]
+groups = ["docs"]
 dependencies = [
     "markdown-exec==1.8.1",
     "pygments-ansi-color",
@@ -1691,7 +1691,7 @@ name = "pygments-ansi-color"
 version = "0.3.0"
 requires_python = ">=3.7"
 summary = ""
-groups = ["default", "docs"]
+groups = ["docs"]
 dependencies = [
     "pygments!=2.7.3",
 ]
@@ -1705,7 +1705,7 @@ name = "pymdown-extensions"
 version = "10.7.1"
 requires_python = ">=3.8"
 summary = "Extension pack for Python Markdown."
-groups = ["default", "docs"]
+groups = ["docs"]
 dependencies = [
     "markdown>=3.5",
     "pyyaml",
