@@ -259,6 +259,11 @@ def print_solar_position_series_table(
         columns.append(INCIDENCE_COLUMN_NAME)
 
     title = 'Solar geometry overview'
+    
+    # Build a Caption
+
+    ## Position
+
     caption = f"[underline]Position[/underline]  "
     caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
     # Should be the same in case of multiple models!
@@ -272,6 +277,8 @@ def print_solar_position_series_table(
 
     units = rounded_table[first_model].get(UNITS_NAME, UNITLESS)
     caption += f"\[[dim]{units}[/dim]]"
+
+    ## Algorithms
 
     caption += f"\n[underline]Algorithms[/underline]  "
 
@@ -291,6 +298,9 @@ def print_solar_position_series_table(
 
     position_algorithm = rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
     caption += f"Positioning : [bold]{position_algorithm}[/bold], "
+
+    incidence_algorithm = rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
+    caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
 
     incidence_angle_definition = rounded_table[first_model].get(INCIDENCE_DEFINITION, None) if incidence else None
     caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
@@ -644,6 +654,7 @@ def print_irradiance_table_2(
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
     timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
     position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
+    incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
 
     if algorithms or radiation_model or timing_algorithm or position_algorithm:
         caption += f"\n[underline]Algorithms[/underline]  "
@@ -660,9 +671,12 @@ def print_irradiance_table_2(
     if position_algorithm:
         caption += f"Positioning : [bold]{position_algorithm}[/bold], "
 
-    solar_incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
-    if solar_incidence_algorithm is not None:
-        caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow], "
+    if incidence_algorithm:
+        caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
+
+    # solar_incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
+    # if solar_incidence_algorithm is not None:
+    #     caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow], "
 
     solar_incidence_definition = dictionary.get(INCIDENCE_DEFINITION, None)
     if solar_incidence_definition is not None:
@@ -689,14 +703,18 @@ def print_irradiance_table_2(
     table = Table(
             title=title,
             caption=caption.rstrip(', '),  # Remove trailing comma + space
+            caption_justify="center",
+            expand=False,
+            padding=(0, 2),
             box=SIMPLE_HEAD,
+            show_footer=True,
             )
     
     if index:
         table.add_column("Index")
 
     # base columns
-    table.add_column('Time')
+    table.add_column('Time')  # footer = 'Something'
     
     # remove the 'Title' entry! ---------------------------------------------
     dictionary.pop('Title', NOT_AVAILABLE)
@@ -722,14 +740,25 @@ def print_irradiance_table_2(
     for key, value in dictionary.items():
         if key not in keys_to_exclude:
 
-            if dictionary[key] is not None:
-                table.add_column(key)
+            if isinstance(value, np.ndarray) and value.dtype.kind in "if":
+                sum_of_key_value = str(value.sum())
 
             if isinstance(value, (float, int)):
                 dictionary[key] = np.full(len(timestamps), value)
 
             if isinstance(value, str):
                 dictionary[key] = np.full(len(timestamps), str(value))
+
+            if sum_of_key_value:
+                table.add_column(key, footer=sum_of_key_value)
+            else:
+                table.add_column(key)
+
+
+            # if dictionary[key] is not None and key_sum:
+
+            # if dictionary[key] is not None:
+
     
     # Zip series and timestamps
     filtered_dictionary = {key: value for key, value in dictionary.items() if key not in keys_to_exclude}
