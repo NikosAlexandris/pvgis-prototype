@@ -10,6 +10,7 @@ During a cloudy day the sunlight will be partially absorbed and scattered by
 different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
+
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -29,6 +30,8 @@ from typing import Union
 from typing import Sequence
 from typing import List
 from pathlib import Path
+from pvgisprototype import SurfaceOrientation
+from pvgisprototype import SurfaceTilt
 from pvgisprototype import SolarAltitude
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import OpticalAirMass
@@ -134,8 +137,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     longitude: float,
     latitude: float,
     elevation: float,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = None,
     timezone: Optional[str] = None,
     convert_longitude_360: bool = False,

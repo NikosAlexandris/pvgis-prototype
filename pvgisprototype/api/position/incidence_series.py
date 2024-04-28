@@ -42,7 +42,8 @@ def model_solar_incidence_time_series(
     timestamps: DatetimeIndex,
     timezone: Optional[ZoneInfo] = None,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Union[float, SurfaceTilt] = SURFACE_TILT_DEFAULT,
+    surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
@@ -57,7 +58,7 @@ def model_solar_incidence_time_series(
     """
     if solar_incidence_model.value == SolarIncidenceModel.jenco:
 
-        # Jenco / Hofierka measure azimuth angles from East !
+        # Hofierka (2002) measures azimuth angles from East !
         surface_orientation_east_convention = SurfaceOrientation(
             value=convert_north_to_east_radians_convention(
                 north_based_angle=surface_orientation
@@ -72,8 +73,16 @@ def model_solar_incidence_time_series(
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
+            # surface_orientation=surface_orientation,
             surface_orientation=surface_orientation_east_convention,
             surface_tilt=surface_tilt,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            complementary_incidence_angle=complementary_incidence_angle,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
             complementary_incidence_angle=complementary_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,
