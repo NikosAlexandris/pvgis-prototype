@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the diffuse horizontal irradiance component over a
+location for a period in time based on external solar irradiance time series.
+"""
+
 from typing import Annotated
 from typing import Optional
 from pathlib import Path

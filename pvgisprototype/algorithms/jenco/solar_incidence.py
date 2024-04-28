@@ -45,6 +45,7 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype.constants import RADIANS
 import numpy as np
@@ -187,7 +188,7 @@ def calculate_solar_incidence_jenco(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarIncidence:
     """Calculate the solar incidence angle 
 
@@ -347,6 +348,8 @@ def calculate_solar_incidence_jenco(
         solar_incidence = asin(sine_solar_incidence)
 
     if not complementary_incidence_angle:
+        logger.info(':information: [bold][magenta]Converting[/magenta] solar incidence angle to Sun-to-Surface-Normal[/bold]...')
+        
         solar_incidence = np.pi/2 - solar_incidence
 
     if solar_incidence < 0:
