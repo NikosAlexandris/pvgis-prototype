@@ -397,6 +397,7 @@ class ModelSolarGeometryOverviewTimeSeriesInputModel(
     SurfaceOrientationModel,
     SolarPositionModel,
     SolarTimeModelModel,
+    SolarIncidenceModel,
     ApplyAtmosphericRefractionModel,
     EarthOrbitModel,
     ComplementaryIncidenceAngleModel,

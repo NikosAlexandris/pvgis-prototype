@@ -302,7 +302,7 @@ class SolarPositionModel(BaseModel):
 
 
 class SolarIncidenceModel(BaseModel):
-    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal
 
 
 class ComplementaryIncidenceAngleModel(BaseModel):
