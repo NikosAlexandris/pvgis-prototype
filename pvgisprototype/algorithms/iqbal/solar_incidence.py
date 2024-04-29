@@ -17,6 +17,7 @@ from pvgisprototype import SurfaceTilt
 from pvgisprototype import SolarZenith
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import SolarIncidence
+from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -135,7 +136,6 @@ def calculate_solar_incidence_time_series_iqbal(
     # projection = numpy.clip(projection, -1, 1)
     cosine_solar_incidence_series = numpy.clip(cosine_solar_incidence_series, -1, 1)
     solar_incidence_series = numpy.arccos(cosine_solar_incidence_series)
-    print(f'{solar_incidence_series=}')
 
     description='Incidence angle between sun-vector and surface-normal'
     incidence_definition='Sun-to-Surface-Normal'
@@ -163,7 +163,7 @@ def calculate_solar_incidence_time_series_iqbal(
         unit=RADIANS,
         positioning_algorithm=solar_azimuth_series.position_algorithm,  #
         timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
-        incidence_algorithm='Iqbal',
+        incidence_algorithm=SolarIncidenceModel.iqbal,
         definition=incidence_definition,
         description=description,
     )
