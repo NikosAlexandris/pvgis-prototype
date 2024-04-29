@@ -206,6 +206,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     # ----------------------------------- Diffuse Horizontal Irradiance -- >>>
     # Based on external global and direct irradiance components
     if global_horizontal_component and direct_horizontal_component:
+        if verbose > 0:
+            logger.info(':information: [bold]Reading[/bold] the [magenta]global and direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]...')
         horizontal_irradiance_components = (
             read_horizontal_irradiance_components_from_sarah(
                 shortwave=global_horizontal_component,
@@ -242,7 +244,12 @@ def calculate_diffuse_inclined_irradiance_time_series(
         ).value  # Important !
 
     else:  # OR from the model
-        # in which case : we need the direct component for the kb series, if it's NOT read fom external series!
+        if verbose > 0:
+            logger.info(
+                ":information: [bold][magenta]Modelling[/magenta] clear-sky diffuse horizontal irradiance[/bold]..."
+            )
+        global_horizontal_irradiance_series = NOT_AVAILABLE
+        # in which case, however: we need the direct component for the kb series, if it's NOT read fom external series!
         direct_horizontal_irradiance_series = (
             calculate_direct_horizontal_irradiance_time_series(
                 longitude=longitude,
@@ -277,7 +284,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     # if surface_tilt == 0:  # horizontally flat surface
     surface_tilt_threshold = 0.0001
     if surface_tilt <= surface_tilt_threshold:
-        diffuse_inclined_irradiance_series = diffuse_horizontal_irradiance_series
+        diffuse_inclined_irradiance_series = np.copy(diffuse_horizontal_irradiance_series)
         # to not break the output !
         diffuse_sky_irradiance_series = NOT_AVAILABLE
         n_series = NOT_AVAILABLE
@@ -289,7 +296,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
     else:  # tilted (or inclined) surface
     # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
         # print(f'{surface_tilt=} should NOT be zero!, hence {diffuse_horizontal_irradiance_series=}')
-
         kb_series = ( # proportion between direct and extraterrestrial
             direct_horizontal_irradiance_series
             / extraterrestrial_horizontal_irradiance_series
@@ -349,11 +355,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         #     azimuth_difference_series_array = None  # Avoid UnboundLocalError!
         #     solar_azimuth_series_array = None
         #     # ----------------------------------------------------------------
-
         if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
-            diffuse_sky_irradiance_series = np.full_like(
-                diffuse_horizontal_irradiance_series, diffuse_sky_irradiance_series
-            )
             diffuse_inclined_irradiance_series[
                 mask_sunlit_surface_series
             ] = diffuse_horizontal_irradiance_series[mask_sunlit_surface_series] * (
@@ -468,6 +470,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         } if verbose > 3 else {},
 
         'and_even_more_extended': lambda: {
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_horizontal_irradiance_series,
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,

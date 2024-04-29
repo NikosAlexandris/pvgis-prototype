@@ -10,6 +10,7 @@ During a cloudy day the sunlight will be partially absorbed and scattered by
 different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
+
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -29,6 +30,8 @@ from typing import Union
 from typing import Sequence
 from typing import List
 from pathlib import Path
+from pvgisprototype import SurfaceOrientation
+from pvgisprototype import SurfaceTilt
 from pvgisprototype import SolarAltitude
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import OpticalAirMass
@@ -129,13 +132,13 @@ from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+# @cached(cache={}, key=custom_hashkey)
 def calculate_direct_inclined_irradiance_time_series_pvgis(
     longitude: float,
     latitude: float,
     elevation: float,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = None,
     timezone: Optional[str] = None,
     convert_longitude_360: bool = False,
@@ -161,27 +164,37 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_COLUMN_NAME,
-    show_progress: bool = True,
 ) -> np.array:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
-    This function implements the algorithm described by Hofierka, 2002. [1]_
+    Calculate the direct irradiance on an inclined surface based on the
+    solar radiation model by Hofierka, 2002. [1]_
+
 
     Notes
     -----
+    Bic = B0c sin δexp (equation 11)
 
-              B   ⋅ sin ⎛δ   ⎞                    
-               hc       ⎝ exp⎠         ⎛ W ⎞
-        B   = ────────────────     in  ⎜───⎟
-         ic       sin ⎛h ⎞             ⎜ -2⎟           
-                      ⎝ 0⎠             ⎝m  ⎠           
+    or
+    
+          B   ⋅ sin ⎛δ   ⎞                    
+           hc       ⎝ exp⎠         ⎛ W ⎞
+    B   = ────────────────     in  ⎜───⎟
+     ic       sin ⎛h ⎞             ⎜ -2⎟           
+                  ⎝ 0⎠             ⎝m  ⎠           
 
-        or else :
+        (equation 12)
+
+    where :
+
+    - δexp is the solar incidence angle measured between the sun and an
+      inclined surface defined in equation (16).
+    or else :
 
         Direct Inclined = Direct Horizontal * sin( Solar Incidence ) / sin( Solar Altitude )
 
     The implementation by Hofierka (2002) uses the solar incidence angle
-    between the sun-vetor and plance of the reference surface (as per Jenco,
+    between the sun-vector and plane of the reference surface (as per Jenco,
     1992). This is very important and relates to the hardcoded value `True` for
     the `complementary_incidence_angle` input parameter of the function. We
     call this angle (definition) the _complementary_ incidence angle.
@@ -265,7 +278,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     in_shade = is_surface_in_shade_time_series(
             solar_altitude_series,
             solar_azimuth_series,
-            )
+            )  # This is currenrly a stub, will return always False = Not in Shade! 
     mask_not_in_shade = ~in_shade
     mask = np.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
@@ -280,6 +293,12 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if not direct_horizontal_component:
         if verbose > 0:
             logger.info(':information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...')
+        print(f'{longitude=}')
+        print(f'{latitude=}')
+        print()
+        print(f'{surface_orientation=}')
+        print(f'{surface_tilt=}')
+        debug(locals())
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
             longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
@@ -298,7 +317,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             array_backend=array_backend,
             verbose=0,  # no verbosity here by choice!
             log=log,
-            show_progress=show_progress,
         ).value  # Important
     else:  # read from a time series dataset
         if verbose > 0:
@@ -319,6 +337,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             log=log,
         ).to_numpy().astype(dtype=dtype)
 
+        print(f'{direct_horizontal_irradiance_series=}')
+
     try:
         # the number of timestamps should match the number of "x" values
         if verbose > 0:
@@ -328,9 +348,13 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         )
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
-            * np.sin(solar_incidence_series.radians)
+            * np.sin(solar_incidence_series.radians)  # Should be the _complementary_ incidence angle!
             / np.sin(solar_altitude_series.radians)
         )
+        print(f'{direct_horizontal_irradiance_series=}')
+        print(f'{solar_incidence_series=}')
+        print(f'{solar_altitude_series=}')
+        print(f'{direct_inclined_irradiance_series=}')
     except ZeroDivisionError:
         logger.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
         logger.debug("Is the solar altitude angle zero?")
@@ -350,6 +374,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
                     verbose=0,
                 )
             )
+            print(f'{np.pi/2 - solar_incidence_series.value=}')
             direct_inclined_irradiance_series *= angular_loss_factor_series
 
         except ZeroDivisionError as e:
