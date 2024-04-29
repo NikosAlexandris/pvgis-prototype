@@ -2,6 +2,7 @@ from devtools import debug
 from typing import Union
 from typing import Sequence
 import numpy as np
+from numpy import mod
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import sin
@@ -29,6 +30,8 @@ from pandas import DatetimeIndex
 from rich import print
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import FIX_OUT_OF_RANGE_VALUES_POSITIVE
+from pvgisprototype.constants import FIX_OUT_OF_RANGE_VALUES_NEGATIVE
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -349,19 +352,23 @@ def calculate_solar_azimuth_time_series_noaa(
         verbose=verbose,
         log=log,
     )
-    numerator_series = np.sin(solar_declination_series.radians) - sin(
-        latitude.radians
-    ) * np.cos(solar_zenith_series.radians)
-    denominator_series = cos(latitude.radians) * np.sin(solar_zenith_series.radians)
+    numerator_series = (sin(latitude.radians) 
+        * np.cos(solar_zenith_series.radians)
+        - np.sin(solar_declination_series.radians))
+    denominator_series = (cos(latitude.radians) 
+        * np.sin(solar_zenith_series.radians))
+    
     cosine_solar_azimuth_series = numerator_series / denominator_series
-    solar_azimuth_series = np.arccos(cosine_solar_azimuth_series)
+    cosine_solar_azimuth_series[cosine_solar_azimuth_series > 1] = FIX_OUT_OF_RANGE_VALUES_POSITIVE
+    cosine_solar_azimuth_series[cosine_solar_azimuth_series < -1] = FIX_OUT_OF_RANGE_VALUES_NEGATIVE
+    solar_azimuth_series = mod(3 * np.pi - np.arccos(cosine_solar_azimuth_series), 2 * np.pi)
 
     # interpretation for afternoon hours !
     afternoon_hours = solar_hour_angle_series.value > 0
-    solar_azimuth_series[afternoon_hours] = (
-        2 * np.pi - solar_azimuth_series[afternoon_hours]
+    solar_azimuth_series[afternoon_hours] = mod(
+        np.arccos(cosine_solar_azimuth_series[afternoon_hours]) + np.pi, 2 * np.pi
     )
-
+    
     if (
         (solar_azimuth_series < SolarAzimuth().min_radians)
         | (solar_azimuth_series > SolarAzimuth().max_radians)
