@@ -231,27 +231,10 @@ def calculate_solar_hour_angle_time_series_noaa(
         verbose=verbose,
         log=log,
     )
-    # true_solar_time_series_in_minutes = np.array(
-    #     (true_solar_time_series.hour * 60)
-    #     + true_solar_time_series.minute
-    #     + (true_solar_time_series.second / 60.0), dtype
-    # )
 
-    # The following gives a slightly different result than the above approach!
-    true_solar_time_series_in_minutes = (
-        np.array(
-            (
-                true_solar_time_series - true_solar_time_series.normalize()
-            ).total_seconds(),
-            dtype,
-        )
-        / 60
-    )
-    nppi = np.array(np.pi, dtype=dtype)
-    solar_hour_angle_series = (true_solar_time_series_in_minutes - 720) * (nppi / 720)
-
-    if np.any(solar_hour_angle_series < -nppi):
-        solar_hour_angle_series += 2 * nppi * (solar_hour_angle_series < -nppi)
+    solar_hour_angle_series = (true_solar_time_series.value - 720.) * (np.pi / 720.)
+    solar_hour_angle_series[solar_hour_angle_series < -np.pi] += np.pi
+    solar_hour_angle_series[solar_hour_angle_series > np.pi] -= np.pi
 
     if not np.all(
         (SolarHourAngle().min_radians <= solar_hour_angle_series)
@@ -264,7 +247,7 @@ def calculate_solar_hour_angle_time_series_noaa(
             )
         ]
         raise ValueError(
-            f"Calculated solar hour angle/s out of the expected range [{-nppi}, {nppi}] radians : {out_of_range_values}"
+            f"Calculated solar hour angle/s out of the expected range [{-np.pi}, {np.pi}] radians : {out_of_range_values}"
         )
     log_data_fingerprint(
             data=solar_hour_angle_series,
