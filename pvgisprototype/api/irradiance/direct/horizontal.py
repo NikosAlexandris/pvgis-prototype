@@ -130,7 +130,7 @@ from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+# @cached(cache={}, key=custom_hashkey)
 def calculate_direct_horizontal_irradiance_time_series(
     longitude: float,
     latitude: float,
@@ -151,7 +151,6 @@ def calculate_direct_horizontal_irradiance_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_COLUMN_NAME,
-    show_progress: bool = True,
 ) -> np.ndarray:
     """Calculate the direct horizontal irradiance
 
@@ -210,7 +209,6 @@ def calculate_direct_horizontal_irradiance_time_series(
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
-        show_progress=show_progress,
     )
 
     # Mask conditions -------------------------------------------------------

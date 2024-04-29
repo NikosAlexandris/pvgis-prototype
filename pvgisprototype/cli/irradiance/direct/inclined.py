@@ -188,7 +188,6 @@ def get_direct_inclined_irradiance_time_series(
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,
-        show_progress=show_progress,
     )
     if not quiet:
         if verbose > 0:
