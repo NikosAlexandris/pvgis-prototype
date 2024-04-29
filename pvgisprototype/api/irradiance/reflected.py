@@ -124,7 +124,7 @@ def calculate_ground_reflected_inclined_irradiance_time_series(
             timestamps.shape
         )
         ground_reflected_inclined_irradiance_series = create_array(
-            shape_of_array, dtype=dtype, init_method=numpy.nan, backend=array_backend
+            shape_of_array, dtype=dtype, init_method="zeros", backend=array_backend
         )
         global_horizontal_irradiance_series = NOT_AVAILABLE 
         ground_view_fraction = NOT_AVAILABLE
