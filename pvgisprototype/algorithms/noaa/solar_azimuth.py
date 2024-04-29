@@ -355,6 +355,8 @@ def calculate_solar_azimuth_time_series_noaa(
     denominator_series = cos(latitude.radians) * np.sin(solar_zenith_series.radians)
     cosine_solar_azimuth_series = numerator_series / denominator_series
     solar_azimuth_series = np.arccos(cosine_solar_azimuth_series)
+
+    # interpretation for afternoon hours !
     afternoon_hours = solar_hour_angle_series.value > 0
     solar_azimuth_series[afternoon_hours] = (
         2 * np.pi - solar_azimuth_series[afternoon_hours]
@@ -369,7 +371,7 @@ def calculate_solar_azimuth_time_series_noaa(
             | (solar_azimuth_series > SolarAzimuth().max_radians)
         ]
         # raise ValueError(# ?
-        print(
+        logger.warning(
             f"{WARNING_OUT_OF_RANGE_VALUES} "
             f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
             f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
