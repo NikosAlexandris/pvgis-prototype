@@ -169,6 +169,7 @@ class CalculateSolarAzimuthNOAAInput(
 class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
+    ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
