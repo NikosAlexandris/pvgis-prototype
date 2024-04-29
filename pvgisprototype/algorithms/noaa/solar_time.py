@@ -15,6 +15,8 @@ from pandas import Timestamp
 from pandas import Timedelta
 from pandas import to_timedelta
 from pandas import DatetimeIndex
+from numpy import array
+from numpy import mod
 from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_noaa
 from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_time_series_noaa
 from datetime import datetime
@@ -186,16 +188,15 @@ def calculate_true_solar_time_time_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
     )
-    true_solar_time_series = timestamps + to_timedelta(time_offset_series.value, unit='min')
-    true_solar_time_series_in_minutes = (
+    true_solar_time_series_in_minutes = mod((
         (timestamps - timestamps.normalize()).total_seconds()
         + (time_offset_series.value * 60)
-    ).astype(dtype) / 60
+    ).astype(dtype) / 60, 1440)
 
     if not (
         (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
         & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
-    ).all():
+    ).all(): 
         out_of_range_values = true_solar_time_series_in_minutes[
             ~(
                 (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
@@ -211,4 +212,4 @@ def calculate_true_solar_time_time_series_noaa(
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return true_solar_time_series
+    return TrueSolarTime(value = array(true_solar_time_series_in_minutes, dtype = "float32"), unit = "minutes")
