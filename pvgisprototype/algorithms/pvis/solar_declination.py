@@ -33,7 +33,7 @@ def calculate_solar_declination_pvis(
     Parameters
     ----------
     day_of_year: int
-        The day of the year (ranging froSolarAzimuthm 1 to 365 or 366 in a leap year).
+        The day of the year (ranging from 1 to 365 or 366 in a leap year).
 
     Returns
     -------
