@@ -167,18 +167,29 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 ) -> np.array:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
-    This function implements the algorithm described by Hofierka, 2002. [1]_
+    Calculate the direct irradiance on an inclined surface based on the
+    solar radiation model by Hofierka, 2002. [1]_
+
 
     Notes
     -----
+    Bic = B0c sin δexp (equation 11)
 
-              B   ⋅ sin ⎛δ   ⎞                    
-               hc       ⎝ exp⎠         ⎛ W ⎞
-        B   = ────────────────     in  ⎜───⎟
-         ic       sin ⎛h ⎞             ⎜ -2⎟           
-                      ⎝ 0⎠             ⎝m  ⎠           
+    or
+    
+          B   ⋅ sin ⎛δ   ⎞                    
+           hc       ⎝ exp⎠         ⎛ W ⎞
+    B   = ────────────────     in  ⎜───⎟
+     ic       sin ⎛h ⎞             ⎜ -2⎟           
+                  ⎝ 0⎠             ⎝m  ⎠           
 
-        or else :
+        (equation 12)
+
+    where :
+
+    - δexp is the solar incidence angle measured between the sun and an
+      inclined surface defined in equation (16).
+    or else :
 
         Direct Inclined = Direct Horizontal * sin( Solar Incidence ) / sin( Solar Altitude )
 
@@ -337,7 +348,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         )
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
-            * np.sin(solar_incidence_series.radians)
+            * np.sin(solar_incidence_series.radians)  # Should be the _complementary_ incidence angle!
             / np.sin(solar_altitude_series.radians)
         )
         print(f'{direct_horizontal_irradiance_series=}')
@@ -363,6 +374,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
                     verbose=0,
                 )
             )
+            print(f'{np.pi/2 - solar_incidence_series.value=}')
             direct_inclined_irradiance_series *= angular_loss_factor_series
 
         except ZeroDivisionError as e:
