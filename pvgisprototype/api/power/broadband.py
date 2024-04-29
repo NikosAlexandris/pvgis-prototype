@@ -328,7 +328,7 @@ def calculate_photovoltaic_power_output_series(
                 angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
-                verbose=0,  # no verbosity here by choice!
+                verbose=verbose,  # no verbosity here by choice!
                 log=log,
             )
         direct_irradiance_series[mask_above_horizon_not_in_shade] = calculated_direct_irradiance_series.value[mask_above_horizon_not_in_shade]

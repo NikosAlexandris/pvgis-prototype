@@ -148,7 +148,7 @@ class BaseCoordinatesModel(
 # When?
 
 class BaseTimestampModel(BaseModel):
-    timestamp: Union[np.datetime64, np.ndarray, Timestamp, DatetimeIndex]
+    timestamp: Union[np.datetime64, Timestamp, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamp')
