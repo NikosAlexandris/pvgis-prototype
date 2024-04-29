@@ -66,9 +66,6 @@ def model_solar_incidence_time_series(
             ),
             unit=RADIANS,
         )
-        print(f'{surface_orientation=}')
-        print(f'{surface_orientation_east_convention=}')
-        print()
         solar_incidence_series = calculate_solar_incidence_time_series_jenco(
             longitude=longitude,
             latitude=latitude,
