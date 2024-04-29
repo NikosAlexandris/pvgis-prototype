@@ -60,4 +60,4 @@ class SolarIncidenceModel(str, Enum):
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
 SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
 SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa
-SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.jenco
+SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.iqbal
