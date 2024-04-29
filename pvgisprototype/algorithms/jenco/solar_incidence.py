@@ -9,8 +9,8 @@ from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_noaa
 from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_noaa
-from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
+from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_time_series_jenco
+from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_time_series_jenco
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
@@ -26,6 +26,7 @@ from pvgisprototype import Latitude
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SolarHourAngle
+from pvgisprototype.api.position.models import SolarIncidenceModel
 
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel
@@ -450,19 +451,17 @@ def calculate_solar_incidence_time_series_jenco(
       3. negative solar hour angle for the incidence angle
 
     """
-    debug(locals())
-    solar_altitude_series = calculate_solar_altitude_time_series_noaa(
+    solar_altitude_series = calculate_solar_altitude_time_series_jenco(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
         log=log,
     )
-    solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
+    solar_azimuth_series = calculate_solar_azimuth_time_series_jenco(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -486,7 +485,9 @@ def calculate_solar_incidence_time_series_jenco(
 
     else:
         sine_relative_inclined_latitude = -(
-            cos(latitude.radians) * sin(surface_tilt.radians) * cos(surface_orientation.radians)
+            cos(latitude.radians)
+            * sin(surface_tilt.radians)
+            * cos(surface_orientation.radians)
             + sin(latitude.radians) * cos(surface_tilt.radians)
         )
         relative_inclined_latitude = asin(sine_relative_inclined_latitude)
@@ -534,9 +535,8 @@ def calculate_solar_incidence_time_series_jenco(
             + c_inclined_33_series
         )
         solar_incidence_series = np.arcsin(sine_solar_incidence_series)
-        print(f'{solar_incidence_series=}')
 
-    description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination angle of a surface (surface-plane)."
+    description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination of a surface (surface-plane)."
     if not complementary_incidence_angle:  # derive the 'typical' incidence angle
         solar_incidence_series = np.pi/2 - solar_incidence_series
         description='Incidence angle between sun-vector and surface-normal'
@@ -558,7 +558,8 @@ def calculate_solar_incidence_time_series_jenco(
     return SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
-        positioning_algorithm='Jenco',
-        timing_algorithm='Jenco',
+        positioning_algorithm=solar_azimuth_series.position_algorithm,  #
+        timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
+        incidence_algorithm=SolarIncidenceModel.jenco,
         description=description,
     )
