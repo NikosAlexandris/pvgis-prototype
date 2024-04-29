@@ -17,5 +17,9 @@ class TestSolarAzimuthNOAA(GenericCheckCustomObjects):
     def operation(self):
         return calculate_solar_azimuth_time_series_noaa
     
-    def test_value(self, in_, expected, tolerance:float=1e-1): # FIXME NEEDS TOLERANCE FOR HANDLING EXTREME CASES
+    def test_value(self, in_, expected, tolerance:float=0.01): # FIXME NEEDS TOLERANCE FOR HANDLING EXTREME CASES
         self._check_value(in_, expected, tolerance=tolerance)
+    
+    def test_extra_object_attributes(self, in_):
+        assert in_.position_algorithm == "NOAA"
+        assert in_.timing_algorithm == "NOAA"
