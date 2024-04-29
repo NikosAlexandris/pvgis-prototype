@@ -13,6 +13,7 @@ from enum import Enum
 from rich import print
 from pandas import DatetimeIndex, to_datetime
 from datetime import datetime
+from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import SpectralFactorSeries
@@ -22,9 +23,9 @@ from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import SolarDeclinationModel
+from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
@@ -121,7 +122,7 @@ def calculate_photovoltaic_power_output_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
     timestamps: Optional[DatetimeIndex] = None,
     timezone: Optional[str] = None,
@@ -244,7 +245,7 @@ def calculate_photovoltaic_power_output_series(
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=verbose,
+        verbose=0,
         log=log,
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
@@ -262,7 +263,7 @@ def calculate_photovoltaic_power_output_series(
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=verbose,
+        verbose=0,
         log=log,
     )
     # Masks based on the solar altitude series
@@ -590,7 +591,7 @@ def calculate_photovoltaic_power_output_series(
         ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
         ps.print_stats()
 
-        if verbose > 6:
+        if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             print(s.getvalue())
 
     log_data_fingerprint(

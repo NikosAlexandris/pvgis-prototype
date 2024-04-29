@@ -359,9 +359,19 @@ SolarIncidence:
   timing_algorithm:
     type: str
     initial:
+  incidence_algorithm:
+    type: str
+    initial:
+  definition:  # short definition i.e. 'Sun-to-Surface-Normal' for tabular outputs
+    type: str
+    initial:
   desription:
     type: str
-    initial: "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination angle of a surface (surface-plane), contrasting typical definitions of the incidence angle between the sun-vector and the normal to the surface in question."
+    initial: "The angle between the position of the sun (sun-vector) and the normal to the surface (surface-normal). Alternative definitions measure the angle between the sun-vector and the inclination of the surface in question."
+  description_alternative:
+    type: str
+    initial: "Alternative definitions measure the angle between the sun-vector and the inclination of the surface in question."
+      
 
 # How ?
 
