@@ -355,7 +355,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
         #     azimuth_difference_series_array = None  # Avoid UnboundLocalError!
         #     solar_azimuth_series_array = None
         #     # ----------------------------------------------------------------
-
         if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
             diffuse_inclined_irradiance_series[
                 mask_sunlit_surface_series
