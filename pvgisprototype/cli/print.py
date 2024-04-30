@@ -96,12 +96,15 @@ def print_solar_position_table(
     timestamp,
     timezone,
     table,
+    title = 'Solar position overview',
     declination=None,
     hour_angle=None,
     timing=None,
     zenith=None,
     altitude=None,
     azimuth=None,
+    surface_orientation=None,
+    surface_tilt=None,
     incidence=None,
     user_requested_timestamp=None,
     user_requested_timezone=None,
@@ -115,16 +118,8 @@ def print_solar_position_table(
     quantities = [declination, zenith, altitude, azimuth, incidence]
 
     columns = []
-    if longitude is not None:
-        columns.append(LONGITUDE_COLUMN_NAME)
-    if latitude is not None:
-        columns.append(LATITUDE_COLUMN_NAME)
     if timestamp is not None:
         columns.append('Time')
-    if timezone is not None:
-        columns.append('Zone')
-    if user_requested_timestamp and user_requested_timezone:
-        columns.extend(["Local Time", "Local Zone"])
     if timing is not None:
         columns.append(TIME_ALGORITHM_COLUMN_NAME)
     if declination is not None:
@@ -141,9 +136,49 @@ def print_solar_position_table(
         columns.append(AZIMUTH_COLUMN_NAME)
     if incidence is not None:
         columns.append(INCIDENCE_COLUMN_NAME)
-    columns.append(UNITS_COLUMN_NAME)
 
-    table = Table(*columns, box=SIMPLE_HEAD)
+    # Build a Caption
+
+    ## Position
+
+    caption = f"[underline]Position[/underline]  "
+    caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
+
+    # Should be the same in case of multiple models!
+    # first_model = next(iter(rounded_table))
+
+    surface_orientation = rounded_table[0].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
+    caption += f"Orientation : [bold blue]{surface_orientation}[/bold blue], "
+
+    surface_tilt = rounded_table[0].get(SURFACE_TILT_NAME, None) if surface_tilt else None
+    caption += f"Tilt : [bold blue]{surface_tilt}[/bold blue] "
+
+    units = rounded_table[0].get(UNITS_NAME, UNITLESS)
+    caption += f"\[[dim]{units}[/dim]] "
+
+    caption += f"Zone : {timezone} "
+    if (
+        user_requested_timestamp is not None
+        and user_requested_timezone is not None
+    ):
+        caption += f"Local zone : {user_requested_timezone}, "
+           # [
+           #     str(user_requested_timestamps.get_loc(timestamp)),
+           #     str(user_requested_timezone),
+           # ]
+
+    incidence_algorithm = rounded_table[0].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
+    caption += f"\nIncidence : [bold]{incidence_algorithm}[/bold], "
+
+    incidence_angle_definition = rounded_table[0].get(INCIDENCE_DEFINITION, None) if incidence else None
+    caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
+
+    table = Table(
+        *columns,
+        title=title,
+        caption=caption,
+        box=SIMPLE_HEAD,
+    )
 
     get_value_or_default = (
         lambda dictionary, key, default="-", not_available=NOT_AVAILABLE: default
@@ -159,15 +194,11 @@ def print_solar_position_table(
         zenith_value = get_value_or_default(model_result, ZENITH_NAME)
         altitude_value = get_value_or_default(model_result, ALTITUDE_NAME)
         azimuth_value = get_value_or_default(model_result, AZIMUTH_NAME)
+        incidence_algorithm = get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME)
         incidence_value = get_value_or_default(model_result, INCIDENCE_NAME)
-        units = model_result.get(UNITS_NAME, UNITLESS)
 
         row = []
-        if longitude:
-            row.append(str(longitude))
-        if latitude:
-            row.append(str(latitude))
-        row.extend([str(timestamp), str(timezone)])
+        row.extend([str(timestamp)])
 
        # ---------------------------------------------------- Implement-Me---
        # Convert the result back to the user's time zone
@@ -195,7 +226,6 @@ def print_solar_position_table(
             row.append(str(azimuth_value))
         if incidence_value is not NOT_AVAILABLE:
             row.append(str(incidence_value))
-        row.append(str(units))
 
         style_map = {
             "pvis": "red",  # red because PVIS is incomplete!
@@ -213,6 +243,7 @@ def print_solar_position_series_table(
     timestamps,
     timezone,
     table,
+    title = 'Solar position overview',
     index: bool = False,
     timing=None,
     declination=None,
@@ -258,8 +289,6 @@ def print_solar_position_series_table(
     if incidence is not None:
         columns.append(INCIDENCE_COLUMN_NAME)
 
-    title = 'Solar geometry overview'
-    
     # Build a Caption
 
     ## Position

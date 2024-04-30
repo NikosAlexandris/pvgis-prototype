@@ -64,17 +64,11 @@ def calculate_solar_altitude_noaa(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
     solar_altitude = pi / 2 - solar_zenith.radians
-    solar_altitude = SolarAltitude(
-        value=solar_altitude,
-        unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
-        )
     if (
         # not isfinite(solar_altitude.degrees)
         # or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
-        not isfinite(solar_altitude.radians)
-        or not solar_altitude.min_radians <= solar_altitude.radians <= solar_altitude.max_radians
+        not isfinite(solar_altitude)
+        or not SolarAltitude().min_radians <= solar_altitude <= SolarAltitude().max_radians
     ):
         raise ValueError(
             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
@@ -83,7 +77,12 @@ def calculate_solar_altitude_noaa(
     if verbose > 5:
         debug(locals())
 
-    return solar_altitude
+    return SolarAltitude(
+        value=solar_altitude,
+        unit=RADIANS,
+        position_algorithm='NOAA',
+        timing_algorithm='NOAA',
+    )
 
 
 @log_function_call
