@@ -55,6 +55,11 @@ def calculate_solar_incidence_time_series_iqbal(
 )-> SolarIncidence:
     """Calculate the solar incidence angle between the sun position unit vector and the surface normal unit vector; in other words, the cosine of the angle of incidence.
 
+    The surface orientation angle (also referred to as the surface azimuth
+    rotation angle) for this equation is measured from south to the projection
+    of the surface normal on the horizontal plane, positive or negative if
+    oriented west or east from south, respectively.
+ 
     Parameters
     ----------
     longitude : Longitude
@@ -92,6 +97,7 @@ def calculate_solar_incidence_time_series_iqbal(
     .. [0] Iqbal, M. “An Introduction to Solar Radiation”. New York: 1983; pp. 23-25.
 
     """
+    debug(locals())
     solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
