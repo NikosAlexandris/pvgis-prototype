@@ -34,6 +34,7 @@ from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_inci
 import numpy as np
 from pandas import DatetimeIndex
 from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
+from pvgisprototype.api.position.conversions import convert_north_to_south_radians_convention
 
 
 @validate_with_pydantic(ModelSolarIncidenceTimeSeriesInputModel)
@@ -83,6 +84,15 @@ def model_solar_incidence_time_series(
         )
 
     if solar_incidence_model.value == SolarIncidenceModel.iqbal:
+
+        # Iqbal (1983) measures azimuth angles from South !
+        surface_orientation_south_convention = SurfaceOrientation(
+            value=convert_north_to_south_radians_convention(
+                north_based_angle=surface_orientation
+            ),
+            unit=RADIANS,
+        )
+        print(f"Hello!")
 
         solar_incidence_series = calculate_solar_incidence_time_series_iqbal(
             longitude=longitude,
