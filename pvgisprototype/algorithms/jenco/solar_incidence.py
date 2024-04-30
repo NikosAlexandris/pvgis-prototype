@@ -349,9 +349,11 @@ def calculate_solar_incidence_jenco(
         )
         solar_incidence = asin(sine_solar_incidence)
 
-    if not complementary_incidence_angle:
+    description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination of a surface (surface-plane)."
+    if not complementary_incidence_angle:  # derive the 'typical' incidence angle
         logger.info(':information: [bold][magenta]Converting[/magenta] solar incidence angle to Sun-to-Surface-Normal[/bold]...')
         solar_incidence = (pi / 2) - solar_incidence
+        description='Incidence angle between sun-vector and surface-normal'
 
     if solar_incidence < 0:
         solar_incidence = NO_SOLAR_INCIDENCE
@@ -359,7 +361,14 @@ def calculate_solar_incidence_jenco(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return SolarIncidence(value=solar_incidence, unit=RADIANS)
+    return SolarIncidence(
+        value=solar_incidence,
+        unit=RADIANS,
+        positioning_algorithm=solar_altitude.position_algorithm,  #
+        timing_algorithm=solar_hour_angle.timing_algorithm,  #
+        incidence_algorithm=SolarIncidenceModel.jenco,
+        description=description,
+    )
 
 
 @log_function_call
@@ -538,6 +547,7 @@ def calculate_solar_incidence_time_series_jenco(
 
     description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination of a surface (surface-plane)."
     if not complementary_incidence_angle:  # derive the 'typical' incidence angle
+        logger.info(':information: [bold][magenta]Converting[/magenta] solar incidence angle to Sun-to-Surface-Normal[/bold]...')
         solar_incidence_series = np.pi/2 - solar_incidence_series
         description='Incidence angle between sun-vector and surface-normal'
 

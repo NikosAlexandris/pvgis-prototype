@@ -1,5 +1,6 @@
 from devtools import debug
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_jenco
+from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_time_series_iqbal
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
@@ -30,17 +31,19 @@ from pvgisprototype.constants import INCIDENCE_NAME
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
+from pandas import DatetimeIndex
+from pandas import Timestamp
 
 
 def model_solar_incidence(
     longitude: Longitude,
     latitude: Latitude,
-    timestamp: datetime,
+    timestamp: Timestamp,
     timezone: ZoneInfo = None,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
-    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -74,6 +77,23 @@ def model_solar_incidence(
             verbose=verbose,
         )
 
+    if solar_incidence_model.value == SolarIncidenceModel.iqbal:
+
+        solar_incidence = calculate_solar_incidence_time_series_iqbal(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=DatetimeIndex([timestamp]),  # Update Me !
+            timezone=timezone,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            complementary_incidence_angle=complementary_incidence_angle,
+            # dtype=dtype,
+            # array_backend=array_backend,
+            verbose=verbose,
+            # log=log,
+        )
+
     if solar_incidence_model.value == SolarIncidenceModel.pvis:
 
         solar_incidence = calculate_solar_incidence_pvis(
@@ -103,7 +123,7 @@ def calculate_solar_incidence(
     random_time: bool = RANDOM_DAY_FLAG_DEFAULT,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
-    solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.jenco],
+    solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.iqbal],
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     horizon_heights: List[float] = None,
     horizon_interval: float = None,
