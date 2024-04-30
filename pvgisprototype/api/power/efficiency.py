@@ -148,6 +148,11 @@ def calculate_pv_efficiency_time_series(
     ValueError
         If an insufficient number of model constants is provided.
 
+    Notes
+    -----
+    Currently, external time series of monthly spectral factors are centered in
+    the beginning of the month and applied plus/minus half a month.
+
     Examples
     --------
     >>> calculate_pv_efficiency_time_series([1000, 950], [1.1, 1.05], temperature_series=np.array([25, 26]))
