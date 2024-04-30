@@ -213,6 +213,7 @@ def get_diffuse_horizontal_component_from_sarah(
             label = 'Diffuse Horizontal Irradiance',
             label_2 = None,
             unit = IRRADIANCE_UNITS,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
