@@ -293,12 +293,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if not direct_horizontal_component:
         if verbose > 0:
             logger.info(':information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...')
-        print(f'{longitude=}')
-        print(f'{latitude=}')
-        print()
-        print(f'{surface_orientation=}')
-        print(f'{surface_tilt=}')
-        debug(locals())
         direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
             longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
@@ -337,8 +331,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             log=log,
         ).to_numpy().astype(dtype=dtype)
 
-        print(f'{direct_horizontal_irradiance_series=}')
-
     try:
         # the number of timestamps should match the number of "x" values
         if verbose > 0:
@@ -351,14 +343,9 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             * np.sin(solar_incidence_series.radians)  # Should be the _complementary_ incidence angle!
             / np.sin(solar_altitude_series.radians)
         )
-        print(f'{direct_horizontal_irradiance_series=}')
-        print(f'{solar_incidence_series=}')
-        print(f'{solar_altitude_series=}')
-        print(f'{direct_inclined_irradiance_series=}')
     except ZeroDivisionError:
         logger.error(f"Error: Division by zero in calculating the direct inclined irradiance!")
         logger.debug("Is the solar altitude angle zero?")
-        print("Is the solar altitude angle zero?")
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
@@ -374,7 +361,6 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
                     verbose=0,
                 )
             )
-            print(f'{np.pi/2 - solar_incidence_series.value=}')
             direct_inclined_irradiance_series *= angular_loss_factor_series
 
         except ZeroDivisionError as e:
