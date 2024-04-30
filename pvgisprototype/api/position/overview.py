@@ -14,8 +14,9 @@ from pvgisprototype import Longitude
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import SolarZenith
-from .models import SolarTimeModel
-from .models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.noaa.solar_position import calculate_solar_hour_angle_noaa
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_noaa
@@ -27,7 +28,7 @@ from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_pvis
 from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_pvis
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_pvis
-from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_jenco
+from pvgisprototype.api.position.incidence import model_solar_incidence
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_hour_angle_declination_skyfield
 from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_altitude_azimuth_skyfield
 from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_pvlib
@@ -48,7 +49,9 @@ from pvgisprototype.constants import SURFACE_TILT_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_NAME
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import INCIDENCE_ALGORITHM_NAME
 from pvgisprototype.constants import INCIDENCE_NAME
+from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
@@ -68,6 +71,7 @@ def model_solar_geometry_overview(
     surface_orientation: float,
     surface_tilt: float,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = True,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
@@ -161,16 +165,6 @@ def model_solar_geometry_overview(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             verbose=verbose,
         )
-        solar_incidence = calculate_solar_incidence_jenco(
-            longitude=longitude,
-            latitude=latitude,
-            timestamp=timestamp,
-            timezone=timezone,
-            surface_orientation=surface_orientation,
-            surface_tilt=surface_tilt,
-            verbose=verbose,
-        )
-
     
     if solar_position_model.value == SolarPositionModel.skyfield:
 
@@ -333,6 +327,18 @@ def model_solar_geometry_overview(
             timezone=timezone,
         )
 
+    if not solar_incidence:  # get through the API
+        solar_incidence = model_solar_incidence(
+            longitude=longitude,
+            latitude=latitude,
+            timestamp=timestamp,
+            timezone=timezone,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            solar_incidence_model=solar_incidence_model,
+            verbose=verbose,
+        )
+
     position = (
             solar_declination if solar_declination is not None else None,
             solar_hour_angle if solar_hour_angle is not None else None,
@@ -360,6 +366,7 @@ def calculate_solar_geometry_overview(
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = True,
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
@@ -394,6 +401,7 @@ def calculate_solar_geometry_overview(
                 complementary_incidence_angle=complementary_incidence_angle,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 solar_time_model=solar_time_model,
+                solar_incidence_model=solar_incidence_model,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 dtype=dtype,
@@ -411,7 +419,9 @@ def calculate_solar_geometry_overview(
                 AZIMUTH_NAME: getattr(solar_azimuth, angle_output_units, NOT_AVAILABLE) if solar_azimuth else None,
                 SURFACE_ORIENTATION_NAME: getattr(surface_orientation, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
                 SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
+                INCIDENCE_ALGORITHM_NAME: solar_incidence.incidence_algorithm,
                 INCIDENCE_NAME: getattr(solar_incidence, angle_output_units, NOT_AVAILABLE) if solar_incidence else NOT_IMPLEMENTED,
+                INCIDENCE_DEFINITION: solar_incidence.definition,
                 UNITS_NAME: angle_output_units,
             })
 
