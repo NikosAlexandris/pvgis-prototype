@@ -1,7 +1,7 @@
-- lemma: Angle Of Incidence
+- lemma: Angle of Incidence
   lemma_name: angle_of_incidence
   symbol: θ
-  description: Angle Of Incidence is defined as the angle formed between the direction of the sun ray and the line normal to the surface.
+  description: Angle of Incidence is the angle formed between the direction of the sun ray and the line normal to the surface.
   units: Radian
   tags:
     - solar
