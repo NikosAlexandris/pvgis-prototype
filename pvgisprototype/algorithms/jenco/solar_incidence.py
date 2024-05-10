@@ -418,6 +418,35 @@ def calculate_solar_incidence_time_series_jenco(
 
     Notes
     -----
+    Reading from the original paper (last page is a summary translation in
+    English):
+
+        Orientation of georelief An with respect to Cardinal points and slopes
+        γN of georelief in the direction of slope curves in the given point on
+        the georelief with the latitude φ determines the latitude φ' and in
+        relation to longitude λ of this point also the relative longitude λ' of
+        the contact point of contact plane to reference spheric surface of the
+        Earth with identical course of the insolation (Fig. 1). Thus sinus of
+        insolation angle δexp on georelief for the local time moment T can be
+        expressed by modification of a relation that is well known in astronomy
+        for the calculation of sinus of solar altitude h0 a form of equation
+        (3). Latitude φ' and longitude λ' in the equation (3) is definitely
+        determined on the basis of transformation equations (4.3.31) in the
+        work [5] in dependence on the assessment of the basic direction of
+        orientation of georelief AN with respect to the cardinal points by
+        goniometric equations (5), (6) or (9), (10). After determination of the
+        hour of sunrise (Tv)s from shadow to light and hour of sunset (Tr)s
+        from light to shadow by equations (12), (13) abstracting also from hill
+        shading of georelief, total quantity of direct solar irradiance Qd on
+        the unit of area of georelief for one day under blue sky conditions can
+        be expressed by equation (14).
+
+    Although Hofierka (2002) does not explicitly state "the angle between the
+    sun-vector and the plane to the surface," he borrows the equation defined
+    by Jenco (1992) who measures the incidence angle between the sun-vector and
+    plane of the reference solar surface. Care needs to be taken when comparing
+    or using other definitions of the solar incidence angle.
+
     - Shadow check not implemented.
     - In PVGIS' source code, in order :
 
@@ -480,7 +509,7 @@ def calculate_solar_incidence_time_series_jenco(
         array_backend=array_backend,
         verbose=0,
         log=log,
-    )  # North = 0 according to NOAA's solar geometry equations
+    )  # Origin ?
     in_shade = is_surface_in_shade_time_series(
         solar_altitude_series=solar_altitude_series,
         solar_azimuth_series=solar_azimuth_series,
@@ -527,29 +556,20 @@ def calculate_solar_incidence_time_series_jenco(
             dtype=dtype,
             log=log,
         )
-        print(f'Surface orientation  : {surface_orientation}')
-        print(f'Relative longitude : {relative_longitude}')
-        print(f'Hour angel : {solar_hour_angle_series=}')
-        # from rich import print
-        # if surface_orientation.radians < np.pi and relative_longitude.value < 0:
-        #     print(f'[bold red]Add[/bold red] {np.pi} to relative_longitude {relative_longitude}')
-        #     relative_longitude.value += np.pi
-
-        # if surface_orientation.radians > np.pi and relative_longitude.value > 0:
-        #     print(f'[bold red]Remove[/bold red] {np.pi} from relative_longitude {relative_longitude}')
-        #     relative_longitude.value -= np.pi
-        # print(f'Relative longitude Adjusted ? : {relative_longitude}')
+        # Note the - in front of the solar_hour_angle_series ! Explain-Me !
         sine_solar_incidence_series = (
-            c_inclined_31_series * np.cos(solar_hour_angle_series.radians - relative_longitude.radians)
+            c_inclined_31_series * np.cos(-solar_hour_angle_series.radians - relative_longitude.radians)
             + c_inclined_33_series
         )
         solar_incidence_series = np.arcsin(sine_solar_incidence_series)
 
-    description = "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination of a surface (surface-plane)."
-    if not complementary_incidence_angle:  # derive the 'typical' incidence angle
-        logger.info(':information: [bold][magenta]Converting[/magenta] solar incidence angle to Sun-to-Surface-Normal[/bold]...')
-        solar_incidence_series = np.pi/2 - solar_incidence_series
-        description='Incidence angle between sun-vector and surface-normal'
+    incidence_angle_definition = SolarIncidence().definition_complementary
+    incidence_angle_description = SolarIncidence().description_complementary
+    if not complementary_incidence_angle:
+        logger.info(':information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]...')
+        solar_incidence_series = (pi / 2) - solar_incidence_series
+        incidence_angle_definition = SolarIncidence().definition
+        incidence_angle_description = SolarIncidence().description
 
     # set negative or below horizon angles to 0 !
     solar_incidence_series[
@@ -571,5 +591,6 @@ def calculate_solar_incidence_time_series_jenco(
         positioning_algorithm=solar_azimuth_series.position_algorithm,  #
         timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
         incidence_algorithm=SolarIncidenceModel.jenco,
-        description=description,
+        definition=incidence_angle_definition,
+        description=incidence_angle_description,
     )
