@@ -345,7 +345,7 @@ def get_days_in_year(year):
     return (end_date - start_date).days
 
 
-def get_days_in_years_series(years):
+def get_days_in_years(years):
     """ Calculate the number of days in a given year, accounting for leap years.
 
     Parameters

@@ -17,7 +17,7 @@ from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
 from datetime import datetime
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from math import sin
 from math import asin
 from math import cos
@@ -69,7 +69,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -78,22 +78,13 @@ from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import SOLAR_CONSTANT_COLUMN_NAME
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import PERIGEE_OFFSET_COLUMN_NAME
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
-from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
-from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
-from pvgisprototype.constants import LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME
-from pvgisprototype.constants import OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
-from pvgisprototype.constants import OPTICAL_AIR_MASS_COLUMN_NAME
-from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
-from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
@@ -101,16 +92,10 @@ from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import IRRADIANCE_SOURCE_COLUMN_NAME
 from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
-from pvgisprototype.constants import LONGITUDE_COLUMN_NAME
-from pvgisprototype.constants import LATITUDE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE
-from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import LOSS_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
@@ -129,18 +114,19 @@ from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 
 
 @log_function_call
-# @cached(cache={}, key=custom_hashkey)
+@cached(cache={}, key=custom_hashkey)
 def calculate_direct_inclined_irradiance_time_series_pvgis(
     longitude: float,
     latitude: float,
     elevation: float,
     surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
-    timestamps: DatetimeIndex = None,
-    timezone: Optional[str] = None,
+    timestamps: DatetimeIndex = str(now_utc_datetimezone()),
+    timezone: Optional[ZoneInfo] = None,
     convert_longitude_360: bool = False,
     direct_horizontal_component: Optional[Path] = None,
     neighbor_lookup: MethodForInexactMatches = None,
@@ -153,7 +139,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     apply_angular_loss_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
-    complementary_incidence_angle: bool = True,  # Let Me Hardcoded, Read the docstring!
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -163,8 +149,8 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-    fingerprint: bool = FINGERPRINT_COLUMN_NAME,
-) -> np.array:
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
+) -> Irradiance:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
     Calculate the direct irradiance on an inclined surface based on the
@@ -189,12 +175,13 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     - δexp is the solar incidence angle measured between the sun and an
       inclined surface defined in equation (16).
+
     or else :
 
         Direct Inclined = Direct Horizontal * sin( Solar Incidence ) / sin( Solar Altitude )
 
     The implementation by Hofierka (2002) uses the solar incidence angle
-    between the sun-vector and plane of the reference surface (as per Jenco,
+    between the sun-vector and the plane of the reference surface (as per Jenco,
     1992). This is very important and relates to the hardcoded value `True` for
     the `complementary_incidence_angle` input parameter of the function. We
     call this angle (definition) the _complementary_ incidence angle.
@@ -225,7 +212,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         surface_tilt=surface_tilt,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
+        complementary_incidence_angle=True,  # True = between sun-vector and surface-plane !
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
@@ -354,10 +341,10 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         try:
             # per Martin & Ruiz 2005,
             # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
-            # which is the _complementary_ of the incidence angle per Hofierka 2002
+            # which is the _complement_ of the incidence angle per Hofierka 2002
             angular_loss_factor_series = (
                 calculate_angular_loss_factor_for_direct_irradiance_time_series(
-                    solar_incidence_series=(np.pi/2 - solar_incidence_series.value),
+                    solar_incidence_series=(np.pi/2 - solar_incidence_series.radians),
                     verbose=0,
                 )
             )
@@ -396,7 +383,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         'and_even_more_extended': lambda: {
             INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units),
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
-            INCIDENCE_DEFINITION: 'Sun-to-Plane' if complementary_incidence_angle else 'Sun-to-Surface-Normal',
+            INCIDENCE_DEFINITION: solar_incidence_series.definition,  # Review Me ! Report the _complementary_ incidence angle series ?
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
         } if verbose > 4 else {},
         
@@ -414,7 +401,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
