@@ -1,3 +1,40 @@
+"""
+API modules to calculate the solar incidence angle between the direction of the
+sun-to-surface vector and either the direction of the normal-to-surface vector
+or the direction of the surface-plane vector.
+
+Attention is required im handling the rotational solar azimuth and surface
+orientation (also referred to as surface azimuth) anngles. The origin of
+measuring azimuthal angles will obvisouly impact the direction of the
+calculated angles.
+
+An overview of conventions and conversions from a North-based system to either
+East- or South-based systems is:
+
+             ┌─────────────┐  ┌────────────┐  ┌────────────┐
+             │     N=0     │  │     N      │  │      N     │
+             │      ▲      │  │     ▲      │  │      ▲     │
+     Origin  │   W ◄┼► E   │  │  W ◄┼► E=0 │  │   W ◄┼► E  │
+             │      ▼      │  │     ▼      │  │      ▼     │
+             │      S      │  │     S      │  │      S=0   │
+             └─────────────┘  └────────────┘  └────────────┘
+             ┌─────────────┐  ┌────────────┐  ┌────────────┐
+             │             │  │            │  │            │
+             │             │  │            │  │            │
+Input South  │     180     │  │     90     │  │     0      │
+    (IS)     │             │  │            │  │            │
+             │             │  │            │  │            │
+             └─────────────┘  └────────────┘  └────────────┘
+             ┌─────────────┐  ┌────────────┐  ┌────────────┐
+             │             │  │            │  │            │
+   Internal  │             │  │            │  │            │
+             │      =      │  │  IS - 90   │  │  IS - 180  │
+  Conversion │             │  │            │  │            │
+             │             │  │            │  │            │
+             └─────────────┘  └────────────┘  └────────────┘
+"""
+
+from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_time_series_pvis
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarIncidenceTimeSeriesInputModel
 from pvgisprototype import Longitude
@@ -61,19 +98,50 @@ def model_solar_incidence_time_series(
     if solar_incidence_model.value == SolarIncidenceModel.jenco:
 
         # Hofierka (2002) measures azimuth angles from East !
+        # Convert the user-defined North-based surface orientation angle to East-based
         surface_orientation_east_convention = SurfaceOrientation(
             value=convert_north_to_east_radians_convention(
                 north_based_angle=surface_orientation
             ),
             unit=RADIANS,
         )
+        # And apparently, defined the complementary surface tilt angle too!
+        from math import pi
+        surface_tilt = SurfaceTilt(
+                value=(pi/2 - surface_tilt.radians),
+                unit=RADIANS,
+                )
         solar_incidence_series = calculate_solar_incidence_time_series_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            # surface_orientation=surface_orientation,
             surface_orientation=surface_orientation_east_convention,
+            surface_tilt=surface_tilt,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            # complementary_incidence_angle=complementary_incidence_angle,
+            complementary_incidence_angle=True,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
+
+    if solar_incidence_model.value == SolarIncidenceModel.iqbal:
+
+        # Iqbal (1983) measures azimuthal angles from South !
+        surface_orientation_south_convention = SurfaceOrientation(
+            value=convert_north_to_south_radians_convention(
+                north_based_angle=surface_orientation
+            ),
+            unit=RADIANS,
+        )
+        solar_incidence_series = calculate_solar_incidence_time_series_iqbal(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
@@ -83,18 +151,9 @@ def model_solar_incidence_time_series(
             log=log,
         )
 
-    if solar_incidence_model.value == SolarIncidenceModel.iqbal:
+    if solar_incidence_model.value == SolarIncidenceModel.pvis:
 
-        # Iqbal (1983) measures azimuth angles from South !
-        surface_orientation_south_convention = SurfaceOrientation(
-            value=convert_north_to_south_radians_convention(
-                north_based_angle=surface_orientation
-            ),
-            unit=RADIANS,
-        )
-        print(f"Hello!")
-
-        solar_incidence_series = calculate_solar_incidence_time_series_iqbal(
+        solar_incidence_series = calculate_solar_incidence_time_series_pvis(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -108,8 +167,5 @@ def model_solar_incidence_time_series(
             verbose=verbose,
             log=log,
         )
-
-    if solar_incidence_model.value == SolarIncidenceModel.pvis:
-        pass
 
     return solar_incidence_series
