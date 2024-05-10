@@ -23,9 +23,12 @@ from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
@@ -151,11 +154,11 @@ def calculate_solar_hour_angle_noaa(
 def calculate_solar_hour_angle_time_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex, 
-    timezone: Optional[str] = None, 
+    timezone: ZoneInfo,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarHourAngle:
     """Calculate the solar hour angle in radians for a time series.
 
@@ -231,10 +234,13 @@ def calculate_solar_hour_angle_time_series_noaa(
         verbose=verbose,
         log=log,
     )
-
-    solar_hour_angle_series = (true_solar_time_series.value - 720.) * (np.pi / 720.)
-    solar_hour_angle_series[solar_hour_angle_series < -np.pi] += np.pi
-    solar_hour_angle_series[solar_hour_angle_series > np.pi] -= np.pi
+    solar_hour_angle_series = (true_solar_time_series.minutes - 720.) * (np.pi / 720.)
+    # solar_hour_angle_series = np.where(
+    #         # true_solar_time_series.minutes < 0,
+    #         solar_hour_angle_series < 0,
+    #         solar_hour_angle_series + pi,
+    #         solar_hour_angle_series - pi,
+    #         )
 
     if not np.all(
         (SolarHourAngle().min_radians <= solar_hour_angle_series)
@@ -247,7 +253,9 @@ def calculate_solar_hour_angle_time_series_noaa(
             )
         ]
         raise ValueError(
-            f"Calculated solar hour angle/s out of the expected range [{-np.pi}, {np.pi}] radians : {out_of_range_values}"
+            f"{WARNING_OUT_OF_RANGE_VALUES} "
+            f"[{SolarHourAngle().min_degrees}, {SolarHourAngle().max_degrees}] degrees"
+            f" in [code]solar_hour_angle_series[/code] : {np.degrees(out_of_range_values)}"
         )
     log_data_fingerprint(
             data=solar_hour_angle_series,
