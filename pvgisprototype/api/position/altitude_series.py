@@ -1,3 +1,4 @@
+from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_time_series_jenco
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
@@ -13,6 +14,7 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
 from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
+from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_time_series_jenco
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -25,6 +27,8 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import NOT_AVAILABLE
+from pvgisprototype.constants import RADIANS
 from cachetools import cached
 from rich import print
 
@@ -46,6 +50,7 @@ def model_solar_altitude_time_series(
 ) -> SolarAltitude:
     """
     """
+    solar_altitude_series = None
     if solar_position_model.value == SolarPositionModel.noaa:
 
         solar_altitude_series = calculate_solar_altitude_time_series_noaa(
@@ -70,16 +75,20 @@ def model_solar_altitude_time_series(
         pass
 
     if solar_position_model.value  == SolarPositionModel.pvis:
-        pass
+
+        solar_altitude_series = calculate_solar_altitude_time_series_jenco(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            log=log,
+        )
 
     if solar_position_model.value  == SolarPositionModel.pvlib:
         pass
-
-    log_data_fingerprint(
-            data=solar_altitude_series.value,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    )
 
     return solar_altitude_series
 
@@ -88,13 +97,14 @@ def model_solar_altitude_time_series(
 def calculate_solar_altitude_time_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: Union[datetime, Sequence[datetime]],
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -103,10 +113,10 @@ def calculate_solar_altitude_time_series(
     """
     Calculates the solar position using all models and returns the results in a table.
     """
-    results = []
+    results = {}
     for solar_position_model in solar_position_models:
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
-            solar_altitude = model_solar_altitude_time_series(
+            solar_altitude_series = model_solar_altitude_time_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -120,11 +130,14 @@ def calculate_solar_altitude_time_series(
                 verbose=verbose,
                 log=log,
             )
-            results.append({
-                TIME_ALGORITHM_NAME: solar_altitude.timing_algorithm,
-                POSITION_ALGORITHM_NAME: solar_position_model.value,
-                ALTITUDE_NAME: getattr(solar_altitude, None) if solar_altitude else None,
-                UNITS_NAME: None,
-            })
+            solar_position_model_overview = {
+                    solar_position_model.name: {
+                        TIME_ALGORITHM_NAME: solar_altitude_series.timing_algorithm if solar_altitude_series else NOT_AVAILABLE,
+                        POSITION_ALGORITHM_NAME: solar_position_model.value,
+                        ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
+                        UNITS_NAME: None,
+                        }
+                    }
+            results = results | solar_position_model_overview
 
     return results
