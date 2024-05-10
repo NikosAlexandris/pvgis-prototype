@@ -1,6 +1,5 @@
 from devtools import debug
 from typing import Union
-from typing import Sequence
 import numpy as np
 from numpy import mod
 from datetime import datetime
@@ -27,11 +26,8 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
-from rich import print
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import FIX_OUT_OF_RANGE_VALUES_POSITIVE
-from pvgisprototype.constants import FIX_OUT_OF_RANGE_VALUES_NEGATIVE
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -124,10 +120,8 @@ def calculate_solar_azimuth_noaa(
     cosine_solar_azimuth = numerator / denominator
     solar_azimuth = acos(cosine_solar_azimuth)
 
-    # ----------------------------------------------------- What is this for ?
-    if solar_hour_angle.radians > 0:
+    if solar_hour_angle.radians > 0: # interpretation for afternoon hours !
         solar_azimuth = 2 * pi - solar_azimuth
-    # ------------------------------------------------------------------------
 
     if (
         not isfinite(solar_azimuth)
@@ -212,6 +206,29 @@ def calculate_solar_azimuth_time_series_noaa(
 
     Notes
     -----
+
+    From .. Excel sheet :
+
+    =IF(AC2>0,
+        MOD(
+            DEGREES(ACOS(((SIN(RADIANS($B$3))*COS(RADIANS(AD2)))-SIN(RADIANS(T2)))/(COS(RADIANS($B$3))*SIN(RADIANS(AD2)))))+180,
+        360),
+        MOD(
+            540-DEGREES(ACOS(((SIN(RADIANS($B$3))*COS(RADIANS(AD2)))-SIN(RADIANS(T2)))/(COS(RADIANS($B$3))*SIN(RADIANS(AD2))))),
+        360)
+    )
+
+    numerator = (sin(latitude.radians) * cos(solar_zenith.radians)) - sin(solar_declination.radians)
+    denominator = (cos(latitude.radians) * sin(solar_zenith.radians))
+    cosine_solar_azimuth = numerator / denominator
+
+    if solar_hour_angle > 0:
+        (pi + arccos(cosine_solar_azimuth)) % 2*pi
+
+    else:
+        (3*pi - arccos(cosine_solar_azimuth)) % 2*pi
+
+
     Two important notes on the calculation of the solar azimuth angle : 
     
     - The equation implemented here follows upon the relevant Wikipedia article
@@ -329,7 +346,7 @@ def calculate_solar_azimuth_time_series_noaa(
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
@@ -338,7 +355,7 @@ def calculate_solar_azimuth_time_series_noaa(
         timestamps=timestamps,
         timezone=timezone,
         dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
@@ -348,25 +365,25 @@ def calculate_solar_azimuth_time_series_noaa(
         solar_hour_angle_series=solar_hour_angle_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
-    numerator_series = (sin(latitude.radians) 
+    numerator_series = (
+        sin(latitude.radians) 
         * np.cos(solar_zenith_series.radians)
-        - np.sin(solar_declination_series.radians))
-    denominator_series = (cos(latitude.radians) 
-        * np.sin(solar_zenith_series.radians))
-    
+        - np.sin(solar_declination_series.radians)
+    )
+    denominator_series = (
+        cos(latitude.radians) 
+        * np.sin(solar_zenith_series.radians)
+    )
     cosine_solar_azimuth_series = numerator_series / denominator_series
-    cosine_solar_azimuth_series[cosine_solar_azimuth_series > 1] = FIX_OUT_OF_RANGE_VALUES_POSITIVE
-    cosine_solar_azimuth_series[cosine_solar_azimuth_series < -1] = FIX_OUT_OF_RANGE_VALUES_NEGATIVE
-    solar_azimuth_series = mod(3 * np.pi - np.arccos(cosine_solar_azimuth_series), 2 * np.pi)
-
-    # interpretation for afternoon hours !
-    afternoon_hours = solar_hour_angle_series.value > 0
-    solar_azimuth_series[afternoon_hours] = mod(
-        np.arccos(cosine_solar_azimuth_series[afternoon_hours]) + np.pi, 2 * np.pi
+    solar_azimuth_series = np.arccos(np.clip(cosine_solar_azimuth_series, -1, 1))
+    solar_azimuth_series = np.where(
+        solar_hour_angle_series.radians > 0,  # afternoon hours !
+        np.mod((pi + solar_azimuth_series), 2 * pi),
+        np.mod(3 * pi - solar_azimuth_series, 2 * pi),
     )
     
     if (
@@ -378,11 +395,15 @@ def calculate_solar_azimuth_time_series_noaa(
             | (solar_azimuth_series > SolarAzimuth().max_radians)
         ]
         # raise ValueError(# ?
-        logger.warning(
+        raise ValueError(
             f"{WARNING_OUT_OF_RANGE_VALUES} "
             f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
             f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
         )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
         data=solar_azimuth_series,
         log_level=log,
@@ -394,4 +415,5 @@ def calculate_solar_azimuth_time_series_noaa(
         unit=RADIANS,
         position_algorithm="NOAA",
         timing_algorithm="NOAA",
+        origin="North"
     )
