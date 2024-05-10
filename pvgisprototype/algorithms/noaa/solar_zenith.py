@@ -259,6 +259,7 @@ def calculate_solar_zenith_noaa(
     cosine_solar_zenith = sin(latitude.radians) * sin(solar_declination.radians) + cos(
         latitude.radians
     ) * cos(solar_declination.radians) * cos(solar_hour_angle.radians)
+
     solar_zenith = SolarZenith(
                 value=acos(cosine_solar_zenith),  # Important !
                 unit=RADIANS,
