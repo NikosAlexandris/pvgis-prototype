@@ -1,4 +1,8 @@
 from devtools import debug
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudeNOAAInput
 from pvgisprototype.validation.functions import CalculateSolarAltitudeNOAAInput
@@ -6,12 +10,6 @@ from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitud
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from datetime import datetime
-from typing import Union
-from typing import Sequence
-from zoneinfo import ZoneInfo
-from datetime import datetime
-from typing import Union
-from typing import Sequence
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAltitude
 from pvgisprototype.constants import RADIANS
@@ -33,13 +31,9 @@ from math import isfinite
 import numpy as np
 from pandas import DatetimeIndex
 from rich import print
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 
 
 @validate_with_pydantic(CalculateSolarAltitudeNOAAInput)
@@ -91,7 +85,7 @@ def calculate_solar_altitude_noaa(
 def calculate_solar_altitude_time_series_noaa(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: Union[datetime, DatetimeIndex],
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -127,11 +121,15 @@ def calculate_solar_altitude_time_series_noaa(
             f"The `solar_altitude` should be a finite number ranging in [{-np.pi/2}, {np.pi/2}] radians"
         )
 
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
             data=solar_altitude_series,
             log_level=log,
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+
     return SolarAltitude(
         value=solar_altitude_series,
         unit=RADIANS,

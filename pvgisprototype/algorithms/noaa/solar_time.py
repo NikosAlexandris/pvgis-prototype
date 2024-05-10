@@ -22,7 +22,7 @@ from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_tim
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
-from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import MINUTES, RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from cachetools import cached
@@ -188,10 +188,12 @@ def calculate_true_solar_time_time_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
     )
-    true_solar_time_series_in_minutes = mod((
-        (timestamps - timestamps.normalize()).total_seconds()
-        + (time_offset_series.value * 60)
-    ).astype(dtype) / 60, 1440)
+    true_solar_time_series = (timestamps - timestamps.normalize()).total_seconds() + (
+        time_offset_series.value * 60
+    )
+    true_solar_time_series_in_minutes = mod(
+        (true_solar_time_series).astype(dtype) / 60, 1440
+    )
 
     if not (
         (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
@@ -206,10 +208,18 @@ def calculate_true_solar_time_time_series_noaa(
         raise ValueError(
             f"The calculated true solar time series `{true_solar_time_series_in_minutes}` is out of the expected range [{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes!"
         )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
             data=true_solar_time_series_in_minutes.values,
             log_level=log,
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return TrueSolarTime(value = array(true_solar_time_series_in_minutes, dtype = "float32"), unit = "minutes")
+    return TrueSolarTime(
+        value=array(true_solar_time_series_in_minutes, dtype = "float32"),
+        unit = MINUTES,
+        timing_algorithm="NOAA",
+    )

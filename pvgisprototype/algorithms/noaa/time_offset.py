@@ -2,10 +2,11 @@
 The time offset based on NOAA's General Solar Position Calculations.
 """
 
-from rich import print
 from devtools import debug
 from zoneinfo import ZoneInfo
 from math import pi
+
+from pandas.core.internals.managers import raise_construction_error
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateTimeOffsetNOAAInput
 from pvgisprototype.validation.functions import CalculateTimeOffsetNOAAInput
@@ -14,9 +15,7 @@ from pvgisprototype import TimeOffset
 from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTimeSeriesNOAAInput
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_noaa
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
-from typing import Union
 import numpy as np
-from pvgisprototype import EquationOfTime
 from pandas import Timestamp
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -25,11 +24,13 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import MINUTES
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 # equivalent to : 4 * longitude (in degrees) ?
@@ -160,7 +161,7 @@ def calculate_time_offset_noaa(
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
 def calculate_time_offset_time_series_noaa(
     longitude: Longitude,
-    timestamps: Union[Timestamp, DatetimeIndex],
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo = ZoneInfo('UTC'),
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -301,43 +302,50 @@ def calculate_time_offset_time_series_noaa(
     unique_offsets = {
         tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)
     }
-
     # Map offsets back to timestamps
     timezone_offset_minutes_series = np.array(
         [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
     )
-
-    # 2
+    # ------------------------------------------------- Further Optimisation ?
     equation_of_time_series = calculate_equation_of_time_time_series_noaa(
-        timestamps,
+        timestamps=timestamps,
         dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
         verbose=verbose,
     )
-    time_offset_series = (
+    time_offset_series_in_minutes = (
         longitude.as_minutes
         - timezone_offset_minutes_series
         + equation_of_time_series.minutes
     )
-    # ------------------------------------------------- Further Optimisation ?
 
     if not np.all(
-        (TimeOffset().min_minutes <= time_offset_series)
-        & (time_offset_series <= TimeOffset().max_minutes)
+        (TimeOffset().min_minutes <= time_offset_series_in_minutes)
+        & (time_offset_series_in_minutes <= TimeOffset().max_minutes)
     ):
+        index_of_out_of_range_values = np.where(
+            (time_offset_series_in_minutes < TimeOffset().min_radians)
+            | (time_offset_series_in_minutes > TimeOffset().max_radians)
+        )
+        out_of_range_values = time_offset_series_in_minutes[index_of_out_of_range_values]
         raise ValueError(
-            "At least one calculated time offset is out of the expected range [{TimeOffset().min_minutes, TimeOffset().max_minutes] minutes!"
+            f"{WARNING_OUT_OF_RANGE_VALUES} "
+            f"[{TimeOffset().min_radians}, {TimeOffset().max_radians}] radians"
+            f" in [code]solar_declination_series[/code] : {out_of_range_values}"
         )
 
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
-        data=time_offset_series,
+        data=time_offset_series_in_minutes,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return TimeOffset(
-        value=time_offset_series,
-        unit="minutes",
+        value=time_offset_series_in_minutes,
+        unit=MINUTES,
         position_algorithm="NOAA",
         timing_algorithm="NOAA",
     )
