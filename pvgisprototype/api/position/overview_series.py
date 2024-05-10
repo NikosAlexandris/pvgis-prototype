@@ -1,13 +1,25 @@
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_time_series_pvis
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_time_series_pvis
+from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_time_series_pvis
+from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_time_series_pvlib
 from pvgisprototype.log import logger
 from devtools import debug
-from typing import List, Union, Sequence
+from typing import List, Tuple
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
+from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_time_series_pvis
+from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_time_series_jenco
+from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_time_series_jenco
+from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_time_series_jenco
+from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_time_series_pvis
+from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
+from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
 from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarGeometryOverviewTimeSeriesInputModel
@@ -20,7 +32,7 @@ from pvgisprototype import SolarAltitude
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
 from datetime import datetime
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import AZIMUTH_ORIGIN_NAME, DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -56,8 +68,8 @@ def model_solar_geometry_overview_time_series(
     latitude: Latitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    surface_orientation: None | SurfaceOrientation,
-    surface_tilt: None | SurfaceTilt,
+    surface_orientation: SurfaceOrientation,
+    surface_tilt: SurfaceTilt,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
@@ -69,8 +81,16 @@ def model_solar_geometry_overview_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = VERBOSE_LEVEL_DEFAULT,
-) -> List:
+) -> Tuple:
     """
+    
+    Notes
+    -----
+    In order to avoid confusion, the solar incidence angle series are derived
+    using the meta-function `model_solar_incidence_time_series()`. Review-Me
+    and Refactor-Me if more flexibility is required, for example to facilitate
+    the cross-comparison between different incidence angle definitions.
+
     """
     solar_declination_series = None  # updated if applicable
     solar_hour_angle_series = None
@@ -78,7 +98,6 @@ def model_solar_geometry_overview_time_series(
     solar_altitude_series = None
     solar_azimuth_series = None
     solar_incidence_series = None
-    debug(locals())
 
     if solar_position_model.value == SolarPositionModel.noaa:
 
@@ -93,6 +112,8 @@ def model_solar_geometry_overview_time_series(
             longitude=longitude,
             timestamps=timestamps,
             timezone=timezone,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=verbose,
             log=log,
         )
@@ -101,6 +122,8 @@ def model_solar_geometry_overview_time_series(
             timestamps=timestamps,
             solar_hour_angle_series=solar_hour_angle_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=verbose,
             log=log,
         )
@@ -110,6 +133,8 @@ def model_solar_geometry_overview_time_series(
             timestamps=timestamps,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=verbose,
             log=log,
         )
@@ -119,19 +144,8 @@ def model_solar_geometry_overview_time_series(
             timestamps=timestamps,
             timezone=timezone,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            verbose=verbose,
-            log=log,
-        )
-        solar_incidence_series = model_solar_incidence_time_series(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
-            surface_orientation=surface_orientation,
-            surface_tilt=surface_tilt,
-            solar_incidence_model=solar_incidence_model,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            complementary_incidence_angle=complementary_incidence_angle,
+            dtype=dtype,
+            array_backend=array_backend,
             verbose=verbose,
             log=log,
         )
@@ -145,11 +159,108 @@ def model_solar_geometry_overview_time_series(
     if solar_position_model.value == SolarPositionModel.pysolar:
         pass
 
+    if solar_position_model.value == SolarPositionModel.jenco:
+
+        solar_declination_series = calculate_solar_declination_time_series_jenco(
+            timestamps=timestamps,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
+        solar_altitude_series = calculate_solar_altitude_time_series_jenco(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            log=log,
+        )
+        solar_azimuth_series = calculate_solar_azimuth_time_series_jenco(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            log=log,
+        )  # North = 0 according to NOAA's solar geometry equations
+
     if solar_position_model.value == SolarPositionModel.pvis:
-        pass
+
+        solar_declination_series = calculate_solar_declination_time_series_pvis(
+            timestamps=timestamps,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
+        solar_hour_angle_series = calculate_solar_hour_angle_time_series_pvis(
+            longitude=longitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
+        solar_altitude_series = calculate_solar_altitude_time_series_pvis(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            log=log,
+        )
+        # solar_azimuth_series = calculate_solar_azimuth_time_series_jenco(
+        solar_azimuth_series = calculate_solar_azimuth_time_series_pvis(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            # apply_atmospheric_refraction=apply_atmospheric_refraction,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            log=log,
+        )  # East = 0 !
 
     if solar_position_model.value == SolarPositionModel.pvlib:
-        pass
+
+        solar_declination_series = calculate_solar_declination_time_series_pvlib(
+            timestamps=timestamps,
+            # dtype=dtype,
+            # array_backend=array_backend,
+            # verbose=verbose,
+            # log=log,
+        )
+
+    # One meta-function for the solar incidence angle series
+    solar_incidence_series = model_solar_incidence_time_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        solar_incidence_model=solar_incidence_model,
+        complementary_incidence_angle=complementary_incidence_angle,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
+    )
 
     position_series = (
         solar_declination_series if solar_declination_series is not None else None,
@@ -167,15 +278,14 @@ def model_solar_geometry_overview_time_series(
     return position_series
 
 
-from typing import Optional
 def calculate_solar_geometry_overview_time_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: datetime,
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     surface_orientation: SurfaceOrientation,
     surface_tilt: SurfaceTilt,
-    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -206,7 +316,7 @@ def calculate_solar_geometry_overview_time_series(
     geometry parameters.
 
     """
-    debug(locals())
+    results = {}
     for solar_position_model in solar_position_models:
         # for the time being! ------------------------------------------------
         if solar_position_model != SolarPositionModel.noaa:
@@ -236,12 +346,12 @@ def calculate_solar_geometry_overview_time_series(
                 complementary_incidence_angle=complementary_incidence_angle,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
-                backend=array_backend,
                 dtype=dtype,
+                array_backend=array_backend,
                 verbose=verbose,
                 log=log,
             )
-            results = {
+            solar_position_model_overview = {
                     solar_position_model.name: {
                         TIME_ALGORITHM_NAME: solar_azimuth_series.timing_algorithm if solar_azimuth_series else NOT_AVAILABLE,
                         DECLINATION_NAME: getattr(solar_declination_series, angle_output_units, NOT_AVAILABLE) if solar_declination_series else NOT_AVAILABLE,
@@ -250,13 +360,17 @@ def calculate_solar_geometry_overview_time_series(
                         ZENITH_NAME: getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE) if solar_zenith_series else NOT_AVAILABLE,
                         ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
                         AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
+                        AZIMUTH_ORIGIN_NAME: solar_azimuth_series.origin if solar_azimuth_series else NOT_AVAILABLE,
                         SURFACE_ORIENTATION_NAME: getattr(surface_orientation, angle_output_units, NOT_AVAILABLE) if surface_orientation else None,
                         SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
-                        INCIDENCE_ALGORITHM_NAME: solar_incidence_series.incidence_algorithm,
+                        INCIDENCE_ALGORITHM_NAME: solar_incidence_series.incidence_algorithm if solar_incidence_series else NOT_AVAILABLE,
                         INCIDENCE_NAME: getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE) if solar_incidence_series else NOT_AVAILABLE,
-                        INCIDENCE_DEFINITION: solar_incidence_series.definition,
+                        INCIDENCE_DEFINITION: solar_incidence_series.definition if solar_incidence_series else NOT_AVAILABLE,
                         UNITS_NAME: angle_output_units,
                         }
                     }
+            results = results | solar_position_model_overview
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     return results
