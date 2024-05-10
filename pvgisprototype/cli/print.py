@@ -694,6 +694,7 @@ def print_irradiance_table_2(
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
     timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
     position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
+    azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, NOT_AVAILABLE)
     incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
 
     if algorithms or radiation_model or timing_algorithm or position_algorithm:
@@ -710,6 +711,9 @@ def print_irradiance_table_2(
 
     if position_algorithm:
         caption += f"Positioning : [bold]{position_algorithm}[/bold], "
+
+    if azimuth_origin:
+        caption += f"Azimuth origin : [bold indigo]{azimuth_origin}[/bold indigo]"
 
     if incidence_algorithm:
         caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
