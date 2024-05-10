@@ -37,6 +37,8 @@ from pvgisprototype.constants import (
     ALTITUDE_NAME,
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_NAME,
+    AZIMUTH_ORIGIN_COLUMN_NAME,
+    AZIMUTH_ORIGIN_NAME,
     INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_COLUMN_NAME,
@@ -265,7 +267,7 @@ def print_solar_position_series_table(
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
 
-    quantities = [declination, zenith, altitude, azimuth, incidence]
+    # quantities = [declination, zenith, altitude, azimuth, incidence]
 
     columns = []
     if index:
@@ -295,6 +297,7 @@ def print_solar_position_series_table(
 
     caption = f"[underline]Position[/underline]  "
     caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
+
     # Should be the same in case of multiple models!
     first_model = next(iter(rounded_table))
 
@@ -313,7 +316,6 @@ def print_solar_position_series_table(
 
     timing_algorithm = rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
     caption += f"Timing : [bold]{timing_algorithm}[/bold], "
-
     caption += f"Zone : {timezone}, "
     if (
         user_requested_timestamps is not None
@@ -325,24 +327,32 @@ def print_solar_position_series_table(
            #     str(user_requested_timezone),
            # ]
 
-    position_algorithm = rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
-    caption += f"Positioning : [bold]{position_algorithm}[/bold], "
-
-    incidence_algorithm = rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
-    caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
-
-    incidence_angle_definition = rounded_table[first_model].get(INCIDENCE_DEFINITION, None) if incidence else None
-    caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
-
-    table = Table(
-        *columns,
-        title=title,
-        caption=caption,
-        box=SIMPLE_HEAD,
-    )
 
     # Iterate over each timestamp and its corresponding result
     for model_name, model_result in rounded_table.items():
+
+        model_caption = caption
+        position_algorithm = safe_get_value(model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
+        model_caption += f"Positioning : [bold]{position_algorithm}[/bold], "
+
+        azimuth_origin = safe_get_value(model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)
+        model_caption += f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "
+
+        incidence_algorithm = safe_get_value(model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
+        model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
+
+        incidence_angle_definition = safe_get_value(model_result, INCIDENCE_DEFINITION, None) if incidence else None
+        model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
+
+        from rich import print
+        print(f'Model : [bold green]{model_name=}[/bold green]')
+        table = Table(
+            *columns,
+            title=title,
+            caption=model_caption,
+            box=SIMPLE_HEAD,
+        )
+        
         for _index, timestamp in enumerate(timestamps):
             declination_value = safe_get_value(model_result, DECLINATION_NAME, _index) if declination else None
             hour_angle_value = safe_get_value(model_result, HOUR_ANGLE_NAME, _index) if hour_angle else None
@@ -393,10 +403,11 @@ def print_solar_position_series_table(
             }
             style = style_map.get(position_algorithm.lower(), None)
             table.add_row(*row, style=style)
-        if group_models:
-            table.add_row()
 
-    Console().print(table)
+        # if group_models:
+        #     table.add_row()
+
+        Console().print(table)
 
 
 def print_solar_position_table_panels(

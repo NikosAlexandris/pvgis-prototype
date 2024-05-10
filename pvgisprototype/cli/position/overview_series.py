@@ -156,6 +156,7 @@ def overview_series(
         # refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
         solar_incidence_model=solar_incidence_model,
+        complementary_incidence_angle=complementary_incidence_angle,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         # time_output_units=time_output_units,
@@ -163,10 +164,8 @@ def overview_series(
         angle_output_units=angle_output_units,
         array_backend=array_backend,
         dtype=dtype,
-        complementary_incidence_angle=complementary_incidence_angle,
         verbose=verbose,
     )
-    debug(locals())
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     from pvgisprototype.cli.print import print_solar_position_series_table
@@ -177,6 +176,8 @@ def overview_series(
             timestamps=timestamps,
             timezone=timezone,
             table=solar_position_series,
+            title='Solar Position Overview',
+            index=index,
             timing=True,
             declination=True,
             hour_angle=True,
