@@ -2,10 +2,9 @@ from pydantic import BaseModel
 from pydantic_numpy import NpNDArray
 from pydantic_numpy.model import NumpyModel
 from pvgisprototype.constants import RADIANS, DEGREES
-from datetime import datetime, time
 from typing import Optional, Union, Tuple
-from numpy import ndarray
 import numpy as np
+from math import pi
 
 
 type_mapping = {
@@ -25,8 +24,8 @@ type_mapping = {
 }
 
 
-def _degrees_to_timedelta(degrees):
-    return degrees / 15.0
+def _radians_to_minutes(radians):
+    return (1440 / (2 * pi)) * radians
 
 
 def _degrees_to_minutes(degrees):
@@ -34,13 +33,13 @@ def _degrees_to_minutes(degrees):
     return _radians_to_minutes(radians)
 
 
+def _degrees_to_timedelta(degrees):
+    return degrees / 15.0
+
+
 def _radians_to_timedelta(radians):
     degrees = np.degrees(radians)
     return _degrees_to_timedelta(degrees)
-
-
-def _radians_to_minutes(radians):
-    return (1440 / (2 * np.pi)) * radians
 
 
 def _timestamp_to_hours(timestamp):
@@ -55,6 +54,24 @@ def _timestamp_to_hours(timestamp):
 def _timestamp_to_minutes(timestamp):
     total_seconds = timestamp.hour * 3600 + timestamp.minute * 60 + timestamp.second
     return total_seconds / 60
+
+
+def _sun_to_plane(self):
+    from pvgisprototype import SolarIncidence
+    if isinstance(self, SolarIncidence):
+        if self.definition == SolarIncidence().definition_complementary:
+            return self
+        else:
+            if self.unit == DEGREES:
+                return 90 - self.degrees
+            if self.unit == RADIANS:
+                return pi/2 - self.radians
+
+
+def complementary_incidence_angle_property(self):
+    from pvgisprototype import SolarIncidence
+    if isinstance(self, SolarIncidence):
+        return _sun_to_plane(self)
 
 
 def minutes_property(self):
@@ -78,20 +95,20 @@ def timedelta_property(self):
 
 def as_minutes_property(self):
     """Instance property to convert to minutes"""
-    if self.unit == "timedelta":
-        value = self.value.total_seconds() / 60
+    if self.unit == "minutes":
+        value = self.value
     elif self.unit == "datetime":
         value = (
             self.value.hour * 3600 + self.value.minute * 60 + self.value.second
         ) / 60
+    elif self.unit == "timestamp":
+        value = _timestamp_to_minutes(self.value)
+    elif self.unit == "timedelta":
+        value = self.value.total_seconds() / 60
     elif self.unit == RADIANS:
         value = _radians_to_minutes(self.value)
     elif self.unit == DEGREES:
         value = _degrees_to_minutes(self.value)
-    elif self.unit == "timestamp":
-        value = _timestamp_to_minutes(self.value)
-    elif self.unit == "as_minutes":
-        value = self.value
     else:
         value = None
     return value
@@ -129,7 +146,12 @@ def degrees_property(self):
         if self.unit == DEGREES:
             return self.value
         elif self.unit == RADIANS:
-            return np.degrees(self.value)
+            from numbers import Number
+            if isinstance(self.value, Number):
+                from math import degrees
+                return degrees(self.value)
+            else:
+                return np.degrees(self.value)
         else:
             return None
     else:
@@ -142,7 +164,12 @@ def radians_property(self):
         if self.unit == RADIANS:
             return self.value
         elif self.unit == DEGREES:
-            return np.radians(self.value)
+            from numbers import Number
+            if isinstance(self.value, Number):
+                from math import radians
+                return radians(self.value)
+            else:
+                return np.radians(self.value)
         else:
             return None
     else:
@@ -153,6 +180,7 @@ def _custom_getattr(self, attr_name):
     property_functions = {
         "radians": radians_property,
         "degrees": degrees_property,
+        "complementary" : complementary_incidence_angle_property,
         "minutes": minutes_property,
         "timedelta": timedelta_property,
         "as_minutes": as_minutes_property,
@@ -196,11 +224,16 @@ class DataClassFactory:
         def hash_model(self):
             # Create a tuple of hashable representations of each field
             hash_values = tuple(
-                DataClassFactory._hashable_array(getattr(self, field)) if isinstance(getattr(self, field), np.ndarray) or annotations[field] == NpNDArray
-                else hash(getattr(self, field))
+                (
+                    DataClassFactory._hashable_array(getattr(self, field))
+                    if isinstance(getattr(self, field), np.ndarray)
+                    or annotations[field] == NpNDArray
+                    else hash(getattr(self, field))
+                )
                 for field in fields
             )
             return hash(hash_values)
+
         return hash_model
 
 
@@ -210,13 +243,14 @@ class DataClassFactory:
         # Handle direct type comparisons
         if field_type is NpNDArray:
             return True
-    
+
         # Handle complex types involving NpNDArray
         from types import GenericAlias
+
         if isinstance(field_type, GenericAlias):
             # Check if NpNDArray is part of a Union or other complex type
-            return NpNDArray in getattr(field_type, '__args__', [])
-        
+            return NpNDArray in getattr(field_type, "__args__", [])
+
         return False
 
 
