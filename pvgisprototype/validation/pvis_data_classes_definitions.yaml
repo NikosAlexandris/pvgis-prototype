@@ -183,16 +183,16 @@ SolarDeclination:
     initial:
   min_radians:
     type: float
-    initial: -0.40910517666747087
+    initial: -0.4094542425178697
   max_radians:
     type: float
-    initial: 0.40910517666747087
+    initial: 0.4094542425178697
   min_degrees:
     type: float
-    initial: -23.44
+    initial: -23.46  # 23.44
   max_degrees:
     type: float
-    initial: 23.44
+    initial: 23.46  # 23.44
 
 SolarZenith:
   value:
@@ -317,6 +317,15 @@ SolarAzimuth:
   timing_algorithm:
     type: str
     initial:
+  definition:  # short definition for tabular outputs
+    type: str
+    initial: "Solar azimuth angle"
+  description:
+    type: str
+    initial: "Solar azimuth angle"
+  origin:
+    type: str
+    initial:
   min_radians:
     type: float
     initial: 0
@@ -362,15 +371,18 @@ SolarIncidence:
   incidence_algorithm:
     type: str
     initial:
-  definition:  # short definition i.e. 'Sun-to-Surface-Normal' for tabular outputs
+  definition:  # short definition for tabular outputs
     type: str
-    initial:
-  desription:
+    initial: "Sun-to-Surface-Normal"
+  definition_complementary:
     type: str
-    initial: "The angle between the position of the sun (sun-vector) and the normal to the surface (surface-normal). Alternative definitions measure the angle between the sun-vector and the inclination of the surface in question."
-  description_alternative:
+    initial: "Sun-to-Surface-Plane"
+  description:
     type: str
-    initial: "Alternative definitions measure the angle between the sun-vector and the inclination of the surface in question."
+    initial: "The angle between the position of the sun (sun-vector) and the normal to the surface (surface-normal). Alternative definitions measure the complementary angle between the sun-vector and the inclination of the surface in question."
+  description_complementary:
+    type: str
+    initial: "The 'complementary' incidence angle between the position of the sun in the sky (sun-vector) and the inclination of the surface in question (surface-plane)."
       
 
 # How ?
