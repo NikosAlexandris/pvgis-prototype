@@ -44,6 +44,7 @@ class SolarPositionModel(str, Enum):
     noaa = 'NOAA'
     # pvgis = 'PVGIS'
     pvis = 'PVIS'
+    jenco = 'Jenco'
     pvlib = 'pvlib'
     pysolar = 'pysolar'
     skyfield = 'Skyfield'
