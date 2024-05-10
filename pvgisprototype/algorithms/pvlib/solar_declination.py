@@ -1,5 +1,6 @@
 from datetime import datetime
 from math import isfinite
+from pandas import DatetimeIndex
 import pvlib
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationPVLIBInput
@@ -30,3 +31,26 @@ def calculate_solar_declination_pvlib(
                 [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
                 )
         return solar_declination
+
+
+def calculate_solar_declination_time_series_pvlib(
+        timestamps: DatetimeIndex,
+) -> SolarDeclination:
+        """Calculate the solar declination in radians"""
+        days_of_year = timestamps.dayofyear
+        solar_declination_series = pvlib.solarposition.declination_spencer71(days_of_year)
+        # solar_declination = pvlib.solarposition.declination_spencer71(doy)
+        # if (
+        #         not isfinite(solar_declination.degrees)
+        #         or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+        # ):
+        #         raise ValueError(
+        #         f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
+        #         [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
+        #         )
+        return SolarDeclination(
+            value=solar_declination_series.values,
+            unit=RADIANS,
+            position_algorithm='pvlib',
+            timing_algorithm='pvlib',
+        )
