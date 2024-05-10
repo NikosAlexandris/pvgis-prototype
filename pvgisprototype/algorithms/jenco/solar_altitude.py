@@ -78,7 +78,7 @@ def calculate_solar_altitude_time_series_jenco(
     solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
@@ -87,13 +87,13 @@ def calculate_solar_altitude_time_series_jenco(
         timestamps=timestamps,
         timezone=timezone,
         dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
     C31 = cos(latitude.radians) * numpy.cos(solar_declination_series.radians)
     C33 = sin(latitude.radians) * numpy.sin(solar_declination_series.radians)
-    sine_solar_altitude_series = C31 * numpy.cos(solar_hour_angle_series.value) + C33
+    sine_solar_altitude_series = C31 * numpy.cos(solar_hour_angle_series.radians) + C33
     solar_altitude_series = numpy.arcsin(sine_solar_altitude_series)
 
     if (
