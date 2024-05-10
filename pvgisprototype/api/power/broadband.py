@@ -141,7 +141,7 @@ def calculate_photovoltaic_power_output_series(
     albedo: Optional[float] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -285,7 +285,7 @@ def calculate_photovoltaic_power_output_series(
         "dtype": dtype,
         "init_method": "zeros",
         "backend": array_backend,
-    }  # Borrow shape from solar_altitude_series
+    }  # Borrow shape from timestamps
     direct_irradiance_series = create_array(**array_parameters)
     diffuse_irradiance_series = create_array(**array_parameters)
     reflected_irradiance_series = create_array(**array_parameters)
@@ -358,6 +358,7 @@ def calculate_photovoltaic_power_output_series(
             in_memory=in_memory,
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
+            solar_incidence_model=solar_incidence_model,
             solar_time_model=solar_time_model,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,

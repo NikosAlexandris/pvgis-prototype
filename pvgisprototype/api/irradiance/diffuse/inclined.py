@@ -12,6 +12,8 @@ import numpy as np
 from math import cos, sin, pi
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import Irradiance
+from pvgisprototype import SurfaceOrientation
+from pvgisprototype import SurfaceTilt
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SolarTimeModel
@@ -96,6 +98,7 @@ from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_term_
 from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_sky_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import calculate_diffuse_horizontal_component_from_sarah
+from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 
 
 @log_function_call
@@ -103,8 +106,8 @@ def calculate_diffuse_inclined_irradiance_time_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = None,
     timezone: Optional[str] = None,
     global_horizontal_component: Optional[Path] = None,
@@ -119,6 +122,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,  # Let Me Hardcoded, Read the docstring!
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -130,7 +134,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-) -> np.array:
+) -> Irradiance:
     """Calculate the diffuse irradiance incident on a solar surface.
 
     Notes
@@ -315,12 +319,13 @@ def calculate_diffuse_inclined_irradiance_time_series(
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            solar_incidence_model=solar_incidence_model,
             surface_orientation=surface_orientation,
             surface_tilt=surface_tilt,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            solar_incidence_model=solar_incidence_model,
+            complementary_incidence_angle=True,  # True = between sun-vector and surface-plane !
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            complementary_incidence_angle=True,  # = between sun-vector and surface-plane!
             dtype=dtype,
             array_backend=array_backend,
             verbose=0,
@@ -334,7 +339,12 @@ def calculate_diffuse_inclined_irradiance_time_series(
         )
 
         # prepare cases : surfaces in shade, sunlit, potentially sunlit
+
+        #  --------------------------------------------------------- Review Me
         mask_surface_in_shade_series = np.logical_and(np.sin(solar_incidence_series.radians) < 0, solar_altitude_series.radians >= 0)  # in shade, yet there is ambient light
+        # Should this be the _complementary_ incidence angle series ?
+        #  Review Me ---------------------------------------------------------
+
         mask_sunlit_surface_series = solar_altitude_series.radians >= 0.1 
         mask_potentially_sunlit_surface_series = ~mask_sunlit_surface_series 
 
@@ -362,7 +372,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
                 diffuse_sky_irradiance_series[mask_sunlit_surface_series]
                 * (1 - kb_series[mask_sunlit_surface_series])
                 + kb_series[mask_sunlit_surface_series]
-                * np.sin(solar_incidence_series.radians[mask_sunlit_surface_series])
+                * np.sin(solar_incidence_series.radians[mask_sunlit_surface_series])  # Should be the _complementary_ incidence angle!
                 / np.sin(solar_altitude_series.radians[mask_sunlit_surface_series])
             )
 
@@ -493,7 +503,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
