@@ -4,10 +4,12 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import sin
 from math import cos
+from math import pi
 from math import isfinite
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
+from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_time_series_jenco
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
@@ -39,25 +41,9 @@ def calculate_solar_azimuth_time_series_jenco(
     verbose: int = 0,
     log: int = 0,
 ) -> SolarAzimuth:
-    """Calculate the solar azimuth angle (θ) for a time series at a specific
-    geographic latitude and longitude.
-
-    Calculate the solar azimuth angle (θ) for a time series at a specific
-    geographic latitude and longitude, by default correcting the solar zenith
-    angle for atmospheric refraction, as described in the following steps:
-    
-        1. Calculate the solar declination, solar hour angle, and solar zenith
-        using NOAA's General Solar Position Calculations.
-
-        2. Calculate the solar azimuth angle using the equation reported in
-        Wikipedia's article "Solar azimuth angle" adjusting for the time of
-        day -- see also Notes :
-
-            - Morning (solar hour angle < 0): azimuth derived directly from the
-              arccosine function.
-
-            - Afternoon (solar hour angle > 0): azimuth adjusted to range in
-              [180°, 360°] by subtracting it from 360°.
+    """Calculate the solar azimuth angle (θ) between the sun and meridian
+    measured from East for a time series at a specific geographic latitude
+    and longitude.
 
     Parameters
     ----------
@@ -98,66 +84,47 @@ def calculate_solar_azimuth_time_series_jenco(
     correctly represent both morning and afternoon solar azimuth angles.
 
 
-    1. The equation given in NOAA's General Solar Position Calculations [0]_ is
+    Adjusting the solar azimuth based on the time of day
 
-                         sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-        cos(180 - θ) = - ----------------------------------------------------------
-                                  cos(latitude) * sin(solar_zenith)
+    Given that arccosine ranges in [0, π] or else in [0°, 180°], the raw
+    calculated solar azimuth angle will likewise range in [0, π]. This
+    necessitates an adjustment based on the time of day.
 
+    - Morning (solar hour angle < 0): the azimuth angle is correctly
+      derived directly from the arccosine function representing angles from
+      the North clockwise to the South [0°, 180°].
 
-        or after converting cos(180 - θ) to - cos(θ) :
+    - Afternoon (solar hour angle > 0): the azimuth angle needs to be
+      adjusted in order to correctly represent angles going further from
+      the South to the West [180°, 360°]. This is achieved by subtracting
+      the azimuth from 360°.
 
-                     sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-        - cos(θ) = - ------------------------------------------------------------
-                                cos(latitude) * sin(solar_zenith)
+    On the use of arctan2 from Wikipedia :
 
+    Corollary: if (y1, x1) and (y2, x2) are 2-dimensional vectors, the
+    difference formula is frequently used in practice to compute the angle
+    between those vectors with the help of atan2, since the resulting
+    computation behaves benign in the range (−π, π] and can thus be used
+    without range checks in many practical situations.
 
-        or :
+    The atan2 function was originally designed for the convention in pure
+    mathematics that can be termed east-counterclockwise. In practical
+    applications, however, the north-clockwise and south-clockwise conventions
+    are often the norm. The solar azimuth angle for example, that uses both the
+    north-clockwise and south-clockwise conventions widely, can be calculated
+    similarly with the east- and north-components of the solar vector as its
+    arguments. Different conventions can be realized by swapping the positions
+    and changing the signs of the x- and y-arguments as follows:
 
-                 sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-        cos(θ) = ----------------------------------------------------------
-                             cos(latitude) * sin(solar_zenith)
+    - atan2(y,x) : East-Counterclockwise Convention
+    - atan2(x,y) : North-Clockwise Convention
+    - atan2(-x,-y) : South-Clockwise Convention
 
-        
-        and finally :
-
-                      sin(latitude) * cos(solar_zenith) - sin(solar_declination)
-        θ = arccos( -------------------------------------------------------------- )
-                                  cos(latitude) * sin(solar_zenith)
-
-        where θ is the wanted solar azimuth angle.
-
-        However, comparing this equation with the _almost identical_ equation
-        reported in Wikipedia's relevant article and subsection titled
-        "Conventional Trigonometric Formulas" [1]_, there seems to be a
-        difference of a minus sign :
-
-                     sin(declination) - cos(zenith) * sin(latitude)
-        φs = arccos( ---------------------------------------------- )
-                             sin(zenith) * cos(latitude)
-
-        where φs is the wanted solar azimuth angle.
-
-        A cross-comparison of the solar azimuth angle derived by the equation
-        reported in Wikipedia's article [1]_ and the libraries pvlib [2]_,
-        pysolar [3]_, Skyfield [4]_ and suncalc [5]_, show a high agreement
-        across all of them.
-
-
-    2. Adjusting the solar azimuth based on the time of day
-
-        Given that arccosine ranges in [0, π] or else in [0°, 180°], the raw
-        calculated solar azimuth angle will likewise range in [0, π]. This
-        necessitates an adjustment based on the time of day.
-
-        - Morning (solar hour angle < 0): the azimuth angle is correctly
-          derived directly from the arccosine function representing angles from
-          the North clockwise to the South [0°, 180°].
-
-        - Afternoon (solar hour angle > 0): the azimuth angle needs to be
-          adjusted in order to correctly represent angles going further from
-          the South to the West [180°, 360°]. This is achieved by subtracting
-          the azimuth from 360°.
+    Changing the sign of the x- and/or y-arguments and/or swapping their
+    positions can create 8 possible variations of the atan2 function and they,
+    interestingly, correspond to 8 possible definitions of the angle, namely,
+    clockwise or counterclockwise starting from each of the 4 cardinal
+    directions, north, east, south and west.
 
     References
     ----------
@@ -191,10 +158,10 @@ def calculate_solar_azimuth_time_series_jenco(
     >>> print(solar_azimuth_series.degrees)
 
     """
-    solar_declination_series = calculate_solar_declination_time_series_noaa(
+    solar_declination_series = calculate_solar_declination_time_series_jenco(
         timestamps=timestamps,
         dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
@@ -203,35 +170,21 @@ def calculate_solar_azimuth_time_series_jenco(
         timestamps=timestamps,
         timezone=timezone,
         dtype=dtype,
-        backend=array_backend,
-        verbose=verbose,
-        log=log,
-    )
-    solar_zenith_series = calculate_solar_zenith_time_series_noaa(
-        latitude=latitude,
-        timestamps=timestamps,
-        solar_hour_angle_series=solar_hour_angle_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
     C11 = sin(latitude.radians) * numpy.cos(solar_declination_series.radians)
-    C13 = - cos(latitude.radians) * numpy.sin(solar_declination_series.radians)
+    C13 = cos(latitude.radians) * numpy.sin(solar_declination_series.radians)
     C22 = numpy.cos(solar_declination_series.radians)
-    numerator = C11 * numpy.cos(solar_hour_angle_series.radians) - C13
-    denominator_a = numpy.power(C22 * numpy.sin(solar_hour_angle_series.radians), 2)
-    denominator_b = numpy.power((C11 * numpy.cos(solar_hour_angle_series.radians) + C13), 2)
-    denominator = numpy.power(denominator_a + denominator_b, 0.5)
-    cosine_solar_azimuth_series = numerator / denominator
-    solar_azimuth_series = numpy.arccos(cosine_solar_azimuth_series)
-
-    # # interpretation for afternoon hours !
-    # afternoon_hours = solar_hour_angle_series.value > 0
-    # solar_azimuth_series[afternoon_hours] = (
-    #     (2 * numpy.pi) - solar_azimuth_series[afternoon_hours]
-    # )
+    numerator = C22 * numpy.sin(solar_hour_angle_series.radians)
+    denominator = C11 * numpy.cos(solar_hour_angle_series.radians) - C13
+    # # ========================================================================
+    # """West is negative, East is positive, Masters p. 395"""
+    # a = numpy.sin(solar_hour_angle_series.radians)
+    # b = numpy.cos(solar_hour_angle_series.radians) * sin(latitude.radians) - numpy.tan(solar_declination_series.radians) * cos(latitude.radians)
+    # # ========================================================================
+    solar_azimuth_series = numpy.mod((pi + numpy.arctan2(numerator, denominator)), 2*pi)
 
     if (
         (solar_azimuth_series < SolarAzimuth().min_radians)
@@ -258,4 +211,5 @@ def calculate_solar_azimuth_time_series_jenco(
         unit=RADIANS,
         # positioning_algorithm=solar_declination_series.position_algorithm,  #
         timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
+        origin="East"
     )
