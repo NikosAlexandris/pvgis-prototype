@@ -69,10 +69,10 @@ def calculate_equation_of_time_time_series_noaa(
     """Calculate the equation of time in minutes for a time series."""
     fractional_year_series = calculate_fractional_year_time_series_noaa(
         timestamps=timestamps,
-        angle_output_units=RADIANS,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        log=log,
     )
     equation_of_time_series = 229.18 * (
         0.000075

@@ -1,13 +1,30 @@
+from devtools import debug
+from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.log import log_function_call
+from pandas import DatetimeIndex
+from pvgisprototype.api.utilities.timestamp import get_days_in_year
+from pvgisprototype.api.utilities.timestamp import get_days_in_years
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
-from pvgisprototype.api.utilities.timestamp import get_days_in_year
-from datetime import datetime
+from datetime import date, datetime
 from pvgisprototype import FractionalYear
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import FRACTIONAL_YEAR_MINIMUM
 from pvgisprototype.constants import FRACTIONAL_YEAR_MAXIMUM
 from math import pi
 from math import isclose
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
+from pandas import DatetimeIndex
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.validation.arrays import create_array
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+import numpy
 
 
 @validate_with_pydantic(CalculateFractionalYearPVISInputModel)
