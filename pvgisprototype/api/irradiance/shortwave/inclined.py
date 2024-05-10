@@ -301,7 +301,7 @@ def calculate_global_inclined_irradiance_time_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             albedo=albedo,
-            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            global_horizontal_component=global_horizontal_irradiance,  # time series, optional
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
