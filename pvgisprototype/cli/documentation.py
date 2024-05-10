@@ -68,4 +68,60 @@ arbitrary aggregate of the instantaneous power estimations over a time series.
 In turn, the instantaneous (effective irradiance, and thereby) power values
 reflect the [italic]current[/italic] output of the photovoltaic (PV) system
 at each moment in time.
+
+How does PVGIS calculcate photovoltaic power output ?
+First, we calculcate the position of the sun in the sky relative to the
+positioning of a solar surface. Essentially this boils down to one
+trigonometric paramter : the solar incidence angle. This angle depends on the
+solar altitude and solar azimuth angles on any given moment in time combined
+with the location, the orientation and the tilt of the solar surface itself.
+Second, we ..
+
+Analytically, we can break down the algorith as follows:
+Let us go through the calculation step-by-step.
+
+
+Hence, .. :
+
+1. Defina an arbitrary period of time
+
+2. Calculate the solar altitude angle series
+
+> The default algoriths for solar timing, positioning and the definition of the
+incidence angle are :
+
+    - `solar_time_model` is set to Milne1921 (see in pvgisprototype.constants: SOLAR_TIME_ALGORITHM_DEFAULT).
+        - Calculate the apparent solar time based on the equation of time by Milne 1921
+
+    - `solar_position_model` is set to NOAA's equation for .. (see : SOLAR_POSITION_ALGORITHM_DEFAULT).
+    - `solar_incidence_model` is set to Iqbal (see : SolarIncidenceModel.iqbal).
+
+3. Calculate the solar azimuth angle series
+
+> NOAA
+
+4. Derive masks of the position of the sun :
+
+  i. above the horizon and not in shade
+  ii. very low sun angles
+  iii. below the horizon
+
+5. Calculate the direct horizontal irradiance component for ..
+
+6. Calculate the diffuse and reflected irradiance components for the sun above
+the horizon
+
+7. Sum the individual irradiance components to derive the global inclined
+irradiance
+
+8. Read time series of the ambient temperature, the wind speed and the spectral factor
+
+9. Derive the conversion efficiency coefficients
+
+10. Estimate the photovoltaic power as the product of the global irradiance and
+the efficiency coefficients.
+
 """
+
+
+
