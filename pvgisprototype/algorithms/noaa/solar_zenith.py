@@ -318,8 +318,8 @@ def calculate_solar_zenith_time_series_noaa(
     solar_zenith_series = SolarZenith(
                     value=np.arccos(cosine_solar_zenith),  # Important !
                     unit=RADIANS,
-                    timing_algorithm="NOAA",
-                    position_algorithm="NOAA",
+                    position_algorithm=solar_declination_series.position_algorithm,
+                    timing_algorithm=solar_hour_angle_series.timing_algorithm,
                 )
     if apply_atmospheric_refraction:
         solar_zenith_series = (
@@ -342,10 +342,4 @@ def calculate_solar_zenith_time_series_noaa(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return solar_zenith_series  # Is this a SolarZenith data class ?
-    # return SolarZenith(
-    #     value=solar_zenith_series,
-    #     unit=RADIANS,
-    #     position_algorithm='NOAA',
-    #     timing_algorithm='NOAA',
-    # )
+    return solar_zenith_series  # This is a SolarZenith data class !
