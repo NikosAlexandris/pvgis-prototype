@@ -130,7 +130,7 @@ from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 
 @log_function_call
-# @cached(cache={}, key=custom_hashkey)
+@cached(cache={}, key=custom_hashkey)
 def calculate_direct_horizontal_irradiance_time_series(
     longitude: float,
     latitude: float,
