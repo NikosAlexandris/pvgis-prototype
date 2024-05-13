@@ -4,6 +4,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarHourAngleNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleTimeSeriesNOAAInput
 from pvgisprototype import Longitude
+from pvgisprototype.api.position.models import SolarPositionModel
 from datetime import datetime
 from pandas import DatetimeIndex
 from typing import Optional
@@ -257,6 +258,9 @@ def calculate_solar_hour_angle_time_series_noaa(
             f"[{SolarHourAngle().min_degrees}, {SolarHourAngle().max_degrees}] degrees"
             f" in [code]solar_hour_angle_series[/code] : {np.degrees(out_of_range_values)}"
         )
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
             data=solar_hour_angle_series,
             log_level=log,
@@ -266,6 +270,6 @@ def calculate_solar_hour_angle_time_series_noaa(
     return SolarHourAngle(
         value=solar_hour_angle_series,
         unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
+        position_algorithm=SolarPositionModel.noaa,
+        timing_algorithm=true_solar_time_series.timing_algorithm,
     )

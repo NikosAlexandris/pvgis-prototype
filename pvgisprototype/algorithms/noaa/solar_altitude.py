@@ -12,6 +12,7 @@ from pvgisprototype import Latitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAltitude
+from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
@@ -133,6 +134,6 @@ def calculate_solar_altitude_time_series_noaa(
     return SolarAltitude(
         value=solar_altitude_series,
         unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
+        position_algorithm=solar_zenith_series.position_algorithm,
+        timing_algorithm=solar_hour_angle_series.timing_algorithm,
     )
