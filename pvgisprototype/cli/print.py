@@ -6,6 +6,8 @@ from rich.console import Console
 from rich.table import Table
 from rich.columns import Columns
 from rich.panel import Panel
+from rich.pretty import Pretty
+from rich.text import Text
 from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 from typing import List
 import numpy as np
@@ -156,7 +158,7 @@ def print_solar_position_table(
     caption += f"Tilt : [bold blue]{surface_tilt}[/bold blue] "
 
     units = rounded_table[0].get(UNITS_NAME, UNITLESS)
-    caption += f"\[[dim]{units}[/dim]] "
+    caption += f"[[dim]{units}[/dim]] "
 
     caption += f"Zone : {timezone} "
     if (
@@ -239,6 +241,15 @@ def print_solar_position_table(
     Console().print(table)
 
 
+def style_value(value, style_if_negative='dim'):
+    if value is not None:
+        if value < 0:
+            return f"[{style_if_negative}]{value}[/]"
+        else:
+            return str(value)
+    return None
+
+
 def print_solar_position_series_table(
     longitude,
     latitude,
@@ -308,7 +319,7 @@ def print_solar_position_series_table(
     caption += f"Tilt : [bold blue]{surface_tilt}[/bold blue] "
 
     units = rounded_table[first_model].get(UNITS_NAME, UNITLESS)
-    caption += f"\[[dim]{units}[/dim]]"
+    caption += f"[[dim]{units}[/dim]]"
 
     ## Algorithms
 
@@ -327,6 +338,25 @@ def print_solar_position_series_table(
            #     str(user_requested_timezone),
            # ]
 
+    solar_position_metrics = {
+        DECLINATION_NAME: declination,
+        HOUR_ANGLE_NAME: hour_angle,
+        ZENITH_NAME: zenith,
+        ALTITUDE_NAME: altitude,
+        AZIMUTH_NAME: azimuth,
+        INCIDENCE_NAME: incidence,
+    }
+    def add_solar_position_metrics_to_row(
+            row: list,
+            metrics: dict,
+            model_result: dict,
+            index: int,
+            ):
+        for solar_position_metric_name, include in metrics.items():
+            if include:
+                value = safe_get_value(model_result, solar_position_metric_name, index)
+                styled_value = style_value(value) if value is not None else None
+                row.append(styled_value or '-')
 
     # Iterate over each timestamp and its corresponding result
     for model_name, model_result in rounded_table.items():
@@ -344,8 +374,6 @@ def print_solar_position_series_table(
         incidence_angle_definition = safe_get_value(model_result, INCIDENCE_DEFINITION, None) if incidence else None
         model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
-        from rich import print
-        print(f'Model : [bold green]{model_name=}[/bold green]')
         table = Table(
             *columns,
             title=title,
@@ -353,61 +381,23 @@ def print_solar_position_series_table(
             box=SIMPLE_HEAD,
         )
         
-        for _index, timestamp in enumerate(timestamps):
-            declination_value = safe_get_value(model_result, DECLINATION_NAME, _index) if declination else None
-            hour_angle_value = safe_get_value(model_result, HOUR_ANGLE_NAME, _index) if hour_angle else None
-            zenith_value = safe_get_value(model_result, ZENITH_NAME, _index) if zenith else None
-            altitude_value = safe_get_value(model_result, ALTITUDE_NAME, _index) if altitude else None
-            azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, _index) if azimuth else None
-            incidence_value = safe_get_value(model_result, INCIDENCE_NAME, _index) if incidence else None
-
-            row = []
-            if index:
-                row.append(str(_index))
-            row.extend([str(timestamp)])
-            
-           # ---------------------------------------------------- Implement-Me---
-           # Convert the result back to the user's time zone
-           # output_timestamp = output_timestamp.astimezone(user_timezone)
-           # --------------------------------------------------------------------
-
-           ## Redesign Me! =======================================================
-           # if (
-           #     user_requested_timestamps is not None
-           #     and user_requested_timezone is not None
-           # ):
-           #     row.extend(
-           #         [
-           #             str(user_requested_timestamps.get_loc(timestamp)),
-           #             str(user_requested_timezone),
-           #         ]
-           #     )
-           ##=====================================================================
-
-            if declination_value is not None:
-                row.append(str(declination_value))
-            if hour_angle_value is not None:
-                row.append(str(hour_angle_value))
-            if zenith_value is not None:
-                row.append(str(zenith_value))
-            if altitude_value is not None:
-                row.append(str(altitude_value))
-            if azimuth_value is not None:
-                row.append(str(azimuth_value))
-            if incidence_value is not None:
-                row.append(str(incidence_value))
-
-            style_map = {
-                "pvis": "red",  # red because PVIS is incomplete!
-                "pvlib": "bold",
-            }
-            style = style_map.get(position_algorithm.lower(), None)
-            table.add_row(*row, style=style)
+    for _index, timestamp in enumerate(timestamps):
+        row = []
+        if index:
+            row.append(str(_index))
+        row.append(str(timestamp))
+        add_solar_position_metrics_to_row(
+                row=row,
+                metrics=solar_position_metrics,
+                model_result=model_result,
+                index=_index,
+        )
+        table.add_row(*row)
 
         # if group_models:
         #     table.add_row()
 
-        Console().print(table)
+    Console().print(table)
 
 
 def print_solar_position_table_panels(
@@ -628,7 +618,6 @@ def print_quantity_table(
             index_counter += 1
 
         for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
-            from rich.text import Text
             if idx == 0:  # assuming after 'Time' is the value of main interest
                 bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
                 row.append(bold_value)
@@ -688,7 +677,7 @@ def print_irradiance_table_2(
 
     units = dictionary.get(ANGLE_UNITS_COLUMN_NAME, UNITLESS)
     if longitude or latitude or elevation or surface_orientation or surface_tilt and units is not None:
-        caption += f"\[[dim]{units}[/dim]]"
+        caption += f"[[dim]{units}[/dim]]"
     
     algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
@@ -821,7 +810,6 @@ def print_irradiance_table_2(
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
 
         for idx, (column_name, value) in enumerate(zip(filtered_dictionary.keys(), values)):
-            from rich.text import Text
             if idx == 0:  # assuming after 'Time' is the value of main interest
                 bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
                 row.append(bold_value)
@@ -845,7 +833,6 @@ def print_finger_hash(dictionary: dict):
     """ """
     fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
     if fingerprint is not None:
-        from rich.text import Text
         fingerprint_panel = Panel.fit(
             Text(f"{fingerprint}", justify="center", style="bold yellow"),
             subtitle="[reverse]Fingerprint[/reverse]",
@@ -863,9 +850,6 @@ def print_command_metadata(context: Context):
     command_parameters = {}
     command_parameters['command'] = context.command_path
     command_parameters = command_parameters | context.params
-    from rich.panel import Panel
-    from rich.text import Text
-    from rich.pretty import Pretty
     command_parameters_panel = Panel.fit(
         Pretty(command_parameters, no_wrap=True),
         subtitle="[reverse]Command Metadata[/reverse]",
@@ -873,7 +857,6 @@ def print_command_metadata(context: Context):
         border_style="dim",
         style="dim",
     )
-    from rich.console import Console
     Console().print(command_parameters_panel)
 
     # write to file ?
