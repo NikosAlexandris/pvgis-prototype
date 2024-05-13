@@ -6,6 +6,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearTimeSeriesNOAAInput
 from pvgisprototype import FractionalYear
+from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.constants import RADIANS
 from math import pi
 import numpy as np
@@ -152,6 +153,5 @@ def calculate_fractional_year_time_series_noaa(
     return FractionalYear(
         value=fractional_year_series,
         unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
+        position_algorithm=SolarPositionModel.noaa,
     )

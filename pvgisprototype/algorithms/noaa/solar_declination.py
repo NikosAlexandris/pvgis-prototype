@@ -141,6 +141,5 @@ def calculate_solar_declination_time_series_noaa(
     return SolarDeclination(
         value=solar_declination_series,
         unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
+        position_algorithm=fractional_year_series.position_algorithm,
     )

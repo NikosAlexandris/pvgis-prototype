@@ -137,7 +137,7 @@ def calculate_true_solar_time_time_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-) -> DatetimeIndex:
+) -> TrueSolarTime:
     """Calculate the true solar time at a specific geographic locations for a
 
     Calculate the true solar time at a specific geographic locations for a
