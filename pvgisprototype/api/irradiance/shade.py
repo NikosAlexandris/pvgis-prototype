@@ -8,6 +8,11 @@ from typing import Optional
 import numpy as np
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
+from pvgisprototype.validation.arrays import create_array
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
 
 # @validate_with_pydantic()
@@ -153,8 +158,10 @@ def is_surface_in_shade_time_series(
     shadow_indicator: Path = None,
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
-    verbose: int = 0,
-    log: int = 0,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> List[bool]:
     """
     Determine if a surface is in shade based on solar altitude for each timestamp.
@@ -170,9 +177,17 @@ def is_surface_in_shade_time_series(
     each timestamp.
 
     """
+    array_parameters = {
+        "shape": solar_altitude_series.value.shape,  # Borrow shape from it
+        "dtype": 'bool',
+        "init_method": False,
+        "backend": array_backend,
+    }
+    surface_in_shade_series = create_array(**array_parameters)
     log_data_fingerprint(
-            data=np.full(solar_altitude_series.value.shape, False), ### FixMe!
+            data=surface_in_shade_series, ### FixMe!
             log_level=log,
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-    return np.full(solar_altitude_series.value.shape, False)
+
+    return surface_in_shade_series
