@@ -2,6 +2,7 @@ from pandas import DatetimeIndex
 from devtools import debug
 from numpy import number
 import numpy
+from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_time_series_pvis
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarIncidencePVISInputModel
 from pvgisprototype import SolarIncidence
@@ -34,6 +35,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 
 
 @validate_with_pydantic(CalculateSolarIncidencePVISInputModel)
@@ -219,9 +221,27 @@ def calculate_solar_incidence_time_series_pvis(
         * numpy.sin(solar_hour_angle_series.radians)
         * sin(surface_tilt.radians)
     )
+    
+    # set negative or below horizon angles to 0 !
+    solar_incidence_series[
+        (solar_incidence_series < 0) | (solar_altitude_series.value < 0)
+    ] = NO_SOLAR_INCIDENCE
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    log_data_fingerprint(
+            data=solar_incidence_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return SolarIncidence(
             value=solar_incidence_series,
             unit=RADIANS,
-            origin="East"
+            positioning_algorithm=solar_azimuth_series.position_algorithm,  #
+            timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
+            incidence_algorithm=SolarIncidenceModel.pvis,
+            definition=incidence_angle_definition,
+            description=incidence_angle_description,
     )
