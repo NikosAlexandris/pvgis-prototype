@@ -103,6 +103,9 @@ TrueSolarTime:
   max_minutes:
     type: float
     initial: 1580
+  timing_algorithm:
+    type: str
+    initial:
 
 SolarHourAngle:
   value:
@@ -167,6 +170,9 @@ FractionalYear:
   max_degrees:
     type: float
     initial: 360
+  position_algorithm:
+    type: str
+    initial:
 
 SolarDeclination:
   value:
