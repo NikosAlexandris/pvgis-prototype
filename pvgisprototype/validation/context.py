@@ -29,7 +29,7 @@ def with_custom_context(func):
         # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
         # print(f'Context : {ctx.params}')
         ctx.meta['function_trace'] = ctx.params.get('function_trace', []) + [func.__name__]
-        print(ctx.meta)
+        # print(ctx.meta)
 
         return func(*args, **kwargs)
 
