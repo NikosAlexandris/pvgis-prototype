@@ -1,4 +1,5 @@
 from devtools import debug
+from numpy import True_
 import typer
 from rich import print
 from typing import Annotated
@@ -8,11 +9,14 @@ from datetime import timedelta
 
 from math import radians
 from math import degrees
+from pvgisprototype.constants import MINUTES
+from pvgisprototype import TrueSolarTime
 from math import sin
 from math import cos
 from zoneinfo import ZoneInfo
 
 from pvgisprototype import Longitude
+from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarTimeMilne1921InputModel
 
@@ -141,4 +145,8 @@ def calculate_apparent_solar_time_milne1921(
     if verbose == 3:
         debug(locals())
     
-    return apparent_solar_time
+    return TrueSolarTime(
+        value=apparent_solar_time,
+        unit = MINUTES,
+        timing_algorithm=SolarTimeModel.milne,
+    )
