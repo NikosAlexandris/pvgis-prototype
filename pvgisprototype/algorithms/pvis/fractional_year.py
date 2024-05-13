@@ -53,8 +53,6 @@ def calculate_fractional_year_pvis(
     if not ((isclose(FRACTIONAL_YEAR_MINIMUM, fractional_year) or FRACTIONAL_YEAR_MINIMUM < fractional_year) and 
             (isclose(FRACTIONAL_YEAR_MAXIMUM, fractional_year) or fractional_year < FRACTIONAL_YEAR_MAXIMUM)):
         raise ValueError(f'Calculated fractional year {fractional_year} is out of the expected range [{FRACTIONAL_YEAR_MINIMUM}, {FRACTIONAL_YEAR_MAXIMUM}] radians')
-
-    print(f'{fractional_year=}')
     fractional_year = FractionalYear(value=fractional_year, unit=RADIANS)
             
     return fractional_year
@@ -98,7 +96,6 @@ def calculate_fractional_year_series_pvis(
         2 * pi * days_of_year / days_in_years,
         dtype=dtype,
     )
-    print(f'{fractional_year_series=}')
 
     # if not ((isclose(FRACTIONAL_YEAR_MINIMUM, fractional_year) or FRACTIONAL_YEAR_MINIMUM < fractional_year) and 
     #         (isclose(FRACTIONAL_YEAR_MAXIMUM, fractional_year) or fractional_year < FRACTIONAL_YEAR_MAXIMUM)):
