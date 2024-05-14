@@ -333,15 +333,15 @@ def calculate_photovoltaic_power_output_series(
                 verbose=verbose,  # no verbosity here by choice!
                 log=log,
             )
-        direct_irradiance_series[mask_above_horizon_not_in_shade] = calculated_direct_irradiance_series.value[mask_above_horizon_not_in_shade]
+        direct_irradiance_series[mask_above_horizon_not_in_shade] = (
+            calculated_direct_irradiance_series.value[mask_above_horizon_not_in_shade]
+        )  # .value is the direct inclined irradiance series
 
     # Calculate diffuse and reflected irradiance for sun above horizon
     if np.any(mask_above_horizon):
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             logger.info(f'i [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for daylight moments ..')
-        diffuse_irradiance_series[
-            mask_above_horizon
-        ] = calculate_diffuse_inclined_irradiance_time_series(
+        calculated_diffuse_irradiance_series = calculate_diffuse_inclined_irradiance_time_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -369,16 +369,15 @@ def calculate_photovoltaic_power_output_series(
             dtype=dtype,
             array_backend=array_backend,
             multi_thread=multi_thread,
-            verbose=0,  # no verbosity here by choice!
+            verbose=verbose,  # no verbosity here by choice!
             log=log,
-        ).value[  # Important !
-            mask_above_horizon
-        ]
+        )
+        diffuse_irradiance_series[mask_above_horizon] = (
+            calculated_diffuse_irradiance_series.value[mask_above_horizon]
+        )  # .value is the diffuse irradiance series
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             logger.info(f'i [bold]Calculating[/bold] the [magenta]reflected inclined irradiance[/magenta] for daylight moments ..')
-        reflected_irradiance_series[
-            mask_above_horizon
-        ] = calculate_ground_reflected_inclined_irradiance_time_series(
+        calculated_ground_reflected_inclined_irradiance_series = calculate_ground_reflected_inclined_irradiance_time_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -405,11 +404,14 @@ def calculate_photovoltaic_power_output_series(
             angle_output_units=angle_output_units,
             dtype=dtype,
             array_backend=array_backend,
-            verbose=0,  # no verbosity here by choice!
+            verbose=verbose,  # no verbosity here by choice!
             log=log,
-        ).value[  # Important !
-            mask_above_horizon
-        ]
+        )
+        reflected_irradiance_series[mask_above_horizon] = (
+            calculated_ground_reflected_inclined_irradiance_series.value[
+                mask_above_horizon
+            ]
+        )  # .value is the ground reflected irradiance series
 
     # sum components
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
@@ -541,9 +543,10 @@ def calculate_photovoltaic_power_output_series(
         } if verbose > 2 else {},
         
         'even_more_extended': lambda: {
-            # DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME:
-            # DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: 
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_direct_irradiance_series.components[DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME],
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_diffuse_irradiance_series.components[DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME],
             # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME:
+            # calculated_ground_reflected_inclined_irradiance_series.components[REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME], Is zero for horizontal surfaces !
             TEMPERATURE_COLUMN_NAME: temperature_series.value,
             WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
             SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor_series.value,
