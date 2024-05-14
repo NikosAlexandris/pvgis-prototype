@@ -4,7 +4,7 @@ from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_
 from .cases.true_solar_time import cases_true_solar_time_noaa
 from .cases.true_solar_time import cases_true_solar_time_ids
 
-from .conftest import GenericCheckCustomObjects
+from ..conftest import GenericCheckCustomObjects
 
 
 class TestCalculateTrueSolarTimeNOAA(GenericCheckCustomObjects):

@@ -4,7 +4,7 @@ from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_dec
 
 from .cases.solar_declination_angle_noaa import cases_solar_declination_angle_noaa
 from .cases.solar_declination_angle_noaa import cases_solar_declination_angle_noaa_ids
-from .conftest import GenericCheckCustomObjects
+from ..conftest import GenericCheckCustomObjects
 
 
 class TestSolarDeclinationNOAA(GenericCheckCustomObjects):
