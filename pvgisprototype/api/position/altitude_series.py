@@ -31,6 +31,9 @@ from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
 from cachetools import cached
 from rich import print
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 
 
 @log_function_call
@@ -42,11 +45,11 @@ def model_solar_altitude_time_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
-    apply_atmospheric_refraction: bool = True,
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarAltitude:
     """
     """
@@ -83,7 +86,7 @@ def model_solar_altitude_time_series(
             timezone=timezone,
             dtype=dtype,
             array_backend=array_backend,
-            verbose=0,
+            verbose=verbose,
             log=log,
         )
 
