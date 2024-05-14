@@ -4,7 +4,7 @@ from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_
 from .cases.fractional_year_noaa import cases_fractional_year_noaa 
 from .cases.fractional_year_noaa import cases_fractional_year_noaa_ids
 from .cases.fractional_year_noaa import cases_fractional_year_noaa_invalid
-from .conftest import GenericCheckCustomObjects
+from ..conftest import GenericCheckCustomObjects
 
 
 class TestCalculateFractionalYearNOAA(GenericCheckCustomObjects):
