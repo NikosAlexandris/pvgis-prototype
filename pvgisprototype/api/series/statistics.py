@@ -1,3 +1,34 @@
+"""
+Statistics 
+
+Wanted results for example for a grid-connected photovoltaic system :
+
+- the average monthly energy production
+- the average annual production
+- year-to-year variability : the standard deviation of the annual values
+  calculated over the period covered by the selected solar radiation database
+
+- Annual Production in kW considering geographic and climatic parameters :
+  Yearly PV energy production (kWh):        example: 1066.36
+
+- Annual Irradiation, the potential production of kWhs per m2 :
+  Yearly in-plane irradiation (kWh/m2):     example: 1341.06
+
+- Annual Variability in kWh, representing the possible variation between two years :
+  Yearly-to-year variability (kWh):         example: 43.48
+
+- Total estimates of losses, considering losses due to the angle, spectral
+  effects, and ambient temperature:
+
+  Changes in output due to:
+
+  - Angle of incidence (%):                     example: -3.41
+  - Spectral effects (%):                       example: 1.56
+  - Temperature and low irradiance (%):         example: -5.75
+	
+Total loss (%): 	     -20.48
+"""
+
 from devtools import debug
 from rich.console import Console
 from typing import Union, Dict
