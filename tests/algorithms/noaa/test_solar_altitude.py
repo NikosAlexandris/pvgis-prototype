@@ -4,7 +4,7 @@ from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitu
 
 from .cases.solar_altitude import cases_solar_altitude_noaa
 from .cases.solar_altitude import cases_solar_altitude_noaa_ids
-from .conftest import GenericCheckCustomObjects
+from ..conftest import GenericCheckCustomObjects
 
 
 class TestSolarAltitudeNOAA(GenericCheckCustomObjects):
