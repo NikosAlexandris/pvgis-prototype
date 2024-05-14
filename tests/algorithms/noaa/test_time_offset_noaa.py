@@ -4,7 +4,7 @@ from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_tim
 from .cases.time_offset_noaa import cases_time_offset_noaa
 from .cases.time_offset_noaa import cases_time_offset_noaa_ids
 
-from .conftest import GenericCheckCustomObjects
+from ..conftest import GenericCheckCustomObjects
 
 
 class TestCalculateTimeOffsetNOAA(GenericCheckCustomObjects):

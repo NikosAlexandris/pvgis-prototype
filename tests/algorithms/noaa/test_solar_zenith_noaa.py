@@ -4,7 +4,7 @@ from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_t
 
 from .cases.solar_zenith import cases_solar_zenith
 from .cases.solar_zenith import cases_solar_zenith_ids
-from .conftest import GenericCheckCustomObjects
+from ..conftest import GenericCheckCustomObjects
 
 class TestSolarZenithNOAA(GenericCheckCustomObjects):
 

@@ -4,7 +4,7 @@ from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth
 
 from .cases.solar_azimuth import cases_solar_azimuth_noaa
 from .cases.solar_azimuth import cases_solar_azimuth_noaa_ids
-from .conftest import GenericCheckCustomObjects
+from ..conftest import GenericCheckCustomObjects
 
 
 class TestSolarAzimuthNOAA(GenericCheckCustomObjects):
