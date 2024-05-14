@@ -91,7 +91,9 @@ from pvgisprototype.constants import POWER_MODEL_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import TEMPERATURE_COLUMN_NAME
 from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
@@ -136,10 +138,10 @@ def calculate_photovoltaic_power_output_series(
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_angular_loss_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -239,13 +241,13 @@ def calculate_photovoltaic_power_output_series(
         timezone=timezone,
         solar_position_model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        # refracted_solar_zenith=refracted_solar_zenith,
         # solar_time_model=solar_time_model,
         # perigee_offset=perigee_offset,
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=0,
+        verbose=verbose,
         log=log,
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
