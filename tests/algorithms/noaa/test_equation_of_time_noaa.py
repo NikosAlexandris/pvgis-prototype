@@ -9,7 +9,7 @@ from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_o
 from .cases.equation_of_time_noaa import cases_equation_of_time_noaa 
 from .cases.equation_of_time_noaa import cases_equation_of_time_noaa_ids
 from .cases.equation_of_time_noaa import cases_equation_of_time_noaa_invalid
-from .conftest import GenericCheckCustomObjects
+from ..conftest import GenericCheckCustomObjects
 
 
 class TestCalculateEquationOfTimeNOAA(GenericCheckCustomObjects):
