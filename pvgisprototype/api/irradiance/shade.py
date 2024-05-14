@@ -24,7 +24,7 @@ def interpolate_horizon_height(
 ) -> HorizonHeight:
     """Interpolate the height of the horizon for a given sun azimuth angle.
 
-    Interpolate the hiehgt of the horizon for a given sun azimuth angle based
+    Interpolate the heihgt of the horizon for a given sun azimuth angle based
     on existing horizon height values at a given interval.
 
     Parameters

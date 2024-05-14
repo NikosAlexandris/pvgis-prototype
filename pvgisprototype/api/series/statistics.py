@@ -1,6 +1,8 @@
 from devtools import debug
 from rich.console import Console
+from typing import Union, Dict
 import numpy as np
+import xarray as xr
 from scipy.stats import mode
 from rich.table import Table
 from rich import box
@@ -26,12 +28,11 @@ from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
 
 
 def calculate_series_statistics(
-    data_array: np.array,
+    data_array: Union[np.ndarray, Dict[str, np.ndarray]],
     timestamps: DatetimeIndex,
-    groupby: str = None,
+    groupby: str | None = None,
 ) -> dict:
     """ """
-    import xarray as xr
     irradiance_xarray = None  # Ugly Hack :-/
     if isinstance(data_array, dict):
 
@@ -50,7 +51,7 @@ def calculate_series_statistics(
         # Then, the primary wanted data
         data_array = data_array[PHOTOVOLTAIC_POWER_COLUMN_NAME]
 
-    # Regardless of whether the input data_array is a array or a dict :
+    # Regardless of whether the input data_array is an array or a dict :
     data_xarray = xr.DataArray(
         data_array,
         coords=[('time', timestamps)],
