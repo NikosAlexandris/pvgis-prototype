@@ -81,3 +81,101 @@ def uniplot_data_array_time_series(
             raise IOError(
                 f"Could not _uniplot_ {data_array.value=}"
             ) from e
+def uniplot_solar_position_series(
+    solar_position_series,
+    # index: bool = False,
+    timing=None,
+    declination=None,
+    hour_angle=None,
+    zenith=None,
+    altitude=None,
+    azimuth=None,
+    surface_orientation=None,
+    surface_tilt=None,
+    incidence=None,
+    # longitude: float,
+    # latitude: float,
+    # time_series_2: Path = None,
+    timestamps: DatetimeIndex = None,
+    # start_time: Timestamp = None,
+    # end_time: Timestamp = None,
+    resample_large_series: bool = False,
+    lines: bool = True,
+    supertitle: str = None,
+    title: str = None,
+    label: str = None,
+    legend_labels: str = None,
+    # unit: str = UNITS_NAME,
+    terminal_width_fraction: float = TERMINAL_WIDTH_FRACTION,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    ):
+    """
+    """
+    from pvgisprototype.constants import (
+        DECLINATION_NAME,
+        HOUR_ANGLE_NAME,
+        ZENITH_NAME,
+        ALTITUDE_NAME,
+        AZIMUTH_NAME,
+        INCIDENCE_NAME,
+    )
+    solar_position_metrics = {
+        DECLINATION_NAME: declination,
+        HOUR_ANGLE_NAME: hour_angle,
+        ZENITH_NAME: zenith,
+        ALTITUDE_NAME: altitude,
+        AZIMUTH_NAME: azimuth,
+        INCIDENCE_NAME: incidence,
+    }
+    def safe_get_value(dictionary, key, index, default='NA'):
+        """
+        Parameters
+        ----------
+        dictionary: dict
+            Input dictionary
+        key: str
+            key to retrieve from the dictionary
+        index: int
+            index ... ?
+
+        Returns
+        -------
+        The value corresponding to the given `key` in the `dictionary` or the
+        default value if the key does not exist.
+
+        """
+        value = dictionary.get(key, default)
+        if isinstance(value, (list, numpy.ndarray)) and len(value) > index:
+            return value[index]
+        return value
+
+    for model_name, model_result in solar_position_series.items():
+        solar_incidence_series = model_result.get(INCIDENCE_NAME, numpy.array([]))
+        solar_incidence_label = label + f' {model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}'
+        individual_series = [
+            model_result.get(solar_position_metric_name, numpy.array([]))
+            for solar_position_metric_name, include in solar_position_metrics.items()
+            if include and solar_position_metric_name != INCIDENCE_NAME
+        ]
+        individual_metrics_labels = [
+            (solar_position_metric_name + f' {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}')
+            if solar_position_metric_name == AZIMUTH_NAME and include
+            else solar_position_metric_name
+            for solar_position_metric_name, include in solar_position_metrics.items()
+            if include and solar_position_metric_name != INCIDENCE_NAME
+        ]
+
+        uniplot_data_array_time_series(
+            data_array=solar_incidence_series,
+            list_extra_data_arrays=individual_series,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
+            lines=True,
+            supertitle=f'{supertitle} {model_name}',
+            title=title,
+            label=solar_incidence_label,
+            extra_legend_labels=individual_metrics_labels,
+            unit=model_result.get(UNITS_NAME, UNITLESS),
+            terminal_width_fraction=terminal_width_fraction,
+            verbose=verbose,
+        )
