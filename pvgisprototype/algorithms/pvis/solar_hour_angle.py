@@ -9,6 +9,7 @@ from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
+from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarHourAnglePVISInputModel
 from pvgisprototype.validation.functions import CalculateEventHourAnglePVISInputModel
@@ -53,8 +54,8 @@ def calculate_solar_hour_angle_pvis(
 
         where the solar time was given in seconds.
     """
-    true_solar_time_minutes = timestamp_to_minutes(solar_time)
-    hour_angle = (true_solar_time_minutes / 60 - 12) * 15 * pi / 180
+    # true_solar_time_minutes = timestamp_to_minutes(solar_time)
+    hour_angle = (solar_time.minutes / 60 - 12) * 15 * pi / 180
     hour_angle = SolarHourAngle(
         value=hour_angle,
         unit=RADIANS,
@@ -72,7 +73,7 @@ def calculate_solar_hour_angle_pvis(
     return hour_angle
 
 
-def calculate_solar_hour_angle_time_series_pvis(
+def calculate_solar_hour_angle_series_hofierka(
     longitude: Longitude,
     timestamps: DatetimeIndex, 
     timezone: ZoneInfo,
@@ -131,8 +132,8 @@ def calculate_solar_hour_angle_time_series_pvis(
     return SolarHourAngle(
         value=solar_hour_angle_series,
         unit=RADIANS,
-        position_algorithm='PVIS',
-        timing_algorithm='PVIS',
+        position_algorithm=SolarPositionModel.hofierka,
+        timing_algorithm='Hofierka',
     )
 
 
