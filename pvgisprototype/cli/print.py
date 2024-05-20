@@ -124,14 +124,14 @@ def print_solar_position_table(
     columns = []
     if timestamp is not None:
         columns.append('Time')
-    if timing is not None:
-        columns.append(TIME_ALGORITHM_COLUMN_NAME)
+    # if timing is not None:
+    #     columns.append(TIME_ALGORITHM_COLUMN_NAME)
     if declination is not None:
         columns.append(DECLINATION_COLUMN_NAME)
     if hour_angle is not None:
         columns.append(HOUR_ANGLE_COLUMN_NAME)
-    if any(quantity is not None for quantity in quantities):
-        columns.append(POSITIONING_ALGORITHM_COLUMN_NAME)
+    # if any(quantity is not None for quantity in quantities):
+    #     columns.append(POSITIONING_ALGORITHM_COLUMN_NAME)
     if zenith is not None:
         columns.append(ZENITH_COLUMN_NAME)
     if altitude is not None:
@@ -149,18 +149,24 @@ def print_solar_position_table(
     caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
 
     # Should be the same in case of multiple models!
-    # first_model = next(iter(rounded_table))
+    first_model = next(iter(rounded_table))
 
-    surface_orientation = rounded_table[0].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
+    surface_orientation = rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
     caption += f"Orientation : [bold blue]{surface_orientation}[/bold blue], "
 
-    surface_tilt = rounded_table[0].get(SURFACE_TILT_NAME, None) if surface_tilt else None
+    surface_tilt = rounded_table[first_model].get(SURFACE_TILT_NAME, None) if surface_tilt else None
     caption += f"Tilt : [bold blue]{surface_tilt}[/bold blue] "
 
-    units = rounded_table[0].get(UNITS_NAME, UNITLESS)
+    units = rounded_table[first_model].get(UNITS_NAME, UNITLESS)
     caption += f"[[dim]{units}[/dim]] "
 
-    caption += f"Zone : {timezone} "
+    ## Algorithms
+
+    caption += f"\n[underline]Algorithms[/underline]  "
+
+    timing_algorithm = rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
+    caption += f"Timing : [bold]{timing_algorithm}[/bold], "
+    caption += f"Zone : {timezone}, "
     if (
         user_requested_timestamp is not None
         and user_requested_timezone is not None
@@ -171,10 +177,10 @@ def print_solar_position_table(
            #     str(user_requested_timezone),
            # ]
 
-    incidence_algorithm = rounded_table[0].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
+    incidence_algorithm = rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
     caption += f"\nIncidence : [bold]{incidence_algorithm}[/bold], "
 
-    incidence_angle_definition = rounded_table[0].get(INCIDENCE_DEFINITION, None) if incidence else None
+    incidence_angle_definition = rounded_table[first_model].get(INCIDENCE_DEFINITION, None) if incidence else None
     caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
     table = Table(
@@ -190,38 +196,43 @@ def print_solar_position_table(
         else dictionary.get(key, not_available)
     )
 
-    for model_result in rounded_table:
-        declination_value = get_value_or_default(model_result, DECLINATION_NAME)
-        hour_angle_value = get_value_or_default(model_result, HOUR_ANGLE_NAME)
-        timing_algorithm = get_value_or_default(model_result, TIME_ALGORITHM_NAME)
+    get_scalar = lambda value: value.item() if isinstance(value, np.ndarray) else value
+    get_value_or_default = (
+        lambda dictionary, key, default=NOT_AVAILABLE: dictionary.get(key, default)
+    )
+
+    print(f'{rounded_table=}')
+    for model_name, model_result in rounded_table.items():
+        declination_value = get_scalar(get_value_or_default(model_result, DECLINATION_NAME))
+        # timing_algorithm = get_value_or_default(model_result, TIME_ALGORITHM_NAME)
         position_algorithm = get_value_or_default(model_result, POSITIONING_ALGORITHM_NAME)
-        zenith_value = get_value_or_default(model_result, ZENITH_NAME)
-        altitude_value = get_value_or_default(model_result, ALTITUDE_NAME)
-        azimuth_value = get_value_or_default(model_result, AZIMUTH_NAME)
-        incidence_algorithm = get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME)
-        incidence_value = get_value_or_default(model_result, INCIDENCE_NAME)
+        hour_angle_value = get_scalar(get_value_or_default(model_result, HOUR_ANGLE_NAME))
+        zenith_value = get_scalar(get_value_or_default(model_result, ZENITH_NAME))
+        altitude_value = get_scalar(get_value_or_default(model_result, ALTITUDE_NAME))
+        azimuth_value = get_scalar(get_value_or_default(model_result, AZIMUTH_NAME))
+        incidence_value = get_scalar(get_value_or_default(model_result, INCIDENCE_NAME))
 
         row = []
-        row.extend([str(timestamp)])
+        row.extend([str(timestamp[0])])  # expectedly a single timestamp
 
        # ---------------------------------------------------- Implement-Me---
        # Convert the result back to the user's time zone
        # output_timestamp = output_timestamp.astimezone(user_timezone)
        # --------------------------------------------------------------------
 
-       # Redesign Me! =======================================================
-        if user_requested_timestamp and user_requested_timezone:
-            row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
-       #=====================================================================
+       ## Redesign Me! =======================================================
+       # if not user_requested_timestamp.empty and user_requested_timezone:
+       #     row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
+       ##=====================================================================
 
-        if timing is not None:
-            row.append(timing_algorithm)
+        # if timing is not None:
+        #     row.append(timing_algorithm)
         if declination_value is not NOT_AVAILABLE:
             row.append(str(declination_value))
         if hour_angle_value is not NOT_AVAILABLE:
             row.append(str(hour_angle_value))
-        if position_algorithm is not NOT_AVAILABLE:
-            row.append(position_algorithm)
+        # if position_algorithm is not NOT_AVAILABLE:
+        #     row.append(position_algorithm)
         if zenith_value is not NOT_AVAILABLE:
             row.append(str(zenith_value))
         if altitude_value is not NOT_AVAILABLE:
@@ -355,8 +366,9 @@ def print_solar_position_series_table(
         for solar_position_metric_name, include in metrics.items():
             if include:
                 value = safe_get_value(model_result, solar_position_metric_name, index)
-                styled_value = style_value(value) if value is not None else None
-                row.append(styled_value or '-')
+                # styled_value = style_value(value) if value is not None else None
+                # row.append(styled_value or '-')
+                row.append(str(value) or '-')
 
     # Iterate over each timestamp and its corresponding result
     for model_name, model_result in rounded_table.items():
@@ -381,23 +393,23 @@ def print_solar_position_series_table(
             box=SIMPLE_HEAD,
         )
         
-    for _index, timestamp in enumerate(timestamps):
-        row = []
-        if index:
-            row.append(str(_index))
-        row.append(str(timestamp))
-        add_solar_position_metrics_to_row(
-                row=row,
-                metrics=solar_position_metrics,
-                model_result=model_result,
-                index=_index,
-        )
-        table.add_row(*row)
+        for _index, timestamp in enumerate(timestamps):
+            row = []
+            if index:
+                row.append(str(_index))
+            row.append(str(timestamp))
+            add_solar_position_metrics_to_row(
+                    row=row,
+                    metrics=solar_position_metrics,
+                    model_result=model_result,
+                    index=_index,
+            )
+            table.add_row(*row)
 
-        # if group_models:
-        #     table.add_row()
+            # if group_models:
+            #     table.add_row()
 
-    Console().print(table)
+        Console().print(table)
 
 
 def print_solar_position_table_panels(
