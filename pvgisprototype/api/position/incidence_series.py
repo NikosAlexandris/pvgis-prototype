@@ -34,7 +34,7 @@ Input South  │     180     │  │     90     │  │     0      │
              └─────────────┘  └────────────┘  └────────────┘
 """
 
-from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_time_series_pvis
+from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_series_hofierka
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarIncidenceTimeSeriesInputModel
 from pvgisprototype import Longitude
@@ -95,32 +95,38 @@ def model_solar_incidence_time_series(
 ) -> SolarIncidence:
     """
     """
+    solar_incidence_series = None
+
     if solar_incidence_model.value == SolarIncidenceModel.jenco:
 
+        # Update-Me ----------------------------------------------------------
         # Hofierka (2002) measures azimuth angles from East !
         # Convert the user-defined North-based surface orientation angle to East-based
-        surface_orientation_east_convention = SurfaceOrientation(
-            value=convert_north_to_east_radians_convention(
-                north_based_angle=surface_orientation
-            ),
-            unit=RADIANS,
-        )
-        # And apparently, defined the complementary surface tilt angle too!
-        from math import pi
-        surface_tilt = SurfaceTilt(
-                value=(pi/2 - surface_tilt.radians),
-                unit=RADIANS,
-                )
+        # surface_orientation_east_convention = SurfaceOrientation(
+        #     value=convert_north_to_east_radians_convention(
+        #         north_based_angle=surface_orientation
+        #     ),
+        #     unit=RADIANS,
+        # )
+        # # And apparently, defined the complementary surface tilt angle too!
+        # from math import pi
+        # surface_tilt = SurfaceTilt(
+        #         value=(pi/2 - surface_tilt.radians),
+        #         unit=RADIANS,
+        #         )
+        # ---------------------------------------------------------- Update-Me
+
         solar_incidence_series = calculate_solar_incidence_time_series_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            surface_orientation=surface_orientation_east_convention,
+            surface_orientation=surface_orientation,
+            # surface_orientation=surface_orientation_east_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             # complementary_incidence_angle=complementary_incidence_angle,
-            complementary_incidence_angle=True,
+            complementary_incidence_angle=complementary_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -153,7 +159,7 @@ def model_solar_incidence_time_series(
 
     if solar_incidence_model.value == SolarIncidenceModel.pvis:
 
-        solar_incidence_series = calculate_solar_incidence_time_series_pvis(
+        solar_incidence_series = calculate_solar_incidence_series_hofierka(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -169,3 +175,57 @@ def model_solar_incidence_time_series(
         )
 
     return solar_incidence_series
+
+
+def calculate_solar_incidence_series(
+):
+    pass
+#     longitude: Longitude,
+#     latitude: Latitude,
+#     timestamp: datetime,
+#     timezone: ZoneInfo = None,
+#     random_time: bool = RANDOM_DAY_FLAG_DEFAULT,
+#     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+#     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
+#     solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.iqbal],
+#     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+#     horizon_heights: List[float] = None,
+#     horizon_interval: float = None,
+#     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
+#     perigee_offset: float = PERIGEE_OFFSET,
+#     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+#     time_offset_global: float = TIME_OFFSET_GLOBAL_DEFAULT,
+#     hour_offset: float = HOUR_OFFSET_DEFAULT,
+#     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
+#     verbose: int = VERBOSE_LEVEL_DEFAULT,
+# ) -> List:
+#     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
+#     results = []
+#     for solar_incidence_model in solar_incidence_models:
+#         if solar_incidence_model != SolarIncidenceModel.all:  # ignore 'all' in the enumeration
+#             solar_incidence = model_solar_incidence(
+#                 longitude=longitude,
+#                 latitude=latitude,
+#                 timestamp=timestamp,
+#                 timezone=timezone,
+#                 surface_orientation=surface_orientation,
+#                 surface_tilt=surface_tilt,
+#                 solar_time_model=solar_time_model,
+#                 solar_incidence_model=solar_incidence_model,
+#                 complementary_incidence_angle=complementary_incidence_angle,
+#                 time_offset_global=time_offset_global,
+#                 hour_offset=hour_offset,
+#                 eccentricity_correction_factor=eccentricity_correction_factor,
+#                 perigee_offset=perigee_offset,
+#                 verbose=verbose,
+#             )
+#             results.append(
+#                 {
+#                     TIME_ALGORITHM_NAME: solar_time_model.value,
+#                     POSITION_ALGORITHM_NAME: solar_incidence_model.value,
+#                     INCIDENCE_NAME: getattr(solar_incidence, angle_output_units, None) if solar_incidence else None,
+#                     'Sun-to-Plane': complementary_incidence_angle,
+#                     UNITS_NAME: angle_output_units,
+#                 }
+#             )
+#     return results

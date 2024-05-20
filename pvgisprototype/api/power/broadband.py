@@ -260,7 +260,7 @@ def calculate_photovoltaic_power_output_series(
         solar_position_model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        solar_time_model=solar_time_model,
+        # solar_time_model=solar_time_model,
         # perigee_offset=perigee_offset,
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
