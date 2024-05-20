@@ -1,25 +1,22 @@
 from devtools import debug
+from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
+from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
-from datetime import datetime
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
 from math import cos
 from math import sin
-from math import asin
-from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_time_series_pvis
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
 from pvgisprototype import SolarAltitude
-from pvgisprototype.api.position.declination import calculate_solar_declination_pvis
-from pvgisprototype.api.position.solar_time import model_solar_time
-from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
 from pvgisprototype.constants import RADIANS
 from math import isfinite
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
@@ -28,100 +25,16 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, L
 import numpy
 
 
-@validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
-def calculate_solar_altitude_pvis(
-    longitude: Longitude,
-    latitude: Latitude,
-    timestamp: datetime,
-    timezone: ZoneInfo,
-    perigee_offset: float,
-    eccentricity_correction_factor: float,
-    time_offset_global: int,
-    solar_time_model: SolarTimeModel,
-    verbose: int = 0,
-) -> SolarAltitude:
-    """Compute various solar geometry variables.
-    Parameters
-    ----------
-    longitude : float
-        The longitude in degrees. This value will be converted to radians. 
-        It should be in the range [-180, 180].
-
-    latitude : float
-        The latitude in degrees. This value will be converted to radians. 
-        It should be in the range [-90, 90].
-    
-    timestamp : datetime, optional
-        The timestamp for which to calculate the solar altitude. 
-        If not provided, the current UTC time will be used.
-    
-    timezone : str, optional
-        The timezone to use for the calculation. 
-        If not provided, the system's local timezone will be used.
-    
-    angle_output_units : str, default 'radians'
-        The units to use for the output solar geometry variables. 
-        This should be either 'degrees' or 'radians'.
-
-    Returns
-    -------
-    float
-        The calculated solar altitude.
-    """
-    solar_declination = calculate_solar_declination_pvis(
-        timestamp=timestamp,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-    )
-    C31 = cos(latitude.radians) * cos(solar_declination.radians)
-    C33 = sin(latitude.radians) * sin(solar_declination.radians)
-    solar_time = model_solar_time(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        solar_time_model=solar_time_model,  # returns datetime.time object
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        time_offset_global=time_offset_global,
-    )
-    hour_angle = calculate_solar_hour_angle_pvis(
-            solar_time=solar_time,
-    )
-    sine_solar_altitude = C31 * cos(hour_angle.radians) + C33
-    solar_altitude = asin(sine_solar_altitude)
-    solar_altitude = SolarAltitude(
-        value=solar_altitude,
-        unit=RADIANS,
-        position_algorithm='PVIS',
-        timing_algorithm=solar_time_model.value,
-    )
-    if (
-        not isfinite(solar_altitude.degrees)
-        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
-        )
-
-    if verbose == 3:
-        debug(locals())
-
-    return solar_altitude
-
-
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
-def calculate_solar_altitude_time_series_pvis(
+def calculate_solar_altitude_series_hofierka(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     perigee_offset: float,
     eccentricity_correction_factor: float,
-    # time_offset_global: int,
     # solar_time_model: SolarTimeModel,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -181,14 +94,32 @@ def calculate_solar_altitude_time_series_pvis(
         * np.cos(solar_hour_angle_series.radians)
 
     """
-    solar_declination_series = calculate_solar_declination_time_series_pvis(
+    solar_declination_series = calculate_solar_declination_series_hofierka(
         timestamps=timestamps,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
     )
-    C31 = cos(latitude.radians) * numpy.cos(solar_declination_series.radians)
-    C33 = sin(latitude.radians) * numpy.sin(solar_declination_series.radians)
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+
+    # Idea for alternative solar time modelling, i.e. Milne 1921 -------------
+    # solar_time = model_solar_time(
+    #     longitude=longitude,
+    #     latitude=latitude,
+    #     timestamp=timestamp,
+    #     timezone=timezone,
+    #     solar_time_model=solar_time_model,  # returns datetime.time object
+    #     perigee_offset=perigee_offset,
+    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    # )
+    # hour_angle = calculate_solar_hour_angle_pvis(
+    #         solar_time=solar_time,
+    # )
+    # ------------------------------------------------------------------------
+
+    solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
@@ -197,22 +128,36 @@ def calculate_solar_altitude_time_series_pvis(
         verbose=verbose,
         log=log,
     )
-    solar_altitude_series = numpy.arcsin(
-        C31 * numpy.cos(solar_hour_angle_series.radians) + C33
-    )
+    C31 = cos(latitude.radians) * numpy.cos(solar_declination_series.radians)
+    C33 = sin(latitude.radians) * numpy.sin(solar_declination_series.radians)
+    sine_solar_altitude_series = C31 * numpy.cos(solar_hour_angle_series.radians) + C33
+    solar_altitude_series = numpy.arcsin(sine_solar_altitude_series)
+
+    # mask_positive_C31 = C31 > 1e-7
+    # solar_altitude_series[mask_positive_C31] = numpy.where(
+    #     sine_solar_altitude_series < 0,
+    #     NO_SOLAR_INCIDENCE,
+    #     solar_altitude_series,
+    # )
 
     # The hour angle of the time of sunrise/sunset over a horizontal surface
     # Thr,s can be calculated then as:
     # cos(event_hour_angle_horizontal) = -C33 / C31
 
-    # if (
-    #     not isfinite(solar_altitude.degrees)
-    #     or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
-    # ):
-    #     raise ValueError(
-    #         f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-    #         [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] radians"
-    #     )
+    if (
+        (solar_altitude_series < SolarAltitude().min_radians)
+        | (solar_altitude_series > SolarAltitude().max_radians)
+    ).any():
+        out_of_range_values = solar_altitude_series[
+            (solar_altitude_series < SolarAltitude().min_radians)
+            | (solar_altitude_series > SolarAltitude().max_radians)
+        ]
+        # raise ValueError(# ?
+        logger.warning(
+            f"{WARNING_NEGATIVE_VALUES} "
+            f"[{SolarAltitude().min_radians}, {SolarAltitude().max_radians}] radians"
+            f" in [code]solar_altitude_series[/code] : {out_of_range_values}"
+        )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -226,6 +171,6 @@ def calculate_solar_altitude_time_series_pvis(
     return SolarAltitude(
         value=solar_altitude_series,
         unit=RADIANS,
-        position_algorithm='PVIS',
+        position_algorithm=SolarPositionModel.hofierka,
         timing_algorithm=solar_hour_angle_series.timing_algorithm,
     )
