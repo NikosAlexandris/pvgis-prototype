@@ -89,9 +89,9 @@ typer_option_solar_incidence_model = typer.Option(
     case_sensitive=False,
     rich_help_panel=rich_help_panel_solar_position,
 )
-typer_option_sun_to_plane_incidence_angle = typer.Option(
-    '--sun-to-plane-incidence-angle',
-    '--sun-to-plane',
+typer_option_sun_to_surface_plane_incidence_angle = typer.Option(
+    '--sun-to-surface-plane/--sun-to-surface-normal',
+    '--sun-to-plane/--sun-to-normal',
     help='Incidence angle between sun-vector and surface-plane',
     show_default=True,
     show_choices=True,
