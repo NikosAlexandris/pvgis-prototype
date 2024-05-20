@@ -6,7 +6,6 @@ from typing import Optional
 from typing import List
 from pathlib import Path
 from rich import print
-from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.api.power.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
@@ -15,7 +14,7 @@ from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.cli.typer.irradiance import typer_argument_irradiance_series
 from pvgisprototype import TemperatureSeries
 from pvgisprototype.cli.typer.temperature import typer_option_temperature_series
-from pvgisprototype.constants import TEMPERATURE_DEFAULT
+from pvgisprototype.constants import TEMPERATURE_DEFAULT, UNITLESS
 from pvgisprototype import WindSpeedSeries
 from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
@@ -36,7 +35,6 @@ from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
 from pvgisprototype.constants import EFFICIENCY
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
-from pvgisprototype.cli.print import print_quantity_table
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 import typer
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
@@ -73,6 +71,7 @@ def photovoltaic_efficiency_time_series(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -130,12 +129,15 @@ def photovoltaic_efficiency_time_series(
         uniplot_data_array_time_series(
             data_array=photovoltaic_efficiency_time_series.value,
             list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
-            # supertitle = 'Photovoltaic Power Output Series',
-            # title="Photovoltaic power output",
-            # label = 'Photovoltaic Power',
-            label_2 = None,
-            # unit = POWER_UNIT,
+            supertitle = 'Efficiency Coefficients Series',
+            title = 'Efficiency Coefficients Series',
+            label = 'Efficiency Coefficients',
+            extra_legend_labels=None,
+            unit = UNITLESS,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash

@@ -13,7 +13,7 @@ from pathlib import Path
 from pvgisprototype import TemperatureSeries
 from pvgisprototype import WindSpeedSeries
 from pvgisprototype import SpectralFactorSeries
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested, round_float_values
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SolarPositionModel
@@ -189,6 +189,7 @@ def photovoltaic_power_output_series(
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -320,12 +321,14 @@ def photovoltaic_power_output_series(
         uniplot_data_array_time_series(
             data_array=photovoltaic_power_output_series.value,
             list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
-            supertitle = 'Photovoltaic Power Output Series',
+            supertitle='Photovoltaic Power Output Series',
             title="Photovoltaic power output",
-            label = 'Photovoltaic Power',
-            label_2 = None,
-            unit = POWER_UNIT,
+            label='Photovoltaic Power',
+            extra_legend_labels=None,
+            unit=POWER_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
@@ -433,6 +436,8 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
+        surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
         timestamps=timestamps,
         timezone=timezone,
         global_horizontal_irradiance=global_horizontal_irradiance,
@@ -447,8 +452,6 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         dtype=dtype,
         array_backend=array_backend,
         multi_thread=multi_thread,
-        surface_orientation=surface_orientation,
-        surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
@@ -472,6 +475,8 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         fingerprint=fingerprint,
         profile=profile,
     )
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print import print_irradiance_table_2
@@ -491,7 +496,6 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             flat_list = photovoltaic_power_output_series.series.flatten().astype(str)
             csv_str = ','.join(flat_list)
             print(csv_str)
-
     if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
         write_irradiance_csv(
@@ -513,17 +517,22 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_time_series
         individual_series = [series.value for series in photovoltaic_power_output_series.individual_series]
-        if resample_large_series:
-            data_array = data_array.resample(time='1M').mean()
+        surface_orientation = [convert_float_to_degrees_if_requested(orientation, angle_output_units) for orientation in surface_orientation]
+        surface_tilt = [convert_float_to_degrees_if_requested(tilt, angle_output_units) for tilt in surface_tilt]
+        surface_orientation = round_float_values(surface_orientation, rounding_places)
+        surface_tilt = round_float_values(surface_tilt, rounding_places)
+        individual_labels = [f"Orientation, Tilt : {orientation}°, {tilt}°" for orientation, tilt in zip(surface_orientation, surface_tilt)]
         uniplot_data_array_time_series(
             data_array=photovoltaic_power_output_series.series,
             list_extra_data_arrays=individual_series,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
-            supertitle = 'Photovoltaic Power Output Series',
-            title="Photovoltaic power output",
-            label = 'Photovoltaic Power',
-            label_2 = None,
-            unit = POWER_UNIT,
+            supertitle='Photovoltaic Power Output Series',
+            title="Photovoltaic power output from multiple surfaces",
+            label='Sum of Photovoltaic Power',
+            extra_legend_labels=individual_labels,
+            unit=POWER_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:

@@ -25,7 +25,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
 
-from pvgisprototype.constants import RADIANS, DEGREES
+from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -37,7 +37,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.position.altitude import calculate_solar_altitude
+from pvgisprototype.api.position.altitude_series import calculate_solar_altitude_time_series
 from pvgisprototype.cli.print import print_solar_position_table
 
 
@@ -51,7 +51,7 @@ def calculate_zenith(angle_output_units, solar_altitude_angle):
 def zenith(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timestamps: Annotated[Optional[datetime], typer_argument_timestamp],
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -93,10 +93,10 @@ def zenith(
         print(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
-    solar_altitude = calculate_solar_altitude(
+    solar_altitude = calculate_solar_altitude_time_series(
         longitude=longitude,
         latitude=latitude,
-        timestamp=timestamp,
+        timestamps=timestamps,
         timezone=timezone,
         solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
