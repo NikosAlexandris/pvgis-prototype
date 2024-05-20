@@ -163,14 +163,15 @@ where as the _Sun-to-Surface-Normal_
 we call it the _typical_ incidence angle.
 
 To get the _typical_ solar incidence angle,
-one can use the optional flag `--no-complementary-incidence-angle` like so :
+one can use the optional flag `--sun-to-surface-normal`
+(or even `--sun-to-normal`) like so :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype position overview-series \
     8.628 45.812 180 45 \
     '2010-01-17 12:00' \
     -aou degrees \
-    --no-complementary-incidence-angle
+    --sun-to-surface-normal
 ```
 <!-- returns -->
 <!--                                          Solar geometry overview -->
