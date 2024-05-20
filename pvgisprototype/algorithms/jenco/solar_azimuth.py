@@ -107,7 +107,7 @@ def calculate_solar_azimuth_time_series_jenco(
     computation behaves benign in the range (−π, π] and can thus be used
     without range checks in many practical situations.
 
-    The atan2 function was originally designed for the convention in pure
+    The `atan2` function was originally designed for the convention in pure
     mathematics that can be termed east-counterclockwise. In practical
     applications, however, the north-clockwise and south-clockwise conventions
     are often the norm. The solar azimuth angle for example, that uses both the
@@ -177,14 +177,13 @@ def calculate_solar_azimuth_time_series_jenco(
     C11 = sin(latitude.radians) * numpy.cos(solar_declination_series.radians)
     C13 = cos(latitude.radians) * numpy.sin(solar_declination_series.radians)
     C22 = numpy.cos(solar_declination_series.radians)
-    numerator = C22 * numpy.sin(solar_hour_angle_series.radians)
-    denominator = C11 * numpy.cos(solar_hour_angle_series.radians) - C13
-    # # ========================================================================
-    # """West is negative, East is positive, Masters p. 395"""
-    # a = numpy.sin(solar_hour_angle_series.radians)
-    # b = numpy.cos(solar_hour_angle_series.radians) * sin(latitude.radians) - numpy.tan(solar_declination_series.radians) * cos(latitude.radians)
-    # # ========================================================================
-    solar_azimuth_series = numpy.mod((pi + numpy.arctan2(numerator, denominator)), 2*pi)
+    x_solar_vector_component = C22 * numpy.sin(solar_hour_angle_series.radians)
+    y_solar_vector_component = C11 * numpy.cos(solar_hour_angle_series.radians) - C13
+    # `x` to `y` derives North-Clockwise azimuth
+    azimuth_origin = 'North'
+    solar_azimuth_series = numpy.mod(
+        (pi + numpy.arctan2(x_solar_vector_component, y_solar_vector_component)), 2 * pi
+    )
 
     if (
         (solar_azimuth_series < SolarAzimuth().min_radians)
@@ -211,5 +210,5 @@ def calculate_solar_azimuth_time_series_jenco(
         unit=RADIANS,
         # positioning_algorithm=solar_declination_series.position_algorithm,  #
         timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
-        origin="East"
+        origin=azimuth_origin,
     )
