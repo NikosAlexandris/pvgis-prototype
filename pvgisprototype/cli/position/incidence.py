@@ -9,6 +9,8 @@ from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from click.utils import R
+
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.timestamps import typer_option_random_time
@@ -34,7 +36,7 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
 
-from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
+from pvgisprototype.constants import RADIANS, RANDOM_DAY_FLAG_DEFAULT
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -44,12 +46,13 @@ from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
-from math import radians
 from math import pi
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.timestamp import random_datetimezone
-from pvgisprototype.api.position.incidence import calculate_solar_incidence
+from pvgisprototype.api.position.incidence_series import calculate_solar_incidence_series
 from pvgisprototype.cli.print import print_solar_position_table
+from pvgisprototype import SurfaceOrientation
+from pvgisprototype import SurfaceTilt
 
 
 def incidence(
@@ -120,8 +123,8 @@ def incidence(
         timezone=timezone,
         solar_incidence_models=solar_incidence_models,
         complementary_incidence_angle=complementary_incidence_angle,
-        surface_orientation=surface_orientation,
-        surface_tilt=surface_tilt,
+        surface_orientation=SurfaceOrientation(value=surface_orientation, unit=RADIANS),  # Typer does not easily support custom types !
+        surface_tilt=SurfaceTilt(value=surface_tilt, unit=RADIANS),  # Typer does not easily support custom types !
         solar_time_model=solar_time_model,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,

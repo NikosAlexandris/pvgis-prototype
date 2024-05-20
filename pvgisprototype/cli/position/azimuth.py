@@ -30,7 +30,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.position.azimuth import calculate_solar_azimuth
+from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_series
 from pvgisprototype.cli.print import print_solar_position_table
 
 
@@ -80,7 +80,7 @@ def azimuth(
         print(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
-    solar_azimuth = calculate_solar_azimuth(
+    solar_azimuth = calculate_solar_azimuth_series(
         longitude=longitude,
         latitude=latitude,
         timestamp=timestamp,

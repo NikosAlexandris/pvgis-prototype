@@ -14,7 +14,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
-from pvgisprototype.api.position.solar_time import calculate_solar_time
+from pvgisprototype.api.position.solar_time_series import calculate_solar_time_series
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
@@ -96,7 +96,7 @@ def solar_time(
     """
     # Convert the input timestamp to UTC, for _all_ internal calculations
     utc_zoneinfo = ZoneInfo("UTC")
-    if timestamp.tzinfo != utc_zoneinfo:
+    if timestamp.tz != utc_zoneinfo:
 
         # Note the input timestamp and timezone
         user_requested_timestamp = timestamp
@@ -107,20 +107,20 @@ def solar_time(
         typer.echo(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
     
     solar_time_model = select_models(SolarTimeModel, solar_time_model)  # Using a callback fails!
-    solar_time = calculate_solar_time(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        solar_time_models=solar_time_model,  # keep the CLI simple
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        verbose=verbose,
+    solar_time_series = calculate_solar_time_series(
+        # longitude=longitude,
+        # latitude=latitude,
+        # timestamp=timestamp,
+        # timezone=timezone,
+        # solar_time_models=solar_time_model,  # keep the CLI simple
+        # perigee_offset=perigee_offset,
+        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # verbose=verbose,
     ) 
     solar_time_table = Table(
         TIME_ALGORITHM_COLUMN_NAME, SOLAR_TIME_COLUMN_NAME, box=box.SIMPLE_HEAD  # UNITS_NAME,
     )
-    for model_result in solar_time:
+    for model_result in solar_time_series:
         # typer.echo(f'Solar time: {solar_time} {units} ({timezone})')
         model_name = model_result.get(TIME_ALGORITHM_NAME, '')
         solar_time = model_result.get(SOLAR_TIME_NAME, '')
