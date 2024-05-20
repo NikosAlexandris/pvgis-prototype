@@ -9,7 +9,7 @@ from pvgisprototype import Irradiance
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import IRRADIANCE_UNITS
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
-from pvgisprototype.constants import POSITION_OF_EARTH_SERIES
+from pvgisprototype.constants import DAY_ANGLE_SERIES
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
@@ -38,7 +38,7 @@ def get_days_per_year(years):
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 def calculate_extraterrestrial_normal_irradiance_time_series(
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -61,8 +61,9 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
     days_per_year = get_days_per_year(years).astype(dtype)
     days_in_years = days_per_year[indices]
     day_of_year_series = timestamps.dayofyear.to_numpy().astype(dtype)
-    position_of_earth_series = 2 * np.pi * day_of_year_series / days_in_years
-    distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(position_of_earth_series - perigee_offset)
+    # day angle == fractional year, hence : use model_fractional_year_series()
+    day_angle_series = 2 * np.pi * day_of_year_series / days_in_years
+    distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(day_angle_series - perigee_offset)
     extraterrestrial_normal_irradiance_series = solar_constant * distance_correction_factor_series
 
     components_container = {
@@ -73,7 +74,7 @@ def calculate_extraterrestrial_normal_irradiance_time_series(
 
         'extended': lambda: {
             DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
-            POSITION_OF_EARTH_SERIES: position_of_earth_series,
+            DAY_ANGLE_SERIES: day_angle_series,
             DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
         } if verbose > 1 else {},
 
