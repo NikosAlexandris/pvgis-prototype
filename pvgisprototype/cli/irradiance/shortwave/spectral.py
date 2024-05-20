@@ -144,6 +144,7 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -242,11 +243,13 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         uniplot_data_array_time_series(
             data_array=spectrally_resolved_global_inclined_irradiance_series.value,
             list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
             supertitle = 'Global Horizontal Irradiance Series',
             title = 'Global Horizontal Irradiance Series',
             label = 'Global Horizontal Irradiance',
-            label_2 = None,
+            extra_legend_labels=None,
             unit = IRRADIANCE_UNITS,
             terminal_width_fraction=terminal_width_fraction,
         )
