@@ -19,7 +19,7 @@ from pvgisprototype import SolarZenith
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import SolarIncidence
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import LOSS_NAME, SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -42,6 +42,7 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.validation.arrays import create_array
 
 
 @log_function_call
@@ -177,19 +178,11 @@ def calculate_solar_incidence_time_series_iqbal(
     .. [0] Iqbal, M. “An Introduction to Solar Radiation”. New York: 1983; pp. 23-25.
 
     """
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
-        longitude=longitude,
-        timestamps=timestamps,
-        timezone=timezone,
-        dtype=dtype,
-        array_backend=array_backend,
-        verbose=verbose,
-        log=log,
-    )
     solar_zenith_series = calculate_solar_zenith_time_series_noaa(
+        longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
-        solar_hour_angle_series=solar_hour_angle_series,
+        timezone=timezone,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         dtype=dtype,
         array_backend=array_backend,
@@ -208,26 +201,32 @@ def calculate_solar_incidence_time_series_iqbal(
         log=log,
     )  # North = 0 according to NOAA's solar geometry equations
 
+    # array_parameters = {
+    #     "shape": timestamps.shape,
+    #     "dtype": dtype,
+    #     "init_method": "empty",
+    #     "backend": array_backend,
+    # }  # Borrow shape from timestamps
+    # solar_incidence_series = create_array(**array_parameters)
+
     # Convert to south-based
     solar_azimuth_series = SolarAzimuth(
-        value=((solar_azimuth_series_north_based.value - numpy.pi)),
+        value=((solar_azimuth_series_north_based.radians - pi)),
         unit=RADIANS,
     )
     # Φimit Φ to the range from 0° to 360°.
     # Divide Φ by 360, record the decimal fraction of the division as F.
+    # Divide phi by 360 and get the remainder and the fractional part
+    fraction_series, _ = numpy.modf(solar_azimuth_series.radians / (2 * pi))
+
     # If Φ is positive, then the limited Φ = 360 * F .
     # If Φ is negative, then the limited Φ = 360 - 360 *F.
-
-    # Divide phi by 360 and get the remainder and the fractional part
-    fraction_series, _ = numpy.modf(solar_azimuth_series.radians / (2 * numpy.pi))
-    # solar_azimuth_series[solar_azimuth_series.radians >= 0] = 2 * numpy.pi * fraction_series
-    # solar_azimuth_series[solar_azimuth_series.radians < 0] = 2 * numpy.pi - (2 * numpy.pi * numpy.abs(fraction_series))
 
     solar_azimuth_series = SolarAzimuth(
         value=numpy.where(
             solar_azimuth_series.radians >= 0,
-            2 * numpy.pi * fraction_series,
-            2 * numpy.pi - (2 * numpy.pi * numpy.abs(fraction_series)),
+            2 * pi * fraction_series,
+            2 * pi - (2 * pi * numpy.abs(fraction_series)),
         ),
         unit=RADIANS,
     )
@@ -256,9 +255,17 @@ def calculate_solar_incidence_time_series_iqbal(
         incidence_angle_description = SolarIncidence().description_complementary
 
     # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
+    # mask_below_horizon = solar_zenith_series.value > pi/2
+    # solar_incidence_series[mask_below_horizon] = 0
     solar_incidence_series[
-        (solar_incidence_series < 0) | (solar_zenith_series.value > pi / 2)
+        (solar_incidence_series < 0) | (solar_zenith_series.radians > pi / 2)
     ] = NO_SOLAR_INCIDENCE
+
+    # solar_incidence_series = numpy.where(
+    #     (solar_incidence_series < 0) | (solar_zenith_series.radians > pi / 2),
+    #     NO_SOLAR_INCIDENCE,
+    #     solar_incidence_series,
+    # )
 
     log_data_fingerprint(
             data=solar_incidence_series,
@@ -272,8 +279,8 @@ def calculate_solar_incidence_time_series_iqbal(
     return SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
-        positioning_algorithm=solar_azimuth_series.position_algorithm,  #
-        timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
+        positioning_algorithm=solar_zenith_series.position_algorithm,  #
+        timing_algorithm=solar_zenith_series.timing_algorithm,  #
         incidence_algorithm=SolarIncidenceModel.iqbal,
         definition=incidence_angle_definition,
         description=incidence_angle_description,
