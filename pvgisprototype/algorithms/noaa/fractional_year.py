@@ -1,14 +1,10 @@
 from devtools import debug
-from datetime import datetime
-from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from pvgisprototype.api.utilities.timestamp import get_days_in_years
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearTimeSeriesNOAAInput
 from pvgisprototype import FractionalYear
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.constants import RADIANS
-from math import pi
 import numpy as np
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
@@ -26,30 +22,6 @@ from pvgisprototype.validation.arrays import create_array
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
-@validate_with_pydantic(CalculateFractionalYearNOAAInput)
-def calculate_fractional_year_noaa(
-        timestamp: datetime,
-    ) -> FractionalYear:
-    """Calculate fractional year in radians """
-    days_in_year = get_days_in_year(timestamp.year)
-    fractional_year = (
-        2
-        * pi
-        / days_in_year
-        * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
-    )
-
-    # slightly less than 0 ?
-    if -pi/365 <= fractional_year < 0:  # for example, consider values > -1e-6 as close enough to 0
-        fractional_year = 0
-    fractional_year = FractionalYear(value=fractional_year, unit=RADIANS)
-
-    if not FractionalYear().min_radians <= fractional_year.radians < FractionalYear().max_radians:
-        raise ValueError(f'The calculated fractional year {fractional_year} is outside the expected range [0, {2*pi}] radians')
-
-    return fractional_year
-
-
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
@@ -60,8 +32,7 @@ def calculate_fractional_year_time_series_noaa(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> FractionalYear:
-    """
-    Calculate the fractional year series for a given series of timestamps.
+    """Calculate the fractional year for a time series.
 
     Parameters
     ----------
@@ -83,7 +54,8 @@ def calculate_fractional_year_time_series_noaa(
     Returns
     -------
     FractionalYear
-        A FractionalYear object containing the calculated fractional year series.
+        A FractionalYear object containing the calculated fractional year
+        series.
 
     Raises
     ------
@@ -98,9 +70,10 @@ def calculate_fractional_year_time_series_noaa(
 
     Notes
     -----
-    The function calculates the fractional year considering leap years and converts
-    the timestamps into fractional values considering their position within the year.
-    This is used in various solar energy calculations and models.
+    The function calculates the fractional year considering leap years and
+    converts the timestamps into fractional values considering their position
+    within the year. This is used in various solar energy calculations and
+    models.
 
     See also
     --------
