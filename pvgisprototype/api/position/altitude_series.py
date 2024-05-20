@@ -1,4 +1,5 @@
 from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_time_series_jenco
+from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
@@ -46,14 +47,35 @@ def model_solar_altitude_time_series(
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarAltitude:
     """
+    Notes
+    -----
+
+    The solar altitude angle measures from the horizon up towards the zenith
+    (positive, and down towards the nadir (negative)). The altitude is zero all
+    along the great circle between zenith and nadir.
+
+    - All solar calculation functions return floating angular measurements in
+      radians.
+
+    pysolar :
+
+    From https://pysolar.readthedocs.io:
+
+    - Altitude is reckoned with zero at the horizon. The altitude is positive
+      when the sun is above the horizon.
+
+    - The result is returned with units.
     """
     solar_altitude_series = None
+
     if solar_position_model.value == SolarPositionModel.noaa:
 
         solar_altitude_series = calculate_solar_altitude_time_series_noaa(
@@ -70,20 +92,89 @@ def model_solar_altitude_time_series(
 
     if solar_position_model.value == SolarPositionModel.skyfield:
         pass
+    # if solar_position_model.value == SolarPositionModel.skyfield:
+    #     solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
+    #         longitude=longitude,
+    #         latitude=latitude,
+    #         timestamp=timestamp,
+    #     )
 
     if solar_position_model.value == SolarPositionModel.suncalc:
         pass
+    # if solar_position_model.value == SolarPositionModel.suncalc:
+    #     # note : first azimuth, then altitude
+    #     solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
+    #         date=timestamp,  # this comes first here!
+    #         lng=longitude.degrees,
+    #         lat=latitude.degrees,
+    #     ).values()  # zero points to south
+    #     solar_altitude = SolarAltitude(
+    #         value=solar_altitude,
+    #         unit=RADIANS,
+    #         position_algorithm='suncalc',
+    #         timing_algorithm='suncalc',
+    #     )
+    #     if (
+    #         not isfinite(solar_altitude.degrees)
+    #         or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+    #     ):
+    #         raise ValueError(
+    #             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+    #             [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
+    #         )
+
 
     if solar_position_model.value == SolarPositionModel.pysolar:
         pass
+    # if solar_position_model.value == SolarPositionModel.pysolar:
 
-    if solar_position_model.value  == SolarPositionModel.pvis:
+    #     timestamp = attach_timezone(timestamp, timezone)
+    #     solar_altitude = pysolar.solar.get_altitude(
+    #         latitude_deg=latitude.degrees,  # this comes first
+    #         longitude_deg=longitude.degrees,
+    #         when=timestamp,
+    #     )  # returns degrees by default
+    #     # required by output function
+    #     solar_altitude = SolarAltitude(
+    #         value=solar_altitude,
+    #         unit=DEGREES,
+    #         position_algorithm='pysolar',
+    #         timing_algorithm='pysolar',
+    #     )
+    #     if (
+    #         not isfinite(solar_altitude.degrees)
+    #         or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+    #     ):
+    #         raise ValueError(
+    #             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
+    #             [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
+    #         )
+
+
+    if solar_position_model.value  == SolarPositionModel.jenco:
 
         solar_altitude_series = calculate_solar_altitude_time_series_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
+
+    if solar_position_model.value  == SolarPositionModel.hofierka:
+
+        solar_altitude_series = calculate_solar_altitude_series_hofierka(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -92,6 +183,16 @@ def model_solar_altitude_time_series(
 
     if solar_position_model.value  == SolarPositionModel.pvlib:
         pass
+    # if solar_position_model.value  == SolarPositionModel.pvlib:
+
+    #     solar_altitude = calculate_solar_altitude_pvlib(
+    #         longitude=longitude,
+    #         latitude=latitude,
+    #         timestamp=timestamp,
+    #         timezone=timezone,
+    #         verbose=verbose,
+    #     )
+
 
     return solar_altitude_series
 
@@ -113,8 +214,8 @@ def calculate_solar_altitude_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
 ) -> List:
-    """
-    Calculates the solar position using all models and returns the results in a table.
+    """Calculates the solar position using the requested models and returns the
+    results in a dictionary.
     """
     results = {}
     for solar_position_model in solar_position_models:
