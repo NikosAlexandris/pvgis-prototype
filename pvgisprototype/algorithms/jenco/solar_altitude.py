@@ -8,7 +8,9 @@ from math import isfinite
 from pvgisprototype import SolarAltitude
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.constants import RADIANS
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
+from pvgisprototype.constants import NO_SOLAR_INCIDENCE, RADIANS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -17,11 +19,12 @@ from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.api.position.models import SolarPositionModel
+
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
@@ -31,6 +34,8 @@ def calculate_solar_altitude_time_series_jenco(
     latitude: Latitude,     # radians
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
+    perigee_offset: float,
+    eccentricity_correction_factor: float,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
@@ -75,14 +80,17 @@ def calculate_solar_altitude_time_series_jenco(
     --------
 
     """
-    solar_declination_series = calculate_solar_declination_time_series_noaa(
+    solar_declination_series = calculate_solar_declination_series_hofierka(
         timestamps=timestamps,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    # solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
@@ -95,6 +103,13 @@ def calculate_solar_altitude_time_series_jenco(
     C33 = sin(latitude.radians) * numpy.sin(solar_declination_series.radians)
     sine_solar_altitude_series = C31 * numpy.cos(solar_hour_angle_series.radians) + C33
     solar_altitude_series = numpy.arcsin(sine_solar_altitude_series)
+
+    # mask_positive_C31 = C31 > 1e-7
+    # solar_altitude_series[mask_positive_C31] = numpy.where(
+    #     sine_solar_altitude_series < 0,
+    #     NO_SOLAR_INCIDENCE,
+    #     solar_altitude_series,
+    # )
 
     if (
         (solar_altitude_series < SolarAltitude().min_radians)
@@ -110,6 +125,10 @@ def calculate_solar_altitude_time_series_jenco(
             f"[{SolarAltitude().min_radians}, {SolarAltitude().max_radians}] radians"
             f" in [code]solar_altitude_series[/code] : {out_of_range_values}"
         )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
         data=solar_altitude_series,
         log_level=log,
@@ -119,6 +138,6 @@ def calculate_solar_altitude_time_series_jenco(
     return SolarAltitude(
         value=solar_altitude_series,
         unit=RADIANS,
-        # positioning_algorithm=solar_declination_series.position_algorithm,  #
+        positioning_algorithm=solar_declination_series.position_algorithm,  #
         timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
     )
