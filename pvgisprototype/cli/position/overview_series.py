@@ -210,7 +210,7 @@ def overview_series(
                 print_solar_position_table_panels(
                     longitude=longitude,
                     latitude=latitude,
-                    timestamp=timestamp,
+                    timestamp=timestamps,
                     timezone=timezone,
                     table=solar_position_series,
                     rounding_places=rounding_places,
