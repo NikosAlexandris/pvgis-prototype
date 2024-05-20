@@ -32,7 +32,6 @@ class SolarTimeModel(str, Enum):
 
 class SolarDeclinationModel(str, Enum):
     all = 'all'
-    # pvgis = 'PVGIS'
     hargreaves = 'Hargreaves'
     noaa = 'NOAA'
     pvis = 'PVIS'
@@ -42,8 +41,7 @@ class SolarDeclinationModel(str, Enum):
 class SolarPositionModel(str, Enum):
     all = 'all'
     noaa = 'NOAA'
-    # pvgis = 'PVGIS'
-    pvis = 'PVIS'
+    hofierka = 'Hofierka'
     jenco = 'Jenco'
     pvlib = 'pvlib'
     pysolar = 'pysolar'
@@ -53,6 +51,7 @@ class SolarPositionModel(str, Enum):
 
 class SolarIncidenceModel(str, Enum):
     all = 'all'
+    hofierka = 'Hofierka 2002'
     jenco = 'Jenco'
     iqbal = 'Iqbal'  # NREL
     pvis = 'PVIS'
