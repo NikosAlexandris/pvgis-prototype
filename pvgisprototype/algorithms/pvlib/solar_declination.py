@@ -51,6 +51,6 @@ def calculate_solar_declination_time_series_pvlib(
         return SolarDeclination(
             value=solar_declination_series.values,
             unit=RADIANS,
-            position_algorithm='pvlib',
+            position_algorithm='pvlib (Spencer, 1971)',
             timing_algorithm='pvlib',
         )
