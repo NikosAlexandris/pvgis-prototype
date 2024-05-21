@@ -6,32 +6,7 @@ or the direction of the surface-plane vector.
 Attention is required im handling the rotational solar azimuth and surface
 orientation (also referred to as surface azimuth) anngles. The origin of
 measuring azimuthal angles will obvisouly impact the direction of the
-calculated angles.
-
-An overview of conventions and conversions from a North-based system to either
-East- or South-based systems is:
-
-             ┌─────────────┐  ┌────────────┐  ┌────────────┐
-             │     N=0     │  │     N      │  │      N     │
-             │      ▲      │  │     ▲      │  │      ▲     │
-     Origin  │   W ◄┼► E   │  │  W ◄┼► E=0 │  │   W ◄┼► E  │
-             │      ▼      │  │     ▼      │  │      ▼     │
-             │      S      │  │     S      │  │      S=0   │
-             └─────────────┘  └────────────┘  └────────────┘
-             ┌─────────────┐  ┌────────────┐  ┌────────────┐
-             │             │  │            │  │            │
-             │             │  │            │  │            │
-Input South  │     180     │  │     90     │  │     0      │
-    (IS)     │             │  │            │  │            │
-             │             │  │            │  │            │
-             └─────────────┘  └────────────┘  └────────────┘
-             ┌─────────────┐  ┌────────────┐  ┌────────────┐
-             │             │  │            │  │            │
-   Internal  │             │  │            │  │            │
-             │      =      │  │  IS - 90   │  │  IS - 180  │
-  Conversion │             │  │            │  │            │
-             │             │  │            │  │            │
-             └─────────────┘  └────────────┘  └────────────┘
+calculated angles. See also the API azimuth.py module.
 """
 
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_series_hofierka
