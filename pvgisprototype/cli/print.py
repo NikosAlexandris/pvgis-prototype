@@ -116,8 +116,6 @@ def print_solar_position_table(
 ) -> None:
     """
     """
-    from devtools import debug
-    debug(locals())
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
@@ -204,7 +202,6 @@ def print_solar_position_table(
         lambda dictionary, key, default=NOT_AVAILABLE: dictionary.get(key, default)
     )
 
-    print(f'{rounded_table=}')
     for model_name, model_result in rounded_table.items():
         declination_value = get_scalar(get_value_or_default(model_result, DECLINATION_NAME))
         timing_algorithm = get_value_or_default(model_result, TIME_ALGORITHM_NAME)

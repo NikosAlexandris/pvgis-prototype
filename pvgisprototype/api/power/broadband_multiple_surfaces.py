@@ -27,8 +27,8 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_time_series

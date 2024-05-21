@@ -3,9 +3,7 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from rich import print
 from typing import Optional
-from typing import List
 from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
@@ -15,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from math import sin
 from math import cos
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series

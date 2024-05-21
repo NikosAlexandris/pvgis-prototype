@@ -1,3 +1,4 @@
+from zoneinfo import ZoneInfo
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -28,8 +29,8 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
 from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_time_series_pvgis
 from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_time_series
@@ -127,7 +128,7 @@ def calculate_photovoltaic_power_output_series(
     surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
     timestamps: Optional[DatetimeIndex] = None,
-    timezone: Optional[str] = None,
+    timezone: ZoneInfo = ZoneInfo('UTC'),
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
@@ -543,8 +544,8 @@ def calculate_photovoltaic_power_output_series(
         } if verbose > 2 else {},
         
         'even_more_extended': lambda: {
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_direct_irradiance_series.components[DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME],
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_diffuse_irradiance_series.components[DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME],
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_direct_irradiance_series.components[DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME] if calculated_direct_irradiance_series.components else NOT_AVAILABLE,
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_diffuse_irradiance_series.components[DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME] if calculated_diffuse_irradiance_series.components else NOT_AVAILABLE,
             # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME:
             # calculated_ground_reflected_inclined_irradiance_series.components[REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME], Is zero for horizontal surfaces !
             TEMPERATURE_COLUMN_NAME: temperature_series.value,
