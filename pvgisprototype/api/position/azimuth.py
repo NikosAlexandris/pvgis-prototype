@@ -224,10 +224,10 @@ def calculate_solar_azimuth_series(
     results = []
     for solar_position_model in solar_position_models:
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
-            solar_azimuth = model_solar_azimuth(
+            solar_azimuth = model_solar_azimuth_time_series(
                 longitude=longitude,
                 latitude=latitude,
-                timestamp=timestamp,
+                timestamps=timestamp,
                 timezone=timezone,
                 solar_position_model=solar_position_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
