@@ -41,7 +41,7 @@ from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_ser
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import INCIDENCE_COLUMN_NAME, INCIDENCE_DEFINITION, SOLAR_CONSTANT, UNITS_NAME
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -563,9 +563,12 @@ def calculate_photovoltaic_power_output_series(
         } if verbose > 4 else {},
         
         'extra': lambda: {
-            INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
-            ALTITUDE_COLUMN_NAME: solar_altitude_series.value,
-            AZIMUTH_COLUMN_NAME: solar_azimuth_series.value,
+            INCIDENCE_COLUMN_NAME: calculated_direct_irradiance_series.components[INCIDENCE_COLUMN_NAME] if calculated_direct_irradiance_series.components else NOT_AVAILABLE,
+            INCIDENCE_ALGORITHM_COLUMN_NAME: calculated_direct_irradiance_series.components[INCIDENCE_ALGORITHM_COLUMN_NAME] if calculated_direct_irradiance_series.components else NOT_AVAILABLE,
+            INCIDENCE_DEFINITION: calculated_direct_irradiance_series.components[INCIDENCE_DEFINITION] if calculated_direct_irradiance_series.components else NOT_AVAILABLE,
+            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
+            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
+            UNITS_NAME: angle_output_units,
         } if verbose > 5 else {},
 
         'fingerprint': lambda: {
