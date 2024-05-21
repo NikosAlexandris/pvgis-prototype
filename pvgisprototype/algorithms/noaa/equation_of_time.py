@@ -1,3 +1,10 @@
+"""
+The Equation of Time based on the General Solar Position Calculations provided
+by the NOAA Global Monitoring Division.
+
+See also: https://unpkg.com/solar-calculator@0.1.0/index.js
+"""
+
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
