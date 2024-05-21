@@ -5,6 +5,7 @@ from datetime import datetime
 # from math import acos
 import numpy as np
 from typing import Union, Sequence
+from pandas import DatetimeIndex
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventHourAngleNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventHourAngleTimeSeriesNOAAInput
@@ -14,7 +15,9 @@ from pvgisprototype import EventHourAngle
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.constants import RADIANS
-
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 
 @validate_with_pydantic(CalculateEventHourAngleNOAAInput)
 def calculate_event_hour_angle_noaa(
@@ -79,8 +82,12 @@ def calculate_event_hour_angle_noaa(
 @validate_with_pydantic(CalculateEventHourAngleTimeSeriesNOAAInput)
 def calculate_event_hour_angle_time_series_noaa(
     latitude: Latitude, # radians
-    timestamps: Union[float, Sequence[float]],
-    refracted_solar_zenith: RefractedSolarZenith,
+    timestamps: DatetimeIndex,
+    refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = 0,
+    log: int = 0,
 ) -> EventHourAngle:
     """
     """
@@ -90,7 +97,8 @@ def calculate_event_hour_angle_time_series_noaa(
     cosine_event_hour_angle = np.cos(refracted_solar_zenith.radians) / (
         np.cos(latitude.radians) * np.cos(solar_declination.radians)
     ) - np.tan(latitude.radians) * np.tan(solar_declination.radians)
-    event_hour_angle = np.arccos(cosine_event_hour_angle)  # radians
-    event_hour_angle = EventHourAngle(value=event_hour_angle, unit=RADIANS)
+    event_hour_angle = np.arccos(np.clip(cosine_event_hour_angle, -1, 1))  # radians
+    event_hour_angle = event_hour_angle.astype(dtype)
 
-    return event_hour_angle
+    return EventHourAngle(value=event_hour_angle, 
+                        unit=RADIANS)
