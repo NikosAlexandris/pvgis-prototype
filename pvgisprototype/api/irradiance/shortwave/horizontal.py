@@ -7,14 +7,8 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from pathlib import Path
-from math import cos
-from typing import Annotated
-from typing import List
 from typing import Optional
-import math
 import numpy as np
-from enum import Enum
 from rich import print
 
 from datetime import datetime
@@ -25,11 +19,10 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.position.solar_time_series import model_solar_time_time_series
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
+from pvgisprototype.api.position.solar_time import model_solar_time_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.diffuse.solar_altitude import diffuse_transmission_function_time_series

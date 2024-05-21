@@ -3,7 +3,6 @@ CLI module to calculate and overview the solar position parameters over a
 location for a period in time.
 """
 
-import numpy
 from pvgisprototype.api.plot import uniplot_solar_position_series
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
@@ -50,7 +49,7 @@ from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 from pvgisprototype.cli.typer.output import typer_option_index
 
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.position.overview_series import calculate_solar_geometry_overview_time_series
+from pvgisprototype.api.position.overview import calculate_solar_geometry_overview_time_series
 from pvgisprototype.cli.write import write_solar_position_series_csv
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT

@@ -37,7 +37,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.position.altitude_series import calculate_solar_altitude_time_series
+from pvgisprototype.api.position.altitude import calculate_solar_altitude_time_series
 from pvgisprototype.cli.print import print_solar_position_table
 
 
