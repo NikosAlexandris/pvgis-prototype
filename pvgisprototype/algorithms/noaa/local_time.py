@@ -1,24 +1,36 @@
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
+from devtools import debug
+from pandas import DatetimeIndex
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateLocalSolarTimeNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
-from .event_time import calculate_event_time_noaa
+from .event_time import calculate_event_time_time_series_noaa
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
 
 @validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
 def calculate_local_solar_time_noaa(
-        longitude: Longitude,   # radians
-        latitude: Latitude, # radians
-        timestamp: datetime,
-        timezone: ZoneInfo,
-        refracted_solar_zenith: RefractedSolarZenith,  # radians
-        apply_atmospheric_refraction: bool = False,
-        verbose: int = 0,
-    ) -> datetime:
+    longitude: Longitude,  # radians
+    latitude: Latitude,  # radians
+    timestamps: DatetimeIndex,
+    timezone: ZoneInfo,
+    refracted_solar_zenith: RefractedSolarZenith,  # radians
+    apply_atmospheric_refraction: bool = False,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+) -> datetime:
     """
     Returns
     -------
@@ -61,38 +73,23 @@ def calculate_local_solar_time_noaa(
     corrections are applied; the equation of time (ET) and longitude
     correction. These are analyzed next.
     """
-    # # Handle Me during input validation? -------------------------------------
-    # if timezone != timestamp.tzinfo:
-    #     try:
-    #         timestamp = timestamp.astimezone(timezone)
-    #     except Exception as e:
-    #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
-    # # ------------------------------------------------------------------------
-    solar_noon_timestamp = calculate_event_time_noaa(
+    solar_noon_series = calculate_event_time_time_series_noaa(
         longitude=longitude,
         latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
+        timestamps=timestamps,
         event='noon',
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
-
-    if timestamp < solar_noon_timestamp:
-        previous_solar_noon_timestamp = solar_noon_timestamp - timedelta(days=1)
-        local_solar_time_delta = timestamp - previous_solar_noon_timestamp
-
-    else:
-        local_solar_time_delta = timestamp - solar_noon_timestamp
-
+    local_solar_time_delta = numpy.where(
+            timestamps < solar_noon_series,
+            timestamps - (solar_noon_series - timedelta(days=1)),
+            timestamps - solar_noon_series
+            )
     total_seconds = int(local_solar_time_delta.total_seconds())
-    # hours, remainder = divmod(total_seconds, 3600)
-    # minutes, seconds = divmod(remainder, 60)
-    # local_solar_timestamp = time(hour=hours, minute=minutes, second=seconds)
+    local_solar_time_series= timestamps + timedelta(seconds=total_seconds)
 
-    if verbose:
-        print(f'Local solar time: {local_solar_timestamp}')
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
-    local_solar_time = timestamp + timedelta(seconds=total_seconds)
-
-    return local_solar_time
+    return local_solar_time_series
