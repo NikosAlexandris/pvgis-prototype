@@ -23,7 +23,7 @@ nav:
     - tutorials/index.md
     - tutorials/introduction.md
     - tutorials/solar_position.md
-    - Comparison of Algorithms: notebooks/plot_solar_geometry_pvis.ipynb
+      - notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
   - CLI:
