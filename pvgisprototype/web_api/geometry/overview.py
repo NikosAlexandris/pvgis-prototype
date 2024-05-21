@@ -1,9 +1,6 @@
 from datetime import datetime
 from fastapi import Depends, Query
-from pvgisprototype.api.utilities.timestamp import convert_to_timezone
-from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
-from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_timeseries_solar_position
-from pvgisprototype.api.position.overview import calculate_solar_geometry_overview
+from pvgisprototype.api.position.overview import calculate_solar_geometry_overview_time_series
 from typing import Optional
 from typing import List
 from pvgisprototype.constants import RADIANS
@@ -35,10 +32,10 @@ async def get_calculate_solar_geometry_overview(
 ):
     """ """
     solar_position_models = select_models(SolarPositionModel, solar_position_models)  # Using a callback fails!
-    results = calculate_solar_geometry_overview(
+    results = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,
-        timestamp=timestamp,
+        timestamps=timestamp,
         timezone=timezone,
         solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
