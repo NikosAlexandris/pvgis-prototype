@@ -202,7 +202,7 @@ def print_solar_position_table(
         lambda dictionary, key, default=NOT_AVAILABLE: dictionary.get(key, default)
     )
 
-    for model_name, model_result in rounded_table.items():
+    for _, model_result in rounded_table.items():
         declination_value = get_scalar(get_value_or_default(model_result, DECLINATION_NAME))
         timing_algorithm = get_value_or_default(model_result, TIME_ALGORITHM_NAME)
         position_algorithm = get_value_or_default(model_result, POSITIONING_ALGORITHM_NAME)
@@ -228,22 +228,22 @@ def print_solar_position_table(
 
         if timing is not None:
             row.append(timing_algorithm)
-        if declination_value is not None:
+        if declination and declination_value is not None:
             row.append(str(declination_value))
-        if hour_angle_value is not None:
+        if hour_angle and hour_angle_value is not None:
             row.append(str(hour_angle_value))
-        if position_algorithm is not None:
+        if position_algorithm and position_algorithm is not None:
             row.append(position_algorithm)
-        if zenith_value is not None:
+        if zenith and zenith_value is not None:
             row.append(str(zenith_value))
-        if altitude_value is not None:
+        if altitude and altitude_value is not None:
             row.append(str(altitude_value))
-        if azimuth_value is not None:
+        if azimuth and azimuth_value is not None:
             row.append(str(azimuth_value))
-        if incidence_algorithm is not None:
+        if incidence and incidence_algorithm is not None:
             row.append(str(incidence_algorithm))
-        if incidence_value is not None:
-            row.append(str(incidence_value))
+            if incidence_value is not None:
+                row.append(str(incidence_value))
 
         style_map = {
             "pvis": "red",  # red because PVIS is incomplete!

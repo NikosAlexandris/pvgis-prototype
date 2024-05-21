@@ -11,6 +11,7 @@ from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_dec
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
 
+from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAzimuthTimeSeriesNOAAInput
 from pvgisprototype import SolarAzimuth
@@ -302,7 +303,7 @@ def calculate_solar_azimuth_time_series_noaa(
     return SolarAzimuth(
         value=solar_azimuth_series,
         unit=RADIANS,
-        position_algorithm="NOAA",
-        timing_algorithm="NOAA",
+        position_algorithm=SolarPositionModel.noaa,
+        timing_algorithm=SolarTimeModel.noaa,
         origin="North"
     )
