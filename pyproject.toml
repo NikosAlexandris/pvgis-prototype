@@ -96,6 +96,7 @@ docs = [
   "mkdocs-badges",
   "mkdocs-coverage",
   "diagrams",
+  "mkdocs-jupyter",
 ]
 all = ["pvgisprototype[web, dev, test, docs]"]
 
