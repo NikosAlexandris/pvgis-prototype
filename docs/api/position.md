@@ -38,7 +38,7 @@ for the coordinates. We can import them as every other Python module
 and create objects
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
-from pvgisprototype import Longitude, Latitude
+>>> from pvgisprototype import Longitude, Latitude
 ```
 
 inspect them
@@ -98,8 +98,8 @@ Let's confirm the generation of the timestamps and the timezone :
 ## Solar altitude
 
 ``` pycon exec="1" source="console" session="solar-altitude"
->>> from pvgisprototype.api.position.altitude import calculate_solar_altitude
->>> calculate_solar_altitude
+>>> from pvgisprototype.api.position.altitude import calculate_solar_altitude_series
+>>> calculate_solar_altitude_series
 ```
 
 <!-- ``` python exec="1" source="console" session="solar-altitude" -->
@@ -116,7 +116,7 @@ Let's give it a first try with some _reasonable_ inputs
 !!! failure
 
     ``` pycon exec="1" source="console" session="solar-altitude"
-    >>> calculate_solar_altitude(8, 45, '2001-01-01 10:00:00', 'UTC')
+    >>> calculate_solar_altitude_series(8, 45, '2001-01-01 10:00:00', 'UTC')
     ```
 
 PVGIS' API is indeed idiomatic and our _reasonable_ inputs won't work.
@@ -137,7 +137,7 @@ Let's import the required modules
 And retry again
 
 ```pycon exec="1" source="console" session="solar-altitude"
->>> solar_altitude = calculate_solar_altitude(convert_float_to_radians_if_requested(8, 'radians'), convert_float_to_radians_if_requested(45, 'radians'), Timestamp('2001-01-01 10:00:00+00:00'), ZoneInfo('UTC'))
+>>> solar_altitude = calculate_solar_altitude_series(convert_float_to_radians_if_requested(8, 'radians'), convert_float_to_radians_if_requested(45, 'radians'), Timestamp('2001-01-01 10:00:00+00:00'), ZoneInfo('UTC'))
 >>> print(f"Solar altitude from PVGIS' API : {solar_altitude}")
 ```
 
@@ -145,10 +145,10 @@ And retry again
 
 We can calculate solar azimuth angles
 for a specific geographic location and over a time series
-with the API function `calculate_solar_azimuth_time_series_noaa()`.
+with the API function `calculate_solar_azimuth_series()`.
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
->>> from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_time_series_noaa
+>>> from pvgisprototype.api.position.azimuth import calculate_solar_azimuth_series
 ```
 
 ### Help
@@ -157,14 +157,14 @@ What exactly can we do with it ?
 We can use the Python built-in function `help` to find out
 
 ``` python
->>> help(calculate_solar_azimuth_time_series_noaa)
+>>> help(calculate_solar_azimuth_series)
 ```
 
 Or indeed, in an interactive ipython session, it suffices to use a `?` right
 after the function name and without space
 
 ```python
->>> calculate_solar_azimuth_time_series_noaa?
+>>> calculate_solar_azimuth_series?
 ```
 
 ### More Imports
@@ -179,7 +179,7 @@ after the function name and without space
 Calculate solar azimuth time series for the 27th January 2010 
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
->>> calculate_solar_azimuth_time_series_noaa(
+>>> calculate_solar_azimuth_series(
 ... longitude=radians(longitude),
 ... latitude=radians(latitude),
 ... surface_orientation=radians(surface_orientation),
@@ -195,7 +195,7 @@ Of course we can feed the result to a new variable
 and print or re-use it for further processing
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
->>> solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
+>>> solar_azimuth_series = calculate_solar_azimuth_series(
 ... longitude=radians(longitude),
 ... latitude=radians(latitude),
 ... surface_orientation=radians(surface_orientation),
