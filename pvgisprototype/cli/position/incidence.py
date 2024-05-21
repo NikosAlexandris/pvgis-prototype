@@ -49,7 +49,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from math import pi
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.timestamp import random_datetimezone
-from pvgisprototype.api.position.incidence_series import calculate_solar_incidence_series
+from pvgisprototype.api.position.incidence import calculate_solar_incidence_series
 from pvgisprototype.cli.print import print_solar_position_table
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
@@ -116,20 +116,20 @@ def incidence(
         surface_tilt = random.uniform(0, pi/2)  # radians
 
     solar_incidence_models = select_models(SolarIncidenceModel, solar_incidence_model)  # Using a callback fails!
-    solar_incidence = calculate_solar_incidence(
-        longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
-        timezone=timezone,
-        solar_incidence_models=solar_incidence_models,
-        complementary_incidence_angle=complementary_incidence_angle,
-        surface_orientation=SurfaceOrientation(value=surface_orientation, unit=RADIANS),  # Typer does not easily support custom types !
-        surface_tilt=SurfaceTilt(value=surface_tilt, unit=RADIANS),  # Typer does not easily support custom types !
-        solar_time_model=solar_time_model,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
-        verbose=verbose,
+    solar_incidence = calculate_solar_incidence_series(
+        # longitude=longitude,
+        # latitude=latitude,
+        # timestamps=timestamp,
+        # timezone=timezone,
+        # solar_incidence_models=solar_incidence_models,
+        # complementary_incidence_angle=complementary_incidence_angle,
+        # surface_orientation=SurfaceOrientation(value=surface_orientation, unit=RADIANS),  # Typer does not easily support custom types !
+        # surface_tilt=SurfaceTilt(value=surface_tilt, unit=RADIANS),  # Typer does not easily support custom types !
+        # solar_time_model=solar_time_model,
+        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # perigee_offset=perigee_offset,
+        # angle_output_units=angle_output_units,
+        # verbose=verbose,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)

@@ -20,9 +20,9 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_time_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
@@ -328,7 +328,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             eccentricity_correction_factor=eccentricity_correction_factor,
             dtype=dtype,
             array_backend=array_backend,
-            verbose=0,
+            verbose=verbose,
             log=log,
         )
 
@@ -476,7 +476,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
             KB_RATIO_COLUMN_NAME: kb_series,
             AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(azimuth_difference_series_array, angle_output_units, NOT_AVAILABLE),
             AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series_array, angle_output_units, NOT_AVAILABLE),
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,
+            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,  # Altitude should be always there! If not, something is wrong.  This is why this entry does not need the NOT_AVAILABLE fallback.
         } if verbose > 3 else {},
 
         'and_even_more_extended': lambda: {
@@ -488,7 +488,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         } if verbose > 4 else {},
 
         'extra': lambda: {
-            INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units) if solar_incidence_series else None,
+            INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE) if solar_incidence_series else None,
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
         } if verbose > 5 else {},
 

@@ -12,7 +12,6 @@ from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_
 from pvgisprototype.log import logger
 from devtools import debug
 from typing import Dict, List, Tuple
-from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
@@ -25,7 +24,7 @@ from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altit
 from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_time_series_jenco
 from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_time_series
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarGeometryOverviewTimeSeriesInputModel
 from pvgisprototype import Longitude

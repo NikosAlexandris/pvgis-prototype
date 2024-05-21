@@ -26,7 +26,7 @@ from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 
 from pvgisprototype.api.utilities.timestamp import random_datetimezone
-from pvgisprototype.api.position.declination_series import calculate_solar_declination_series
+from pvgisprototype.api.position.declination import calculate_solar_declination_series
 from pvgisprototype.cli.print import print_solar_position_table
 
 from pvgisprototype.constants import RADIANS
@@ -81,13 +81,13 @@ def declination(
         print(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
 
     solar_declination_models = select_models(SolarDeclinationModel, model)  # Using a callback fails!
-    solar_declination = calculate_solar_declination(
-        timestamp=timestamp,
-        timezone=timezone,
-        declination_models=solar_declination_models,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
-        angle_output_units=angle_output_units,
+    solar_declination = calculate_solar_declination_series(
+        # timestamps=timestamp,
+        # timezone=timezone,
+        # declination_models=solar_declination_models,
+        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # perigee_offset=perigee_offset,
+        # angle_output_units=angle_output_units,
     )
     print_solar_position_table(
         longitude=None,
