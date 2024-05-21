@@ -28,9 +28,8 @@ from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
-from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_series
+from pvgisprototype.api.position.azimuth import calculate_solar_azimuth_series
 from pvgisprototype.cli.print import print_solar_position_table
 
 

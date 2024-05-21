@@ -9,7 +9,7 @@ from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from pvgisprototype.api.position.altitude_series import calculate_solar_altitude_time_series
+from pvgisprototype.api.position.altitude import calculate_solar_altitude_time_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
