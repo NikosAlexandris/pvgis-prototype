@@ -23,6 +23,7 @@ nav:
     - tutorials/index.md
     - tutorials/introduction.md
     - tutorials/solar_position.md
+    - Comparison of Algorithms: notebooks/plot_solar_geometry_pvis.ipynb
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
   - CLI:
@@ -309,6 +310,9 @@ plugins:
             signature_crossrefs: true
             summary: true
             show_bases: true
+  - mkdocs-jupyter:
+          execute: true
+          include_source: True
 
 # extra:
 #   social:
