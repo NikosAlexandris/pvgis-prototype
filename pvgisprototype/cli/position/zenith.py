@@ -5,12 +5,14 @@ CLI module to calculate the solar zenith angle for a location and a single momen
 from typing import Annotated
 from typing import Optional
 from typing import List
-from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from pandas import DatetimeIndex
+
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
-from pvgisprototype.cli.typer.timestamps import typer_argument_timestamp
+from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
@@ -51,7 +53,7 @@ def calculate_zenith(angle_output_units, solar_altitude_angle):
 def zenith(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamp],
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.skyfield],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -61,7 +63,7 @@ def zenith(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-) -> float:
+) -> None:
     """Calculate the solar zenith angle
 
     The solar zenith angle (SZA) is the angle between the zenith (directly
@@ -77,20 +79,20 @@ def zenith(
 
     """
     # Initialize with None ---------------------------------------------------
-    user_requested_timestamp = None
+    user_requested_timestamps = None
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
 
     # Convert the input timestamp to UTC, for _all_ internal calculations
     utc_zoneinfo = ZoneInfo("UTC")
-    if timestamp.tzinfo != utc_zoneinfo:
+    if timestamps.tz != utc_zoneinfo:
 
         # Note the input timestamp and timezone
-        user_requested_timestamp = timestamp
+        user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
-        timestamp = timestamp.astimezone(utc_zoneinfo)
-        print(f'The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!')
+        timestamps = timestamps.tz_convert(utc_zoneinfo)
+        print(f'The requested timestamp - zone {user_requested_timestamps} {user_requested_timezone} has been converted to {timestamps} for all internal calculations!')
 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     solar_altitude = calculate_solar_altitude_time_series(
@@ -107,7 +109,7 @@ def zenith(
         verbose=verbose,
     )
     solar_zenith = solar_altitude
-    for model_result in solar_zenith:
+    for _, model_result in solar_zenith.items():
         if ZENITH_NAME not in model_result:
             solar_altitude_angle = model_result.get(ALTITUDE_NAME, None)
             if solar_altitude_angle is not None:
@@ -120,12 +122,19 @@ def zenith(
     print_solar_position_table(
         longitude=longitude,
         latitude=latitude,
-        timestamp=timestamp,
+        timestamp=timestamps,
         timezone=timezone,
         table=solar_zenith,
         rounding_places=rounding_places,
+        declination=None,
+        hour_angle=None,
         timing=True,
         zenith=True,
-        user_requested_timestamp=user_requested_timestamp,
+        altitude=None,
+        azimuth=None,
+        surface_orientation=None,
+        surface_tilt=None,
+        incidence=None,
+        user_requested_timestamp=user_requested_timestamps,
         user_requested_timezone=user_requested_timezone,
     )
