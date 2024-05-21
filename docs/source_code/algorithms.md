@@ -31,7 +31,6 @@ independent from the core API, the CLI and the Web API components.
 ::: pvgisprototype.algorithms.noaa.solar_zenith
 ::: pvgisprototype.algorithms.noaa.solar_altitude
 ::: pvgisprototype.algorithms.noaa.solar_azimuth
-::: pvgisprototype.algorithms.noaa.solar_position
 <!-- ::: pvgisprototype.algorithms.pvgis/ -->
 ::: pvgisprototype.algorithms.pvis
 <!-- ::: pvgisprototype.algorithms.pvlib/ -->
