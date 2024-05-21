@@ -146,11 +146,7 @@ def overview_series(
         user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
-        # timestamps = timestamps.tz_convert(utc_zoneinfo)
-        from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
-        timezone_aware_timestamps = [
-            attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
-        ]
+        timestamps = timestamps.tz_convert(utc_zoneinfo)
         timezone = utc_zoneinfo
         # print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
