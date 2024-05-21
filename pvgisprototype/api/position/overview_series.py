@@ -59,6 +59,8 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED
+from pvgisprototype.constants import ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+
 from pandas import DatetimeIndex
 
 
@@ -77,6 +79,7 @@ def model_solar_geometry_overview_time_series(
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    zero_negative_solar_incidence_angles:bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -256,6 +259,7 @@ def model_solar_geometry_overview_time_series(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         solar_incidence_model=solar_incidence_model,
         complementary_incidence_angle=complementary_incidence_angle,
+        zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
