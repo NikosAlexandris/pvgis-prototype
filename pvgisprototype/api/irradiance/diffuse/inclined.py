@@ -165,6 +165,10 @@ def calculate_diffuse_inclined_irradiance_time_series(
     - surface_orientation :
     - diffuse_irradiance
     """
+    # Some quantities are not always required, hence set them to avoid UnboundLocalError!
+    solar_azimuth_series_array = NOT_AVAILABLE
+    azimuth_difference_series_array = NOT_AVAILABLE 
+
     # Calculate quantities required : ---------------------------- >>> >>> >>>
     # 1. to model the diffuse horizontal irradiance [optional]
     # 2. to calculate the diffuse sky ... to consider shaded, sunlit and potentially sunlit surfaces
@@ -293,8 +297,7 @@ def calculate_diffuse_inclined_irradiance_time_series(
         diffuse_sky_irradiance_series = NOT_AVAILABLE
         n_series = NOT_AVAILABLE
         kb_series = NOT_AVAILABLE
-        azimuth_difference_series_array = NOT_AVAILABLE
-        solar_azimuth_series_array = NOT_AVAILABLE
+        # azimuth_difference_series_array = NOT_AVAILABLE
         solar_incidence_series = NOT_AVAILABLE
 
     else:  # tilted (or inclined) surface
@@ -362,7 +365,6 @@ def calculate_diffuse_inclined_irradiance_time_series(
 
         # else:  # sunlit surface and non-overcast sky
         #     # ----------------------------------------------------------------
-        #     azimuth_difference_series_array = None  # Avoid UnboundLocalError!
         #     solar_azimuth_series_array = None
         #     # ----------------------------------------------------------------
         if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
