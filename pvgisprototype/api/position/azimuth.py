@@ -1,3 +1,31 @@
+"""
+An overview of conventions and conversions from a North-based system to either
+East- or South-based systems is:
+
+             ┌─────────────┐  ┌────────────┐  ┌────────────┐
+             │     N=0     │  │     N      │  │      N     │
+             │      ▲      │  │     ▲      │  │      ▲     │
+     Origin  │   W ◄┼► E   │  │  W ◄┼► E=0 │  │   W ◄┼► E  │
+             │      ▼      │  │     ▼      │  │      ▼     │
+             │      S      │  │     S      │  │      S=0   │
+             └─────────────┘  └────────────┘  └────────────┘
+             ┌─────────────┐  ┌────────────┐  ┌────────────┐
+             │             │  │            │  │            │
+             │             │  │            │  │            │
+Input South  │     180     │  │     90     │  │     0      │
+    (IS)     │             │  │            │  │            │
+             │             │  │            │  │            │
+             └─────────────┘  └────────────┘  └────────────┘
+             ┌─────────────┐  ┌────────────┐  ┌────────────┐
+             │             │  │            │  │            │
+   Internal  │             │  │            │  │            │
+             │      =      │  │  IS - 90   │  │  IS - 180  │
+  Conversion │             │  │            │  │            │
+             │             │  │            │  │            │
+             └─────────────┘  └────────────┘  └────────────┘
+
+"""
+
 from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_time_series_jenco
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
