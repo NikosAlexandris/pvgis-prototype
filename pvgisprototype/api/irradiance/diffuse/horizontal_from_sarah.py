@@ -6,10 +6,6 @@ from devtools import debug
 from pandas import DatetimeIndex
 from pathlib import Path
 from typing import Optional
-from typing import List
-from rich import print
-import numpy as np
-from math import cos, sin, pi
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import Irradiance
 from pvgisprototype.api.position.models import SolarPositionModel
@@ -18,9 +14,9 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_time_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT

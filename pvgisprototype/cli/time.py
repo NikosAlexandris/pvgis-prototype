@@ -14,7 +14,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
-from pvgisprototype.api.position.solar_time_series import calculate_solar_time_series
+from pvgisprototype.api.position.solar_time import calculate_solar_time_series
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
