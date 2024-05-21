@@ -24,17 +24,11 @@ This section documents the API.
 
 ::: pvgisprototype.api.position.fractional_year
 ::: pvgisprototype.api.position.solar_time
-::: pvgisprototype.api.position.solar_time_series
 ::: pvgisprototype.api.position.hour_angle
 ::: pvgisprototype.api.position.declination
-::: pvgisprototype.api.position.declination_series
 ::: pvgisprototype.api.position.zenith
 ::: pvgisprototype.api.position.altitude
-::: pvgisprototype.api.position.altitude_series
 ::: pvgisprototype.api.position.azimuth
-::: pvgisprototype.api.position.azimuth_series
 ::: pvgisprototype.api.position.overview
-::: pvgisprototype.api.position.overview_series
 ::: pvgisprototype.api.position.incidence
-::: pvgisprototype.api.position.incidence_series
 ::: pvgisprototype.api.position.models
