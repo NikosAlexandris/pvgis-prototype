@@ -20,6 +20,7 @@ from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @log_function_call
@@ -49,11 +50,19 @@ def calculate_solar_altitude_time_series_noaa(
         log=log,
     )
     solar_altitude_series = np.pi / 2 - solar_zenith_series.radians
-    if not np.all(np.isfinite(solar_altitude_series)) or not np.all(
-        (-np.pi / 2 <= solar_altitude_series) & (solar_altitude_series <= np.pi / 2)
-    ):
-        raise ValueError(
-            f"The `solar_altitude` should be a finite number ranging in [{-np.pi/2}, {np.pi/2}] radians"
+    if (
+        (solar_altitude_series < SolarAltitude().min_radians)
+        | (solar_altitude_series > SolarAltitude().max_radians)
+    ).any():
+        out_of_range_values = solar_altitude_series[
+            (solar_altitude_series < SolarAltitude().min_radians)
+            | (solar_altitude_series > SolarAltitude().max_radians)
+        ]
+        # raise ValueError(# ?
+        logger.warning(
+            f"{WARNING_OUT_OF_RANGE_VALUES} "
+            f"[{SolarAltitude().min_radians}, {SolarAltitude().max_radians}] radians"
+            f" in [code]solar_altitude_series[/code] : {out_of_range_values}"
         )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
