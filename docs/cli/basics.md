@@ -177,7 +177,7 @@ pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00,
 
 ### Mixing optional parameters
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi"
 pvgis-prototype irradiance global inclined \
     8 45 214 170 44 \
     '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
@@ -187,7 +187,7 @@ pvgis-prototype irradiance global inclined \
 
 is the same as
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi"
 pvgis-prototype irradiance global inclined \
     8 45 214 170 44 \
     '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
@@ -197,7 +197,7 @@ pvgis-prototype irradiance global inclined \
 
 One more example _mixing_ the order of options
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi"
 pvgis-prototype irradiance global inclined \
     8 45 214 170 44 \
     '2010-01-27 12:00:00, 2010-01-27 13:30:00' \
@@ -206,6 +206,10 @@ pvgis-prototype irradiance global inclined \
     -vv
 ```
 
+!!! warning "--quiet silences the output"
+
+    All of the above commands will not return anything since this is what the
+    `--quiet` flag (or `-q` for the matter) is meant to do!
 
 ## Examples that fail !
 
