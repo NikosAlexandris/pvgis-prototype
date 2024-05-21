@@ -72,6 +72,7 @@ import numpy as np
 from pandas import DatetimeIndex
 from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
 from pvgisprototype.api.position.conversions import convert_north_to_south_radians_convention
+from pvgisprototype.constants import ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 
 
 @validate_with_pydantic(ModelSolarIncidenceTimeSeriesInputModel)
@@ -86,6 +87,7 @@ def model_solar_incidence_time_series(
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    zero_negative_solar_incidence_angles:bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -145,6 +147,7 @@ def model_solar_incidence_time_series(
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
+            zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,

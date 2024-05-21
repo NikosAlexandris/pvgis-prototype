@@ -42,7 +42,7 @@ from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-
+from pvgisprototype.constants import ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 
 @log_function_call
 def calculate_solar_incidence_time_series_iqbal(
@@ -54,6 +54,7 @@ def calculate_solar_incidence_time_series_iqbal(
     timezone: ZoneInfo | None = None,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -152,6 +153,7 @@ def calculate_solar_incidence_time_series_iqbal(
         Panel tilt from horizontal.
     apply_atmospheric_refraction : bool
     complementary_incidence_angle : bool
+    zero_negative_solar_incidence_angles : bool
     dtype : str
     array_backend : str
     verbose : int
@@ -255,10 +257,11 @@ def calculate_solar_incidence_time_series_iqbal(
         incidence_angle_definition = SolarIncidence().definition_complementary
         incidence_angle_description = SolarIncidence().description_complementary
 
-    # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
-    solar_incidence_series[
-        (solar_incidence_series < 0) | (solar_zenith_series.value > pi / 2)
-    ] = NO_SOLAR_INCIDENCE
+    if zero_negative_solar_incidence_angles:
+        # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
+        solar_incidence_series[
+            (solar_incidence_series < 0) | (solar_zenith_series.value > pi / 2)
+        ] = NO_SOLAR_INCIDENCE
 
     log_data_fingerprint(
             data=solar_incidence_series,
