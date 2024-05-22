@@ -95,6 +95,7 @@ def declination(
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
     
+    # Convert the input timestamp to UTC, for _all_ internal calculations
     utc_zoneinfo = ZoneInfo("UTC")
     if timestamps.tz != utc_zoneinfo:
 
@@ -118,7 +119,6 @@ def declination(
         dtype=dtype,
         verbose=verbose,
     )
-    from pvgisprototype.cli.print import print_solar_position_series_table
     if not quiet:
         if timestamps.size == 1:
             if not panels:
@@ -162,6 +162,7 @@ def declination(
                     user_requested_timezone=user_requested_timezone
                 )
         else:
+            from pvgisprototype.cli.print import print_solar_position_series_table
             print_solar_position_series_table(
                 longitude=None,
                 latitude=None,
