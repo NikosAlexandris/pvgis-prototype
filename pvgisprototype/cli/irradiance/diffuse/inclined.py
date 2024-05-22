@@ -73,7 +73,7 @@ from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import IRRADIANCE_UNITS
-from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
@@ -102,7 +102,7 @@ from pvgisprototype.constants import MINUTES
 
 
 @log_function_call
-def get_diffuse_inclined_irradiance_time_series(
+def get_diffuse_inclined_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -149,7 +149,7 @@ def get_diffuse_inclined_irradiance_time_series(
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ) -> None:
-    diffuse_inclined_irradiance_time_series = calculate_diffuse_inclined_irradiance_time_series(
+    diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -190,14 +190,14 @@ def get_diffuse_inclined_irradiance_time_series(
                 latitude=latitude,
                 elevation=elevation,
                 timestamps=timestamps,
-                dictionary=diffuse_inclined_irradiance_time_series.components,
-                title=diffuse_inclined_irradiance_time_series.components[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
+                dictionary=diffuse_inclined_irradiance_series.components,
+                title=diffuse_inclined_irradiance_series.components[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
             )
         else:
-            flat_list = diffuse_inclined_irradiance_time_series.value.flatten().astype(str)
+            flat_list = diffuse_inclined_irradiance_series.value.flatten().astype(str)
             csv_str = ','.join(flat_list)
             print(csv_str)
 
@@ -207,22 +207,22 @@ def get_diffuse_inclined_irradiance_time_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=diffuse_inclined_irradiance_time_series.components,
+            dictionary=diffuse_inclined_irradiance_series.components,
             filename=csv,
         )
     if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
         print_series_statistics(
-            data_array=diffuse_inclined_irradiance_time_series.value,
+            data_array=diffuse_inclined_irradiance_series.value,
             timestamps=timestamps,
             groupby=groupby,
             title="Diffuse inclined irradiance",
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
-            data_array=diffuse_inclined_irradiance_time_series.value,
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
+            data_array=diffuse_inclined_irradiance_series.value,
             list_extra_data_arrays=None,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
@@ -236,7 +236,7 @@ def get_diffuse_inclined_irradiance_time_series(
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
-        print_finger_hash(dictionary=diffuse_inclined_irradiance_time_series.components)
+        print_finger_hash(dictionary=diffuse_inclined_irradiance_series.components)
     if metadata:
         from pvgisprototype.cli.print import print_command_metadata
         import click

@@ -10,7 +10,7 @@ from pvgisprototype.validation.functions import ModelSolarTimeTimeSeriesInputMod
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from .models import SolarTimeModel
-from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_series_noaa
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -22,7 +22,7 @@ from pvgisprototype.log import log_function_call
 
 @log_function_call
 @validate_with_pydantic(ModelSolarTimeTimeSeriesInputModel)
-def model_solar_time_time_series(
+def model_solar_time_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
@@ -77,7 +77,7 @@ def model_solar_time_time_series(
 
     if solar_time_model.value == SolarTimeModel.noaa:
 
-        solar_time_series = calculate_true_solar_time_time_series_noaa(
+        solar_time_series = calculate_true_solar_time_series_noaa(
             longitude=longitude,
             timestamps=timestamps,
             timezone=timezone,

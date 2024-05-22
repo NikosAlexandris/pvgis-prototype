@@ -39,7 +39,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.position.altitude import calculate_solar_altitude_time_series
+from pvgisprototype.api.position.altitude import calculate_solar_altitude_series
 from pvgisprototype.cli.print import print_solar_position_table
 
 
@@ -92,10 +92,11 @@ def zenith(
         user_requested_timezone = timezone
 
         timestamps = timestamps.tz_convert(utc_zoneinfo)
-        print(f'The requested timestamp - zone {user_requested_timestamps} {user_requested_timezone} has been converted to {timestamps} for all internal calculations!')
+        # print(f'The requested timestamp - zone {user_requested_timestamps} {user_requested_timezone} has been converted to {timestamps} for all internal calculations!')
+        timezone = utc_zoneinfo
 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
-    solar_altitude = calculate_solar_altitude_time_series(
+    solar_altitude = calculate_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,

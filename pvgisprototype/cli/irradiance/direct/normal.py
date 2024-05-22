@@ -17,7 +17,7 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.irradiance.direct.normal import calculate_direct_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.direct.normal import calculate_direct_normal_irradiance_series
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress
@@ -116,7 +116,7 @@ from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 
 
 @log_function_call
-def get_direct_normal_irradiance_time_series(
+def get_direct_normal_irradiance_series(
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,  # Used by a callback function
     periods: Annotated[Optional[int], typer_option_periods] = None,  # Used by a callback function
@@ -144,7 +144,7 @@ def get_direct_normal_irradiance_time_series(
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ) -> None:
     # with progress:
-    direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
+    direct_normal_irradiance_series = calculate_direct_normal_irradiance_series(
         timestamps=timestamps,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         optical_air_mass_series=optical_air_mass_series,
@@ -194,8 +194,8 @@ def get_direct_normal_irradiance_time_series(
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=direct_normal_irradiance_series.value,
             list_extra_data_arrays=None,
             timestamps=timestamps,

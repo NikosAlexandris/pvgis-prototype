@@ -4,16 +4,10 @@ from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pathlib import Path
-from math import cos
-from typing import Annotated
-from typing import List
 from typing import Optional
-import math
 import numpy as np
-from enum import Enum
 from rich import print
-from pandas import DatetimeIndex, to_datetime
-from datetime import datetime
+from pandas import DatetimeIndex
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import LinkeTurbidityFactor
@@ -29,15 +23,14 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
-from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_time_series_pvgis
-from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_time_series
-from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
-from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_series_pvgis
+from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_series
+from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_series
 from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
-from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_series
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.validation.hashing import generate_hash
@@ -108,7 +101,6 @@ from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
-from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import cPROFILE_FLAG_DEFAULT
 from pvgisprototype.constants import MINUTES
@@ -235,7 +227,7 @@ def calculate_photovoltaic_power_output_series(
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info('i [bold]Modelling[/bold] the [magenta]solar altitude[/magenta] for the given timestamps ..')
-    solar_altitude_series = model_solar_altitude_time_series(
+    solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -253,7 +245,7 @@ def calculate_photovoltaic_power_output_series(
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info(f'i [bold]Modelling[/bold] the [magenta]solar azimuth[/magenta] for the given timestamps ..')
-    solar_azimuth_series = model_solar_azimuth_time_series(
+    solar_azimuth_series = model_solar_azimuth_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -275,7 +267,7 @@ def calculate_photovoltaic_power_output_series(
     mask_above_horizon = solar_altitude_series.value > 0
     mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
-    in_shade = is_surface_in_shade_time_series(
+    in_shade = is_surface_in_shade_series(
             solar_altitude_series,
             solar_azimuth_series,
             )
@@ -305,7 +297,7 @@ def calculate_photovoltaic_power_output_series(
     if np.any(mask_above_horizon_not_in_shade):
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             logger.info(f'i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade ..')
-        calculated_direct_irradiance_series = calculate_direct_inclined_irradiance_time_series_pvgis(
+        calculated_direct_irradiance_series = calculate_direct_inclined_irradiance_series_pvgis(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -342,7 +334,7 @@ def calculate_photovoltaic_power_output_series(
     if np.any(mask_above_horizon):
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             logger.info(f'i [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for daylight moments ..')
-        calculated_diffuse_irradiance_series = calculate_diffuse_inclined_irradiance_time_series(
+        calculated_diffuse_irradiance_series = calculate_diffuse_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -378,7 +370,7 @@ def calculate_photovoltaic_power_output_series(
         )  # .value is the diffuse irradiance series
         if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
             logger.info(f'i [bold]Calculating[/bold] the [magenta]reflected inclined irradiance[/magenta] for daylight moments ..')
-        calculated_ground_reflected_inclined_irradiance_series = calculate_ground_reflected_inclined_irradiance_time_series(
+        calculated_ground_reflected_inclined_irradiance_series = calculate_ground_reflected_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -424,7 +416,7 @@ def calculate_photovoltaic_power_output_series(
     )
     # -----------------------------------------------------------------------
     # Try the following, to deduplicate code,
-    # global_irradiance_series = calculate_global_irradiance_time_series()
+    # global_irradiance_series = calculate_global_irradiance_series()
     # ?
     # -----------------------------------------------------------------------
     if not power_model:
@@ -497,7 +489,7 @@ def calculate_photovoltaic_power_output_series(
                             ).to_numpy().astype(dtype=dtype),
                         unit=UNITLESS)
 
-            efficiency_coefficient_series = calculate_pv_efficiency_time_series(
+            efficiency_coefficient_series = calculate_pv_efficiency_series(
                 spectral_factor_series=spectral_factor_series,
                 irradiance_series=global_irradiance_series,
                 temperature_series=temperature_series,

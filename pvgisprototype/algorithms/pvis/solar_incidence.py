@@ -3,7 +3,6 @@ from pandas import DatetimeIndex
 from devtools import debug
 from numpy import number
 import numpy
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarIncidencePVISInputModel
@@ -18,7 +17,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
-from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis, calculate_solar_hour_angle_series_hofierka
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
 from math import pi, sin, asin, cos, acos
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SurfaceOrientation
@@ -318,7 +317,7 @@ def calculate_solar_incidence_series_hofierka(
     # )
     # ------------------------------------------------------------------------
     
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,

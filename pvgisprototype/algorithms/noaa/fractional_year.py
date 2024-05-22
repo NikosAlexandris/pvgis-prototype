@@ -25,7 +25,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
-def calculate_fractional_year_time_series_noaa(
+def calculate_fractional_year_series_noaa(
     timestamps: DatetimeIndex,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -65,7 +65,7 @@ def calculate_fractional_year_time_series_noaa(
     Examples
     --------
     >>> timestamps = pd.date_range(start='2020-01-01', end='2020-12-31', freq='D')
-    >>> fractional_year_series = calculate_fractional_year_time_series_noaa(timestamps)
+    >>> fractional_year_series = calculate_fractional_year_series_noaa(timestamps)
     >>> print(fractional_year_series)
 
     Notes

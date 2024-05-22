@@ -1,7 +1,7 @@
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarDeclinationTimeSeriesNOAAInput
-from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa
+from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_series_noaa
 import numpy as np
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import RADIANS
@@ -23,7 +23,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)
-def calculate_solar_declination_time_series_noaa(
+def calculate_solar_declination_series_noaa(
     timestamps: DatetimeIndex,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -57,7 +57,7 @@ def calculate_solar_declination_time_series_noaa(
        Q2 = Mean Obliq Ecliptic (deg)
 
     """
-    fractional_year_series = calculate_fractional_year_time_series_noaa(
+    fractional_year_series = calculate_fractional_year_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
