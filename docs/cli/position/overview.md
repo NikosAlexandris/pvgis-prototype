@@ -11,10 +11,10 @@ hide:
 ## Time series
 
 To get a time series of solar position parameters over a location,
-you can use the `pvgis-prototype position overview-series` command.
+you can use the `pvgis-prototype position overview` command.
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype position overview-series 8.627626 45.812233 --start-time '2020-01-01' --end-time '2020-01-02' -r2 -aou degrees
+pvgis-prototype position overview 8.627626 45.812233 --start-time '2020-01-01' --end-time '2020-01-02' -r2 -aou degrees
 ```
 
 ### CSV
@@ -22,7 +22,7 @@ pvgis-prototype position overview-series 8.627626 45.812233 --start-time '2020-0
 We can export the results in widely known and machine readable CSV format
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype position overview-series 8.627626 45.812233 --start-time '2020-01-01' --end-time '2020-01-02' -r2 -aou degrees --csv solar_incidence_angle_sample.csv
+pvgis-prototype position overview 8.627626 45.812233 --start-time '2020-01-01' --end-time '2020-01-02' -r2 -aou degrees --csv solar_incidence_angle_sample.csv
 ```
 
 Let's verify it worked well
