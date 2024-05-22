@@ -149,8 +149,7 @@ def print_solar_position_table(
     caption = f"[underline]Position[/underline]  "
     caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
 
-    # Should be the same in case of multiple models!
-    first_model = next(iter(rounded_table))
+    first_model = next(iter(rounded_table)) # Should be the same in case of multiple models!
 
     surface_orientation = rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
     caption += f"Orientation : [bold blue]{surface_orientation}[/bold blue], "
