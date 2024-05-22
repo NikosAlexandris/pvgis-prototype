@@ -17,7 +17,7 @@ from pvgisprototype.api.position.models import select_models
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.timestamps import typer_option_local_time
-from pvgisprototype.cli.typer.position import typer_option_solar_position_model
+from pvgisprototype.cli.typer.position import typer_option_solar_declination_model
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
@@ -60,7 +60,7 @@ def declination(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     local_time: Annotated[bool, typer_option_local_time] = False,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
-    model: Annotated[List[SolarDeclinationModel], typer_option_solar_position_model] = [SolarDeclinationModel.pvis],
+    solar_declination_model: Annotated[List[SolarDeclinationModel], typer_option_solar_declination_model] = [SolarDeclinationModel.pvis],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
@@ -106,7 +106,7 @@ def declination(
         timezone = utc_zoneinfo
         logger.info(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
-    solar_declination_models = select_models(SolarDeclinationModel, model)  # Using a callback fails!
+    solar_declination_models = select_models(SolarDeclinationModel, solar_declination_model)  # Using a callback fails!
     solar_declination_series = calculate_solar_declination_series(
         timestamps=timestamps,
         timezone=timezone,
@@ -132,13 +132,13 @@ def declination(
                     rounding_places=rounding_places,
                     timing=True,
                     declination=True,
-                    hour_angle=True,
-                    zenith=True,
-                    altitude=True,
-                    azimuth=True,
-                    surface_orientation=True,
-                    surface_tilt=True,
-                    incidence=True,  # Add Me ?
+                    hour_angle=None,
+                    zenith=None,
+                    altitude=None,
+                    azimuth=None,
+                    surface_orientation=None,
+                    surface_tilt=None,
+                    incidence=None,  # Add Me ?
                     user_requested_timestamp=user_requested_timestamps, 
                     user_requested_timezone=user_requested_timezone
                 )
@@ -153,11 +153,11 @@ def declination(
                     rounding_places=rounding_places,
                     timing=True,
                     declination=True,
-                    hour_angle=True,
-                    zenith=True,
-                    altitude=True,
-                    azimuth=True,
-                    incidence=False,  # Add Me ?
+                    hour_angle=None,
+                    zenith=None,
+                    altitude=None,
+                    azimuth=None,
+                    incidence=None,  # Add Me ?
                     user_requested_timestamp=user_requested_timestamps, 
                     user_requested_timezone=user_requested_timezone
                 )
@@ -172,13 +172,13 @@ def declination(
                 index=index,
                 timing=True,
                 declination=True,
-                hour_angle=False,
-                zenith=False,
-                altitude=False,
-                azimuth=False,
-                surface_orientation=False,
-                surface_tilt=False,
-                incidence=False,
+                hour_angle=None,
+                zenith=None,
+                altitude=None,
+                azimuth=None,
+                surface_orientation=None,
+                surface_tilt=None,
+                incidence=None,
                 user_requested_timestamps=user_requested_timestamps, 
                 user_requested_timezone=user_requested_timezone,
                 rounding_places=rounding_places,
@@ -194,13 +194,13 @@ def declination(
             table=solar_declination_series,
             timing=True,
             declination=True,
-            hour_angle=False,
-            zenith=False,
-            altitude=False,
-            azimuth=False,
-            surface_orientation=False,
-            surface_tilt=False,
-            incidence=False,
+            hour_angle=None,
+            zenith=None,
+            altitude=None,
+            azimuth=None,
+            surface_orientation=None,
+            surface_tilt=None,
+            incidence=None,
             user_requested_timestamps=user_requested_timestamps, 
             user_requested_timezone=user_requested_timezone,
             # rounding_places=rounding_places,
