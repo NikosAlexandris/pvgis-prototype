@@ -239,8 +239,8 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=spectrally_resolved_global_inclined_irradiance_series.value,
             list_extra_data_arrays=None,
             timestamps=timestamps,
