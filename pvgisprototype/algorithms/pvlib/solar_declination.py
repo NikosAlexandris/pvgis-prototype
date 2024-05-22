@@ -33,7 +33,7 @@ def calculate_solar_declination_pvlib(
         return solar_declination
 
 
-def calculate_solar_declination_time_series_pvlib(
+def calculate_solar_declination_series_pvlib(
         timestamps: DatetimeIndex,
 ) -> SolarDeclination:
         """Calculate the solar declination in radians"""

@@ -37,7 +37,7 @@ def get_days_per_year(years):
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
-def calculate_extraterrestrial_normal_irradiance_time_series(
+def calculate_extraterrestrial_normal_irradiance_series(
     timestamps: DatetimeIndex,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,

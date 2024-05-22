@@ -26,7 +26,7 @@ Input South  │     180     │  │     90     │  │     0      │
 
 """
 
-from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_time_series_jenco
+from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_series_jenco
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
@@ -35,7 +35,7 @@ from typing import List
 from pandas import DatetimeIndex
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_series_noaa
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -60,7 +60,7 @@ from pvgisprototype.constants import RADIANS
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(ModelSolarAzimuthTimeSeriesInputModel)
-def model_solar_azimuth_time_series(
+def model_solar_azimuth_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
@@ -102,7 +102,7 @@ def model_solar_azimuth_time_series(
 
     if solar_position_model.value == SolarPositionModel.noaa:
 
-        solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
+        solar_azimuth_series = calculate_solar_azimuth_series_noaa(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -116,7 +116,7 @@ def model_solar_azimuth_time_series(
 
     if solar_position_model.value == SolarPositionModel.jenco:
 
-        solar_azimuth_series = calculate_solar_azimuth_time_series_jenco(
+        solar_azimuth_series = calculate_solar_azimuth_series_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -224,7 +224,7 @@ def calculate_solar_azimuth_series(
     results = []
     for solar_position_model in solar_position_models:
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
-            solar_azimuth = model_solar_azimuth_time_series(
+            solar_azimuth = model_solar_azimuth_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamp,

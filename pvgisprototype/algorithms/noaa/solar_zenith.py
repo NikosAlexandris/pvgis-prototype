@@ -7,7 +7,7 @@ from math import cos
 from math import tan
 from math import radians
 from math import degrees
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype import AtmosphericRefraction
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
@@ -18,7 +18,7 @@ from pvgisprototype import SolarZenith
 from pvgisprototype import SolarAltitude
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
 import numpy as np
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
@@ -158,7 +158,7 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarZenithTimeSeriesNOAAInput)
-def calculate_solar_zenith_time_series_noaa(
+def calculate_solar_zenith_series_noaa(
     longitude: Longitude,
     latitude: Latitude,  # radians
     timestamps: Union[Timestamp, DatetimeIndex],
@@ -171,13 +171,13 @@ def calculate_solar_zenith_time_series_noaa(
     log: int = 0,
 ) -> SolarZenith:
     """Calculate the solar zenith angle for a location over a time series"""
-    solar_declination_series = calculate_solar_declination_time_series_noaa(
+    solar_declination_series = calculate_solar_declination_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
     )
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,

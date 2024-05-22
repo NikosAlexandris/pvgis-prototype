@@ -24,13 +24,13 @@ from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_time_series_pvgis
-from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_time_series
-from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_series_pvgis
+from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_series
+from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
@@ -95,7 +95,7 @@ from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 
 
 @log_function_call
-def calculate_global_inclined_irradiance_time_series(
+def calculate_global_inclined_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -144,7 +144,7 @@ def calculate_global_inclined_irradiance_time_series(
     considered.
 
     """
-    solar_altitude_series = model_solar_altitude_time_series(
+    solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -161,7 +161,7 @@ def calculate_global_inclined_irradiance_time_series(
         verbose=0,
         log=log,
         )
-    solar_azimuth_series = model_solar_azimuth_time_series(
+    solar_azimuth_series = model_solar_azimuth_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -182,7 +182,7 @@ def calculate_global_inclined_irradiance_time_series(
     mask_above_horizon = solar_altitude_series.value > 0
     mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
-    in_shade = is_surface_in_shade_time_series(
+    in_shade = is_surface_in_shade_series(
             solar_altitude_series,
             solar_azimuth_series,
             log=log,
@@ -216,7 +216,7 @@ def calculate_global_inclined_irradiance_time_series(
     if np.any(mask_above_horizon_not_shade):
         # if given, will read from external time series
         direct_inclined_irradiance_series[mask_above_horizon_not_shade] = (
-            calculate_direct_inclined_irradiance_time_series_pvgis(
+            calculate_direct_inclined_irradiance_series_pvgis(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -252,7 +252,7 @@ def calculate_global_inclined_irradiance_time_series(
         # if given, will read from external time series
         diffuse_inclined_irradiance_series[
             mask_above_horizon
-        ] = calculate_diffuse_inclined_irradiance_time_series(
+        ] = calculate_diffuse_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -283,7 +283,7 @@ def calculate_global_inclined_irradiance_time_series(
         ]
         reflected_inclined_irradiance_series[
             mask_above_horizon
-        ] = calculate_ground_reflected_inclined_irradiance_time_series(
+        ] = calculate_ground_reflected_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,

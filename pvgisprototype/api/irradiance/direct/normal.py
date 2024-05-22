@@ -28,13 +28,13 @@ from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSerie
 from pvgisprototype.api.position.models import validate_model
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.incidence import model_solar_incidence_time_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
-from pvgisprototype.api.irradiance.direct.linke_turbidity_factor import correct_linke_turbidity_factor_time_series
-from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import calculate_rayleigh_optical_thickness_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+from pvgisprototype.api.irradiance.direct.linke_turbidity_factor import correct_linke_turbidity_factor_series
+from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import calculate_rayleigh_optical_thickness_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
@@ -84,7 +84,7 @@ from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
-def calculate_direct_normal_irradiance_time_series(
+def calculate_direct_normal_irradiance_series(
     timestamps: DatetimeIndex = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     optical_air_mass_series: OpticalAirMass = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
@@ -116,7 +116,7 @@ def calculate_direct_normal_irradiance_time_series(
 
     """
     extraterrestrial_normal_irradiance_series = (
-        calculate_extraterrestrial_normal_irradiance_time_series(
+        calculate_extraterrestrial_normal_irradiance_series(
             timestamps=timestamps,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
@@ -125,11 +125,11 @@ def calculate_direct_normal_irradiance_time_series(
             array_backend=array_backend,
         )
     )
-    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
+    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_series(
         linke_turbidity_factor_series,
         verbose=verbose,
     )
-    rayleigh_optical_thickness_series = calculate_rayleigh_optical_thickness_time_series(
+    rayleigh_optical_thickness_series = calculate_rayleigh_optical_thickness_series(
         optical_air_mass_series,
         verbose=verbose,
     )  # _quite_ high when the sun is below the horizon. Makes sense ?

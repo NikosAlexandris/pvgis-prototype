@@ -1,6 +1,6 @@
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
-from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_series
 from typing import Annotated
 from typing import Optional
 from typing import List
@@ -55,7 +55,7 @@ from pvgisprototype.cli.typer.output import typer_option_command_metadata
 
 
 @log_function_call
-def photovoltaic_efficiency_time_series(
+def photovoltaic_efficiency_series(
     irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
     spectral_factor_series: Annotated[Path|SpectralFactorSeries, typer_argument_spectral_factor_series] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[TemperatureSeries, typer_option_temperature_series] = TEMPERATURE_DEFAULT,
@@ -81,7 +81,7 @@ def photovoltaic_efficiency_time_series(
     metadata: Annotated[bool, typer_option_command_metadata] = False,
     ctx: typer.Context = typer.Context,
 ):
-    photovoltaic_efficiency_time_series = calculate_pv_efficiency_time_series(
+    photovoltaic_efficiency_series = calculate_pv_efficiency_series(
         irradiance_series=irradiance_series,
         spectral_factor_series=spectral_factor_series,
         temperature_series=temperature_series,
@@ -96,21 +96,21 @@ def photovoltaic_efficiency_time_series(
         if verbose > 0:
             from pvgisprototype.cli.print import print_quantity_table
             print_quantity_table(
-                dictionary=photovoltaic_efficiency_time_series,
-                title=photovoltaic_efficiency_time_series['Title'],
+                dictionary=photovoltaic_efficiency_series,
+                title=photovoltaic_efficiency_series['Title'],
                 main_key=EFFICIENCY_COLUMN_NAME,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
             )
         # else:
-        #     flat_list = photovoltaic_efficiency_time_series.value.flatten().astype(str)
+        #     flat_list = photovoltaic_efficiency_series.value.flatten().astype(str)
         #     csv_str = ','.join(flat_list)
         #     print(csv_str)
 
     # if statistics:
     #     print_series_statistics(
-    #         data_array=photovoltaic_efficiency_time_series[GLOBAL_INCLINED_IRRADIANCE],
+    #         data_array=photovoltaic_efficiency_series[GLOBAL_INCLINED_IRRADIANCE],
     #         timestamps=timestamps,
     #         title="Efficiency",
     #         rounding_places=rounding_places,
@@ -120,14 +120,14 @@ def photovoltaic_efficiency_time_series(
     #         longitude=None,
     #         latitude=None,
     #         timestamps=timestamps,
-    #         dictionary=photovoltaic_efficiency_time_series,
+    #         dictionary=photovoltaic_efficiency_series,
     #         filename=csv,
     #     )
     #   
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
-            data_array=photovoltaic_efficiency_time_series.value,
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
+            data_array=photovoltaic_efficiency_series.value,
             list_extra_data_arrays=None,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
@@ -141,7 +141,7 @@ def photovoltaic_efficiency_time_series(
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
-        print_finger_hash(dictionary=photovoltaic_efficiency_time_series.components)
+        print_finger_hash(dictionary=photovoltaic_efficiency_series.components)
     if metadata:
         from pvgisprototype.cli.print import print_command_metadata
         import click

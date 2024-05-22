@@ -7,9 +7,9 @@ from zoneinfo import ZoneInfo
 from math import sin
 from math import cos
 from math import pi
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -34,7 +34,7 @@ from pvgisprototype.caching import custom_hashkey
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesNOAAInput)
-def calculate_solar_azimuth_time_series_noaa(
+def calculate_solar_azimuth_series_noaa(
     longitude: Longitude,   # radians
     latitude: Latitude,     # radians
     timestamps: DatetimeIndex,
@@ -208,8 +208,8 @@ def calculate_solar_azimuth_time_series_noaa(
     >>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
     >>> timestamps = generate_datetime_series(start_time='2010-01-27', end_time='2010-01-28')
     >>> from zoneinfo import ZoneInfo
-    >>> from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_time_series_noaa
-    >>> solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
+    >>> from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_series_noaa
+    >>> solar_azimuth_series = calculate_solar_azimuth_series_noaa(
     ... longitude=radians(8.628),
     ... latitude=radians(45.812),
     ... timestamps=timestamps,
@@ -232,14 +232,14 @@ def calculate_solar_azimuth_time_series_noaa(
           11.449485]
 
     """
-    solar_declination_series = calculate_solar_declination_time_series_noaa(
+    solar_declination_series = calculate_solar_declination_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
@@ -248,7 +248,7 @@ def calculate_solar_azimuth_time_series_noaa(
         verbose=verbose,
         log=log,
     )
-    solar_zenith_series = calculate_solar_zenith_time_series_noaa(
+    solar_zenith_series = calculate_solar_zenith_series_noaa(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,

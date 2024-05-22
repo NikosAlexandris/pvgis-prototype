@@ -10,7 +10,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
 from pvgisprototype import EquationOfTime
 import numpy as np
-from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa 
+from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_series_noaa 
 from pvgisprototype.constants import MINUTES
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
@@ -29,7 +29,7 @@ from pvgisprototype.log import log_data_fingerprint
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput) 
-def calculate_equation_of_time_time_series_noaa(
+def calculate_equation_of_time_series_noaa(
     timestamps: DatetimeIndex,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -42,7 +42,7 @@ def calculate_equation_of_time_time_series_noaa(
     time.
 
     """
-    fractional_year_series = calculate_fractional_year_time_series_noaa(
+    fractional_year_series = calculate_fractional_year_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
