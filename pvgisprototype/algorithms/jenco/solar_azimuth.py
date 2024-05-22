@@ -9,7 +9,7 @@ from math import isfinite
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_time_series_jenco
+from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_series_jenco
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
@@ -19,9 +19,9 @@ from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
@@ -30,7 +30,7 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesJencoInput)
-def calculate_solar_azimuth_time_series_jenco(
+def calculate_solar_azimuth_series_jenco(
     longitude: Longitude,   # radians
     latitude: Latitude,     # radians
     timestamps: DatetimeIndex,
@@ -146,8 +146,8 @@ def calculate_solar_azimuth_time_series_jenco(
     >>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
     >>> timestamps = generate_datetime_series(start_time='2010-01-27', end_time='2010-01-28')
     >>> from zoneinfo import ZoneInfo
-    >>> from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_time_series_noaa
-    >>> solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
+    >>> from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_series_noaa
+    >>> solar_azimuth_series = calculate_solar_azimuth_series_noaa(
     ... longitude=radians(8.628),
     ... latitude=radians(45.812),
     ... timestamps=timestamps,
@@ -158,14 +158,14 @@ def calculate_solar_azimuth_time_series_jenco(
     >>> print(solar_azimuth_series.degrees)
 
     """
-    solar_declination_series = calculate_solar_declination_time_series_jenco(
+    solar_declination_series = calculate_solar_declination_series_jenco(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,

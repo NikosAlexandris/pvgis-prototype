@@ -18,7 +18,7 @@ from pvgisprototype.log import log_function_call
 
 
 @log_function_call
-def uniplot_data_array_time_series(
+def uniplot_data_array_series(
     data_array,
     list_extra_data_arrays,
     # longitude: float,
@@ -177,7 +177,7 @@ def uniplot_solar_position_series(
             if include and solar_position_metric_name != INCIDENCE_NAME
         ]
 
-        uniplot_data_array_time_series(
+        uniplot_data_array_series(
             data_array=solar_incidence_series,
             list_extra_data_arrays=individual_series,
             timestamps=timestamps,

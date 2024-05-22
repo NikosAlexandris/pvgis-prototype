@@ -19,7 +19,7 @@ from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
@@ -29,7 +29,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(CalculateSolarAltitudeTimeSeriesJencoInput)
-def calculate_solar_altitude_time_series_jenco(
+def calculate_solar_altitude_series_jenco(
     longitude: Longitude,   # radians
     latitude: Latitude,     # radians
     timestamps: DatetimeIndex,
@@ -89,7 +89,7 @@ def calculate_solar_altitude_time_series_jenco(
         verbose=verbose,
         log=log,
     )
-    # solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    # solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
     solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
         longitude=longitude,
         timestamps=timestamps,

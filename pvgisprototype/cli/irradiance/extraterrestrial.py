@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 from pandas import DatetimeIndex
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
@@ -58,7 +58,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 @log_function_call
-def get_extraterrestrial_normal_irradiance_time_series(
+def get_extraterrestrial_normal_irradiance_series(
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     periods: Annotated[Optional[int], typer_option_periods] = None,
@@ -87,7 +87,7 @@ def get_extraterrestrial_normal_irradiance_time_series(
 ) -> None:
     """
     """
-    extraterrestrial_normal_irradiance_series = calculate_extraterrestrial_normal_irradiance_time_series(
+    extraterrestrial_normal_irradiance_series = calculate_extraterrestrial_normal_irradiance_series(
         timestamps=timestamps,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
@@ -137,8 +137,8 @@ def get_extraterrestrial_normal_irradiance_time_series(
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=extraterrestrial_normal_irradiance_series.value,
             list_extra_data_arrays=None,
             timestamps=timestamps,

@@ -9,7 +9,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype import Longitude
 from pvgisprototype import TimeOffset
 from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTimeSeriesNOAAInput
-from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
+from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_series_noaa
 import numpy as np
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -29,7 +29,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
-def calculate_time_offset_time_series_noaa(
+def calculate_time_offset_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo = ZoneInfo('UTC'),
@@ -177,7 +177,7 @@ def calculate_time_offset_time_series_noaa(
         [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
     )
     # ------------------------------------------------- Further Optimisation ?
-    equation_of_time_series = calculate_equation_of_time_time_series_noaa(
+    equation_of_time_series = calculate_equation_of_time_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
