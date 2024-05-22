@@ -1,9 +1,9 @@
-from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_time_series_jenco
+from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from typing import List, Union, Sequence
+from typing import Dict, List, Union, Sequence
 from pandas import DatetimeIndex
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -14,8 +14,8 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
-from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
-from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_time_series_jenco
+from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_series_noaa
+from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -40,7 +40,7 @@ from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(ModelSolarAltitudeTimeSeriesInputModel)
-def model_solar_altitude_time_series(
+def model_solar_altitude_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
@@ -78,7 +78,7 @@ def model_solar_altitude_time_series(
 
     if solar_position_model.value == SolarPositionModel.noaa:
 
-        solar_altitude_series = calculate_solar_altitude_time_series_noaa(
+        solar_altitude_series = calculate_solar_altitude_series_noaa(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -153,7 +153,7 @@ def model_solar_altitude_time_series(
 
     if solar_position_model.value  == SolarPositionModel.jenco:
 
-        solar_altitude_series = calculate_solar_altitude_time_series_jenco(
+        solar_altitude_series = calculate_solar_altitude_series_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -198,7 +198,7 @@ def model_solar_altitude_time_series(
 
 
 @log_function_call
-def calculate_solar_altitude_time_series(
+def calculate_solar_altitude_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
@@ -212,15 +212,15 @@ def calculate_solar_altitude_time_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
-) -> List:
+    log: int = LOG_LEVEL_DEFAULT,
+) -> Dict:
     """Calculates the solar position using the requested models and returns the
     results in a dictionary.
     """
     results = {}
     for solar_position_model in solar_position_models:
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
-            solar_altitude_series = model_solar_altitude_time_series(
+            solar_altitude_series = model_solar_altitude_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,

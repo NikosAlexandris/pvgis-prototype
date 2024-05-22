@@ -12,9 +12,9 @@ from pvgisprototype import SolarAltitude
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 import numpy as np
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 import numpy as np
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -26,7 +26,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarAltitudeTimeSeriesNOAAInput)
-def calculate_solar_altitude_time_series_noaa(
+def calculate_solar_altitude_series_noaa(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
@@ -38,7 +38,7 @@ def calculate_solar_altitude_time_series_noaa(
     log: int = 0,
 ) -> SolarAltitude:
     """Calculate the solar altitude angle for a location over a time series"""
-    solar_zenith_series = calculate_solar_zenith_time_series_noaa(
+    solar_zenith_series = calculate_solar_zenith_series_noaa(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,

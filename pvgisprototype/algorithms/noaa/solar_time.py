@@ -12,7 +12,7 @@ from typing import Optional
 from pandas import DatetimeIndex
 from numpy import array
 from numpy import mod
-from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_time_series_noaa
+from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_series_noaa
 from zoneinfo import ZoneInfo
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
@@ -31,7 +31,7 @@ from pvgisprototype.log import log_data_fingerprint
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateTrueSolarTimeTimeSeriesNOAAInput)
-def calculate_true_solar_time_time_series_noaa(
+def calculate_true_solar_time_series_noaa(
     longitude: Longitude,  # radians
     timestamps: DatetimeIndex,
     timezone: Optional[ZoneInfo],
@@ -126,7 +126,7 @@ def calculate_true_solar_time_time_series_noaa(
     .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF
 
     """
-    time_offset_series = calculate_time_offset_time_series_noaa(
+    time_offset_series = calculate_time_offset_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
@@ -137,35 +137,35 @@ def calculate_true_solar_time_time_series_noaa(
     true_solar_time_series = (
         timestamps - timestamps.normalize()
     ).total_seconds() + time_offset_series.value * 60
-    true_solar_time_series_in_minutes = mod(
+    true_solar_series_in_minutes = mod(
         (true_solar_time_series).astype(dtype) / 60, 1440
     )
 
     if not (
-        (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
-        & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+        (TrueSolarTime().min_minutes <= true_solar_series_in_minutes)
+        & (true_solar_series_in_minutes <= TrueSolarTime().max_minutes)
     ).all(): 
-        out_of_range_values = true_solar_time_series_in_minutes[
+        out_of_range_values = true_solar_series_in_minutes[
             ~(
-                (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
-                & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+                (TrueSolarTime().min_minutes <= true_solar_series_in_minutes)
+                & (true_solar_series_in_minutes <= TrueSolarTime().max_minutes)
             )
         ]
         raise ValueError(
-            f"The calculated true solar time series `{true_solar_time_series_in_minutes}` is out of the expected range [{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes!"
+            f"The calculated true solar time series `{true_solar_series_in_minutes}` is out of the expected range [{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes!"
         )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     log_data_fingerprint(
-            data=true_solar_time_series_in_minutes,
+            data=true_solar_series_in_minutes,
             log_level=log,
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return TrueSolarTime(
-        value=array(true_solar_time_series_in_minutes, dtype = "float32"),
+        value=array(true_solar_series_in_minutes, dtype = "float32"),
         unit = MINUTES,
         timing_algorithm=SolarTimeModel.noaa,
     )

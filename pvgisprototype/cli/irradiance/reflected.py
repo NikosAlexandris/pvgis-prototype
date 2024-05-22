@@ -9,7 +9,7 @@ from typing import Optional
 from pandas import DatetimeIndex
 from datetime import datetime
 from pathlib import Path
-from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
@@ -105,7 +105,7 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 
 
-def get_ground_reflected_inclined_irradiance_time_series(
+def get_ground_reflected_inclined_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -166,7 +166,7 @@ def get_ground_reflected_inclined_irradiance_time_series(
     Known also as : Ri
 
     """
-    ground_reflected_inclined_irradiance_series = calculate_ground_reflected_inclined_irradiance_time_series(
+    ground_reflected_inclined_irradiance_series = calculate_ground_reflected_inclined_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -233,8 +233,8 @@ def get_ground_reflected_inclined_irradiance_time_series(
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=ground_reflected_inclined_irradiance_series.value,
             list_extra_data_arrays=None,
             timestamps=timestamps,

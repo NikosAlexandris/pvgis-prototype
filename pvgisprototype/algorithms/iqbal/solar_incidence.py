@@ -27,9 +27,9 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
+from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_series_noaa
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -46,7 +46,7 @@ from pvgisprototype.validation.arrays import create_array
 
 
 @log_function_call
-def calculate_solar_incidence_time_series_iqbal(
+def calculate_solar_incidence_series_iqbal(
     longitude: Longitude,
     latitude: Latitude,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
@@ -178,7 +178,7 @@ def calculate_solar_incidence_time_series_iqbal(
     .. [0] Iqbal, M. “An Introduction to Solar Radiation”. New York: 1983; pp. 23-25.
 
     """
-    solar_zenith_series = calculate_solar_zenith_time_series_noaa(
+    solar_zenith_series = calculate_solar_zenith_series_noaa(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -189,7 +189,7 @@ def calculate_solar_incidence_time_series_iqbal(
         verbose=verbose,
         log=log,
     )
-    solar_azimuth_series_north_based = calculate_solar_azimuth_time_series_noaa(
+    solar_azimuth_series_north_based = calculate_solar_azimuth_series_noaa(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,

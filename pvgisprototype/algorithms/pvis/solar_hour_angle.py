@@ -110,8 +110,8 @@ def calculate_solar_hour_angle_series_hofierka(
 
         where the solar time was given in seconds.
     """
-    from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_time_series_noaa
-    true_solar_time_series = calculate_true_solar_time_time_series_noaa(
+    from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_series_noaa
+    true_solar_time_series = calculate_true_solar_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,

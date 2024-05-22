@@ -1,15 +1,11 @@
+from zoneinfo import ZoneInfo
 from pvgisprototype.log import logger
-from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pandas import DatetimeIndex
-from pathlib import Path
 from typing import Optional
-from typing import List
-from rich import print
 import numpy as np
-from math import cos, sin, pi
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import Irradiance
 from pvgisprototype.api.position.models import SolarPositionModel
@@ -18,17 +14,10 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
-from pvgisprototype.api.position.incidence import model_solar_incidence_time_series
-from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
-from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
@@ -89,16 +78,16 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import diffuse_transmission_function_time_series
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import diffuse_solar_altitude_function_time_series
+from pvgisprototype.api.irradiance.diffuse.solar_altitude import diffuse_transmission_function_series
+from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_solar_altitude_function_series
 
 
 @log_function_call
-def calculate_diffuse_horizontal_irradiance_time_series(
+def calculate_diffuse_horizontal_irradiance_series(
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex = None,
-    timezone: Optional[str] = None,
+    timezone: Optional[ZoneInfo] = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
@@ -117,7 +106,7 @@ def calculate_diffuse_horizontal_irradiance_time_series(
     """
     """
     extraterrestrial_normal_irradiance_series = (
-        calculate_extraterrestrial_normal_irradiance_time_series(
+        calculate_extraterrestrial_normal_irradiance_series(
             timestamps=timestamps,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
@@ -129,7 +118,7 @@ def calculate_diffuse_horizontal_irradiance_time_series(
         )
     )
     # extraterrestrial on a horizontal surface requires the solar altitude
-    solar_altitude_series = model_solar_altitude_time_series(
+    solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -150,8 +139,8 @@ def calculate_diffuse_horizontal_irradiance_time_series(
 
     diffuse_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series.value
-        * diffuse_transmission_function_time_series(linke_turbidity_factor_series)
-        * diffuse_solar_altitude_function_time_series(
+        * diffuse_transmission_function_series(linke_turbidity_factor_series)
+        * calculate_diffuse_solar_altitude_function_series(
             solar_altitude_series, linke_turbidity_factor_series
         )
     )

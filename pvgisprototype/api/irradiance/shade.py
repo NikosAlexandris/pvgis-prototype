@@ -152,7 +152,7 @@ def is_surface_in_shade(
 
 
 @log_function_call
-def is_surface_in_shade_time_series(
+def is_surface_in_shade_series(
     solar_altitude_series,
     solar_azimuth_series,
     shadow_indicator: Path = None,

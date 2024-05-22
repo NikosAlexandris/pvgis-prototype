@@ -41,8 +41,8 @@ from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype.constants import RADIANS
 from pvgisprototype import SolarIncidence
-from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_time_series_jenco
-from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_time_series_iqbal
+from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_series_jenco
+from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_series_iqbal
 import numpy as np
 from pandas import DatetimeIndex
 from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
@@ -50,7 +50,7 @@ from pvgisprototype.api.position.conversions import convert_north_to_south_radia
 
 
 @validate_with_pydantic(ModelSolarIncidenceTimeSeriesInputModel)
-def model_solar_incidence_time_series(
+def model_solar_incidence_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
@@ -91,7 +91,7 @@ def model_solar_incidence_time_series(
         #         )
         # ---------------------------------------------------------- Update-Me
 
-        solar_incidence_series = calculate_solar_incidence_time_series_jenco(
+        solar_incidence_series = calculate_solar_incidence_series_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -117,7 +117,7 @@ def model_solar_incidence_time_series(
             ),
             unit=RADIANS,
         )
-        solar_incidence_series = calculate_solar_incidence_time_series_iqbal(
+        solar_incidence_series = calculate_solar_incidence_series_iqbal(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,

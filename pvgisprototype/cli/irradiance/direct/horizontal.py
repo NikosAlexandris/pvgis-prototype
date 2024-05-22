@@ -4,7 +4,7 @@ location for a period in time.
 """
 
 import typer
-from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
+from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype import LinkeTurbidityFactor
@@ -108,7 +108,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 @log_function_call
-def get_direct_horizontal_irradiance_time_series(
+def get_direct_horizontal_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -154,7 +154,7 @@ def get_direct_horizontal_irradiance_time_series(
     vol(issue), pages.
 
     """
-    direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
+    direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -217,8 +217,8 @@ def get_direct_horizontal_irradiance_time_series(
             filename=csv,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=direct_horizontal_irradiance_series.value,
             list_extra_data_arrays=None,
             timestamps=timestamps,

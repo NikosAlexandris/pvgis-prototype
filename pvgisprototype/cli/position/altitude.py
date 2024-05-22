@@ -9,7 +9,7 @@ from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from pvgisprototype.api.position.altitude import calculate_solar_altitude_time_series
+from pvgisprototype.api.position.altitude import calculate_solar_altitude_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
@@ -100,16 +100,13 @@ def altitude(
         user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
-        # timestamps = timestamps.tz_convert(utc_zoneinfo)
-        from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
-        timezone_aware_timestamps = [
-            attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
-        ]
+        timestamps = timestamps.tz_convert(utc_zoneinfo)
+        # print(f'The requested timestamp - zone {user_requested_timestamps} {user_requested_timezone} has been converted to {timestamps} for all internal calculations!')
         timezone = utc_zoneinfo
 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     from devtools import debug
-    solar_altitude_series = calculate_solar_altitude_time_series(
+    solar_altitude_series = calculate_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,

@@ -122,7 +122,7 @@ def calculate_angular_loss_factor_for_direct_irradiance(
 
 
 @log_function_call
-def calculate_angular_loss_factor_for_direct_irradiance_time_series(
+def calculate_angular_loss_factor_for_direct_irradiance_series(
     solar_incidence_series: List[float],
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
