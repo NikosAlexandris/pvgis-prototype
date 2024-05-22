@@ -216,7 +216,7 @@ def photovoltaic_power_output_series(
     functions that calculate the diffuse and direct components, are defined as
     `global_horizontal_component` and `direct_horizontal_component`. This is to
     avoid confusion at the function level. For example, the function
-    `calculate_diffuse_inclined_irradiance_time_series()` can read the direct
+    `calculate_diffuse_inclined_irradiance_series()` can read the direct
     horizontal component (thus the name of it `direct_horizontal_component` as
     well as simulate it.  The point is to make it clear that if the
     `direct_horizontal_component` parameter is True (which means the user has
@@ -317,8 +317,8 @@ def photovoltaic_power_output_series(
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=photovoltaic_power_output_series.value,
             list_extra_data_arrays=None,
             timestamps=timestamps,
@@ -418,7 +418,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     functions that calculate the diffuse and direct components, are defined as
     `global_horizontal_component` and `direct_horizontal_component`. This is to
     avoid confusion at the function level. For example, the function
-    `calculate_diffuse_inclined_irradiance_time_series()` can read the direct
+    `calculate_diffuse_inclined_irradiance_series()` can read the direct
     horizontal component (thus the name of it `direct_horizontal_component` as
     well as simulate it.  The point is to make it clear that if the
     `direct_horizontal_component` parameter is True (which means the user has
@@ -515,14 +515,14 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             title="Photovoltaic power output",
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
+        from pvgisprototype.api.plot import uniplot_data_array_series
         individual_series = [series.value for series in photovoltaic_power_output_series.individual_series]
         surface_orientation = [convert_float_to_degrees_if_requested(orientation, angle_output_units) for orientation in surface_orientation]
         surface_tilt = [convert_float_to_degrees_if_requested(tilt, angle_output_units) for tilt in surface_tilt]
         surface_orientation = round_float_values(surface_orientation, rounding_places)
         surface_tilt = round_float_values(surface_tilt, rounding_places)
         individual_labels = [f"Orientation, Tilt : {orientation}°, {tilt}°" for orientation, tilt in zip(surface_orientation, surface_tilt)]
-        uniplot_data_array_time_series(
+        uniplot_data_array_series(
             data_array=photovoltaic_power_output_series.series,
             list_extra_data_arrays=individual_series,
             timestamps=timestamps,
