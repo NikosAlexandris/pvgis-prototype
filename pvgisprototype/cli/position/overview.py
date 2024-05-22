@@ -3,7 +3,6 @@ CLI module to calculate and overview the solar position parameters over a
 location for a period in time.
 """
 
-from pvgisprototype.api.plot import uniplot_solar_position_series
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 import typer
@@ -49,8 +48,7 @@ from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 from pvgisprototype.cli.typer.output import typer_option_index
 
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.position.overview import calculate_solar_geometry_overview_time_series
-from pvgisprototype.cli.write import write_solar_position_series_csv
+from pvgisprototype.api.position.overview import calculate_solar_position_overview_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -79,7 +77,7 @@ from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.cli.typer.output import typer_option_panels_output
 
 
-def overview_series(
+def overview(
     ctx: typer.Context,
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -116,7 +114,7 @@ def overview_series(
     panels: Annotated[bool, typer_option_panels_output] = False,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
-):
+) -> None:
     """
     """
     # print(f'Context: {ctx}')
@@ -146,13 +144,13 @@ def overview_series(
         user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
-        timestamps = timestamps.tz_convert(utc_zoneinfo)
+        timestamps = timestamps.tz_localize(utc_zoneinfo)
         timezone = utc_zoneinfo
-        # print(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
+        logger.info(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
     # Why does the callback function `_parse_model` not work? 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
-    solar_position_series = calculate_solar_geometry_overview_time_series(
+    solar_position_series = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -252,6 +250,7 @@ def overview_series(
             #         )
 
     if csv:
+        from pvgisprototype.cli.write import write_solar_position_series_csv
         write_solar_position_series_csv(
             longitude=longitude,
             latitude=latitude,
@@ -275,6 +274,7 @@ def overview_series(
         )
 
     if uniplot:
+        from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
             solar_position_series=solar_position_series,
             timing=True,
