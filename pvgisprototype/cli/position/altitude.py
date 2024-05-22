@@ -3,11 +3,11 @@ CLI module to calculate the solar altitude angle parameters over a
 location and a moment in time.
 """
 
-from typing import Annotated, Sequence
+from typing import Annotated
 from typing import Optional
-from typing import List
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from pathlib import Path
 
 from pvgisprototype.api.position.altitude import calculate_solar_altitude_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude
@@ -33,7 +33,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
 
-from pvgisprototype.constants import RADIANS, DEGREES
+from pvgisprototype.constants import CSV_PATH_DEFAULT, QUIET_FLAG_DEFAULT, RADIANS, DEGREES, TERMINAL_WIDTH_FRACTION, UNIPLOT_FLAG_DEFAULT
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -53,8 +53,18 @@ from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype import SolarAltitude
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.cli.typer.data_processing import typer_option_dtype
+from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
+from pvgisprototype.cli.typer.plot import typer_option_uniplot
+from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
+from pvgisprototype.cli.typer.output import typer_option_csv
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet
+from pvgisprototype.cli.typer.output import typer_option_panels_output
 
 
+@log_function_call
 def altitude(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -72,11 +82,17 @@ def altitude(
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[int, typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
     group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
+    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
+    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    panels: Annotated[bool, typer_option_panels_output] = False,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
 ) -> SolarAltitude:
     """Calculate the solar altitude angle above the horizon.
 
@@ -93,19 +109,19 @@ def altitude(
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
     
+    # Convert the input timestamp to UTC, for _all_ internal calculations
     utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tzinfo != utc_zoneinfo:
+    if timestamps.tz != utc_zoneinfo:
 
         # Note the input timestamp and timezone
         user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
-        timestamps = timestamps.tz_convert(utc_zoneinfo)
-        # print(f'The requested timestamp - zone {user_requested_timestamps} {user_requested_timezone} has been converted to {timestamps} for all internal calculations!')
+        timestamps = timestamps.tz_localize(utc_zoneinfo)
         timezone = utc_zoneinfo
+        logger.info(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
-    from devtools import debug
     solar_altitude_series = calculate_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
@@ -123,26 +139,115 @@ def altitude(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    from pvgisprototype.cli.print import print_solar_position_series_table
-    print_solar_position_series_table(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
-        table=solar_altitude_series,
-        title='Solar Altitude Series',
-        index=index,
-        timing=True,
-        declination=None,
-        hour_angle=None,
-        zenith=None,
-        altitude=True,
-        azimuth=None,
-        surface_orientation=None,
-        surface_tilt=None,
-        incidence=None,
-        user_requested_timestamps=user_requested_timestamps, 
-        user_requested_timezone=user_requested_timezone,
-        rounding_places=rounding_places,
-        group_models=group_models,
-    )
+    if not quiet:
+        if timestamps.size == 1:
+            if not panels:
+                from pvgisprototype.cli.print import print_solar_position_table
+                print_solar_position_table(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamp=timestamps,
+                    timezone=timezone,
+                    table=solar_altitude_series,
+                    rounding_places=rounding_places,
+                    timing=True,
+                    declination=None,
+                    hour_angle=None,
+                    zenith=None,
+                    altitude=True,
+                    azimuth=None,
+                    surface_orientation=None,
+                    surface_tilt=None,
+                    incidence=None,  # Add Me ?
+                    user_requested_timestamp=user_requested_timestamps, 
+                    user_requested_timezone=user_requested_timezone
+                )
+            else:
+                from pvgisprototype.cli.print import print_solar_position_table_panels
+                print_solar_position_table_panels(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamp=timestamps,
+                    timezone=timezone,
+                    table=solar_altitude_series,
+                    rounding_places=rounding_places,
+                    # timing=True,
+                    # declination=None,
+                    # hour_angle=None,
+                    # zenith=None,
+                    altitude=True,
+                    # azimuth=None,
+                    # incidence=None,  # Add Me ?
+                    user_requested_timestamp=user_requested_timestamps, 
+                    user_requested_timezone=user_requested_timezone
+                )
+        else:
+            from pvgisprototype.cli.print import print_solar_position_series_table
+            print_solar_position_series_table(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                timezone=timezone,
+                table=solar_altitude_series,
+                title='Solar Altitude Series',
+                index=index,
+                timing=True,
+                declination=None,
+                hour_angle=None,
+                zenith=None,
+                altitude=True,
+                azimuth=None,
+                surface_orientation=None,
+                surface_tilt=None,
+                incidence=None,
+                user_requested_timestamps=user_requested_timestamps, 
+                user_requested_timezone=user_requested_timezone,
+                rounding_places=rounding_places,
+                group_models=group_models,
+            )
+
+    if csv:
+        from pvgisprototype.cli.write import write_solar_position_series_csv
+        write_solar_position_series_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_altitude_series,
+            # timing=True,
+            # declination=True,
+            # hour_angle=None,
+            # zenith=None,
+            altitude=None,
+            # azimuth=None,
+            # surface_orientation=None,
+            # surface_tilt=None,
+            # incidence=None,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            # rounding_places=rounding_places,
+            # group_models=group_models,
+            filename=csv,
+        )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_solar_position_series
+        uniplot_solar_position_series(
+            solar_position_series=solar_altitude_series,
+            timing=True,
+            timestamps=timestamps,
+            # declination=True,
+            # hour_angle=True,
+            # zenith=True,
+            altitude=True,
+            # azimuth=True,
+            # surface_orientation=True,
+            # surface_tilt=True,
+            # incidence=True,
+            resample_large_series=resample_large_series,
+            lines=True,
+            supertitle='Solar Declination Series',
+            title="Solar Declination",
+            label='Declination',
+            legend_labels=None,
+            terminal_width_fraction=terminal_width_fraction,
+        )
