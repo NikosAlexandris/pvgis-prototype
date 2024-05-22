@@ -4,11 +4,11 @@ from typing import Optional
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from math import pi, sin, cos, asin
-from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_time_series_jenco
+from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_series_jenco
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_time_series_jenco
-from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_time_series_jenco
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
+from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_series_jenco
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
 
 from pvgisprototype import RelativeLongitude
 from pvgisprototype import SolarIncidence
@@ -41,7 +41,7 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype.constants import RADIANS
 import numpy as np
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
@@ -168,7 +168,7 @@ def calculate_relative_longitude(
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarIncidenceTimeSeriesJencoInputModel)
-def calculate_solar_incidence_time_series_jenco(
+def calculate_solar_incidence_series_jenco(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
@@ -320,7 +320,7 @@ def calculate_solar_incidence_time_series_jenco(
     - Shadow check not implemented.
     """
     # Identify times without solar insolation
-    solar_altitude_series = calculate_solar_altitude_time_series_jenco(
+    solar_altitude_series = calculate_solar_altitude_series_jenco(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -332,7 +332,7 @@ def calculate_solar_incidence_time_series_jenco(
         verbose=0,
         log=log,
     )
-    solar_azimuth_east_based_series = calculate_solar_azimuth_time_series_jenco(
+    solar_azimuth_east_based_series = calculate_solar_azimuth_series_jenco(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -350,7 +350,7 @@ def calculate_solar_incidence_time_series_jenco(
     #     unit=RADIANS,
     # )
     
-    in_shade = is_surface_in_shade_time_series(
+    in_shade = is_surface_in_shade_series(
         solar_altitude_series=solar_altitude_series,
         solar_azimuth_series=solar_azimuth_east_based_series,
         shadow_indicator=shadow_indicator,
@@ -369,7 +369,7 @@ def calculate_solar_incidence_time_series_jenco(
     )
     relative_inclined_latitude = asin(sine_relative_inclined_latitude)
 
-    solar_declination_series = calculate_solar_declination_time_series_jenco(
+    solar_declination_series = calculate_solar_declination_series_jenco(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
@@ -382,7 +382,7 @@ def calculate_solar_incidence_time_series_jenco(
     c_inclined_33_series = sin(relative_inclined_latitude) * np.sin(
         solar_declination_series.radians
     )
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,

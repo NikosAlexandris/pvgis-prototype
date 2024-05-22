@@ -20,7 +20,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 
 
 @log_function_call
-def calculate_solar_declination_time_series_jenco(
+def calculate_solar_declination_series_jenco(
     timestamps: DatetimeIndex,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,

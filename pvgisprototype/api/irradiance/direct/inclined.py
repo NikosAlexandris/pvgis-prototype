@@ -49,19 +49,18 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth import model_solar_azimuth_time_series
-from pvgisprototype.api.position.incidence import model_solar_incidence_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
-from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 # from pvgisprototype.api.utilities.progress import progress
 # from rich.progress import Progress
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -119,7 +118,7 @@ from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
-def calculate_direct_inclined_irradiance_time_series_pvgis(
+def calculate_direct_inclined_irradiance_series_pvgis(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -189,20 +188,20 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     For the losses due to reflectivity, the incidence angle modifier by Martin
     & Ruiz (2005) expects the incidence angle between the sun-vector and the
     surface-normal. Hence, the respective call of the function
-    `calculate_angular_loss_factor_for_direct_irradiance_time_series()`,
+    `calculate_angular_loss_factor_for_direct_irradiance_series()`,
     expects the complement of the angle defined by Jenco (1992). We call the
     incidence angle expected by the incidence angle modifier by Martin & Ruiz
     (2005) the _typical_ incidence angle.
 
     See also the documentation of the function
-    `calculate_solar_incidence_time_series_jenco()`.
+    `calculate_solar_incidence_series_jenco()`.
 
     References
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
 
     """
-    solar_incidence_series = model_solar_incidence_time_series(
+    solar_incidence_series = model_solar_incidence_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -218,7 +217,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         verbose=0,
         log=log,
     )
-    solar_altitude_series = model_solar_altitude_time_series(
+    solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -234,7 +233,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
         verbose=0,
         log=log,
     )
-    solar_azimuth_series = model_solar_azimuth_time_series(
+    solar_azimuth_series = model_solar_azimuth_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -262,7 +261,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
 
     # Following, the _complementary_ solar incidence angle is used (Jenco, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
-    in_shade = is_surface_in_shade_time_series(
+    in_shade = is_surface_in_shade_series(
             solar_altitude_series,
             solar_azimuth_series,
             )  # This is currenrly a stub, will return always False = Not in Shade! 
@@ -280,7 +279,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
     if not direct_horizontal_component:
         if verbose > 0:
             logger.info(':information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...')
-        direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_time_series(
+        direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_series(
             longitude=longitude,  # required by some of the solar time algorithms
             latitude=latitude,
             elevation=elevation,
@@ -343,7 +342,7 @@ def calculate_direct_inclined_irradiance_time_series_pvgis(
             # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
             # which is the _complement_ of the incidence angle per Hofierka 2002
             angular_loss_factor_series = (
-                calculate_angular_loss_factor_for_direct_irradiance_time_series(
+                calculate_angular_loss_factor_for_direct_irradiance_series(
                     solar_incidence_series=(np.pi/2 - solar_incidence_series.radians),
                     verbose=0,
                 )

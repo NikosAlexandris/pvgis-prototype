@@ -408,7 +408,8 @@ def parse_timestamp_series(
     """
     from pandas import to_datetime
     if isinstance(timestamps, str):
-        return to_datetime(timestamps.split(','), format='mixed', utc=True)
+        # return to_datetime(timestamps.split(','), format='mixed', utc=True)
+        return to_datetime(timestamps.split(','), format='mixed')
     else:
         raise ValueError("The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function")
 

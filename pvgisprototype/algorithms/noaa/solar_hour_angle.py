@@ -7,7 +7,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarHourAngle
-from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_series_noaa
 import numpy as np
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
@@ -28,7 +28,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
-def calculate_solar_hour_angle_time_series_noaa(
+def calculate_solar_hour_angle_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex, 
     timezone: ZoneInfo,
@@ -102,7 +102,7 @@ def calculate_solar_hour_angle_time_series_noaa(
             = 360 * F. If L is negative, then the limited L = 360 - 360 * F.
 
     """
-    true_solar_time_series = calculate_true_solar_time_time_series_noaa(
+    true_solar_time_series = calculate_true_solar_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
