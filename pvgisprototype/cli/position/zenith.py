@@ -41,8 +41,11 @@ from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.position.altitude import calculate_solar_altitude_series
 from pvgisprototype.cli.print import print_solar_position_table
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
 
 
+@log_function_call
 def calculate_zenith(angle_output_units, solar_altitude_angle):
     if angle_output_units == DEGREES:
         return 90 - solar_altitude_angle
@@ -91,9 +94,9 @@ def zenith(
         user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
-        timestamps = timestamps.tz_convert(utc_zoneinfo)
-        # print(f'The requested timestamp - zone {user_requested_timestamps} {user_requested_timezone} has been converted to {timestamps} for all internal calculations!')
+        timestamps = timestamps.tz_localize(utc_zoneinfo)
         timezone = utc_zoneinfo
+        logger.info(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
     solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
     solar_altitude = calculate_solar_altitude_series(
