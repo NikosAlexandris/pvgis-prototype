@@ -1,4 +1,3 @@
-from pydantic import Field
 from typing import Tuple
 from pydantic import BaseModel
 from pydantic import ConfigDict
@@ -6,14 +5,12 @@ from pydantic import field_validator
 from pydantic import confloat
 from typing import Union
 from typing import Optional
-from typing import Sequence
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import time
 from pandas import Timestamp
 from pandas import DatetimeIndex
 from math import pi
-from pydantic import validator
 import numpy as np
 from numpy import ndarray
 from pvgisprototype import RefractedSolarAltitude
@@ -407,8 +404,10 @@ class SolarHourAngleSeriesModel(BaseModel):
 class ApplyAtmosphericRefractionModel(BaseModel):
     apply_atmospheric_refraction: Optional[bool] = True
 
+
 class ZeroNegativeSolarIncidenceAnglesModel(BaseModel):
     zero_negative_solar_incidence_angles: Optional[bool] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+
 
 class RefractedSolarAltitudeModel(BaseModel):
     refracted_solar_altitude: Union[float, RefractedSolarAltitude]
