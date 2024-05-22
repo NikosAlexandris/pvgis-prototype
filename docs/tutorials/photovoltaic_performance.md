@@ -21,7 +21,7 @@ in the chain of calculations to estimate photovoltaic power output.
 
 ## Photovoltaic power
 
-We can simulate the photovoltaic power output via
+We can _simulate_ the photovoltaic power output via
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
@@ -29,9 +29,9 @@ pvgis-prototype power broadband \
     '2010-01-27 12:00:00'
 ```
 
-or estimate it via
+or _estimate_ it by reading external irradiance time series via
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="4 5 6"
 pvgis-prototype power broadband \
     8.628 45.812 214 180 45 \
     '2010-01-27 12:00:00' \
@@ -51,7 +51,7 @@ Let's add it to the power commands :
 
 - simulating the photovoltaic power output
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="2"
 pvgis-prototype power broadband \
     8.628 45.812 214 180 0.0001 \
     '2010-01-27 12:00:00'
@@ -59,7 +59,7 @@ pvgis-prototype power broadband \
 
 - using SARAH2 data
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="4 5"
 pvgis-prototype power broadband \
     8.628 45.812 214 180 0.0001 \
     '2010-01-27 12:00:00' \
@@ -70,7 +70,7 @@ pvgis-prototype power broadband \
 
 We can request more details on the calculations
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="7"
 pvgis-prototype power broadband \
     8.628 45.812 214 180 0.0001 \
     '2010-01-27 12:00:00' \
