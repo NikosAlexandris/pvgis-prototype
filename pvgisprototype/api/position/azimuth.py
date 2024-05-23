@@ -30,7 +30,7 @@ from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimut
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from typing import Optional
+from typing import Dict, Optional
 from typing import List
 from pandas import DatetimeIndex
 from datetime import datetime
@@ -55,6 +55,11 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import TIME_ALGORITHM_NAME
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME
+from pvgisprototype.constants import AZIMUTH_NAME, AZIMUTH_ORIGIN_NAME
+from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import NOT_AVAILABLE
 
 
 @log_function_call
@@ -193,11 +198,11 @@ def model_solar_azimuth_series(
         #     timezone=timezone,
         # )
 
-    log_data_fingerprint(
-            data=solar_azimuth_series.value,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    )
+    # log_data_fingerprint(
+    #         data=solar_azimuth_series.value,
+    #         log_level=log,
+    #         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    # )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -207,27 +212,27 @@ def model_solar_azimuth_series(
 def calculate_solar_azimuth_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamp: datetime,
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
-    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
+    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-) -> List:
+) -> Dict:
     """
     Calculates the solar position using all models and returns the results in a table.
     """
-    results = []
+    results = {}
     for solar_position_model in solar_position_models:
         if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
-            solar_azimuth = model_solar_azimuth_series(
+            solar_azimuth_series = model_solar_azimuth_series(
                 longitude=longitude,
                 latitude=latitude,
-                timestamps=timestamp,
+                timestamps=timestamps,
                 timezone=timezone,
                 solar_position_model=solar_position_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
@@ -237,11 +242,15 @@ def calculate_solar_azimuth_series(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 verbose=verbose,
             )
-            results.append({
-                TIME_ALGORITHM_NAME: solar_azimuth.timing_algorithm,
-                POSITION_ALGORITHM_NAME: solar_azimuth.position_algorithm,
-                AZIMUTH_NAME if solar_azimuth else None: getattr(solar_azimuth, angle_output_units) if solar_azimuth else None,
-                UNITS_NAME: angle_output_units,
-            })
+            solar_azimuth_model_series = {
+                solar_position_model.name: {
+                    TIME_ALGORITHM_NAME: solar_azimuth_series.timing_algorithm if solar_azimuth_series else NOT_AVAILABLE,
+                    POSITION_ALGORITHM_NAME: solar_azimuth_series.position_algorithm if solar_azimuth_series else NOT_AVAILABLE,
+                    AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
+                    AZIMUTH_ORIGIN_NAME: solar_azimuth_series.origin if solar_azimuth_series else NOT_AVAILABLE,
+                    UNITS_NAME: angle_output_units,
+                }
+            }
+            results = results | solar_azimuth_model_series
 
     return results
