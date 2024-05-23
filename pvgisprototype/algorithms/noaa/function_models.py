@@ -221,10 +221,9 @@ class CalculateEventTimeNOAAInput(
 
 class CalculateEventTimeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
-    BaseTimestampSeriesModel,
+    BaseTimeSeriesModel,
     RefractedSolarZenithModel,
     BaseTimeEventModel,
-    ApplyAtmosphericRefractionModel,
     VerbosityModel,
     LoggingModel,
 ):
