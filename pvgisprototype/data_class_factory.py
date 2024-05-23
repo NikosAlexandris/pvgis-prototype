@@ -5,6 +5,7 @@ from pvgisprototype.constants import RADIANS, DEGREES
 from typing import Optional, Union, Tuple
 import numpy as np
 from math import pi
+from pandas import DatetimeIndex
 
 
 type_mapping = {
@@ -21,6 +22,7 @@ type_mapping = {
     'Elevation': float,
     'SurfaceOrientation': float,
     'SurfaceTilt': float,
+    'DatetimeIndex': DatetimeIndex
 }
 
 
@@ -270,7 +272,7 @@ class DataClassFactory:
                 fields.append(field_name)
                 if DataClassFactory._is_np_ndarray_type(type_mapping[field_type]):
                     use_numpy_model = True
-
+                    
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
 
@@ -292,4 +294,4 @@ class DataClassFactory:
                 }
             })
 
-        return base_class.__class__(model_name, (base_class,), class_attributes)
+        return base_class.__class__(model_name, (base_class,), class_attributes, arbitrary_types_allowed=True)
