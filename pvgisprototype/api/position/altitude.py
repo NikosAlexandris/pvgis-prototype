@@ -183,6 +183,7 @@ def model_solar_altitude_series(
 
     if solar_position_model.value  == SolarPositionModel.pvlib:
         pass
+
     # if solar_position_model.value  == SolarPositionModel.pvlib:
 
     #     solar_altitude = calculate_solar_altitude_pvlib(
@@ -192,7 +193,8 @@ def model_solar_altitude_series(
     #         timezone=timezone,
     #         verbose=verbose,
     #     )
-
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     return solar_altitude_series
 
@@ -203,8 +205,8 @@ def calculate_solar_altitude_series(
     latitude: Latitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.skyfield],
-    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
+    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -235,13 +237,13 @@ def calculate_solar_altitude_series(
                 log=log,
             )
             solar_position_model_overview = {
-                    solar_position_model.name: {
-                        TIME_ALGORITHM_NAME: solar_altitude_series.timing_algorithm if solar_altitude_series else NOT_AVAILABLE,
-                        POSITION_ALGORITHM_NAME: solar_position_model.value,
-                        ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
-                        UNITS_NAME: None,
-                        }
-                    }
+                solar_position_model.name: {
+                    TIME_ALGORITHM_NAME: solar_altitude_series.timing_algorithm if solar_altitude_series else NOT_AVAILABLE,
+                    POSITION_ALGORITHM_NAME: solar_position_model.value,
+                    ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
+                    UNITS_NAME: None,
+                }
+            }
             results = results | solar_position_model_overview
 
     return results
