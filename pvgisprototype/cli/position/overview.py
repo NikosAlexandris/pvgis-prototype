@@ -77,6 +77,7 @@ from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.cli.typer.output import typer_option_panels_output
 
 
+@log_function_call
 def overview(
     ctx: typer.Context,
     longitude: Annotated[float, typer_argument_longitude],
@@ -168,13 +169,12 @@ def overview(
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         angle_output_units=angle_output_units,
-        array_backend=array_backend,
         dtype=dtype,
+        array_backend=array_backend,
         verbose=verbose,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    from pvgisprototype.cli.print import print_solar_position_series_table
     if not quiet:
         if timestamps.size == 1:
             if not panels:
@@ -194,7 +194,7 @@ def overview(
                     azimuth=True,
                     surface_orientation=True,
                     surface_tilt=True,
-                    incidence=True,  # Add Me ?
+                    incidence=True,
                     user_requested_timestamp=user_requested_timestamps, 
                     user_requested_timezone=user_requested_timezone
                 )
@@ -218,6 +218,7 @@ def overview(
                     user_requested_timezone=user_requested_timezone
                 )
         else:
+            from pvgisprototype.cli.print import print_solar_position_series_table
             print_solar_position_series_table(
                 longitude=longitude,
                 latitude=latitude,
