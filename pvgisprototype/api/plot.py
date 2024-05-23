@@ -1,18 +1,14 @@
-from pathlib import Path
-from typing import List, Optional
+from devtools import debug
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from typing import List
 from pandas import DatetimeIndex
-from pandas import Timestamp
-from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.constants import AZIMUTH_ORIGIN_NAME, INCIDENCE_DEFINITION, NOT_AVAILABLE, UNITS_NAME, UNITLESS
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.api.series.hardcodings import check_mark
-from pvgisprototype.api.series.hardcodings import x_mark
 from rich import print
 import numpy
 import xarray
-from numpy import ndarray
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 
@@ -20,7 +16,7 @@ from pvgisprototype.log import log_function_call
 @log_function_call
 def uniplot_data_array_series(
     data_array,
-    list_extra_data_arrays,
+    list_extra_data_arrays = None,
     # longitude: float,
     # latitude: float,
     orientation: List[float] | float = None,
@@ -49,6 +45,17 @@ def uniplot_data_array_series(
     plot = partial(default_plot, width=terminal_length)
 
     def convert_and_resample(array, timestamps, freq='1ME'):
+        """
+        """
+        # Ensure array and timestamps are of the same size
+        if array.size != timestamps.size:
+            # Handle empty array case
+            if array.size == 0:
+                print("Empty array provided.")
+                return xarray.DataArray([])
+            else:
+                raise ValueError("The size the data array and timestamps must match.")
+
         # Create xarray DataArray with time dimension
         data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
         if resample_large_series:
@@ -62,6 +69,7 @@ def uniplot_data_array_series(
     y_series = (
         [data_array] + (list_extra_data_arrays if list_extra_data_arrays else [])
     )
+
 
     if isinstance(data_array, float):
         logger.error(f"{exclamation_mark} Aborting as I cannot plot the single float value {float}!", alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
@@ -77,6 +85,10 @@ def uniplot_data_array_series(
     # legend_labels = [label] + [getattr(extra_array, 'name', None) for extra_array in list_extra_data_arrays]
     legend_labels = [label] + (extra_legend_labels if extra_legend_labels else [])
     unit = getattr(data_array, 'units', None) or unit
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     print(f'[reverse]Uniplot[/reverse]')
     try:
         plot(
@@ -163,7 +175,7 @@ def uniplot_solar_position_series(
 
     for model_name, model_result in solar_position_series.items():
         solar_incidence_series = model_result.get(INCIDENCE_NAME, numpy.array([]))
-        solar_incidence_label = label + f' {model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}'
+        solar_incidence_label = f'{model_result.get(INCIDENCE_NAME, NOT_AVAILABLE)} {model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}'
         individual_series = [
             model_result.get(solar_position_metric_name, numpy.array([]))
             for solar_position_metric_name, include in solar_position_metrics.items()
@@ -176,6 +188,8 @@ def uniplot_solar_position_series(
             for solar_position_metric_name, include in solar_position_metrics.items()
             if include and solar_position_metric_name != INCIDENCE_NAME
         ]
+        if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+            debug(locals())
 
         uniplot_data_array_series(
             data_array=solar_incidence_series,
@@ -185,7 +199,7 @@ def uniplot_solar_position_series(
             lines=True,
             supertitle=f'{supertitle} {model_name}',
             title=title,
-            label=solar_incidence_label,
+            label=solar_incidence_label if not label else label,
             extra_legend_labels=individual_metrics_labels,
             unit=model_result.get(UNITS_NAME, UNITLESS),
             terminal_width_fraction=terminal_width_fraction,
