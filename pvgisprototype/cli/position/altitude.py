@@ -33,9 +33,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
 
-from pvgisprototype.constants import CSV_PATH_DEFAULT, QUIET_FLAG_DEFAULT, RADIANS, DEGREES, TERMINAL_WIDTH_FRACTION, UNIPLOT_FLAG_DEFAULT
-from pvgisprototype.constants import ZENITH_NAME
-from pvgisprototype.constants import ALTITUDE_NAME
+from pvgisprototype.constants import CSV_PATH_DEFAULT, QUIET_FLAG_DEFAULT, TERMINAL_WIDTH_FRACTION, UNIPLOT_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -44,10 +42,8 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
-from math import radians
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pandas import DatetimeIndex
-from pandas import Timestamp
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -245,9 +241,9 @@ def altitude(
             # incidence=True,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle='Solar Declination Series',
-            title="Solar Declination",
-            label='Declination',
+            supertitle='Solar Altitude Series',
+            title="Solar Altitude",
+            label='Altitude',
             legend_labels=None,
             terminal_width_fraction=terminal_width_fraction,
         )
