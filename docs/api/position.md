@@ -182,8 +182,6 @@ Calculate solar azimuth time series for the 27th January 2010
 >>> calculate_solar_azimuth_series(
 ... longitude=radians(longitude),
 ... latitude=radians(latitude),
-... surface_orientation=radians(surface_orientation),
-... surface_tilt=radians(surface_tilt),
 ... timestamps=timestamps,
 ... timezone=ZoneInfo("UTC"),
 ... apply_atmospheric_refraction=True
@@ -198,8 +196,6 @@ and print or re-use it for further processing
 >>> solar_azimuth_series = calculate_solar_azimuth_series(
 ... longitude=radians(longitude),
 ... latitude=radians(latitude),
-... surface_orientation=radians(surface_orientation),
-... surface_tilt=radians(surface_tilt),
 ... timestamps=timestamps,
 ... timezone=ZoneInfo("UTC"),
 ... apply_atmospheric_refraction=True
