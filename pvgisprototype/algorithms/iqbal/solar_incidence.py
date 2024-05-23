@@ -222,6 +222,7 @@ def calculate_solar_incidence_series_iqbal(
     # If Φ is positive, then the limited Φ = 360 * F .
     # If Φ is negative, then the limited Φ = 360 - 360 *F.
 
+    # Remember all of the metadata ! Review-Me & Abstract-Me !
     solar_azimuth_series = SolarAzimuth(
         value=numpy.where(
             solar_azimuth_series.radians >= 0,
@@ -229,6 +230,9 @@ def calculate_solar_incidence_series_iqbal(
             2 * pi - (2 * pi * numpy.abs(fraction_series)),
         ),
         unit=RADIANS,
+        position_algorithm=solar_azimuth_series_north_based.position_algorithm,
+        timing_algorithm=solar_azimuth_series_north_based.timing_algorithm,
+        origin=solar_azimuth_series_north_based.origin,
     )
     # named 'projection' in pvlib
     cosine_solar_incidence_series = (
@@ -279,9 +283,10 @@ def calculate_solar_incidence_series_iqbal(
     return SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
-        positioning_algorithm=solar_zenith_series.position_algorithm,  #
-        timing_algorithm=solar_zenith_series.timing_algorithm,  #
+        position_algorithm=solar_zenith_series.position_algorithm,
+        timing_algorithm=solar_zenith_series.timing_algorithm,
         incidence_algorithm=SolarIncidenceModel.iqbal,
         definition=incidence_angle_definition,
         description=incidence_angle_description,
+        azimuth_origin=solar_azimuth_series.origin,
     )
