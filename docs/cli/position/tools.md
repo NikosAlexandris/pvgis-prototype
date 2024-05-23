@@ -29,13 +29,12 @@ tags:
     
     | Subcommand                                              | Description                                         |
     |---------------------------------------------------------|-----------------------------------------------------|
-    | :octicons-command-palette-24: [**`introduction`**]()    | A short primer on solar geometry                    |
-    | :octicons-command-palette-24: [**`overview`**]()        | ⦩⦬ Calculate solar position parameters              |
-    | :octicons-command-palette-24: [**`overview-series`**]() | ⦩⦬📈 Calculate series of solar position parameters  |
+    | :octicons-command-palette-24: [**`introduction`**]()    | i A short primer on solar geometry                    |
+    | :octicons-command-palette-24: [**`overview`**]()        | ⦩⦬📈Overview of solar position parameters            |
     | :octicons-command-palette-24: [**`declination`**]()     | ∢ Calculate the solar declination                   |
-    | :octicons-command-palette-24: [**`zenith`**]()          | Calculate the solar zenith                          |
     | :octicons-command-palette-24: [**`hour-angle`**]()      | 🕛 🌐 Calculate the hour angle (ω)                  |
     | :octicons-command-palette-24: [**`sun-rise-set`**]()    | 🌅 Calculate the hour angle (ω) at sun rise and set |
+    | :octicons-command-palette-24: [**`zenith`**]()          | ~⦩ Calculate the solar zenith                       |
     | :octicons-command-palette-24: [**`altitude`**]()        | ⦩ Calculate the solar altitude                      |
     | :octicons-command-palette-24: [**`azimuth`**]()         | ⦬ Calculate the solar azimuth                       |
     | :octicons-command-palette-24: [**`incidence`**]()       | ⭸ Calculate the solar incidence angle               |
