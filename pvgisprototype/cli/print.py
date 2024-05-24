@@ -62,7 +62,7 @@ from pvgisprototype.constants import (
 )
 
 
-def safe_get_value(dictionary, key, index, default='NA'):
+def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
     """
     Parameters
     ----------
@@ -80,6 +80,7 @@ def safe_get_value(dictionary, key, index, default='NA'):
 
     """
     value = dictionary.get(key, default)
+    # if isinstance(value, np.ndarray) and value.size > 1:
     if isinstance(value, (list, np.ndarray)) and len(value) > index:
         return value[index]
     return value
@@ -264,6 +265,38 @@ def style_value(value, style_if_negative='dim'):
     return None
 
 
+def get_scalar(value, index, places):
+    """Safely get a scalar value from an array or return the value itself """
+    if isinstance(value, np.ndarray) and value.size > 1:
+        return round(value[index].item(), places)
+    return round(value, places)
+
+
+def get_value_or_default(dictionary, key, default=None):
+    """Get a value from a dictionary or return a default value"""
+    return dictionary.get(key, default)
+
+
+def build_caption(longitude, latitude, rounded_table, timezone, user_requested_timezone):
+    first_model = next(iter(rounded_table))
+    caption = (
+        f"[underline]Position[/underline]  "
+        f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
+        f"Orientation : [bold blue]{rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None)}[/bold blue], "
+        f"Tilt : [bold blue]{rounded_table[first_model].get(SURFACE_TILT_NAME, None)}[/bold blue] "
+        f"[[dim]{rounded_table[first_model].get(UNITS_NAME, UNITLESS)}[/dim]]\n"
+        f"[underline]Algorithms[/underline]  "
+        f"Timing : [bold]{rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
+        f"Zone : {timezone}, "
+        f"Local zone : {user_requested_timezone if user_requested_timezone else 'N/A'}, "
+        f"Positioning: {rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)}, "
+        f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
+        f"Incidence: {rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)}, "
+        f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}"
+    )
+    return caption
+
+
 def print_solar_position_series_table(
     longitude,
     latitude,
@@ -271,14 +304,8 @@ def print_solar_position_series_table(
     timezone,
     table,
     position_parameters: Sequence[SolarPositionParameter] = SolarPositionParameter.all,
-    title = 'Solar position overview',
+    title='Solar position overview',
     index: bool = False,
-    timing=None,
-    declination=None,
-    hour_angle=None,
-    zenith=None,
-    altitude=None,
-    azimuth=None,
     surface_orientation=None,
     surface_tilt=None,
     incidence=None,
@@ -287,143 +314,90 @@ def print_solar_position_series_table(
     rounding_places=ROUNDING_PLACES_DEFAULT,
     group_models=False,
 ) -> None:
-    """
-    """
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
-
-    # quantities = [declination, zenith, altitude, azimuth, incidence]
 
     columns = []
     if index:
         columns.append("Index")
     if timestamps is not None:
         columns.append('Time')
-    # if user_requested_timestamps is not None and user_requested_timezone is not None:
-    #     columns.extend(["Local Time", "Local Zone"])
 
-    if declination is not None:
-        columns.append(DECLINATION_COLUMN_NAME)
-    if hour_angle is not None:
-        columns.append(HOUR_ANGLE_COLUMN_NAME)
-    # if any(quantity is not None for quantity in quantities):
-    #     columns.append(POSITIONING_ALGORITHM_COLUMN_NAME)
-    if zenith is not None:
-        columns.append(ZENITH_COLUMN_NAME)
-    if altitude is not None:
-        columns.append(ALTITUDE_COLUMN_NAME)
-    if azimuth is not None:
-        columns.append(AZIMUTH_COLUMN_NAME)
-    if incidence is not None:
-        columns.append(INCIDENCE_COLUMN_NAME)
+    for parameter in position_parameters:
+        if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
+            column = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
+            if isinstance(column, list):
+                columns.extend(column)
+            else:
+                columns.append(column)
 
-    # --------------------------------------------------------------- Use Me !
-    # for parameter in position_parameters:
-    #     if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
-    #         column = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
-    #         if isinstance(column, list):
-    #             columns.extend(column)
-    #         else:
-    #             columns.append(column)
-    # ------------------------------------------------------------------------
+    caption = build_caption(longitude, latitude, rounded_table, timezone, user_requested_timezone)
 
-    # Build a Caption
-
-    ## Position
-
-    caption = f"[underline]Position[/underline]  "
-    caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
-
-    # Should be the same in case of multiple models!
-    first_model = next(iter(rounded_table))
-
-    surface_orientation = rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None) if surface_orientation else None
-    caption += f"Orientation : [bold blue]{surface_orientation}[/bold blue], "
-
-    surface_tilt = rounded_table[first_model].get(SURFACE_TILT_NAME, None) if surface_tilt else None
-    caption += f"Tilt : [bold blue]{surface_tilt}[/bold blue] "
-
-    units = rounded_table[first_model].get(UNITS_NAME, UNITLESS)
-    caption += f"[[dim]{units}[/dim]]"
-
-    ## Algorithms
-
-    caption += f"\n[underline]Algorithms[/underline]  "
-
-    timing_algorithm = rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
-    caption += f"Timing : [bold]{timing_algorithm}[/bold], "
-    caption += f"Zone : {timezone}, "
-    if (
-        user_requested_timestamps is not None
-        and user_requested_timezone is not None
-    ):
-        caption += f"Local zone : {user_requested_timezone}, "
-           # [
-           #     str(user_requested_timestamps.get_loc(timestamp)),
-           #     str(user_requested_timezone),
-           # ]
-
-    solar_position_metrics = {
-        DECLINATION_NAME: declination,
-        HOUR_ANGLE_NAME: hour_angle,
-        ZENITH_NAME: zenith,
-        ALTITUDE_NAME: altitude,
-        AZIMUTH_NAME: azimuth,
-        INCIDENCE_NAME: incidence,
-    }
-    def add_solar_position_metrics_to_row(
-            row: list,
-            metrics: dict,
-            model_result: dict,
-            index: int,
-            ):
-        for solar_position_metric_name, include in metrics.items():
-            if include:
-                value = safe_get_value(model_result, solar_position_metric_name, index)
-                # styled_value = style_value(value) if value is not None else None
-                # row.append(styled_value or '-')
-                row.append(str(value) or '-')
-
-    # Iterate over each timestamp and its corresponding result
-    for model_name, model_result in rounded_table.items():
+    for _, model_result in rounded_table.items():
         model_caption = caption
-        position_algorithm = safe_get_value(model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
+        position_algorithm = get_value_or_default(model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
         model_caption += f"Positioning : [bold]{position_algorithm}[/bold], "
-
-        azimuth_origin = safe_get_value(model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)
+        azimuth_origin = get_value_or_default(model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)
         model_caption += f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "
-
-        incidence_algorithm = safe_get_value(model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
+        incidence_algorithm = get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
         model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
-
-        incidence_angle_definition = safe_get_value(model_result, INCIDENCE_DEFINITION, None) if incidence else None
+        incidence_angle_definition = get_value_or_default(model_result, INCIDENCE_DEFINITION, None) if incidence else None
         model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
-        table = Table(
+        table_obj = Table(
             *columns,
             title=title,
             caption=model_caption,
             box=SIMPLE_HEAD,
         )
-        
+
         for _index, timestamp in enumerate(timestamps):
             row = []
             if index:
                 row.append(str(_index))
             row.append(str(timestamp))
-            add_solar_position_metrics_to_row(
-                    row=row,
-                    metrics=solar_position_metrics,
-                    model_result=model_result,
-                    index=_index,
-            )
-            table.add_row(*row)
 
-            # if group_models:
-            #     table.add_row()
+            position_parameter_values = {
+                SolarPositionParameter.declination: lambda idx=_index: str(get_scalar(
+                    get_value_or_default(model_result, DECLINATION_NAME), idx, rounding_places
+                )),
+                SolarPositionParameter.timing: lambda idx=_index: str(get_value_or_default(
+                    model_result, TIME_ALGORITHM_NAME
+                )),
+                SolarPositionParameter.positioning: lambda idx=_index: str(get_value_or_default(
+                    model_result, POSITIONING_ALGORITHM_NAME
+                )),
+                SolarPositionParameter.hour_angle: lambda idx=_index: str(get_scalar(
+                    get_value_or_default(model_result, HOUR_ANGLE_NAME), idx, rounding_places
+                )),
+                SolarPositionParameter.zenith: lambda idx=_index: str(get_scalar(
+                    get_value_or_default(model_result, ZENITH_NAME), idx, rounding_places
+                )),
+                SolarPositionParameter.altitude: lambda idx=_index: str(get_scalar(
+                    get_value_or_default(model_result, ALTITUDE_NAME), idx, rounding_places
+                )),
+                SolarPositionParameter.azimuth: lambda idx=_index: str(get_scalar(
+                    get_value_or_default(model_result, AZIMUTH_NAME), idx, rounding_places
+                )),
+                SolarPositionParameter.incidence: lambda idx=_index: (
+                    str(get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME)),
+                    str(get_scalar(get_value_or_default(model_result, INCIDENCE_NAME), idx, rounding_places)),
+                ),
+            }
 
-        Console().print(table)
+
+            for parameter in position_parameters:
+                if parameter in position_parameter_values:
+                    value = position_parameter_values[parameter]()
+                    if isinstance(value, tuple):
+                        row.extend(value)
+                    else:
+                        row.append(value)
+
+            table_obj.add_row(*row)
+
+        Console().print(table_obj)
 
 
 def print_solar_position_table_panels(
