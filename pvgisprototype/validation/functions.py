@@ -33,7 +33,7 @@ from pvgisprototype.validation.pvis_data_classes import BaseTimeOutputUnitsModel
 from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeModel
 from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeSeriesModel
 from pvgisprototype.validation.pvis_data_classes import SolarDeclinationModel
-from pvgisprototype.validation.pvis_data_classes import SolarPositionModel
+from pvgisprototype.validation.pvis_data_classes import SolarPositionModelModel
 from pvgisprototype.validation.pvis_data_classes import SolarHourAngleModel
 from pvgisprototype.validation.pvis_data_classes import ComplementaryIncidenceAngleModel
 
@@ -329,7 +329,7 @@ class CalculateSolarAzimuthPVISInputModel(
 class ModelSolarAltitudeInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
     EarthOrbitModel,
@@ -340,7 +340,7 @@ class ModelSolarAltitudeInputModel(
 class ModelSolarAltitudeTimeSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     # ArrayBackendModel,
@@ -353,7 +353,7 @@ class ModelSolarAltitudeTimeSeriesInputModel(
 class ModelSolarAzimuthInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
     VerbosityModel,
@@ -365,7 +365,7 @@ class ModelSolarAzimuthInputModel(
 class ModelSolarAzimuthTimeSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     # ArrayBackendModel,
@@ -380,7 +380,7 @@ class ModelSolarGeometryOverviewInputModel(
     BaseTimeModel,
     SurfaceOrientationModel,
     SurfaceTiltModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
     EarthOrbitModel,
@@ -395,7 +395,7 @@ class ModelSolarGeometryOverviewTimeSeriesInputModel(
     BaseTimeSeriesModel,
     SurfaceOrientationModel,
     SurfaceTiltModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     SolarTimeModelModel,
     # SolarIncidenceModel,
     ApplyAtmosphericRefractionModel,
