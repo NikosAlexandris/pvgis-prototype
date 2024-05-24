@@ -93,8 +93,7 @@ def incidence(
     solar_incidence_model: Annotated[List[SolarIncidenceModel], typer_option_solar_incidence_model] = [SolarIncidenceModel.iqbal],
     complementary_incidence_angle: Annotated[bool, typer_option_sun_to_surface_plane_incidence_angle] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
-    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] =
-    [SolarPositionParameter.incidence],
+    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] = [SolarPositionParameter.incidence],
     zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -155,10 +154,10 @@ def incidence(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        solar_incidence_models=solar_incidence_models,
-        complementary_incidence_angle=complementary_incidence_angle,
         surface_orientation=SurfaceOrientation(value=surface_orientation, unit=RADIANS),  # Typer does not easily support custom types !
         surface_tilt=SurfaceTilt(value=surface_tilt, unit=RADIANS),  # Typer does not easily support custom types !
+        solar_incidence_models=solar_incidence_models,
+        complementary_incidence_angle=complementary_incidence_angle,
         zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
         # solar_time_model=solar_time_model,
         eccentricity_correction_factor=eccentricity_correction_factor,
@@ -237,8 +236,8 @@ def incidence(
             #         )
 
     if csv:
-        from pvgisprototype.cli.write import write_solar_incidence_series_csv
-        write_solar_incidence_series_csv(
+        from pvgisprototype.cli.write import write_solar_position_series_csv
+        write_solar_position_series_csv(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -264,16 +263,10 @@ def incidence(
         from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
             solar_position_series=solar_incidence_series,
-            timing=True,
+            position_parameters=solar_position_parameters,
             timestamps=timestamps,
-            # declination=True,
-            # hour_angle=True,
-            # zenith=True,
-            altitude=None,
-            azimuth=None,
             surface_orientation=None,
             surface_tilt=None,
-            incidence=True,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle='Solar Position Series',
@@ -281,4 +274,5 @@ def incidence(
             label='Incidence',
             legend_labels=None,
             terminal_width_fraction=terminal_width_fraction,
+            verbose=verbose,
         )
