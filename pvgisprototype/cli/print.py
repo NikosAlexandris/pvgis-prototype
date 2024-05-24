@@ -381,11 +381,9 @@ def print_solar_position_series_table(
                     get_value_or_default(model_result, AZIMUTH_NAME), idx, rounding_places
                 )),
                 SolarPositionParameter.incidence: lambda idx=_index: (
-                    str(get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME)),
                     str(get_scalar(get_value_or_default(model_result, INCIDENCE_NAME), idx, rounding_places)),
                 ),
             }
-
 
             for parameter in position_parameters:
                 if parameter in position_parameter_values:
