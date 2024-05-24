@@ -14,16 +14,43 @@ tags:
     various commands, required arguments and optional parameters
     as well as some insight into generating arbitrary series of Timestamps.
 
+<div class="grid cards" markdown>
+
+- :material-at: __Generic structure__
+
+    ---
+
+    ```bash
+    pvgis-prototype <command> <sub-command> <sub-sub-command> \
+        <1> <2> <3> [4] [5] \
+        <--option-a 'a'> <--option-b 'b'>
+    ```
+
+- :material-puzzle-plus: __Positional parameters__
+
+    - No prefixing
+
+    - Strict pre-specified order
+
+    - `<1>`, `<2>` and `<3>` are ***required*** for <Longitude> <Latitude> <Elevation>
+
+    - `[4]` and `[5]` are ***optional*** for [Orientation] [Tilt]
+
+</div>
+
 ## Generic Structure
 
 The fundamental structure of the command line interface is
 a `command` and a `sub-command`
 _following_ the name of the program **`pvgis-prototype`**
-and a series of _required positional_, _optional positional_
-and _named optional_ input parameters. Like so :
+and a series of __required__ _positional_, __optional__ _positional_
+and __named__ _optional_ input parameters. Like so :
 
 ```bash
-pvgis-prototype <command> <sub-command> <1> <2> <3> [4] [5] <--option-a 'a'> <--option-b 'b'>
+pvgis-prototype <command> <sub-command> \
+    <1> <2> <3> \
+    [4] [5] \
+    <--option-a 'a'> <--option-b 'b'>
 ```
 
 !!! example
@@ -36,6 +63,9 @@ pvgis-prototype <command> <sub-command> <1> <2> <3> [4] [5] <--option-a 'a'> <--
 
     - `power` is the command
     - `broadband` a sub-command
+    - `8 45` are the Longitude and Latitude
+    - `214` is the Elevation
+    - `170 44` are the Orientation and Tilt angles
 
 Several commands feature chained `sub-sub-commands`.
 The structure remains the same and a `sub-command` `sub-sub-commands`
@@ -95,7 +125,7 @@ is the **pair of `orientation` and `tilt` angles**
 of the solar surface in question.
 
 ``` bash
-pvgis-prototype <command> <Longitude> <Latitude> <Elevation> <Orientation> <Tilt>
+pvgis-prototype <command> <Longitude> <Latitude> <Elevation> [Orientation] [Tilt]
 ```
 
 If not provided,
@@ -132,7 +162,7 @@ pvgis-prototype <command> <Longitude> <Latitude> <Elevation> <Orientation> <Tilt
 
 ### Without a timestamp
 
-Example that works with all positional parameters yet without a timestamp:
+Example that works with all positional parameters yet _without_ a timestamp :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined 8 45 214 170 44
@@ -147,7 +177,7 @@ by adding some verbosity :
 pvgis-prototype irradiance global inclined 8 45 214 170 44 -v
 ```
 
-!!! question "Where did this timestamp came from?"
+!!! question "Where did this timestamp came from ?"
 
     The timestamp in the above command
     is the one of this very example's execution time
@@ -155,7 +185,7 @@ pvgis-prototype irradiance global inclined 8 45 214 170 44 -v
 
 ### Single timestamp
 
-Example that works with all positional parameters including a timestamp:
+Example that works with all positional parameters _including_ a timestamp:
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00'
@@ -177,7 +207,7 @@ pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00,
 
 ### Mixing optional parameters
 
-``` bash exec="true" result="ansi"
+``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined \
     8 45 214 170 44 \
     '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
@@ -187,7 +217,7 @@ pvgis-prototype irradiance global inclined \
 
 is the same as
 
-``` bash exec="true" result="ansi"
+``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined \
     8 45 214 170 44 \
     '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
@@ -197,7 +227,7 @@ pvgis-prototype irradiance global inclined \
 
 One more example _mixing_ the order of options
 
-``` bash exec="true" result="ansi"
+``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined \
     8 45 214 170 44 \
     '2010-01-27 12:00:00, 2010-01-27 13:30:00' \
