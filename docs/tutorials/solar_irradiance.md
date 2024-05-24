@@ -163,7 +163,7 @@ $$
 
     Equation 3-6 from  https://www.cmsaf.eu/SharedDocs/Literatur/document/2023/saf_cm_dwd_pum_meteosat_hel_sarah_3_3_pdf.pdf?__blob=publicationFile.
 
-1. First, let's get the _zenith__ angle in radians
+1. First, let's get the _zenith_ angle in radians
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype position zenith \

@@ -1,11 +1,12 @@
 from enum import Enum
-from typing import Type
+from typing import Sequence, Type
 from typing import List
-from typing import Union
 import typer
 
+from pvgisprototype.constants import ALTITUDE_COLUMN_NAME, ALTITUDE_NAME, AZIMUTH_COLUMN_NAME, AZIMUTH_NAME, DECLINATION_COLUMN_NAME, DECLINATION_NAME, HOUR_ANGLE_COLUMN_NAME, HOUR_ANGLE_NAME, INCIDENCE_ALGORITHM_NAME, INCIDENCE_COLUMN_NAME, INCIDENCE_NAME, POSITION_ALGORITHM_NAME, POSITIONING_ALGORITHM_COLUMN_NAME, TIME_ALGORITHM_COLUMN_NAME, TIME_ALGORITHM_NAME, ZENITH_COLUMN_NAME, ZENITH_NAME
 
-def select_models(enum_type: Type[Enum], models: List[Enum]) -> List[Enum]:
+
+def select_models(enum_type: Type[Enum], models: List[Enum]) -> Sequence[Enum]:
     """Select models from an enum list."""
     if enum_type.all in models:
         return [model for model in enum_type if model != enum_type.all]
@@ -21,6 +22,30 @@ def validate_model(enum_type: Type[Enum], model: List[Enum]) -> Enum:
     return model
 
 
+class SolarPositionParameter(str, Enum):
+    all = 'all'
+    timing = TIME_ALGORITHM_NAME
+    declination = DECLINATION_NAME
+    hour_angle = HOUR_ANGLE_NAME
+    positioning = POSITION_ALGORITHM_NAME
+    zenith = ZENITH_NAME
+    altitude = ALTITUDE_NAME
+    azimuth = AZIMUTH_NAME
+    incidence = INCIDENCE_NAME
+    overview = 'Overview'
+
+
+SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
+    SolarPositionParameter.timing: TIME_ALGORITHM_COLUMN_NAME,
+    SolarPositionParameter.declination: DECLINATION_COLUMN_NAME,
+    SolarPositionParameter.hour_angle: HOUR_ANGLE_COLUMN_NAME,
+    SolarPositionParameter.positioning: POSITIONING_ALGORITHM_COLUMN_NAME,
+    SolarPositionParameter.zenith: ZENITH_COLUMN_NAME,
+    SolarPositionParameter.altitude: ALTITUDE_COLUMN_NAME,
+    SolarPositionParameter.azimuth: AZIMUTH_COLUMN_NAME,
+    SolarPositionParameter.incidence: [INCIDENCE_ALGORITHM_NAME, INCIDENCE_COLUMN_NAME],
+}
+
 class SolarTimeModel(str, Enum):
     all = 'all'
     ephem = 'ephem'
@@ -32,7 +57,6 @@ class SolarTimeModel(str, Enum):
 
 class SolarDeclinationModel(str, Enum):
     all = 'all'
-    # pvgis = 'PVGIS'
     hargreaves = 'Hargreaves'
     noaa = 'NOAA'
     pvis = 'PVIS'
@@ -42,8 +66,7 @@ class SolarDeclinationModel(str, Enum):
 class SolarPositionModel(str, Enum):
     all = 'all'
     noaa = 'NOAA'
-    # pvgis = 'PVGIS'
-    pvis = 'PVIS'
+    hofierka = 'Hofierka'
     jenco = 'Jenco'
     pvlib = 'pvlib'
     pysolar = 'pysolar'
@@ -53,6 +76,7 @@ class SolarPositionModel(str, Enum):
 
 class SolarIncidenceModel(str, Enum):
     all = 'all'
+    hofierka = 'Hofierka 2002'
     jenco = 'Jenco'
     iqbal = 'Iqbal'  # NREL
     pvis = 'PVIS'

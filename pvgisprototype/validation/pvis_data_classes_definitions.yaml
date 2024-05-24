@@ -103,6 +103,9 @@ TrueSolarTime:
   max_minutes:
     type: float
     initial: 1580
+  timing_algorithm:
+    type: str
+    initial:
 
 SolarHourAngle:
   value:
@@ -175,6 +178,9 @@ FractionalYear:
   max_degrees:
     type: float
     initial: 360
+  position_algorithm:
+    type: str
+    initial:
 
 SolarDeclination:
   value:
@@ -381,16 +387,19 @@ SolarIncidence:
     initial:
   definition:  # short definition for tabular outputs
     type: str
-    initial: "Sun-to-Surface-Normal"
+    initial: "Sun-Vector-to-Surface-Normal"
   definition_complementary:
     type: str
-    initial: "Sun-to-Surface-Plane"
+    initial: "Sun-Vector-to-Surface-Plane"
   description:
     type: str
     initial: "The angle between the position of the sun (sun-vector) and the normal to the surface (surface-normal). Alternative definitions measure the complementary angle between the sun-vector and the inclination of the surface in question."
   description_complementary:
     type: str
     initial: "The 'complementary' incidence angle between the position of the sun in the sky (sun-vector) and the inclination of the surface in question (surface-plane)."
+  azimuth_origin:
+    type: str
+    initial:
       
 
 # How ?
@@ -434,6 +443,18 @@ SurfaceOrientation:
   unit:
     type: str
     initial: 'degrees'
+  min_radians:
+    type: float
+    initial: 0
+  max_radians:
+    type: float
+    initial: 6.283185307179586
+  min_degrees:
+    type: float
+    initial: 0
+  max_degrees:
+    type: float
+    initial: 360
 
 SurfaceTilt:
   value:
@@ -442,6 +463,18 @@ SurfaceTilt:
   unit:
     type: str
     initial: 'degrees'
+  min_radians:
+    type: float
+    initial: 0
+  max_radians:
+    type: float
+    initial: 1.5707963267948966
+  min_degrees:
+    type: float
+    initial: 0
+  max_degrees:
+    type: float
+    initial: 90
 
 # Irradiance ?
 

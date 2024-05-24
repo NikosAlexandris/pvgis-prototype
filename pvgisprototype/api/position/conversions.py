@@ -1,20 +1,19 @@
 from typing import Protocol
 from math import pi
 
+import numpy
+from numpy.typing import NDArray
+
+
 class HasRadians(Protocol):
     @property
     def radians(self) -> float:
         ...
 
 
-def convert_east_to_north_radians_convention(azimuth_east_radians):
-    # return (pi/2 - east_based_angle + 360) % 360
-    return (azimuth_east_radians + 3 * pi / 2) % (2 * pi)
-
-
 def convert_north_to_east_radians_convention(
     north_based_angle: HasRadians
-) -> float:
+) -> NDArray:
     """Convert an azimuth angle from North-based to East-based radians.
     
     Parameters
@@ -31,12 +30,12 @@ def convert_north_to_east_radians_convention(
     -----
     This conversion subtracts π/2 from the angle and takes modulo 2π.
     """
-    return (north_based_angle.radians - pi / 2) % (2 * pi)
+    return numpy.mod((north_based_angle.radians - pi / 2), 2 * pi)
 
 
 def convert_north_to_south_radians_convention(
     north_based_angle: HasRadians
-) -> float:
+) -> NDArray:
     """Convert an azimuth angle from North-based to South-based radians.
     
     Parameters
@@ -53,12 +52,12 @@ def convert_north_to_south_radians_convention(
     -----
     This conversion subtracts π from the angle and takes modulo 2π.
     """
-    return (north_based_angle.radians - pi) % (2 * pi)
+    return numpy.mod((north_based_angle.radians - pi), 2 * pi)
 
 
 def convert_east_to_north_radians_convention(
-    azimuth_east_radians: float
-) -> float:
+    east_based_angle: NDArray,
+) -> NDArray:
     """Convert an azimuth from East-based to North-based radians.
     
     Parameters
@@ -75,4 +74,4 @@ def convert_east_to_north_radians_convention(
     -----
     This conversion adds 3π/2 to the angle and takes modulo 2π.
     """
-    return (azimuth_east_radians + 3 * pi / 2) % (2 * pi)
+    return numpy.mod((east_based_angle + 3 * pi / 2), 2 * pi)

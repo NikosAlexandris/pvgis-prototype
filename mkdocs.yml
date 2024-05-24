@@ -25,6 +25,7 @@ nav:
     - tutorials/solar_position.md
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
+    - notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
   - CLI:
     - cli/index.md
     - cli/features.md
@@ -309,6 +310,9 @@ plugins:
             signature_crossrefs: true
             summary: true
             show_bases: true
+  - mkdocs-jupyter:
+          execute: true
+          include_source: True
 
 # extra:
 #   social:

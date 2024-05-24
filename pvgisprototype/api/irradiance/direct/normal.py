@@ -14,21 +14,7 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from math import sin
-from math import asin
-from math import cos
-from math import atan
 import numpy as np
-from numpy import ndarray
-from typing import Annotated
-from typing import Optional
-from typing import Union
-from typing import Sequence
-from typing import List
-from pathlib import Path
 from pvgisprototype import SolarAltitude
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import OpticalAirMass
@@ -42,39 +28,21 @@ from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSerie
 from pvgisprototype.api.position.models import validate_model
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
-from pvgisprototype.api.irradiance.direct.linke_turbidity_factor import correct_linke_turbidity_factor_time_series
-from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import calculate_rayleigh_optical_thickness_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+from pvgisprototype.api.irradiance.direct.linke_turbidity_factor import correct_linke_turbidity_factor_series
+from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import calculate_rayleigh_optical_thickness_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
-# from pvgisprototype.api.utilities.progress import progress
-# from rich.progress import Progress
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
-from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import SOLAR_CONSTANT_COLUMN_NAME
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -101,27 +69,13 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import IRRADIANCE_SOURCE_COLUMN_NAME
 from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
-from pvgisprototype.constants import LONGITUDE_COLUMN_NAME
-from pvgisprototype.constants import LATITUDE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE
 from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import LOSS_COLUMN_NAME
-from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
-from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
-from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
-from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
-from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
-from pvgisprototype.constants import INCIDENCE_DEFINITION
-from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
-from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
-from rich import print
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
@@ -130,7 +84,7 @@ from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
-def calculate_direct_normal_irradiance_time_series(
+def calculate_direct_normal_irradiance_series(
     timestamps: DatetimeIndex = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     optical_air_mass_series: OpticalAirMass = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT], # REVIEW-ME + ?
@@ -162,7 +116,7 @@ def calculate_direct_normal_irradiance_time_series(
 
     """
     extraterrestrial_normal_irradiance_series = (
-        calculate_extraterrestrial_normal_irradiance_time_series(
+        calculate_extraterrestrial_normal_irradiance_series(
             timestamps=timestamps,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
@@ -171,11 +125,11 @@ def calculate_direct_normal_irradiance_time_series(
             array_backend=array_backend,
         )
     )
-    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_time_series(
+    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_series(
         linke_turbidity_factor_series,
         verbose=verbose,
     )
-    rayleigh_optical_thickness_series = calculate_rayleigh_optical_thickness_time_series(
+    rayleigh_optical_thickness_series = calculate_rayleigh_optical_thickness_series(
         optical_air_mass_series,
         verbose=verbose,
     )  # _quite_ high when the sun is below the horizon. Makes sense ?
