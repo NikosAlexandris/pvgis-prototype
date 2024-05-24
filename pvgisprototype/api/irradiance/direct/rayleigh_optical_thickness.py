@@ -14,21 +14,7 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from math import sin
-from math import asin
-from math import cos
-from math import atan
 import numpy as np
-from numpy import ndarray
-from typing import Annotated
-from typing import Optional
-from typing import Union
-from typing import Sequence
-from typing import List
-from pathlib import Path
 from pvgisprototype import SolarAltitude
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import OpticalAirMass
@@ -46,21 +32,16 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
-# from pvgisprototype.api.utilities.progress import progress
-# from rich.progress import Progress
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.cli.print import print_irradiance_table_2
@@ -115,11 +96,8 @@ from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
-from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
-from pvgisprototype.validation.hashing import generate_hash
-from rich import print
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
@@ -164,7 +142,7 @@ def adjust_elevation(
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
-def calculate_refracted_solar_altitude_time_series(
+def calculate_refracted_solar_altitude_series(
     solar_altitude_series: SolarAltitude,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -218,7 +196,7 @@ def calculate_refracted_solar_altitude_time_series(
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateOpticalAirMassTimeSeriesInputModel)
-def calculate_optical_air_mass_time_series(
+def calculate_optical_air_mass_series(
     elevation: float,
     refracted_solar_altitude_series: RefractedSolarAltitude,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -275,7 +253,7 @@ def calculate_optical_air_mass_time_series(
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
-def calculate_rayleigh_optical_thickness_time_series(
+def calculate_rayleigh_optical_thickness_series(
     optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,

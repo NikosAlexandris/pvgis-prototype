@@ -12,7 +12,7 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shortwave.horizontal import calculate_global_horizontal_irradiance_time_series
+from pvgisprototype.api.irradiance.shortwave.horizontal import calculate_global_horizontal_irradiance_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_elevation
@@ -91,7 +91,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 @log_function_call
-def get_global_horizontal_irradiance_time_series(
+def get_global_horizontal_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -120,6 +120,7 @@ def get_global_horizontal_irradiance_time_series(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -134,7 +135,7 @@ def get_global_horizontal_irradiance_time_series(
     radiation received from above by a surface horizontal to the ground. It
     includes both the direct and the diffuse solar radiation.
     """
-    global_horizontal_irradiance_series = calculate_global_horizontal_irradiance_time_series(
+    global_horizontal_irradiance_series = calculate_global_horizontal_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -196,15 +197,17 @@ def get_global_horizontal_irradiance_time_series(
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=global_horizontal_irradiance_series.value,
             list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
             supertitle = 'Global Horizontal Irradiance Series',
             title = 'Global Horizontal Irradiance Series',
             label = 'Global Horizontal Irradiance',
-            label_2 = None,
+            extra_legend_labels=None,
             unit = IRRADIANCE_UNITS,
             terminal_width_fraction=terminal_width_fraction,
         )

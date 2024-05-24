@@ -63,7 +63,7 @@ Now that we have an overview,
 let's start with the basics :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype position overview-series \
+pvgis-prototype position overview \
     8.628 45.812 180 45 \
     '2010-01-17 12:00' \
     -aou degrees
@@ -74,7 +74,7 @@ pvgis-prototype position overview-series \
     **The command**
     
     ``` bash
-    pvgis-prototype position overview-series \
+    pvgis-prototype position overview \
     8.628 45.812 180 45 \
     '2010-01-17 12:00' \
     -aou degrees
@@ -82,7 +82,7 @@ pvgis-prototype position overview-series \
 
     **reads** :
 
-    - execute `pvgis-prototype` command `position` and sub-command `overview-series`
+    - execute `pvgis-prototype` command `position` and sub-command `overview`
     - set
         - the longitude to `8.628` and the latitude to `45.812`
         - the surface (panel) orientation to `180` and the tilt to `45` degrees
@@ -95,7 +95,7 @@ pvgis-prototype position overview-series \
     of `-aou` is required to get the reported numbers in degrees. Without it :
 
     ``` bash exec="true" result="ansi" source="material-block"
-    pvgis-prototype position overview-series \
+    pvgis-prototype position overview \
     8.628 45.812 180 45 \
     '2010-01-17 12:00'
     ```
@@ -163,35 +163,26 @@ where as the _Sun-to-Surface-Normal_
 we call it the _typical_ incidence angle.
 
 To get the _typical_ solar incidence angle,
-one can use the optional flag `--no-complementary-incidence-angle` like so :
+one can use the optional flag `--sun-to-surface-normal`
+(or even `--sun-to-normal`) like so :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype position overview-series \
+pvgis-prototype position overview \
     8.628 45.812 180 45 \
     '2010-01-17 12:00' \
     -aou degrees \
-    --no-complementary-incidence-angle
+    --sun-to-surface-normal
 ```
-<!-- returns -->
-<!--                                          Solar geometry overview -->
-
-<!--   Time                  Declination ∢   Hour Angle 🕛   Zenith ⦭   Altitude ⦩   Azimuth ⭮   Incidence ⦡ -->
-<!--  ─────────────────────────────────────────────────────────────────────────────────────────────────────── -->
-<!--   2010-01-17 12:00:00   -20.9036        6.29694         66.92272   23.07728     174.11928   21.0114 -->
-
-<!-- Position  Longitude ϑ, Latitude ϕ = 8.62800, 45.81200, Orientation : 180.00000, Tilt : 45.00000 [degrees] -->
-<!--      Algorithms  Timing : NOAA, Zone : UTC, Local zone : UTC, Positioning : NOAA, Incidence angle : -->
-<!--                                           Sun-to-Surface-Normal -->
 
 ## Time series
 
-The power of `overview-series`
+The power of `overview`
 is exactly its capability to generate time series.
 
 It suffices to provide a `start-time` and an `end-time` :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype position overview-series \
+pvgis-prototype position overview \
     8.628 45.812 180 45 \
     --start-time '2010-01-17 06:00:00' \
     --end-time '2010-01-17 18:00:00' \
@@ -202,7 +193,7 @@ And what about every 30 minutes ?
 Ask this via the `--frequency` option :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype position overview-series \
+pvgis-prototype position overview \
     8.628 45.812 180 45 \
     --start-time '2010-01-17 06:00:00' \
     --end-time '2010-01-17 18:00:00' \
@@ -214,10 +205,36 @@ Maybe we want shorter figures ?
 We can limit the output numbers to 2 decimals :
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype position overview-series \
+pvgis-prototype position overview \
     8.628 45.812 180 45 \
     --start-time '2010-01-17 06:00:00' \
     --end-time '2010-01-17 18:00:00' \
     -aou degrees \
     -r 2
+```
+
+## Uniplot
+
+We can also have a visual overview via the `--uniplot` option :
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype position overview \
+    8.628 45.812 180 45 \
+    --start-time '2010-01-17 06:00:00' \
+    --end-time '2010-01-17 18:00:00' \
+    -aou degrees \
+    --quiet \
+    --uniplot
+```
+
+We can _zoom-out_ a bit to gain a better understanding :
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype position overview \
+    8.628 45.812 180 45 \
+    --start-time '2010-01-17' \
+    --end-time '2010-01-18' \
+    -aou degrees \
+    --quiet \
+    --uniplot
 ```

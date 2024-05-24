@@ -1,14 +1,7 @@
 from devtools import debug
-from datetime import datetime
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateSolarDeclinationNOAAInput
-from pvgisprototype.validation.functions import CalculateSolarDeclinationNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarDeclinationTimeSeriesNOAAInput
-from .fractional_year import calculate_fractional_year_noaa 
-from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa
-from math import sin
-from math import cos
-from math import isfinite
+from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_series_noaa
 import numpy as np
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import RADIANS
@@ -27,51 +20,17 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
-@validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
-def calculate_solar_declination_noaa(
-    timestamp: datetime,
-) -> SolarDeclination:
-    """Calculate the solar declination angle in radians"""
-    fractional_year = calculate_fractional_year_noaa(
-        timestamp=timestamp,
-    )
-    declination = (
-        0.006918
-        - 0.399912 * cos(fractional_year.radians)
-        + 0.070257 * sin(fractional_year.radians)
-        - 0.006758 * cos(2 * fractional_year.radians)
-        + 0.000907 * sin(2 * fractional_year.radians)
-        - 0.002697 * cos(3 * fractional_year.radians)
-        + 0.00148 * sin(3 * fractional_year.radians)
-        )
-    solar_declination = SolarDeclination(
-        value=declination,
-        unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA'
-    )
-    if (
-        not isfinite(solar_declination.degrees)
-        or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
-            [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
-        )
-    return solar_declination
-
-
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)
-def calculate_solar_declination_time_series_noaa(
+def calculate_solar_declination_series_noaa(
     timestamps: DatetimeIndex,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarDeclination:
-    """
+    """Calculate the solar declination for a time series.
 
     Notes
     -----
@@ -97,9 +56,8 @@ def calculate_solar_declination_time_series_noaa(
 
        Q2 = Mean Obliq Ecliptic (deg)
 
-
     """
-    fractional_year_series = calculate_fractional_year_time_series_noaa(
+    fractional_year_series = calculate_fractional_year_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
@@ -129,6 +87,7 @@ def calculate_solar_declination_time_series_noaa(
             f"[{SolarDeclination().min_degrees}, {SolarDeclination().max_degrees}] degrees"
             f" in [code]solar_declination_series[/code] : {np.degrees(out_of_range_values)}"
         )
+
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -141,6 +100,5 @@ def calculate_solar_declination_time_series_noaa(
     return SolarDeclination(
         value=solar_declination_series,
         unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
+        position_algorithm=fractional_year_series.position_algorithm,
     )

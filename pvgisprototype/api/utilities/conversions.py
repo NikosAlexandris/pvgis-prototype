@@ -60,6 +60,7 @@ def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
     if output_units == DEGREES and not data_class.unit == DEGREES:
         copy_of_data_class.value = degrees(data_class.value)
         copy_of_data_class.unit = DEGREES
+
     return copy_of_data_class
 
 
@@ -211,11 +212,17 @@ def convert_dictionary_to_table(dictionary):
 
 def round_float_values(obj, decimal_places=3):
     """Recursively round float attributes in a custom data class or any float."""
-    if isinstance(obj, float) or (isinstance(obj, np.floating)):
+    if isinstance(obj, float):
         return round(obj, decimal_places)
 
+    if (isinstance(obj, np.floating)):
+        return np.around(obj, decimals=decimal_places)  # See also Notes in numpy.round?
+
     if isinstance(obj, np.ndarray) and obj.dtype.kind in "if":
-        return np.around(obj, decimals=decimal_places)
+        if not obj.size == 1:
+            return np.around(obj, decimals=decimal_places)  # See also Notes in numpy.round?
+        else:
+            return np.format_float_positional(obj, precision=decimal_places)
 
     if isinstance(obj, dict):
         return {key: round_float_values(value, decimal_places) for key, value in obj.items() if not isinstance(value, Enum)}

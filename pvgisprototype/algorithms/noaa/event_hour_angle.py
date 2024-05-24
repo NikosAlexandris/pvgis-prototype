@@ -5,26 +5,48 @@ from datetime import datetime
 # from math import acos
 import numpy as np
 from typing import Union, Sequence
+<<<<<<< HEAD
 from pandas import DatetimeIndex
+||||||| 4cd84259
+=======
+from pandas import DatetimeIndex
+from pvgisprototype.api.position.models import SolarTimeModel
+>>>>>>> main
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventHourAngleNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventHourAngleTimeSeriesNOAAInput
 from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import EventHourAngle
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 
-@validate_with_pydantic(CalculateEventHourAngleNOAAInput)
-def calculate_event_hour_angle_noaa(
-        latitude: Latitude, # radians
-        timestamp: datetime,
-        refracted_solar_zenith: RefractedSolarZenith,
-    ) -> EventHourAngle:
+
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
+@validate_with_pydantic(CalculateEventHourAngleTimeSeriesNOAAInput)
+def calculate_event_hour_angle_time_series_noaa(
+    latitude: Latitude,
+    timestamps: DatetimeIndex,
+    refracted_solar_zenith: RefractedSolarZenith,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+) -> EventHourAngle:
     """
     Calculates the event hour angle using the NOAA method.
 
@@ -67,38 +89,29 @@ def calculate_event_hour_angle_noaa(
     Commented out: If the output units are 'degrees', the function
     will convert the calculated event hour angle from radians to degrees.
     """
-    solar_declination = calculate_solar_declination_noaa(
-            timestamp=timestamp,
-            )  # radians
-    cosine_event_hour_angle = np.cos(refracted_solar_zenith.radians) / (
-        np.cos(latitude.radians) * np.cos(solar_declination.radians)
-    ) - np.tan(latitude.radians) * np.tan(solar_declination.radians)
-    event_hour_angle = np.arccos(cosine_event_hour_angle)  # radians
-    event_hour_angle = EventHourAngle(value=event_hour_angle, unit=RADIANS)
-
-    return event_hour_angle
-
-
-@validate_with_pydantic(CalculateEventHourAngleTimeSeriesNOAAInput)
-def calculate_event_hour_angle_time_series_noaa(
-    latitude: Latitude, # radians
-    timestamps: DatetimeIndex,
-    refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
-) -> EventHourAngle:
-    """
-    """
-    solar_declination = calculate_solar_declination_time_series_noaa(
+    solar_declination_series = calculate_solar_declination_time_series_noaa(
         timestamps=timestamps,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
     )  # radians
-    cosine_event_hour_angle = np.cos(refracted_solar_zenith.radians) / (
-        np.cos(latitude.radians) * np.cos(solar_declination.radians)
-    ) - np.tan(latitude.radians) * np.tan(solar_declination.radians)
-    event_hour_angle = np.arccos(np.clip(cosine_event_hour_angle, -1, 1))  # radians
-    event_hour_angle = event_hour_angle.astype(dtype)
+    cosine_event_hour_angle_series = np.cos(refracted_solar_zenith.radians) / (
+        np.cos(latitude.radians) * np.cos(solar_declination_series.radians)
+    ) - np.tan(latitude.radians) * np.tan(solar_declination_series.radians)
+    event_hour_angle_series = np.arccos(cosine_event_hour_angle_series)  # radians
 
-    return EventHourAngle(value=event_hour_angle, 
-                        unit=RADIANS)
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    log_data_fingerprint(
+        data=event_hour_angle_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+
+    return EventHourAngle(
+            value=event_hour_angle_series,
+            unit=RADIANS,
+            timing_algorithm=SolarTimeModel.noaa,
+            )
