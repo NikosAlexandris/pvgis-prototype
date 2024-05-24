@@ -58,6 +58,7 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 from pvgisprototype.cli.typer.output import typer_option_panels_output
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 
 
 @log_function_call
@@ -128,7 +129,7 @@ def altitude(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # angle_output_units=angle_output_units,
+        angle_output_units=angle_output_units,
         array_backend=array_backend,
         dtype=dtype,
         verbose=verbose,
