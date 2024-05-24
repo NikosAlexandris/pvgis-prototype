@@ -40,7 +40,7 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
 
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT, CSV_PATH_DEFAULT, DATA_TYPE_DEFAULT, RADIANS, RANDOM_TIMESTAMPS_FLAG_DEFAULT, TERMINAL_WIDTH_FRACTION, UNIPLOT_FLAG_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT, CSV_PATH_DEFAULT, DATA_TYPE_DEFAULT, RADIANS, RANDOM_TIMESTAMPS_FLAG_DEFAULT, TERMINAL_WIDTH_FRACTION, UNIPLOT_FLAG_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -95,6 +95,7 @@ def incidence(
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] =
     [SolarPositionParameter.incidence],
+    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
@@ -158,6 +159,7 @@ def incidence(
         complementary_incidence_angle=complementary_incidence_angle,
         surface_orientation=SurfaceOrientation(value=surface_orientation, unit=RADIANS),  # Typer does not easily support custom types !
         surface_tilt=SurfaceTilt(value=surface_tilt, unit=RADIANS),  # Typer does not easily support custom types !
+        zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
         # solar_time_model=solar_time_model,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
