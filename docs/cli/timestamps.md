@@ -65,25 +65,25 @@ pvgis-prototype power broadband 8 45 214 -v
 ### Start and end dates
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 --start-time '2010-01-27' --end-time '2010-01-28'
+pvgis-prototype power broadband 8 45 214 180 45 --start-time '2010-01-27' --end-time '2010-01-28'
 ```
 
 ### Start and end date-times
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' -v
+pvgis-prototype power broadband 8 45 214 180 45 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' -v
 ```
 
 ### Frequency
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' --frequency 30min -v
+pvgis-prototype power broadband 8 45 214 180 45 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' --frequency 30min -v
 ```
 
 ### Number of periods
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' --periods 8 -v
+pvgis-prototype power broadband 8 45 214 180 45 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' --periods 8 -v
 ```
 ### With Orientation and Tilt
 

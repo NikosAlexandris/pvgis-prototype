@@ -4,8 +4,8 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.cli.typer.linke_turbidity import typer_argument_linke_turbidity_factor
 from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer.position import typer_argument_solar_altitude_series
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import diffuse_solar_altitude_coefficients_time_series
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import diffuse_solar_altitude_function_time_series
+from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_solar_altitude_coefficients_series
+from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_solar_altitude_function_series
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 
@@ -26,7 +26,7 @@ def get_diffuse_solar_altitude_coefficients_series(
     Returns
     -------
     """
-    diffuse_solar_altitude_coefficients_series = diffuse_solar_altitude_coefficients_time_series(
+    diffuse_solar_altitude_coefficients_series = calculate_diffuse_solar_altitude_coefficients_series(
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         verbose=verbose,
     )
@@ -36,13 +36,13 @@ def get_diffuse_solar_altitude_coefficients_series(
 
 
 @log_function_call
-def get_diffuse_solar_altitude_function_time_series(
+def get_diffuse_solar_altitude_function_series(
     solar_altitude_series: Annotated[List[float], typer_argument_solar_altitude_series],
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series],#: np.ndarray,
     verbose: int = 0,
 ):
     """Diffuse solar altitude function Fd"""
-    diffuse_solar_altitude_series = diffuse_solar_altitude_function_time_series(
+    diffuse_solar_altitude_series = calculate_diffuse_solar_altitude_function_series(
         solar_altitude_series=solar_altitude_series,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
     )

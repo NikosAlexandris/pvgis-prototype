@@ -1,8 +1,9 @@
 from pvgisprototype import SolarDeclination
 from devtools import debug
-from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_series_pvis
+from pvgisprototype.algorithms.pvis.fractional_year import calculate_day_angle_series_hofierka
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -14,10 +15,12 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 import numpy
 from pvgisprototype.constants import RADIANS
 from pandas import DatetimeIndex
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.api.position.models import SolarPositionModel
 
 
 @log_function_call
-def calculate_solar_declination_time_series_jenco(
+def calculate_solar_declination_series_jenco(
     timestamps: DatetimeIndex,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -63,7 +66,7 @@ def calculate_solar_declination_time_series_jenco(
     For more accurate calculations of solar position, comprehensive models like
     the Solar Position Algorithm (SPA) are typically used.
     """
-    fractional_year_series = calculate_fractional_year_series_pvis(
+    day_angle_series = calculate_day_angle_series_hofierka(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
@@ -71,12 +74,26 @@ def calculate_solar_declination_time_series_jenco(
     solar_declination_series = numpy.arcsin(
         0.3978
         * numpy.sin(
-            fractional_year_series.radians
+            day_angle_series.radians
             - 1.4
             + eccentricity_correction_factor
-            * numpy.sin(fractional_year_series.radians - perigee_offset)
+            * numpy.sin(day_angle_series.radians - perigee_offset)
         )
     )
+    if (
+        (solar_declination_series < SolarDeclination().min_radians)
+        | (solar_declination_series > SolarDeclination().max_radians)
+    ).any():
+        out_of_range_values = solar_declination_series[
+            (solar_declination_series < SolarDeclination().min_radians)
+            | (solar_declination_series > SolarDeclination().max_radians)
+        ]
+        # raise ValueError(# ?
+        logger.warning(
+            f"{WARNING_OUT_OF_RANGE_VALUES} "
+            f"[{SolarDeclination().min_radians}, {SolarDeclination().max_radians}] radians"
+            f" in [code]solar_declination_series[/code] : {out_of_range_values}"
+        )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -89,6 +106,6 @@ def calculate_solar_declination_time_series_jenco(
     return SolarDeclination(
         value=solar_declination_series,
         unit=RADIANS,
-        position_algorithm='Jenco',
+        position_algorithm=SolarPositionModel.jenco,
         timing_algorithm='Jenco',
     )

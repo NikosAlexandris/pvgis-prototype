@@ -122,22 +122,11 @@ class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
     pass
 
 
-class CalculateSolarZenithNOAAInput(
-    LatitudeModel,
-    BaseTimestampModel,
-    SolarHourAngleModel,
-    ApplyAtmosphericRefractionModel,
-    BaseAngleOutputUnitsModel,
-    VerbosityModel,
-    LoggingModel,
-):
-    pass
-
-
 class CalculateSolarZenithTimeSeriesNOAAInput(
+    LongitudeModel,
     LatitudeModel,
-    BaseTimestampSeriesModel,  # != BaseTimestampModel
-    SolarHourAngleSeriesModel,
+    BaseTimeSeriesModel,  # != BaseTimestampModel
+    # SolarHourAngleSeriesModel,
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     VerbosityModel,
@@ -151,15 +140,6 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
     BaseTimeSeriesModel,
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
-    VerbosityModel,
-    LoggingModel,
-):
-    pass
-
-
-class CalculateSolarAzimuthNOAAInput(
-    BaseCoordinatesModel,
-    BaseTimeModel,
     VerbosityModel,
     LoggingModel,
 ):

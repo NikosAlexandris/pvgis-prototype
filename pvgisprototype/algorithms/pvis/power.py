@@ -9,18 +9,18 @@ from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_time_series_pvgis
-from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_time_series
-from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_series_pvgis
+from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_series
+from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.algorithms.pvis.read import read_spectral_response
 from pvgisprototype.algorithms.pvis.spectral_factor import calculate_spectral_factor
-from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_time_series
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_series
 from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
 from pvgisprototype.algorithms.pvis.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE  # why not calculate it?
@@ -96,7 +96,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
     )
 
     # In r.pv_spec : s0 = lumcline2()
-    solar_incidence_series = model_solar_incidence_time_series(
+    solar_incidence_series = model_solar_incidence_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -111,7 +111,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
         angle_output_units=angle_output_units,
         verbose=0,
     )
-    solar_altitude_series = model_solar_altitude_time_series(
+    solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -129,7 +129,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
     )
     sun_above_horizon = solar_altitude_series.value > 0  # or : .radians ?
     positive_solar_incidence = solar_incidence_series.radians > 0
-    surface_in_shade = is_surface_in_shade_time_series(solar_altitude_series.value)
+    surface_in_shade = is_surface_in_shade_series(solar_altitude_series.value)
     surface_not_in_shade = ~surface_in_shade
     positive_solar_incidence_and_surface_not_in_shade = np.logical_and(
         positive_solar_incidence, surface_not_in_shade
@@ -169,7 +169,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
 
             # extraterrestrial_normal_irradiance_series = EXTRATERRESTRIAL_NORMAL_IRRADIANCE[spectral_band_number]
             # extraterrestrial_normal_irradiance_series = (
-            #     calculate_extraterrestrial_normal_irradiance_time_series(
+            #     calculate_extraterrestrial_normal_irradiance_series(
             #         timestamps=timestamps,
             #         solar_constant=solar_constant,
             #         perigee_offset=perigee_offset,
@@ -179,7 +179,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
 
             # following is in r.pv_spec : `ra`
             spectrally_resolved_direct_irradiance_series[positive_solar_incidence_and_surface_not_in_shade] = (
-                calculate_direct_inclined_irradiance_time_series_pvgis(
+                calculate_direct_inclined_irradiance_series_pvgis(
                     longitude=longitude,
                     latitude=latitude,
                     elevation=elevation,
@@ -212,7 +212,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
         # Calculate diffuse and reflected irradiance for sun above horizon
         spectrally_resolved_diffuse_irradiance_series[
             sun_above_horizon
-        ] = calculate_diffuse_inclined_irradiance_time_series(
+        ] = calculate_diffuse_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -242,7 +242,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
 
         spectrally_resolved_reflected_irradiance_series[
             sun_above_horizon
-        ] = calculate_ground_reflected_inclined_irradiance_time_series(
+        ] = calculate_ground_reflected_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -390,7 +390,7 @@ def calculate_spectral_photovoltaic_power_output(
     spectrally_resolved_photovoltaic_power = spectrally_resolved_global_irradiance_series * spectral_factor
 
     if efficiency:  # user-set
-        efficiency_coefficient_series = calculate_pv_efficiency_time_series(
+        efficiency_coefficient_series = calculate_pv_efficiency_series(
             irradiance_series=spectrally_resolved_global_irradiance_series,  # global_total_power,
             spectrally_factor=spectral_factor,  # internally will do *= global_total_power
             temperature_series=temperature_series,  # pres_temperature,
