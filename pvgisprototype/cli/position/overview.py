@@ -94,7 +94,7 @@ def overview(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
-    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] = [SolarPositionParameter.all],
+    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] = [SolarPositionParameter.altitude, SolarPositionParameter.azimuth, SolarPositionParameter.incidence],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
@@ -272,16 +272,10 @@ def overview(
         from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
             solar_position_series=solar_position_series,
-            timing=True,
+            position_parameters=solar_position_parameters,
             timestamps=timestamps,
-            # declination=True,
-            # hour_angle=True,
-            # zenith=True,
-            altitude=True,
-            azimuth=True,
             surface_orientation=True,
             surface_tilt=True,
-            incidence=True,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle='Solar Position Series',
@@ -289,4 +283,5 @@ def overview(
             label='Incidence',
             legend_labels=None,
             terminal_width_fraction=terminal_width_fraction,
+            verbose=verbose,
         )
