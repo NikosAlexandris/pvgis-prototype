@@ -4,19 +4,13 @@ The time offset based on NOAA's General Solar Position Calculations.
 
 from devtools import debug
 from zoneinfo import ZoneInfo
-from math import pi
 
-from pandas.core.internals.managers import raise_construction_error
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateTimeOffsetNOAAInput
-from pvgisprototype.validation.functions import CalculateTimeOffsetNOAAInput
 from pvgisprototype import Longitude
 from pvgisprototype import TimeOffset
 from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTimeSeriesNOAAInput
-from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_noaa
-from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_time_series_noaa
+from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_series_noaa
 import numpy as np
-from pandas import Timestamp
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -25,7 +19,6 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import MINUTES
-from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from cachetools import cached
@@ -33,133 +26,10 @@ from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
-# equivalent to : 4 * longitude (in degrees) ?
-radians_to_time_minutes = lambda value_in_radians: (1440 / (2 * pi)) * value_in_radians
-
-
-@validate_with_pydantic(CalculateTimeOffsetNOAAInput)
-def calculate_time_offset_noaa(
-    longitude: Longitude,
-    timestamp: Timestamp,
-    timezone: ZoneInfo,
-) -> TimeOffset:
-    """Calculate the time offset in minutes based on NOAA's solar geometry equations.
-
-    Calculate the time offset (in minutes) for NOAA's solar position calculations.
-    The time offset (in minutes) incorporates the Equation of Time and accounts
-    for the variation of the Local Solar Time (LST) within a given time zone
-    due to the longitude variations within the time zone.
-
-    Parameters
-    ----------
-    longitude: float
-        The longitude for calculation in radians (note: differs from the original
-        equation which expects degrees).
-
-    timestamp: Timestamp
-        The timestamp to calculate the offset for
-
-    equation_of_time: float
-        The equation of time value for calculation
-
-    Returns
-    -------
-    float: The time offset
-
-    Notes
-    -----
-    The equation given in NOAA's General Solar Position Calculations [0]_ is
-
-        time_offset = eqtime + 4*longitude – 60*timezone
-
-        where (variable name and units):
-        - time_offset, minutes
-        - longitude, degrees
-        - timezone, hours
-        - eqtime, minutes
-
-    A cleaner reference:
-
-        TC = 4 * (Longitude - LSTM) + EoT
-
-        where:
-
-        - TC        : Time Correction Factor, minutes
-        - Longitude : Geographical Longitude, degrees
-        - LSTM      : Local Standard Time Meridian, degrees * hours
-        - EoT       : Equation of Time
-
-            where:
-            - `LSTM = 15 degrees * ΔTUTC`
-
-                where:
-                - ΔTUTC = LT - UTC, hours
-
-                    where:
-                    - ΔTUTC : difference of LT from UTC in hours
-                    - LT    : Local Time
-                    - UTC   : Universal Coordinated Time
-
-            - The factor 4 (minutes) comes from the fact that the Earth
-              rotates 1° every 4 minutes.
-
-            Examples:
-
-                Mount Olympus is UTC + 2, hence LSTM = 15 * 2 = 30 deg. East
-
-    The time offset in minutes ranges in
-
-        [ -720 (Longitude) - 840 (TimeZone) - 20 (Equation of Time) = -1580,
-          +720 (Longitude) + 840 (TimeZone) + 20 (Equation of Time) = 1580 ]
-
-    The valid ranges of the components that contribute to the time offset are:
-
-    - Geographical longitude ranges from west to east in [-180, 180] degrees.
-      A day is approximately 1440 minutes, hence converting the degrees to minutes,
-      the longitude ranges in [-720, 720] minutes.
-
-    - The timezone offset from the Coordinated Universal Time (UTC),
-      considering time zones that are offset by unusual amounts of time from
-      UTC, ranges  from west of UTC to east of UTC in [-12, 14] hours or [-720,
-      840] minutes.
-
-    - The Equation of Time accounts for the variations in the Earth's orbital
-      speed and axial tilt. It varies throughout the year, but is typically
-      within the range of about -20 minutes to +20 minutes.
-
-    References
-    ----------
-    .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF
-
-    """
-
-    # This will be 0 for UTC, obviously! Review-Me! --------------------------
-
-    if timestamp.tzinfo is None or timestamp.tzinfo.utcoffset(timestamp) is None:
-        timestamp = timestamp.tz_localize(timezone)
-    else:
-        timestamp = timestamp.tz_convert(timezone)
-
-    timezone_offset_minutes = timestamp.utcoffset().total_seconds() / 60  # minutes
-    equation_of_time = calculate_equation_of_time_noaa(
-        timestamp=timestamp,
-    )  # minutes
-    time_offset = (
-        longitude.as_minutes - timezone_offset_minutes + equation_of_time.minutes
-    )
-    time_offset = TimeOffset(value=time_offset, unit="minutes")
-    if not TimeOffset().min_minutes <= time_offset.minutes <= TimeOffset().max_minutes:
-        raise ValueError(
-            f"The calculated time offset {time_offset} is out of the expected range [{TimeOffset().min_minutes, TimeOffset().max_minutes}] minutes!"
-        )
-
-    return time_offset
-
-
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
-def calculate_time_offset_time_series_noaa(
+def calculate_time_offset_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo = ZoneInfo('UTC'),
@@ -168,8 +38,8 @@ def calculate_time_offset_time_series_noaa(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> TimeOffset:
-    """Calculate the variation of the local solar time in minutes within a
-    given timezone for a series of timestamps.
+    """Calculate the variation of the local solar time within a
+    given timezone for a time series.
 
     Calculate the variation of the local solar time, also referred to as _time
     offset_, within a timezone for NOAA's General Solar Position Calculations
@@ -307,7 +177,7 @@ def calculate_time_offset_time_series_noaa(
         [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
     )
     # ------------------------------------------------- Further Optimisation ?
-    equation_of_time_series = calculate_equation_of_time_time_series_noaa(
+    equation_of_time_series = calculate_equation_of_time_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
