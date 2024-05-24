@@ -297,7 +297,7 @@ class SolarDeclinationModel(BaseModel):
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_declination`")
 
 
-class SolarPositionModel(BaseModel):
+class SolarPositionModelModel(BaseModel):  # ModelModel is intentional !
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa
 
 
@@ -314,7 +314,7 @@ class EarthOrbitModel(BaseModel):
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR
 
 
-class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
+class SolarTimeModelModel(BaseModel):  # ModelModel is intentional !
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield
 
 
