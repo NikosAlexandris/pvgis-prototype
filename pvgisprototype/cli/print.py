@@ -1,5 +1,8 @@
 from pandas import to_datetime
 from datetime import datetime
+
+from typer.main import solve_typer_info_defaults
+from pvgisprototype.api.position.models import SOLAR_POSITION_PARAMETER_COLUMN_NAMES, SolarPositionParameter
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import round_float_values
 from rich.console import Console
@@ -9,7 +12,7 @@ from rich.panel import Panel
 from rich.pretty import Pretty
 from rich.text import Text
 from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
-from typing import List
+from typing import List, Sequence
 import numpy as np
 from pvgisprototype.constants import (
     TITLE_KEY_NAME,
@@ -100,13 +103,8 @@ def print_solar_position_table(
     timestamp,
     timezone,
     table,
+    position_parameters: Sequence[SolarPositionParameter] = SolarPositionParameter.all,
     title = 'Solar position overview',
-    declination=None,
-    hour_angle=None,
-    timing=None,
-    zenith=None,
-    altitude=None,
-    azimuth=None,
     surface_orientation=None,
     surface_tilt=None,
     incidence=None,
@@ -119,28 +117,19 @@ def print_solar_position_table(
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     rounded_table = round_float_values(table, rounding_places)
-    quantities = [declination, zenith, altitude, azimuth, incidence]
+
 
     columns = []
     if timestamp is not None:
         columns.append('Time')
-    if timing is not None:
-        columns.append(TIME_ALGORITHM_COLUMN_NAME)
-    if declination is not None:
-        columns.append(DECLINATION_COLUMN_NAME)
-    if hour_angle is not None:
-        columns.append(HOUR_ANGLE_COLUMN_NAME)
-    if any(quantity is not None for quantity in quantities):
-        columns.append(POSITIONING_ALGORITHM_COLUMN_NAME)
-    if zenith is not None:
-        columns.append(ZENITH_COLUMN_NAME)
-    if altitude is not None:
-        columns.append(ALTITUDE_COLUMN_NAME)
-    if azimuth is not None:
-        columns.append(AZIMUTH_COLUMN_NAME)
-    if incidence is not None:
-        columns.append(INCIDENCE_ALGORITHM_NAME)
-        columns.append(INCIDENCE_COLUMN_NAME)
+
+    for parameter in position_parameters:
+        if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
+            column = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
+            if isinstance(column, list):
+                columns.extend(column)
+            else:
+                columns.append(column)
 
     # Build a Caption
 
@@ -202,18 +191,46 @@ def print_solar_position_table(
     )
 
     for _, model_result in rounded_table.items():
-        declination_value = get_scalar(get_value_or_default(model_result, DECLINATION_NAME))
-        timing_algorithm = get_value_or_default(model_result, TIME_ALGORITHM_NAME)
-        position_algorithm = get_value_or_default(model_result, POSITIONING_ALGORITHM_NAME)
-        hour_angle_value = get_scalar(get_value_or_default(model_result, HOUR_ANGLE_NAME))
-        zenith_value = get_scalar(get_value_or_default(model_result, ZENITH_NAME))
-        altitude_value = get_scalar(get_value_or_default(model_result, ALTITUDE_NAME))
-        azimuth_value = get_scalar(get_value_or_default(model_result, AZIMUTH_NAME))
-        incidence_algorithm = get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME)
-        incidence_value = get_scalar(get_value_or_default(model_result, INCIDENCE_NAME))
+        # Mapping of parameters to functions for getting values
+        position_parameter_values = {
+            SolarPositionParameter.declination: lambda: get_scalar(
+                get_value_or_default(model_result, DECLINATION_NAME)
+            ),
+            SolarPositionParameter.timing: lambda: get_value_or_default(
+                model_result, TIME_ALGORITHM_NAME
+            ),
+            SolarPositionParameter.positioning: lambda: get_value_or_default(
+                model_result, POSITIONING_ALGORITHM_NAME
+            ),
+            SolarPositionParameter.hour_angle: lambda: get_scalar(
+                get_value_or_default(model_result, HOUR_ANGLE_NAME)
+            ),
+            SolarPositionParameter.zenith: lambda: get_scalar(
+                get_value_or_default(model_result, ZENITH_NAME)
+            ),
+            SolarPositionParameter.altitude: lambda: get_scalar(
+                get_value_or_default(model_result, ALTITUDE_NAME)
+            ),
+            SolarPositionParameter.azimuth: lambda: get_scalar(
+                get_value_or_default(model_result, AZIMUTH_NAME)
+            ),
+            SolarPositionParameter.incidence: lambda: (
+                get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME),
+                get_scalar(get_value_or_default(model_result, INCIDENCE_NAME)),
+            ),
+        }
 
-        row = []
-        row.extend([str(timestamp[0])])  # expectedly a single timestamp
+        # Initialize the row with the timestamp
+        row = [str(timestamp[0])]  # expectedly a single timestamp
+
+        # Loop through the parameters and append the values to the row
+        for parameter in position_parameters:
+            if parameter in position_parameter_values:
+                value = position_parameter_values[parameter]()
+                if isinstance(value, tuple):
+                    row.extend(value)
+                else:
+                    row.append(value)
 
        # ---------------------------------------------------- Implement-Me---
        # Convert the result back to the user's time zone
@@ -225,30 +242,14 @@ def print_solar_position_table(
        #     row.extend([str(user_requested_timestamp), str(user_requested_timezone)])
        ##=====================================================================
 
-        if timing is not None:
-            row.append(timing_algorithm)
-        if declination and declination_value is not None:
-            row.append(str(declination_value))
-        if hour_angle and hour_angle_value is not None:
-            row.append(str(hour_angle_value))
-        if position_algorithm and position_algorithm is not None:
-            row.append(position_algorithm)
-        if zenith and zenith_value is not None:
-            row.append(str(zenith_value))
-        if altitude and altitude_value is not None:
-            row.append(str(altitude_value))
-        if azimuth and azimuth_value is not None:
-            row.append(str(azimuth_value))
-        if incidence and incidence_algorithm is not None:
-            row.append(str(incidence_algorithm))
-            if incidence_value is not None:
-                row.append(str(incidence_value))
-
         style_map = {
-            "pvis": "red",  # red because PVIS is incomplete!
-            "pvlib": "bold",
+            # "hofierka": "red",  # red because PVIS is incomplete!
+            # "pvlib": "bold",
+            "noaa": "bold",
         }
-        style = style_map.get(position_algorithm.lower(), None)
+        # Add the row to the table with the appropriate style
+        positioning_algorithm = model_result.get(SolarPositionParameter.positioning, '').lower()
+        style = style_map.get(positioning_algorithm, None)
         table.add_row(*row, style=style)
 
     Console().print(table)
@@ -269,6 +270,7 @@ def print_solar_position_series_table(
     timestamps,
     timezone,
     table,
+    position_parameters: Sequence[SolarPositionParameter] = SolarPositionParameter.all,
     title = 'Solar position overview',
     index: bool = False,
     timing=None,
@@ -300,6 +302,7 @@ def print_solar_position_series_table(
         columns.append('Time')
     # if user_requested_timestamps is not None and user_requested_timezone is not None:
     #     columns.extend(["Local Time", "Local Zone"])
+
     if declination is not None:
         columns.append(DECLINATION_COLUMN_NAME)
     if hour_angle is not None:
@@ -314,6 +317,16 @@ def print_solar_position_series_table(
         columns.append(AZIMUTH_COLUMN_NAME)
     if incidence is not None:
         columns.append(INCIDENCE_COLUMN_NAME)
+
+    # --------------------------------------------------------------- Use Me !
+    # for parameter in position_parameters:
+    #     if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
+    #         column = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
+    #         if isinstance(column, list):
+    #             columns.extend(column)
+    #         else:
+    #             columns.append(column)
+    # ------------------------------------------------------------------------
 
     # Build a Caption
 
@@ -374,7 +387,6 @@ def print_solar_position_series_table(
 
     # Iterate over each timestamp and its corresponding result
     for model_name, model_result in rounded_table.items():
-
         model_caption = caption
         position_algorithm = safe_get_value(model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
         model_caption += f"Positioning : [bold]{position_algorithm}[/bold], "
@@ -421,6 +433,7 @@ def print_solar_position_table_panels(
     timezone,
     table,
     rounding_places=ROUNDING_PLACES_DEFAULT,
+    position_parameter=SolarPositionParameter.all,
     surface_orientation=True,
     surface_tilt=True,
     timing=None,
@@ -435,6 +448,7 @@ def print_solar_position_table_panels(
 ) -> None:
     """
     """
+    print(f'position_parameter=')
     rounded_table = round_float_values(table, rounding_places)
     first_model = rounded_table[next(iter(rounded_table))]
     panels = []
