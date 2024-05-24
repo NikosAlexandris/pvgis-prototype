@@ -13,7 +13,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pathlib import Path
 
-from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarPositionModel, SolarPositionParameter
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import select_models
@@ -94,6 +94,7 @@ def overview(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
+    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] = [SolarPositionParameter.all],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
@@ -176,6 +177,7 @@ def overview(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
+        solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
                 from pvgisprototype.cli.print import print_solar_position_table
@@ -186,12 +188,7 @@ def overview(
                     timezone=timezone,
                     table=solar_position_series,
                     rounding_places=rounding_places,
-                    timing=True,
-                    declination=True,
-                    hour_angle=True,
-                    zenith=True,
-                    altitude=True,
-                    azimuth=True,
+                    position_parameters=solar_position_parameters,
                     surface_orientation=True,
                     surface_tilt=True,
                     incidence=True,
