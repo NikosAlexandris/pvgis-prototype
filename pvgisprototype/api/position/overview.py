@@ -32,7 +32,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
-from pvgisprototype.constants import AZIMUTH_ORIGIN_NAME, DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import AZIMUTH_ORIGIN_NAME, DEBUG_AFTER_THIS_VERBOSITY_LEVEL, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -77,6 +77,7 @@ def model_solar_position_overview_series(
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -459,6 +460,7 @@ def calculate_solar_position_overview_series(
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -513,6 +515,7 @@ def calculate_solar_position_overview_series(
                 complementary_incidence_angle=complementary_incidence_angle,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
+                zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
                 dtype=dtype,
                 array_backend=array_backend,
                 verbose=verbose,
