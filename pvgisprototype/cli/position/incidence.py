@@ -35,7 +35,7 @@ from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 
-from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarPositionModel, SolarPositionParameter
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
@@ -93,6 +93,8 @@ def incidence(
     solar_incidence_model: Annotated[List[SolarIncidenceModel], typer_option_solar_incidence_model] = [SolarIncidenceModel.iqbal],
     complementary_incidence_angle: Annotated[bool, typer_option_sun_to_surface_plane_incidence_angle] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
+    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] =
+    [SolarPositionParameter.incidence],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
@@ -167,6 +169,7 @@ def incidence(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
+        solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
                 from pvgisprototype.cli.print import print_solar_position_table
@@ -177,12 +180,7 @@ def incidence(
                     timezone=timezone,
                     table=solar_incidence_series,
                     rounding_places=rounding_places,
-                    timing=None,
-                    declination=None,
-                    hour_angle=None,
-                    zenith=None,
-                    altitude=None,
-                    azimuth=None,
+                    position_parameters=solar_position_parameters,
                     surface_orientation=None,
                     surface_tilt=None,
                     incidence=None,
@@ -216,14 +214,9 @@ def incidence(
                 timestamps=timestamps,
                 timezone=timezone,
                 table=solar_incidence_series,
+                position_parameters=solar_position_parameters,
                 title='Solar Position Overview',
                 index=index,
-                timing=None,
-                declination=None,
-                hour_angle=None,
-                zenith=None,
-                altitude=None,
-                azimuth=None,
                 surface_orientation=None,
                 surface_tilt=None,
                 incidence=True,
