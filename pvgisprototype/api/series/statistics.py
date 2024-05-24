@@ -1,6 +1,39 @@
+"""
+Statistics 
+
+Wanted results for example for a grid-connected photovoltaic system :
+
+- the average monthly energy production
+- the average annual production
+- year-to-year variability : the standard deviation of the annual values
+  calculated over the period covered by the selected solar radiation database
+
+- Annual Production in kW considering geographic and climatic parameters :
+  Yearly PV energy production (kWh):        example: 1066.36
+
+- Annual Irradiation, the potential production of kWhs per m2 :
+  Yearly in-plane irradiation (kWh/m2):     example: 1341.06
+
+- Annual Variability in kWh, representing the possible variation between two years :
+  Yearly-to-year variability (kWh):         example: 43.48
+
+- Total estimates of losses, considering losses due to the angle, spectral
+  effects, and ambient temperature:
+
+  Changes in output due to:
+
+  - Angle of incidence (%):                     example: -3.41
+  - Spectral effects (%):                       example: 1.56
+  - Temperature and low irradiance (%):         example: -5.75
+	
+Total loss (%): 	     -20.48
+"""
+
 from devtools import debug
 from rich.console import Console
+from typing import Union, Dict
 import numpy as np
+import xarray as xr
 from scipy.stats import mode
 from rich.table import Table
 from rich import box
@@ -26,12 +59,11 @@ from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
 
 
 def calculate_series_statistics(
-    data_array: np.array,
+    data_array: Union[np.ndarray, Dict[str, np.ndarray]],
     timestamps: DatetimeIndex,
-    groupby: str = None,
+    groupby: str | None = None,
 ) -> dict:
     """ """
-    import xarray as xr
     irradiance_xarray = None  # Ugly Hack :-/
     if isinstance(data_array, dict):
 
@@ -50,7 +82,7 @@ def calculate_series_statistics(
         # Then, the primary wanted data
         data_array = data_array[PHOTOVOLTAIC_POWER_COLUMN_NAME]
 
-    # Regardless of whether the input data_array is a array or a dict :
+    # Regardless of whether the input data_array is an array or a dict :
     data_xarray = xr.DataArray(
         data_array,
         coords=[('time', timestamps)],

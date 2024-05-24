@@ -15,7 +15,7 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import ANGULAR_LOSS_COEFFICIENT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_series
 
 
 app = typer.Typer(
@@ -33,7 +33,7 @@ app = typer.Typer(
     short_help=f'⦟ Solar incidence angle modifier for direct irradiance due to reflectivity {NOT_IMPLEMENTED_CLI}',
     rich_help_panel=rich_help_panel_toolbox,
 )
-def get_angular_loss_factor_for_direct_irradiance_time_series(
+def get_angular_loss_factor_for_direct_irradiance_series(
     solar_incidence_series: Annotated[List[float], typer_argument_solar_incidence_series],
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -49,7 +49,7 @@ def get_angular_loss_factor_for_direct_irradiance_time_series(
     defined by Jenco (1992).
 
     """
-    angular_loss_factor_for_direct_irradiance_series = calculate_angular_loss_factor_for_direct_irradiance_time_series(
+    angular_loss_factor_for_direct_irradiance_series = calculate_angular_loss_factor_for_direct_irradiance_series(
             solar_incidence_series=solar_incidence_series,
             angular_loss_coefficient=angular_loss_coefficient,
             verbose=verbose,

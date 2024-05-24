@@ -43,16 +43,60 @@ pvgis-prototype power broadband \
     --uniplot
 ```
 
-or change slightly the surface tilt
+### A year of power output
 
-``` bash exec="true" result="ansi" source="material-block"
+For a horizontally flat panel, we get
+
+``` bash exec="true" result="ansi" source="material-block" hl_lines="5"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 35 \
-    --start-time '2010-01-27' \
-    --end-time '2010-01-28' \
+    8.628 45.812 214 180 0.0000001 \
+    --start-time '2010-01-01' \
+    --end-time '2010-12-31' \
+    --quiet \
     --uniplot
 ```
 
+!!! tip "Use the `--quiet` option"
+
+    Large time series will take some time to print in the command line. It's
+    really useful to use the `--quiet` flag.
+
+
+Let's change the tilt to 30 degrees
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 180 30 \
+    --start-time '2010-01-01' \
+    --end-time '2010-12-31' \
+    --quiet \
+    --uniplot
+```
+
+and then to 45 -- at the same time, we can ask for a simplification of the plot
+via the `--resample-large-series` option
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 180 45 \
+    --start-time '2010-01-01' \
+    --end-time '2010-12-31' \
+    --quiet \
+    --uniplot \
+    --resample-large-series
+```
+
+### A day of solar incidence angles
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype position overview \
+    8.628 45.812 \
+    --start-time '2010-01-17' \
+    --end-time '2010-01-18' \
+    -aou degrees \
+    --quiet \
+    --uniplot
+```
 ### Reading external time series data
 
 We can repeat the same task

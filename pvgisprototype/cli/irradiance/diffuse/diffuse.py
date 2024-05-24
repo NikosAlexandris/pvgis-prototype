@@ -6,10 +6,10 @@ from pvgisprototype.cli.irradiance.diffuse.term_n import get_term_n_series
 from pvgisprototype.cli.irradiance.diffuse.sky_irradiance import get_diffuse_sky_irradiance_series
 from pvgisprototype.cli.irradiance.diffuse.transmission_function import get_diffuse_transmission_function_series
 from pvgisprototype.cli.irradiance.diffuse.altitude import get_diffuse_solar_altitude_coefficients_series
-from pvgisprototype.cli.irradiance.diffuse.altitude import get_diffuse_solar_altitude_function_time_series
-from pvgisprototype.cli.irradiance.diffuse.horizontal import get_diffuse_horizontal_irradiance_time_series
+from pvgisprototype.cli.irradiance.diffuse.altitude import get_diffuse_solar_altitude_function_series
+from pvgisprototype.cli.irradiance.diffuse.horizontal import get_diffuse_horizontal_irradiance_series
 from pvgisprototype.cli.irradiance.diffuse.horizontal_from_sarah import get_diffuse_horizontal_component_from_sarah
-from pvgisprototype.cli.irradiance.diffuse.inclined import get_diffuse_inclined_irradiance_time_series
+from pvgisprototype.cli.irradiance.diffuse.inclined import get_diffuse_inclined_irradiance_series
 
 
 app = typer.Typer(
@@ -48,19 +48,19 @@ app.command(
     no_args_is_help=True,
     help=f'☀∡ Calculate diffuse solar altitude angle time series',
     rich_help_panel=rich_help_panel_toolbox,
-)(get_diffuse_solar_altitude_function_time_series)
+)(get_diffuse_solar_altitude_function_series)
 app.command(
     name='horizontal',
     no_args_is_help=True,
     help=f'☀∡ Estimate the diffuse horizontal irradiance over a period of time [red]Not Complete[/red]',
     rich_help_panel=rich_help_panel_irradiance_series,
-)(get_diffuse_horizontal_irradiance_time_series)
+)(get_diffuse_horizontal_irradiance_series)
 app.command(
     name='inclined',
     no_args_is_help=True,
     help=f'☀∡ Calculate the diffuse irradiance incident on a surface over a period of time',
     rich_help_panel=rich_help_panel_irradiance_series,
-)(get_diffuse_inclined_irradiance_time_series)
+)(get_diffuse_inclined_irradiance_series)
 app.command(
     name='from-sarah',
     no_args_is_help=True,

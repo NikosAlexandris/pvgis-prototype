@@ -9,7 +9,7 @@ from math import isfinite
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_time_series_jenco
+from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_series_jenco
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
@@ -19,9 +19,9 @@ from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_time_series_noaa
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
@@ -30,7 +30,7 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesJencoInput)
-def calculate_solar_azimuth_time_series_jenco(
+def calculate_solar_azimuth_series_jenco(
     longitude: Longitude,   # radians
     latitude: Latitude,     # radians
     timestamps: DatetimeIndex,
@@ -107,7 +107,7 @@ def calculate_solar_azimuth_time_series_jenco(
     computation behaves benign in the range (−π, π] and can thus be used
     without range checks in many practical situations.
 
-    The atan2 function was originally designed for the convention in pure
+    The `atan2` function was originally designed for the convention in pure
     mathematics that can be termed east-counterclockwise. In practical
     applications, however, the north-clockwise and south-clockwise conventions
     are often the norm. The solar azimuth angle for example, that uses both the
@@ -146,8 +146,8 @@ def calculate_solar_azimuth_time_series_jenco(
     >>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
     >>> timestamps = generate_datetime_series(start_time='2010-01-27', end_time='2010-01-28')
     >>> from zoneinfo import ZoneInfo
-    >>> from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_time_series_noaa
-    >>> solar_azimuth_series = calculate_solar_azimuth_time_series_noaa(
+    >>> from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_series_noaa
+    >>> solar_azimuth_series = calculate_solar_azimuth_series_noaa(
     ... longitude=radians(8.628),
     ... latitude=radians(45.812),
     ... timestamps=timestamps,
@@ -158,14 +158,14 @@ def calculate_solar_azimuth_time_series_jenco(
     >>> print(solar_azimuth_series.degrees)
 
     """
-    solar_declination_series = calculate_solar_declination_time_series_jenco(
+    solar_declination_series = calculate_solar_declination_series_jenco(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
-    solar_hour_angle_series = calculate_solar_hour_angle_time_series_noaa(
+    solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
@@ -177,14 +177,13 @@ def calculate_solar_azimuth_time_series_jenco(
     C11 = sin(latitude.radians) * numpy.cos(solar_declination_series.radians)
     C13 = cos(latitude.radians) * numpy.sin(solar_declination_series.radians)
     C22 = numpy.cos(solar_declination_series.radians)
-    numerator = C22 * numpy.sin(solar_hour_angle_series.radians)
-    denominator = C11 * numpy.cos(solar_hour_angle_series.radians) - C13
-    # # ========================================================================
-    # """West is negative, East is positive, Masters p. 395"""
-    # a = numpy.sin(solar_hour_angle_series.radians)
-    # b = numpy.cos(solar_hour_angle_series.radians) * sin(latitude.radians) - numpy.tan(solar_declination_series.radians) * cos(latitude.radians)
-    # # ========================================================================
-    solar_azimuth_series = numpy.mod((pi + numpy.arctan2(numerator, denominator)), 2*pi)
+    x_solar_vector_component = C22 * numpy.sin(solar_hour_angle_series.radians)
+    y_solar_vector_component = C11 * numpy.cos(solar_hour_angle_series.radians) - C13
+    # `x` to `y` derives North-Clockwise azimuth
+    azimuth_origin = 'North'
+    solar_azimuth_series = numpy.mod(
+        (pi + numpy.arctan2(x_solar_vector_component, y_solar_vector_component)), 2 * pi
+    )
 
     if (
         (solar_azimuth_series < SolarAzimuth().min_radians)
@@ -211,5 +210,5 @@ def calculate_solar_azimuth_time_series_jenco(
         unit=RADIANS,
         # positioning_algorithm=solar_declination_series.position_algorithm,  #
         timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
-        origin="East"
+        origin=azimuth_origin,
     )
