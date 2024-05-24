@@ -24,7 +24,7 @@ from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 
-from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarPositionModel, SolarPositionParameter
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import select_models
 
@@ -79,7 +79,8 @@ def zenith(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,  # Used by a callback function
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
-    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.skyfield],
+    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
+    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] = [SolarPositionParameter.zenith],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -148,6 +149,7 @@ def zenith(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
+        solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
                 from pvgisprototype.cli.print import print_solar_position_table
@@ -158,12 +160,7 @@ def zenith(
                     timezone=timezone,
                     table=solar_zenith_series,
                     rounding_places=rounding_places,
-                    timing=True,
-                    declination=None,
-                    hour_angle=None,
-                    zenith=True,
-                    altitude=None,
-                    azimuth=None,
+                    position_parameters=solar_position_parameters,
                     surface_orientation=None,
                     surface_tilt=None,
                     incidence=None,  # Add Me ?
@@ -197,14 +194,9 @@ def zenith(
                 timestamps=timestamps,
                 timezone=timezone,
                 table=solar_zenith_series,
+                position_parameters=solar_position_parameters,
                 title='Solar Zenith Series',
                 index=index,
-                timing=True,
-                declination=None,
-                hour_angle=None,
-                zenith=True,
-                altitude=None,
-                azimuth=None,
                 surface_orientation=None,
                 surface_tilt=None,
                 incidence=None,
