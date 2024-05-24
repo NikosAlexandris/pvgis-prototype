@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import SolarAltitude
+from pvgisprototype import SolarZenith
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -50,7 +51,7 @@ def model_solar_zenith_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-) -> SolarAltitude:
+) -> SolarZenith:
     """
     Notes
     -----
