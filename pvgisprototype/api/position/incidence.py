@@ -23,7 +23,7 @@ from pvgisprototype import SurfaceOrientation
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype import RefractedSolarZenith
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import DATA_TYPE_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -78,6 +78,7 @@ def model_solar_incidence_series(
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -117,8 +118,8 @@ def model_solar_incidence_series(
             # surface_orientation=surface_orientation_east_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
-            # complementary_incidence_angle=complementary_incidence_angle,
             complementary_incidence_angle=complementary_incidence_angle,
+            zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -143,6 +144,7 @@ def model_solar_incidence_series(
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
+            zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -182,6 +184,7 @@ def calculate_solar_incidence_series(
     # solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.iqbal],
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     # horizon_heights: List[float] = None,
     # horizon_interval: float = None,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -207,6 +210,7 @@ def calculate_solar_incidence_series(
                     # solar_time_model=solar_time_model,
                     solar_incidence_model=solar_incidence_model,
                     complementary_incidence_angle=complementary_incidence_angle,
+                    zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
                     perigee_offset=perigee_offset,
                     eccentricity_correction_factor=eccentricity_correction_factor,
                     dtype=dtype,
