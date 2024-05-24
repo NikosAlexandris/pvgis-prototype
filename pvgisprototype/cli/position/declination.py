@@ -11,7 +11,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pathlib import Path
 
-from pvgisprototype.api.position.models import SolarDeclinationModel
+from pvgisprototype.api.position.models import SolarDeclinationModel, SolarPositionParameter
 from pvgisprototype.api.position.models import select_models
 
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -61,6 +61,8 @@ def declination(
     local_time: Annotated[bool, typer_option_local_time] = False,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     solar_declination_model: Annotated[List[SolarDeclinationModel], typer_option_solar_declination_model] = [SolarDeclinationModel.pvis],
+    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] =
+    [SolarPositionParameter.declination],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
@@ -120,6 +122,7 @@ def declination(
         verbose=verbose,
     )
     if not quiet:
+        solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
                 from pvgisprototype.cli.print import print_solar_position_table
@@ -129,13 +132,8 @@ def declination(
                     timestamp=timestamps,
                     timezone=timezone,
                     table=solar_declination_series,
+                    position_parameters=solar_position_parameters,
                     rounding_places=rounding_places,
-                    timing=True,
-                    declination=True,
-                    hour_angle=None,
-                    zenith=None,
-                    altitude=None,
-                    azimuth=None,
                     surface_orientation=None,
                     surface_tilt=None,
                     incidence=None,  # Add Me ?
@@ -171,18 +169,13 @@ def declination(
                 table=solar_declination_series,
                 title='Solar Declination Angle',
                 index=index,
-                timing=True,
-                declination=True,
-                hour_angle=None,
-                zenith=None,
-                altitude=None,
-                azimuth=None,
                 surface_orientation=None,
                 surface_tilt=None,
                 incidence=None,
                 user_requested_timestamps=user_requested_timestamps, 
                 user_requested_timezone=user_requested_timezone,
                 rounding_places=rounding_places,
+                position_parameters=solar_position_parameters,
                 group_models=group_models,
             )
     if csv:
