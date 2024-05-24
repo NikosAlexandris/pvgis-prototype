@@ -233,16 +233,8 @@ def zenith(
         from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
             solar_position_series=solar_zenith_series,
-            timing=True,
+            position_parameters=solar_position_parameters,
             timestamps=timestamps,
-            # declination=True,
-            # hour_angle=True,
-            zenith=True,
-            # altitude=True,
-            # azimuth=True,
-            # surface_orientation=True,
-            # surface_tilt=True,
-            # incidence=True,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle='Solar Zenith Series',
