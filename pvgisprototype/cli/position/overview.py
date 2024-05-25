@@ -32,6 +32,7 @@ from pvgisprototype.cli.typer.position import typer_option_random_surface_orient
 from pvgisprototype.cli.typer.position import typer_argument_surface_tilt
 from pvgisprototype.cli.typer.position import typer_option_random_surface_tilt
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
+from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
 from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer.position import typer_option_sun_to_surface_plane_incidence_angle
 from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
@@ -75,6 +76,7 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.constants import UNIPLOT_FLAG_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.cli.typer.output import typer_option_panels_output
+from pvgisprototype.cli.typer.position import typer_option_zero_negative_solar_incidence_angle
 
 
 @log_function_call
@@ -94,13 +96,13 @@ def overview(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
-    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] = [SolarPositionParameter.altitude, SolarPositionParameter.azimuth, SolarPositionParameter.incidence],
+    position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.all],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     # solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: Annotated[bool, typer_option_sun_to_surface_plane_incidence_angle] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
-    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
@@ -166,7 +168,7 @@ def overview(
         solar_time_model=solar_time_model,
         # solar_incidence_model=solar_incidence_model,
         complementary_incidence_angle=complementary_incidence_angle,
-        zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         # time_output_units=time_output_units,

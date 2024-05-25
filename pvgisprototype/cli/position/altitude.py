@@ -59,6 +59,7 @@ from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 from pvgisprototype.cli.typer.output import typer_option_panels_output
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet
+from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
 
 
 @log_function_call
@@ -73,8 +74,7 @@ def altitude(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     model: Annotated[list[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
-    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] =
-    [SolarPositionParameter.altitude],
+    position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.altitude],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
