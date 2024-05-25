@@ -180,7 +180,7 @@ def calculate_solar_incidence_series_jenco(
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
-    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -417,7 +417,7 @@ def calculate_solar_incidence_series_jenco(
     # Combined mask for no solar incidence, negative solar incidence or below horizon angles
     mask_no_solar_incidence_series = (solar_incidence_series < 0) | mask_below_horizon_or_in_shade
 
-    if zero_negative_solar_incidence_angles:
+    if zero_negative_solar_incidence_angle:
         solar_incidence_series = np.where(
             mask_no_solar_incidence_series,
             # (solar_incidence_series < 0) | (solar_altitude_series.value < 0),
