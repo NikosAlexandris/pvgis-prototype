@@ -405,8 +405,8 @@ class ApplyAtmosphericRefractionModel(BaseModel):
     apply_atmospheric_refraction: Optional[bool] = True
 
 
-class ZeroNegativeSolarIncidenceAnglesModel(BaseModel):
-    zero_negative_solar_incidence_angles: Optional[bool] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+class ZeroNegativeSolarIncidenceAngleModel(BaseModel):
+    zero_negative_solar_incidence_angle: Optional[bool] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 
 
 class RefractedSolarAltitudeModel(BaseModel):

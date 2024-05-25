@@ -153,27 +153,40 @@ def uniplot_solar_position_series(
     ):
     """
     """
+    def safe_get_value(dictionary, key, index, default='NA'):
+        """
+        Parameters
+        ----------
+        dictionary: dict
+            Input dictionary
+        key: str
+            key to retrieve from the dictionary
+        index: int
+            index ... ?
+
+        Returns
+        -------
+        The value corresponding to the given `key` in the `dictionary` or the
+        default value if the key does not exist.
+
+        """
+        value = dictionary.get(key, default)
+        if isinstance(value, (list, numpy.ndarray)) and len(value) > index:
+            return value[index]
+        return value
+
     for model_name, model_result in solar_position_series.items():
 
-        solar_incidence_series = model_result.get(SolarPositionParameter.incidence, numpy.array([]))
-        if label and solar_incidence_series is not None:
-            label = f'{model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)} ' + label
-            label += f' ({model_result.get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)})'
-        
+        solar_incidence_series = model_result.get(SolarPositionParameter.incidence, numpy.array([])) if not isinstance(model_result.get(SolarPositionParameter.incidence), str) else None
+        solar_position_metric_series = solar_incidence_series if solar_incidence_series is not None else model_result.pop(0)
         individual_series = [
             model_result.get(parameter, numpy.array([]))
             for parameter in position_parameters if not isinstance(model_result.get(parameter), str)
             and parameter != SolarPositionParameter.incidence
         ]
-        
-        # individual_metrics_labels = [
-        #     (solar_position_metric_name + f' {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}')
-        #     if solar_position_metric_name == AZIMUTH_NAME and include
-        #     else solar_position_metric_name
-        #     for solar_position_metric_name, include in solar_position_metrics.items()
-        #     if include and solar_position_metric_name != INCIDENCE_NAME
-        # ]
-
+        if label and solar_incidence_series is not None:
+            label = f'{model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)} ' + label
+            label += f' ({model_result.get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)})'
         individual_series_labels = []
         for parameter in position_parameters:
             if (
@@ -199,7 +212,7 @@ def uniplot_solar_position_series(
             debug(locals())
 
         uniplot_data_array_series(
-            data_array=solar_incidence_series,
+            data_array=solar_position_metric_series,
             list_extra_data_arrays=individual_series,
             timestamps=timestamps,
             resample_large_series=resample_large_series,

@@ -25,7 +25,7 @@ from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import SOLAR_CONSTANT
+from pvgisprototype.constants import SOLAR_CONSTANT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -156,6 +156,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
+    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -296,6 +297,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         "apply_angular_loss_factor": apply_angular_loss_factor,
         "solar_position_model": solar_position_model,
         "solar_incidence_model": solar_incidence_model,
+        "zero_negative_solar_incidence_angle": zero_negative_solar_incidence_angle,
         "solar_time_model": solar_time_model,
         "solar_constant": solar_constant,
         "perigee_offset": perigee_offset,

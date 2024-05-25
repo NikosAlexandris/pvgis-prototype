@@ -43,7 +43,7 @@ from pvgisprototype.validation.pvis_data_classes import SurfaceTiltModel
 
 # Incidence
 from pvgisprototype.validation.pvis_data_classes import SolarIncidenceModel
-from pvgisprototype.validation.pvis_data_classes import ZeroNegativeSolarIncidenceAnglesModel
+from pvgisprototype.validation.pvis_data_classes import ZeroNegativeSolarIncidenceAngleModel
 
 # Output
 from pvgisprototype.validation.pvis_data_classes import BaseAngleUnitsModel
@@ -376,23 +376,7 @@ class ModelSolarAzimuthTimeSeriesInputModel(
     pass
 
 
-class ModelSolarGeometryOverviewInputModel(
-    BaseCoordinatesModel,
-    BaseTimeModel,
-    SurfaceOrientationModel,
-    SurfaceTiltModel,
-    SolarPositionModelModel,
-    SolarTimeModelModel,
-    ApplyAtmosphericRefractionModel,
-    ZeroNegativeSolarIncidenceAnglesModel,
-    EarthOrbitModel,
-    VerbosityModel,
-    LoggingModel,
-):
-    pass
-
-
-class ModelSolarGeometryOverviewTimeSeriesInputModel(
+class ModelSolarPositionOverviewSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     SurfaceOrientationModel,
@@ -401,7 +385,7 @@ class ModelSolarGeometryOverviewTimeSeriesInputModel(
     SolarTimeModelModel,
     # SolarIncidenceModel,
     ApplyAtmosphericRefractionModel,
-    ZeroNegativeSolarIncidenceAnglesModel,
+    ZeroNegativeSolarIncidenceAngleModel,
     EarthOrbitModel,
     ComplementaryIncidenceAngleModel,
     VerbosityModel,
@@ -497,7 +481,7 @@ class ModelSolarIncidenceTimeSeriesInputModel(
     SurfaceOrientationModel,
     SurfaceTiltModel,
     EarthOrbitModel,
-    ZeroNegativeSolarIncidenceAnglesModel,
+    ZeroNegativeSolarIncidenceAngleModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
