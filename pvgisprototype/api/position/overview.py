@@ -24,8 +24,7 @@ from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_de
 from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
 from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_series_jenco
 from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_series_jenco
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarGeometryOverviewTimeSeriesInputModel
+from pvgisprototype.validation.functions import ModelSolarPositionOverviewSeriesInputModel, validate_with_pydantic
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype.api.position.models import SolarTimeModel
@@ -63,7 +62,7 @@ from pandas import DatetimeIndex
 
 
 @log_function_call
-@validate_with_pydantic(ModelSolarGeometryOverviewTimeSeriesInputModel)
+@validate_with_pydantic(ModelSolarPositionOverviewSeriesInputModel)
 def model_solar_position_overview_series(
     longitude: Longitude,
     latitude: Latitude,
@@ -78,7 +77,7 @@ def model_solar_position_overview_series(
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -197,6 +196,7 @@ def model_solar_position_overview_series(
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             complementary_incidence_angle=complementary_incidence_angle,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -331,6 +331,7 @@ def model_solar_position_overview_series(
             surface_orientation=surface_orientation,
             surface_tilt=surface_tilt,
             complementary_incidence_angle=complementary_incidence_angle,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -386,6 +387,7 @@ def model_solar_position_overview_series(
             surface_orientation=surface_orientation,
             surface_tilt=surface_tilt,
             complementary_incidence_angle=complementary_incidence_angle,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -464,11 +466,11 @@ def calculate_solar_position_overview_series(
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -521,7 +523,7 @@ def calculate_solar_position_overview_series(
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 # solar_incidence_model=solar_incidence_model,
                 complementary_incidence_angle=complementary_incidence_angle,
-                zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
+                zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 dtype=dtype,

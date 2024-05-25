@@ -56,7 +56,7 @@ def calculate_solar_incidence_series_iqbal(
     timezone: ZoneInfo | None = None,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
-    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -155,7 +155,7 @@ def calculate_solar_incidence_series_iqbal(
         Panel tilt from horizontal.
     apply_atmospheric_refraction : bool
     complementary_incidence_angle : bool
-    zero_negative_solar_incidence_angles : bool
+    zero_negative_solar_incidence_angle : bool
     dtype : str
     array_backend : str
     verbose : int
@@ -261,7 +261,7 @@ def calculate_solar_incidence_series_iqbal(
         incidence_angle_definition = SolarIncidence().definition_complementary
         incidence_angle_description = SolarIncidence().description_complementary
 
-    if zero_negative_solar_incidence_angles:
+    if zero_negative_solar_incidence_angle:
         # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
         solar_incidence_series[
             (solar_incidence_series < 0) | (solar_zenith_series.value > pi / 2)
