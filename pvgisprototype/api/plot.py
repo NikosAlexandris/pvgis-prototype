@@ -1,5 +1,5 @@
 from devtools import debug
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, INCIDENCE_ALGORITHM_NAME, INCIDENCE_NAME
 from typing import List
 from pandas import DatetimeIndex
 from pvgisprototype.constants import AZIMUTH_ORIGIN_NAME, INCIDENCE_DEFINITION, NOT_AVAILABLE, UNITS_NAME, UNITLESS
@@ -11,6 +11,31 @@ import numpy
 import xarray
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
+from pvgisprototype.api.position.models import SOLAR_POSITION_PARAMETER_COLUMN_NAMES, SolarPositionParameter
+from typing import Sequence
+
+
+def safe_get_value(dictionary, key, index, default='NA'):
+    """
+    Parameters
+    ----------
+    dictionary: dict
+        Input dictionary
+    key: str
+        key to retrieve from the dictionary
+    index: int
+        index ... ?
+
+    Returns
+    -------
+    The value corresponding to the given `key` in the `dictionary` or the
+    default value if the key does not exist.
+
+    """
+    value = dictionary.get(key, default)
+    if isinstance(value, (list, numpy.ndarray)) and len(value) > index:
+        return value[index]
+    return value
 
 
 @log_function_call
@@ -70,7 +95,6 @@ def uniplot_data_array_series(
         [data_array] + (list_extra_data_arrays if list_extra_data_arrays else [])
     )
 
-
     if isinstance(data_array, float):
         logger.error(f"{exclamation_mark} Aborting as I cannot plot the single float value {float}!", alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!")
         return
@@ -107,20 +131,14 @@ def uniplot_data_array_series(
 
 def uniplot_solar_position_series(
     solar_position_series,
+    position_parameters: SolarPositionParameter = SolarPositionParameter.all,
+    timestamps: DatetimeIndex = None,
     # index: bool = False,
-    timing=None,
-    declination=None,
-    hour_angle=None,
-    zenith=None,
-    altitude=None,
-    azimuth=None,
     surface_orientation=None,
     surface_tilt=None,
-    incidence=None,
     # longitude: float,
     # latitude: float,
     # time_series_2: Path = None,
-    timestamps: DatetimeIndex = None,
     # start_time: Timestamp = None,
     # end_time: Timestamp = None,
     resample_large_series: bool = False,
@@ -135,59 +153,48 @@ def uniplot_solar_position_series(
     ):
     """
     """
-    from pvgisprototype.constants import (
-        DECLINATION_NAME,
-        HOUR_ANGLE_NAME,
-        ZENITH_NAME,
-        ALTITUDE_NAME,
-        AZIMUTH_NAME,
-        INCIDENCE_NAME,
-    )
-    solar_position_metrics = {
-        DECLINATION_NAME: declination,
-        HOUR_ANGLE_NAME: hour_angle,
-        ZENITH_NAME: zenith,
-        ALTITUDE_NAME: altitude,
-        AZIMUTH_NAME: azimuth,
-        INCIDENCE_NAME: incidence,
-    }
-    def safe_get_value(dictionary, key, index, default='NA'):
-        """
-        Parameters
-        ----------
-        dictionary: dict
-            Input dictionary
-        key: str
-            key to retrieve from the dictionary
-        index: int
-            index ... ?
-
-        Returns
-        -------
-        The value corresponding to the given `key` in the `dictionary` or the
-        default value if the key does not exist.
-
-        """
-        value = dictionary.get(key, default)
-        if isinstance(value, (list, numpy.ndarray)) and len(value) > index:
-            return value[index]
-        return value
-
     for model_name, model_result in solar_position_series.items():
-        solar_incidence_series = model_result.get(INCIDENCE_NAME, numpy.array([]))
-        solar_incidence_label = f'{model_result.get(INCIDENCE_NAME, NOT_AVAILABLE)} {model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}'
+
+        solar_incidence_series = model_result.get(SolarPositionParameter.incidence, numpy.array([]))
+        if label and solar_incidence_series is not None:
+            label = f'{model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)} ' + label
+            label += f' ({model_result.get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)})'
+        
         individual_series = [
-            model_result.get(solar_position_metric_name, numpy.array([]))
-            for solar_position_metric_name, include in solar_position_metrics.items()
-            if include and solar_position_metric_name != INCIDENCE_NAME
+            model_result.get(parameter, numpy.array([]))
+            for parameter in position_parameters if not isinstance(model_result.get(parameter), str)
+            and parameter != SolarPositionParameter.incidence
         ]
-        individual_metrics_labels = [
-            (solar_position_metric_name + f' {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}')
-            if solar_position_metric_name == AZIMUTH_NAME and include
-            else solar_position_metric_name
-            for solar_position_metric_name, include in solar_position_metrics.items()
-            if include and solar_position_metric_name != INCIDENCE_NAME
-        ]
+        
+        # individual_metrics_labels = [
+        #     (solar_position_metric_name + f' {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}')
+        #     if solar_position_metric_name == AZIMUTH_NAME and include
+        #     else solar_position_metric_name
+        #     for solar_position_metric_name, include in solar_position_metrics.items()
+        #     if include and solar_position_metric_name != INCIDENCE_NAME
+        # ]
+
+        individual_series_labels = []
+        for parameter in position_parameters:
+            if (
+                parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES
+                and parameter != SolarPositionParameter.incidence
+            ):
+                metric_label = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
+                if parameter == SolarPositionParameter.azimuth:
+                    metric_label = (
+                        [
+                            f"{label} {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}"
+                            for label in metric_label
+                        ]
+                        if isinstance(metric_label, list)
+                        else f"{metric_label} {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}"
+                    )
+                if isinstance(metric_label, list):
+                    individual_series_labels.extend(metric_label)
+                else:
+                    individual_series_labels.append(metric_label)
+
         if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             debug(locals())
 
@@ -199,8 +206,8 @@ def uniplot_solar_position_series(
             lines=True,
             supertitle=f'{supertitle} {model_name}',
             title=title,
-            label=solar_incidence_label if not label else label,
-            extra_legend_labels=individual_metrics_labels,
+            label=label,
+            extra_legend_labels=individual_series_labels,
             unit=model_result.get(UNITS_NAME, UNITLESS),
             terminal_width_fraction=terminal_width_fraction,
             verbose=verbose,
