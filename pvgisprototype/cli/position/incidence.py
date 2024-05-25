@@ -73,6 +73,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_dtype
 from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
+from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
 
 
 @log_function_call
@@ -93,7 +94,7 @@ def incidence(
     solar_incidence_model: Annotated[List[SolarIncidenceModel], typer_option_solar_incidence_model] = [SolarIncidenceModel.iqbal],
     complementary_incidence_angle: Annotated[bool, typer_option_sun_to_surface_plane_incidence_angle] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
-    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] = [SolarPositionParameter.incidence],
+    position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.incidence],
     zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,

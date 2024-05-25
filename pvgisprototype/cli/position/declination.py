@@ -48,6 +48,7 @@ from pvgisprototype.cli.typer.output import typer_option_index
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.cli.typer.output import typer_option_panels_output
+from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
 
 
 @log_function_call
@@ -61,8 +62,7 @@ def declination(
     local_time: Annotated[bool, typer_option_local_time] = False,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     solar_declination_model: Annotated[List[SolarDeclinationModel], typer_option_solar_declination_model] = [SolarDeclinationModel.pvis],
-    position_parameter: Annotated[List[SolarPositionParameter], 'Solar position parameter'] =
-    [SolarPositionParameter.declination],
+    position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.declination],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
