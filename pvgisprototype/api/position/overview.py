@@ -9,6 +9,7 @@ from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimut
 from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_series_pvlib
 from pvgisprototype.algorithms.pvlib.solar_hour_angle import calculate_solar_hour_angle_series_pvlib
 from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_series_pvlib
+from pvgisprototype.api.position.conversions import convert_north_to_south_radians_convention
 from pvgisprototype.log import log_function_call, logger
 from devtools import debug
 from typing import Dict, List, Tuple
@@ -181,12 +182,19 @@ def model_solar_position_overview_series(
             verbose=verbose,
             log=log,
         )
+        # Iqbal (1983) measures azimuthal angles from South !
+        surface_orientation_south_convention = SurfaceOrientation(
+            value=convert_north_to_south_radians_convention(
+                north_based_angle=surface_orientation
+            ),
+            unit=RADIANS,
+        )
         solar_incidence_series = calculate_solar_incidence_series_iqbal(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            surface_orientation=surface_orientation,
+            surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             complementary_incidence_angle=complementary_incidence_angle,
             dtype=dtype,
