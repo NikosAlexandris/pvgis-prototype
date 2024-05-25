@@ -12,7 +12,6 @@ from pvgisprototype.constants import (
     DECLINATION_NAME,
     HOUR_ANGLE_COLUMN_NAME,
     HOUR_ANGLE_NAME,
-    INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
     POSITION_ALGORITHM_NAME,
@@ -51,6 +50,17 @@ class SolarPositionParameter(str, Enum):
     azimuth = AZIMUTH_NAME
     incidence = INCIDENCE_NAME
     overview = 'Overview'
+    # Better ?
+    # all = [
+    #     timing,
+    #     declination,
+    #     hour_angle,
+    #     positioning,
+    #     zenith,
+    #     altitude,
+    #     azimuth,
+    #     incidence,
+    # ]
 
 
 SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
