@@ -2,6 +2,9 @@
 Solar position and solar surface position parameters 
 """
 
+from enum import Enum
+from devtools import debug
+from numpy import positive
 import typer
 from pvgisprototype.constants import SOLAR_DECLINATION_MINIMUM
 from pvgisprototype.constants import SOLAR_DECLINATION_MAXIMUM
@@ -12,14 +15,49 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_MINIMUM
 from pvgisprototype.constants import SURFACE_TILT_MAXIMUM
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarIncidenceModel, SolarPositionParameter, select_models
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_surface_geometry
+from typing import List, Sequence
 
 
+def solar_position_parameter_callback(
+    ctx: typer.Context,
+    position_parameter: List[Enum],
+) -> Sequence[Enum]:
+    """Set the default surface tilt equal to the latitude
+    """
+    uniplot = ctx.params.get('uniplot')
+    if uniplot:
+        from pvgisprototype.log import logger
+        logger.warning(
+            f'Attention ! You asked for a uniplot along with {ctx.command.name} and I think its less consfusing to only plot the incidence along with the altitude and azimuth angles!',
+            # alt=f'Attention ! You are running [code]{ctx.command.name}[/code] which expected multiple surface tilt angles!',
+        )
+        position_parameter = [SolarPositionParameter.altitude,
+                SolarPositionParameter.azimuth,
+                SolarPositionParameter.incidence]
+
+    debug(locals())
+    return select_models(SolarPositionParameter, position_parameter)
+    # return position_parameter
+
+
+typer_option_solar_position_parameter = typer.Option(
+    '--solar-position-parameter',
+    '--position-parameter',
+    help='Solar position parameter to calculate',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    # callback=solar_position_parameter_callback,  # This did not work!
+    rich_help_panel=rich_help_panel_solar_position,
+)
 typer_option_solar_declination_model = typer.Option(
+    '--solar-declination-model',
+    '--declination-model',
     help='Model to calculate the solar declination angle',
     show_default=True,
     show_choices=True,
@@ -56,6 +94,7 @@ typer_option_solar_constant = typer.Option(
 )
 typer_option_solar_position_model = typer.Option(
     '--solar-position-model',
+    '--position-model',
     help='Model to calculate solar position',
     show_default=True,
     show_choices=True,
@@ -83,6 +122,7 @@ typer_argument_refracted_solar_altitude_series = typer.Argument(
 )
 typer_option_solar_incidence_model = typer.Option(
     '--solar-incidence-model',
+    '--incidence-model',
     help='Method to calculate the solar incidence angle',
     show_default=True,
     show_choices=True,
@@ -90,9 +130,9 @@ typer_option_solar_incidence_model = typer.Option(
     rich_help_panel=rich_help_panel_solar_position,
 )
 typer_option_sun_to_surface_plane_incidence_angle = typer.Option(
-    '--sun-to-surface-plane/--sun-to-surface-normal',
+    '--sun-vector-to-surface-plane/--sun-vector-to-surface-normal',
     '--sun-to-plane/--sun-to-normal',
-    help='Incidence angle between sun-vector and surface-plane',
+    help='Incidence angle between Sun-Vector and Surface- Normal or Plane',
     show_default=True,
     show_choices=True,
     case_sensitive=False,
@@ -107,6 +147,17 @@ typer_argument_solar_incidence_series = typer.Argument(
     help='Solar incidence series',
     rich_help_panel=rich_help_panel_solar_position,
     show_default=False,
+)
+
+typer_option_zero_negative_solar_incidence_angle = typer.Option(
+    '--zero-negative-solar-incidence-angle/--do-not-zero-negative-solar-incidence-angle',
+    '--zero-negative-incidence-angle/--do-not-zero-negative-incidence-angle',
+    '--zero-negative-incidence/--do-not-zero-negative-incidence',
+    help='Zero negative solar incidence angles',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_solar_position,
 )
 
 # Solar surface parameters 
