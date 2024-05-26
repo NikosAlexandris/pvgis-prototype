@@ -64,10 +64,10 @@ class SolarPositionParameter(str, Enum):
 
 
 SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
-    SolarPositionParameter.timing: TIME_ALGORITHM_COLUMN_NAME,
+    # SolarPositionParameter.timing: TIME_ALGORITHM_COLUMN_NAME,
     SolarPositionParameter.declination: DECLINATION_COLUMN_NAME,
     SolarPositionParameter.hour_angle: HOUR_ANGLE_COLUMN_NAME,
-    SolarPositionParameter.positioning: POSITIONING_ALGORITHM_COLUMN_NAME,
+    # SolarPositionParameter.positioning: POSITIONING_ALGORITHM_COLUMN_NAME,
     SolarPositionParameter.zenith: ZENITH_COLUMN_NAME,
     SolarPositionParameter.altitude: ALTITUDE_COLUMN_NAME,
     SolarPositionParameter.azimuth: AZIMUTH_COLUMN_NAME,
