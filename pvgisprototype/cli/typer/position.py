@@ -15,7 +15,7 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_MINIMUM
 from pvgisprototype.constants import SURFACE_TILT_MAXIMUM
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.api.position.models import SolarIncidenceModel, SolarPositionParameter, select_models
+from pvgisprototype.api.position.models import SolarIncidenceModel, SolarPositionModel, SolarPositionParameter, select_models
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
@@ -25,24 +25,33 @@ from typing import List, Sequence
 
 def solar_position_parameter_callback(
     ctx: typer.Context,
-    position_parameter: List[Enum],
-) -> Sequence[Enum]:
-    """Set the default surface tilt equal to the latitude
+    position_parameter: List[SolarPositionParameter],
+) -> List[SolarPositionParameter]:
+    """Select specific solar position parameters if uniplot is aked.
+
+    Notes
+    -----
+    The context is updated as expected. The CLI interface, however, does not
+    return the expected output. Need to use in the CLI function body the
+    ctx.params.get('position_parameter') in order to make use of the updated
+    parameter!
+
     """
-    uniplot = ctx.params.get('uniplot')
-    if uniplot:
+    if ctx.params.get('uniplot'):
         from pvgisprototype.log import logger
-        logger.warning(
+        logger.info(
             f'Attention ! You asked for a uniplot along with {ctx.command.name} and I think its less consfusing to only plot the incidence along with the altitude and azimuth angles!',
-            # alt=f'Attention ! You are running [code]{ctx.command.name}[/code] which expected multiple surface tilt angles!',
+            alt=f'Attention ! You asked for a uniplot along with [code]{ctx.command.name}[/code] and I think its less consfusing to only plot the [bold]incidence[/bold] along with the [bold]altitude[bold] and [bold]azimuth[bold] angles!',
         )
-        position_parameter = [SolarPositionParameter.altitude,
+        from rich import print
+        print(
+                f'Attention ! You asked for a uniplot along with [code]{ctx.command.name}[/code] and I think its less consfusing to only plot the [bold]incidence[/bold] along with the [bold]altitude[bold] and [bold]azimuth[bold] angles!',
+        )
+        return [SolarPositionParameter.altitude,
                 SolarPositionParameter.azimuth,
                 SolarPositionParameter.incidence]
 
-    debug(locals())
-    return select_models(SolarPositionParameter, position_parameter)
-    # return position_parameter
+    return position_parameter
 
 
 typer_option_solar_position_parameter = typer.Option(
@@ -52,7 +61,7 @@ typer_option_solar_position_parameter = typer.Option(
     show_default=True,
     show_choices=True,
     case_sensitive=False,
-    # callback=solar_position_parameter_callback,  # This did not work!
+    callback=solar_position_parameter_callback,  # Works but does not return correctly in the inreface!
     rich_help_panel=rich_help_panel_solar_position,
 )
 typer_option_solar_declination_model = typer.Option(
