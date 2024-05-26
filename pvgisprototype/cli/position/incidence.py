@@ -73,7 +73,11 @@ from pvgisprototype.cli.typer.data_processing import typer_option_dtype
 from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
-from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_fingerprint
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_command_metadata
 
 
 @log_function_call
@@ -94,7 +98,6 @@ def incidence(
     solar_incidence_model: Annotated[List[SolarIncidenceModel], typer_option_solar_incidence_model] = [SolarIncidenceModel.iqbal],
     complementary_incidence_angle: Annotated[bool, typer_option_sun_to_surface_plane_incidence_angle] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
-    position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.incidence],
     zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
@@ -109,6 +112,9 @@ def incidence(
     resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = False,
     panels: Annotated[bool, typer_option_panels_output] = False,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -171,7 +177,6 @@ def incidence(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
-        solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
                 from pvgisprototype.cli.print import print_solar_position_table
@@ -182,7 +187,7 @@ def incidence(
                     timezone=timezone,
                     table=solar_incidence_series,
                     rounding_places=rounding_places,
-                    position_parameters=solar_position_parameters,
+                    position_parameters=[SolarPositionParameter.incidence],
                     surface_orientation=None,
                     surface_tilt=None,
                     incidence=None,
@@ -216,7 +221,7 @@ def incidence(
                 timestamps=timestamps,
                 timezone=timezone,
                 table=solar_incidence_series,
-                position_parameters=solar_position_parameters,
+                position_parameters=[SolarPositionParameter.incidence],
                 title='Solar Position Overview',
                 index=index,
                 surface_orientation=None,
@@ -264,7 +269,7 @@ def incidence(
         from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
             solar_position_series=solar_incidence_series,
-            position_parameters=solar_position_parameters,
+            position_parameters=[SolarPositionParameter.incidence],
             timestamps=timestamps,
             surface_orientation=None,
             surface_tilt=None,
