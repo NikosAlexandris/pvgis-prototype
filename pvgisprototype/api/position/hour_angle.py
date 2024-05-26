@@ -3,22 +3,119 @@ from math import radians
 from math import acos
 from math import tan
 from math import isfinite
-from datetime import datetime
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.validation.functions import CalculateSolarHourAngleInputModel
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
+from pvgisprototype.algorithms.pvlib.solar_hour_angle import calculate_solar_hour_angle_series_pvlib
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, RADIANS
+from pvgisprototype.validation.functions import CalculateSolarHourAngleSeriesInputModel
 from pvgisprototype.validation.functions import CalculateEventHourAngleInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pandas import DatetimeIndex
+from pvgisprototype import Longitude
+from zoneinfo import ZoneInfo
+from pvgisprototype.api.position.models import SolarTimeModel
+from typing import List
+from pvgisprototype.constants import POSITION_ALGORITHM_NAME
+from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import TIME_ALGORITHM_NAME
+from pvgisprototype.constants import HOUR_ANGLE_NAME
+from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import NOT_AVAILABLE
 
 
-@validate_with_pydantic(CalculateSolarHourAngleInputModel)
-def calculate_solar_hour_angle(
-    solar_time: datetime,
+def model_solar_hour_angle_series(
+    longitude: Longitude,
+    timestamps: DatetimeIndex, 
+    timezone: ZoneInfo,
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+        ) -> SolarHourAngle:
+    """
+    """
+    solar_hour_angle_series = None
+
+    if solar_position_model.value == SolarPositionModel.noaa:
+
+        solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
+            longitude=longitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
+
+    if solar_position_model.value == SolarPositionModel.skyfield:
+        pass
+
+    if solar_position_model.value  == SolarPositionModel.jenco:
+        pass
+
+    if solar_position_model.value == SolarPositionModel.hofierka:
+
+        solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
+            longitude=longitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
+
+    if solar_position_model.value == SolarPositionModel.pvlib:
+
+        solar_hour_angle_series = calculate_solar_hour_angle_series_pvlib(
+            longitude=longitude,
+            timestamps=timestamps,
+            # timezone=timezone,
+            # dtype=dtype,
+            # array_backend=array_backend,
+            # verbose=verbose,
+            # log=log,
+        )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    return solar_hour_angle_series
+
+
+# @validate_with_pydantic(CalculateSolarHourAngleSeriesInputModel)
+def calculate_solar_hour_angle_series(
+    longitude: Longitude,
+    timestamps: DatetimeIndex, 
+    timezone: ZoneInfo,
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
+    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
+    angle_output_units: str = RADIANS,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarHourAngle:
     """Calculate the hour angle ω'
 
@@ -134,22 +231,40 @@ def calculate_solar_hour_angle(
 
     In this function:
     """
-    solar_time_decimal_hours = timestamp_to_decimal_hours(solar_time)
-    hour_angle = (solar_time_decimal_hours - 12) * radians(15)
-    hour_angle = SolarHourAngle(value=hour_angle, unit=RADIANS)
-    if (
-        not isfinite(hour_angle.degrees)
-        or not hour_angle.min_degrees <= hour_angle.degrees <= hour_angle.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar hour angle {hour_angle.degrees} is out of the expected range\
-            [{hour_angle.min_degrees}, {hour_angle.max_degrees}] degrees"
-        )
-    return hour_angle
+    results = {}
+    for solar_position_model in solar_position_models:
+        # for the time being! ------------------------------------------------
+        if solar_position_model != SolarPositionModel.noaa:
+            logger.warning(f"Solar geometry overview series is not implemented for the requested solar position model: {solar_position_model}!")
+        # --------------------------------------------------------------------
+        if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
+            solar_hour_angle_series = model_solar_hour_angle_series(
+                    longitude=longitude,
+                    # latitude=latitude,
+                    timestamps=timestamps,
+                    timezone=timezone,
+                    solar_time_model=solar_time_model,
+                    solar_position_model=solar_position_model,
+                    dtype=dtype,
+                    array_backend=array_backend,
+                    verbose=verbose,
+                    log=log,
+                        )
+            solar_position_model_overview = {
+                solar_position_model.name: {
+                    POSITION_ALGORITHM_NAME: solar_position_model.value,
+                    TIME_ALGORITHM_NAME: solar_hour_angle_series.timing_algorithm if solar_hour_angle_series else NOT_AVAILABLE,
+                    HOUR_ANGLE_NAME: getattr(solar_hour_angle_series, angle_output_units, NOT_AVAILABLE) if solar_hour_angle_series else NOT_AVAILABLE,
+                    UNITS_NAME: angle_output_units,
+                }
+            }
+            results = results | solar_position_model_overview
+
+    return results
 
 
 @validate_with_pydantic(CalculateEventHourAngleInputModel)
-def calculate_event_hour_angle(
+def calculate_event_hour_angle_series(
     latitude: Latitude,
     surface_tilt: float = 0,
     solar_declination: float = 0,
