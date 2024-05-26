@@ -295,8 +295,31 @@ class SolarDeclinationModel(BaseModel):
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_declination`")
 
 
-class SolarPositionModelModel(BaseModel):  # ModelModel is intentional !
+class SolarPositionModelModel(BaseModel):
+    """
+    This Pydantic model defines the input parameter required by CLI and API
+    functions for solar position that expect an SolarPositionModel item.
+
+    Notes
+    -----
+
+    The suffix ModelModels is intentional !
+    """
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa
+
+
+class SolarPositionModelModels(BaseModel):
+    """
+    This Pydantic model defines the input parameter required (mainly) in API
+    functions for solar position that expect a list of SolarPositionModel
+    items.
+
+    Notes
+    -----
+
+    The suffix ModelModels is intentional !
+    """
+    solar_position_models: SolarPositionModel = SolarPositionModel.noaa
 
 
 class SolarIncidenceModel(BaseModel):
