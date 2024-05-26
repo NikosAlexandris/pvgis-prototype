@@ -66,7 +66,6 @@ from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from datetime import datetime
-from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
 
 
 @log_function_call
@@ -81,7 +80,6 @@ def zenith(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
-    position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.zenith],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -150,7 +148,6 @@ def zenith(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
-        solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
                 from pvgisprototype.cli.print import print_solar_position_table
@@ -161,7 +158,7 @@ def zenith(
                     timezone=timezone,
                     table=solar_zenith_series,
                     rounding_places=rounding_places,
-                    position_parameters=solar_position_parameters,
+                    position_parameters=[SolarPositionParameter.zenith],
                     surface_orientation=None,
                     surface_tilt=None,
                     incidence=None,  # Add Me ?
@@ -195,7 +192,7 @@ def zenith(
                 timestamps=timestamps,
                 timezone=timezone,
                 table=solar_zenith_series,
-                position_parameters=solar_position_parameters,
+                position_parameters=[SolarPositionParameter.zenith],
                 title='Solar Zenith Series',
                 index=index,
                 surface_orientation=None,
@@ -234,7 +231,7 @@ def zenith(
         from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
             solar_position_series=solar_zenith_series,
-            position_parameters=solar_position_parameters,
+            position_parameters=[SolarPositionParameter.zenith],
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
