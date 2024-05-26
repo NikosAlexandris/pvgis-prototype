@@ -15,7 +15,7 @@ from pvgisprototype.api.position.models import SOLAR_POSITION_PARAMETER_COLUMN_N
 from typing import Sequence
 
 
-def safe_get_value(dictionary, key, index, default='NA'):
+def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
     """
     Parameters
     ----------
@@ -131,7 +131,7 @@ def uniplot_data_array_series(
 
 def uniplot_solar_position_series(
     solar_position_series,
-    position_parameters: SolarPositionParameter = SolarPositionParameter.all,
+    position_parameters: [SolarPositionParameter] = SolarPositionParameter.all,
     timestamps: DatetimeIndex = None,
     # index: bool = False,
     surface_orientation=None,
@@ -153,60 +153,48 @@ def uniplot_solar_position_series(
     ):
     """
     """
-    def safe_get_value(dictionary, key, index, default='NA'):
-        """
-        Parameters
-        ----------
-        dictionary: dict
-            Input dictionary
-        key: str
-            key to retrieve from the dictionary
-        index: int
-            index ... ?
-
-        Returns
-        -------
-        The value corresponding to the given `key` in the `dictionary` or the
-        default value if the key does not exist.
-
-        """
-        value = dictionary.get(key, default)
-        if isinstance(value, (list, numpy.ndarray)) and len(value) > index:
-            return value[index]
-        return value
+    individual_series = None
+    individual_series_labels = None
 
     for model_name, model_result in solar_position_series.items():
 
-        solar_incidence_series = model_result.get(SolarPositionParameter.incidence, numpy.array([])) if not isinstance(model_result.get(SolarPositionParameter.incidence), str) else None
-        solar_position_metric_series = solar_incidence_series if solar_incidence_series is not None else model_result.pop(0)
-        individual_series = [
-            model_result.get(parameter, numpy.array([]))
-            for parameter in position_parameters if not isinstance(model_result.get(parameter), str)
-            and parameter != SolarPositionParameter.incidence
-        ]
-        if label and solar_incidence_series is not None:
-            label = f'{model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)} ' + label
-            label += f' ({model_result.get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)})'
-        individual_series_labels = []
-        for parameter in position_parameters:
-            if (
-                parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES
+        if len(position_parameters) == 1:
+            solar_position_metric_series = model_result.get(position_parameters[0])
+
+        else:
+            # Get the incidence series
+            solar_incidence_series = model_result.get(SolarPositionParameter.incidence, numpy.array([])) if not isinstance(model_result.get(SolarPositionParameter.incidence), str) else None
+            # Adjust the label for the incidence series
+            if label and solar_incidence_series is not None:
+                label = f'{model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)} ' + label
+                label += f' ({model_result.get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)})'
+            solar_position_metric_series = solar_incidence_series if solar_incidence_series is not None else model_result.pop(0)
+
+            individual_series = [
+                model_result.get(parameter, numpy.array([]))
+                for parameter in position_parameters if not isinstance(model_result.get(parameter), str)
                 and parameter != SolarPositionParameter.incidence
-            ):
-                metric_label = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
-                if parameter == SolarPositionParameter.azimuth:
-                    metric_label = (
-                        [
-                            f"{label} {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}"
-                            for label in metric_label
-                        ]
-                        if isinstance(metric_label, list)
-                        else f"{metric_label} {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}"
-                    )
-                if isinstance(metric_label, list):
-                    individual_series_labels.extend(metric_label)
-                else:
-                    individual_series_labels.append(metric_label)
+            ]
+            individual_series_labels = []
+            for parameter in position_parameters:
+                if (
+                    parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES
+                    and parameter != SolarPositionParameter.incidence
+                ):
+                    metric_label = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
+                    if parameter == SolarPositionParameter.azimuth:
+                        metric_label = (
+                            [
+                                f"{label} {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}"
+                                for label in metric_label
+                            ]
+                            if isinstance(metric_label, list)
+                            else f"{metric_label} {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}"
+                        )
+                    if isinstance(metric_label, list):
+                        individual_series_labels.extend(metric_label)
+                    else:
+                        individual_series_labels.append(metric_label)
 
         if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             debug(locals())
