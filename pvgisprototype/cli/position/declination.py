@@ -48,7 +48,11 @@ from pvgisprototype.cli.typer.output import typer_option_index
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.cli.typer.output import typer_option_panels_output
-from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_fingerprint
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_command_metadata
 
 
 @log_function_call
@@ -62,7 +66,6 @@ def declination(
     local_time: Annotated[bool, typer_option_local_time] = False,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     solar_declination_model: Annotated[List[SolarDeclinationModel], typer_option_solar_declination_model] = [SolarDeclinationModel.pvis],
-    position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.declination],
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
@@ -75,6 +78,9 @@ def declination(
     resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = False,
     panels: Annotated[bool, typer_option_panels_output] = False,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -122,7 +128,6 @@ def declination(
         verbose=verbose,
     )
     if not quiet:
-        solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
                 from pvgisprototype.cli.print import print_solar_position_table
@@ -132,7 +137,7 @@ def declination(
                     timestamp=timestamps,
                     timezone=timezone,
                     table=solar_declination_series,
-                    position_parameters=solar_position_parameters,
+                    position_parameters=[SolarPositionParameter.declination],
                     rounding_places=rounding_places,
                     surface_orientation=None,
                     surface_tilt=None,
@@ -175,7 +180,7 @@ def declination(
                 user_requested_timestamps=user_requested_timestamps, 
                 user_requested_timezone=user_requested_timezone,
                 rounding_places=rounding_places,
-                position_parameters=solar_position_parameters,
+                position_parameters=[SolarPositionParameter.declination],
                 group_models=group_models,
             )
     if csv:
@@ -205,16 +210,10 @@ def declination(
         from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
             solar_position_series=solar_declination_series,
-            timing=True,
+            position_parameters=[SolarPositionParameter.declination],
             timestamps=timestamps,
-            declination=True,
-            # hour_angle=True,
-            # zenith=True,
-            # altitude=True,
-            # azimuth=True,
             # surface_orientation=True,
             # surface_tilt=True,
-            # incidence=True,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle='Solar Declination Series',
@@ -222,4 +221,5 @@ def declination(
             label='Declination',
             legend_labels=None,
             terminal_width_fraction=terminal_width_fraction,
+            verbose=verbose,
         )
