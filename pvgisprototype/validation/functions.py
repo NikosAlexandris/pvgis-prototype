@@ -1,4 +1,5 @@
 # Generic input/output
+from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.validation.pvis_data_classes import VerbosityModel
 from pvgisprototype.validation.pvis_data_classes import LoggingModel
 from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
@@ -34,6 +35,7 @@ from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeMo
 from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeSeriesModel
 from pvgisprototype.validation.pvis_data_classes import SolarDeclinationModel
 from pvgisprototype.validation.pvis_data_classes import SolarPositionModelModel
+from pvgisprototype.validation.pvis_data_classes import SolarPositionModelModels
 from pvgisprototype.validation.pvis_data_classes import SolarHourAngleModel
 from pvgisprototype.validation.pvis_data_classes import ComplementaryIncidenceAngleModel
 
@@ -189,8 +191,15 @@ class CalculateEquationOfTimeNOAAInput(
 
 # Hour angle
 
-class CalculateSolarHourAngleInputModel(
-    SolarTimeModel,
+class CalculateSolarHourAngleSeriesInputModel(
+    LongitudeModel,
+    BaseTimeSeriesModel,
+    SolarPositionModelModels,
+    SolarTimeModelModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    VerbosityModel,
+    LoggingModel,
 ):
     pass
 
