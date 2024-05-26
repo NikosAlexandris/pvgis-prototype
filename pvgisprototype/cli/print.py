@@ -277,22 +277,28 @@ def get_value_or_default(dictionary, key, default=None):
     return dictionary.get(key, default)
 
 
-def build_caption(longitude, latitude, rounded_table, timezone, user_requested_timezone):
+def build_caption(
+    longitude, latitude, rounded_table, timezone, user_requested_timezone
+):
     first_model = next(iter(rounded_table))
     caption = (
         f"[underline]Position[/underline]  "
         f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
         f"Orientation : [bold blue]{rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None)}[/bold blue], "
         f"Tilt : [bold blue]{rounded_table[first_model].get(SURFACE_TILT_NAME, None)}[/bold blue] "
-        f"[[dim]{rounded_table[first_model].get(UNITS_NAME, UNITLESS)}[/dim]]\n"
-        f"[underline]Algorithms[/underline]  "
+        f"[[dim]{rounded_table[first_model].get(UNITS_NAME, UNITLESS)}[/dim]]"
+
+        f"\n[underline]Algorithms[/underline]  " # ---------------------------
         f"Timing : [bold]{rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
         f"Zone : {timezone}, "
         f"Local zone : {user_requested_timezone if user_requested_timezone else 'N/A'}, "
-        f"Positioning: {rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)}, "
-        f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
-        f"Incidence: {rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)}, "
-        f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}"
+
+        # f"Positioning: {rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)}, "
+        # f"Incidence: {rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)}\n"
+        
+        # f"[underline]Definitions[/underline]  "
+        # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
+        # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
     )
     return caption
 
@@ -332,16 +338,24 @@ def print_solar_position_series_table(
             else:
                 columns.append(column)
 
-    caption = build_caption(longitude, latitude, rounded_table, timezone, user_requested_timezone)
+    caption = build_caption(
+        longitude, latitude, rounded_table, timezone, user_requested_timezone
+    )
 
     for _, model_result in rounded_table.items():
         model_caption = caption
+        
         position_algorithm = get_value_or_default(model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
         model_caption += f"Positioning : [bold]{position_algorithm}[/bold], "
-        azimuth_origin = get_value_or_default(model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)
-        model_caption += f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "
+        
         incidence_algorithm = get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
         model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
+        
+        model_caption += f"\n[underline]Definitions[/underline]  " # -----------
+
+        azimuth_origin = get_value_or_default(model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)
+        model_caption += f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "
+        
         incidence_angle_definition = get_value_or_default(model_result, INCIDENCE_DEFINITION, None) if incidence else None
         model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
@@ -362,12 +376,12 @@ def print_solar_position_series_table(
                 SolarPositionParameter.declination: lambda idx=_index: str(get_scalar(
                     get_value_or_default(model_result, DECLINATION_NAME), idx, rounding_places
                 )),
-                SolarPositionParameter.timing: lambda idx=_index: str(get_value_or_default(
-                    model_result, TIME_ALGORITHM_NAME
-                )),
-                SolarPositionParameter.positioning: lambda idx=_index: str(get_value_or_default(
-                    model_result, POSITIONING_ALGORITHM_NAME
-                )),
+                # SolarPositionParameter.timing: lambda idx=_index: str(get_value_or_default(
+                #     model_result, TIME_ALGORITHM_NAME
+                # )),
+                # SolarPositionParameter.positioning: lambda idx=_index: str(get_value_or_default(
+                #     model_result, POSITIONING_ALGORITHM_NAME
+                # )),
                 SolarPositionParameter.hour_angle: lambda idx=_index: str(get_scalar(
                     get_value_or_default(model_result, HOUR_ANGLE_NAME), idx, rounding_places
                 )),
