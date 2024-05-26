@@ -77,6 +77,11 @@ from pvgisprototype.constants import UNIPLOT_FLAG_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.cli.typer.output import typer_option_panels_output
 from pvgisprototype.cli.typer.position import typer_option_zero_negative_solar_incidence_angle
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_fingerprint
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_command_metadata
 
 
 @log_function_call
@@ -95,7 +100,7 @@ def overview(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,  # Used by a callback function
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
-    model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
+    solar_position_model: Annotated[List[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
     position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.all],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -116,15 +121,18 @@ def overview(
     resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = False,
     panels: Annotated[bool, typer_option_panels_output] = False,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
 ) -> None:
     """
     """
+    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
     # print(f'Context: {ctx}')
     # print(f'Context: {ctx.params}')
-    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
 
     # if ctx.invoked_subcommand is not None:
     #     print("Skipping default command to run sub-command.")
@@ -154,7 +162,7 @@ def overview(
         logger.info(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
 
     # Why does the callback function `_parse_model` not work? 
-    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
+    solar_position_models = select_models(SolarPositionModel, solar_position_model)  # Using a callback fails!
     solar_position_series = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,
@@ -181,6 +189,7 @@ def overview(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
+        position_parameter = ctx.params.get('position_parameter')  # Bug in Typer that is not passing correctly whatever is in the context ?
         solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
