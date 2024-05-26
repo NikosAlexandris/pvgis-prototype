@@ -57,6 +57,7 @@ from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import UNITS_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pandas import DatetimeIndex
 
@@ -81,7 +82,7 @@ def model_solar_position_overview_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> Tuple:
     """Model solar position parameters for a position and moment in time.
 
@@ -124,7 +125,6 @@ def model_solar_position_overview_series(
     solar_altitude_series = None
     solar_azimuth_series = None
     solar_incidence_series = None
-
 
     # SolarPositionModel.noaa + SolarIncidenceModel.iqbal
     # SolarPositionModel.jenco + SolarIncidenceModel.jenco
@@ -468,7 +468,7 @@ def calculate_solar_position_overview_series(
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: SolarTimeModel = SolarTimeModel.skyfield,
+    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
