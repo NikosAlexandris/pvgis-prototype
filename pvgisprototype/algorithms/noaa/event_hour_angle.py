@@ -1,28 +1,16 @@
 from devtools import debug
-from datetime import datetime
-# from math import cos
-# from math import tan
-# from math import acos
 import numpy as np
-from typing import Union, Sequence
-<<<<<<< HEAD
-from pandas import DatetimeIndex
-||||||| 4cd84259
-=======
 from pandas import DatetimeIndex
 from pvgisprototype.api.position.models import SolarTimeModel
->>>>>>> main
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateEventHourAngleNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventHourAngleTimeSeriesNOAAInput
 from pvgisprototype import Latitude
 from pvgisprototype import RefractedSolarZenith
 from pvgisprototype import EventHourAngle
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from cachetools import cached
@@ -38,7 +26,7 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateEventHourAngleTimeSeriesNOAAInput)
-def calculate_event_hour_angle_time_series_noaa(
+def calculate_event_hour_angle_series_noaa(
     latitude: Latitude,
     timestamps: DatetimeIndex,
     refracted_solar_zenith: RefractedSolarZenith,
@@ -89,7 +77,7 @@ def calculate_event_hour_angle_time_series_noaa(
     Commented out: If the output units are 'degrees', the function
     will convert the calculated event hour angle from radians to degrees.
     """
-    solar_declination_series = calculate_solar_declination_time_series_noaa(
+    solar_declination_series = calculate_solar_declination_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
