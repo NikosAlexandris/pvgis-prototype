@@ -60,6 +60,11 @@ from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 from pvgisprototype.cli.typer.output import typer_option_panels_output
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_fingerprint
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.cli.typer.output import typer_option_command_metadata
 
 
 @log_function_call
@@ -74,7 +79,6 @@ def altitude(
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     model: Annotated[list[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
-    position_parameter: Annotated[List[SolarPositionParameter], typer_option_solar_position_parameter] = [SolarPositionParameter.altitude],
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -89,6 +93,9 @@ def altitude(
     resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = False,
     panels: Annotated[bool, typer_option_panels_output] = False,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -139,7 +146,6 @@ def altitude(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
-        solar_position_parameters = select_models(SolarPositionParameter, position_parameter)  # Using a callback fails!
         if timestamps.size == 1:
             if not panels:
                 from pvgisprototype.cli.print import print_solar_position_table
@@ -150,7 +156,7 @@ def altitude(
                     timezone=timezone,
                     table=solar_altitude_series,
                     rounding_places=rounding_places,
-                    position_parameters=solar_position_parameters,
+                    position_parameters=[SolarPositionParameter.altitude],
                     surface_orientation=None,
                     surface_tilt=None,
                     incidence=None,  # Add Me ?
@@ -184,7 +190,7 @@ def altitude(
                 timestamps=timestamps,
                 timezone=timezone,
                 table=solar_altitude_series,
-                position_parameters=solar_position_parameters,
+                position_parameters=[SolarPositionParameter.altitude],
                 title='Solar Altitude Series',
                 index=index,
                 surface_orientation=None,
@@ -223,7 +229,7 @@ def altitude(
         from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
             solar_position_series=solar_altitude_series,
-            position_parameters=solar_position_parameters,
+            position_parameters=[SolarPositionParameter.altitude],
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
