@@ -144,8 +144,8 @@ For a full list of features, see the [Features](overview/features.md) page.
 
     **For advanced users and programmers**
 
-    You may want work directly with the [PVGIS API](api/index.md).
-    to peek over the [source code](source_code/index.md)
+    You may want work directly with the [PVGIS API](api/index.md) ?
+    Peek over relevant [API examples]() and the [source code](source_code/index.md) documentation.
 
 - Development
 
