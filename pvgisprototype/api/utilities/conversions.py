@@ -210,32 +210,32 @@ def convert_dictionary_to_table(dictionary):
     return table
 
 
-def round_float_values(obj, decimal_places=3):
+def round_float_values(data, decimal_places=3):
     """Recursively round float attributes in a custom data class or any float."""
-    if isinstance(obj, float):
-        return round(obj, decimal_places)
+    if isinstance(data, float):
+        return round(data, decimal_places)
 
-    if (isinstance(obj, np.floating)):
-        return np.around(obj, decimals=decimal_places)  # See also Notes in numpy.round?
+    if (isinstance(data, np.floating)):
+        return np.around(data, decimals=decimal_places)  # See also Notes in numpy.round?
 
-    if isinstance(obj, np.ndarray) and obj.dtype.kind in "if":
-        if not obj.size == 1:
-            return np.around(obj, decimals=decimal_places)  # See also Notes in numpy.round?
-        else:
-            return np.format_float_positional(obj, precision=decimal_places)
+    if isinstance(data, np.ndarray) and data.dtype.kind in "if":
+        # if not data.size == 1:
+        return np.around(data, decimals=decimal_places)  # See also Notes in numpy.round?
+        # else:
+        #     return np.format_float_positional(data, precision=decimal_places)
 
-    if isinstance(obj, dict):
-        return {key: round_float_values(value, decimal_places) for key, value in obj.items() if not isinstance(value, Enum)}
+    if isinstance(data, dict):
+        return {key: round_float_values(value, decimal_places) for key, value in data.items() if not isinstance(value, Enum)}
 
-    if isinstance(obj, list):
-        return [round_float_values(item, decimal_places) for item in obj if not isinstance(item, Enum)]
+    if isinstance(data, list):
+        return [round_float_values(item, decimal_places) for item in data if not isinstance(item, Enum)]
 
-    if hasattr(obj, "__dict__") and not isinstance(obj, Enum):
-        for key, value in vars(obj).items():
-            setattr(obj, key, round_float_values(value, decimal_places))
-        return obj
+    if hasattr(data, "__dict__") and not isinstance(data, Enum):
+        for key, value in vars(data).items():
+            setattr(data, key, round_float_values(value, decimal_places))
+        return data
 
-    return obj
+    return data
 
     
 def convert_south_to_north_degrees_convention(azimuth_south_degrees):
