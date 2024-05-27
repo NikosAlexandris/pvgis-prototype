@@ -132,13 +132,22 @@ pvgis-prototype position azimuth \
 Nonetheless,
 the single-most important angle in the context of photovoltaics,
 is the solar incidence angle.
+Let's get it for a South-facing surface,
+tilted at 35 degrees
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="3"
 pvgis-prototype position incidence \
     8.628 45.812 \
+    180 35 \
     '2010-01-17 12:00:00' \
     -aou degrees
 ```
+
+!!! warning Orientation & Tilt angles
+
+    The `incidence` command requires a surface orientation and tilt angle (see
+    highlighted figures in the above example).
+    Missing to provide these parameters, would cause the command to fail.
 
 <!-- returns -->
 <!--   Time                  Declination ∢   Hour Angle 🕛   Zenith ⦭   Altitude ⦩   Azimuth ⭮   Incidence ⦡ -->
