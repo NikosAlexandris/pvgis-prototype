@@ -132,70 +132,25 @@ def hour_angle(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     if not quiet:
-        if timestamps.size == 1:
-            if not panels:
-                from pvgisprototype.cli.print import print_solar_position_table
-                print_solar_position_table(
-                    longitude=longitude,
-                    latitude=None,
-                    timestamp=timestamps,
-                    timezone=timezone,
-                    table=solar_hour_angle_series,
-                    rounding_places=rounding_places,
-                    position_parameters=[SolarPositionParameter.hour_angle],
-                    surface_orientation=True,
-                    surface_tilt=True,
-                    incidence=True,
-                    user_requested_timestamp=user_requested_timestamps, 
-                    user_requested_timezone=user_requested_timezone
-                )
-            else:
-                from pvgisprototype.cli.print import print_solar_position_table_panels
-                print_solar_position_table_panels(
-                    longitude=longitude,
-                    latitude=None,
-                    timestamp=timestamps,
-                    timezone=timezone,
-                    table=solar_hour_angle_series,
-                    rounding_places=rounding_places,
-                    timing=True,
-                    declination=True,
-                    hour_angle=True,
-                    zenith=True,
-                    altitude=True,
-                    azimuth=True,
-                    incidence=False,  # Add Me ?
-                    user_requested_timestamp=user_requested_timestamps, 
-                    user_requested_timezone=user_requested_timezone
-                )
-        else:
-            from pvgisprototype.cli.print import print_solar_position_series_table
-            print_solar_position_series_table(
-                longitude=longitude,
-                latitude=None,
-                timestamps=timestamps,
-                timezone=timezone,
-                table=solar_hour_angle_series,
-                position_parameters=[SolarPositionParameter.hour_angle],
-                title='Solar Position Overview',
-                index=index,
-                surface_orientation=True,
-                surface_tilt=True,
-                incidence=True,
-                user_requested_timestamps=user_requested_timestamps, 
-                user_requested_timezone=user_requested_timezone,
-                rounding_places=rounding_places,
-                group_models=group_models,
-            )
-            # from pvgisprototype.cli.print import print_solar_position_series_in_columns
-            # print_solar_position_series_in_columns(
-            #         longitude=longitude,
-            #         latitude=latitude,
-            #         timestamps=timestamps,
-            #         timezone=timezone,
-            #         table=solar_position_series,
-            #         )
-
+        from pvgisprototype.cli.print import print_solar_position_series_table
+        print_solar_position_series_table(
+            longitude=longitude,
+            latitude=None,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_hour_angle_series,
+            position_parameters=[SolarPositionParameter.hour_angle],
+            title='Solar Position Overview',
+            index=index,
+            surface_orientation=True,
+            surface_tilt=True,
+            incidence=True,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            rounding_places=rounding_places,
+            group_models=group_models,
+            panels=panels,
+        )
     if csv:
         from pvgisprototype.cli.write import write_solar_position_series_csv
         write_solar_position_series_csv(
@@ -219,7 +174,6 @@ def hour_angle(
             # group_models=group_models,
             filename=csv,
         )
-
     if uniplot:
         from pvgisprototype.api.plot import uniplot_solar_position_series
         uniplot_solar_position_series(
