@@ -50,17 +50,6 @@ class SolarPositionParameter(str, Enum):
     azimuth = AZIMUTH_NAME
     incidence = INCIDENCE_NAME
     overview = 'Overview'
-    # Better ?
-    # all = [
-    #     timing,
-    #     declination,
-    #     hour_angle,
-    #     positioning,
-    #     zenith,
-    #     altitude,
-    #     azimuth,
-    #     incidence,
-    # ]
 
 
 SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
