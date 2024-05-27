@@ -3,7 +3,7 @@ CLI module to calculate the solar declination angle for a location and moment in
 """
 
 from pandas import DatetimeIndex
-from rich import print
+from rich import panel, print
 from typing import Annotated
 from typing import Optional
 from typing import List
@@ -128,61 +128,25 @@ def declination(
         verbose=verbose,
     )
     if not quiet:
-        if timestamps.size == 1:
-            if not panels:
-                from pvgisprototype.cli.print import print_solar_position_table
-                print_solar_position_table(
-                    longitude=None,
-                    latitude=None,
-                    timestamp=timestamps,
-                    timezone=timezone,
-                    table=solar_declination_series,
-                    position_parameters=[SolarPositionParameter.declination],
-                    rounding_places=rounding_places,
-                    surface_orientation=None,
-                    surface_tilt=None,
-                    incidence=None,  # Add Me ?
-                    user_requested_timestamp=user_requested_timestamps, 
-                    user_requested_timezone=user_requested_timezone
-                )
-            else:
-                from pvgisprototype.cli.print import print_solar_position_table_panels
-                print_solar_position_table_panels(
-                    longitude=None,
-                    latitude=None,
-                    timestamp=timestamps,
-                    timezone=timezone,
-                    table=solar_declination_series,
-                    rounding_places=rounding_places,
-                    timing=True,
-                    declination=True,
-                    hour_angle=None,
-                    zenith=None,
-                    altitude=None,
-                    azimuth=None,
-                    incidence=None,  # Add Me ?
-                    user_requested_timestamp=user_requested_timestamps, 
-                    user_requested_timezone=user_requested_timezone
-                )
-        else:
-            from pvgisprototype.cli.print import print_solar_position_series_table
-            print_solar_position_series_table(
-                longitude=None,
-                latitude=None,
-                timestamps=timestamps,
-                timezone=timezone,
-                table=solar_declination_series,
-                title='Solar Declination Angle',
-                index=index,
-                surface_orientation=None,
-                surface_tilt=None,
-                incidence=None,
-                user_requested_timestamps=user_requested_timestamps, 
-                user_requested_timezone=user_requested_timezone,
-                rounding_places=rounding_places,
-                position_parameters=[SolarPositionParameter.declination],
-                group_models=group_models,
-            )
+        from pvgisprototype.cli.print import print_solar_position_series_table
+        print_solar_position_series_table(
+            longitude=None,
+            latitude=None,
+            timestamps=timestamps,
+            timezone=timezone,
+            table=solar_declination_series,
+            title='Solar Declination Angle',
+            index=index,
+            surface_orientation=None,
+            surface_tilt=None,
+            incidence=None,
+            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timezone=user_requested_timezone,
+            rounding_places=rounding_places,
+            position_parameters=[SolarPositionParameter.declination],
+            group_models=group_models,
+            panels=panels,
+        )
     if csv:
         from pvgisprototype.cli.write import write_solar_position_series_csv
         write_solar_position_series_csv(
