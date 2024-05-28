@@ -1,6 +1,8 @@
 import pytest
 from numpy import isclose
 
+TOLERANCE_LEVELS = [1, 1e-1, 1e-2, 1e-3]
+
 
 class GenericCheckCustomObjects:
     """Check structure of Pydantic custom objects.
@@ -37,7 +39,8 @@ class GenericCheckCustomObjects:
     def test_type(self, in_, expected):
         self._check_type(in_, expected)
 
-    def test_value(self, in_, expected, tolerance:float=1e-2):
+    @pytest.mark.parametrize('tolerance', TOLERANCE_LEVELS)
+    def test_value(self, in_, expected, tolerance:float):
         self._check_value(in_, expected, tolerance=tolerance)
     
     def test_unit(self, in_, expected,):
