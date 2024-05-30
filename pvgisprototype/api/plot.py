@@ -158,18 +158,19 @@ def uniplot_solar_position_series(
 
     for model_name, model_result in solar_position_series.items():
 
+        # First, chech if we received incidence series !
+        solar_incidence_series = model_result.get(SolarPositionParameter.incidence, numpy.array([])) if not isinstance(model_result.get(SolarPositionParameter.incidence), str) else None
+
+        # If this is the case, then adjust the label for the incidence series
+        if solar_incidence_series.size > 0:
+            label = f'{model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)} ' + 'Incidence ' + f' ({model_result.get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)})'
+
+        # However, and except for the overview commmand, we expect one angular metric time series
         if len(position_parameters) == 1:
             solar_position_metric_series = model_result.get(position_parameters[0])
 
         else:
-            # Get the incidence series
-            solar_incidence_series = model_result.get(SolarPositionParameter.incidence, numpy.array([])) if not isinstance(model_result.get(SolarPositionParameter.incidence), str) else None
-            # Adjust the label for the incidence series
-            if label and solar_incidence_series is not None:
-                label = f'{model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)} ' + label
-                label += f' ({model_result.get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)})'
             solar_position_metric_series = solar_incidence_series if solar_incidence_series is not None else model_result.pop(0)
-
             individual_series = [
                 model_result.get(parameter, numpy.array([]))
                 for parameter in position_parameters if not isinstance(model_result.get(parameter), str)
