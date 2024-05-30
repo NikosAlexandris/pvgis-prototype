@@ -27,6 +27,7 @@ Input South  │     180     │  │     90     │  │     0      │
 """
 
 from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_series_jenco
+from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimuth_series_pvlib
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
@@ -190,13 +191,16 @@ def model_solar_azimuth_series(
         # )
 
     if solar_position_model.value  == SolarPositionModel.pvlib:
-        pass
-        # solar_azimuth = calculate_solar_azimuth_pvlib(
-        #     longitude=longitude,
-        #     latitude=latitude,
-        #     timestamp=timestamp,
-        #     timezone=timezone,
-        # )
+
+        solar_azimuth_series = calculate_solar_azimuth_series_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
 
     # log_data_fingerprint(
     #         data=solar_azimuth_series.value,
