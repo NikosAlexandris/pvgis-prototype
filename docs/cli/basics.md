@@ -14,50 +14,131 @@ tags:
     various commands, required arguments and optional parameters
     as well as some insight into generating arbitrary series of Timestamps.
 
+<div class="grid cards" markdown>
+
+- :material-at: __Generic structure__
+
+    ---
+
+    ```bash
+    pvgis-prototype <command> <sub-command> <sub-sub-command> \
+        <1> <2> <3> [4] [5] \
+        <--option-a 'a'> <--option-b 'b'>
+    ```
+
+- :material-puzzle-plus: __Positional parameters__
+
+    - No prefixing
+
+    - Strict pre-specified order
+
+    - `<1>`, `<2>` and `<3>` are ***required*** for <Longitude> <Latitude> <Elevation>
+
+    - `[4]` and `[5]` are ***optional*** for [Orientation] [Tilt]
+
+</div>
+
+## Generic Structure
+
 The fundamental structure of the command line interface is
-a `command`
-_following_ the name of the program `pvgis-prototype`
-and a series of _required_ and _optional_ input parameters.
-Like so :
+a `command` and a `sub-command`
+_following_ the name of the program **`pvgis-prototype`**
+and a series of __required__ _positional_, __optional__ _positional_
+and __named__ _optional_ input parameters. Like so :
 
 ```bash
-pvgis-prototype <command> <1> <2> <3> <--option-a 'a'> <--option-b 'b'>
+pvgis-prototype <command> <sub-command> \
+    <1> <2> <3> \
+    [4] [5] \
+    <--option-a 'a'> <--option-b 'b'>
 ```
 
-## Command Structure
+!!! example
+
+    ``` bash
+    pvgis-prototype power broadband 8 45 214 170 44
+    ```
+
+    where :
+
+    - `power` is the command
+    - `broadband` a sub-command
+    - `8 45` are the Longitude and Latitude
+    - `214` is the Elevation
+    - `170 44` are the Orientation and Tilt angles
+
+Several commands feature chained `sub-sub-commands`.
+The structure remains the same and a `sub-command` `sub-sub-commands`
+only add up to the `command`
+which indeed follows the generic program name **`pvgis-prototype`** like
+
+```bash
+pvgis-prototype <command> <sub-command> <sub-sub-command> <1> <2> <3> [4] [5] <--option-a 'a'> <--option-b 'b'>
+```
+
+!!! example
+
+    ``` bash
+    pvgis-prototype irradiance global inclined 8 45 214 170 44
+    ```
+    
+    where :
+
+    - `irradiance` is the command
+    - `global` a sub-command
+    - `inclined` a sub-sub-command
+
+### Positional parameters
+
+- The numbers `<1>`, `<2>` and `<3>` enumerate the ***required*** _positional_ parameters.
+- The numbers `[4]` and `[5]` enumerate two ***optional*** yet _positional_ parameters.
+- Positional parameters need no prefixing. However, they are required to be
+  given strictly in the pre-specified order.
+
+### Optional parameters
+
+Optional parameters need
+
+1. to be _named_, for example [`--verbose`](verbosity) or its equivalent
+   simpler form `-v`.
+
+2. **not** to be given in a specific order, i.e. asking for `-v --uniplot` is
+   the same as `--uniplot -v`.
+
+### Location
 
 With a few exceptions,
 the `power`, `irradiance` and `position` commands,
 require _at the very least_
 the three basic input parameters
 that describe the **location of a solar surface**.
-Hence a more descriptive representation of basic command structure is :
+Hence a more descriptive representation of the basic command structure is :
 
 ``` bash
 pvgis-prototype <command> <Longitude> <Latitude> <Elevation>
 ```
 
-## Orientation and Tilt
+### Orientation and Tilt
 
 What follows after the location parameters
 is the **pair of `orientation` and `tilt` angles**
 of the solar surface in question.
 
 ``` bash
-pvgis-prototype <command> <Longitude> <Latitude> <Elevation> <Orientation> <Tilt>
+pvgis-prototype <command> <Longitude> <Latitude> <Elevation> [Orientation] [Tilt]
 ```
 
 If not provided,
 the default pre-set values are `orientation = 180` and `tilt = 45` degrees.
 
-## Time
+### Time
 
 Of course,
 _time_ is the first variable that determines the position of the sun in the sky
 and therefore impacts each and every calculation that depends on it.
 Nonetheless, in PVGIS, it comes as the last required positional parameter!
 The importance of _time_ is such that we have a dedicated section called
-[Timestamps](cli/timestamps.md) !
+[Timestamps](timestamps.md) !
 
 ``` bash
 pvgis-prototype <command> <Longitude> <Latitude> <Elevation> <Orientation> <Tilt> <Timestamp>
@@ -79,17 +160,38 @@ pvgis-prototype <command> <Longitude> <Latitude> <Elevation> <Orientation> <Tilt
 
 ## Examples that work
 
-Example that works with all positional parameters yet without a timestamp:
+### Without a timestamp
+
+Example that works with all positional parameters yet _without_ a timestamp :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined 8 45 214 170 44
 ```
 
-Example that works with all positional parameters including a timestamp:
+As mentioned above,
+this command will run with your computer's current local time and zone.
+We can see for example which timestamp the command ran for
+by adding some verbosity :
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance global inclined 8 45 214 170 44 -v
+```
+
+!!! question "Where did this timestamp came from ?"
+
+    The timestamp in the above command
+    is the one of this very example's execution time
+    which ran at build time of the interactive documentation you are reading.
+
+### Single timestamp
+
+Example that works with all positional parameters _including_ a timestamp:
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00'
 ```
+
+### Arbitrary number of single timestamps
 
 Example that works with all positional parameters including multiple timestamps:
 
@@ -103,38 +205,72 @@ The same as above, with additional verbosity :
 pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' -v
 ```
 
-## Examples that fail !
-
-Example that fails :
+### Mixing optional parameters
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 170 '2010-01-27 12:00:00'
+pvgis-prototype irradiance global inclined \
+    8 45 214 170 44 \
+    '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
+    -v \
+    --quiet
 ```
 
-!!! danger
+is the same as
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance global inclined \
+    8 45 214 170 44 \
+    '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00' \
+    --quiet \
+    --verbose
+```
+
+One more example _mixing_ the order of options
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance global inclined \
+    8 45 214 170 44 \
+    '2010-01-27 12:00:00, 2010-01-27 13:30:00' \
+    -v \
+    --quiet \
+    -vv
+```
+
+!!! warning "--quiet silences the output"
+
+    All of the above commands will not return anything since this is what the
+    `--quiet` flag (or `-q` for the matter) is meant to do!
+
+## Examples that fail !
+
+It is useful to get a sense of things that _don't work_ too.
+Following are some examples that fail
+and ideally should return meaninfgul error messages.
+
+!!! danger "Example that fails"
+
+    ``` bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype irradiance global inclined 8 45 214 170 '2010-01-27 12:00:00'
+    ```
 
     In the above example, the surface tilt angle is missing, followed by a
     user-requested timestamp. Due to the nature of the command line positional
     arguments, it is expected to follow strictly their order.
 
-Another example that fails :
+!!! danger "Another failing example"
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 44 '2010-01-27 12:00:00'
-```
-
-!!! danger
+    ``` bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype irradiance global inclined 8 45 214 44 '2010-01-27 12:00:00'
+    ```
 
     In the above example, the surface orientation angle is missing,
     followed by a user-requested timestamp.
 
-One more example that fails :
+!!! danger "One more failing example"
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 '2010-01-27 12:00:00'
-```
-
-!!! danger
+    ``` bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype irradiance global inclined 8 45 214 '2010-01-27 12:00:00'
+    ```
 
     In the last example that fails,
     both the surface orientation angle and tilt angles are missing followed by

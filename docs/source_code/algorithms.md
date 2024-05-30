@@ -16,6 +16,21 @@ independent from the core API, the CLI and the Web API components.
 <!-- ::: pvgisprototype.algorithms.martin_ruiz/ -->
 ::: pvgisprototype.algorithms.milne1921
 ::: pvgisprototype.algorithms.noaa
+::: pvgisprototype.algorithms.noaa.parameter_models
+::: pvgisprototype.algorithms.noaa.function_models
+::: pvgisprototype.algorithms.noaa.fractional_year
+::: pvgisprototype.algorithms.noaa.equation_of_time
+::: pvgisprototype.algorithms.noaa.time_offset
+::: pvgisprototype.algorithms.noaa.solar_time
+::: pvgisprototype.algorithms.noaa.local_time
+::: pvgisprototype.algorithms.noaa.solar_hour_angle
+::: pvgisprototype.algorithms.noaa.event_hour_angle
+::: pvgisprototype.algorithms.noaa.event_time
+::: pvgisprototype.algorithms.noaa.events
+::: pvgisprototype.algorithms.noaa.solar_declination
+::: pvgisprototype.algorithms.noaa.solar_zenith
+::: pvgisprototype.algorithms.noaa.solar_altitude
+::: pvgisprototype.algorithms.noaa.solar_azimuth
 <!-- ::: pvgisprototype.algorithms.pvgis/ -->
 ::: pvgisprototype.algorithms.pvis
 <!-- ::: pvgisprototype.algorithms.pvlib/ -->

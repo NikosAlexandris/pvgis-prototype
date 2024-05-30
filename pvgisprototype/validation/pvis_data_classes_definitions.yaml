@@ -103,6 +103,9 @@ TrueSolarTime:
   max_minutes:
     type: float
     initial: 1580
+  timing_algorithm:
+    type: str
+    initial:
 
 SolarHourAngle:
   value:
@@ -138,6 +141,14 @@ EventHourAngle:
     type: str
     initial:
 
+EventTime:
+  value:
+    type: DatetimeIndex
+    initial:
+  event:
+    type: str
+    initial:
+
 HourAngleSunrise:
   value:
     type: float
@@ -167,6 +178,9 @@ FractionalYear:
   max_degrees:
     type: float
     initial: 360
+  position_algorithm:
+    type: str
+    initial:
 
 SolarDeclination:
   value:
@@ -183,16 +197,16 @@ SolarDeclination:
     initial:
   min_radians:
     type: float
-    initial: -0.40910517666747087
+    initial: -0.4094542425178697
   max_radians:
     type: float
-    initial: 0.40910517666747087
+    initial: 0.4094542425178697
   min_degrees:
     type: float
-    initial: -23.44
+    initial: -23.46  # 23.44
   max_degrees:
     type: float
-    initial: 23.44
+    initial: 23.46  # 23.44
 
 SolarZenith:
   value:
@@ -317,6 +331,15 @@ SolarAzimuth:
   timing_algorithm:
     type: str
     initial:
+  definition:  # short definition for tabular outputs
+    type: str
+    initial: "Solar azimuth angle"
+  description:
+    type: str
+    initial: "Solar azimuth angle"
+  origin:
+    type: str
+    initial:
   min_radians:
     type: float
     initial: 0
@@ -359,15 +382,31 @@ SolarIncidence:
   timing_algorithm:
     type: str
     initial:
-  desription:
+  incidence_algorithm:
     type: str
-    initial: "The 'complementary' incidence angle between the position of the sun (sun-vector) and the inclination angle of a surface (surface-plane), contrasting typical definitions of the incidence angle between the sun-vector and the normal to the surface in question."
+    initial:
+  definition:  # short definition for tabular outputs
+    type: str
+    initial: "Sun-Vector-to-Surface-Normal"
+  definition_complementary:
+    type: str
+    initial: "Sun-Vector-to-Surface-Plane"
+  description:
+    type: str
+    initial: "The angle between the position of the sun (sun-vector) and the normal to the surface (surface-normal). Alternative definitions measure the complementary angle between the sun-vector and the inclination of the surface in question."
+  description_complementary:
+    type: str
+    initial: "The 'complementary' incidence angle between the position of the sun in the sky (sun-vector) and the inclination of the surface in question (surface-plane)."
+  azimuth_origin:
+    type: str
+    initial:
+      
 
 # How ?
 
 RelativeLongitude:
   value:
-    type: float
+    type: Union[ndarray, float]
     initial:
   unit:
     type: str
@@ -404,6 +443,18 @@ SurfaceOrientation:
   unit:
     type: str
     initial: 'degrees'
+  min_radians:
+    type: float
+    initial: 0
+  max_radians:
+    type: float
+    initial: 6.283185307179586
+  min_degrees:
+    type: float
+    initial: 0
+  max_degrees:
+    type: float
+    initial: 360
 
 SurfaceTilt:
   value:
@@ -412,6 +463,18 @@ SurfaceTilt:
   unit:
     type: str
     initial: 'degrees'
+  min_radians:
+    type: float
+    initial: 0
+  max_radians:
+    type: float
+    initial: 1.5707963267948966
+  min_degrees:
+    type: float
+    initial: 0
+  max_degrees:
+    type: float
+    initial: 90
 
 # Irradiance ?
 

@@ -1,3 +1,8 @@
+"""
+CLI module to calculate the diffuse horizontal irradiance component over a
+location for a period in time based on external solar irradiance time series.
+"""
+
 from typing import Annotated
 from typing import Optional
 from pathlib import Path
@@ -73,7 +78,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_multi_thread
 
 
 @log_function_call
-def get_diffuse_horizontal_component_from_sarah(
+def get_diffuse_horizontal_from_global_and_direct_irradiance(
     shortwave: Annotated[Path, typer_argument_global_horizontal_irradiance],
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
@@ -97,6 +102,7 @@ def get_diffuse_horizontal_component_from_sarah(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -133,9 +139,9 @@ def get_diffuse_horizontal_component_from_sarah(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                mask_and_scale=mask_and_scale,
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
                 in_memory=in_memory,
                 multi_thread=multi_thread,
                 verbose=verbose,
@@ -198,16 +204,16 @@ def get_diffuse_horizontal_component_from_sarah(
             title="Diffuse horizontal irradiance",
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=diffuse_horizontal_irradiance_series.value,
-            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Diffuse Horizontal Irradiance Series',
             title = 'Diffuse Horizontal Irradiance Series',
             label = 'Diffuse Horizontal Irradiance',
-            label_2 = None,
+            extra_legend_labels=None,
             unit = IRRADIANCE_UNITS,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash

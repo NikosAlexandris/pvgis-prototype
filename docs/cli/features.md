@@ -12,6 +12,37 @@ tags:
   - Debugging
 ---
 
+<div class="grid cards" markdown>
+
+- :material-help: __Help__
+
+    ---
+
+    For each command,
+    there is a `--help` option.
+
+- :octicons-versions-24: __Versioning__
+
+    ---
+
+    Which version of the software am I running ?
+
+    ``` bash
+    pvgis-prototype --version
+    ```
+
+- :octicons-command-palette-24: __Auto-Completion__
+
+    ---
+
+    Auto-completion in the command line ?
+
+    ``` bash
+    pvgis-prototype completion --help
+    ```
+
+</div>
+
 ## Help
 
 For each and every command,
@@ -40,7 +71,7 @@ pvgis-prototype --help
     pvgis-prototype --help
     ```
 
-## Version
+## Version :octicons-versions-24:
 
 It might be useful to know which version of the software we have installed :
 

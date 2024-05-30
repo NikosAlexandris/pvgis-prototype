@@ -1,4 +1,5 @@
 # Generic input/output
+from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.validation.pvis_data_classes import VerbosityModel
 from pvgisprototype.validation.pvis_data_classes import LoggingModel
 from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
@@ -14,6 +15,7 @@ from pvgisprototype.validation.pvis_data_classes import ElevationModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimeModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimeSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 
 # Atmospheric effects
 from pvgisprototype.validation.pvis_data_classes import ApplyAtmosphericRefractionModel
@@ -33,16 +35,18 @@ from pvgisprototype.validation.pvis_data_classes import BaseTimeOutputUnitsModel
 from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeModel
 from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeSeriesModel
 from pvgisprototype.validation.pvis_data_classes import SolarDeclinationModel
-from pvgisprototype.validation.pvis_data_classes import SolarPositionModel
+from pvgisprototype.validation.pvis_data_classes import SolarPositionModelModel
+from pvgisprototype.validation.pvis_data_classes import SolarPositionModelModels
 from pvgisprototype.validation.pvis_data_classes import SolarHourAngleModel
 from pvgisprototype.validation.pvis_data_classes import ComplementaryIncidenceAngleModel
 
 # Solar Surface
-from pvgisprototype.validation.pvis_data_classes import SurfaceTiltModel
 from pvgisprototype.validation.pvis_data_classes import SurfaceOrientationModel
+from pvgisprototype.validation.pvis_data_classes import SurfaceTiltModel
 
 # Incidence
 from pvgisprototype.validation.pvis_data_classes import SolarIncidenceModel
+from pvgisprototype.validation.pvis_data_classes import ZeroNegativeSolarIncidenceAngleModel
 
 # Output
 from pvgisprototype.validation.pvis_data_classes import BaseAngleUnitsModel
@@ -188,8 +192,15 @@ class CalculateEquationOfTimeNOAAInput(
 
 # Hour angle
 
-class CalculateSolarHourAngleInputModel(
-    SolarTimeModel,
+class CalculateSolarHourAngleSeriesInputModel(
+    LongitudeModel,
+    BaseTimeSeriesModel,
+    SolarPositionModelModels,
+    SolarTimeModelModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    VerbosityModel,
+    LoggingModel,
 ):
     pass
 
@@ -225,9 +236,9 @@ class CalculateEventHourAnglePVISInputModel(CalculateEventHourAngleInputModel):
     pass
 
 
-class SolarHourAnglePVLIBInput(
+class SolarHourAngleSeriesPVLIBInput(
     LongitudeModel,
-    BaseTimestampModel,
+    BaseTimestampSeriesModel,
 ):
     pass
 
@@ -286,8 +297,8 @@ class CalculateSolarAzimuthPVLIBInputModel(
     pass
 
 
-class CalculateSolarDeclinationPVLIBInput(
-    BaseTimestampModel,
+class CalculateSolarDeclinationSeriesPVLIBInput(
+    BaseTimestampSeriesModel,
 ):
     pass
 
@@ -298,10 +309,6 @@ class CalculateSolarDeclinationSkyfieldInput(
 ):
     pass
 
-class CalculateSolarDeclinationSkyfieldInput(
-    BaseTimestampModel,
-):
-    pass
 
 class CalculateSolarZenithPVLIBInputModel(
     CalculateSolarAltitudePVLIBInputModel
@@ -329,7 +336,7 @@ class CalculateSolarAzimuthPVISInputModel(
 class ModelSolarAltitudeInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
     EarthOrbitModel,
@@ -340,7 +347,7 @@ class ModelSolarAltitudeInputModel(
 class ModelSolarAltitudeTimeSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     # ArrayBackendModel,
@@ -353,7 +360,7 @@ class ModelSolarAltitudeTimeSeriesInputModel(
 class ModelSolarAzimuthInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     SolarTimeModelModel,
     ApplyAtmosphericRefractionModel,
     VerbosityModel,
@@ -365,7 +372,7 @@ class ModelSolarAzimuthInputModel(
 class ModelSolarAzimuthTimeSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    SolarPositionModel,
+    SolarPositionModelModel,
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     # ArrayBackendModel,
@@ -375,29 +382,16 @@ class ModelSolarAzimuthTimeSeriesInputModel(
     pass
 
 
-class ModelSolarGeometryOverviewInputModel(
-    BaseCoordinatesModel,
-    BaseTimeModel,
-    SurfaceTiltModel,
-    SurfaceOrientationModel,
-    SolarPositionModel,
-    SolarTimeModelModel,
-    ApplyAtmosphericRefractionModel,
-    EarthOrbitModel,
-    VerbosityModel,
-    LoggingModel,
-):
-    pass
-
-
-class ModelSolarGeometryOverviewTimeSeriesInputModel(
+class ModelSolarPositionOverviewSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    SurfaceTiltModel,
     SurfaceOrientationModel,
-    SolarPositionModel,
+    SurfaceTiltModel,
+    SolarPositionModelModel,
     SolarTimeModelModel,
+    # SolarIncidenceModel,
     ApplyAtmosphericRefractionModel,
+    ZeroNegativeSolarIncidenceAngleModel,
     EarthOrbitModel,
     ComplementaryIncidenceAngleModel,
     VerbosityModel,
@@ -410,8 +404,8 @@ class ModelSolarGeometryOverviewTimeSeriesInputModel(
 
 class CalculateRelativeLongitudeInputModel(
     LatitudeModel,
-    SurfaceTiltModel,
     SurfaceOrientationModel,
+    SurfaceTiltModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
@@ -422,8 +416,8 @@ class CalculateRelativeLongitudeInputModel(
 class CalculateSolarIncidenceInputModel(
     LatitudeModel,
     SolarDeclinationModel,
-    SurfaceTiltModel,
     SurfaceOrientationModel,
+    SurfaceTiltModel,
     LoggingModel,
 ):
     pass
@@ -432,8 +426,8 @@ class CalculateSolarIncidenceInputModel(
 class CalculateSolarIncidencePVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    SurfaceTiltModel,
     SurfaceOrientationModel,
+    SurfaceTiltModel,
     LoggingModel,
 ):
     pass
@@ -442,8 +436,8 @@ class CalculateSolarIncidencePVISInputModel(
 class CalculateSolarIncidenceJencoInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
-    SurfaceTiltModel,
     SurfaceOrientationModel,
+    SurfaceTiltModel,
     EarthOrbitModel,
     ComplementaryIncidenceAngleModel,
     VerbosityModel,
@@ -455,8 +449,8 @@ class CalculateSolarIncidenceJencoInputModel(
 class CalculateSolarIncidenceTimeSeriesJencoInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    SurfaceTiltModel,
     SurfaceOrientationModel,
+    SurfaceTiltModel,
     ComplementaryIncidenceAngleModel,
     ArrayTypeModel,
     VerbosityModel,
@@ -471,8 +465,8 @@ class ModelSolarIncidenceInputModel(
     SolarTimeModelModel,
     SolarIncidenceModel,
     ComplementaryIncidenceAngleModel,
-    SurfaceTiltModel,
     SurfaceOrientationModel,
+    SurfaceTiltModel,
     ApplyAtmosphericRefractionModel,
     RefractedSolarZenithModel,
     EarthOrbitModel,
@@ -490,9 +484,10 @@ class ModelSolarIncidenceTimeSeriesInputModel(
     SolarTimeModelModel,
     SolarIncidenceModel,
     ComplementaryIncidenceAngleModel,
-    SurfaceTiltModel,
     SurfaceOrientationModel,
+    SurfaceTiltModel,
     EarthOrbitModel,
+    ZeroNegativeSolarIncidenceAngleModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,

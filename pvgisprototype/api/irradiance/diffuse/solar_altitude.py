@@ -18,11 +18,11 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
@@ -93,7 +93,7 @@ from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 
 
 @log_function_call
-def calculate_term_n_time_series(
+def calculate_term_n_series(
     kb_series: List[float],
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -133,9 +133,11 @@ def calculate_term_n_time_series(
 
 
 @log_function_call
-def calculate_diffuse_sky_irradiance_time_series(
+def calculate_diffuse_sky_irradiance_series(
     n_series: List[float],
     surface_tilt: Optional[float] = np.radians(45),
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
     log: int = 0,
 ):
     """Calculate the diffuse sky irradiance
@@ -160,22 +162,19 @@ def calculate_diffuse_sky_irradiance_time_series(
     Internally the function calculates first the dimensionless fraction of the
     sky dome viewed by a tilted (or inclined) surface `ri(γN)`.
     """
-    sky_view_fraction = (1 + cos(surface_tilt)) / 2
-    diffuse_sky_irradiance_series = sky_view_fraction
-    + (
+    # sky_view_fraction = (1 + cos(surface_tilt)) / 2
+    diffuse_sky_irradiance_series = ((1 + cos(surface_tilt)) / 2) + (
         sin(surface_tilt)
         - surface_tilt
         * cos(surface_tilt)
-        - pi
-        * sin(surface_tilt / 2) ** 2
+        - pi * np.power((sin(surface_tilt / 2)), 2)
     ) * n_series
 
-    # return np.array(diffuse_sky_irradiance_series, dtype=dtype)
-    return diffuse_sky_irradiance_series
+    return np.array(diffuse_sky_irradiance_series, dtype=dtype)
 
 
 @log_function_call
-def diffuse_transmission_function_time_series(
+def diffuse_transmission_function_series(
     linke_turbidity_factor_series,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -216,7 +215,7 @@ def diffuse_transmission_function_time_series(
 
 
 @log_function_call
-def diffuse_solar_altitude_coefficients_time_series(
+def calculate_diffuse_solar_altitude_coefficients_series(
     linke_turbidity_factor_series,
     verbose: int = 0,
     log: int = 0,
@@ -236,7 +235,7 @@ def diffuse_solar_altitude_coefficients_time_series(
 
     """
     linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series.value, 2)
-    diffuse_transmission_series = diffuse_transmission_function_time_series(linke_turbidity_factor_series)
+    diffuse_transmission_series = diffuse_transmission_function_series(linke_turbidity_factor_series)
     diffuse_transmission_series_array = np.array(diffuse_transmission_series)
     a1_prime_series = (
         0.26463
@@ -266,7 +265,7 @@ def diffuse_solar_altitude_coefficients_time_series(
 
 
 @log_function_call
-def diffuse_solar_altitude_function_time_series(
+def calculate_diffuse_solar_altitude_function_series(
     solar_altitude_series: List[float],
     linke_turbidity_factor_series: LinkeTurbidityFactor,
     verbose: int = 0,
@@ -279,7 +278,7 @@ def diffuse_solar_altitude_function_time_series(
     Other symbol: function Fd
 
     """
-    a1_series, a2_series, a3_series = diffuse_solar_altitude_coefficients_time_series(
+    a1_series, a2_series, a3_series = calculate_diffuse_solar_altitude_coefficients_series(
         linke_turbidity_factor_series
     )
 
