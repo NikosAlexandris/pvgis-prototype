@@ -71,6 +71,148 @@ app = FastAPI(
     #     "url": "",
     # },
 )
+from fastapi.openapi.utils import get_openapi
+
+
+def reorder_params(api_spec, endpoint_path, params_order):
+    parameters_list = api_spec["paths"][endpoint_path]["get"]["parameters"]
+    print(f'{parameters_list=}')
+    ordered_parameters = sorted(
+        parameters_list, key=lambda x: params_order.index(x["name"])
+    )
+    api_spec["paths"][endpoint_path]["get"]["parameters"] = ordered_parameters
+    return api_spec
+
+
+def custom_openapi():
+        openapi_schema = get_openapi(
+            title="Some API",
+            version="1.0.0",
+            summary="This is a very custom OpenAPI schema",
+            description="Here's a longer description of the custom **OpenAPI** schema",
+            routes=app.routes,
+        )
+        reordered_openapi_schema = reorder_params(
+            openapi_schema,
+            "/calculate/power/broadband-advanced",
+            [
+                "longitude",
+                "latitude",
+                "elevation",
+                "surface_orientation",
+                "surface_tilt",
+                "timestamps",
+                "start_time",
+                "periods",
+                "frequency",
+                "end_time",
+                "timezone",
+                "global_horizontal_irradiance",
+                "direct_horizontal_irradiance",
+                "temperature_series",
+                "wind_speed_series",
+                "spectral_factor_series",
+                "neighbor_lookup",
+                "tolerance",
+                "mask_and_scale",
+                "in_memory",
+                "linke_turbidity_factor_series",
+                "apply_atmospheric_refraction",
+                "refracted_solar_zenith",
+                "albedo",
+                "apply_angular_loss_factor",
+                "solar_position_model",
+                "solar_incidence_model",
+                "zero_negative_solar_incidence_angle",
+                "solar_time_model",
+                "time_offset_global",
+                "hour_offset",
+                "solar_constant",
+                "perigee_offset",
+                "eccentricity_correction_factor",
+                "photovoltaic_module",
+                "system_efficiency",
+                "power_model",
+                "temperature_model",
+                "efficiency",
+                "dtype",
+                "array_backend",
+                "multi_thread",
+                "rounding_places",
+                "statistics",
+                "groupby",
+                "csv",
+                "verbose",
+                "quiet",
+                "log",
+                "fingerprint",
+                "metadata",
+                "profile",
+            ],
+        )
+        reordered_openapi_schema = reorder_params(
+            openapi_schema,
+            "/calculate/power/broadband",
+            [
+                "longitude",
+                "latitude",
+                "elevation",
+                "surface_orientation",
+                "surface_tilt",
+                "timestamps",
+                "start_time",
+                "periods",
+                "frequency",
+                "end_time",
+                "timezone",
+                "global_horizontal_irradiance",
+                "direct_horizontal_irradiance",
+                "temperature_series",
+                "wind_speed_series",
+                "spectral_factor_series",
+                "neighbor_lookup",
+                "tolerance",
+                "mask_and_scale",
+                "in_memory",
+                "linke_turbidity_factor_series",
+                "apply_atmospheric_refraction",
+                "refracted_solar_zenith",
+                "albedo",
+                "apply_angular_loss_factor",
+                "solar_position_model",
+                "solar_incidence_model",
+                "zero_negative_solar_incidence_angle",
+                "solar_time_model",
+                "time_offset_global",
+                "hour_offset",
+                "solar_constant",
+                "perigee_offset",
+                "eccentricity_correction_factor",
+                "photovoltaic_module",
+                "system_efficiency",
+                "power_model",
+                "temperature_model",
+                "efficiency",
+                "dtype",
+                "array_backend",
+                "multi_thread",
+                "rounding_places",
+                "statistics",
+                "groupby",
+                "csv",
+                "verbose",
+                "quiet",
+                "log",
+                "fingerprint",
+                "metadata",
+                "profile",
+            ],
+        )
+        app.openapi_schema = reordered_openapi_schema
+        return app.openapi_schema
+
+# from pvgisprototype.custom_openapi import custom_openapi
+app.openapi = custom_openapi#(app) # customely ordered parameters
 
 app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 templates = Jinja2Templates(directory="templates")
