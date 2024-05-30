@@ -39,8 +39,16 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
 
 
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
+# @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def model_solar_hour_angle_series(
     longitude: Longitude,
     timestamps: DatetimeIndex, 

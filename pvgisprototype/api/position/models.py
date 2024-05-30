@@ -70,6 +70,7 @@ class SolarTimeModel(str, Enum):
     milne = 'Milne1921'
     noaa = 'NOAA'
     pvgis = 'PVGIS'
+    pvlib = 'pvlib'
     skyfield = 'Skyfield'
 
 
@@ -94,7 +95,7 @@ class SolarPositionModel(str, Enum):
 
 class SolarIncidenceModel(str, Enum):
     all = 'all'
-    hofierka = 'Hofierka 2002'
+    hofierka = 'Hofierka'
     jenco = 'Jenco'
     iqbal = 'Iqbal'  # NREL
     pvis = 'PVIS'
