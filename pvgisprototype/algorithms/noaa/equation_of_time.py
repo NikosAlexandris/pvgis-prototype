@@ -6,6 +6,7 @@ See also: https://unpkg.com/solar-calculator@0.1.0/index.js
 """
 
 from devtools import debug
+from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
 from pvgisprototype import EquationOfTime
@@ -38,8 +39,13 @@ def calculate_equation_of_time_series_noaa(
 ) -> EquationOfTime:
     """Calculate the Equation of Time for a time series in minutes.
 
-    The Equation of Time is the difference between solar apparent and mean
-    time.
+    The Equation of Time is the difference between the apparent solar time and
+    the mean solar time.
+
+    Returns
+    -------
+    equation_of_time_series : numeric
+        Difference in time between solar time and mean solar time in minutes.
 
     """
     fractional_year_series = calculate_fractional_year_series_noaa(
@@ -76,6 +82,6 @@ def calculate_equation_of_time_series_noaa(
     return EquationOfTime(
         value=equation_of_time_series,
         unit=MINUTES,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
+        position_algorithm=fractional_year_series.position_algorithm,
+        timing_algorithm=SolarTimeModel.noaa,
     )

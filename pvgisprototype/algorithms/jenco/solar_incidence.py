@@ -366,7 +366,8 @@ def calculate_solar_incidence_series_jenco(
         - cos(latitude.radians)
         * sin(surface_tilt.radians)
         * cos(surface_orientation.radians)
-        + sin(latitude.radians) * cos(surface_tilt.radians)
+        + sin(latitude.radians)
+        * cos(surface_tilt.radians)
     )
     relative_inclined_latitude = asin(sine_relative_inclined_latitude)
 
@@ -401,7 +402,8 @@ def calculate_solar_incidence_series_jenco(
 
     # Note the - in front of the solar_hour_angle_series ! Explain-Me !
     sine_solar_incidence_series = (
-        c_inclined_31_series * np.cos(solar_hour_angle_series.radians - relative_longitude.radians)
+        c_inclined_31_series 
+        * np.cos(solar_hour_angle_series.radians - relative_longitude.radians)
         + c_inclined_33_series
     )
     solar_incidence_series = np.arcsin(sine_solar_incidence_series)
@@ -437,10 +439,10 @@ def calculate_solar_incidence_series_jenco(
     return SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
-        positioning_algorithm=solar_azimuth_east_based_series.position_algorithm,  #
+        positioning_algorithm=solar_declination_series.position_algorithm,  #
         timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
         incidence_algorithm=SolarIncidenceModel.jenco,
         definition=incidence_angle_definition,
         description=incidence_angle_description,
-        azimuth_origin=solar_azimuth_east_based_series.origin,
+        # azimuth_origin=solar_azimuth_east_based_series.origin,
     )
