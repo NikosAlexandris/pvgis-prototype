@@ -14,7 +14,7 @@ authors = [
     { name = 'Nikos Alexandris', email = 'Nikos.Alexandris@ec.europa.eu' },
     { name = 'Olympia Gounari', email = '' },
 ]
-requires-python = ">=3.11"
+requires-python = "<3.12,>=3.11"
 dependencies = [
   "typer",
   "numpy",
@@ -24,6 +24,7 @@ dependencies = [
   "loguru",
   "xarray_extras",
   "pydantic",
+  "pydantic_numpy",
   "pvlib",
   "netcdf4",
   "distributed",
@@ -96,6 +97,7 @@ docs = [
   "mkdocs-badges",
   "mkdocs-coverage",
   "diagrams",
+  "mkdocs-jupyter",
 ]
 all = ["pvgisprototype[web, dev, test, docs]"]
 

@@ -12,7 +12,7 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shortwave.horizontal import calculate_global_horizontal_irradiance_time_series
+from pvgisprototype.api.irradiance.shortwave.horizontal import calculate_global_horizontal_irradiance_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_elevation
@@ -31,10 +31,8 @@ from pvgisprototype.cli.typer.time_series import typer_option_in_memory
 from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer.albedo import typer_option_albedo
 from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
-from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
@@ -53,7 +51,6 @@ from pvgisprototype.cli.typer.output import typer_option_fingerprint
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -94,7 +91,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 @log_function_call
-def get_global_horizontal_irradiance_time_series(
+def get_global_horizontal_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -105,17 +102,11 @@ def get_global_horizontal_irradiance_time_series(
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    neighbor_lookup: Annotated[MethodForInexactMatches, typer_option_nearest_neighbor_lookup] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,
-    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -129,6 +120,7 @@ def get_global_horizontal_irradiance_time_series(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -143,23 +135,16 @@ def get_global_horizontal_irradiance_time_series(
     radiation received from above by a surface horizontal to the ground. It
     includes both the direct and the diffuse solar radiation.
     """
-    global_horizontal_irradiance_series = calculate_global_horizontal_irradiance_time_series(
+    global_horizontal_irradiance_series = calculate_global_horizontal_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
         timestamps=timestamps,
         timezone=timezone,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        albedo=albedo,
-        apply_angular_loss_factor=apply_angular_loss_factor,
         solar_position_model=solar_position_model,
-        solar_incidence_model=solar_incidence_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
@@ -212,15 +197,17 @@ def get_global_horizontal_irradiance_time_series(
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=global_horizontal_irradiance_series.value,
             list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
             supertitle = 'Global Horizontal Irradiance Series',
             title = 'Global Horizontal Irradiance Series',
             label = 'Global Horizontal Irradiance',
-            label_2 = None,
+            extra_legend_labels=None,
             unit = IRRADIANCE_UNITS,
             terminal_width_fraction=terminal_width_fraction,
         )

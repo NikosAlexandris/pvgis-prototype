@@ -34,13 +34,15 @@ def get_coordinates(data_array: xr.DataArray) -> tuple:
 def plot_series(
     data_array,
     time: DatetimeIndex,
-    figure_name: str,
+    figure_name: str = 'series_plot',
+    file_extension: str = 'png',
     add_offset: bool = False,
     variable_name_as_suffix: bool = None,
     tufte_style: bool = None,
     width: int = 16,
     height: int = 9,
     resample_large_series: bool = False,
+    fingerprint: bool = False,
 ):
     """
     Plot series over a location
@@ -208,7 +210,7 @@ def plot_series(
                     )
 
     # Identity
-
+    plt.subplots_adjust(bottom=0.18)
     data_source = 'Data Source'
     fig.text(
             0.5,
@@ -220,29 +222,43 @@ def plot_series(
             alpha=0.5,
     )
 
-    # Handle variable name as suffix
-    if variable_name_as_suffix:
-        name_suffix = getattr(data_array, 'long_name', data_array.name).replace(' ', '_').lower()
-        figure_name = Path(f"{figure_name}_{name_suffix}")
+    if figure_name:
 
-    # ------------------------------------------------------------------------
-    # Handle time-based naming
-    if isinstance(time, (list, tuple)) and len(time) == 1:
-        time = time[0]
-        time_string = str(time).replace('-', '')
+        # Handle variable name as suffix
+        if variable_name_as_suffix:
+            name_suffix = getattr(data_array, 'long_name', data_array.name).replace(' ', '_').lower()
+            figure_name = Path(f"{figure_name}_{name_suffix}")
+
+        # Handle time-based naming
+        if isinstance(time, (list, tuple)) and len(time) == 1:
+            time = time[0]
+            time_string = str(time).replace('-', '')
+
+        else:
+            start_time = data_array.time.to_series().iloc[0].strftime('%Y%m%d%H%M%S')
+            end_time = data_array.time.to_series().iloc[-1].strftime('%Y%m%d%H%M%S')
+            time_string = f'{start_time}_{end_time}'
+
+        figure_name = Path(f"{figure_name}_{time_string}")
+
     else:
-        time_string = data_array.time.values[0]
+        figure_name = f'series_plot' # the long name of the input data array ?
+        if supertitle:
+            figure_name += f'_{supertitle}' # the long name of the input data array ?
+        from datetime import datetime
+        figure_name += f"_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
-    figure_name = Path(f"{figure_name}_{time_string}")
-    # ------------------------------------------------------------------------
+    if fingerprint:
+        from pvgisprototype.validation.hashing import generate_hash
+        figure_name += f'{generate_hash(data_array)}'
 
     # plt.legend(loc='upper right')
-    file_extension='png'
-    output_filename = f'{figure_name}.{file_extension}'
 
     # Save figure
     if not tufte_style:
         plt.tight_layout()
+
+    output_filename = f'{figure_name}.{file_extension}'
     plt.savefig(
             output_filename,
             # dpi=300,

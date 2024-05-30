@@ -25,9 +25,7 @@ nav:
     - tutorials/solar_position.md
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
-  - API:
-    - api/index.md
-    - api/api.md
+    - notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
   - CLI:
     - cli/index.md
     - cli/features.md
@@ -35,28 +33,40 @@ nav:
     - cli/verbosity.md
     - cli/symbols.md
     - cli/timestamps.md
+    - cli/rounding.md
     - cli/plots.md
     - cli/fingerprint.md
     - cli/metadata.md
+    - cli/numpy.md
     - cli/logging.md
     - Power:
       - Introduction: cli/power/introduction.md
+      - Tools: cli/power/tools.md
       - Broadband: cli/power/broadband.md
       - Spectrally Resolved: cli/power/spectral.md
-      - Toolbox: cli/power/tools.md
+      - Spectral Effect: cli/power/spectral_effect.md
     - Irradiance:
-      - Overview: cli/irradiance/introduction.md
-      - Overview: cli/irradiance/irradiance.md
+      - Introduction: cli/irradiance/introduction.md
+      - Tools: cli/irradiance/tools.md
+      - Global: cli/irradiance/global.md
       - Direct: cli/irradiance/direct.md
-    - Solar Geometry:
+      - Diffuse: cli/irradiance/diffuse.md
+      - Reflected: cli/irradiance/reflected.md
+    - Position:
       - Introduction: cli/position/introduction.md
+      - Tools: cli/position/tools.md
       - Overview: cli/position/overview.md
+      - Solar Time: cli/position/time.md
       - Incidence: cli/position/incidence.md
   - Web API:
     - web_api/index.md
     - web_api/install.md
     - web_api/run.md
     - web_api/examples.md
+  - API:
+    - api/index.md
+    - api/position.md
+    - api/power.md
   - Reference:
     - reference/index.md
     - reference/solar_geometry_introduction.md
@@ -70,6 +80,7 @@ nav:
     - Architecture: source_code/architecture.md
     - Dependencies: source_code/dependencies.md
     - Algorithms: source_code/algorithms.md
+    - Custom Data Classes: source_code/custom_data_classes.md
     - API: source_code/api.md
     - CLI: source_code/cli.md
     - Web API: source_code/web_api.md
@@ -80,10 +91,13 @@ nav:
     - development/roadmap_and_progress.md
     - development/conventions.md
     - development/optimisation.md
+    - development/contribution_guidelines.md
+    - development/adding_new_features.md
     - development/photovoltaic_performance.md
     - development/solar_irradiance.md
     - development/solar_geometry.md
     - development/topography.md
+    - development/pytest.md
     # - development/state_and_future_of_pvgis.md
     - "<p><i class='fas fa-flask'>&nbsp;</i> Coverage report</p>": coverage.md
   - Tags: includes/tags.md
@@ -204,6 +218,7 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - attr_list
+  - md_in_html
   - abbr
   - pymdownx.snippets:
       auto_append:
@@ -250,7 +265,8 @@ plugins:
   - coverage:
       html_report_dir: docs/development/coverage_html
       # page_name: coverage  # default
-  - markdown-exec
+  - markdown-exec:
+      ansi: required
   - autorefs
   - git-revision-date-localized:
       type: timeago
@@ -294,6 +310,9 @@ plugins:
             signature_crossrefs: true
             summary: true
             show_bases: true
+  - mkdocs-jupyter:
+          execute: true
+          include_source: True
 
 # extra:
 #   social:

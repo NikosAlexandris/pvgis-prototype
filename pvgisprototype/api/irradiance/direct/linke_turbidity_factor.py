@@ -14,7 +14,7 @@ from devtools import debug
 
 
 @log_function_call
-def correct_linke_turbidity_factor_time_series(
+def correct_linke_turbidity_factor_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,

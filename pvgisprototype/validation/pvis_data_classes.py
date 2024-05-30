@@ -1,4 +1,3 @@
-from pydantic import Field
 from typing import Tuple
 from pydantic import BaseModel
 from pydantic import ConfigDict
@@ -6,14 +5,12 @@ from pydantic import field_validator
 from pydantic import confloat
 from typing import Union
 from typing import Optional
-from typing import Sequence
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import time
 from pandas import Timestamp
 from pandas import DatetimeIndex
 from math import pi
-from pydantic import validator
 import numpy as np
 from numpy import ndarray
 from pvgisprototype import RefractedSolarAltitude
@@ -39,6 +36,7 @@ from pvgisprototype.validation.arrays import NDArrayBackend
 from pvgisprototype.validation.arrays import CUPY_ENABLED
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 
 
 MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
@@ -62,7 +60,7 @@ class ArrayShapeModel(BaseModel):
 class ArrayInitialisationModel(BaseModel):
     initialisation_method: str = 'zeros' 
 
-    @validator('initialisation_method')
+    @field_validator('initialisation_method')
     def check_init_method(cls, v):
         valid_methods = ['zeros', 'ones', 'empty']
         if v not in valid_methods:
@@ -87,7 +85,7 @@ class ArrayTypeModel(BaseModel):
 class ArrayBackendModel(BaseModel):
     array_backend: str = ARRAY_BACKEND_DEFAULT
 
-    @validator('array_backend')
+    @field_validator('array_backend')
     def check_backend(cls, v, values, **kwargs):
         if values.get('use_gpu') and CUPY_ENABLED:
             return 'CUPY'
@@ -148,7 +146,7 @@ class BaseCoordinatesModel(
 # When?
 
 class BaseTimestampModel(BaseModel):
-    timestamp: Union[np.datetime64, np.ndarray, Timestamp, DatetimeIndex]
+    timestamp: Union[np.datetime64, Timestamp, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamp')
@@ -168,16 +166,13 @@ class BaseTimestampModel(BaseModel):
 
 
 class BaseTimestampSeriesModel(BaseModel):
-    timestamps: Union[np.ndarray, DatetimeIndex]
+    timestamps: Union[Timestamp, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamps')
-    def check_empty_list(cls, value):
-        if isinstance(value, np.ndarray):
-            if value.dtype.type != np.datetime64:
-                raise ValueError("NumPy array must be of dtype 'datetime64'")
-        elif not isinstance(value, DatetimeIndex):
-            raise TypeError("Timestamps must be a NumPy datetime64 array or a Pandas DatetimeIndex")
+    def check_type(cls, value):
+        if not isinstance(value, DatetimeIndex|Timestamp) :
+            raise TypeError("Timestamps must be a Pandas DatetimeIndex or Timestamp object")
         return value
 
 
@@ -300,12 +295,35 @@ class SolarDeclinationModel(BaseModel):
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_declination`")
 
 
-class SolarPositionModel(BaseModel):
+class SolarPositionModelModel(BaseModel):
+    """
+    This Pydantic model defines the input parameter required by CLI and API
+    functions for solar position that expect an SolarPositionModel item.
+
+    Notes
+    -----
+
+    The suffix ModelModels is intentional !
+    """
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa
 
 
+class SolarPositionModelModels(BaseModel):
+    """
+    This Pydantic model defines the input parameter required (mainly) in API
+    functions for solar position that expect a list of SolarPositionModel
+    items.
+
+    Notes
+    -----
+
+    The suffix ModelModels is intentional !
+    """
+    solar_position_models: SolarPositionModel = SolarPositionModel.noaa
+
+
 class SolarIncidenceModel(BaseModel):
-    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal
 
 
 class ComplementaryIncidenceAngleModel(BaseModel):
@@ -317,7 +335,7 @@ class EarthOrbitModel(BaseModel):
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR
 
 
-class SolarTimeModelModel(BaseModel):  # ModelModel is intentional!
+class SolarTimeModelModel(BaseModel):  # ModelModel is intentional !
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield
 
 
@@ -408,6 +426,10 @@ class SolarHourAngleSeriesModel(BaseModel):
 
 class ApplyAtmosphericRefractionModel(BaseModel):
     apply_atmospheric_refraction: Optional[bool] = True
+
+
+class ZeroNegativeSolarIncidenceAngleModel(BaseModel):
+    zero_negative_solar_incidence_angle: Optional[bool] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 
 
 class RefractedSolarAltitudeModel(BaseModel):

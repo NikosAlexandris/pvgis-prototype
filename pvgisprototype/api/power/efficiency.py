@@ -92,7 +92,7 @@ from pvgisprototype import TemperatureSeries
 from pvgisprototype import WindSpeedSeries
 
 @log_function_call
-def calculate_pv_efficiency_time_series(
+def calculate_pv_efficiency_series(
     irradiance_series: List[float],
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
@@ -148,9 +148,14 @@ def calculate_pv_efficiency_time_series(
     ValueError
         If an insufficient number of model constants is provided.
 
+    Notes
+    -----
+    Currently, external time series of monthly spectral factors are centered in
+    the beginning of the month and applied plus/minus half a month.
+
     Examples
     --------
-    >>> calculate_pv_efficiency_time_series([1000, 950], [1.1, 1.05], temperature_series=np.array([25, 26]))
+    >>> calculate_pv_efficiency_series([1000, 950], [1.1, 1.05], temperature_series=np.array([25, 26]))
     # Returns efficiency series and possibly detailed results based on the verbose level.
 
     Notes

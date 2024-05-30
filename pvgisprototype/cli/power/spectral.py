@@ -152,7 +152,7 @@ def spectral_photovoltaic_power_output_series(
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
+    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -262,8 +262,8 @@ def spectral_photovoltaic_power_output_series(
     #         filename=csv,
     #     )
     # if uniplot:
-    #     from pvgisprototype.api.plot import uniplot_data_array_time_series
-    #     uniplot_data_array_time_series(
+    #     from pvgisprototype.api.plot import uniplot_data_array_series
+    #     uniplot_data_array_series(
     #         data_array=photovoltaic_power_output_series.value,
     #         list_extra_data_arrays=None,
     #         lines=True,

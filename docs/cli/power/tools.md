@@ -1,32 +1,32 @@
 ---
 icon: material/tools
 tags:
-  - Power Tools
+  - CLI
+  - Tools
+  - Power
   - Average Photon Energy
   - Spectral Effect
   - Spectral Mismatch
 ---
 
-!!! danger
+!!! danger "Incomplete"
 
-    Incomplete
+    This section is yet to be completed.
 
-# Photon energy
+<div class="grid cards" markdown>
 
-``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power photon-energy
-```
+- [**`power`**](power/power.md){ .lg .middle } 🔌
 
-# Spectral Effect
+    ---
 
-## Spectral Factor
+    | Subcommand                                                                                    | Description                                                                                                                                                                                                                               |
+    |-----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | :octicons-command-palette-24: [**`broadband`**](power/power.md##Broadband irradiance)         | :simple-spectrum: Estimate the photovoltaic performance based on broadband irradiance, ambient temperature and wind speed                                                                                                                 |
+    | :octicons-command-palette-24: [**`broadband-multi`**](power/power.md##Broadband irradiance)   | :material-sigma::simple-spectrum: Estimate the total photovoltaic performance for multiple solar surfaces, i.e. different pairs of surface orientation and tilt angles) based on broadband irradiance, ambient temperature and wind speed |
+    | :octicons-command-palette-24: [**`spectral`**](power/power.md##Spectrally resoled irradiance) | :material-heat-wave: Estimate the photovoltaic performance based on spectrally resolved irradiance, ambient temperature and wind speed Prototype                                                                                          |
+    | :octicons-command-palette-24: [**`efficiency`**]()                                                                                    | Calculate the efficiency of a photovoltaic system                                                                                                                                                                                         |
+    | :octicons-command-palette-24: [**`photon-energy`**]()                                                                                 | 🔌 Estimate the average photon energy (APE)                                                                                                                                                                                               |
+    | :octicons-command-palette-24: [**`spectral-factor`**]()                                                                               | Estimate the spectral factor                                                                                                                                                                                                              |
+    | :octicons-command-palette-24: [**`spectral-mismatch`**]()                                                                             | Estimate the spectral mismatch                                                                                                                                                                                                            |
 
-``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power spectral-factor
-```
-
-## Spectral Mismatch
-
-``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power spectral-mismatch
-```
+</div>

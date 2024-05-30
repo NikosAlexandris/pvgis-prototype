@@ -13,7 +13,6 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_overview
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position
 from pvgisprototype.cli.position.introduction import introduction
 from pvgisprototype.cli.position.overview import overview
-from pvgisprototype.cli.position.overview_series import overview_series
 from pvgisprototype.cli.position.declination import declination
 from pvgisprototype.cli.position.hour_angle import hour_angle
 from pvgisprototype.cli.position.sunrise import sunrise
@@ -24,7 +23,7 @@ from pvgisprototype.cli.position.incidence import incidence
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
-state = {"verbose": False}
+# state = {"verbose": False}
 
 
 app = typer.Typer(
@@ -63,16 +62,10 @@ app.command(
 )(introduction)
 app.command(
     'overview',
-    help='⦩⦬ Calculate solar position parameters',
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_overview,
-)(overview)
-app.command(
-    'overview-series',
     help='⦩⦬📈 Calculate series of solar position parameters',
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_overview,
-)(overview_series)
+)(overview)
 app.command(
     'declination',
     help='∢ Calculate the solar declination',
