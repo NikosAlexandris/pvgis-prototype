@@ -2,19 +2,14 @@ from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from fastapi import Depends, Query
-from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_solar_position
-from pvgisprototype.algorithms.noaa.solar_position import calculate_noaa_timeseries_solar_position
-from pvgisprototype.api.position.overview import calculate_solar_geometry_overview
-from pvgisprototype.api.position.overview_series import calculate_solar_geometry_overview_time_series
+from pvgisprototype.api.position.overview import calculate_solar_geometry_overview_time_series
 from typing import Optional
 from typing import List
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.web_api.dependencies import process_series_timestamp
 from pvgisprototype.web_api.dependencies import process_longitude
 from pvgisprototype.web_api.dependencies import process_latitude
-from pvgisprototype.web_api.dependencies import process_single_timestamp
 from pvgisprototype.api.position.models import select_models
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
@@ -35,7 +30,6 @@ async def overview_series(
     model: List[SolarTimeModel] = Query([SolarTimeModel.skyfield], description="Model to calculate solar time"),
     apply_atmospheric_refraction: Optional[bool] = Query(True),
     solar_time_model: SolarTimeModel = Query(SolarTimeModel.milne),
-    time_output_units: str = Query('minutes'),
     perigee_offset: float = Query(PERIGEE_OFFSET),
     eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
     angle_output_units: str = Query(RADIANS),
@@ -95,10 +89,6 @@ async def overview_series(
         solar_time_model=solar_time_model,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        # time_offset_global=time_offset_global,
-        # hour_offset=hour_offset,
-        # time_output_units=time_output_units,
-        # angle_units=angle_units,
         angle_output_units=angle_output_units,
         verbose=verbose,
     )

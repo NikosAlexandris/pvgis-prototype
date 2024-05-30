@@ -1,32 +1,24 @@
-from rich import print
 from pandas import Timestamp, DatetimeIndex
 from devtools import debug
 from typing import Union
-from typing import Sequence
-from datetime import datetime
+from zoneinfo import ZoneInfo
 from math import sin
 from math import cos
 from math import tan
-from math import acos
 from math import radians
 from math import degrees
-from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
-from math import isfinite
-from math import pi
+from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype import AtmosphericRefraction
-from pvgisprototype.validation.functions import CalculateSolarZenithNOAAInput
-from pvgisprototype.validation.functions import CalculateSolarZenithNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarZenithTimeSeriesNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput
 from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
 from pvgisprototype import SolarZenith
 from pvgisprototype import SolarAltitude
+from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype import SolarHourAngle
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_noaa
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
 import numpy as np
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
@@ -120,87 +112,6 @@ def atmospheric_refraction_for_below_horizon(
     return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
 
 
-@validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionNOAAInput)
-def adjust_solar_zenith_for_atmospheric_refraction(
-    solar_zenith: SolarZenith,  # radians
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
-) -> SolarZenith:
-    """Adjust solar zenith for atmospheric refraction
-
-    The effects of the atmosphere vary with atmospheric pressure, humidity, and
-    other variables. Therefore, the solar position calculations presented here
-    are approximate. Errors in sunrise and sunset times can be expected to
-    increase the further away you are from the equator, because the sun rises
-    and sets at a very shallow angle. Small variations in the atmosphere can
-    have a larger effect.
-
-    Parameters
-    ----------
-    solar_zenith: float
-        The solar zenith angle in radians
-
-    Returns
-    -------
-    float: The corrected solar zenith angle
-    """
-    atmospheric_refraction_functions: Dict[str, Callable[[float], float]] = {
-        'high_solar_altitude': atmospheric_refraction_for_high_solar_altitude,
-        'near_horizon': atmospheric_refraction_for_near_horizon,
-        'below_horizon': atmospheric_refraction_for_below_horizon
-    }
-
-    # solar_altitude = radians(90) - solar_zenith.radians
-    solar_altitude = radians(90) - solar_zenith.radians
-    # adjusted_solar_zenith = solar_zenith.radians  # Default to input if no adjustment is made
-
-    # if solar_altitude <= radians(85):
-    if solar_altitude <= radians(85):
-
-        # if solar_altitude > radians(5):
-        if solar_altitude > radians(5):
-            function: Callable = atmospheric_refraction_functions['high_solar_altitude']
-        
-        # elif solar_altitude > radians(-0.575):
-        elif solar_altitude > radians(-0.575):
-            function = atmospheric_refraction_functions['near_horizon']
-        
-        else:
-            function = atmospheric_refraction_functions['below_horizon']
-        
-        # solar zenith = 0 degrees + refraction correction.
-        atmospheric_refraction_adjustment_radians = function(solar_altitude)  # in radians
-        adjusted_solar_zenith = solar_zenith.radians - atmospheric_refraction_adjustment_radians.radians
-
-    solar_zenith = SolarZenith(
-        value=adjusted_solar_zenith,
-        unit=RADIANS,
-        position_algorithm=solar_zenith.position_algorithm,
-        timing_algorithm=solar_zenith.timing_algorithm
-    )
-
-    # Reasonably increase the upper limit for the solar zenith
-    # beyond π/2 radians to account for atmospheric refraction.
-    # i.e. at 90.833 degrees or about π/2 + 0.0146 radians
-    # which is the solar zenith angle when the center of the sun is at the horizon,
-    # considering both its apparent size and atmospheric refraction.
-    if (
-        not isfinite(solar_zenith.degrees)
-        or not solar_zenith.min_degrees <= solar_zenith.degrees <= solar_zenith.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar zenith angle {solar_zenith.degrees} is out of the expected range\
-            [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
-        )
-
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
-    return solar_zenith
-
-
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     solar_zenith_series: SolarZenith,
@@ -244,59 +155,15 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     )
 
 
-@validate_with_pydantic(CalculateSolarZenithNOAAInput)
-def calculate_solar_zenith_noaa(
-    latitude: Latitude,  # radians
-    timestamp: datetime,
-    solar_hour_angle: SolarHourAngle,
-    apply_atmospheric_refraction: bool = True,
-    verbose: int = 0,
-) -> SolarZenith:
-    """Calculate the solar zenith angle (φ) in radians """
-    solar_declination = calculate_solar_declination_noaa(
-        timestamp=timestamp,
-    )
-    cosine_solar_zenith = sin(latitude.radians) * sin(solar_declination.radians) + cos(
-        latitude.radians
-    ) * cos(solar_declination.radians) * cos(solar_hour_angle.radians)
-    solar_zenith = SolarZenith(
-                value=acos(cosine_solar_zenith),  # Important !
-                unit=RADIANS,
-                position_algorithm='NOAA',
-                timing_algorithm='NOAA',
-                )
-    if apply_atmospheric_refraction:
-        solar_zenith = adjust_solar_zenith_for_atmospheric_refraction(
-            solar_zenith=solar_zenith
-        )
-    if (
-        not isfinite(solar_zenith.radians)
-        or not SolarZenith().min_radians <= solar_zenith.radians <= SolarZenith().max_radians
-    ):
-        raise ValueError(
-            f"The calculated solar zenith angle {solar_zenith.degrees} is out of the expected range\
-            [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
-        )
-
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
-    return solar_zenith  # is already a SolarZenith object
-    # return SolarZenith(
-    #     value=solar_zenith,
-    #     unit=RADIANS,
-    #     position_algorithm='NOAA',
-    #     timing_algorithm='NOAA',
-    # )
-
-
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarZenithTimeSeriesNOAAInput)
-def calculate_solar_zenith_time_series_noaa(
+def calculate_solar_zenith_series_noaa(
+    longitude: Longitude,
     latitude: Latitude,  # radians
     timestamps: Union[Timestamp, DatetimeIndex],
-    solar_hour_angle_series: SolarHourAngle,
+    timezone: ZoneInfo,
+    # solar_hour_angle_series: SolarHourAngle,
     apply_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -304,11 +171,20 @@ def calculate_solar_zenith_time_series_noaa(
     log: int = 0,
 ) -> SolarZenith:
     """Calculate the solar zenith angle for a location over a time series"""
-    solar_declination_series = calculate_solar_declination_time_series_noaa(
+    solar_declination_series = calculate_solar_declination_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+    )
+    solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
+        longitude=longitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
     )
     cosine_solar_zenith = (
         sin(latitude.radians) * np.sin(solar_declination_series.radians)
@@ -317,8 +193,8 @@ def calculate_solar_zenith_time_series_noaa(
     solar_zenith_series = SolarZenith(
                     value=np.arccos(cosine_solar_zenith),  # Important !
                     unit=RADIANS,
-                    timing_algorithm="NOAA",
-                    position_algorithm="NOAA",
+                    position_algorithm=solar_declination_series.position_algorithm,
+                    timing_algorithm=solar_hour_angle_series.timing_algorithm,
                 )
     if apply_atmospheric_refraction:
         solar_zenith_series = (
@@ -341,10 +217,4 @@ def calculate_solar_zenith_time_series_noaa(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return solar_zenith_series  # Is this a SolarZenith data class ?
-    # return SolarZenith(
-    #     value=solar_zenith_series,
-    #     unit=RADIANS,
-    #     position_algorithm='NOAA',
-    #     timing_algorithm='NOAA',
-    # )
+    return solar_zenith_series  # This is a SolarZenith data class !

@@ -42,7 +42,7 @@ Read also:
 - https://peps.python.org/pep-0615/
 """
 
-from pandas import Timestamp
+from pandas import DatetimeIndex, Timestamp
 from pandas import date_range
 from datetime import datetime
 from datetime import timedelta
@@ -345,7 +345,7 @@ def get_days_in_year(year):
     return (end_date - start_date).days
 
 
-def get_days_in_years_series(years):
+def get_days_in_years(years):
     """ Calculate the number of days in a given year, accounting for leap years.
 
     Parameters
@@ -408,6 +408,7 @@ def parse_timestamp_series(
     """
     from pandas import to_datetime
     if isinstance(timestamps, str):
+        # return to_datetime(timestamps.split(','), format='mixed', utc=True)
         return to_datetime(timestamps.split(','), format='mixed')
     else:
         raise ValueError("The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function")
@@ -539,7 +540,7 @@ def generate_datetime_series(
 
 def callback_generate_datetime_series(
     ctx: typer.Context,
-    timestamps: str,
+    timestamps: DatetimeIndex,
     # timestamps: List[datetime],
     # value: Union[str, datetime, List[datetime]],
     # param: typer.CallbackParam,

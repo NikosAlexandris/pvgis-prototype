@@ -16,17 +16,10 @@ async def get_calculate_solar_time(
     timestamp: Optional[datetime] = None,
     timezone: Optional[str] = None,
     model: List[SolarTimeModel] = Query([SolarTimeModel.skyfield], description="Model to calculate solar time"),
-    refracted_solar_zenith: float = Query(1.5853349194640094, description='The solar zenith angle defaults to 1.5853349194640094 radians at sunrise or sunset, adjusted for the approximate correction for atmospheric refraction at those times, and the size of the solar disk.'),
-    apply_atmospheric_refraction: bool = False,
-    time_output_units: Optional[str] = 'minutes',
-    angle_units: Optional[str] = RADIANS,
-    angle_output_units: Optional[str] = RADIANS,
     perigee_offset: float = Query(0.048869, description="Perigee offset"),
     eccentricity_correction_factor: float = Query(0.01672, description="Eccentricity"),
     time_offset_global: float = Query(0, description="Global time offset"),
-    hour_offset: float = Query(0, description="Hour offset"),
 ):
-    # debug(locals())
     longitude = convert_to_radians_fastapi(longitude)
     latitude = convert_to_radians_fastapi(latitude)
 
@@ -37,20 +30,15 @@ async def get_calculate_solar_time(
         timezone = convert_to_timezone(timezone)
         timestamp = timestamp.astimezone(timezone)
     
-    # debug(locals())
     solar_time  = calculate_solar_time(
             longitude=longitude,
             latitude=latitude,
             timestamp=timestamp,
             timezone=timezone,
             solar_time_models=model,
-            time_output_units=time_output_units,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
             time_offset_global=time_offset_global,
             )
-    # debug(locals())
+
     return {"Local solar time": solar_time}
-
-
-

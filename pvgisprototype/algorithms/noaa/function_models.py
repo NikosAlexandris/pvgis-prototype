@@ -22,7 +22,6 @@ from pvgisprototype.validation.pvis_data_classes import BaseCoordinatesModel
 
 # Units?
 from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeOutputUnitsModel
 from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
 
 # What?
@@ -75,7 +74,6 @@ class CalculateTimeOffsetTimeSeriesNOAAInput(
 class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     LongitudeModel,
     BaseTimeSeriesModel,
-    BaseTimeOutputUnitsModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
@@ -124,22 +122,11 @@ class AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput(
     pass
 
 
-class CalculateSolarZenithNOAAInput(
-    LatitudeModel,
-    BaseTimestampModel,
-    SolarHourAngleModel,
-    ApplyAtmosphericRefractionModel,
-    BaseAngleOutputUnitsModel,
-    VerbosityModel,
-    LoggingModel,
-):
-    pass
-
-
 class CalculateSolarZenithTimeSeriesNOAAInput(
+    LongitudeModel,
     LatitudeModel,
-    BaseTimestampSeriesModel,  # != BaseTimestampModel
-    SolarHourAngleSeriesModel,
+    BaseTimeSeriesModel,  # != BaseTimestampModel
+    # SolarHourAngleSeriesModel,
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     VerbosityModel,
@@ -159,18 +146,10 @@ class CalculateSolarAltitudeTimeSeriesNOAAInput(
     pass
 
 
-class CalculateSolarAzimuthNOAAInput(
-    BaseCoordinatesModel,
-    BaseTimeModel,
-    VerbosityModel,
-    LoggingModel,
-):
-    pass
-
-
 class CalculateSolarAzimuthTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
+    ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
@@ -222,10 +201,9 @@ class CalculateEventTimeNOAAInput(
 
 class CalculateEventTimeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
-    BaseTimestampSeriesModel,
+    BaseTimeSeriesModel,
     RefractedSolarZenithModel,
     BaseTimeEventModel,
-    ApplyAtmosphericRefractionModel,
     VerbosityModel,
     LoggingModel,
 ):
