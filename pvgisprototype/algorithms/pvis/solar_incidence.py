@@ -140,8 +140,10 @@ def calculate_relative_longitude(
         [numpy.arctan(tangent_relative_longitude_numerator / tangent_relative_longitude_denominator)],
         dtype=dtype,
     )
+
     if surface_orientation.radians < pi and relative_longitude < 0:
         relative_longitude += pi
+
     if surface_orientation.radians > pi and relative_longitude > 0:
         relative_longitude -= pi
 
@@ -382,8 +384,8 @@ def calculate_solar_incidence_series_hofierka(
         surface_tilt=surface_tilt,
     )
     sine_solar_incidence_series = (
-        # c_inclined_31_series * numpy.cos(-solar_hour_angle_series.radians - relative_longitude.radians)
-        c_inclined_31_series * numpy.cos(solar_hour_angle_series.radians - relative_longitude.radians)
+        c_inclined_31_series * numpy.cos(-solar_hour_angle_series.radians - relative_longitude.radians)
+        # c_inclined_31_series * numpy.cos(solar_hour_angle_series.radians - relative_longitude.radians)
         + c_inclined_33_series
     )
     solar_incidence_series = numpy.arcsin(sine_solar_incidence_series)
@@ -414,9 +416,10 @@ def calculate_solar_incidence_series_hofierka(
     return SolarIncidence(
             value=solar_incidence_series,
             unit=RADIANS,
-            positioning_algorithm=solar_altitude_series.position_algorithm,  #
+            positioning_algorithm=solar_declination_series.position_algorithm,  #
             timing_algorithm=solar_hour_angle_series.timing_algorithm,  #
             incidence_algorithm=SolarIncidenceModel.hofierka,
             definition=incidence_angle_definition,
             description=incidence_angle_description,
+            # azimuth_origin=solar_azimuth_series.origin,
     )
