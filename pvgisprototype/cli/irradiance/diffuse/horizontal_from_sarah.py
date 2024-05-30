@@ -78,7 +78,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_multi_thread
 
 
 @log_function_call
-def get_diffuse_horizontal_component_from_sarah(
+def get_diffuse_horizontal_from_global_and_direct_irradiance(
     shortwave: Annotated[Path, typer_argument_global_horizontal_irradiance],
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
@@ -139,9 +139,9 @@ def get_diffuse_horizontal_component_from_sarah(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                mask_and_scale=mask_and_scale,
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
                 in_memory=in_memory,
                 multi_thread=multi_thread,
                 verbose=verbose,
