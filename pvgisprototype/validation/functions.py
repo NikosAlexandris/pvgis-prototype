@@ -15,6 +15,7 @@ from pvgisprototype.validation.pvis_data_classes import ElevationModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimeModel
 from pvgisprototype.validation.pvis_data_classes import BaseTimeSeriesModel
+from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 
 # Atmospheric effects
 from pvgisprototype.validation.pvis_data_classes import ApplyAtmosphericRefractionModel
@@ -235,9 +236,9 @@ class CalculateEventHourAnglePVISInputModel(CalculateEventHourAngleInputModel):
     pass
 
 
-class SolarHourAnglePVLIBInput(
+class SolarHourAngleSeriesPVLIBInput(
     LongitudeModel,
-    BaseTimestampModel,
+    BaseTimestampSeriesModel,
 ):
     pass
 
@@ -296,8 +297,8 @@ class CalculateSolarAzimuthPVLIBInputModel(
     pass
 
 
-class CalculateSolarDeclinationPVLIBInput(
-    BaseTimestampModel,
+class CalculateSolarDeclinationSeriesPVLIBInput(
+    BaseTimestampSeriesModel,
 ):
     pass
 
@@ -308,10 +309,6 @@ class CalculateSolarDeclinationSkyfieldInput(
 ):
     pass
 
-class CalculateSolarDeclinationSkyfieldInput(
-    BaseTimestampModel,
-):
-    pass
 
 class CalculateSolarZenithPVLIBInputModel(
     CalculateSolarAltitudePVLIBInputModel
