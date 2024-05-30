@@ -18,7 +18,8 @@ from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
+from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.cli.typer.position import typer_option_zero_negative_solar_incidence_angle
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
@@ -225,6 +226,7 @@ async def get_photovoltaic_power_series_advanced(
     apply_angular_loss_factor: Annotated[Optional[bool], fastapi_query_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, fastapi_query_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, fastapi_query_solar_incidence_model] = SolarIncidenceModel.jenco,
+    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, fastapi_query_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, fastapi_query_time_offset_global] = 0,
     hour_offset: Annotated[float, fastapi_query_hour_offset] = 0,
@@ -290,6 +292,7 @@ async def get_photovoltaic_power_series_advanced(
         apply_angular_loss_factor=apply_angular_loss_factor,
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         solar_time_model=solar_time_model,
         time_offset_global=time_offset_global,
         hour_offset=hour_offset,
@@ -442,10 +445,6 @@ async def get_photovoltaic_power_series(
                 photovoltaic_power_output_series.components
             )
         else:
-            if fingerprint:
-                response["fingerprint"] = photovoltaic_power_output_series.components[
-                    FINGERPRINT_COLUMN_NAME
-                ]
             response = {
                 "Photovoltaic power output series": photovoltaic_power_output_series.value.tolist(),
             }
@@ -453,6 +452,11 @@ async def get_photovoltaic_power_series(
         # print(f'{response=}')
         # headers = {'Content-Disposition': 'attachment; filename="pvgis_photovoltaic_power_series.json"'}
         # return Response(orjson.dumps(response), headers=headers, media_type="application/json")
+    if fingerprint:
+        response["fingerprint"] = photovoltaic_power_output_series.components[
+            FINGERPRINT_COLUMN_NAME
+        ]
+
     if statistics:
         from pvgisprototype.api.series.statistics import calculate_series_statistics
 
