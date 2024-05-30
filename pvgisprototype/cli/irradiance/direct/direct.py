@@ -1,4 +1,5 @@
 import typer
+from pvgisprototype.cli.irradiance.direct.normal_from_horizontal import get_direct_normal_from_horizontal_irradiance_series
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.irradiance.direct.normal import get_direct_normal_irradiance_series
 from pvgisprototype.cli.irradiance.direct.horizontal import get_direct_horizontal_irradiance_series
@@ -19,6 +20,12 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
 )(get_direct_normal_irradiance_series)
+app.command(
+    name='normal-from-horizontal',
+    help=f"Estimate the direct normal from the horizontal irradiance over a period of time",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_irradiance_series,
+)(get_direct_normal_from_horizontal_irradiance_series)
 app.command(
     name='horizontal',
     help=f"Estimate the direct horizontal irradiance over a period of time",
