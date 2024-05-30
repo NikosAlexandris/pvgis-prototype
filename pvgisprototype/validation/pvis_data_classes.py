@@ -143,6 +143,15 @@ class BaseCoordinatesModel(
     pass
 
 
+class LocationModel(
+    BaseCoordinatesModel,
+    Elevation,
+):
+    timezone: Optional[ZoneInfo] = None
+    name: Optional[str] = None
+    description: Optional[str] = None 
+
+
 # When?
 
 class BaseTimestampModel(BaseModel):
