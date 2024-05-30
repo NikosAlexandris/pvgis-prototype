@@ -11,6 +11,7 @@ from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_de
 from pvgisprototype.algorithms.pvlib.solar_hour_angle import calculate_solar_hour_angle_series_pvlib
 from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_series_pvlib
 from pvgisprototype.api.position.conversions import convert_north_to_south_radians_convention
+from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
 from pvgisprototype.log import log_function_call, logger
 from devtools import debug
 from typing import Dict, List, Tuple
@@ -323,13 +324,25 @@ def model_solar_position_overview_series(
             array_backend=array_backend,
             verbose=0,
             log=log,
+        )  # North = 0
+        surface_orientation_south_convention = SurfaceOrientation(
+            value=convert_north_to_south_radians_convention(
+                north_based_angle=surface_orientation
+            ),
+            unit=RADIANS,
         )
+        from math import pi
+        surface_tilt = SurfaceTilt(
+                value=(pi/2 - surface_tilt.radians),
+                unit=RADIANS,
+                )
         solar_incidence_series = calculate_solar_incidence_series_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            surface_orientation=surface_orientation,
+            # surface_orientation=surface_orientation,
+            surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
@@ -380,12 +393,19 @@ def model_solar_position_overview_series(
             verbose=verbose,
             log=log,
         )  # East = 0 !
+        surface_orientation_south_convention = SurfaceOrientation(
+            value=convert_north_to_south_radians_convention(
+                north_based_angle=surface_orientation
+            ),
+            unit=RADIANS,
+        )
         solar_incidence_series = calculate_solar_incidence_series_hofierka(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            surface_orientation=surface_orientation,
+            # surface_orientation=surface_orientation,
+            surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
