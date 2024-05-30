@@ -10,6 +10,7 @@ calculated angles. See also the API azimuth.py module.
 """
 
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_series_hofierka
+from pvgisprototype.algorithms.pvlib.solar_incidence import calculate_solar_incidence_series_pvlib
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarIncidenceTimeSeriesInputModel
 from pvgisprototype import Longitude
@@ -61,6 +62,7 @@ from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_inci
 from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_series_iqbal
 from pandas import DatetimeIndex
 from pvgisprototype.api.position.conversions import convert_north_to_south_radians_convention
+from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
 from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.constants import UNITS_NAME
 
@@ -101,7 +103,13 @@ def model_solar_incidence_series(
         #     ),
         #     unit=RADIANS,
         # )
-        # # And apparently, defined the complementary surface tilt angle too!
+        surface_orientation_south_convention = SurfaceOrientation(
+            value=convert_north_to_south_radians_convention(
+                north_based_angle=surface_orientation
+            ),
+            unit=RADIANS,
+        )
+        # And apparently, defined the complementary surface tilt angle too!
         # from math import pi
         # surface_tilt = SurfaceTilt(
         #         value=(pi/2 - surface_tilt.radians),
@@ -114,8 +122,9 @@ def model_solar_incidence_series(
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            surface_orientation=surface_orientation,
+            # surface_orientation=surface_orientation,
             # surface_orientation=surface_orientation_east_convention,
+            surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
@@ -151,14 +160,21 @@ def model_solar_incidence_series(
             log=log,
         )
 
-    if solar_incidence_model.value == SolarIncidenceModel.pvis:
+    if solar_incidence_model.value == SolarIncidenceModel.hofierka:
 
+        surface_orientation_south_convention = SurfaceOrientation(
+            value=convert_north_to_south_radians_convention(
+                north_based_angle=surface_orientation
+            ),
+            unit=RADIANS,
+        )
         solar_incidence_series = calculate_solar_incidence_series_hofierka(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
-            surface_orientation=surface_orientation,
+            # surface_orientation=surface_orientation,
+            surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
