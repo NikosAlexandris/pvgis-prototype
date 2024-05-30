@@ -1,5 +1,5 @@
 ---
-icon: material/view-grid-plus
+icon: material/notebook-edit-outline
 title: Logging
 description: Welcome in PVGIS' CLI
 tags:

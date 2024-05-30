@@ -2,6 +2,9 @@
 Solar position and solar surface position parameters 
 """
 
+from enum import Enum
+from devtools import debug
+from numpy import positive
 import typer
 from pvgisprototype.constants import SOLAR_DECLINATION_MINIMUM
 from pvgisprototype.constants import SOLAR_DECLINATION_MAXIMUM
@@ -12,14 +15,58 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_MINIMUM
 from pvgisprototype.constants import SURFACE_TILT_MAXIMUM
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import SolarIncidenceModel, SolarPositionModel, SolarPositionParameter, select_models
 from pvgisprototype.api.utilities.conversions import convert_to_radians
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_position
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_surface_geometry
+from typing import List, Sequence
 
 
+def solar_position_parameter_callback(
+    ctx: typer.Context,
+    position_parameter: List[SolarPositionParameter],
+) -> List[SolarPositionParameter]:
+    """Select specific solar position parameters if uniplot is aked.
+
+    Notes
+    -----
+    The context is updated as expected. The CLI interface, however, does not
+    return the expected output. Need to use in the CLI function body the
+    ctx.params.get('position_parameter') in order to make use of the updated
+    parameter!
+
+    """
+    if ctx.params.get('uniplot'):
+        from pvgisprototype.log import logger
+        logger.info(
+            f'Attention ! You asked for a uniplot along with {ctx.command.name} and I think its less consfusing to only plot the incidence along with the altitude and azimuth angles!',
+            alt=f'Attention ! You asked for a uniplot along with [code]{ctx.command.name}[/code] and I think its less consfusing to only plot the [bold]incidence[/bold] along with the [bold]altitude[bold] and [bold]azimuth[bold] angles!',
+        )
+        from rich import print
+        print(
+                f'Attention ! You asked for a uniplot along with [code]{ctx.command.name}[/code] and I think its less consfusing to only plot the [bold]incidence[/bold] along with the [bold]altitude[bold] and [bold]azimuth[bold] angles!',
+        )
+        return [SolarPositionParameter.altitude,
+                SolarPositionParameter.azimuth,
+                SolarPositionParameter.incidence]
+
+    return position_parameter
+
+
+typer_option_solar_position_parameter = typer.Option(
+    '--solar-position-parameter',
+    '--position-parameter',
+    help='Solar position parameter to calculate',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    callback=solar_position_parameter_callback,  # Works but does not return correctly in the inreface!
+    rich_help_panel=rich_help_panel_solar_position,
+)
 typer_option_solar_declination_model = typer.Option(
+    '--solar-declination-model',
+    '--declination-model',
     help='Model to calculate the solar declination angle',
     show_default=True,
     show_choices=True,
@@ -56,6 +103,7 @@ typer_option_solar_constant = typer.Option(
 )
 typer_option_solar_position_model = typer.Option(
     '--solar-position-model',
+    '--position-model',
     help='Model to calculate solar position',
     show_default=True,
     show_choices=True,
@@ -83,7 +131,17 @@ typer_argument_refracted_solar_altitude_series = typer.Argument(
 )
 typer_option_solar_incidence_model = typer.Option(
     '--solar-incidence-model',
+    '--incidence-model',
     help='Method to calculate the solar incidence angle',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_solar_position,
+)
+typer_option_sun_to_surface_plane_incidence_angle = typer.Option(
+    '--sun-vector-to-surface-plane/--sun-vector-to-surface-normal',
+    '--sun-to-plane/--sun-to-normal',
+    help='Incidence angle between Sun-Vector and Surface- Normal or Plane',
     show_default=True,
     show_choices=True,
     case_sensitive=False,
@@ -100,6 +158,17 @@ typer_argument_solar_incidence_series = typer.Argument(
     show_default=False,
 )
 
+typer_option_zero_negative_solar_incidence_angle = typer.Option(
+    '--zero-negative-solar-incidence-angle/--do-not-zero-negative-solar-incidence-angle',
+    '--zero-negative-incidence-angle/--do-not-zero-negative-incidence-angle',
+    '--zero-negative-incidence/--do-not-zero-negative-incidence',
+    help='Zero negative solar incidence angles',
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_solar_position,
+)
+
 # Solar surface parameters 
 
 surface_orientation_typer_help='Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]'  # also known as : azimuth, in PVGIS : aspect
@@ -111,7 +180,6 @@ typer_argument_surface_orientation = typer.Argument(
     is_eager=True,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_surface_geometry,
-    # default_factory = SURFACE_ORIENTATION_DEFAULT,
     show_default=False,
 )
 typer_option_surface_orientation = typer.Option(
@@ -121,7 +189,6 @@ typer_option_surface_orientation = typer.Option(
     is_eager=True,
     callback=convert_to_radians,
     rich_help_panel=rich_help_panel_surface_geometry,
-    # default_factory = SURFACE_ORIENTATION_DEFAULT,
 )
 typer_option_random_surface_orientation = typer.Option(
     help='Random solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]',

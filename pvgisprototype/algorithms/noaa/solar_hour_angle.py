@@ -1,19 +1,13 @@
 from rich import print
 from devtools import debug
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateSolarHourAngleNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleTimeSeriesNOAAInput
 from pvgisprototype import Longitude
-from datetime import datetime
+from pvgisprototype.api.position.models import SolarPositionModel
 from pandas import DatetimeIndex
-from typing import Optional
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarHourAngle
-from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_noaa
-from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_time_series_noaa
-from math import pi
-from math import isfinite
-from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
+from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_series_noaa
 import numpy as np
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
@@ -23,20 +17,27 @@ from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
-@validate_with_pydantic(CalculateSolarHourAngleNOAAInput)
-def calculate_solar_hour_angle_noaa(
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
+@validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
+def calculate_solar_hour_angle_series_noaa(
     longitude: Longitude,
-    timestamp: datetime, 
-    timezone: Optional[ZoneInfo] = None, 
-    verbose: int = 0,
-    log: int = 0,
+    timestamps: DatetimeIndex, 
+    timezone: ZoneInfo,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarHourAngle:
-    """Calculate the solar hour angle in radians.
+    """Calculate the solar hour angle for a time series.
 
     The solar hour angle calculation converts the local solar time (LST) into
     the number of degrees which the sun moves across the sky. In other words,
@@ -50,23 +51,13 @@ def calculate_solar_hour_angle_noaa(
 
     Since the Earth rotates 15° per hour, each hour away from solar noon
     corresponds to an angular motion of the sun in the sky of 15°.
-
     Practically, the calculation converts a timestamp into a solar time.
 
     Parameters
     ----------
-    timestamp: datetime, optional
-        The timestamp to calculate offset for
-
-    timezone: str, optional
-        The timezone for calculation
-    
-    longitude: float
-        The longitude for calculation
 
     Returns
     -------
-    float: The solar hour angle
 
     Notes
     -----
@@ -111,61 +102,7 @@ def calculate_solar_hour_angle_noaa(
             = 360 * F. If L is negative, then the limited L = 360 - 360 * F.
 
     """
-    true_solar_time = calculate_true_solar_time_noaa(
-        longitude=longitude,
-        timestamp=timestamp,
-        timezone=timezone,
-    )
-    true_solar_time_minutes = timestamp_to_minutes(true_solar_time)
-    solar_hour_angle = (true_solar_time_minutes - 720) * (np.pi / 720)
-
-    # Important ! ------------------------------------------------------------
-    # If (hourangle < -180) Then hourangle = hourangle + 360
-    if solar_hour_angle < -pi:
-        solar_hour_angle += 2 * pi
-    # ------------------------------------------------------------------------
-
-    if (
-        not isfinite(solar_hour_angle)
-        or not SolarHourAngle().min_radians <= solar_hour_angle <= SolarHourAngle().max_radians
-    ):
-        raise ValueError(
-            f"The calculated solar hour angle {solar_hour_angle.degrees} is out of the expected range\
-            [{solar_hour_angle.min_degrees}, {solar_hour_angle.max_degrees}] degrees"
-        )
-
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
-    return SolarHourAngle(
-        value=solar_hour_angle,
-        unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
-    )
-
-
-@log_function_call
-@cached(cache={}, key=custom_hashkey)
-@validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
-def calculate_solar_hour_angle_time_series_noaa(
-    longitude: Longitude,
-    timestamps: DatetimeIndex, 
-    timezone: Optional[str] = None, 
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
-) -> SolarHourAngle:
-    """Calculate the solar hour angle in radians for a time series.
-
-    Notes
-    -----
-
-    # solar_hour_angle_series = (true_solar_time_series_in_minutes - 720) * (np.pi / 720)
-
-    """
-    true_solar_time_series = calculate_true_solar_time_time_series_noaa(
+    true_solar_time_series = calculate_true_solar_time_series_noaa(
         longitude=longitude,
         timestamps=timestamps,
         timezone=timezone,
@@ -174,27 +111,13 @@ def calculate_solar_hour_angle_time_series_noaa(
         verbose=verbose,
         log=log,
     )
-    # true_solar_time_series_in_minutes = np.array(
-    #     (true_solar_time_series.hour * 60)
-    #     + true_solar_time_series.minute
-    #     + (true_solar_time_series.second / 60.0), dtype
-    # )
-
-    # The following gives a slightly different result than the above approach!
-    true_solar_time_series_in_minutes = (
-        np.array(
-            (
-                true_solar_time_series - true_solar_time_series.normalize()
-            ).total_seconds(),
-            dtype,
-        )
-        / 60
-    )
-    nppi = np.array(np.pi, dtype=dtype)
-    solar_hour_angle_series = (true_solar_time_series_in_minutes - 720) * (nppi / 720)
-
-    if np.any(solar_hour_angle_series < -nppi):
-        solar_hour_angle_series += 2 * nppi * (solar_hour_angle_series < -nppi)
+    solar_hour_angle_series = (true_solar_time_series.minutes - 720.) * (np.pi / 720.)
+    # solar_hour_angle_series = np.where(
+    #         # true_solar_time_series.minutes < 0,
+    #         solar_hour_angle_series < 0,
+    #         solar_hour_angle_series + pi,
+    #         solar_hour_angle_series - pi,
+    #         )
 
     if not np.all(
         (SolarHourAngle().min_radians <= solar_hour_angle_series)
@@ -207,8 +130,13 @@ def calculate_solar_hour_angle_time_series_noaa(
             )
         ]
         raise ValueError(
-            f"Calculated solar hour angle/s out of the expected range [{-nppi}, {nppi}] radians : {out_of_range_values}"
+            f"{WARNING_OUT_OF_RANGE_VALUES} "
+            f"[{SolarHourAngle().min_degrees}, {SolarHourAngle().max_degrees}] degrees"
+            f" in [code]solar_hour_angle_series[/code] : {np.degrees(out_of_range_values)}"
         )
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
             data=solar_hour_angle_series,
             log_level=log,
@@ -218,6 +146,6 @@ def calculate_solar_hour_angle_time_series_noaa(
     return SolarHourAngle(
         value=solar_hour_angle_series,
         unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
+        position_algorithm=SolarPositionModel.noaa,
+        timing_algorithm=true_solar_time_series.timing_algorithm,
     )

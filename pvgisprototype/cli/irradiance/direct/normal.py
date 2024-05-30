@@ -17,7 +17,7 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.irradiance.direct.normal import calculate_direct_normal_irradiance_time_series
+from pvgisprototype.api.irradiance.direct.normal import calculate_direct_normal_irradiance_series
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.progress import progress
@@ -116,7 +116,7 @@ from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 
 
 @log_function_call
-def get_direct_normal_irradiance_time_series(
+def get_direct_normal_irradiance_series(
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,  # Used by a callback function
     periods: Annotated[Optional[int], typer_option_periods] = None,  # Used by a callback function
@@ -134,6 +134,7 @@ def get_direct_normal_irradiance_time_series(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -143,7 +144,7 @@ def get_direct_normal_irradiance_time_series(
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ) -> None:
     # with progress:
-    direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
+    direct_normal_irradiance_series = calculate_direct_normal_irradiance_series(
         timestamps=timestamps,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         optical_air_mass_series=optical_air_mass_series,
@@ -154,7 +155,6 @@ def get_direct_normal_irradiance_time_series(
         log=log,
         fingerprint=fingerprint,
     )
-    # Reporting =============================================================
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print import print_irradiance_table_2
@@ -175,15 +175,6 @@ def get_direct_normal_irradiance_time_series(
             csv_str = ','.join(flat_list)
             print(csv_str)
 
-    if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
-        print_series_statistics(
-            data_array=direct_normal_irradiance_series[DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME],
-            timestamps=timestamps,
-            groupby=groupby,
-            title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
-            rounding_places=rounding_places,
-        )
     if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
         write_irradiance_csv(
@@ -193,17 +184,28 @@ def get_direct_normal_irradiance_time_series(
             dictionary=direct_normal_irradiance_series.components,
             filename=csv,
         )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_series_statistics
+        print_series_statistics(
+            data_array=direct_normal_irradiance_series.value,
+            timestamps=timestamps,
+            groupby=groupby,
+            title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
+            rounding_places=rounding_places,
+        )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=direct_normal_irradiance_series.value,
             list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
-            supertitle = 'Direct Normal Irradiance Series',
-            title = 'Direct Normal Irradiance Series',
-            label = 'Direct Normal Irradiance',
-            label_2 = None,
-            unit = IRRADIANCE_UNITS,
+            supertitle='Direct Normal Irradiance Series',
+            title='Direct Normal Irradiance Series',
+            label='Direct Normal Irradiance',
+            extra_legend_labels=None,
+            unit=IRRADIANCE_UNITS,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:

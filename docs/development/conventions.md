@@ -11,6 +11,22 @@ tags:
   - GitLab Issues
 ---
 
+# Docstrings
+
+PVGIS adheres to the [NumPy Style Guide][numpy-style-guide]
+for the syntax and best practices for docstrings.
+The NumPy Style itself follows the standard Python style conventions[^0][^1].
+
+!!! seealso "Example of best docstrings practices for a Python module"
+
+    See [example.py](https://numpydoc.readthedocs.io/en/latest/example.html#example).
+
+[numpy-style-guide]: https://numpydoc.readthedocs.io/en/latest/format.html#
+
+[^0]: https://peps.python.org/pep-0008/
+
+[^1]: https://peps.python.org/pep-0257/
+
 # Git Commit Message
 
 ``` mermaid

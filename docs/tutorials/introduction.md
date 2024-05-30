@@ -10,20 +10,20 @@ tags:
   - Broadband Irradiance
 ---
 
-## Overview
+# Overview
 
 Curious about photovoltaic performance ?
 This is an introduction into the estimation of photovoltaic power
 over a location and a moment or period in time.
 
-We will explore solar radiation components
-and photovoltaic power estimates,
+We will explore _solar radiation components_
+and _photovoltaic power estimates_,
 by stepping through :
 
-- the calculation of the position of the sun in the sky
-- the measurement of sun-to-surface angles
-- the analysis of solar irradiance components
-- and the derivation of the _effective_ amount of global irradiance.
+- the calculation of **the position of the sun in the sky**
+- the measurement of **sun-to-surface angles**
+- the analysis of **solar irradiance components**
+- and the derivation of the **_effective_ amount of global irradiance**.
 
 !!! note
 
@@ -36,7 +36,7 @@ by stepping through :
     let's go through this step-by-step
     and overview some theoretical concepts too.
 
-## Example
+# Example
 
 Before we walk through the tutorial,
 let's get straight a/the result we are aiming at !
@@ -61,7 +61,7 @@ pvgis-prototype power broadband \
     Just copy-and-paste the commands and follow along.
     This is one way to practice through this tutorial!
 
-## Analysis
+# Analysis
 
 Let's break-down the result :
 
@@ -90,4 +90,4 @@ and a predefined efficiency and other parameters.
     the global inclined irradiance can be broken down in
     its _inclined_ irradiance components
     `Direct ∡`, `Diffuse ∡` and `Reflected ∡`.
-    See the complete list at [Symbols](cli/symbols.md)
+    See the complete list at [Symbols](../cli/symbols.md)

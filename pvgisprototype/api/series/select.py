@@ -90,9 +90,8 @@ def select_time_series(
             print(f"No data found for the given period {start_time} and {end_time}.")
 
     if remap_to_month_start:
-        month_start_timestamps = timestamps.map(
-            lambda timestamp: timestamp.replace(day=1, hour=0, minute=0, second=0)
-        )
+        from pandas import date_range
+        month_start_timestamps = date_range(start=timestamps.min().normalize(), end=timestamps.max(), freq='MS')
         try:
             location_time_series = location_time_series.sel(
                 time=month_start_timestamps, method=neighbor_lookup

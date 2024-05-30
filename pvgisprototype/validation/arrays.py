@@ -1,4 +1,5 @@
 import enum
+from os import initgroups
 import numpy
 import dask.array
 import importlib.util
@@ -83,6 +84,7 @@ class ArrayDType(enum.Enum):
     FLOAT64 = numpy.float64
     INT32 = numpy.int32
     INT64 = numpy.int64
+    BOOL = numpy.bool_
     # Add other data types as needed
 
     @classmethod
@@ -104,7 +106,7 @@ def supported_array_types() -> cabc.Collection[type]:
 def create_array(
     shape,
     dtype: str = DATA_TYPE_DEFAULT,
-    init_method: int | float | str ='zeros',
+    init_method: bool | int | float | str ='zeros',
     backend: str ='numpy',
     use_gpu: bool =False,
 ):
@@ -140,6 +142,8 @@ def create_array(
     # Select the initialization method
     if isinstance(init_method, (int, float)):  # User-requested value !
         array = array_module.full(shape, init_method, dtype=dtype_obj)
+    elif isinstance(init_method, bool):
+        array = array_module.full(shape, init_method, dtype=bool)
     elif init_method == 'zeros':
         array = array_module.zeros(shape, dtype=dtype_obj)
     elif init_method == 'ones':

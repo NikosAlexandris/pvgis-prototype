@@ -1,18 +1,7 @@
-from rich import print
 from devtools import debug
-from typing import Optional
-from typing import Union
-from typing import Sequence
-from datetime import datetime
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateSolarDeclinationNOAAInput
-from pvgisprototype.validation.functions import CalculateSolarDeclinationNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarDeclinationTimeSeriesNOAAInput
-from .fractional_year import calculate_fractional_year_noaa 
-from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa
-from math import sin
-from math import cos
-from math import isfinite
+from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_series_noaa
 import numpy as np
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import RADIANS
@@ -26,61 +15,54 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-
-
-@validate_with_pydantic(CalculateSolarDeclinationNOAAInput)
-def calculate_solar_declination_noaa(
-    timestamp: datetime,
-) -> SolarDeclination:
-    """Calculate the solar declination angle in radians"""
-    fractional_year = calculate_fractional_year_noaa(
-        timestamp=timestamp,
-    )
-    declination = (
-        0.006918
-        - 0.399912 * cos(fractional_year.radians)
-        + 0.070257 * sin(fractional_year.radians)
-        - 0.006758 * cos(2 * fractional_year.radians)
-        + 0.000907 * sin(2 * fractional_year.radians)
-        - 0.002697 * cos(3 * fractional_year.radians)
-        + 0.00148 * sin(3 * fractional_year.radians)
-        )
-    solar_declination = SolarDeclination(
-        value=declination,
-        unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA'
-    )
-    if (
-        not isfinite(solar_declination.degrees)
-        or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\
-            [{solar_declination.min_degrees}, {solar_declination.max_degrees}] degrees"
-        )
-    return solar_declination
-
-DEFAULT_ARRAY_BACKEND = 'NUMPY'  # OR 'CUPY', 'DASK'
-DEFAULT_ARRAY_DTYPE = 'float32'
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(CalculateSolarDeclinationTimeSeriesNOAAInput)
-def calculate_solar_declination_time_series_noaa(
-    timestamps: Union[datetime, DatetimeIndex],
+def calculate_solar_declination_series_noaa(
+    timestamps: DatetimeIndex,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarDeclination:
+    """Calculate the solar declination for a time series.
+
+    Notes
+    -----
+    From NOAA's .. Excel sheet:
+
+    sine_solar_declination
+    = ASIN(
+        SIN(RADIANS(R2))*SIN(RADIANS(P2))
+    )
+
+    where:
+
+    P2 = M2-0.00569-0.00478*SIN(RADIANS(125.04-1934.136*G2))
+
+        where:
+
+        M2 = Geom Mean Long Sun (deg) + Geom Mean Anom Sun (deg)
+
+
+    R2 = Q2 + 0.00256 * COS(RADIANS(125.04 - 1934.136*G2))
+
+        where :
+
+       Q2 = Mean Obliq Ecliptic (deg)
+
     """
-    """
-    fractional_year_series = calculate_fractional_year_time_series_noaa(
+    fractional_year_series = calculate_fractional_year_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
-        backend=array_backend,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
     )
     solar_declination_series = (
         0.006918
@@ -91,10 +73,23 @@ def calculate_solar_declination_time_series_noaa(
         - 0.002697 * np.cos(3 * fractional_year_series.radians)
         + 0.00148 * np.sin(3 * fractional_year_series.radians)
     )
-    # if not np.all((declination_series.min_degrees <= declination_series.degrees) & (declination_series.degrees <= declination_series.max_degrees)):           # FIXME: Comparison between floats
-    #     wrong_values_index = np.where((declination_series.degrees < declination_series.min_degrees) | (declination_series.degrees > declination_series.max_degrees))
-    #     wrong_values = declination_series.degrees[wrong_values_index]
-    #     raise ValueError(f"The calculated solar declination `{wrong_values}` is out of the expected range [{declination_series.min_degrees}, {declination_series.max_degrees}] degrees!")
+    if not np.all(
+        (SolarDeclination().min_radians <= solar_declination_series)
+        & (solar_declination_series <= SolarDeclination().max_radians)
+    ):
+        index_of_out_of_range_values = np.where(
+            (solar_declination_series < SolarDeclination().min_radians)
+            | (solar_declination_series > SolarDeclination().max_radians)
+        )
+        out_of_range_values = solar_declination_series[index_of_out_of_range_values]
+        raise ValueError(
+            f"{WARNING_OUT_OF_RANGE_VALUES} "
+            f"[{SolarDeclination().min_degrees}, {SolarDeclination().max_degrees}] degrees"
+            f" in [code]solar_declination_series[/code] : {np.degrees(out_of_range_values)}"
+        )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     log_data_fingerprint(
         data=solar_declination_series,
@@ -105,6 +100,5 @@ def calculate_solar_declination_time_series_noaa(
     return SolarDeclination(
         value=solar_declination_series,
         unit=RADIANS,
-        position_algorithm='NOAA',
-        timing_algorithm='NOAA',
+        position_algorithm=fractional_year_series.position_algorithm,
     )

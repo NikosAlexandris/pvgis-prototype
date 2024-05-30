@@ -6,7 +6,7 @@ location for a period in time.
 from typing import Annotated, Optional
 from datetime import datetime
 from pathlib import Path
-from pvgisprototype.api.irradiance.shortwave.inclined import calculate_global_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.shortwave.inclined import calculate_global_inclined_irradiance_series
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import SolarPositionModel
@@ -97,7 +97,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_multi_thread
 
 
 @log_function_call
-def get_global_inclined_irradiance_time_series(
+def get_global_inclined_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -122,7 +122,7 @@ def get_global_inclined_irradiance_time_series(
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,
-    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.jenco,
+    solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -137,6 +137,7 @@ def get_global_inclined_irradiance_time_series(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -151,7 +152,7 @@ def get_global_inclined_irradiance_time_series(
     radiation received from above by a surface horizontal to the ground. It
     includes both the direct and the diffuse solar radiation.
     """
-    global_inclined_irradiance_series = calculate_global_inclined_irradiance_time_series(
+    global_inclined_irradiance_series = calculate_global_inclined_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -223,15 +224,14 @@ def get_global_inclined_irradiance_time_series(
             rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
             data_array=global_inclined_irradiance_series.value,
-            list_extra_data_arrays=None,
             lines=True,
             supertitle = 'Global Inclined Irradiance Series',
             title = 'Global Inclined Irradiance Series',
             label = 'Global Inclined Irradiance',
-            label_2 = None,
+            extra_legend_labels=None,
             unit = IRRADIANCE_UNITS,
             terminal_width_fraction=terminal_width_fraction,
         )
