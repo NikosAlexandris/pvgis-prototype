@@ -4,6 +4,7 @@ from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
 from pvgisprototype.algorithms.pvis.solar_azimuth import calculate_solar_azimuth_series_hofierka
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_series_hofierka
+from pvgisprototype.algorithms.pvlib.solar_incidence import calculate_solar_incidence_series_pvlib
 from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_series_pvlib
 from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimuth_series_pvlib
 from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_series_pvlib
@@ -434,6 +435,19 @@ def model_solar_position_overview_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
+        solar_incidence_series = calculate_solar_incidence_series_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+            timestamps=timestamps,
+            complementary_incidence_angle=complementary_incidence_angle,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
