@@ -19,7 +19,7 @@ from pvgisprototype import SolarZenith
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import SolarIncidence
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.constants import LOSS_NAME, SURFACE_ORIENTATION_DEFAULT
+from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
