@@ -262,7 +262,7 @@ class DataClassFactory:
         default_values = {}
         fields = []
         use_numpy_model = False
-        needs_custom_encoder = False
+        # needs_custom_encoder = False
 
         for field_name, field_data in parameters[model_name].items():
 
@@ -285,13 +285,13 @@ class DataClassFactory:
             "__hash__": DataClassFactory._generate_hash_function(fields, annotations),
             **default_values,
         }
-        if needs_custom_encoder:
-            class_attributes['Config'] = type("Config", (), {
-                "arbitrary_types_allowed": True,
-                "json_encoders": {
-                    np.ndarray: lambda x: x.tolist(),
-                    NpNDArray: lambda x: x.tolist()
-                }
-            })
+        # if needs_custom_encoder:
+        #     class_attributes['Config'] = type("Config", (), {
+        #         "arbitrary_types_allowed": True,
+        #         "json_encoders": {
+        #             np.ndarray: lambda x: x.tolist(),
+        #             NpNDArray: lambda x: x.tolist()
+        #         }
+        #     })
 
         return base_class.__class__(model_name, (base_class,), class_attributes, arbitrary_types_allowed=True)
