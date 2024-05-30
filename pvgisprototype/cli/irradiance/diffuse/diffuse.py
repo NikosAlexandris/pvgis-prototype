@@ -8,7 +8,7 @@ from pvgisprototype.cli.irradiance.diffuse.transmission_function import get_diff
 from pvgisprototype.cli.irradiance.diffuse.altitude import get_diffuse_solar_altitude_coefficients_series
 from pvgisprototype.cli.irradiance.diffuse.altitude import get_diffuse_solar_altitude_function_series
 from pvgisprototype.cli.irradiance.diffuse.horizontal import get_diffuse_horizontal_irradiance_series
-from pvgisprototype.cli.irradiance.diffuse.horizontal_from_sarah import get_diffuse_horizontal_component_from_sarah
+from pvgisprototype.cli.irradiance.diffuse.horizontal_from_sarah import get_diffuse_horizontal_from_global_and_direct_irradiance
 from pvgisprototype.cli.irradiance.diffuse.inclined import get_diffuse_inclined_irradiance_series
 
 
@@ -62,7 +62,7 @@ app.command(
     rich_help_panel=rich_help_panel_irradiance_series,
 )(get_diffuse_inclined_irradiance_series)
 app.command(
-    name='from-sarah',
+    name='from-global-and-direct-irradiance',
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
-)(get_diffuse_horizontal_component_from_sarah)
+)(get_diffuse_horizontal_from_global_and_direct_irradiance)

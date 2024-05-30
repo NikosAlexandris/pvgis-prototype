@@ -287,13 +287,6 @@ def print_solar_position_series_table(
                 solar_position_table=rounded_table,
                 position_parameters=position_parameters,
                 rounding_places=rounding_places,
-                # timing=True,
-                # declination=None,
-                # hour_angle=None,
-                # zenith=None,
-                altitude=True,
-                # azimuth=None,
-                # incidence=None,  # Add Me ?
                 user_requested_timestamp=user_requested_timestamps, 
                 user_requested_timezone=user_requested_timezone
             )
