@@ -14,21 +14,8 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from math import sin
-from math import asin
-from math import cos
-from math import atan
 import numpy as np
-from numpy import ndarray
-from typing import Annotated
 from typing import Optional
-from typing import Union
-from typing import Sequence
-from typing import List
-from pathlib import Path
 from pvgisprototype import SolarAltitude
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import OpticalAirMass
@@ -42,24 +29,17 @@ from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSerie
 from pvgisprototype.api.position.models import validate_model
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct.normal import calculate_direct_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import calculate_refracted_solar_altitude_time_series
-from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import calculate_optical_air_mass_time_series
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_time_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+from pvgisprototype.api.irradiance.direct.normal import calculate_direct_normal_irradiance_series
+from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import calculate_refracted_solar_altitude_series
+from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import calculate_optical_air_mass_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours_time_series
 # from pvgisprototype.api.utilities.progress import progress
 # from rich.progress import Progress
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -122,7 +102,6 @@ from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
-from rich import print
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
@@ -131,7 +110,7 @@ from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
-def calculate_direct_horizontal_irradiance_time_series(
+def calculate_direct_horizontal_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -151,7 +130,6 @@ def calculate_direct_horizontal_irradiance_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_COLUMN_NAME,
-    show_progress: bool = True,
 ) -> np.ndarray:
     """Calculate the direct horizontal irradiance
 
@@ -167,7 +145,7 @@ def calculate_direct_horizontal_irradiance_time_series(
 
     """
     solar_time_model = validate_model(SolarTimeModel, solar_time_model)  # can be only one of!
-    solar_altitude_series = model_solar_altitude_time_series(
+    solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -184,14 +162,14 @@ def calculate_direct_horizontal_irradiance_time_series(
     )
     
     # expects solar altitude in degrees! ----------------------------------vvv
-    refracted_solar_altitude_series = calculate_refracted_solar_altitude_time_series(
+    refracted_solar_altitude_series = calculate_refracted_solar_altitude_series(
         solar_altitude_series=solar_altitude_series,   # expects altitude in degrees!
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
         log=log,
     )
-    optical_air_mass_series = calculate_optical_air_mass_time_series(
+    optical_air_mass_series = calculate_optical_air_mass_series(
         elevation=elevation,
         refracted_solar_altitude_series=refracted_solar_altitude_series,
         dtype=dtype,
@@ -200,7 +178,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         log=log,
     )
     # ^^^ --------------------------------- expects solar altitude in degrees!
-    direct_normal_irradiance_series = calculate_direct_normal_irradiance_time_series(
+    direct_normal_irradiance_series = calculate_direct_normal_irradiance_series(
         timestamps=timestamps,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         optical_air_mass_series=optical_air_mass_series,
@@ -210,7 +188,6 @@ def calculate_direct_horizontal_irradiance_time_series(
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
-        show_progress=show_progress,
     )
 
     # Mask conditions -------------------------------------------------------
@@ -231,6 +208,7 @@ def calculate_direct_horizontal_irradiance_time_series(
         'main': lambda: {
             TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },
 
         'extended': lambda: {
@@ -247,7 +225,6 @@ def calculate_direct_horizontal_irradiance_time_series(
         } if verbose > 2 else {},
 
         'even_more_extended': lambda: {
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
             POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
             TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
             # "Shade": in_shade,

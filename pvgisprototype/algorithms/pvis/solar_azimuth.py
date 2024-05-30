@@ -1,34 +1,44 @@
 from devtools import debug
-from datetime import datetime
 from zoneinfo import ZoneInfo
-from math import pi
 from math import sin
 from math import cos
-from math import acos
-from math import isfinite
+import numpy
+from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAzimuthPVISInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype import SolarAzimuth
-from pvgisprototype.api.position.declination import calculate_solar_declination_pvis
-from pvgisprototype.api.position.solar_time import model_solar_time
-from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_pvis
-from pvgisprototype.constants import RADIANS
+from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, LOG_LEVEL_DEFAULT, NO_SOLAR_INCIDENCE, RADIANS, VERBOSE_LEVEL_DEFAULT
+from pandas import DatetimeIndex
+from pvgisprototype.constants import PERIGEE_OFFSET
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
 
 
-def convert_east_to_north_radians_convention(azimuth_east_radians):
-    return (azimuth_east_radians + 3 * pi / 2) % (2 * pi)
-
-
-@validate_with_pydantic(CalculateSolarAzimuthPVISInputModel)
-def calculate_solar_azimuth_pvis(
-    longitude: Longitude,
-    latitude: Latitude,
-    timestamp: datetime,
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
+# @validate_with_pydantic(CalculateSolarAzimuthPVISInputModel)
+def calculate_solar_azimuth_series_hofierka(
+    longitude: Longitude,   # radians
+    latitude: Latitude,     # radians
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    solar_time_model: SolarTimeModel,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth angle
 
@@ -46,44 +56,117 @@ def calculate_solar_azimuth_pvis(
     According to Hofierka! solar azimuth is measured from East!
     Conflicht with Jenvco 1992?
     """
-    solar_declination = calculate_solar_declination_pvis(
-        timestamp=timestamp,
+    solar_declination_series = calculate_solar_declination_series_hofierka(
+        timestamps=timestamps,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
     )
-    C11 = sin(latitude.radians) * cos(solar_declination.radians)
-    C13 = -cos(latitude.radians) * sin(solar_declination.radians)
-    C22 = cos(solar_declination.radians)
-    solar_time = model_solar_time(
+    # Idea for alternative solar time modelling, i.e. Milne 1921 -------------
+    # solar_time = model_solar_time(
+    #     longitude=longitude,
+    #     latitude=latitude,
+    #     timestamp=timestamp,
+    #     timezone=timezone,
+    #     solar_time_model=solar_time_model,  # returns datetime.time object
+    #     perigee_offset=perigee_offset,
+    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    # )
+    # hour_angle = calculate_solar_hour_angle_pvis(
+    #         solar_time=solar_time,
+    # )
+    # ------------------------------------------------------------------------
+    solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
         longitude=longitude,
-        latitude=latitude,
-        timestamp=timestamp,
+        timestamps=timestamps,
         timezone=timezone,
-        solar_time_model=solar_time_model,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
     )
-    hour_angle = calculate_solar_hour_angle_pvis(
-        solar_time=solar_time,
+    C11 = sin(latitude.radians) * numpy.cos(solar_declination_series.radians)
+    C13 = - cos(latitude.radians) * numpy.sin(solar_declination_series.radians)  # Attention to the - sign
+    C22 = numpy.cos(solar_declination_series.radians)
+    x_solar_vector_component = - C22 * numpy.sin(solar_hour_angle_series.radians)
+    y_solar_vector_component = C11 * numpy.cos(solar_hour_angle_series.radians) + C13
+
+    # numerator = y_solar_vector_component
+    denominator_a = numpy.power(x_solar_vector_component, 2)
+    denominator_b = numpy.power(y_solar_vector_component, 2)
+    event_hour_angle_inclined = numpy.power(denominator_a + denominator_b, 0.5)
+    
+    # mask_positive_event_hour_angle_inclined = event_hour_angle_inclined > 1e-7
+    mask_negative_event_hour_angle_inclined = event_hour_angle_inclined < 1e-7  # ?
+
+    azimuth_origin = 'East'
+    cosine_solar_azimuth_series = numpy.clip(y_solar_vector_component / event_hour_angle_inclined, -1, 1)
+    solar_azimuth_series = numpy.arccos(cosine_solar_azimuth_series)
+    solar_azimuth_series = numpy.where(
+        x_solar_vector_component < 0,
+        numpy.pi * 2 - solar_azimuth_series,
+        solar_azimuth_series
     )
-    cosine_solar_azimuth = (C11 * cos(hour_angle.radians) + C13) / pow(
-        pow((C22 * sin(hour_angle.radians)), 2)
-        + pow((C11 * cos(hour_angle.radians) + C13), 2),
-        0.5,
+    solar_azimuth_series = numpy.where(mask_negative_event_hour_angle_inclined,
+                                       NO_SOLAR_INCIDENCE,
+                                       solar_azimuth_series)
+
+    from math import pi
+    solar_azimuth_series = numpy.where(
+        solar_azimuth_series < pi / 2,
+        pi / 2 - solar_azimuth_series,
+        5 * pi / 2 - solar_azimuth_series
     )
-    solar_azimuth = acos(cosine_solar_azimuth)
+    solar_azimuth_series = numpy.where(
+        solar_azimuth_series >= 2 * pi,
+        solar_azimuth_series - 2 * pi,
+        solar_azimuth_series
+    )
+
     # -------------------------- convert east to north zero degrees convention
     # PVGIS' follows Hofierka (2002) who states : azimuth is measured from East
-    # solar_azimuth = convert_east_to_north_radians_convention(solar_azimuth)
+    # solar_azimuth_series = convert_east_to_north_radians_convention(solar_azimuth_series)
     # convert east to north zero degrees convention --------------------------
-    solar_azimuth = SolarAzimuth(
-        value=solar_azimuth,
-        unit=RADIANS,
-        position_algorithm='PVIS',
-        timing_algorithm=solar_time_model.value,
-    ) # zero_direction='East'
+    # if (
+    #     not isfinite(solar_azimuth.degrees)
+    #     or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+    # ):
+    #     raise ValueError(
+    #         f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
+    #         [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+    #     )
     if (
-        not isfinite(solar_azimuth.degrees)
-        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
-            [{solar_azimuth.min_degrees}, {solar_azimuth.max_degrees}] degrees"
+        (solar_azimuth_series < SolarAzimuth().min_radians)
+        | (solar_azimuth_series > SolarAzimuth().max_radians)
+    ).any():
+        out_of_range_values = solar_azimuth_series[
+            (solar_azimuth_series < SolarAzimuth().min_radians)
+            | (solar_azimuth_series > SolarAzimuth().max_radians)
+        ]
+        # raise ValueError(# ?
+        logger.warning(
+            f"{WARNING_NEGATIVE_VALUES} "
+            f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
+            f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
         )
-    return solar_azimuth
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    log_data_fingerprint(
+            data=solar_azimuth_series,
+            log_level=log,
+            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+
+    return SolarAzimuth(
+        value=solar_azimuth_series,
+        unit=RADIANS,
+        position_algorithm=SolarPositionModel.hofierka,
+        timing_algorithm='PVIS',
+        origin=azimuth_origin,
+        # definition=incidence_angle_definition,
+        # description=incidence_angle_description,
+    ) # zero_direction='East'

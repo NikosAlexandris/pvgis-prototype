@@ -25,9 +25,9 @@ from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.time_series import typer_argument_time_series
 from pvgisprototype.cli.typer.time_series import typer_option_data_variable
 from pvgisprototype.cli.typer.time_series import typer_option_time_series
-from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
 from pvgisprototype.cli.typer.time_series import typer_option_tolerance
+from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_in_memory
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_lines
@@ -36,6 +36,7 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot_unit
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.plot import typer_option_tufte_style
 from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_csv
 from pvgisprototype.cli.typer.output import typer_option_output_filename
@@ -88,7 +89,8 @@ from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
 from pvgisprototype.constants import GROUPBY_DEFAULT
 from pvgisprototype.constants import CSV_PATH_DEFAULT
-from pvgisprototype.cli.typer.statistics import typer_option_groupby
+from pvgisprototype.cli.typer.output import typer_option_fingerprint
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 
 
 app = typer.Typer(
@@ -336,12 +338,13 @@ def plot(
     neighbor_lookup: Annotated[MethodForInexactMatches, typer_option_nearest_neighbor_lookup] = None,
     tolerance: Annotated[Optional[float], typer_option_tolerance] = 0.1, # Customize default if needed
     resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
-    output_filename: Annotated[Path, typer_option_output_filename] = 'series_in',  #Path(),
+    output_filename: Annotated[Path, typer_option_output_filename] = None,
     variable_name_as_suffix: Annotated[bool, typer_option_variable_name_as_suffix] = True,
     width: Annotated[int, 'Width for the plot'] = 16,
     height: Annotated[int, 'Height for the plot'] = 3,
     tufte_style: Annotated[bool, typer_option_tufte_style] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
 ):
     """Plot selected time series"""
     data_array = select_time_series(
@@ -369,6 +372,7 @@ def plot(
             width=width,
             height=height,
             resample_large_series=resample_large_series,
+            fingerprint=fingerprint,
         )
     except Exception as exception:
         print(f"{ERROR_IN_PLOTTING_DATA} : {exception}")

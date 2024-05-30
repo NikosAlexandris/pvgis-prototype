@@ -1,12 +1,12 @@
 ---
-title: Source Code for CLI
 icon: material/console-line
+title: Source Code for CLI
 tags:
   - CLI
   - Reference
 ---
 
-Documentation for all command line tools.
+Source Code Reference for the CLI.
 
 # ::: pvgisprototype.cli
 

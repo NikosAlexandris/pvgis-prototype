@@ -6,10 +6,6 @@ from devtools import debug
 from pandas import DatetimeIndex
 from pathlib import Path
 from typing import Optional
-from typing import List
-from rich import print
-import numpy as np
-from math import cos, sin, pi
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import Irradiance
 from pvgisprototype.api.position.models import SolarPositionModel
@@ -18,11 +14,11 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
+from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
@@ -129,9 +125,9 @@ def read_horizontal_irradiance_components_from_sarah(
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex = None,
-    mask_and_scale: bool = False,
     neighbor_lookup: MethodForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    mask_and_scale: bool = False,
     in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,

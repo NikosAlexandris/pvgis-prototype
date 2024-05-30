@@ -17,6 +17,10 @@ A single timestamp
 http://127.0.0.1:8000/calculate/power/broadband?elevation=214&frequency=h&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812&timestamps=2010-01-27%2012%3A00%3A00
 ```
 
+!!! danger "Understanding the Response -- Update-Me"
+
+    Explain the structure of the API response and how to interpret it.
+
 A day
 
 ``` html
@@ -126,3 +130,8 @@ curl -X 'GET' \
 ## Plot solar declination
 
 - [Plot solar declination for 2023](http://localhost:8000/plot_solar_declination_one_year_bokeh?year=2023)
+
+## Error Handling
+
+[Discuss common errors and how to handle them.]
+

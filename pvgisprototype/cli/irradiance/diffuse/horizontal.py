@@ -1,6 +1,5 @@
 """
-CLI module to calculate the diffuse horizontal irradiance component over a
-location for a period in time.
+CLI module to calculate the clear-sky diffuse horizontal irradiance component over a location for a period in time.
 """
 
 from rich import print
@@ -9,35 +8,25 @@ from typing import Optional
 from datetime import datetime
 from pathlib import Path
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.api.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_time_series
-from pvgisprototype.api.series.models import MethodForInexactMatches
+from pvgisprototype.api.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_elevation
-from pvgisprototype.cli.typer.position import typer_option_surface_orientation
-from pvgisprototype.cli.typer.position import typer_option_surface_tilt
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
-from pvgisprototype.cli.typer.irradiance import typer_option_global_horizontal_irradiance
-from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer.albedo import typer_option_albedo
-from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
-from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.earth_orbit import typer_argument_solar_constant
-# from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
 from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
 from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
@@ -95,7 +84,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
 
 
 @log_function_call
-def get_diffuse_horizontal_irradiance_time_series(
+def get_diffuse_horizontal_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -122,6 +111,7 @@ def get_diffuse_horizontal_irradiance_time_series(
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -132,7 +122,7 @@ def get_diffuse_horizontal_irradiance_time_series(
 ) -> None:
     """
     """
-    diffuse_horizontal_irradiance_time_series = calculate_diffuse_horizontal_irradiance_time_series(
+    diffuse_horizontal_irradiance_series = calculate_diffuse_horizontal_irradiance_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -163,7 +153,7 @@ def get_diffuse_horizontal_irradiance_time_series(
                     latitude, angle_output_units
                 ),
                 timestamps=timestamps,
-                dictionary=diffuse_horizontal_irradiance_time_series.components,
+                dictionary=diffuse_horizontal_irradiance_series.components,
                 title = (
                     DIFFUSE_HORIZONTAL_IRRADIANCE
                     + f" in-plane irradiance series {IRRADIANCE_UNITS}"
@@ -173,7 +163,7 @@ def get_diffuse_horizontal_irradiance_time_series(
                 verbose=verbose,
             )
         else:
-            flat_list = diffuse_horizontal_irradiance_time_series.value.flatten().astype(str)
+            flat_list = diffuse_horizontal_irradiance_series.value.flatten().astype(str)
             csv_str = ','.join(flat_list)
             print(csv_str)
 
@@ -183,32 +173,36 @@ def get_diffuse_horizontal_irradiance_time_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=diffuse_horizontal_irradiance_time_series.components,
+            dictionary=diffuse_horizontal_irradiance_series.components,
             filename=csv,
         )
     if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
         print_series_statistics(
-            data_array=diffuse_horizontal_irradiance_time_series.value,
+            data_array=diffuse_horizontal_irradiance_series.value,
             timestamps=timestamps,
             groupby=groupby,
-            title="Diffuse horizontal irradiance",
+            title=f"Diffuse horizontal irradiance {IRRADIANCE_UNITS}",
+            rounding_places=rounding_places,
         )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_time_series
-        uniplot_data_array_time_series(
-            data_array=diffuse_horizontal_irradiance_time_series.value,
+        from pvgisprototype.api.plot import uniplot_data_array_series
+        uniplot_data_array_series(
+            data_array=diffuse_horizontal_irradiance_series.value,
             list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
             supertitle = 'Diffuse Horizontal Irradiance Series',
             title = 'Diffuse Horizontal Irradiance Series',
             label = 'Diffuse Horizontal Irradiance',
-            label_2 = None,
+            extra_legend_labels=None,
             unit = IRRADIANCE_UNITS,
+            terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
-        print_finger_hash(dictionary=diffuse_horizontal_irradiance_time_series.components)
+        print_finger_hash(dictionary=diffuse_horizontal_irradiance_series.components)
     if metadata:
         from pvgisprototype.cli.print import print_command_metadata
         import click

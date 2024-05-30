@@ -11,7 +11,6 @@ tags:
 
 Ensure you got [FastAPI][FastAPI] and [`uvicorn`][uvicorn] installed
 
-
     <div class="termy">
 
     ``` console

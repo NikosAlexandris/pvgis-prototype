@@ -21,22 +21,16 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.validation.arrays import create_array
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.position.solar_time_series import model_solar_time_time_series
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.position.azimuth_series import model_solar_azimuth_time_series
-from pvgisprototype.api.position.incidence_series import model_solar_incidence_time_series
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_time_series
+from pvgisprototype.api.position.altitude import model_solar_altitude_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.position.altitude_series import model_solar_altitude_time_series
-from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_time_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_time_series
-from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_time_series_pvgis
-from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_time_series
-from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_time_series
+from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_series_pvgis
+from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_series
+from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
@@ -101,7 +95,7 @@ from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 
 
 @log_function_call
-def calculate_global_inclined_irradiance_time_series(
+def calculate_global_inclined_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -135,14 +129,22 @@ def calculate_global_inclined_irradiance_time_series(
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
-    """
-    Calculate the global horizontal irradiance (GHI)
+    """Calculate the global irradiance on an inclined surface [W.m-2]
 
-    The global horizontal irradiance represents the total amount of shortwave
-    radiation received from above by a surface horizontal to the ground. It
-    includes both the direct and the diffuse solar radiation.
+    Calculate the global irradiance on an inclined surface as the sum of the
+    direct, the diffuse and the ground-reflected radiation components.
+    The radiation, selectively attenuated by the atmosphere, which is not
+    reflected or scattered and reaches the surface directly is the direct
+    radiation. The scattered radiation that reaches the ground is the
+    diffuse radiation. In addition, a smaller part of radiation is reflected
+    from the ground onto the inclined surface. Only small percents of reflected
+    radiation contribute to inclined surfaces, thus it is sometimes ignored.
+    PVGIS, however, inherits the solutions adopted in the r.sun solar radiation
+    model in which both the diffuse and reflected radiation components are
+    considered.
+
     """
-    solar_altitude_series = model_solar_altitude_time_series(
+    solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -159,7 +161,7 @@ def calculate_global_inclined_irradiance_time_series(
         verbose=0,
         log=log,
         )
-    solar_azimuth_series = model_solar_azimuth_time_series(
+    solar_azimuth_series = model_solar_azimuth_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -180,7 +182,7 @@ def calculate_global_inclined_irradiance_time_series(
     mask_above_horizon = solar_altitude_series.value > 0
     mask_low_angle = (solar_altitude_series.value >= 0) & (solar_altitude_series.value < 0.04)  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
-    in_shade = is_surface_in_shade_time_series(
+    in_shade = is_surface_in_shade_series(
             solar_altitude_series,
             solar_azimuth_series,
             log=log,
@@ -214,7 +216,7 @@ def calculate_global_inclined_irradiance_time_series(
     if np.any(mask_above_horizon_not_shade):
         # if given, will read from external time series
         direct_inclined_irradiance_series[mask_above_horizon_not_shade] = (
-            calculate_direct_inclined_irradiance_time_series_pvgis(
+            calculate_direct_inclined_irradiance_series_pvgis(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -250,7 +252,7 @@ def calculate_global_inclined_irradiance_time_series(
         # if given, will read from external time series
         diffuse_inclined_irradiance_series[
             mask_above_horizon
-        ] = calculate_diffuse_inclined_irradiance_time_series(
+        ] = calculate_diffuse_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -281,7 +283,7 @@ def calculate_global_inclined_irradiance_time_series(
         ]
         reflected_inclined_irradiance_series[
             mask_above_horizon
-        ] = calculate_ground_reflected_inclined_irradiance_time_series(
+        ] = calculate_ground_reflected_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -293,7 +295,7 @@ def calculate_global_inclined_irradiance_time_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             albedo=albedo,
-            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            global_horizontal_component=global_horizontal_irradiance,  # time series, optional
             apply_angular_loss_factor=apply_angular_loss_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
