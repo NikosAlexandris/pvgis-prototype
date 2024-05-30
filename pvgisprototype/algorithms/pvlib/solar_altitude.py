@@ -3,6 +3,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from math import isfinite
 import numpy
+from pandas import DatetimeIndex
 import pvlib
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVLIBInputModel
@@ -22,41 +23,13 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
 
-@validate_with_pydantic(CalculateSolarAltitudePVLIBInputModel)
-def calculate_solar_altitude_pvlib(
-        longitude: Longitude,   # degrees
-        latitude: Latitude,     # degrees
-        timestamp: datetime,
-        timezone: ZoneInfo,
-    )-> SolarAltitude:
-    """Calculate the solar altitude angle in degrees using pvlib"""
-    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
-    solar_altitude = solar_position['apparent_elevation'].values[0]
-
-    solar_altitude = SolarAltitude(
-        value=solar_altitude,
-        unit=DEGREES,
-        position_algorithm='pvlib',
-        timing_algorithm='pvlib',
-    )
-    if (
-        not isfinite(solar_altitude.degrees)
-        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
-            [{solar_altitude.min_degrees}, {solar_altitude.max_degrees}] degrees"
-        )
-    return solar_altitude
-
-
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(CalculateSolarAltitudePVLIBInputModel)
 def calculate_solar_altitude_series_pvlib(
     longitude: Longitude,  # degrees
     latitude: Latitude,  # degrees
-    timestamps: datetime,
+    timestamps: DatetimeIndex,
     # timezone: ZoneInfo,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
