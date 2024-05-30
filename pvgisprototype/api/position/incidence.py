@@ -168,6 +168,22 @@ def model_solar_incidence_series(
             verbose=verbose,
             log=log,
         )
+
+    if solar_incidence_model.value == SolarIncidenceModel.pvlib:
+
+        solar_incidence_series = calculate_solar_incidence_series_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+            timestamps=timestamps,
+            complementary_incidence_angle=complementary_incidence_angle,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
