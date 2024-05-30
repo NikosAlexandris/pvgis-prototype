@@ -165,7 +165,7 @@ def incidence(
         surface_tilt=SurfaceTilt(value=surface_tilt, unit=RADIANS),  # Typer does not easily support custom types !
         solar_incidence_models=solar_incidence_models,
         complementary_incidence_angle=complementary_incidence_angle,
-        zero_negative_solar_incidence_angles=zero_negative_solar_incidence_angles,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angles,
         # solar_time_model=solar_time_model,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
