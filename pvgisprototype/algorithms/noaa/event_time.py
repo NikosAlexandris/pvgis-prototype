@@ -1,10 +1,10 @@
 from datetime import time
 from datetime import timedelta
 from pandas import DatetimeIndex
+from zoneinfo import ZoneInfo
 import numpy as np
-
 from devtools import debug
-from pandas import DatetimeIndex
+
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventTimeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
@@ -15,7 +15,7 @@ from pvgisprototype import EventTime
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.algorithms.noaa.event_hour_angle import calculate_event_hour_angle_time_series_noaa
+from pvgisprototype.algorithms.noaa.event_hour_angle import calculate_event_hour_angle_series_noaa
 from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_series_noaa
 from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -37,7 +37,7 @@ def calculate_event_time_series_noaa(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
-    # timezone: str,
+    timezone: ZoneInfo,
     event: str,
     refracted_solar_zenith: RefractedSolarZenith,
     apply_atmospheric_refraction: bool = False,
@@ -82,7 +82,7 @@ def calculate_event_time_series_noaa(
       from a range of [0, 2 * pi] which is a full circle
       to a range of [0, 1440] which is a full day in minutes
     """
-    event_hour_angle_series = calculate_event_hour_angle_time_series_noaa(
+    event_hour_angle_series = calculate_event_hour_angle_series_noaa(
         latitude=latitude,
         timestamps=timestamps,
         refracted_solar_zenith=refracted_solar_zenith,
@@ -93,27 +93,28 @@ def calculate_event_time_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
     )
+
+    timezone_offset_timedelta = timezone.utcoffset(None)
+    timezone_offset_hours_utc = timezone_offset_timedelta.total_seconds() / 3600
+
     event_calculations = {
-        "sunrise": 720 - (longitude.as_minutes + event_hour_angle_series.as_minutes) - equation_of_time_series.minutes,
-        "noon": 720 - longitude.as_minutes - equation_of_time_series.minutes,
-        "sunset": 720 - (longitude.as_minutes - event_hour_angle_series.as_minutes) - equation_of_time_series.minutes,
+        'sunrise': 720 - (longitude.as_minutes + event_hour_angle_series.as_minutes) - equation_of_time_series.minutes + timezone_offset_hours_utc * 60,
+        'noon': (720 - longitude.as_minutes - equation_of_time_series.minutes + timezone_offset_hours_utc * 60),
+        'sunset': 720 - (longitude.as_minutes - event_hour_angle_series.as_minutes) - equation_of_time_series.minutes + timezone_offset_hours_utc * 60,
     }
     event_time_series = event_calculations.get(event.lower(), NOT_AVAILABLE)
-    date_series = timestamps.date
-    event_time_series_timedelta = np.array([timedelta(minutes=et) for et in event_time_series], dtype='timedelta64[m]')
-    event_datetime_series = np.array([datetime.combine(date, time(0)) for date in date_series]) + event_time_series_timedelta
-    event_datetime_series_utc = DatetimeIndex(attach_requested_timezone(ed) for ed in event_datetime_series) # assign UTC
+    event_datetimes = [datetime.combine(ts.date(), time(0)) + timedelta(minutes=et) for ts, et in zip(timestamps, event_time_series.tolist())]
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     log_data_fingerprint(
-        data=event_datetime_series_utc,
+        data=DatetimeIndex(event_datetimes),
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return EventTime(
-        value=event_datetime_series_utc,
+        value=DatetimeIndex(event_datetimes),
         event=event,
     )
