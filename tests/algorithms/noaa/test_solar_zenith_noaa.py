@@ -1,6 +1,6 @@
 import pytest
 
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 
 from .cases.solar_zenith import cases_solar_zenith
 from .cases.solar_zenith import cases_solar_zenith_ids
@@ -14,4 +14,4 @@ class TestSolarZenithNOAA(GenericCheckCustomObjects):
 
     @pytest.fixture
     def operation(self):
-        return calculate_solar_zenith_time_series_noaa
+        return calculate_solar_zenith_series_noaa

@@ -87,7 +87,8 @@ def calculate_event_hour_angle_series_noaa(
     cosine_event_hour_angle_series = np.cos(refracted_solar_zenith.radians) / (
         np.cos(latitude.radians) * np.cos(solar_declination_series.radians)
     ) - np.tan(latitude.radians) * np.tan(solar_declination_series.radians)
-    event_hour_angle_series = np.arccos(cosine_event_hour_angle_series)  # radians
+    cosine_event_hour_angle_series
+    event_hour_angle_series = np.arccos(np.clip(cosine_event_hour_angle_series, -1, 1))  # radians
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
