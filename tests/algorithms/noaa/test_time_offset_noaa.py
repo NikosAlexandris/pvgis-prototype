@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_time_series_noaa
+from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_series_noaa
 
 from .cases.time_offset_noaa import cases_time_offset_noaa
 from .cases.time_offset_noaa import cases_time_offset_noaa_ids
@@ -15,4 +15,4 @@ class TestCalculateTimeOffsetNOAA(GenericCheckCustomObjects):
 
     @pytest.fixture
     def operation(self):
-        return calculate_time_offset_time_series_noaa
+        return calculate_time_offset_series_noaa
