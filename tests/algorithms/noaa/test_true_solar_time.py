@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_series_noaa
 
 from .cases.true_solar_time import cases_true_solar_time_noaa
 from .cases.true_solar_time import cases_true_solar_time_ids
@@ -15,4 +15,4 @@ class TestCalculateTrueSolarTimeNOAA(GenericCheckCustomObjects):
 
     @pytest.fixture
     def operation(self):
-        return calculate_true_solar_time_time_series_noaa
+        return calculate_true_solar_time_series_noaa
