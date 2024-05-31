@@ -1,5 +1,5 @@
 import pytest
-from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_time_series_noaa
+from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_series_noaa
 
 from .cases.fractional_year_noaa import cases_fractional_year_noaa 
 from .cases.fractional_year_noaa import cases_fractional_year_noaa_ids
@@ -15,7 +15,7 @@ class TestCalculateFractionalYearNOAA(GenericCheckCustomObjects):
 
     @pytest.fixture
     def operation(self):
-        return calculate_fractional_year_time_series_noaa
+        return calculate_fractional_year_series_noaa
     
     @pytest.fixture(params=cases_fractional_year_noaa_invalid)
     def in_invalid(self, request):
