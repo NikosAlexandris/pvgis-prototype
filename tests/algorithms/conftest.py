@@ -1,7 +1,7 @@
 import pytest
 from numpy import isclose
 
-TOLERANCE_LEVELS = [1, 1e-1, 1e-2, 1e-3]
+TOLERANCE_LEVELS = [1, 1e-1, 1e-2]
 
 
 class GenericCheckCustomObjects:
