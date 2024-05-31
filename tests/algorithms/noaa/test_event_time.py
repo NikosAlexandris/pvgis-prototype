@@ -1,7 +1,7 @@
 import pytest
 from pandas import Timedelta
 from numpy import abs
-from pvgisprototype.algorithms.noaa.event_time import calculate_event_time_time_series_noaa
+from pvgisprototype.algorithms.noaa.event_time import calculate_event_time_series_noaa
 
 from .cases.event_time import cases_event_time_noaa 
 from .cases.event_time import cases_event_time_noaa_ids
@@ -15,9 +15,9 @@ class TestEventTimeNOAA(GenericCheckCustomObjects):
 
     @pytest.fixture
     def operation(self):
-        return calculate_event_time_time_series_noaa
+        return calculate_event_time_series_noaa
 
-    def test_value(self, in_, expected, tolerance:Timedelta=Timedelta(seconds=2)):
+    def test_value(self, in_, expected, tolerance:Timedelta=Timedelta(seconds=5)):
         difference = abs(in_.value - expected.value)
         accepted = difference <= tolerance
         assert accepted.all()

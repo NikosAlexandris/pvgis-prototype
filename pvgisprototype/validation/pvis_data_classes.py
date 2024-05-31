@@ -36,7 +36,7 @@ from pvgisprototype.validation.arrays import NDArrayBackend
 from pvgisprototype.validation.arrays import CUPY_ENABLED
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.constants import ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 
 
 MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
@@ -438,7 +438,7 @@ class ApplyAtmosphericRefractionModel(BaseModel):
 
 
 class ZeroNegativeSolarIncidenceAngleModel(BaseModel):
-    zero_negative_solar_incidence_angle: Optional[bool] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+    zero_negative_solar_incidence_angle: Optional[bool] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 
 
 class RefractedSolarAltitudeModel(BaseModel):
