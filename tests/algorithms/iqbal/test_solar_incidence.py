@@ -1,7 +1,7 @@
 import pytest
 from numpy import isclose
 
-from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_time_series_iqbal
+from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_series_iqbal
 
 from .cases.solar_incidence import cases_solar_incidence_iqbal
 from .cases.solar_incidence import cases_solar_incidence_iqbal_ids
@@ -17,7 +17,7 @@ class TestSolarIncidenceIQBAL(GenericCheckCustomObjects):
 
     @pytest.fixture
     def operation(self):
-        return calculate_solar_incidence_time_series_iqbal
+        return calculate_solar_incidence_series_iqbal
     
     @pytest.fixture(params=cases_solar_incidence_iqbal_pvlib, ids=cases_solar_incidence_iqbal_pvlib_ids)
     def cases_pvlib(self, request):

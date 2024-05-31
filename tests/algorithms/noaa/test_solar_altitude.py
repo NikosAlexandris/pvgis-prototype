@@ -1,6 +1,6 @@
 import pytest
 
-from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_time_series_noaa
+from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_series_noaa
 
 from .cases.solar_altitude import cases_solar_altitude_noaa
 from .cases.solar_altitude import cases_solar_altitude_noaa_ids
@@ -15,4 +15,4 @@ class TestSolarAltitudeNOAA(GenericCheckCustomObjects):
 
     @pytest.fixture
     def operation(self):
-        return calculate_solar_altitude_time_series_noaa
+        return calculate_solar_altitude_series_noaa
