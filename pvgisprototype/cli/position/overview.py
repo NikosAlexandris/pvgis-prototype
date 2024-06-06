@@ -50,7 +50,7 @@ from pvgisprototype.cli.typer.output import typer_option_index
 
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.position.overview import calculate_solar_position_overview_series
-from pvgisprototype.constants import DATA_TYPE_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.constants import DATA_TYPE_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
@@ -107,7 +107,7 @@ def overview(
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
     # solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: Annotated[bool, typer_option_sun_to_surface_plane_incidence_angle] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
-    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
