@@ -13,7 +13,7 @@ from pvgisprototype import RelativeLongitude
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.constants import PERIGEE_OFFSET, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.constants import PERIGEE_OFFSET, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
@@ -252,7 +252,7 @@ def calculate_solar_incidence_series_hofierka(
     timezone: ZoneInfo | None = None,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
-    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,

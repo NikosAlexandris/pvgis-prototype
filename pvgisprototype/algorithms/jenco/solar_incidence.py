@@ -24,7 +24,7 @@ from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateRelativeLongitudeInputModel
 from pvgisprototype.validation.functions import CalculateSolarIncidenceTimeSeriesJencoInputModel
-from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -180,7 +180,7 @@ def calculate_solar_incidence_series_jenco(
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
-    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
