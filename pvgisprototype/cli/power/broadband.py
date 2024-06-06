@@ -80,7 +80,7 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import cPROFILE_FLAG_DEFAULT
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import RADIANS
@@ -170,7 +170,7 @@ def photovoltaic_power_output_series(
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
-    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
@@ -373,7 +373,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
-    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
