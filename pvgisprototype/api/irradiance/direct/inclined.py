@@ -154,7 +154,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         Direct Inclined = Direct Horizontal * sin( Solar Incidence ) / sin( Solar Altitude )
 
     The implementation by Hofierka (2002) uses the solar incidence angle
-    between the sun-vector and the plane of the reference surface (as per Jenco,
+    between the sun-vector and the plane of the reference surface (as per Jenčo,
     1992). This is very important and relates to the hardcoded value `True` for
     the `complementary_incidence_angle` input parameter of the function. We
     call this angle (definition) the _complementary_ incidence angle.
@@ -163,7 +163,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     & Ruiz (2005) expects the incidence angle between the sun-vector and the
     surface-normal. Hence, the respective call of the function
     `calculate_angular_loss_factor_for_direct_irradiance_series()`,
-    expects the complement of the angle defined by Jenco (1992). We call the
+    expects the complement of the angle defined by Jenčo (1992). We call the
     incidence angle expected by the incidence angle modifier by Martin & Ruiz
     (2005) the _typical_ incidence angle.
 
@@ -234,7 +234,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     # To add : ---------------------------------------------------------------
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
 
-    # Following, the _complementary_ solar incidence angle is used (Jenco, 1992)!
+    # Following, the _complementary_ solar incidence angle is used (Jenčo, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
     in_shade = is_surface_in_shade_series(
             solar_altitude_series,
