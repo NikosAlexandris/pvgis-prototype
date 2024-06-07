@@ -62,6 +62,19 @@ from pvgisprototype.constants import (
 )
 
 
+def convert_series_to_sparkline(
+    series: np.array([]),
+    timestamps: DatetimeIndex,
+):
+    """
+    """
+    pandas_series = pandas.Series(series, timestamps)
+    yearly_sum_series = pandas_series.resample('YE').sum()
+    sparkline = sparklines(yearly_sum_series)[0]
+
+    return sparkline
+
+
 def style_value(value, style_if_negative='dim'):
     if value is not None:
         if value < 0:
@@ -715,6 +728,440 @@ def print_irradiance_table_2(
 
     if verbose:
         Console().print(table)
+
+
+def kilofy_unit(value, unit="W", threshold=1000):
+    """
+    Converts the unit of a given value to its kilo-equivalent if the absolute value is greater than or equal to 1000.
+
+    Args:
+        value (float): The numerical value to potentially convert.
+        unit (str): The current unit of the value, defaulting to 'W' (Watts).
+
+    Returns:
+        tuple: The converted value and its unit. If the value is 1000 or more, it converts the value and changes the unit to 'kW' (kilowatts).
+
+    Examples:
+        >>> kilofy_unit(1500, "W", 1000)
+        (1.5, "kW")
+        >>> kilofy_unit(500, "W", 1000)
+        (500, "W")
+    """
+    if value is not None:
+        if abs(value) >= threshold and unit == IRRADIANCE_UNIT:
+            return value / 1000, IRRADIANCE_UNIT_K  # update to kilo
+        if abs(value) >= threshold:
+            return value / 1000, unit  # update to kilo
+    return value, unit
+
+
+def add_table_row(
+    table,
+    quantity,
+    value,
+    unit=IRRADIANCE_UNIT,
+    percentage=None,
+    reference_quantity=None,
+    series=np.array([]),
+    timestamps: DatetimeIndex = None,
+    quantity_style=None,
+    value_style="cyan",
+    unit_style="cyan",
+    percentage_style="dim",
+    reference_quantity_style="white",
+    rounding_places=1,
+):
+    """
+    Adds a row to a table with automatic unit handling and optional percentage.
+
+    Args:
+        table: The table object to which the row will be added.
+        quantity: The name of the quantity being added.
+        value: The numerical value associated with the quantity.
+        base_unit: The base unit of measurement for the value.
+        percentage: Optional; the percentage change or related metric.
+        reference_quantity: Optional; the reference quantity for the percentage.
+        rounding_places: Optional; the number of decimal places to round the value.
+
+    Processes:
+        - Rounds the value if rounding_places is specified.
+        - Converts units from base_unit to a larger unit if value exceeds 1000.
+        - Adds the row to the specified table.
+    """
+    effects = {
+        REFLECTIVITY,
+        SPECTRAL_EFFECT,
+        TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
+        SYSTEM_LOSS,
+        TOTAL_NET_EFFECT,
+    }
+    quantity = f"[{quantity_style}]{quantity}" if quantity_style else quantity
+    value, unit = kilofy_unit(value=value, unit=unit, threshold=1000)
+    # value = f"[red]{value:.{rounding_places}f}" if value < 0 else f"[{value_style}]{value:.{rounding_places}f}"
+    value = f"[{value_style}]{value:.{rounding_places}f}" if value_style else f"{value:.{rounding_places}f}" 
+    unit = f"[{unit_style}]{unit}" if unit_style else unit
+    reference_quantity = f"[{reference_quantity_style}]{reference_quantity}" if reference_quantity_style else reference_quantity
+    sparkline = convert_series_to_sparkline(series, timestamps) if series.size > 0 else ''
+
+    # Prepare the basic row data structure
+    row = [quantity, value, unit]
+    
+    # Add percentage and reference quantity if applicable
+    if percentage is not None:
+        # percentage = f"[red]{percentage:.{rounding_places}f}" if percentage < 0 else f"[{percentage_style}]{percentage:.{rounding_places}f}"
+        percentage = f"[red bold]{percentage:.{rounding_places}f}" if percentage < 0 else f"[green bold]+{percentage:.{rounding_places}f}"
+        row.extend([f"{percentage}"])
+        if reference_quantity:
+            row.extend([reference_quantity])
+        else:
+            row.extend([""])
+    else:
+        row.extend(["", ""])
+    if sparkline:
+        row.extend([sparkline])
+    else:
+        row.extend([""])
+    
+    # table.add_row(
+    #     quantity,
+    #     value,
+    #     unit,
+    #     percentage,
+    #     reference_quantity,
+    #     style=quantity_style
+    # )
+    table.add_row(*row)
+
+
+def calculate_percentage_change(value, reference_value):
+    try:
+        return 100 * (value - reference_value) / abs(reference_value)
+
+    except ZeroDivisionError:
+        return 0
+
+
+def calculate_sum_and_percentage(
+        data_series,
+        base_value,
+        rounding_places=None,
+        dtype=DATA_TYPE_DEFAULT,
+        array_backend=ARRAY_BACKEND_DEFAULT,
+        ):
+    """Calculate total of a series and its percentage relative to a base value."""
+    total = np.nansum(data_series)
+    percentage = (total / base_value * 100) if base_value != 0 else 0
+    if rounding_places is not None:
+        total = round_float_values(total, rounding_places)
+        percentage = round_float_values(percentage, rounding_places)
+    return total.astype(dtype), percentage.astype(dtype)
+
+
+def analyse_photovoltaic_performance(
+        dictionary,
+        rounding_places=1,
+        dtype=DATA_TYPE_DEFAULT,  # Define default data types for array operations
+        array_backend=ARRAY_BACKEND_DEFAULT,
+        ):
+    """
+    Workflow
+
+    In-Plane Irradiance                           
+
+    ┌───────────┘
+    │ Reflectivity Loss             
+    └┐─────────────────
+     ▼
+
+    Irradiance After Reflectivity Loss            
+
+    ┌───────────┘
+    │ Spectral Effect               
+    └┐───────────────
+     ▼
+
+    Effective Irradiance                          
+
+    ┌───────────┘
+    │ Temp. & Low Irradiance Coefficients 
+    └┐───────────────────────────────────
+     ▼
+
+    Effective Power                                         
+
+    ┌───────────┘
+    │ System Loss                   
+    └┐───────────
+     ▼
+
+    Photovoltaic Power Output
+
+    ------------
+    Total Change
+    ------------
+    """
+    inclined_irradiance_series = dictionary.get(
+        GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, np.array([])
+    )
+    inclined_irradiance, _ = calculate_sum_and_percentage(
+        inclined_irradiance_series,
+        1,
+        rounding_places,
+    )  # Base value is dummy for total calculation
+
+    reflectivity_series = dictionary.get(REFLECTIVITY_COLUMN_NAME, np.array([]))
+    reflectivity_change, reflectivity_change_percentage = calculate_sum_and_percentage(
+        reflectivity_series, inclined_irradiance, rounding_places
+    )
+    irradiance_after_reflectivity = inclined_irradiance + reflectivity_change
+
+    spectral_effect_series = dictionary.get(SPECTRAL_EFFECT_COLUMN_NAME, np.array([]))
+    spectral_effect, spectral_effect_percentage = calculate_sum_and_percentage(
+        spectral_effect_series, irradiance_after_reflectivity, rounding_places
+    )
+
+    effective_irradiance = irradiance_after_reflectivity + spectral_effect
+    effective_irradiance_percentage = (
+        (effective_irradiance / inclined_irradiance * 100) if inclined_irradiance != 0 else 0
+    )
+    effective_irradiance_change = (
+        effective_irradiance
+        - inclined_irradiance
+    )
+    effective_irradiance_change_percentage = (
+        100
+        * effective_irradiance_change
+        / inclined_irradiance
+    )
+    # "Effective" Power without System Loss
+    photovoltaic_power_without_system_loss_series = dictionary.get(
+        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, np.array([])
+    )
+    photovoltaic_power_without_system_loss, _ = calculate_sum_and_percentage(
+        photovoltaic_power_without_system_loss_series,
+        base_value=1,
+        rounding_places=rounding_places,
+        dtype=dtype,
+        array_backend=array_backend,
+    )
+
+    # Temperature & Low Irradiance
+    temperature_and_low_irradiance_change = (
+        photovoltaic_power_without_system_loss - effective_irradiance
+    )
+    temperature_and_low_irradiance_change_percentage = (
+        100
+        * temperature_and_low_irradiance_change
+        / effective_irradiance
+    )
+
+    # System efficiency
+    system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None)
+    system_efficiency = np.nanmedian(system_efficiency_series).astype(dtype)
+    system_efficiency_change = photovoltaic_power_without_system_loss * system_efficiency - photovoltaic_power_without_system_loss
+    system_efficiency_change_percentage = 100 * system_efficiency_change / photovoltaic_power_without_system_loss
+
+    # Photovoltaic Power
+    photovoltaic_power_series = dictionary.get(PHOTOVOLTAIC_POWER_COLUMN_NAME, np.array([]))
+    photovoltaic_power, _ = calculate_sum_and_percentage(
+        photovoltaic_power_series,
+        1,
+        rounding_places,
+    )  # Base value is dummy for total calculation
+
+    # Total change
+    total_change = (
+        photovoltaic_power - inclined_irradiance
+    )
+    total_change_percentage = (
+        (total_change / inclined_irradiance * 100) if inclined_irradiance != 0 else 0
+    )
+
+    return {
+        f"[bold purple]{IN_PLANE_IRRADIANCE}": (            # Label
+            (inclined_irradiance, "bold purple"),           # Value, Style
+            None,                                           # %
+            (IRRADIANCE_UNIT, "purple"),                                # Unit
+            "bold",                                         # Style for
+            None,# f"100 {GLOBAL_IRRADIANCE_NAME}",         # % of (which) Quantity
+            inclined_irradiance_series,                     # input series
+        ),
+        f"{REFLECTIVITY}": (
+            (reflectivity_change, "magenta"),
+            reflectivity_change_percentage,
+            (IRRADIANCE_UNIT, "cyan dim"),
+            "bold",
+            IN_PLANE_IRRADIANCE,
+            reflectivity_series,
+        ),
+        f"[white dim]{IRRADIANCE_AFTER_REFLECTIVITY}": (
+            (irradiance_after_reflectivity, "white dim"),
+            None,
+            (IRRADIANCE_UNIT, "white dim"),
+            "bold",
+            IN_PLANE_IRRADIANCE,
+            np.array([], dtype=dtype),
+        ),
+        f"{SPECTRAL_EFFECT}": (
+            (spectral_effect, "magenta"),
+            spectral_effect_percentage,
+            (IRRADIANCE_UNIT, "cyan dim"),
+            "bold",
+            IN_PLANE_IRRADIANCE,
+            spectral_effect_series,
+        ),
+        f"[white dim]{EFFECTIVE_IRRADIANCE_NAME}": (
+            (effective_irradiance, "white dim"),
+            None, # effective_irradiance_percentage,
+            (IRRADIANCE_UNIT, "white dim"),
+            "bold",
+            None, # GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY,
+            np.array([]),
+        ),
+        f"{TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME}": (
+            (temperature_and_low_irradiance_change, "magenta"),
+            temperature_and_low_irradiance_change_percentage,
+            (IRRADIANCE_UNIT, "cyan dim"),
+            "bold",
+            EFFECTIVE_IRRADIANCE_NAME,
+            np.array([]),
+        ),
+        f"[white dim]{PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME}": (
+            (photovoltaic_power_without_system_loss, "white dim"),
+            None,
+            (PHOTOVOLTAIC_POWER_UNIT, "white dim"),
+            "bold",
+            EFFECTIVE_IRRADIANCE_NAME,
+            photovoltaic_power_without_system_loss_series,
+        ),
+        f"{SYSTEM_LOSS}": (
+            (system_efficiency_change, "magenta"),
+            system_efficiency_change_percentage,
+            (PHOTOVOLTAIC_POWER_UNIT, "cyan dim"),
+            "bold",
+            PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+            np.array([]),
+        ),
+        f"[green bold]{PHOTOVOLTAIC_POWER_LONG_NAME}": (
+            (photovoltaic_power, "bold green"),
+            None,
+            (PHOTOVOLTAIC_POWER_UNIT, "green"),
+            "bold",
+            EFFECTIVE_IRRADIANCE_NAME,
+            photovoltaic_power_series,
+        ),
+        f"[white bold dim]{TOTAL_NET_EFFECT}": (
+            (total_change, "white dim"),
+            total_change_percentage,
+            (IRRADIANCE_UNIT, "white dim"),
+            "red",
+            IN_PLANE_IRRADIANCE,
+            np.array([]),
+        ),
+    }
+
+
+def print_change_percentages_panel(
+    longitude=None,
+    latitude=None,
+    elevation=None,
+    timestamps: DatetimeIndex | datetime = [datetime.now()],
+    dictionary: dict = dict(),
+    title: str ='Changes',
+    rounding_places: int = 1,#ROUNDING_PLACES_DEFAULT,
+    verbose=1,
+    index: bool = False,
+    surface_orientation=True,
+    surface_tilt=True,
+    quantity_style="magenta",
+    value_style="cyan",
+    unit_style="cyan",
+    percentage_style="dim",
+    reference_quantity_style="white",
+):
+    """Print a formatted table of photovoltaic performance metrics using the
+    Rich library.
+
+    Analyse the photovoltaic performance in terms of :
+
+    - In-plane (or inclined) irradiance without reflectivity loss
+    - Reflectivity effect as a function of the solar incidence angle
+    - Irradiance after reflectivity effect
+    - Spectral effect due to variation in the natural sunlight spectrum and its
+      difference to standardised artificial laborary light spectrum
+    - Effective irradiance = Inclined irradiance + Reflectivity effect + Spectral effect
+    - Loss as a function of the PV module temperature and low irradiance effects
+    - Conversion of the effective irradiance to photovoltaic power 
+    - Total net effect = Reflectivity, Spectral effect, Temperature & Low
+      irradiance
+
+    Finally, report the photovoltaic power output after system loss and
+    degradation with age
+
+    """
+    results = analyse_photovoltaic_performance(dictionary=dictionary)
+    add_empty_row_before = {
+        # IN_PLANE_IRRADIANCE,
+        REFLECTIVITY,
+        # IRRADIANCE_AFTER_REFLECTIVITY,
+        SPECTRAL_EFFECT,
+        # EFFECTIVE_IRRADIANCE_NAME,
+        TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
+        # PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+        # SYSTEM_LOSS,
+        # PHOTOVOLTAIC_POWER_LONG_NAME,
+        f"[green bold]{PHOTOVOLTAIC_POWER_LONG_NAME}",
+        TOTAL_NET_EFFECT,
+    }
+    table = Table(
+        title="Analysis of Performance",
+        # caption="Caption text",
+        # caption="Detailed view of changes in photovoltaic performance.",
+        show_header=True,
+        header_style="bold magenta",
+        # row_styles=["none", "dim"],
+        box=SIMPLE_HEAD,
+        highlight=True,
+    )
+    table.add_column("Quantity", justify="left", style="magenta", no_wrap=True)
+    table.add_column("Value", justify="right", style="cyan")
+    table.add_column("Unit", justify="right", style="magenta")
+    table.add_column("%", style="dim", justify="right")
+    table.add_column("of", style="dim", justify="left")
+    table.add_column("Yearly sums", style="dim", justify="center")
+
+    # Adding rows based on the dictionary keys and their corresponding values
+    for label, (
+        (value, value_style),
+        percentage,
+        (unit, unit_style),
+        style,
+        reference_quantity,
+        input_series,
+    ) in results.items():
+        if label in add_empty_row_before:
+            table.add_row()
+        add_table_row(
+            table=table,
+            quantity=label,
+            value=value,
+            unit=unit,
+            percentage=percentage,
+            reference_quantity=reference_quantity,
+            series=input_series,
+            timestamps=timestamps,
+            quantity_style=quantity_style,
+            value_style=value_style,
+            unit_style=unit_style,
+            percentage_style=percentage_style,
+            reference_quantity_style=reference_quantity_style,
+            rounding_places=rounding_places,
+        )
+
+    # Print the table within a panel using Rich Console
+    console = Console()
+    console.print(Panel(table, expand=False))
+    # console.print(Panel(table, title="Analysis", expand=False))
 
 
 def print_finger_hash(dictionary: dict):
