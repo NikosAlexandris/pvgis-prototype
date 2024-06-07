@@ -233,9 +233,11 @@ def calculate_reflectivity_loss_percentage(
     reflectivity,
 ):
     """ """
-    percentage = np.where(
-        irradiance != 0,
-        100 * (1 - ((irradiance * reflectivity) / irradiance)),
-        0,
-    )
+    # --------------------------------------------------- Is this safe ? -
+    with np.errstate(divide='ignore', invalid='ignore'):
+        percentage = np.where(
+            irradiance != 0,
+            100 * (1 - ((irradiance * reflectivity) / irradiance)),
+            0,
+        )
     return percentage

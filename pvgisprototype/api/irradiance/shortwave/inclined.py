@@ -323,7 +323,7 @@ def calculate_global_inclined_irradiance_series(
         | (global_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     )
     if out_of_range_indices[0].size > 0:
-        print(
+        logger.warning(
                 f"{WARNING_OUT_OF_RANGE_VALUES} in `global_inclined_irradiance_series` : {out_of_range_indices[0]}!"
         )
 
