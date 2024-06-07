@@ -249,8 +249,12 @@ and ideally should return meaninfgul error messages.
 
 !!! danger "Example that fails"
 
-    ``` bash exec="true" result="ansi" source="material-block"
+    ``` bash exec="false" result="ansi" source="material-block"
     pvgis-prototype irradiance global inclined 8 45 214 170 '2010-01-27 12:00:00'
+    ```
+
+    ``` bash exec="true" result="ansi"
+    pvgis-prototype irradiance global inclined 8 45 214 170 '2010-01-27 12:00:00' # markdown-exec: hide
     ```
 
     In the above example, the surface tilt angle is missing, followed by a
