@@ -46,7 +46,7 @@ def get_angular_loss_factor_for_direct_irradiance_series(
     Ruiz (2005). Expected is the angle between the sun-solar-surface vector and
     the vector normal to the reference solar surface. We call this the
     _typical_ incidence angle as opposed to the _complementary_ incidence angle
-    defined by Jenco (1992).
+    defined by Jenčo (1992).
 
     """
     angular_loss_factor_for_direct_irradiance_series = calculate_angular_loss_factor_for_direct_irradiance_series(
