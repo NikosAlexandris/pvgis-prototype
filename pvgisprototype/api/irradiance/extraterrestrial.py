@@ -7,7 +7,7 @@ from typing import Union
 from datetime import datetime
 from pvgisprototype import Irradiance
 from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DAY_ANGLE_SERIES
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -98,7 +98,7 @@ def calculate_extraterrestrial_normal_irradiance_series(
 
     return Irradiance(
             value=extraterrestrial_normal_irradiance_series,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             position_algorithm="",
             timing_algorithm="",
             elevation=None,
