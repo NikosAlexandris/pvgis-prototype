@@ -1,4 +1,5 @@
 from pvgisprototype.log import logger
+from numpy import where
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -321,10 +322,15 @@ def calculate_diffuse_inclined_irradiance_series(
             array_backend=array_backend,
             verbose=verbose,
         )
-        diffuse_sky_irradiance_series = calculate_diffuse_sky_irradiance_series(
-            n_series=n_series,
-            surface_tilt=surface_tilt,
+        diffuse_sky_irradiance_series = where(
+            np.isnan(n_series),  # handle NaN cases
+            0,
+            calculate_diffuse_sky_irradiance_series(
+                n_series=n_series,
+                surface_tilt=surface_tilt,
+            ),
         )
+
         solar_incidence_series = model_solar_incidence_series(
             longitude=longitude,
             latitude=latitude,
@@ -437,15 +443,32 @@ def calculate_diffuse_inclined_irradiance_series(
                 )
             )
 
+    diffuse_inclined_irradiance_series = np.nan_to_num(
+        diffuse_inclined_irradiance_series, nan=0
+    )
     if apply_angular_loss_factor:
-        diffuse_irradiance_angular_loss_coefficient = sin(surface_tilt) + (
+
+        diffuse_irradiance_reflectivity_coefficient = sin(surface_tilt) + (
             pi - surface_tilt - sin(surface_tilt)
         ) / (1 + cos(surface_tilt))
-        diffuse_irradiance_loss_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
-            indirect_angular_loss_coefficient=diffuse_irradiance_angular_loss_coefficient,
+        diffuse_irradiance_reflectivity_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
+            indirect_angular_loss_coefficient=diffuse_irradiance_reflectivity_coefficient,
         )
-        diffuse_inclined_irradiance_series_before_loss = np.copy(diffuse_inclined_irradiance_series)
-        diffuse_inclined_irradiance_series *= diffuse_irradiance_loss_factor
+        diffuse_irradiance_reflectivity_factor_series = create_array(
+            timestamps.shape,
+            dtype=dtype,
+            init_method=diffuse_irradiance_reflectivity_factor,
+            backend=array_backend,
+        )
+        diffuse_inclined_irradiance_series *= diffuse_irradiance_reflectivity_factor_series
+
+        # for the output dictionary
+        diffuse_inclined_irradiance_before_reflectivity_series = where(
+            diffuse_irradiance_reflectivity_factor_series != 0,
+            diffuse_inclined_irradiance_series
+            / diffuse_irradiance_reflectivity_factor_series,
+            0,
+        )
 
     out_of_range = (
         (diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
@@ -456,7 +479,7 @@ def calculate_diffuse_inclined_irradiance_series(
         logger.warning(warning)
         stub_array = np.full(out_of_range.shape, -1, dtype=int)
         index_array = np.arange(len(out_of_range))
-        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
+        out_of_range_indices = where(out_of_range, index_array, stub_array)
 
     # Building the output dictionary ========================================
 
