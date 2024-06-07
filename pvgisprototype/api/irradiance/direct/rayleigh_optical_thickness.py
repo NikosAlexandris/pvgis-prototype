@@ -160,9 +160,12 @@ def calculate_optical_air_mass_series(
     adjusted_elevation = adjust_elevation(elevation.value)
     degrees_plus_offset = refracted_solar_altitude_series.degrees + 6.07995
     # Handle negative values subjected to np.power()
-    power_values = np.where(
-        degrees_plus_offset > 0, np.power(degrees_plus_offset, -1.6364), 0
-    )
+    # ------------------------------------------------------------------------
+    # Review - Me : This is an ugly hack to avoid warning/s
+    # of either an invalid or a zero value subjected to np.power()
+    degrees_plus_offset = np.where(degrees_plus_offset <0, np.inf, degrees_plus_offset)
+    # ------------------------------------------------------------------------
+    power_values = np.power(degrees_plus_offset, -1.6364)
     optical_air_mass_series = adjusted_elevation.value / (
         np.sin(refracted_solar_altitude_series.radians)  # in radians for NumPy
         + 0.50572 * power_values

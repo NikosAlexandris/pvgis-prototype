@@ -310,11 +310,12 @@ def calculate_diffuse_inclined_irradiance_series(
 
     else:  # tilted (or inclined) surface
     # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
-        # print(f'{surface_tilt=} should NOT be zero!, hence {diffuse_horizontal_irradiance_series=}')
-        kb_series = (  # proportion between direct and extraterrestrial
-            direct_horizontal_irradiance_series
-            / extraterrestrial_horizontal_irradiance_series
-        )
+        # --------------------------------------------------- Is this safe ? -
+        with np.errstate(divide='ignore', invalid='ignore'):
+            kb_series = (  # proportion between direct and extraterrestrial
+                direct_horizontal_irradiance_series
+                / extraterrestrial_horizontal_irradiance_series
+            )
         n_series = calculate_term_n_series(
             kb_series,
             dtype=dtype,
