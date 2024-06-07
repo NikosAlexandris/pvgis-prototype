@@ -257,7 +257,13 @@ def calculate_diffuse_inclined_irradiance_series(
             logger.info(
                 ":information: [bold][magenta]Modelling[/magenta] clear-sky diffuse horizontal irradiance[/bold]..."
             )
-        global_horizontal_irradiance_series = NOT_AVAILABLE
+        global_horizontal_irradiance_series = create_array(
+                timestamps.shape,
+                dtype=dtype,
+                init_method=np.nan,
+                backend=array_backend
+        )
+
         # in which case, however: we need the direct component for the kb series, if it's NOT read fom external series!
         direct_horizontal_irradiance_series = (
             calculate_direct_horizontal_irradiance_series(
@@ -476,21 +482,29 @@ def calculate_diffuse_inclined_irradiance_series(
     # Building the output dictionary ========================================
 
     components_container = {
+
         'main': lambda: {
             TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },# if verbose > 0 else {},
 
+        'extended_2': lambda: {
+            REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_loss_martin_and_ruiz(irradiance=diffuse_inclined_irradiance_before_reflectivity_series, reflectivity=diffuse_irradiance_reflectivity_factor_series),
+            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_loss_percentage(irradiance=diffuse_inclined_irradiance_before_reflectivity_series, reflectivity=diffuse_irradiance_reflectivity_factor_series),
+        } if verbose > 6 and apply_angular_loss_factor else {},
+
         'extended': lambda: {
-            LOSS_COLUMN_NAME: 1 - diffuse_irradiance_loss_factor if apply_angular_loss_factor else NOT_AVAILABLE,
-            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME: diffuse_inclined_irradiance_series_before_loss if apply_angular_loss_factor else NOT_AVAILABLE,
+            # REFLECTIVITY_FACTOR_COLUMN_NAME: where(diffuse_irradiance_loss_factor_series <= 0, 0, (1 - diffuse_irradiance_loss_factor_series)),
+            REFLECTIVITY_FACTOR_COLUMN_NAME: diffuse_irradiance_reflectivity_factor_series,
+            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
+        # } if verbose > 1 and apply_angular_loss_factor else {},
+        } if apply_angular_loss_factor else {},
+
+        'more_extended': lambda: {
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        } if verbose > 1 else {},
-
-        'more_extended': lambda: {
             TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE + ' & relevant components',
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
             DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_sky_irradiance_series,
@@ -499,7 +513,7 @@ def calculate_diffuse_inclined_irradiance_series(
         'even_more_extended': lambda: {
             TERM_N_COLUMN_NAME: n_series,
             KB_RATIO_COLUMN_NAME: kb_series,
-            AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(azimuth_difference_series_array, angle_output_units, NOT_AVAILABLE),
+            AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(azimuth_difference_series_array, angle_output_units, np.nan),
             AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series_array, angle_output_units, NOT_AVAILABLE),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,  # Altitude should be always there! If not, something is wrong.  This is why this entry does not need the NOT_AVAILABLE fallback.
         } if verbose > 3 else {},
