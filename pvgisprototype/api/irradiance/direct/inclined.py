@@ -379,9 +379,16 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             RADIATION_MODEL_COLUMN_NAME: 'External data' if direct_horizontal_component else HOFIERKA_2002,
         },
 
+        'extended_2': lambda: {
+            REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_loss_martin_and_ruiz(irradiance=direct_inclined_irradiance_before_reflectivity_series, reflectivity=direct_irradiance_reflectivity_factor_series),
+            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_loss_percentage(irradiance=direct_inclined_irradiance_before_reflectivity_series, reflectivity=direct_irradiance_reflectivity_factor_series),
+        } if verbose > 6 and apply_angular_loss_factor else {},
+
         'extended': lambda: {
-            LOSS_COLUMN_NAME: 1 - angular_loss_factor_series if apply_angular_loss_factor else np.nan,
-        } if verbose > 1 else {},
+            REFLECTIVITY_FACTOR_COLUMN_NAME: direct_irradiance_reflectivity_factor_series,
+            DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
+        # } if verbose > 1 and apply_angular_loss_factor else {},
+        } if apply_angular_loss_factor else {},
 
         'more_extended': lambda: {
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
