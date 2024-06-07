@@ -68,7 +68,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
@@ -209,7 +209,7 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
                     spectrally_resolved_global_inclined_irradiance_series[
                         TITLE_KEY_NAME
                     ]
-                    + f" in-plane irradiance series {IRRADIANCE_UNITS}"
+                    + f" in-plane irradiance series {IRRADIANCE_UNIT}"
                 ),
                 rounding_places=rounding_places,
                 index=index,
@@ -250,7 +250,7 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
             title = 'Global Horizontal Irradiance Series',
             label = 'Global Horizontal Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:

@@ -35,7 +35,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import TERM_N_IN_SHADE
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import RADIANS
@@ -52,7 +52,6 @@ from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
@@ -125,8 +124,8 @@ def calculate_diffuse_horizontal_irradiance_series(
         timezone=timezone,
         solar_position_model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
-        solar_time_model=solar_time_model,
+        # refracted_solar_zenith=refracted_solar_zenith,
+        # solar_time_model=solar_time_model,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
@@ -144,6 +143,10 @@ def calculate_diffuse_horizontal_irradiance_series(
             solar_altitude_series, linke_turbidity_factor_series
         )
     )
+    # ------------------------------------------------------------------------
+    diffuse_horizontal_irradiance_series = np.nan_to_num(
+        diffuse_horizontal_irradiance_series, nan=0
+    )  # safer ? -------------------------------------------------------------
 
     out_of_range = (
         (diffuse_horizontal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
@@ -207,7 +210,7 @@ def calculate_diffuse_horizontal_irradiance_series(
 
     return Irradiance(
             value=diffuse_horizontal_irradiance_series,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             position_algorithm="",
             timing_algorithm="",
             elevation=None,

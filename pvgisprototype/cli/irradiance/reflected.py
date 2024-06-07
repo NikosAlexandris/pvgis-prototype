@@ -63,7 +63,7 @@ from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
@@ -194,6 +194,7 @@ def get_ground_reflected_inclined_irradiance_series(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        fingerprint=fingerprint,
     )
     if not quiet:
         if verbose > 0:
@@ -205,7 +206,7 @@ def get_ground_reflected_inclined_irradiance_series(
                 latitude=latitude,
                 timestamps=timestamps,
                 dictionary=ground_reflected_inclined_irradiance_series.components,
-                title=REFLECTED_INCLINED_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
+                title=REFLECTED_INCLINED_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNIT}',
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -244,7 +245,7 @@ def get_ground_reflected_inclined_irradiance_series(
             title = 'Global Horizontal Irradiance Series',
             label = 'Global Horizontal Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
