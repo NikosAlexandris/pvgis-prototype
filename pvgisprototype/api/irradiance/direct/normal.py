@@ -67,7 +67,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import RADIANS
@@ -233,7 +233,7 @@ def calculate_direct_normal_irradiance_series(
 
     return Irradiance(
             value=direct_normal_irradiance_series,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             position_algorithm="",
             timing_algorithm="",
             elevation=None,
@@ -394,7 +394,7 @@ def calculate_direct_normal_from_horizontal_irradiance_series(
 
     return Irradiance(
             value=direct_normal_irradiance_series,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             position_algorithm="",
             timing_algorithm="",
             elevation=None,

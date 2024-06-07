@@ -80,7 +80,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype import Longitude
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -397,7 +397,7 @@ def uniplot(
     resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     lines: Annotated[bool, typer_option_uniplot_lines] = True,
     title: Annotated[str, typer_option_uniplot_title] = None,
-    unit: Annotated[str, typer_option_uniplot_unit] = UNITS_NAME,  #" °C")
+    unit: Annotated[str, typer_option_uniplot_unit] = UNIT_NAME,  #" °C")
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):

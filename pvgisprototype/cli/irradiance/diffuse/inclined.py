@@ -72,7 +72,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.log import logger
@@ -191,7 +191,7 @@ def get_diffuse_inclined_irradiance_series(
                 elevation=elevation,
                 timestamps=timestamps,
                 dictionary=diffuse_inclined_irradiance_series.components,
-                title=diffuse_inclined_irradiance_series.components[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
+                title=diffuse_inclined_irradiance_series.components[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNIT}",
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -231,7 +231,7 @@ def get_diffuse_inclined_irradiance_series(
             title = 'Diffuse Inclined Irradiance Series',
             label = 'Diffuse Inclined Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
