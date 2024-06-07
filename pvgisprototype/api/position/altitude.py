@@ -23,7 +23,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import ALTITUDE_NAME
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -241,7 +241,7 @@ def calculate_solar_altitude_series(
                     TIME_ALGORITHM_NAME: solar_altitude_series.timing_algorithm if solar_altitude_series else NOT_AVAILABLE,
                     POSITION_ALGORITHM_NAME: solar_position_model.value,
                     ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
-                    UNITS_NAME: None,
+                    UNIT_NAME: None,
                 }
             }
             results = results | solar_position_model_overview

@@ -76,7 +76,7 @@ from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
@@ -237,7 +237,7 @@ def spectral_photovoltaic_power_output_series(
         #         latitude=latitude,
         #         timestamps=timestamps,
         #         dictionary=results,
-        #         title=title + f' irradiance series {IRRADIANCE_UNITS}',
+        #         title=title + f' irradiance series {IRRADIANCE_UNIT}',
         #         rounding_places=rounding_places,
         #         index=index,
         #         verbose=verbose,
