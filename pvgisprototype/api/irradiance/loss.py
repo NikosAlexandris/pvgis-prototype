@@ -2,12 +2,9 @@ from devtools import debug
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from typing import List
-import math
+from pvgisprototype import SolarIncidence
 from math import exp
 from math import pi
-from math import sin
-from math import cos
 from math import pow
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT

@@ -79,7 +79,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 import numpy as np
@@ -201,7 +201,7 @@ def get_direct_inclined_irradiance_series(
                 elevation=elevation,
                 timestamps=timestamps,
                 dictionary=direct_inclined_irradiance_series.components,
-                title=f'Direct inclined irradiance series {IRRADIANCE_UNITS}',
+                title=f'Direct inclined irradiance series {IRRADIANCE_UNIT}',
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -241,7 +241,7 @@ def get_direct_inclined_irradiance_series(
             title = 'Direct Inclined Irradiance Series',
             label = 'Direct Inclined Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:

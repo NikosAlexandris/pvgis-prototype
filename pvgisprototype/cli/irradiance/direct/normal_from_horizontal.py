@@ -90,7 +90,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
@@ -196,7 +196,7 @@ def get_direct_normal_from_horizontal_irradiance_series(
                 dictionary=direct_normal_irradiance_series.components,
                 title = (
                     direct_normal_irradiance_series.components[TITLE_KEY_NAME]
-                    + f" normal irradiance series {IRRADIANCE_UNITS}"
+                    + f" normal irradiance series {IRRADIANCE_UNIT}"
                 ),
                 rounding_places=rounding_places,
                 index=index,
@@ -222,7 +222,7 @@ def get_direct_normal_from_horizontal_irradiance_series(
             data_array=direct_normal_irradiance_series.value,
             timestamps=timestamps,
             groupby=groupby,
-            title=f"Direct normal irradiance series {IRRADIANCE_UNITS}",
+            title=f"Direct normal irradiance series {IRRADIANCE_UNIT}",
             rounding_places=rounding_places,
         )
     if uniplot:
@@ -237,7 +237,7 @@ def get_direct_normal_from_horizontal_irradiance_series(
             title='Direct Horizontal Irradiance Series',
             label='Direct Horizontal Irradiance',
             extra_legend_labels=None,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:

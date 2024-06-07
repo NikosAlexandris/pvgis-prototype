@@ -57,7 +57,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 import typer
@@ -167,7 +167,7 @@ def get_global_horizontal_irradiance_series(
                 dictionary=global_horizontal_irradiance_series.components,
                 title = (
                     global_horizontal_irradiance_series.components[TITLE_KEY_NAME]
-                    + f" in-plane irradiance series {IRRADIANCE_UNITS}"
+                    + f" in-plane irradiance series {IRRADIANCE_UNIT}"
                 ),
                 rounding_places=rounding_places,
                 index=index,
@@ -208,7 +208,7 @@ def get_global_horizontal_irradiance_series(
             title = 'Global Horizontal Irradiance Series',
             label = 'Global Horizontal Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
