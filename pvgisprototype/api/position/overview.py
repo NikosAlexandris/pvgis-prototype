@@ -56,7 +56,7 @@ from pvgisprototype.constants import INCIDENCE_ALGORITHM_NAME
 from pvgisprototype.constants import INCIDENCE_NAME
 from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
@@ -580,7 +580,7 @@ def calculate_solar_position_overview_series(
                     INCIDENCE_ALGORITHM_NAME: solar_incidence_series.incidence_algorithm if solar_incidence_series else NOT_AVAILABLE,
                     INCIDENCE_NAME: getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE) if solar_incidence_series else NOT_AVAILABLE,
                     INCIDENCE_DEFINITION: solar_incidence_series.definition if solar_incidence_series else NOT_AVAILABLE,
-                    UNITS_NAME: angle_output_units,
+                    UNIT_NAME: angle_output_units,
                 }
             }
             results = results | solar_position_model_overview

@@ -59,7 +59,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import AZIMUTH_NAME, AZIMUTH_ORIGIN_NAME
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 from pvgisprototype.constants import NOT_AVAILABLE
 
 
@@ -252,7 +252,7 @@ def calculate_solar_azimuth_series(
                     POSITION_ALGORITHM_NAME: solar_azimuth_series.position_algorithm if solar_azimuth_series else NOT_AVAILABLE,
                     AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
                     AZIMUTH_ORIGIN_NAME: solar_azimuth_series.origin if solar_azimuth_series else NOT_AVAILABLE,
-                    UNITS_NAME: angle_output_units,
+                    UNIT_NAME: angle_output_units,
                 }
             }
             results = results | solar_azimuth_model_series

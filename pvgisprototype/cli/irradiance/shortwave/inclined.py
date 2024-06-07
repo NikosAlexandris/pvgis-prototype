@@ -67,7 +67,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pandas import DatetimeIndex
@@ -195,7 +195,7 @@ def get_global_inclined_irradiance_series(
                 elevation=elevation,
                 timestamps=timestamps,
                 dictionary=global_inclined_irradiance_series.components,
-                title=global_inclined_irradiance_series.components[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNITS}",
+                title=global_inclined_irradiance_series.components[TITLE_KEY_NAME] + f" in-plane irradiance series {IRRADIANCE_UNIT}",
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -235,7 +235,7 @@ def get_global_inclined_irradiance_series(
             title = 'Global Inclined Irradiance Series',
             label = 'Global Inclined Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:

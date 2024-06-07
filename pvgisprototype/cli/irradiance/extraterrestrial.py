@@ -32,7 +32,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.log import log_function_call
@@ -108,7 +108,7 @@ def get_extraterrestrial_normal_irradiance_series(
                 dictionary=extraterrestrial_normal_irradiance_series.components,
                 title = (
                     extraterrestrial_normal_irradiance_series.components[TITLE_KEY_NAME]
-                        + f" horizontal irradiance series {IRRADIANCE_UNITS}"
+                        + f" horizontal irradiance series {IRRADIANCE_UNIT}"
                 ),
                 rounding_places=rounding_places,
                 index=index,
@@ -148,7 +148,7 @@ def get_extraterrestrial_normal_irradiance_series(
             title = 'Extraterrestrial Normal Irradiance Series',
             label = 'Extraterrestrial Normal Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
