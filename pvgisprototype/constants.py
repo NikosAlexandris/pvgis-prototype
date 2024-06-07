@@ -8,6 +8,7 @@ The content is sectioned to ease-of reviewing and updating.
 from math import pi
 import numpy as np
 
+UNIT_NAME = 'Unit'
 
 # Symbols to use ?
 # ⊾ ∢ ⦠ ∡ ⦛ ⦜ ⦣ ⦤ ⦥
@@ -97,10 +98,13 @@ SYMBOL_INCIDENCE = "⦡"
 SYMBOL_INCIDENCE_NAME = "Incidence"
 
 SYMBOL_TEMPERATURE = "🌡"
-SYMBOL_TEMPERATURE_NAME = "Temperature"
+TEMPERATURE_NAME = 'Temperature'
+SYMBOL_TEMPERATURE_NAME = f"{TEMPERATURE_NAME}"
+SYMBOL_UNIT_TEMPERATURE = '℃'
 
 SYMBOL_WIND_SPEED = "🌬"
 SYMBOL_WIND_SPEED_NAME = "Wind Speed"
+SYMBOL_UNIT_WIND_SPEED = '㎧'
 
 SYMBOL_FINGERPRINT = ""
 SYMBOL_FINGERPRINT_NAME = "Fingerprint"
@@ -157,13 +161,9 @@ FIX_OUT_OF_RANGE_VALUES_NEGATIVE = -.99999
 UNITLESS = 'Unitless'
 UNITLESSS_NAME = UNITLESS
 UNITLESSS_COLUMN_NAME = UNITLESS + ' Column'
-
-UNITS_NAME = 'Units'
-UNITS_COLUMN_NAME = UNITS_NAME
-
 MINUTES = 'minutes'
 TIME_OUTPUT_UNITS_DEFAULT = MINUTES
-TIME_UNITS_COLUMN_NAME = 'Time ' + UNITS_NAME
+TIME_UNITS_COLUMN_NAME = 'Time ' + UNIT_NAME
 TIMESTAMPS_FREQUENCY_DEFAULT = 'h'  # hours
 
 RADIANS = 'radians'
@@ -248,7 +248,6 @@ HOUR_OFFSET_DEFAULT = 0
 
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
-TEMPERATURE_UNIT = '℃'
 TEMPERATURE_DEFAULT = 14  # global average surface air temperature, Celsius degrees
 TEMPERATURE_AT_STANDARD_TEST_CONDITIONS = 25 # Cell temperature under standard test conditions, Celsius degrees
 TEMPERATURE_COLUMN_NAME = 'Temperature ℃ '#
@@ -256,8 +255,7 @@ TEMPERATURE_ADJUSTED_COLUMN_NAME = 'Temperature′ ℃'
 TEMPERATURE_DEVIATION_COLUMN_NAME = 'Temperature ≏℃ '  # for the PV module's temperature model
 
 WIND_SPEED_DEFAULT = 0
-WIND_SPEED_UNIT = '㎧'
-WIND_SPEED_COLUMN_NAME = f'Wind speed {SYMBOL_WIND_SPEED}'
+WIND_SPEED_COLUMN_NAME = f'Wind speed {SYMBOL_UNIT_WIND_SPEED}'
 ALBEDO_DEFAULT = 0.2
 ALBEDO_COLUMN_NAME = 'Albedo'
 
@@ -324,7 +322,7 @@ NOT_AVAILABLE_COLUMN_NAME = 'NA'
 NOT_AVAILABLE = 'NA'
 OUT_OF_RANGE_INDICES_COLUMN_NAME = 'Out-of-range'
 
-IRRADIANCE_UNITS = 'W/m²'
+IRRADIANCE_UNIT = 'W/m²'
 IRRADIANCE_NAME = 'Irradiance'
 IRRADIANCE_COLUMN_NAME = IRRADIANCE_NAME + f' {SYMBOL_IRRADIANCE}'
 RELATIVE_IRRADIANCE_COLUMN_NAME = f'{IRRADIANCE_NAME} {SYMBOL_IRRADIANCE}%'

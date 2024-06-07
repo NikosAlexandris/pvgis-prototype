@@ -43,7 +43,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import TERM_N_IN_SHADE
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import RADIANS
@@ -60,7 +60,6 @@ from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
@@ -133,7 +132,7 @@ def read_horizontal_irradiance_components_from_sarah(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
+    log: int = LOG_LEVEL_DEFAULT,
 ):
     """Read horizontal irradiance components from SARAH time series.
 
@@ -162,9 +161,9 @@ def read_horizontal_irradiance_components_from_sarah(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                mask_and_scale=mask_and_scale,
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
                 in_memory=in_memory,
                 log=log,
             )
@@ -174,9 +173,9 @@ def read_horizontal_irradiance_components_from_sarah(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                mask_and_scale=mask_and_scale,
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
                 in_memory=in_memory,
                 log=log,
             )
@@ -192,10 +191,11 @@ def read_horizontal_irradiance_components_from_sarah(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            mask_and_scale=mask_and_scale,
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
             in_memory=in_memory,
+            verbose=verbose,
             log=log,
         ).to_numpy().astype(dtype=dtype)
         direct_horizontal_irradiance_series = select_time_series(
@@ -203,10 +203,11 @@ def read_horizontal_irradiance_components_from_sarah(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            mask_and_scale=mask_and_scale,
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
             in_memory=in_memory,
+            verbose=verbose,
             log=log,
         ).to_numpy().astype(dtype=dtype)
 
@@ -292,7 +293,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
 
     return Irradiance(
             value=diffuse_horizontal_irradiance_series,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             position_algorithm="",
             timing_algorithm="",
             elevation=None,

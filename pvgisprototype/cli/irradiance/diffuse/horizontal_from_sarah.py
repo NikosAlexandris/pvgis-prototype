@@ -44,7 +44,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
@@ -177,7 +177,7 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
                 latitude=latitude,
                 timestamps=timestamps,
                 dictionary=diffuse_horizontal_irradiance_series.components,
-                title=diffuse_horizontal_irradiance_series.components[TITLE_KEY_NAME] + f' in-plane irradiance series {IRRADIANCE_UNITS}',
+                title=diffuse_horizontal_irradiance_series.components[TITLE_KEY_NAME] + f' in-plane irradiance series {IRRADIANCE_UNIT}',
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -215,7 +215,7 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
             title = 'Diffuse Horizontal Irradiance Series',
             label = 'Diffuse Horizontal Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:

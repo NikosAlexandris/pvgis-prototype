@@ -1,11 +1,14 @@
 from zoneinfo import ZoneInfo
+
+from pandas.core.groupby.groupby import GroupByNthSelector
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pathlib import Path
 from typing import Optional
-import numpy as np
+import numpy
 from rich import print
 from pandas import DatetimeIndex
 from pvgisprototype import SurfaceOrientation
@@ -30,20 +33,43 @@ from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_incli
 from pvgisprototype.api.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_series
 from pvgisprototype.api.irradiance.reflected import calculate_ground_reflected_inclined_irradiance_series
 from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
-from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_series
+from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_series, calculate_spectrally_corrected_effective_irradiance
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import INCIDENCE_COLUMN_NAME, INCIDENCE_DEFINITION, SOLAR_CONSTANT, UNITS_NAME, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.constants import (
+    EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME,
+    GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+    DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+    DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+    PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+    REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+    REFLECTIVITY_FACTOR_COLUMN_NAME,
+    REFLECTIVITY_COLUMN_NAME,
+    REFLECTIVITY_PERCENTAGE_COLUMN_NAME,
+    GLOBAL_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
+    DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
+    DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
+    REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
+    SPECTRAL_EFFECT_COLUMN_NAME,
+    SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME,
+    RADIATION_CUTOFF_THRESHHOLD,
+    INCIDENCE_COLUMN_NAME,
+    INCIDENCE_DEFINITION,
+    SYSTEM_EFFICIENCY_COLUMN_NAME,
+    ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    SOLAR_CONSTANT,
+    UNIT_NAME,
+)
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.constants import UNITLESS
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
-from pvgisprototype.constants import TEMPERATURE_UNIT
+from pvgisprototype.constants import SYMBOL_UNIT_TEMPERATURE
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
-from pvgisprototype.constants import WIND_SPEED_UNIT
+from pvgisprototype.constants import SYMBOL_UNIT_WIND_SPEED
 from pvgisprototype.constants import SPECTRAL_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -70,7 +96,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import TITLE_KEY_NAME

@@ -8,7 +8,7 @@ from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from datetime import datetime
 from pathlib import Path
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT, VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.api.series.utilities import select_location_time_series
@@ -33,13 +33,13 @@ def select_time_series(
     end_time: Optional[datetime] = None,
     remap_to_month_start: Optional[bool] = False,
     # convert_longitude_360: bool = False,
-    mask_and_scale: bool = False,
     neighbor_lookup: MethodForInexactMatches = None,
     tolerance: Optional[float] = 0.1, # Customize default if needed
+    mask_and_scale: bool = False,
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
+    log: int = LOG_LEVEL_DEFAULT,
 ):
     """Select location series"""
     if time_series is None:
@@ -123,12 +123,13 @@ def select_time_series(
         if verbose > 0:
             print(warning)
 
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
             data=location_time_series.values,
             log_level=log,
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
             )
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
 
     return location_time_series
