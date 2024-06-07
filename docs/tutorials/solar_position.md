@@ -158,21 +158,22 @@ pvgis-prototype position incidence \
 <!--      Algorithms  Timing : NOAA, Zone : UTC, Local zone : UTC, Positioning : NOAA, Incidence angle : -->
 <!--                                               Sun-to-Plane -->
 
-The solar radiation model firstly presented by Hofierka (2002),
+The solar radiation model presented by Hofierka (2002),
 defines as _solar incidence_
-the angle between the sun-rays and the plane of the solar surface.
+{==the angle between the sun-rays and the **plane** of the solar surface==}.
 Or else : the angle between the position of the sun and the inclination of the
 panel.
 
-Typically, the incidence angle is defined as the one between the sun-rays and
-the normal to the reference surface.
+Typically,
+_solar incidence_ is defined as
+{==the angle between the sun-rays and the **normal** to the reference surface==}.
 It is important to disinguish between the two, hence,
 in PVGIS we call the _Sun-To-Plane_ the _complementary_ incidence angle,
 where as the _Sun-to-Surface-Normal_
 we call it the _typical_ incidence angle.
 
 To get the _typical_ solar incidence angle,
-one can use the optional flag `--sun-to-surface-normal`
+one can use the optional flag `--sun-vector-to-surface-normal`
 (or even `--sun-to-normal`) like so :
 
 ``` bash exec="true" result="ansi" source="material-block"
@@ -180,7 +181,7 @@ pvgis-prototype position overview \
     8.628 45.812 180 45 \
     '2010-01-17 12:00' \
     -aou degrees \
-    --sun-to-surface-normal
+    --sun-vector-to-surface-normal
 ```
 
 ## Time series
