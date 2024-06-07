@@ -32,7 +32,6 @@ from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.cli.typer.output import typer_option_index
 from pvgisprototype.cli.typer.photovoltaic import typer_option_photovoltaic_module_model
 from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
-from pvgisprototype.constants import EFFICIENCY
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel

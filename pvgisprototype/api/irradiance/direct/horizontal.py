@@ -47,7 +47,7 @@ from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_reque
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, NO_SOLAR_INCIDENCE, NOT_AVAILABLE
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -75,7 +75,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import RADIANS
@@ -242,7 +242,7 @@ def calculate_direct_horizontal_irradiance_series(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -256,9 +256,9 @@ def calculate_direct_horizontal_irradiance_series(
 
     return Irradiance(
             value=direct_horizontal_irradiance_series,
-            unit=IRRADIANCE_UNITS,
-            position_algorithm="",
-            timing_algorithm="",
+            unit=IRRADIANCE_UNIT,
+            position_algorithm=solar_position_model.value,
+            timing_algorithm=solar_time_model.value,
             elevation=elevation,
             surface_orientation=None,
             surface_tilt=None,

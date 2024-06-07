@@ -6,7 +6,6 @@ from devtools import debug
 from pandas import DatetimeIndex
 from pathlib import Path
 from typing import Optional
-from typing import List
 from rich import print
 import numpy as np
 from math import cos, sin, pi
@@ -28,10 +27,8 @@ from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterres
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
-from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_arrays_if_requested
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
@@ -49,7 +46,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import TERM_N_IN_SHADE
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import RADIANS
@@ -66,7 +63,6 @@ from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
@@ -99,6 +95,9 @@ from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffu
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import calculate_diffuse_horizontal_component_from_sarah
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
+from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_martin_and_ruiz
+from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_percentage
+from pvgisprototype.validation.arrays import create_array
 
 
 @log_function_call
@@ -338,7 +337,6 @@ def calculate_diffuse_inclined_irradiance_series(
         )
 
         # prepare size of output array!
-        from pvgisprototype.validation.arrays import create_array
         diffuse_inclined_irradiance_series = create_array(
             timestamps.shape, dtype=dtype, init_method="zeros", backend=array_backend
         )
@@ -521,9 +519,9 @@ def calculate_diffuse_inclined_irradiance_series(
 
     return Irradiance(
             value=diffuse_inclined_irradiance_series,
-            unit=IRRADIANCE_UNITS,
-            position_algorithm="",
-            timing_algorithm="",
+            unit=IRRADIANCE_UNIT,
+            position_algorithm=solar_altitude_series.position_algorithm,
+            timing_algorithm=solar_altitude_series.timing_algorithm,
             elevation=elevation,
             surface_orientation=surface_orientation,
             surface_tilt=surface_tilt,

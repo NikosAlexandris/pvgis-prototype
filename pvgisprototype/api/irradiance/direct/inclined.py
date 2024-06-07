@@ -57,17 +57,11 @@ from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_series
-from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-# from pvgisprototype.api.utilities.progress import progress
-# from rich.progress import Progress
+from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_martin_and_ruiz
+from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_percentage
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -76,8 +70,6 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME
-from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import SOLAR_CONSTANT_COLUMN_NAME
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -87,7 +79,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import RADIANS
@@ -95,11 +87,11 @@ from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import LOSS_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
@@ -108,11 +100,7 @@ from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
-from rich import print
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 
 
@@ -385,6 +373,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units),
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
             INCIDENCE_DEFINITION: solar_incidence_series.definition,  # Review Me ! Report the _complementary_ incidence angle series ?
+            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
         } if verbose > 4 else {},
         
@@ -416,7 +405,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
 
     return Irradiance(
             value=direct_inclined_irradiance_series,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             position_algorithm="",
             timing_algorithm="",
             elevation=elevation,
