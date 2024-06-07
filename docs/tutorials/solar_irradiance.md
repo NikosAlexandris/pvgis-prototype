@@ -281,16 +281,6 @@ pvgis-prototype irradiance global inclined \
         --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
         --neighbor-lookup nearest
     ```
-    <!-- returns -->
-    <!-- 898.95197 -->
-
-    <!-- or -->
-
-    <!-- ``` -->
-      <!-- Time                  Global ∡   Direct ∡   Diffuse ∡   Reflected ∡ -->
-     <!-- ───────────────────────────────────────────────────────────────────── -->
-      <!-- 2010-01-27 12:00:00   898.952    816.8975   69.08706    12.96734 -->
-    <!-- ``` -->
 
 * The _diffuse inclined_ component here uses, of course,
 SARAH3 SIS and SID and goes through the math to derive to `69.08706`.
