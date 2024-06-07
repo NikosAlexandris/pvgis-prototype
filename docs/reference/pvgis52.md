@@ -9,6 +9,41 @@ tags:
   - Archived notes
 ---
 
+## Photovoltaic performance
+
+The Workflow in PVGIS v5.2 is :
+
+[II] In-Plane Irradiance
+     │
+     │ (Reflectivity Calculation)
+     ▼
+[RE] Reflectivity Effect = II * Reflectivity
+     │
+     │ (Temperature & Low Irradiance Adjustment)
+     ▼
+[TE] Temp. & Low Irradiance Effect = II * RE * Temp. & Low Irradiance Coeff.
+     │
+     │ (Power Calculation)
+     ▼
+ [P] Power = II + II * RE * TE
+     │
+     │ (Spectral Calculation)
+     ▼
+[SE] Spectral Effect = P * Spectral Factor
+     │
+     │ (Sum of Effects)
+     ▼
+[EP] "Effective" Power = P + SE
+     │
+     │ (System Loss Calculation)
+     ▼
+[SL] System Loss = EP * System Loss Factor
+     │
+     │ (Final Power Output)
+     ▼
+[PP] Final Photovoltaic Power Output = EP + SL
+
+
 Functions 
 
 |                                   | C function                              | start line | end  | in Python                                                  | Remarks                                                   |
