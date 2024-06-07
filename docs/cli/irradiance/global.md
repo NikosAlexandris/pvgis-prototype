@@ -31,7 +31,7 @@ pvgis-prototype irradiance global inclined \
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global horizontal \
-    8.628 45.812 214 \
+    8.628 45.812 214 180 35 \
     '2010-01-01 12:00:00' \
     -vvv
 ```
