@@ -13,6 +13,7 @@ tags:
 
 The Workflow in PVGIS v5.2 is :
 
+```
 [II] In-Plane Irradiance
      │
      │ (Reflectivity Calculation)
@@ -42,7 +43,7 @@ The Workflow in PVGIS v5.2 is :
      │ (Final Power Output)
      ▼
 [PP] Final Photovoltaic Power Output = EP + SL
-
+```
 
 Functions 
 
