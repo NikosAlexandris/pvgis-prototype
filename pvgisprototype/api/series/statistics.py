@@ -36,7 +36,7 @@ import numpy as np
 import xarray as xr
 from scipy.stats import mode
 from rich.table import Table
-from rich import box
+from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 import csv
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
@@ -156,18 +156,18 @@ def print_series_statistics(
     timestamps: DatetimeIndex,
     title: str ='Time series',
     groupby: str = None,
-    yearly_overview: bool = False,
+    monthly_overview: bool = False,
     rounding_places: int = None,
     verbose=0,
 ) -> None:
     """
     """
-    rename_yearly_output_rows = {
+    rename_monthly_output_rows = {
         "Sum of Group Means": "Yearly PV energy",
         f"Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}": 'Yearly in-plane irradiance',
     }
-    if groupby and groupby.lower() == 'yearly':
-        yearly_overview = True
+    if groupby and groupby.lower() == 'monthly':
+        monthly_overview = True
 
     table = Table(
         title=title,
@@ -175,10 +175,10 @@ def print_series_statistics(
         show_header=True,
         header_style="bold magenta",
         row_styles=['none', 'dim'],
-        box=box.SIMPLE_HEAD,
+        box=SIMPLE_HEAD,
         highlight=True,
     )
-    if yearly_overview:  # typical overview !
+    if monthly_overview:  # typical overview !
         table.add_column("Statistic", justify="right", style="bright_blue", no_wrap=True)
         table.add_column("Value", style="cyan")
         # get monthly mean values
@@ -190,7 +190,7 @@ def print_series_statistics(
 
     # Basic metadata
     basic_metadata = (
-        ["Start", "End", "Count"] if not yearly_overview else ["Start", "End"]
+        ["Start", "End", "Count"] if not monthly_overview else ["Start", "End"]
     )
     
     for key in basic_metadata:
@@ -220,8 +220,8 @@ def print_series_statistics(
         groupby + ' means' if groupby else None,  # do not print custom frequency means
         ]
 
-    if yearly_overview:
-        yearly_metadata = [
+    if monthly_overview:
+        monthly_metadata = [
                 # 'Min',
                 # 'Mean',
                 # 'Max',
@@ -234,27 +234,27 @@ def print_series_statistics(
     # Index of items
     index_metadata = (
         ["Time of Min", "Index of Min", "Time of Max", "Index of Max"]
-        if not yearly_overview
+        if not monthly_overview
         else []  # 'Time of Min', 'Time of Max',
     )
 
     # Add statistics
     for key, value in statistics.items():
-        if not yearly_overview:
+        if not monthly_overview:
             if key not in basic_metadata and key not in time_groupings and key not in index_metadata:
                 # table.add_row(key, str(round_float_values(value, rounding_places)))
                 table.add_row(key, str(value))
         else:
-            if key in yearly_metadata and key not in basic_metadata and key not in index_metadata:
+            if key in monthly_metadata and key not in basic_metadata and key not in index_metadata:
                 # table.add_row(key, str(round_float_values(value, rounding_places)))
                 # table.add_row(key, str(value))
-                display_key = rename_yearly_output_rows.get(key, key)
+                display_key = rename_monthly_output_rows.get(key, key)
                 table.add_row(display_key, str(value))
 
     # Separate!
     table.add_row("", "")
 
-    if yearly_overview:
+    if monthly_overview:
         key = 'Monthly means'
 
     # Groups
@@ -307,8 +307,10 @@ def print_series_statistics(
             # table.add_row(key, str(round_float_values(value, rounding_places)))
             table.add_row(key, str(value))
 
+    from rich.panel import Panel
+    panel = Panel(table, title="Statistics", expand=False)
     console = Console()
-    console.print(table)
+    console.print(panel)
 
 
 def export_statistics_to_csv(data_array, filename):
