@@ -265,6 +265,7 @@ def calculate_diffuse_inclined_irradiance_series(
             logger.info(
                 ":information: [bold][magenta]Modelling[/magenta] clear-sky diffuse horizontal irradiance[/bold]..."
             )
+        # global_horizontal_irradiance_series = NOT_AVAILABLE
         global_horizontal_irradiance_series = create_array(
                 timestamps.shape,
                 dtype=dtype,
@@ -318,7 +319,7 @@ def calculate_diffuse_inclined_irradiance_series(
     else:  # tilted (or inclined) surface
     # Note: in PVGIS: if surface_orientation != 'UNDEF' and surface_tilt != 0:
         # print(f'{surface_tilt=} should NOT be zero!, hence {diffuse_horizontal_irradiance_series=}')
-        kb_series = ( # proportion between direct and extraterrestrial
+        kb_series = (  # proportion between direct and extraterrestrial
             direct_horizontal_irradiance_series
             / extraterrestrial_horizontal_irradiance_series
         )
