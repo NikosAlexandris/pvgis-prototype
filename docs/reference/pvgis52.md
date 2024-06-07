@@ -45,7 +45,7 @@ The Workflow in PVGIS v5.2 is :
 [PP] Final Photovoltaic Power Output = EP + SL
 ```
 
-Functions 
+## Functions 
 
 |                                   | C function                              | start line | end  | in Python                                                  | Remarks                                                   |
 |-----------------------------------|-----------------------------------------|------------|------|------------------------------------------------------------|-----------------------------------------------------------|
@@ -102,4 +102,3 @@ Functions
 | :material-checkbox-blank-circle: slotHourOffset.c                                             |            |     |                                                                                                                     |
 | :material-checkbox-blank-circle: small_functions_from_start_and_before_calculate_angle_loss.c |            |     |                                                                                                                     |
 | :material-checkbox-blank-circle: temperature.c                                                |            |     |                                                                                                                     |
-
