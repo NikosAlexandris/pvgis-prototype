@@ -1237,10 +1237,14 @@ def print_change_percentages_panel(
             rounding_places=rounding_places,
         )
 
-    # Print the table within a panel using Rich Console
     console = Console()
-    console.print(Panel(table, expand=False))
-    # console.print(Panel(table, title="Analysis", expand=False))
+    console.print(
+        Panel(
+            table,
+            title="Analysis",
+            expand=False,
+        )
+    )
 
 
 def print_finger_hash(dictionary: dict):

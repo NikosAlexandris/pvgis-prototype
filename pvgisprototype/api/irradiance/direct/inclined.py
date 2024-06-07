@@ -15,21 +15,10 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
-from datetime import datetime
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-from math import sin
-from math import asin
-from math import cos
-from math import atan
+from zoneinfo import ZoneInfo
 from numpy import where
 import numpy as np
-from numpy import ndarray
-from typing import Annotated
 from typing import Optional
-from typing import Union
-from typing import Sequence
-from typing import List
 from pathlib import Path
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
@@ -40,10 +29,6 @@ from pvgisprototype import RayleighThickness
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import Elevation
 from pvgisprototype import Irradiance
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import AdjustElevationInputModel
-from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
-from pvgisprototype.api.position.models import validate_model
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
@@ -53,7 +38,6 @@ from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
-from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
