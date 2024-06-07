@@ -86,7 +86,7 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype import Irradiance
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
@@ -375,7 +375,7 @@ def calculate_global_inclined_irradiance_series(
 
     return Irradiance(
             value=global_inclined_irradiance_series,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             position_algorithm="",
             timing_algorithm="",
             elevation=elevation,

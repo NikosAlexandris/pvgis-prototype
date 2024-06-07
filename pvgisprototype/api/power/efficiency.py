@@ -1,9 +1,10 @@
+from rich import print
+from pvgisprototype import Efficiency
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from typing import List
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
+from pvgisprototype.constants import EFFECTIVE_IRRADIANCE_COLUMN_NAME, EFFECTIVE_IRRADIANCE_NAME, FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, IRRADIANCE_UNIT, LOG_LEVEL_DEFAULT, LOW_IRRADIANCE_COLUMN_NAME, SPECTRAL_EFFECT_COLUMN_NAME, SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, SPECTRAL_FACTOR_NAME, UNITLESS
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -17,9 +18,8 @@ from pvgisprototype.constants import CURRENT_AT_STANDARD_TEST_CONDITIONS_TEMPERA
 from pvgisprototype.constants import VOLTAGE_AT_STANDARD_TEST_CONDITIONS_TEMPERATURE_COEFFICIENT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TITLE_KEY_NAME
-from pvgisprototype.constants import EFFICIENCY
+from pvgisprototype.constants import EFFICIENCY_NAME
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
-from pvgisprototype.constants import EFFICIENCY_FACTOR
 from pvgisprototype.constants import EFFICIENCY_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.constants import SPECTRAL_FACTOR_COLUMN_NAME
@@ -30,30 +30,29 @@ from pvgisprototype.constants import TEMPERATURE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import RELATIVE_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import LOG_RELATIVE_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import NEGATIVE_RELATIVE_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import TEMPERATURE_COLUMN_NAME
 from pvgisprototype.constants import TEMPERATURE_ADJUSTED_COLUMN_NAME
 from pvgisprototype.constants import TEMPERATURE_DEVIATION_COLUMN_NAME
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
 from pvgisprototype.constants import NOT_AVAILABLE
-from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
-from pvgisprototype.api.power.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.validation.arrays import create_array
 from pvgisprototype.validation.hashing import generate_hash
-from typing import List
 import numpy as np
-from enum import Enum, auto
+from numpy import where
+from numpy import log as numpy_log
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.power.photovoltaic_module import get_coefficients_for_photovoltaic_module
 from copy import deepcopy
+from pvgisprototype import Irradiance
+from pvgisprototype import SpectralFactorSeries
+from pvgisprototype import TemperatureSeries
+from pvgisprototype import WindSpeedSeries
+
 
 def add_unequal_arrays(array_1, array_2):
     """
@@ -87,9 +86,6 @@ def add_unequal_arrays(array_1, array_2):
         array_1 = np.pad(array_1, (0, -length_difference), 'constant')
     return array_1 + array_2
 
-from pvgisprototype import SpectralFactorSeries
-from pvgisprototype import TemperatureSeries
-from pvgisprototype import WindSpeedSeries
 
 @log_function_call
 def calculate_pv_efficiency_series(

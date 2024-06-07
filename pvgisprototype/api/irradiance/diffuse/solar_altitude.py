@@ -47,7 +47,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import TERM_N_IN_SHADE
 from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import RADIANS
@@ -64,7 +64,6 @@ from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_BEFORE_LOSS_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
