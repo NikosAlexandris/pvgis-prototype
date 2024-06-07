@@ -22,6 +22,7 @@ from math import sin
 from math import asin
 from math import cos
 from math import atan
+from numpy import where
 import numpy as np
 from numpy import ndarray
 from typing import Annotated
@@ -327,21 +328,24 @@ def calculate_direct_inclined_irradiance_series_pvgis(
 
     if apply_angular_loss_factor:
 
-        try:
-            # per Martin & Ruiz 2005,
-            # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
-            # which is the _complement_ of the incidence angle per Hofierka 2002
-            angular_loss_factor_series = (
-                calculate_angular_loss_factor_for_direct_irradiance_series(
-                    solar_incidence_series=(np.pi/2 - solar_incidence_series.radians),
-                    verbose=0,
-                )
+        # per Martin & Ruiz 2005,
+        # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
+        # which is the _complement_ of the incidence angle per Hofierka 2002
+        direct_irradiance_reflectivity_factor_series = (
+            calculate_angular_loss_factor_for_direct_irradiance_series(
+                solar_incidence_series=(np.pi/2 - solar_incidence_series.radians),
+                verbose=0,
             )
-            direct_inclined_irradiance_series *= angular_loss_factor_series
+        )
+        direct_inclined_irradiance_series *= direct_irradiance_reflectivity_factor_series
 
-        except ZeroDivisionError as e:
-            logger.error(f"Which Error? {e}")
-            raise ValueError
+        # for the output dictionary
+        direct_inclined_irradiance_before_reflectivity_series = where(
+            direct_irradiance_reflectivity_factor_series != 0,
+            direct_inclined_irradiance_series
+            / direct_irradiance_reflectivity_factor_series,
+            0,
+        )
 
     if np.any(direct_inclined_irradiance_series < 0):
         logger.info("\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
