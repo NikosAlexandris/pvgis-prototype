@@ -1,6 +1,12 @@
-from pandas import to_datetime
+from os import times
+import sys
+from pandas import DatetimeIndex, to_datetime
+import pandas
+from pandas.core.methods.describe import describe_categorical_1d
+from rich import print
 from datetime import datetime
 
+from sparklines import sparklines
 from typer.main import solve_typer_info_defaults
 from pvgisprototype.api.position.models import SOLAR_POSITION_PARAMETER_COLUMN_NAMES, SolarPositionParameter
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
@@ -15,6 +21,65 @@ from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 from typing import List, Sequence
 import numpy as np
 from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME,
+    EFFECTIVE_GLOBAL_IRRADIANCE_DESCRIPTION,
+    EFFECTIVE_IRRADIANCE_COLUMN_NAME,
+    EFFECTIVE_IRRADIANCE_NAME,
+    EFFECTIVE_POWER_COLUMN_NAME,
+    EFFECTIVE_POWER_NAME,
+    EFFICIENCY_NAME,
+    EFFICIENCY_COLUMN_NAME,
+    EFFICIENCY_FACTOR_DESCRIPTION,
+    ENERGY_UNIT,
+    GLOBAL_EFFECTIVE_IRRADIANCE,
+    GLOBAL_IN_PLANE_IRRADIANCE,
+    GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY,
+    GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY,
+    GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_DESCRIPTION,
+    GLOBAL_INCLINED_IRRADIANCE,
+    GLOBAL_INCLINED_IRRADIANCE_AFTER_REFLECTIVITY,
+    GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY,
+    GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_DESCRIPTION,
+    GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME,
+    GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+    GLOBAL_IRRADIANCE_NAME,
+    IN_PLANE_IRRADIANCE,
+    IN_PLANE_IRRADIANCE_NAME,
+    IRRADIANCE_AFTER_REFLECTIVITY,
+    IRRADIANCE_AFTER_REFLECTIVITY_DESCRIPTION,
+    IRRADIANCE_COLUMN_NAME,
+    IRRADIANCE_UNIT,
+    IRRADIANCE_UNIT_K,
+    PHOTOVOLTAIC_POWER_LONG_NAME,
+    PHOTOVOLTAIC_POWER_COLUMN_NAME,
+    PHOTOVOLTAIC_POWER_UNIT,
+    PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS,
+    PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+    PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_DESCRIPTION,
+    POWER_UNIT,
+    REFLECTIVITY_FACTOR_COLUMN_NAME,
+    REFLECTIVITY,
+    REFLECTIVITY_COLUMN_NAME,
+    REFLECTIVITY_DESCRIPTION,
+    REFLECTIVITY_PERCENTAGE,
+    REFLECTIVITY_PERCENTAGE_COLUMN_NAME,
+    SPECTRAL_EFFECT_DESCRIPTION,
+    SPECTRAL_FACTOR_COLUMN_NAME,
+    SPECTRAL_EFFECT,
+    SPECTRAL_EFFECT_COLUMN_NAME,
+    SPECTRAL_EFFECT_PERCENTAGE,
+    SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME,
+    SYMBOL_LOSS,
+    SYMBOL_SUMMATION,
+    SYSTEM_EFFICIENCY,
+    SYSTEM_EFFICIENCY_COLUMN_NAME,
+    SYSTEM_EFFICIENCY_DESCRIPTION,
+    SYSTEM_LOSS,
+    SYSTEM_LOSS_DESCRIPTION,
+    TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
+    TEMPERATURE_AND_LOW_IRRADIANCE_DESCRIPTION,
     TITLE_KEY_NAME,
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
@@ -36,6 +101,8 @@ from pvgisprototype.constants import (
     SOLAR_CONSTANT_COLUMN_NAME,
     PERIGEE_OFFSET_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
+    TOTAL_NET_EFFECT,
+    TOTAL_NET_EFFECT_DESCRIPTION,
     ZENITH_COLUMN_NAME,
     ZENITH_NAME,
     ALTITUDE_COLUMN_NAME,
@@ -51,8 +118,8 @@ from pvgisprototype.constants import (
     INCIDENCE_DEFINITION,
     UNITS_COLUMN_NAME,
     UNITLESS,
-    UNITS_NAME,
-    ANGLE_UNITS_NAME,
+    UNIT_NAME,
+    ANGLE_UNIT_NAME,
     ANGLE_UNITS_COLUMN_NAME,
     NOT_AVAILABLE,
     ROUNDING_PLACES_DEFAULT,
@@ -145,7 +212,7 @@ def build_caption(
         f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
         f"Orientation : [bold blue]{rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None)}[/bold blue], "
         f"Tilt : [bold blue]{rounded_table[first_model].get(SURFACE_TILT_NAME, None)}[/bold blue] "
-        f"[[dim]{rounded_table[first_model].get(UNITS_NAME, UNITLESS)}[/dim]]"
+        f"[[dim]{rounded_table[first_model].get(UNIT_NAME, UNITLESS)}[/dim]]"
 
         f"\n[underline]Algorithms[/underline]  " # ---------------------------
         f"Timing : [bold]{rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
@@ -193,9 +260,9 @@ def print_solar_position_table_panels(
     surface_position_keys = {
             SURFACE_ORIENTATION_NAME,
             SURFACE_TILT_NAME,
-            ANGLE_UNITS_NAME,
+            ANGLE_UNIT_NAME,
             INCIDENCE_DEFINITION,
-            UNITS_NAME,
+            UNIT_NAME,
             }
     for key, value in first_model.items():
         if key in surface_position_keys:
@@ -524,7 +591,7 @@ def print_quantity_table(
                 row.append(bold_value)
             else:
                 if not isinstance(value, str):
-                    if column_name == 'Loss':
+                    if SYMBOL_LOSS in column_name:
                         red_value = Text(str(round_float_values(value, rounding_places)), style="bold red")
                         row.append(red_value)
                     else:
@@ -603,7 +670,7 @@ def print_irradiance_table_2(
         caption += f"Positioning : [bold]{position_algorithm}[/bold], "
 
     if azimuth_origin:
-        caption += f"Azimuth origin : [bold indigo]{azimuth_origin}[/bold indigo]"
+        caption += f"\nAzimuth origin : [bold indigo]{azimuth_origin}[/bold indigo], "
 
     if incidence_algorithm:
         caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
@@ -633,13 +700,12 @@ def print_irradiance_table_2(
         if any(symbol in key for key in dictionary.keys()):
             caption += f"[yellow]{symbol}[/yellow] is {description}, "
     caption=caption.rstrip(', ')  # Remove trailing comma + space
-
     table = Table(
             title=title,
             caption=caption.rstrip(', '),  # Remove trailing comma + space
-            caption_justify="center",
+            caption_justify="left",
             expand=False,
-            padding=(0, 2),
+            padding=(0, 1),
             box=SIMPLE_HEAD,
             show_footer=True,
             )
@@ -648,7 +714,7 @@ def print_irradiance_table_2(
         table.add_column("Index")
 
     # base columns
-    table.add_column('Time')  # footer = 'Something'
+    table.add_column('Time', footer=SYMBOL_SUMMATION)  # footer = 'Something'
     
     # remove the 'Title' entry! ---------------------------------------------
     dictionary.pop('Title', NOT_AVAILABLE)
@@ -674,8 +740,9 @@ def print_irradiance_table_2(
     for key, value in dictionary.items():
         if key not in keys_to_exclude:
 
+            # sum of array values
             if isinstance(value, np.ndarray) and value.dtype.kind in "if":
-                sum_of_key_value = str(value.sum())
+                sum_of_key_value = str(np.nansum(value))
 
             if isinstance(value, (float, int)):
                 dictionary[key] = np.full(len(timestamps), value)
@@ -683,6 +750,7 @@ def print_irradiance_table_2(
             if isinstance(value, str):
                 dictionary[key] = np.full(len(timestamps), str(value))
 
+            # add sum of values as a new column to the footer
             if sum_of_key_value:
                 table.add_column(key, footer=sum_of_key_value)
             else:
@@ -711,19 +779,30 @@ def print_irradiance_table_2(
         row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
 
         for idx, (column_name, value) in enumerate(zip(filtered_dictionary.keys(), values)):
+
+            # First row of the table is the header
             if idx == 0:  # assuming after 'Time' is the value of main interest
+                
+                # Make first row items bold
                 bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
                 row.append(bold_value)
+
             else:
                 if not isinstance(value, str):
-                    if column_name == 'Loss':
+
+                    # If values of this column are negative / represent loss
+                    if SYMBOL_LOSS in column_name:
+                        # Make them bold red
                         red_value = Text(str(round_float_values(value, rounding_places)), style="bold red")
                         row.append(red_value)
+
                     else:
                         row.append(str(round_float_values(value, rounding_places)))
+
                 else:
                     if value is not None:
                         row.append(value)
+
         table.add_row(*row)
 
     if verbose:
