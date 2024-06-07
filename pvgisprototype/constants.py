@@ -7,6 +7,61 @@ The content is sectioned to ease-of reviewing and updating.
 
 
 """
+PVGIS calculates the photovoltaic power/energy production for a given location
+and a solar surface. An overview of the photovoltaic performance workflow is
+presented here in order to make somehow sense of the constants defined in this
+module.
+
+The flow of calculations, one step at a time, from data and input parameters to
+photovoltaic power output is :
+
+    1. position of the sun and a solar surface 
+    2. incident solar irradiance
+    3. conversion of the effective irradiance to photovoltaic power/energy
+
+- Solar position
+
+  Calculation of the solar position parameters in relation to a location and
+  position of a solar surface on earth. The single most import solar angular
+  measurement, in the context of a photovoltaic system, is the solar incidence
+  angle. Togetehr with the solar altitude, the incidence angle impact the
+  amount of in-plane irradiance as well as the temperature of the module. Both
+  affect how much of the incoming solar energy is converted to electricity.
+
+  See also `pvgis position introduction` for a detailed flow of solar timing
+  and positioning.
+
+
+- Solar irradiance
+
+  Calculation of the global horizontal irradiance which is the sum of three
+  components : the dirct horizontal irradiance, the sky-reflected irradiance
+  and the ground-reflected irradiance. Hereafter, irradiance (i.e. _Horizontal
+  irradiance_) refers to the _global_ irradiance.
+
+- Horizontal = Normal * Altitude
+
+- Horizontal irradiance ~~ f(solar altitude & incidence angle) ~~> In-Plane irradiance
+
+  Note : In the context of PVGIS and throughout the source code, the _Inclined_
+  irradiance is an homonym for the _In-Plane_ irradiance.
+
+- In-Plane irradiance ~~Reflectivity Loss~~> In-Plane irradiance after reflectivity loss
+
+  The reflectivity loss is calculated as a function of the incidence angle :
+  Reflectivity Loss = f(Incidence)
+
+- Irradiance afer reflectivity loss ~~ Spectral Effect ~~> Effective irradiance
+  Spectral Effect Ratio = STC-Light ~ Sunlight
+  Effective irradiance = In-Plane irradiance after Reflectivity Loss after Spectral effect
+
+- Effective irradiance ~~Temperature & Low Irradiance effects ~~> Photovoltaic Power
+  Effective irradiance = Inclined (or In-plane) Irradiance * Spectral Effect Ratio
+  Photovoltaic Power = f(Effective Irradiance, Temperature, Wind Speed)
+
+- Photovoltaic Power ~~System Loss & Degradation with age ~~> Photovoltaic Power output
+  System Loss ~= 14%
+"""
 
 # From end to start, the names of physical quantities and desciptipe adjectives
 
