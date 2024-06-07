@@ -37,6 +37,7 @@ dependencies = [
   "devtools",  # currently part of regular functions !
   "cachetools",
   "orjson",
+  "sparklines",
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
