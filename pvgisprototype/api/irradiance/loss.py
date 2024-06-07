@@ -16,13 +16,20 @@ from rich import print
 
 
 @log_function_call
-def calculate_angular_loss_factor_for_direct_irradiance(
-    solar_incidence: float,
+def calculate_angular_loss_factor_for_direct_irradiance_series(
+    solar_incidence_series: SolarIncidence,
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ):
     """Calculate the angular loss factor for the direct horizontal radiation
-    based on the solar incidence angle
+    based on the solar incidence angle.
+
+    This function implements the solar incidence angle modifier as per Martin &
+    Ruiz (2005). Expected is the angle between the sun-solar-surface vector and
+    the vector normal to the reference solar surface. We call this the
+    _typical_ incidence angle as opposed to the _complementary_ incidence angle
+    defined by Jenco (1992).
 
     The adjustment factor represents the fraction of the original
     `direct_radiation` that is retained after accounting for the loss of
@@ -31,14 +38,14 @@ def calculate_angular_loss_factor_for_direct_irradiance(
 
     Parameters
     ----------
+    solar_incidence_series : float
+        Solar incidence angle series
 
-    solar_incidence_angle: float
-        solar incidence angle
-    angular_loss_coefficient: float
+    angular_loss_coefficient : float
 
     Returns
     -------
-    angular_loss_factor: float
+    angular_loss_factor_series : float
 
     Notes
     -----
@@ -102,43 +109,24 @@ def calculate_angular_loss_factor_for_direct_irradiance(
         - iam : incidence angle modifier
         - aoi : angle of incidence
         - a_r : angular loss coefficient
-    """
-    try:
-        numerator = 1 - exp(-cos(solar_incidence) / angular_loss_coefficient)
-        # --------------------------------------------------------------------
-        denominator =  1 / ( 1 - exp( -1 / angular_loss_coefficient))
-        incidence_angle_modifier = numerator / denominator
-        if verbose > 0:
-            print(f'Incidence angle modifier : {incidence_angle_modifier}')
-        return incidence_angle_modifier
 
-    except ZeroDivisionError as e:
-        logger.error(f"Zero Division Error: {e}")
-        print("Error: Division by zero in calculating the angular loss factor.")
-        return 1
+    Review Me : --------------------------------------------------------------
 
-
-@log_function_call
-def calculate_angular_loss_factor_for_direct_irradiance_series(
-    solar_incidence_series: List[float],
-    angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
-    verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = LOG_LEVEL_DEFAULT,
-):
-    """
-    Notes
-    -----
-    This function implements the solar incidence angle modifier as per Martin &
-    Ruiz (2005). Expected is the angle between the sun-solar-surface vector and
-    the vector normal to the reference solar surface. We call this the
-    _typical_ incidence angle as opposed to the _complementary_ incidence angle
-    defined by Jenco (1992).
+    This function will return a time series `incidence_angle_modifier_series`
+    of floating point numbers. As it may generate NaN elements, further
+    processing in a time series context, would required attention for example
+    when summing arrays with NaN elements.
+    
+    To circumvent eventual "problems" and the need for special handling
+    downstream in the code, we replace all NaN elements with 0 just before
+    returning the final time series.
 
     """
     try:
         numerator = 1 - np.exp( - np.cos(solar_incidence_series) / angular_loss_coefficient )
         denominator =  1 / ( 1 - exp( -1 / angular_loss_coefficient))
         incidence_angle_modifier_series = numerator / denominator
+        incidence_angle_modifier_series = np.where(np.abs(solar_incidence_series) >= pi/2, 0, incidence_angle_modifier_series)  # Borrowed from pvlib !
 
         if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             debug(locals())
@@ -154,6 +142,7 @@ def calculate_angular_loss_factor_for_direct_irradiance_series(
 
         return incidence_angle_modifier_series
 
+    # Review-Me !
     except ZeroDivisionError as e:
         logger.error(f"Zero Division Error: {e}")
         print("Error: Division by zero in calculating the angular loss factor.")
@@ -165,9 +154,25 @@ def calculate_angular_loss_factor_for_nondirect_irradiance(
     angular_loss_coefficient = ANGULAR_LOSS_COEFFICIENT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
-    """Calculate the effect of reflectivity at small angles of incidence
+    """Calculate the reflectivity factor as for small angles of solar
+    incidence.
 
-    In PVGIS :
+    Notes
+    -----
+
+    Review Me : --------------------------------------------------------------
+
+    This function will return a single `loss_factor` float number. Further
+    processing in a time series context can be done by simply replicating the
+    reflectivity factor for all timestamps.
+
+    Further, this structure will not generate any NaNs across a time series
+    which often need special handling, i.e. when summing arrays with NaN
+    elements.
+
+    Other implementations
+
+    In PVGIS v5.2 :
 
     - AOIConstants[0]
     - AOIConstants[1]
@@ -198,3 +203,39 @@ def calculate_angular_loss_factor_for_nondirect_irradiance(
         debug(locals())
         
     return loss_factor
+
+
+def calculate_reflectivity_loss_martin_and_ruiz(
+        irradiance,
+        reflectivity,
+        ):
+    """Calculate reflectivity loss as per Martin & Ruiz
+
+    Irradiance loss due to reflectivity as a function of the angle of incidence.
+
+    Notes
+    -----
+    Other ideas :
+
+    - Sum of reflectivity loss :
+        return total_loss_aoi = np.nansum(direct_inclined_irradiance_series - direct_inclined_irradiance_series_before_reflection)  # Total lost energy due to AOI over the period
+
+    - Average of reflectivity loss :
+        REFLECTIVITY_LOSS_AVERAGE_COLUMN_NAME: np.nanmean(calculate_reflectivity_loss_martin_and_ruiz(direct_inclined_irradiance_series, angular_loss_factor_series)),
+
+    """
+    loss = (irradiance * reflectivity) - irradiance
+    return np.nan_to_num(loss, nan=0)  # safer loss !
+
+
+def calculate_reflectivity_loss_percentage(
+    irradiance,
+    reflectivity,
+):
+    """ """
+    percentage = np.where(
+        irradiance != 0,
+        100 * (1 - ((irradiance * reflectivity) / irradiance)),
+        0,
+    )
+    return percentage
