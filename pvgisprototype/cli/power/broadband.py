@@ -69,6 +69,8 @@ from pvgisprototype.cli.typer.efficiency import typer_option_system_efficiency
 from pvgisprototype.cli.typer.spectral_factor import typer_argument_spectral_factor_series
 from pvgisprototype.cli.typer.output import typer_option_angle_output_units
 from pvgisprototype.cli.typer.statistics import typer_option_statistics
+from pvgisprototype.cli.typer.statistics import typer_option_analysis
+from pvgisprototype.cli.typer.statistics import typer_option_nomenclature
 from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_time_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
@@ -80,7 +82,7 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT, NOMENCLATURE_FLAG_DEFAULT, RANDOM_TIMESTAMPS_FLAG_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
 from pvgisprototype.constants import cPROFILE_FLAG_DEFAULT
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import RADIANS
@@ -142,6 +144,7 @@ from pvgisprototype.cli.typer.data_processing import typer_option_multi_thread
 
 @log_function_call
 def photovoltaic_power_output_series(
+    ctx: typer.Context,
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -188,6 +191,8 @@ def photovoltaic_power_output_series(
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_DEFAULT,
+    nomenclature: Annotated[bool, typer_option_nomenclature] = NOMENCLATURE_FLAG_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
@@ -226,6 +231,9 @@ def photovoltaic_power_output_series(
     `select_time_series()` function.
 
     """
+    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
+    # print(f'Context: {ctx}')
+    # print(f'Context: {ctx.params}')
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
@@ -318,6 +326,20 @@ def photovoltaic_power_output_series(
             groupby=groupby,
             title="Photovoltaic power output",
             rounding_places=rounding_places,
+        )
+    if analysis:
+        from pvgisprototype.cli.print import print_change_percentages_panel
+        print_change_percentages_panel(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=photovoltaic_power_output_series.components,
+            # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
+            rounding_places=1,  # minimalism
+            index=index,
+            surface_orientation=True,
+            surface_tilt=True,
+            verbose=verbose,
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
@@ -519,6 +541,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             groupby=groupby,
             title="Photovoltaic power output",
         )
+
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
         individual_series = [series.value for series in photovoltaic_power_output_series.individual_series]
