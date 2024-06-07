@@ -15,21 +15,10 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
-from datetime import datetime
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-from math import sin
-from math import asin
-from math import cos
-from math import atan
+from zoneinfo import ZoneInfo
 from numpy import where
 import numpy as np
-from numpy import ndarray
-from typing import Annotated
 from typing import Optional
-from typing import Union
-from typing import Sequence
-from typing import List
 from pathlib import Path
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
@@ -40,10 +29,6 @@ from pvgisprototype import RayleighThickness
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import Elevation
 from pvgisprototype import Irradiance
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import AdjustElevationInputModel
-from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
-from pvgisprototype.api.position.models import validate_model
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
@@ -53,24 +38,18 @@ from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
-from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_series
 from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_martin_and_ruiz
 from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_percentage
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-# from pvgisprototype.api.utilities.progress import progress
-# from rich.progress import Progress
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.cli.print import print_irradiance_table_2
 from pvgisprototype.constants import (
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
@@ -87,8 +66,6 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME
-from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import SOLAR_CONSTANT_COLUMN_NAME
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -119,11 +96,7 @@ from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
-from rich import print
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 
 
