@@ -1,4 +1,6 @@
 from pandas import DatetimeIndex
+from numpy import nan
+from numpy import where
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
 from pvgisprototype.validation.arrays import create_array
 from pvgisprototype.log import logger
@@ -14,7 +16,7 @@ from pathlib import Path
 from math import sin
 from math import cos
 from pvgisprototype.api.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_series
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -36,15 +38,16 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import TITLE_KEY_NAME
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
+from pvgisprototype.constants import REFLECTIVITY_FACTOR_COLUMN_NAME, REFLECTIVITY_COLUMN_NAME, REFLECTIVITY_PERCENTAGE_COLUMN_NAME
 from pvgisprototype.constants import ALBEDO_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import VIEW_FRACTION_COLUMN_NAME
-from pvgisprototype.constants import LOSS_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
@@ -59,6 +62,11 @@ from pvgisprototype.constants import DEGREES
 from pvgisprototype import Irradiance
 from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
+from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
+from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
+from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_martin_and_ruiz
+from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_percentage
+from rich import print
 
 
 @log_function_call

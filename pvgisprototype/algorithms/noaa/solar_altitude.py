@@ -9,7 +9,7 @@ from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAltitude
-from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT, RADIANS, VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
@@ -34,8 +34,8 @@ def calculate_solar_altitude_series_noaa(
     apply_atmospheric_refraction: bool = True,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarAltitude:
     """Calculate the solar altitude angle for a location over a time series"""
     solar_zenith_series = calculate_solar_zenith_series_noaa(
