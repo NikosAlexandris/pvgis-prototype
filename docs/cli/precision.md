@@ -32,4 +32,4 @@ pvgis-prototype power broadband \
 ## Higher precision
 
 Do you really need higher precision?
-Head over to the [NumPy](cli/numpy.md) section.
+Head over to the [NumPy](../cli/numpy.md) section.
