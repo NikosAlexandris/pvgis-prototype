@@ -323,13 +323,15 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         )
         direct_inclined_irradiance_series *= direct_irradiance_reflectivity_factor_series
 
-        # for the output dictionary
-        direct_inclined_irradiance_before_reflectivity_series = where(
-            direct_irradiance_reflectivity_factor_series != 0,
-            direct_inclined_irradiance_series
-            / direct_irradiance_reflectivity_factor_series,
-            0,
-        )
+        # --------------------------------------------------- Is this safe ? -
+        with np.errstate(divide='ignore', invalid='ignore'):
+            # this quantity is exclusively generated for the output dictionary !
+            direct_inclined_irradiance_before_reflectivity_series = where(
+                direct_irradiance_reflectivity_factor_series != 0,
+                direct_inclined_irradiance_series
+                / direct_irradiance_reflectivity_factor_series,
+                0,
+            )
 
     if np.any(direct_inclined_irradiance_series < 0):
         logger.info("\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
