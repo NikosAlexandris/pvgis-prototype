@@ -66,7 +66,7 @@ def calculate_relative_longitude(
     """
     Notes
     -----
-    Hofierka, 2002 uses equations presented by Jenco :
+    Hofierka (2002) uses equations presented by Jenčo (1992) :
 
         tangent_relative_longitude =
             (
@@ -229,14 +229,14 @@ def calculate_solar_incidence_series_jenco(
     Attention! There is no one, and only one, definition of the solar incidence
     angle! While many authors refer to the angle between the sun-vector and the
     normal to the reference surface, for example Martin and Ruiz (2002, 2005),
-    others, like for example Jenco (1992) and Hofierka (2002), consider as
+    others, like for example Jenčo (1992) and Hofierka (2002), consider as
     incidence the angle between the sun-vector and the reference surface-plane.
     These angles are complementary to each other. This fact is an important one
     when treating trigonometric relationships that affect the calculation of
     the incidence angle.
 
     In this program, we implement and consider as _complementary_ the incidence
-    angle as defined by Jenco (1992) between the direction of the sun-rays and
+    angle as defined by Jenčo (1992) between the direction of the sun-rays and
     the inclination angle, or plane, of a reference surface. Hence, the default
     modus of this function returns the _complementary_ incidence angle.
 
@@ -263,7 +263,7 @@ def calculate_solar_incidence_series_jenco(
            \|
         -----
 
-    Reading the paper by Jenco (1992) [1]_ (last page is a summary translation in
+    Reading the paper by Jenčo (1992) [1]_ (last page is a summary translation in
     English):
 
         Orientation of georelief An with respect to Cardinal points and slopes
@@ -288,7 +288,7 @@ def calculate_solar_incidence_series_jenco(
 
     Although Hofierka (2002) does not explicitly state "the angle between the
     sun-vector and the plane to the surface," he borrows the equation defined
-    by Jenco (1992) who measures the incidence angle between the sun-vector and
+    by Jenčo (1992) who measures the incidence angle between the sun-vector and
     plane of the reference solar surface. Care needs to be taken when comparing
     or using other definitions of the solar incidence angle.
 
