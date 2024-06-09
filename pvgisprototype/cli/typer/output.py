@@ -63,6 +63,18 @@ typer_option_angle_output_units = typer.Option(
     rich_help_panel=rich_help_panel_output,
 )
 
+# Quick Response Code
+
+typer_option_quick_response = typer.Option(
+    "--qr",
+    "--qr-code",
+    "--quick-response",
+    "--quick-response-code",
+    help="󰐳 Quick Response Code",
+    show_default=True,
+    rich_help_panel=rich_help_panel_output_metadata,
+)
+
 # Fingerprint
 
 typer_option_fingerprint = typer.Option(
