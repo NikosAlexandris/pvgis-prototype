@@ -25,9 +25,3 @@ class SolarPanelTechnology(str, Enum):
 class ModuleTemperatureAlgorithm(str, Enum):
     none = None
     faiman = 'Faiman'
-
-
-class PVModuleEfficiencyAlgorithm(str, Enum):
-    none = None
-    iv = 'IV'
-    king = 'King'

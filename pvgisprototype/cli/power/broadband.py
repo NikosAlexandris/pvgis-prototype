@@ -20,7 +20,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
 from pvgisprototype.api.power.broadband_multiple_surfaces import calculate_photovoltaic_power_output_series_from_multiple_surfaces
@@ -181,7 +181,7 @@ def photovoltaic_power_output_series(
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
+    power_model: Annotated[PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
@@ -403,7 +403,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
+    power_model: Annotated[PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
