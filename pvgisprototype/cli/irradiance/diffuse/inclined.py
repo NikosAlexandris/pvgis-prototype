@@ -32,7 +32,7 @@ from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_i
 from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer.irradiance import typer_option_apply_reflectivity_factor
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
@@ -120,7 +120,7 @@ def get_diffuse_inclined_irradiance_series(
     linke_turbidity_factor_series: Annotated[LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    apply_reflectivity_factor: Annotated[Optional[bool], typer_option_apply_reflectivity_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
@@ -166,7 +166,7 @@ def get_diffuse_inclined_irradiance_series(
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        apply_angular_loss_factor=apply_angular_loss_factor,
+        apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
         solar_incidence_model=solar_incidence_model,
