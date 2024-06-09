@@ -311,7 +311,6 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         raise ValueError
 
     if apply_reflectivity_factor:
-
         # per Martin & Ruiz 2005,
         # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
         # which is the _complement_ of the incidence angle per Hofierka 2002
