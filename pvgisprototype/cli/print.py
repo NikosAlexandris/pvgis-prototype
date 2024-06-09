@@ -1325,7 +1325,6 @@ def print_change_percentages_panel(
     table.add_column("of", style="dim", justify="left")
     table.add_column(f"{frequency_label} sums", style="dim", justify="center")
     table.add_column("Source", style="dim", justify="left")
-    print(f'{dictionary=}')
 
     # Adding rows based on the dictionary keys and their corresponding values
     for label, (

@@ -37,7 +37,7 @@ from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidit
 from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
-from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer.irradiance import typer_option_apply_reflectivity_factor
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.position import typer_option_solar_incidence_model
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
