@@ -338,6 +338,7 @@ def photovoltaic_power_output_series(
             index=index,
             surface_orientation=True,
             surface_tilt=True,
+            fingerprint=fingerprint,
             verbose=verbose,
         )
     if uniplot:
@@ -355,9 +356,9 @@ def photovoltaic_power_output_series(
             unit=POWER_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
-    if fingerprint:
-        from pvgisprototype.cli.print import print_finger_hash
-        print_finger_hash(dictionary=photovoltaic_power_output_series.components)
+    # if fingerprint:
+    #     from pvgisprototype.cli.print import print_finger_hash
+    #     print_finger_hash(dictionary=photovoltaic_power_output_series.components)
     if metadata:
         from pvgisprototype.cli.print import print_command_metadata
         import click
@@ -562,7 +563,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             unit=POWER_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
-    if fingerprint:
+    if fingerprint and not analysis:
         from pvgisprototype.cli.print import print_finger_hash
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
     if metadata:
