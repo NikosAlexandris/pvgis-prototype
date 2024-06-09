@@ -1,5 +1,5 @@
 """
-Important sun and solar surface geometry parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
+Important sun and solar surface position parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
 """
 
 import typer
@@ -20,7 +20,7 @@ from pvgisprototype.cli.position.zenith import zenith
 from pvgisprototype.cli.position.altitude import altitude
 from pvgisprototype.cli.position.azimuth import azimuth
 from pvgisprototype.cli.position.incidence import incidence
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import SYMBOL_ALTITUDE, SYMBOL_AZIMUTH, SYMBOL_HOUR_ANGLE, SYMBOL_INCIDENCE, SYMBOL_INTRODUCTION, SYMBOL_ZENITH, VERBOSE_LEVEL_DEFAULT
 
 
 # state = {"verbose": False}
@@ -31,7 +31,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":triangular_ruler: Calculate solar geometry parameters for a location and moment in time",
+    help=f":triangular_ruler: Calculate solar position parameters for a location and moment in time",
 )
 
 
@@ -56,7 +56,7 @@ def main(
 
 app.command(
     name='introduction',
-    help='A short primer on solar geometry',
+    help=f'{SYMBOL_INTRODUCTION} A short primer on solar position',
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_introduction,
 )(introduction)
@@ -74,13 +74,13 @@ app.command(
 )(declination)
 app.command(
     'zenith',
-    help=f' Calculate the solar zenith',
+    help=f'{SYMBOL_ZENITH} Calculate the solar zenith',
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(zenith)
 app.command(
     'hour-angle',
-    help=':clock12: :globe_with_meridians: Calculate the hour angle (ω)',
+    help=f'{SYMBOL_HOUR_ANGLE} Calculate the hour angle (ω)',
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(hour_angle)
@@ -92,19 +92,19 @@ app.command(
 )(sunrise)
 app.command(
     'altitude',
-    help=f'⦩ Calculate the solar altitude',
+    help=f'{SYMBOL_ALTITUDE} Calculate the solar altitude',
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(altitude)
 app.command(
     'azimuth',
-    help='⦬ Calculate the solar azimuth',
+    help=f'{SYMBOL_AZIMUTH} Calculate the solar azimuth',
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(azimuth)
 app.command(
     'incidence',
-    help=f'⭸ Calculate the solar incidence angle',
+    help=f'{SYMBOL_INCIDENCE} Calculate the solar incidence angle',
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(incidence)
