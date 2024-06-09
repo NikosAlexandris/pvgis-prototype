@@ -8,7 +8,7 @@ from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from typing import Optional
-from .loss import calculate_angular_loss_factor_for_nondirect_irradiance
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_effect_percentage, calculate_reflectivity_factor_for_nondirect_irradiance
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -64,8 +64,8 @@ from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
-from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_martin_and_ruiz
-from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_percentage
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_effect
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_effect_percentage
 from rich import print
 
 
@@ -87,7 +87,7 @@ def calculate_ground_reflected_inclined_irradiance_series(
     neighbor_lookup: MethodForInexactMatches = None,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     in_memory: bool = False,
-    apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_constant: float = SOLAR_CONSTANT,
@@ -227,12 +227,12 @@ def calculate_ground_reflected_inclined_irradiance_series(
             albedo * global_horizontal_irradiance_series * ground_view_fraction
         )
 
-        if apply_angular_loss_factor:
+        if apply_reflectivity_factor:
 
             ground_reflected_irradiance_reflectivity_coefficient = sin(surface_tilt) + (
                 surface_tilt - sin(surface_tilt)
             ) / (1 - cos(surface_tilt))
-            ground_reflected_irradiance_reflectivity_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
+            ground_reflected_irradiance_reflectivity_factor = calculate_reflectivity_factor_for_nondirect_irradiance(
                 indirect_angular_loss_coefficient=ground_reflected_irradiance_reflectivity_coefficient,
             )
             ground_reflected_irradiance_reflectivity_factor_series = create_array(
@@ -252,11 +252,11 @@ def calculate_ground_reflected_inclined_irradiance_series(
                     0,
                 )
             )
-            reflectivity_loss = calculate_reflectivity_loss_martin_and_ruiz(
+            reflectivity_effect = calculate_reflectivity_effect(
                 irradiance=ground_reflected_inclined_irradiance_before_reflectivity_series,
                 reflectivity=ground_reflected_irradiance_reflectivity_factor_series,
             )
-            reflectivity_loss_percentage = calculate_reflectivity_loss_percentage(
+            reflectivity_effect_percentage = calculate_reflectivity_effect_percentage(
                 irradiance=ground_reflected_inclined_irradiance_before_reflectivity_series,
                 reflectivity=ground_reflected_irradiance_reflectivity_factor_series,
             )
@@ -271,17 +271,17 @@ def calculate_ground_reflected_inclined_irradiance_series(
         },
 
         'extended_2': lambda: {
-            # Attention : input irradiance _before_ reflectivity loss !
-            REFLECTIVITY_COLUMN_NAME: reflectivity_loss,
-            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: reflectivity_loss_percentage,
-        } if verbose > 6 and apply_angular_loss_factor else {},
+            # Attention : input irradiance _before_ reflectivity effect !
+            REFLECTIVITY_COLUMN_NAME: reflectivity_effect,
+            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: reflectivity_effect_percentage,
+        } if verbose > 6 and apply_reflectivity_factor else {},
 
         'extended': lambda: {
             # REFLECTIVITY_FACTOR_COLUMN_NAME: where(ground_reflected_irradiance_reflectivity_factor_series <= 0, 0, (1 - ground_reflected_irradiance_reflectivity_factor_series)),
             REFLECTIVITY_FACTOR_COLUMN_NAME: ground_reflected_irradiance_reflectivity_factor_series,
             REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_irradiance_before_reflectivity_series,
-        # } if verbose > 1 and apply_angular_loss_factor else {},
-        } if apply_angular_loss_factor else {},
+        # } if verbose > 1 and apply_reflectivity_factor else {},
+        } if apply_reflectivity_factor else {},
 
         'more_extended': lambda: {
             VIEW_FRACTION_COLUMN_NAME: ground_view_fraction,

@@ -158,7 +158,7 @@ def calculate_photovoltaic_power_output_series(
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -346,7 +346,7 @@ def calculate_photovoltaic_power_output_series(
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
-                apply_angular_loss_factor=apply_angular_loss_factor,
+                apply_reflectivity_factor=apply_reflectivity_factor,
                 solar_position_model=solar_position_model,
                 solar_incidence_model=solar_incidence_model,
                 zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
@@ -401,7 +401,7 @@ def calculate_photovoltaic_power_output_series(
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
             in_memory=in_memory,
-            apply_angular_loss_factor=apply_angular_loss_factor,
+            apply_reflectivity_factor=apply_reflectivity_factor,
             solar_position_model=solar_position_model,
             solar_incidence_model=solar_incidence_model,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
@@ -455,7 +455,7 @@ def calculate_photovoltaic_power_output_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,
             albedo=albedo,
-            apply_angular_loss_factor=apply_angular_loss_factor,
+            apply_reflectivity_factor=apply_reflectivity_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
             solar_constant=solar_constant,
@@ -662,7 +662,7 @@ def calculate_photovoltaic_power_output_series(
             DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: direct_inclined_reflectivity_factor_series,
             DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_reflectivity_factor_series,
             REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_reflectivity_factor_series,
-        } if verbose > 6 and apply_angular_loss_factor else {},
+        } if verbose > 6 and apply_reflectivity_factor else {},
         
         'more_extended': lambda: {
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
@@ -675,7 +675,7 @@ def calculate_photovoltaic_power_output_series(
             DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
             REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_irradiance_before_reflectivity_series,
-        } if verbose > 2 and apply_angular_loss_factor else {},
+        } if verbose > 2 and apply_reflectivity_factor else {},
         
         'even_more_extended': lambda: {
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME] if calculated_direct_inclined_irradiance_series.components else NOT_AVAILABLE,

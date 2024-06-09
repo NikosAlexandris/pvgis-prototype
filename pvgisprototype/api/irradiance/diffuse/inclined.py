@@ -1,13 +1,11 @@
 from pvgisprototype.log import logger
 from numpy import where
-from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from pandas import DatetimeIndex
 from pathlib import Path
 from typing import Optional
-from rich import print
 import numpy as np
 from math import cos, sin, pi
 from pvgisprototype import LinkeTurbidityFactor
@@ -27,7 +25,7 @@ from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_hor
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_nondirect_irradiance
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_factor_for_nondirect_irradiance
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.validation.hashing import generate_hash
@@ -42,14 +40,11 @@ from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import RANDOM_DAY_FLAG_DEFAULT
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import TERM_N_IN_SHADE
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -57,14 +52,12 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import TITLE_KEY_NAME
-from pvgisprototype.constants import LOSS_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
@@ -82,8 +75,6 @@ from pvgisprototype.constants import KB_RATIO_COLUMN_NAME
 from pvgisprototype.constants import AZIMUTH_DIFFERENCE_COLUMN_NAME
 from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
@@ -95,9 +86,8 @@ from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_term_
 from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_sky_irradiance_series
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import calculate_diffuse_horizontal_component_from_sarah
-from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_martin_and_ruiz
-from pvgisprototype.api.irradiance.loss import calculate_reflectivity_loss_percentage
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_effect
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_effect_percentage
 from pvgisprototype.validation.arrays import create_array
 
 
@@ -119,7 +109,7 @@ def calculate_diffuse_inclined_irradiance_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,  # Let Me Hardcoded, Read the docstring!
@@ -446,12 +436,12 @@ def calculate_diffuse_inclined_irradiance_series(
     diffuse_inclined_irradiance_series = np.nan_to_num(
         diffuse_inclined_irradiance_series, nan=0
     )
-    if apply_angular_loss_factor:
+    if apply_reflectivity_factor:
 
         diffuse_irradiance_reflectivity_coefficient = sin(surface_tilt) + (
             pi - surface_tilt - sin(surface_tilt)
         ) / (1 + cos(surface_tilt))
-        diffuse_irradiance_reflectivity_factor = calculate_angular_loss_factor_for_nondirect_irradiance(
+        diffuse_irradiance_reflectivity_factor = calculate_reflectivity_factor_for_nondirect_irradiance(
             indirect_angular_loss_coefficient=diffuse_irradiance_reflectivity_coefficient,
         )
         diffuse_irradiance_reflectivity_factor_series = create_array(
@@ -492,16 +482,16 @@ def calculate_diffuse_inclined_irradiance_series(
         },# if verbose > 0 else {},
 
         'extended_2': lambda: {
-            REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_loss_martin_and_ruiz(irradiance=diffuse_inclined_irradiance_before_reflectivity_series, reflectivity=diffuse_irradiance_reflectivity_factor_series),
-            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_loss_percentage(irradiance=diffuse_inclined_irradiance_before_reflectivity_series, reflectivity=diffuse_irradiance_reflectivity_factor_series),
-        } if verbose > 6 and apply_angular_loss_factor else {},
+            REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(irradiance=diffuse_inclined_irradiance_before_reflectivity_series, reflectivity=diffuse_irradiance_reflectivity_factor_series),
+            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_effect_percentage(irradiance=diffuse_inclined_irradiance_before_reflectivity_series, reflectivity=diffuse_irradiance_reflectivity_factor_series),
+        } if verbose > 6 and apply_reflectivity_factor else {},
 
         'extended': lambda: {
             # REFLECTIVITY_FACTOR_COLUMN_NAME: where(diffuse_irradiance_loss_factor_series <= 0, 0, (1 - diffuse_irradiance_loss_factor_series)),
             REFLECTIVITY_FACTOR_COLUMN_NAME: diffuse_irradiance_reflectivity_factor_series,
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
-        # } if verbose > 1 and apply_angular_loss_factor else {},
-        } if apply_angular_loss_factor else {},
+        # } if verbose > 1 and apply_reflectivity_factor else {},
+        } if apply_reflectivity_factor else {},
 
         'more_extended': lambda: {
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
