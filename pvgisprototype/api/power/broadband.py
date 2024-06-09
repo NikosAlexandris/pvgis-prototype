@@ -1,3 +1,4 @@
+from os import name
 from zoneinfo import ZoneInfo
 
 from pandas.core.groupby.groupby import GroupByNthSelector
@@ -17,7 +18,7 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype import PhotovoltaicPower
 from pvgisprototype import PhotovoltaicPowerMultipleModules
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import SolarDeclinationModel
@@ -168,9 +169,9 @@ def calculate_photovoltaic_power_output_series(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float] = None,
-    photovoltaic_module: PhotovoltaicModuleModel = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: PVModuleEfficiencyAlgorithm = PVModuleEfficiencyAlgorithm.king,
+    power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
     efficiency: Optional[float] = EFFICIENCY_DEFAULT,
@@ -538,27 +539,29 @@ def calculate_photovoltaic_power_output_series(
             from pvgisprototype.constants import DEGREES
             from pvgisprototype import TemperatureSeries
             if isinstance(temperature_series, Path):
+                temperature_times_series = select_time_series(
+                    time_series=temperature_series,
+                    # longitude=longitude_for_selection,
+                    # latitude=latitude_for_selection,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    timestamps=timestamps,
+                    # convert_longitude_360=convert_longitude_360,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                    ).to_numpy().astype(dtype=dtype)
                 temperature_series = TemperatureSeries(
-                        value=select_time_series(
-                            time_series=temperature_series,
-                            # longitude=longitude_for_selection,
-                            # latitude=latitude_for_selection,
-                            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                            timestamps=timestamps,
-                            # convert_longitude_360=convert_longitude_360,
-                            neighbor_lookup=neighbor_lookup,
-                            tolerance=tolerance,
-                            mask_and_scale=mask_and_scale,
-                            in_memory=in_memory,
-                            verbose=0,  # no verbosity here by choice!
-                            log=log,
-                            ).to_numpy().astype(dtype=dtype),
-                        unit=SYMBOL_UNIT_TEMPERATURE)
+                        value=temperature_times_series,
+                        unit=SYMBOL_UNIT_TEMPERATURE,
+                        data_source=temperature_series.name,
+                        )
             from pvgisprototype import WindSpeedSeries
             if isinstance(wind_speed_series, Path):
-                wind_speed_series = WindSpeedSeries(
-                        value=select_time_series(
+                wind_speed_time_series = select_time_series(
                             time_series=wind_speed_series,
                             # longitude=longitude_for_selection,
                             # latitude=latitude_for_selection,
@@ -572,8 +575,12 @@ def calculate_photovoltaic_power_output_series(
                             in_memory=in_memory,
                             verbose=0,  # no verbosity here by choice!
                             log=log,
-                            ).to_numpy().astype(dtype=dtype),
-                        unit=SYMBOL_UNIT_WIND_SPEED)
+                            ).to_numpy().astype(dtype=dtype)
+                wind_speed_series = WindSpeedSeries(
+                        value=wind_speed_time_series,
+                        unit=SYMBOL_UNIT_WIND_SPEED,
+                        data_source=wind_speed_series.name,
+                        )
 
             if isinstance(spectral_factor_series, Path):
                 spectral_factor_series = SpectralFactorSeries(
@@ -636,76 +643,84 @@ def calculate_photovoltaic_power_output_series(
         logger.info(f'i [bold]Building the output[/bold] ..')
 
     components_container = {
-        'main': lambda: {
+        'Power': lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
-            PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_output_without_system_loss_series,
             POWER_MODEL_COLUMN_NAME: power_model.value if power_model else NOT_AVAILABLE,
         },# if verbose > 0 else {},
-        
-        'extended': lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & in-plane components",
+
+        'Power extended': lambda: {
+            PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_output_without_system_loss_series,
+        } if verbose > 1 else {},
+
+        'System loss': lambda: {
             EFFICIENCY_COLUMN_NAME: efficiency_factor_series,
             SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
-            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series,
-            REFLECTIVITY_COLUMN_NAME: global_inclined_reflectivity_series if global_inclined_reflectivity_series.size > 1 else NOT_AVAILABLE,
-            # REFLECTIVITY_PERCENTAGE_COLUMN_NAME: global_inclined_reflectivity_loss_percentage_series if global_inclined_reflectivity_loss_percentage_series.size > 1 else NOT_AVAILABLE,
-            # REFLECTIVITY_FACTOR_COLUMN_NAME: global_reflectivity_factor_series if global_reflectivity_factor_series.size > 1 else NOT_AVAILABLE,
+        } if verbose > 2 else {},
+        
+        'Effective irradiance': lambda: {
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & effective components",
             EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series * efficiency_factor_series,
             EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series * efficiency_factor_series,
             EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series * efficiency_factor_series,
             EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series * efficiency_factor_series,
-        } if verbose > 1 else {},
+            SPECTRAL_EFFECT_COLUMN_NAME: effective_global_irradiance_series.components.get(SPECTRAL_EFFECT_COLUMN_NAME, numpy.array([])),
+            SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: effective_global_irradiance_series.components.get(SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, numpy.array([])),
+            SPECTRAL_FACTOR_COLUMN_NAME: effective_global_irradiance_series.components.get(SPECTRAL_FACTOR_COLUMN_NAME, numpy.array([])),
+        } if verbose > 3 else {},
 
-        'reflectivity_loss': lambda: {
-            # GLOBAL_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: global_inclined_reflectivity_factor_series,
+        'Reflectivity': lambda: {
+            REFLECTIVITY_COLUMN_NAME: global_inclined_reflectivity_series if global_inclined_reflectivity_series.size > 1 else NOT_AVAILABLE,
+            # REFLECTIVITY_PERCENTAGE_COLUMN_NAME: global_inclined_reflectivity_loss_percentage_series if global_inclined_reflectivity_loss_percentage_series.size > 1 else NOT_AVAILABLE,
+            # REFLECTIVITY_FACTOR_COLUMN_NAME: global_reflectivity_factor_series if global_reflectivity_factor_series.size > 1 else NOT_AVAILABLE,
             DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: direct_inclined_reflectivity_factor_series,
             DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_reflectivity_factor_series,
             REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_reflectivity_factor_series,
         } if verbose > 6 and apply_reflectivity_factor else {},
         
-        'more_extended': lambda: {
+        'Inclined irradiance components': lambda: {
+            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
             REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
-        } if verbose > 2 else {},
+        } if verbose > 4 else {},
 
         'more_extended_2': lambda: {
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + ", effective & in-plane components",
             GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: global_inclined_irradiance_before_reflectivity_series,
             DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
             REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_irradiance_before_reflectivity_series,
-        } if verbose > 2 and apply_reflectivity_factor else {},
+        } if verbose > 5 and apply_reflectivity_factor else {},
         
-        'even_more_extended': lambda: {
+        'Horizontal irradiance components': lambda: {
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME] if calculated_direct_inclined_irradiance_series.components else NOT_AVAILABLE,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_diffuse_inclined_irradiance_series.components[DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME] if calculated_diffuse_inclined_irradiance_series.components else NOT_AVAILABLE,
-            # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME:
-            # calculated_ground_reflected_inclined_irradiance_series.components[REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME], Is zero for horizontal surfaces !
+            # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.components[REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME], Is zero for horizontal surfaces !
+        } if verbose > 6 else {},
+
+        'Meteorological variables': lambda: {
             TEMPERATURE_COLUMN_NAME: temperature_series.value,
             WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
-            SPECTRAL_EFFECT_COLUMN_NAME: effective_global_irradiance_series.components.get(SPECTRAL_EFFECT_COLUMN_NAME, numpy.array([])),
-            SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: effective_global_irradiance_series.components.get(SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, numpy.array([])),
-            SPECTRAL_FACTOR_COLUMN_NAME: effective_global_irradiance_series.components.get(SPECTRAL_FACTOR_COLUMN_NAME, numpy.array([])),
-        } if verbose > 3 else {},
+        } if verbose > 7 else {},
         
-        'and_even_more_extended': lambda: {
+        'Surface position': lambda: {
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
             SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_tilt, angle_output_units),
             ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
             LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
             SHADE_COLUMN_NAME: in_shade,
-        } if verbose > 4 else {},
+        } if verbose > 8 else {},
         
-        'extra': lambda: {
+        'Solar position': lambda: {
             INCIDENCE_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[INCIDENCE_COLUMN_NAME] if calculated_direct_inclined_irradiance_series.components else NOT_AVAILABLE,
             INCIDENCE_ALGORITHM_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[INCIDENCE_ALGORITHM_COLUMN_NAME] if calculated_direct_inclined_irradiance_series.components else NOT_AVAILABLE,
             INCIDENCE_DEFINITION: calculated_direct_inclined_irradiance_series.components[INCIDENCE_DEFINITION] if calculated_direct_inclined_irradiance_series.components else NOT_AVAILABLE,
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
             AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
             UNIT_NAME: angle_output_units,
-        } if verbose > 5 else {},
+        } if verbose > 9 else {},
 
         'fingerprint': lambda: {
             FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),

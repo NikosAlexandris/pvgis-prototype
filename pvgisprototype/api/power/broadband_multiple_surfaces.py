@@ -13,7 +13,7 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype import PhotovoltaicPower
 from pvgisprototype import PhotovoltaicPowerMultipleModules
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import SolarDeclinationModel
@@ -162,7 +162,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     angle_output_units: str = RADIANS,
     photovoltaic_module: PhotovoltaicModuleModel = PHOTOVOLTAIC_MODULE_DEFAULT, 
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: PVModuleEfficiencyAlgorithm = None,
+    power_model: PhotovoltaicModulePerformanceModel = None,
     temperature_model: ModuleTemperatureAlgorithm = None,
     efficiency: Optional[float] = EFFICIENCY_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -244,7 +244,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         Photovoltaic module, by default PHOTOVOLTAIC_MODULE_DEFAULT
     system_efficiency : Optional[float], optional
         System efficiency, by default SYSTEM_EFFICIENCY_DEFAULT
-    power_model : PVModuleEfficiencyAlgorithm, optional
+    power_model : PhotovoltaicModulePerformanceModel, optional
         Power model, by default None
     temperature_model : ModuleTemperatureAlgorithm, optional
         Temperature model, by default None
