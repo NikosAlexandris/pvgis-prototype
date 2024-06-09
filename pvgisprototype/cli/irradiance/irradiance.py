@@ -97,8 +97,8 @@ app.add_typer(
 app.add_typer(
     limits,
     name="limits",
-    help=f"[] Calculate physically possible irradiance limits",
-    short_help=f"[] Calculate physically possible irradiance limits",
+    help=f"{SYMBOL_IRRADIANCE_LIMITS} Calculate physically possible irradiance limits",
+    short_help=f"{SYMBOL_IRRADIANCE_LIMITS} Calculate physically possible irradiance limits",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_toolbox,
 )
