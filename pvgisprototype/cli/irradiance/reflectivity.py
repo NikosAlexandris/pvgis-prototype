@@ -14,7 +14,7 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import ANGULAR_LOSS_COEFFICIENT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_series, calculate_angular_loss_factor_for_nondirect_irradiance
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_factor_for_direct_irradiance_series, calculate_reflectivity_factor_for_nondirect_irradiance
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 
 
@@ -33,7 +33,7 @@ app = typer.Typer(
     short_help=f'⦟ Solar incidence angle modifier for direct irradiance due to reflectivity {NOT_COMPLETE_CLI}',
     rich_help_panel=rich_help_panel_toolbox,
 )
-def get_angular_loss_factor_for_direct_irradiance_series(
+def get_reflectivity_factor_for_direct_irradiance_series(
     solar_incidence_series: Annotated[List[float], typer_argument_solar_incidence_series],
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     # csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
@@ -60,7 +60,7 @@ def get_angular_loss_factor_for_direct_irradiance_series(
     _complementary_ incidence angle defined by Jenčo (1992).
 
     """
-    reflectivity_factor_for_direct_irradiance_series = calculate_angular_loss_factor_for_direct_irradiance_series(
+    reflectivity_factor_for_direct_irradiance_series = calculate_reflectivity_factor_for_direct_irradiance_series(
             solar_incidence_series=solar_incidence_series,
             angular_loss_coefficient=angular_loss_coefficient,
             verbose=verbose,
@@ -82,7 +82,7 @@ def get_angular_loss_factor_for_direct_irradiance_series(
     short_help=f'⦟ Solar incidence angle modifier for non-direct irradiance due to reflectivity {NOT_COMPLETE_CLI}',
     rich_help_panel=rich_help_panel_toolbox,
 )
-def get_angular_loss_factor_for_nondirect_irradiance(
+def get_reflectivity_factor_for_nondirect_irradiance(
     indirect_angular_loss_coefficient: float,
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     # csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
@@ -101,7 +101,7 @@ def get_angular_loss_factor_for_nondirect_irradiance(
 ):
     """
     """
-    reflectivity_factor_for_nondirect_irradiance = calculate_angular_loss_factor_for_nondirect_irradiance(
+    reflectivity_factor_for_nondirect_irradiance = calculate_reflectivity_factor_for_nondirect_irradiance(
     indirect_angular_loss_coefficient=indirect_angular_loss_coefficient,
     angular_loss_coefficient=angular_loss_coefficient,
     verbose=verbose,

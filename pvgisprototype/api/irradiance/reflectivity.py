@@ -16,7 +16,7 @@ from rich import print
 
 
 @log_function_call
-def calculate_angular_loss_factor_for_direct_irradiance_series(
+def calculate_reflectivity_factor_for_direct_irradiance_series(
     solar_incidence_series: SolarIncidence,
     angular_loss_coefficient: float = ANGULAR_LOSS_COEFFICIENT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -45,7 +45,7 @@ def calculate_angular_loss_factor_for_direct_irradiance_series(
 
     Returns
     -------
-    angular_loss_factor_series : float
+    reflectivity_factor_series : float
 
     Notes
     -----
@@ -149,7 +149,7 @@ def calculate_angular_loss_factor_for_direct_irradiance_series(
         return np.array([1])  # Return an array with a single element as 1
 
 
-def calculate_angular_loss_factor_for_nondirect_irradiance(
+def calculate_reflectivity_factor_for_nondirect_irradiance(
     indirect_angular_loss_coefficient,
     angular_loss_coefficient = ANGULAR_LOSS_COEFFICIENT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -205,30 +205,34 @@ def calculate_angular_loss_factor_for_nondirect_irradiance(
     return loss_factor
 
 
-def calculate_reflectivity_loss_martin_and_ruiz(
+def calculate_reflectivity_effect(
         irradiance,
         reflectivity,
         ):
-    """Calculate reflectivity loss as per Martin & Ruiz
+    """Calculate absolute reflectivity effect
 
-    Irradiance loss due to reflectivity as a function of the angle of incidence.
+    The total loss due to the reflectivity effect (which depends on the solar
+    incidence angle) as the difference of the irradiance after and before.
 
     Notes
     -----
     Other ideas :
 
-    - Sum of reflectivity loss :
-        return total_loss_aoi = np.nansum(direct_inclined_irradiance_series - direct_inclined_irradiance_series_before_reflection)  # Total lost energy due to AOI over the period
+    - Sum of reflectivity effect as a difference between the irradiance time
+      series after and before the reflectivity effect, i.e. :
 
-    - Average of reflectivity loss :
-        REFLECTIVITY_LOSS_AVERAGE_COLUMN_NAME: np.nanmean(calculate_reflectivity_loss_martin_and_ruiz(direct_inclined_irradiance_series, angular_loss_factor_series)),
+        return reflectivity_effect = np.nansum(irradiance_series * reflectivity - irradiance_series)  # Total lost energy due to AOI over the period
+
+    - Average reflectivity effect :
+
+        REFLECTIVITY_EFFECT_AVERAGE_COLUMN_NAME: np.nanmean(calculate_reflectivity_effect(inclined_irradiance_series, reflectivity_factor_series)),
 
     """
-    loss = (irradiance * reflectivity) - irradiance
-    return np.nan_to_num(loss, nan=0)  # safer loss !
+    effect = (irradiance * reflectivity) - irradiance
+    return np.nan_to_num(effect, nan=0)  # safer output ?
 
 
-def calculate_reflectivity_loss_percentage(
+def calculate_reflectivity_effect_percentage(
     irradiance,
     reflectivity,
 ):
