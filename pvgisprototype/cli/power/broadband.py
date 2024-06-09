@@ -42,7 +42,7 @@ from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer.irradiance import typer_option_global_horizontal_irradiance
-from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer.irradiance import typer_option_apply_reflectivity_factor
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
@@ -169,7 +169,7 @@ def photovoltaic_power_output_series(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
-    apply_reflectivity_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: Annotated[Optional[bool], typer_option_apply_reflectivity_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -391,7 +391,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: Annotated[Optional[bool], typer_option_apply_reflectivity_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -481,7 +481,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         albedo=albedo,
-        apply_angular_loss_factor=apply_angular_loss_factor,
+        apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
