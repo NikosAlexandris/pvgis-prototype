@@ -179,11 +179,13 @@ def calculate_efficiency_factor_series(
     photovoltaic_module_efficiency_coefficients = (
         get_coefficients_for_photovoltaic_module(photovoltaic_module)
     )
-    log_relative_irradiance_series = where(
-        relative_irradiance_series > 0,
-        numpy_log(relative_irradiance_series),
-        0  # -numpy_inf,
-    )
+    # --------------------------------------------------- Is this safe ? -
+    with np.errstate(divide='ignore', invalid='ignore'):
+        log_relative_irradiance_series = where(
+            relative_irradiance_series > 0,
+            numpy_log(relative_irradiance_series),
+            0  # -numpy_inf,
+        )
     temperature_deviation_series = (
         temperature_series.value - standard_test_temperature
     )
@@ -314,11 +316,13 @@ def calculate_spectrally_corrected_effective_irradiance(
     spectral_effect_series = (
             irradiance_series - (irradiance_series / spectral_factor_series.value)
     )
-    spectral_effect_percentage_series = 100 * where(
-        irradiance_series != 0,
-        (effective_irradiance_series - irradiance_series) / irradiance_series,
-        0,
-    )
+    # --------------------------------------------------- Is this safe ? -
+    with np.errstate(divide='ignore', invalid='ignore'):
+        spectral_effect_percentage_series = 100 * where(
+            irradiance_series != 0,
+            (effective_irradiance_series - irradiance_series) / irradiance_series,
+            0,
+        )
 
     components_container = {
 
