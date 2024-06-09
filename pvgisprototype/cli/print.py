@@ -53,6 +53,8 @@ from pvgisprototype.constants import (
     IRRADIANCE_COLUMN_NAME,
     IRRADIANCE_UNIT,
     IRRADIANCE_UNIT_K,
+    LATITUDE_NAME,
+    LONGITUDE_NAME,
     PHOTOVOLTAIC_POWER_LONG_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_UNIT,
@@ -880,17 +882,19 @@ def add_table_row(
         SYSTEM_LOSS,
         NET_EFFECT,
     }
-    quantity = f"[{quantity_style}]{quantity}" if quantity_style else quantity
     value, unit = kilofy_unit(value=value, unit=unit, threshold=1000)
     # value = f"[red]{value:.{rounding_places}f}" if value < 0 else f"[{value_style}]{value:.{rounding_places}f}"
-    value = f"[{value_style}]{value:.{rounding_places}f}" if value_style else f"{value:.{rounding_places}f}" 
+    styled_value = f"[{value_style}]{value:.{rounding_places}f}" if value_style else f"{value:.{rounding_places}f}"
+    signed_value = f"[{quantity_style}]+{styled_value}" if quantity in effects and value > 0 else styled_value
+    # need first the unstyled quantity for the `signed_value` :-)
+    quantity = f"[{quantity_style}]{quantity}" if quantity_style else quantity
     mean_value = f"[{mean_value_style}]{mean_value:.{rounding_places}f}" if mean_value_style else f"{mean_value:.{rounding_places}f}" 
     unit = f"[{unit_style}]{unit}" if unit_style else unit
     reference_quantity = f"[{reference_quantity_style}]{reference_quantity}" if reference_quantity_style else reference_quantity
     sparkline = convert_series_to_sparkline(series, timestamps, frequency) if series.size > 0 else ''
 
     # Prepare the basic row data structure
-    row = [quantity, value, mean_value, unit]
+    row = [quantity, signed_value, mean_value, unit]
     
     # Add percentage and reference quantity if applicable
     if percentage is not None:
@@ -1216,12 +1220,12 @@ def analyse_photovoltaic_performance(
             photovoltaic_power_series,
             None,
         ),
-        f"[white bold dim]{NET_EFFECT}": (
+        f"[white dim]{NET_EFFECT}": (
             (total_change, "white dim"),
             (total_change_mean, "white dim"),
             total_change_percentage,
             (IRRADIANCE_UNIT, "white dim"),
-            "red",
+            "dim",
             IN_PLANE_IRRADIANCE,
             np.array([]),
             None,
@@ -1230,22 +1234,23 @@ def analyse_photovoltaic_performance(
 
 
 def print_change_percentages_panel(
-    longitude=None,
-    latitude=None,
-    elevation=None,
+    longitude = None,
+    latitude = None,
+    elevation = None,
     timestamps: DatetimeIndex | datetime = [datetime.now()],
     dictionary: dict = dict(),
     title: str ='Changes',
     rounding_places: int = 1,#ROUNDING_PLACES_DEFAULT,
-    verbose=1,
+    verbose = 1,
     index: bool = False,
-    surface_orientation=True,
-    surface_tilt=True,
+    surface_orientation: bool =True,
+    surface_tilt:bool = True,
+    fingerprint: bool = False,
     quantity_style="magenta",
-    value_style="cyan",
-    unit_style="cyan",
-    percentage_style="dim",
-    reference_quantity_style="white",
+    value_style = "cyan",
+    unit_style ="cyan",
+    percentage_style = "dim",
+    reference_quantity_style = "white",
 ):
     """Print a formatted table of photovoltaic performance metrics using the
     Rich library.
@@ -1299,10 +1304,10 @@ def print_change_percentages_panel(
         # EFFECTIVE_IRRADIANCE_NAME,
         TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
         # PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
-        # SYSTEM_LOSS,
+        SYSTEM_LOSS,
         # PHOTOVOLTAIC_POWER_LONG_NAME,
-        f"[green bold]{PHOTOVOLTAIC_POWER_LONG_NAME}",
-        TOTAL_NET_EFFECT,
+        # f"[green bold]{PHOTOVOLTAIC_POWER_LONG_NAME}",
+        f"[white dim]{NET_EFFECT}",
     }
     table = Table(
         # title="Photovoltaic Performance",
@@ -1368,10 +1373,11 @@ def print_change_percentages_panel(
             pad_edge=False,
             )
     position_table.add_column('Position', justify="right", style="none", no_wrap=True)
+    position_table.add_column('Value', justify="right", style="none", no_wrap=True)
     latitude = round_float_values(latitude, 3)#rounding_places)
-    position_table.add_row(f"{LATITUDE_COLUMN_NAME}", f"[bold]{latitude}[/bold]")
+    position_table.add_row(f"{LATITUDE_NAME}", f"[bold]{latitude}[/bold]")
     longitude = round_float_values(longitude, 3)#rounding_places)
-    position_table.add_row(f"{LONGITUDE_COLUMN_NAME}", f"[bold]{longitude}[/bold]")
+    position_table.add_row(f"{LONGITUDE_NAME}", f"[bold]{longitude}[/bold]")
     position_table.add_row(f"{ELEVATION_COLUMN_NAME}", f"[bold]{elevation}[/bold]")
     surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None) if surface_orientation else None
     position_table.add_row(f"{SURFACE_ORIENTATION_COLUMN_NAME}", f"[bold]{surface_orientation}[/bold]")
@@ -1401,9 +1407,13 @@ def print_change_percentages_panel(
             show_edge=False,
             pad_edge=False,
             )
-    time_table.add_column('Time', justify="left")
+    time_table.add_column('Label', justify="right")
+    time_table.add_column('Timestamp', justify="left")
     time_table.add_row('Start', str(timestamps.values[0])),
     time_table.add_row('End', str(timestamps.values[-1])),
+
+    panels = []
+    
     position_panel = Panel(
             position_table,
             subtitle="Position",
@@ -1412,8 +1422,10 @@ def print_change_percentages_panel(
             safe_box=True,
             style='',
             expand=False,
-            padding=(0, 3),
+            padding=(0, 2),
             )
+    panels.append(position_panel)
+
     time_panel = Panel(
             time_table,
             # title="Time",
@@ -1421,17 +1433,33 @@ def print_change_percentages_panel(
             subtitle_align="right",
             safe_box=True,
             expand=False,
-            padding=(0,3),
+            padding=(0,2),
             )
+    panels.append(time_panel)
+
+    if fingerprint:
+        print(f'{fingerprint=}')
+        fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
+        print(f'{fingerprint=}')
+        fingerprint_panel = Panel(
+            Text(f"{fingerprint}", justify="center", style="bold yellow"),
+            subtitle="[reverse]Fingerprint[/reverse]",
+            subtitle_align="right",
+            border_style="dim",
+            style="dim",
+            # expand=True,
+            padding=(0,2),
+        )
+        panels.append(fingerprint_panel)
     # panels.append(position_panel)
 
     columns = Columns(
-            # [position_table, time_table],
-            [position_panel, time_panel],
+            panels,
             # expand=False,
-            equal=True,
-            padding=2,
+            # equal=True,
+            # padding=1,
             )
+
     from rich.console import Group
     panel_group = Group(
             Panel(
@@ -1448,15 +1476,6 @@ def print_change_percentages_panel(
     )
 
     Console().print(panel_group)
-    # console.print(
-    #     Panel(
-    #         # table,
-    #         panel_group,
-    #         title="Analysis",
-    #         box=ROUNDED,
-    #         expand=False,
-    #     )
-    # )
 
 
 def print_finger_hash(dictionary: dict):
