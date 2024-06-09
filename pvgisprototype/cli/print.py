@@ -32,6 +32,7 @@ from pvgisprototype.constants import (
     EFFICIENCY_NAME,
     EFFICIENCY_COLUMN_NAME,
     EFFICIENCY_FACTOR_DESCRIPTION,
+    ELEVATION_COLUMN_NAME,
     ENERGY_UNIT,
     GLOBAL_EFFECTIVE_IRRADIANCE,
     GLOBAL_IN_PLANE_IRRADIANCE,
@@ -101,6 +102,7 @@ from pvgisprototype.constants import (
     SOLAR_CONSTANT_COLUMN_NAME,
     PERIGEE_OFFSET_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
+    NET_EFFECT,
     TOTAL_NET_EFFECT,
     TOTAL_NET_EFFECT_DESCRIPTION,
     ZENITH_COLUMN_NAME,
@@ -132,11 +134,12 @@ from pvgisprototype.constants import (
 def convert_series_to_sparkline(
     series: np.array([]),
     timestamps: DatetimeIndex,
+    frequency: str,
 ):
     """
     """
     pandas_series = pandas.Series(series, timestamps)
-    yearly_sum_series = pandas_series.resample('YE').sum()
+    yearly_sum_series = pandas_series.resample(frequency).sum()
     sparkline = sparklines(yearly_sum_series)[0]
 
     return sparkline
@@ -255,7 +258,6 @@ def print_solar_position_table_panels(
     table.add_row(f"{LONGITUDE_COLUMN_NAME} :", f"[bold]{longitude}[/bold]")
     table.add_row("Time :", f"{timestamp[0]}")
     table.add_row("Time zone :", f"{timezone}")
-    latitude = round_float_values(latitude, rounding_places)
     longest_label_length = max(len(key) for key in first_model.keys())
     surface_position_keys = {
             SURFACE_ORIENTATION_NAME,
@@ -838,13 +840,17 @@ def add_table_row(
     table,
     quantity,
     value,
+    mean_value,
     unit=IRRADIANCE_UNIT,
     percentage=None,
     reference_quantity=None,
     series=np.array([]),
     timestamps: DatetimeIndex = None,
+    frequency: str = 'YE',
+    source: str = None,
     quantity_style=None,
     value_style="cyan",
+    mean_value_style="cyan",
     unit_style="cyan",
     percentage_style="dim",
     reference_quantity_style="white",
@@ -872,18 +878,19 @@ def add_table_row(
         SPECTRAL_EFFECT,
         TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
         SYSTEM_LOSS,
-        TOTAL_NET_EFFECT,
+        NET_EFFECT,
     }
     quantity = f"[{quantity_style}]{quantity}" if quantity_style else quantity
     value, unit = kilofy_unit(value=value, unit=unit, threshold=1000)
     # value = f"[red]{value:.{rounding_places}f}" if value < 0 else f"[{value_style}]{value:.{rounding_places}f}"
     value = f"[{value_style}]{value:.{rounding_places}f}" if value_style else f"{value:.{rounding_places}f}" 
+    mean_value = f"[{mean_value_style}]{mean_value:.{rounding_places}f}" if mean_value_style else f"{mean_value:.{rounding_places}f}" 
     unit = f"[{unit_style}]{unit}" if unit_style else unit
     reference_quantity = f"[{reference_quantity_style}]{reference_quantity}" if reference_quantity_style else reference_quantity
-    sparkline = convert_series_to_sparkline(series, timestamps) if series.size > 0 else ''
+    sparkline = convert_series_to_sparkline(series, timestamps, frequency) if series.size > 0 else ''
 
     # Prepare the basic row data structure
-    row = [quantity, value, unit]
+    row = [quantity, value, mean_value, unit]
     
     # Add percentage and reference quantity if applicable
     if percentage is not None:
@@ -900,6 +907,8 @@ def add_table_row(
         row.extend([sparkline])
     else:
         row.extend([""])
+    if source:
+        row.extend([source])
     
     # table.add_row(
     #     quantity,
@@ -921,23 +930,39 @@ def calculate_percentage_change(value, reference_value):
 
 
 def calculate_sum_and_percentage(
-        data_series,
-        base_value,
-        rounding_places=None,
-        dtype=DATA_TYPE_DEFAULT,
-        array_backend=ARRAY_BACKEND_DEFAULT,
-        ):
-    """Calculate total of a series and its percentage relative to a base value."""
-    total = np.nansum(data_series)
-    percentage = (total / base_value * 100) if base_value != 0 else 0
+    series,
+    reference_series,
+    rounding_places=None,
+    dtype=DATA_TYPE_DEFAULT,
+    array_backend=ARRAY_BACKEND_DEFAULT,
+):
+    """Calculate sum of a series and its percentage relative to a reference series."""
+    total = np.nansum(series)
+    percentage = (total / reference_series * 100) if reference_series != 0 else 0
     if rounding_places is not None:
         total = round_float_values(total, rounding_places)
         percentage = round_float_values(percentage, rounding_places)
     return total.astype(dtype), percentage.astype(dtype)
 
 
+def calculate_mean_of_series_per_time_unit(
+    series: np.array([]),
+    timestamps: DatetimeIndex,
+    frequency: str,
+    ):
+    """
+    """
+    pandas_series = pandas.Series(series, timestamps)
+    # Review - Me ------------------------------------------------------------
+    mean_per_time_unit_series = pandas_series.resample(frequency).mean().mean()
+    # ------------------------------------------------------------------------
+    return mean_per_time_unit_series
+
+
 def analyse_photovoltaic_performance(
         dictionary,
+        timestamps: DatetimeIndex,
+        frequency: str,
         rounding_places=1,
         dtype=DATA_TYPE_DEFAULT,  # Define default data types for array operations
         array_backend=ARRAY_BACKEND_DEFAULT,
@@ -979,6 +1004,11 @@ def analyse_photovoltaic_performance(
     Total Change
     ------------
     """
+    # In-Plane irradiance (before changes)
+    # ------------------------------------------------------------------------
+    # To Do : In-Plane "Irradiation" ?
+    # Add Standard Deviation in kWh ? Monthly, Yearly ?
+    # ------------------------------------------------------------------------
     inclined_irradiance_series = dictionary.get(
         GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, np.array([])
     )
@@ -987,22 +1017,35 @@ def analyse_photovoltaic_performance(
         1,
         rounding_places,
     )  # Base value is dummy for total calculation
+    inclined_irradiance_mean = calculate_mean_of_series_per_time_unit(
+        inclined_irradiance_series, timestamps=timestamps, frequency=frequency
+    )
 
     reflectivity_series = dictionary.get(REFLECTIVITY_COLUMN_NAME, np.array([]))
     reflectivity_change, reflectivity_change_percentage = calculate_sum_and_percentage(
         reflectivity_series, inclined_irradiance, rounding_places
     )
+    reflectivity_change_mean = calculate_mean_of_series_per_time_unit(
+        reflectivity_series - inclined_irradiance_series, timestamps=timestamps, frequency=frequency
+    )
     irradiance_after_reflectivity = inclined_irradiance + reflectivity_change
+    irradiance_after_reflectivity_mean = calculate_mean_of_series_per_time_unit(
+        inclined_irradiance_series + reflectivity_series, timestamps=timestamps, frequency=frequency
+    )
 
     spectral_effect_series = dictionary.get(SPECTRAL_EFFECT_COLUMN_NAME, np.array([]))
     spectral_effect, spectral_effect_percentage = calculate_sum_and_percentage(
         spectral_effect_series, irradiance_after_reflectivity, rounding_places
+    )
+    spectral_effect_mean = calculate_mean_of_series_per_time_unit(
+        spectral_effect_series, timestamps=timestamps, frequency=frequency
     )
 
     effective_irradiance = irradiance_after_reflectivity + spectral_effect
     effective_irradiance_percentage = (
         (effective_irradiance / inclined_irradiance * 100) if inclined_irradiance != 0 else 0
     )
+    effective_irradiance_mean = irradiance_after_reflectivity_mean + spectral_effect_mean
     effective_irradiance_change = (
         effective_irradiance
         - inclined_irradiance
@@ -1018,15 +1061,26 @@ def analyse_photovoltaic_performance(
     )
     photovoltaic_power_without_system_loss, _ = calculate_sum_and_percentage(
         photovoltaic_power_without_system_loss_series,
-        base_value=1,
+        reference_series=1,
         rounding_places=rounding_places,
         dtype=dtype,
         array_backend=array_backend,
     )
+    photovoltaic_power_without_system_loss_mean = (
+        calculate_mean_of_series_per_time_unit(
+            photovoltaic_power_without_system_loss_series,
+            timestamps=timestamps,
+            frequency=frequency,
+        )
+    )
 
     # Temperature & Low Irradiance
+    photovoltaic_power_rating_model = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     temperature_and_low_irradiance_change = (
         photovoltaic_power_without_system_loss - effective_irradiance
+    )
+    temperature_and_low_irradiance_change_mean = (
+        photovoltaic_power_without_system_loss_mean - effective_irradiance_mean
     )
     temperature_and_low_irradiance_change_percentage = (
         100
@@ -1036,22 +1090,37 @@ def analyse_photovoltaic_performance(
 
     # System efficiency
     system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None)
-    system_efficiency = np.nanmedian(system_efficiency_series).astype(dtype)
+    system_efficiency = np.nanmedian(system_efficiency_series).astype(dtype)  # Just in case we ever get time series of `system_efficiency` !
     system_efficiency_change = photovoltaic_power_without_system_loss * system_efficiency - photovoltaic_power_without_system_loss
+    system_efficiency_change_mean = calculate_mean_of_series_per_time_unit(photovoltaic_power_without_system_loss_mean * system_efficiency - photovoltaic_power_without_system_loss_mean, timestamps=timestamps, frequency=frequency)
     system_efficiency_change_percentage = 100 * system_efficiency_change / photovoltaic_power_without_system_loss
 
     # Photovoltaic Power
     photovoltaic_power_series = dictionary.get(PHOTOVOLTAIC_POWER_COLUMN_NAME, np.array([]))
+    photovoltaic_power_mean = calculate_mean_of_series_per_time_unit(
+        photovoltaic_power_series, timestamps=timestamps, frequency=frequency
+    )
     photovoltaic_power, _ = calculate_sum_and_percentage(
         photovoltaic_power_series,
         1,
         rounding_places,
     )  # Base value is dummy for total calculation
 
+    # From PVGIS v5.2 --------------------------------------------------------
+    # 'H(i)_m': annual[i]['g_poa'] / 12,
+    # 'H(i)_y': annual[i]['g_poa'],
+    # 'E_d': annual[i]['y_dc_spec'] * data['peakpower'] / 365,
+    # 'E_m': annual[i]['y_dc_spec'] * data['peakpower'] / 12,
+    # 'E_y': annual[i]['y_dc_spec'] * data['peakpower'],
+    # 'SD_m': annual[i]['y_dc_var'] * data['peakpower'] / 12,
+    # 'SD_y': annual[i]['y_dc_var'] * data['peakpower'],
+    # ------------------------------------------------------------------------
+
     # Total change
     total_change = (
         photovoltaic_power - inclined_irradiance
     )
+    total_change_mean = photovoltaic_power_mean - inclined_irradiance_mean
     total_change_percentage = (
         (total_change / inclined_irradiance * 100) if inclined_irradiance != 0 else 0
     )
@@ -1059,83 +1128,103 @@ def analyse_photovoltaic_performance(
     return {
         f"[bold purple]{IN_PLANE_IRRADIANCE}": (            # Label
             (inclined_irradiance, "bold purple"),           # Value, Style
+            (inclined_irradiance_mean, "bold purple"),      # Mean Value, Style
             None,                                           # %
-            (IRRADIANCE_UNIT, "purple"),                                # Unit
+            (IRRADIANCE_UNIT, "purple"),                    # Unit
             "bold",                                         # Style for
             None,# f"100 {GLOBAL_IRRADIANCE_NAME}",         # % of (which) Quantity
             inclined_irradiance_series,                     # input series
+            None,                                           # source
         ),
         f"{REFLECTIVITY}": (
             (reflectivity_change, "magenta"),
+            (reflectivity_change_mean, "magenta"),
             reflectivity_change_percentage,
             (IRRADIANCE_UNIT, "cyan dim"),
             "bold",
             IN_PLANE_IRRADIANCE,
             reflectivity_series,
+            None,
         ),
         f"[white dim]{IRRADIANCE_AFTER_REFLECTIVITY}": (
             (irradiance_after_reflectivity, "white dim"),
+            (irradiance_after_reflectivity_mean, "white dim"),
             None,
             (IRRADIANCE_UNIT, "white dim"),
             "bold",
             IN_PLANE_IRRADIANCE,
             np.array([], dtype=dtype),
+            None,
         ),
         f"{SPECTRAL_EFFECT}": (
             (spectral_effect, "magenta"),
+            (spectral_effect_mean, "magenta"),
             spectral_effect_percentage,
             (IRRADIANCE_UNIT, "cyan dim"),
             "bold",
             IN_PLANE_IRRADIANCE,
             spectral_effect_series,
+            None,
         ),
         f"[white dim]{EFFECTIVE_IRRADIANCE_NAME}": (
             (effective_irradiance, "white dim"),
+            (effective_irradiance_mean, "white dim"),
             None, # effective_irradiance_percentage,
             (IRRADIANCE_UNIT, "white dim"),
             "bold",
             None, # GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY,
             np.array([]),
+            None,
         ),
         f"{TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME}": (
             (temperature_and_low_irradiance_change, "magenta"),
+            (temperature_and_low_irradiance_change_mean, "magenta"),
             temperature_and_low_irradiance_change_percentage,
             (IRRADIANCE_UNIT, "cyan dim"),
             "bold",
             EFFECTIVE_IRRADIANCE_NAME,
             np.array([]),
+            photovoltaic_power_rating_model,
         ),
         f"[white dim]{PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME}": (
             (photovoltaic_power_without_system_loss, "white dim"),
+            (photovoltaic_power_without_system_loss_mean, "white dim"),
             None,
             (PHOTOVOLTAIC_POWER_UNIT, "white dim"),
             "bold",
             EFFECTIVE_IRRADIANCE_NAME,
             photovoltaic_power_without_system_loss_series,
+            None,
         ),
         f"{SYSTEM_LOSS}": (
             (system_efficiency_change, "magenta"),
+            (system_efficiency_change_mean, "magenta"),
             system_efficiency_change_percentage,
             (PHOTOVOLTAIC_POWER_UNIT, "cyan dim"),
             "bold",
             PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
             np.array([]),
+            None,
         ),
         f"[green bold]{PHOTOVOLTAIC_POWER_LONG_NAME}": (
             (photovoltaic_power, "bold green"),
+            (photovoltaic_power_mean, "bold green"),
             None,
             (PHOTOVOLTAIC_POWER_UNIT, "green"),
             "bold",
             EFFECTIVE_IRRADIANCE_NAME,
             photovoltaic_power_series,
+            None,
         ),
-        f"[white bold dim]{TOTAL_NET_EFFECT}": (
+        f"[white bold dim]{NET_EFFECT}": (
             (total_change, "white dim"),
+            (total_change_mean, "white dim"),
             total_change_percentage,
             (IRRADIANCE_UNIT, "white dim"),
             "red",
             IN_PLANE_IRRADIANCE,
             np.array([]),
+            None,
         ),
     }
 
@@ -1178,7 +1267,30 @@ def print_change_percentages_panel(
     degradation with age
 
     """
-    results = analyse_photovoltaic_performance(dictionary=dictionary)
+    # First, get the "frequency" from the timestamps
+    time_groupings = {
+        'YE': 'Yearly',
+        'S': 'Seasonal',
+        'ME': 'Monthly',
+        'W': 'Weekly',
+        'D': 'Daily',
+        'H': 'Hourly',
+    }
+    if timestamps.year.unique().size > 1:
+        frequency = 'YE'
+    elif timestamps.month.unique().size > 1:
+        frequency = 'ME'
+    elif timestamps.day.unique().size > 1:
+        frequency = 'D'
+    else:
+        frequency = 'H'
+    frequency_label = time_groupings[frequency]
+
+    results = analyse_photovoltaic_performance(
+            dictionary=dictionary,
+            timestamps=timestamps,
+            frequency=frequency,
+            )
     add_empty_row_before = {
         # IN_PLANE_IRRADIANCE,
         REFLECTIVITY,
@@ -1193,30 +1305,38 @@ def print_change_percentages_panel(
         TOTAL_NET_EFFECT,
     }
     table = Table(
-        title="Analysis of Performance",
+        # title="Photovoltaic Performance",
+        # title="Analysis of Performance",
         # caption="Caption text",
         # caption="Detailed view of changes in photovoltaic performance.",
         show_header=True,
         header_style="bold magenta",
+        # show_footer=True,
         # row_styles=["none", "dim"],
         box=SIMPLE_HEAD,
         highlight=True,
     )
     table.add_column("Quantity", justify="left", style="magenta", no_wrap=True)
-    table.add_column("Value", justify="right", style="cyan")
+    # table.add_column(f"{SYMBOL_SUMMATION}", justify="right", style="cyan")
+    table.add_column("Total", justify="right", style="cyan")
+    table.add_column("Mean (FixMe!)", justify="right", style="cyan")
     table.add_column("Unit", justify="right", style="magenta")
     table.add_column("%", style="dim", justify="right")
     table.add_column("of", style="dim", justify="left")
-    table.add_column("Yearly sums", style="dim", justify="center")
+    table.add_column(f"{frequency_label} sums", style="dim", justify="center")
+    table.add_column("Source", style="dim", justify="left")
+    print(f'{dictionary=}')
 
     # Adding rows based on the dictionary keys and their corresponding values
     for label, (
         (value, value_style),
+        (mean_value, mean_value_style),
         percentage,
         (unit, unit_style),
         style,
         reference_quantity,
         input_series,
+        source,
     ) in results.items():
         if label in add_empty_row_before:
             table.add_row()
@@ -1224,27 +1344,120 @@ def print_change_percentages_panel(
             table=table,
             quantity=label,
             value=value,
+            mean_value=0,#,mean_value,
             unit=unit,
             percentage=percentage,
             reference_quantity=reference_quantity,
             series=input_series,
             timestamps=timestamps,
+            frequency=frequency,
+            source=source,
             quantity_style=quantity_style,
             value_style=value_style,
+            mean_value_style=mean_value_style,
             unit_style=unit_style,
             percentage_style=percentage_style,
             reference_quantity_style=reference_quantity_style,
             rounding_places=rounding_places,
         )
 
-    console = Console()
-    console.print(
-        Panel(
-            table,
-            title="Analysis",
+    # Positioning
+    position_table = Table(
+            box=None,
+            show_header=False,
+            show_edge=False,
+            pad_edge=False,
+            )
+    position_table.add_column('Position', justify="right", style="none", no_wrap=True)
+    latitude = round_float_values(latitude, 3)#rounding_places)
+    position_table.add_row(f"{LATITUDE_COLUMN_NAME}", f"[bold]{latitude}[/bold]")
+    longitude = round_float_values(longitude, 3)#rounding_places)
+    position_table.add_row(f"{LONGITUDE_COLUMN_NAME}", f"[bold]{longitude}[/bold]")
+    position_table.add_row(f"{ELEVATION_COLUMN_NAME}", f"[bold]{elevation}[/bold]")
+    surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None) if surface_orientation else None
+    position_table.add_row(f"{SURFACE_ORIENTATION_COLUMN_NAME}", f"[bold]{surface_orientation}[/bold]")
+    surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    position_table.add_row(f"{SURFACE_TILT_COLUMN_NAME}", f"[bold]{surface_tilt}[/bold]")
+
+    # position_table.add_row("Time :", f"{timestamp[0]}")
+    # position_table.add_row("Time zone :", f"{timezone}")
+    
+    longest_label_length = max(len(key) for key in dictionary.keys())
+    surface_position_keys = {
+            SURFACE_ORIENTATION_NAME,
+            SURFACE_TILT_NAME,
+            ANGLE_UNIT_NAME,
+            # INCIDENCE_DEFINITION,
+            # UNIT_NAME,
+            }
+    for key, value in dictionary.items():
+        if key in surface_position_keys:
+            padded_key = f"{key} :".ljust(longest_label_length + 3, ' ')
+            if key == INCIDENCE_DEFINITION:
+                value = f"[yellow]{value}[/yellow]"
+            position_table.add_row(padded_key, str(value))
+    time_table = Table(
+            box=None,
+            show_header=False,
+            show_edge=False,
+            pad_edge=False,
+            )
+    time_table.add_column('Time', justify="left")
+    time_table.add_row('Start', str(timestamps.values[0])),
+    time_table.add_row('End', str(timestamps.values[-1])),
+    position_panel = Panel(
+            position_table,
+            subtitle="Position",
+            subtitle_align="right",
+            # box=None,
+            safe_box=True,
+            style='',
             expand=False,
-        )
+            padding=(0, 3),
+            )
+    time_panel = Panel(
+            time_table,
+            # title="Time",
+            subtitle="Time",
+            subtitle_align="right",
+            safe_box=True,
+            expand=False,
+            padding=(0,3),
+            )
+    # panels.append(position_panel)
+
+    columns = Columns(
+            # [position_table, time_table],
+            [position_panel, time_panel],
+            # expand=False,
+            equal=True,
+            padding=2,
+            )
+    from rich.console import Group
+    panel_group = Group(
+            Panel(
+                table,
+                title='Analysis of Performance',
+                expand=False,
+                # style="on black",
+                ),
+            columns,
+        # Panel(table),
+        # Panel(position_panel),
+    #     Panel("World", style="on red"),
+            fit=False
     )
+
+    Console().print(panel_group)
+    # console.print(
+    #     Panel(
+    #         # table,
+    #         panel_group,
+    #         title="Analysis",
+    #         box=ROUNDED,
+    #         expand=False,
+    #     )
+    # )
 
 
 def print_finger_hash(dictionary: dict):
