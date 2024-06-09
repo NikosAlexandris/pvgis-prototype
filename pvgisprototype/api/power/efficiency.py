@@ -4,7 +4,7 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from pvgisprototype.constants import EFFECTIVE_IRRADIANCE_COLUMN_NAME, EFFECTIVE_IRRADIANCE_NAME, FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, IRRADIANCE_UNIT, LOG_LEVEL_DEFAULT, LOW_IRRADIANCE_COLUMN_NAME, SPECTRAL_EFFECT_COLUMN_NAME, SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, SPECTRAL_FACTOR_NAME, UNITLESS
+from pvgisprototype.constants import EFFECTIVE_IRRADIANCE_COLUMN_NAME, EFFECTIVE_IRRADIANCE_NAME, FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, IRRADIANCE_UNIT, LOG_LEVEL_DEFAULT, LOW_IRRADIANCE_COLUMN_NAME, SPECTRAL_EFFECT_COLUMN_NAME, SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, SPECTRAL_FACTOR_NAME, SYMBOL_TEMPERATURE, UNITLESS
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
@@ -37,7 +37,7 @@ from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.validation.arrays import create_array
@@ -134,7 +134,7 @@ def calculate_efficiency_factor_series(
     irradiance_series: Irradiance,  # effective irradiance
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    power_model: PVModuleEfficiencyAlgorithm = PVModuleEfficiencyAlgorithm.king,
+    power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -211,7 +211,7 @@ def calculate_efficiency_factor_series(
     # power output fom King (using PV eff coeffs for a specific tech) -  ... ?
     # difference between real conditions and stadard conditions -- should be close to zero
 
-    if power_model.value == PVModuleEfficiencyAlgorithm.king:
+    if power_model.value == PhotovoltaicModulePerformanceModel.king:
         efficiency_factor_series = (
             photovoltaic_module_efficiency_coefficients[0]
             + log_relative_irradiance_series
@@ -227,7 +227,7 @@ def calculate_efficiency_factor_series(
 
         efficiency_factor_series /= photovoltaic_module_efficiency_coefficients[0]
 
-    if power_model.value == PVModuleEfficiencyAlgorithm.iv:  # 'IV' Model ( Name ? )
+    if power_model.value == PhotovoltaicModulePerformanceModel.iv:  # 'IV' Model ( Name ? )
         current_series = (
             CURRENT_AT_STANDARD_TEST_CONDITIONS
             + CURRENT_AT_STANDARD_TEST_CONDITIONS_TEMPERATURE_COEFFICIENT
@@ -385,7 +385,7 @@ def calculate_spectrally_corrected_effective_irradiance(
 def calculate_pv_efficiency_series(
     irradiance_series: Irradiance,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    power_model: PVModuleEfficiencyAlgorithm = PVModuleEfficiencyAlgorithm.king,
+    power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
@@ -424,8 +424,8 @@ def calculate_pv_efficiency_series(
         Temperature used in standard test conditions. Default is TEMPERATURE_DEFAULT.
     wind_speed_series : np.ndarray, optional
         Numpy array of wind speed values over time. Default is np.array(WIND_SPEED_DEFAULT).
-    power_model : PVModuleEfficiencyAlgorithm, optional
-        Algorithm used for calculating PV module power. Default is PVModuleEfficiencyAlgorithm.king.
+    power_model : PhotovoltaicModulePerformanceModel, optional
+        Algorithm used for calculating PV module power. Default is PhotovoltaicModulePerformanceModel.king.
     radiation_cutoff_threshold : float, optional
         Minimum irradiance threshold for calculations. Default is RADIATION_CUTOFF_THRESHOLD.
     verbose : int, optional
@@ -511,9 +511,9 @@ def calculate_pv_efficiency_series(
         } if verbose > 1 else {},
 
         'power_model_results': lambda: {
-            EFFICIENCY_FACTOR_COLUMN_NAME: efficiency_series.value if (verbose > 1 and power_model.value == PVModuleEfficiencyAlgorithm.king) else NOT_AVAILABLE,
-            DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PVModuleEfficiencyAlgorithm.iv) else NOT_AVAILABLE,
-            VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PVModuleEfficiencyAlgorithm.iv) else NOT_AVAILABLE,
+            EFFICIENCY_FACTOR_COLUMN_NAME: efficiency_series.value if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.king) else NOT_AVAILABLE,
+            DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE,
+            VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE,
         } if verbose > 1 else {},
 
         'more_extended': lambda: {
