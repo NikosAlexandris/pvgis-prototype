@@ -75,6 +75,7 @@ from pvgisprototype.cli.typer.statistics import typer_option_groupby
 from pvgisprototype.cli.typer.output import typer_option_time_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_index
+from pvgisprototype.cli.typer.output import typer_option_quick_response
 from pvgisprototype.cli.typer.output import typer_option_fingerprint
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet
 from pvgisprototype.cli.typer.output import typer_option_csv
@@ -126,6 +127,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 from pvgisprototype.constants import QUIET_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pvgisprototype.constants import QUICK_RESPONSE_CODE_FLAG_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import METADATA_FLAG_DEFAULT
 from pvgisprototype import LinkeTurbidityFactor
@@ -202,6 +204,7 @@ def photovoltaic_power_output_series(
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
+    quick_response_code: Annotated[bool, typer_option_quick_response] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
 ):
     """Estimate the photovoltaic power output for a location and a moment or period
@@ -279,6 +282,11 @@ def photovoltaic_power_output_series(
     )  # Re-Design Me ! ------------------------------------------------
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    if quick_response_code:
+        from pvgisprototype.cli.qr import print_quick_response_code
+        from pvgisprototype.constants import QUICK_RESPONSE_CODE_MOCKUP
+        print_quick_response_code(QUICK_RESPONSE_CODE_MOCKUP)
+        return
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print import print_irradiance_table_2
@@ -423,6 +431,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = False,
+    quick_response_code: Annotated[bool, typer_option_quick_response] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
     ):
     """Estimate the sum of photovoltaic output for multiple solar surface
@@ -504,6 +513,12 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    if quick_response_code:
+        from pvgisprototype.cli.qr import print_quick_response_code
+        from pvgisprototype.constants import QUICK_RESPONSE_CODE_MOCKUP
+        print_quick_response_code(QUICK_RESPONSE_CODE_MOCKUP)
+        return
+
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print import print_irradiance_table_2
