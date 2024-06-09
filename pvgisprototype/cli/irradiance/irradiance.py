@@ -40,7 +40,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f"󱟿 Calculate the solar irradiance incident on a solar surface",
+    help=f":sun_with_face: Calculate the solar irradiance incident on a solar surface",
 )
 app.command(
     name='introduction',

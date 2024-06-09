@@ -91,7 +91,7 @@ def adjust_temperature_series(
     irradiance_series: Irradiance,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
-    temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
+    temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT, unit=SYMBOL_TEMPERATURE),
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
     wind_speed_series: WindSpeedSeries = np.array(WIND_SPEED_DEFAULT),
     dtype: str = DATA_TYPE_DEFAULT,
