@@ -209,6 +209,7 @@ def calculate_direct_horizontal_irradiance_series(
             TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
+            IRRADIANCE_SOURCE_COLUMN_NAME: 'Simulation',
         },
 
         'extended': lambda: {
@@ -262,5 +263,6 @@ def calculate_direct_horizontal_irradiance_series(
             elevation=elevation,
             surface_orientation=None,
             surface_tilt=None,
+            data_source=HOFIERKA_2002,
             components=components,
             )
