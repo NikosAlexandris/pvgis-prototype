@@ -6,9 +6,9 @@ from pvgisprototype.cli.irradiance.direct.direct import app as direct_irradiance
 from pvgisprototype.cli.irradiance.diffuse.diffuse import app as diffuse_irradiance
 from pvgisprototype.cli.irradiance.reflected import get_ground_reflected_inclined_irradiance_series
 from pvgisprototype.cli.irradiance.extraterrestrial import get_extraterrestrial_normal_irradiance_series
-from pvgisprototype.cli.irradiance.loss import app as angular_loss_factor
+from pvgisprototype.cli.irradiance.reflectivity import app as reflectivity_factor
 from pvgisprototype.cli.irradiance.limits import app as limits
-from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
+from pvgisprototype.cli.messages import NOT_COMPLETE_CLI, NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
@@ -30,6 +30,8 @@ from pvgisprototype.constants import(
         REFLECTED_IRRADIANCE_TYPER_HELP,
         EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP_SHORT,
         EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP,
+        SYMBOL_IRRADIANCE,
+        SYMBOL_IRRADIANCE_LIMITS,
         )
 
 
@@ -38,7 +40,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":sun_with_face: Calculate the solar irradiance incident on a solar surface",
+    help=f"󱟿 Calculate the solar irradiance incident on a solar surface",
 )
 app.command(
     name='introduction',
@@ -85,10 +87,10 @@ app.command(
     rich_help_panel=rich_help_panel_irradiance_series,
 )(get_extraterrestrial_normal_irradiance_series)
 app.add_typer(
-    angular_loss_factor,
-    name="loss",
-    help=f"⦟ Calculate the reflectivity loss factor for inclined irradiance components {NOT_IMPLEMENTED_CLI}",
-    short_help=f"⦟ Calculate the reflectivity loss factor {NOT_IMPLEMENTED_CLI}",
+    reflectivity_factor,
+    name="reflectivity",
+    help=f"⦟ Calculate the reflectivity effect factor for inclined irradiance components {NOT_COMPLETE_CLI}",
+    short_help=f"⦟ Calculate the reflectivity effect factor {NOT_COMPLETE_CLI}",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_toolbox,
 )
