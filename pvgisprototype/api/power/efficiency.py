@@ -148,7 +148,25 @@ def calculate_efficiency_factor_series(
 
     Calculate the photovoltaic efficiency factor series for a solar irradiance
     component specific to the photovoltaic module technology, the photovoltaic
-    power model and the (adjusted) temperature series.
+    power rating model and the (adjusted) temperature series. The implemented
+    power rating model [0] is a variant of King's model [1, 2].
+
+    References
+    ----------
+
+    [0] Thomas Huld, Gabi Friesen, Artur Skoczek, Robert P. Kenny, Tony Sample,
+    Michael Field, Ewan D. Dunlop, A power-rating model for crystalline silicon
+    PV modules, Solar Energy Materials and Solar Cells, Volume 95, Issue 12,
+    2011, Pages 3359-3369, ISSN 0927-0248,
+    https://doi.org/10.1016/j.solmat.2011.07.026.
+
+    [1] D.L. King, J.A. Kratochvil, W.E. Boyson, W.I. Bower, Field experience
+    with a new performance characterization procedure for photovoltaic arrays,
+    in: Proceedings of the second World Conference and Exhibition on
+    Photovoltaic Solar Energy Conversion, Vienna, 1998, pp. 1947–1952.
+
+    [2] D.L. King, W.E. Boyson, J.A. Kratochvil, Photovoltaic Array
+    Performance Model, SAND2004-3535, Sandia National Laboratories, 2004.
 
     """
     array_parameters = {
