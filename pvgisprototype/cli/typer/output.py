@@ -5,6 +5,7 @@ Output options
 import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output_metadata
+from pvgisprototype.constants import DEGREES, RADIANS
 
 
 # Command metadata
@@ -54,13 +55,27 @@ typer_option_angle_units = typer.Option(
     case_sensitive=False,
     rich_help_panel=rich_help_panel_output,
 )
+
+def callback_angle_output_units(
+    ctx: typer.Context,
+    angle_output_units: str,
+        ):
+    """Callback function : set verbose to >=7 if analysis is requested !
+    """
+    quick_response_code = ctx.params.get('quick_response_code')
+    if quick_response_code:
+        angle_output_units = DEGREES
+    return angle_output_units
+
+
 typer_option_angle_output_units = typer.Option(
     '--angle-ouput-units',
     '-aou',
-    help="Angular units for solar geometry calculations (degrees or radians). :warning: [bold red]Under development[/red bold]",
+    help=f"Angular units for solar geometry calculations ({DEGREES} or {RADIANS}). :warning: [bold red]Under development[/red bold]",
     show_default=True,
     case_sensitive=False,
     rich_help_panel=rich_help_panel_output,
+    callback=callback_angle_output_units,
 )
 
 # Quick Response Code
