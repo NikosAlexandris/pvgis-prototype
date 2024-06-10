@@ -35,7 +35,7 @@ its Web application programming interface (Web API),
 and its core API. (1)
 { .annotate }
 
-1. The _Web_ API is not the same at the _core_ API.
+1. The _Web_ API is not the same as the _core_ API.
    The former _consumes_ the latter
    to produce a FastAPI-based Web API interface.
 
@@ -56,8 +56,8 @@ for systems using various PV technologies.
 
     - :material-power-plug: Grid-connected
     - :material-battery-high: Stand-alone
-
-    Models available in [PVMAPS](https://ec.europa.eu/jrc/en/PVGIS/downloads/PVMAPS) 
+    - :material-fingerprint: [Fingerprint](cli/fingerprint.md)ed reproducible calculations
+    - :material-qrcode-scan: [QR-Code](cli/qrcode.md) shareable results
 
 - :octicons-graph-24:{ .lg .middle } __Time Series__
 
@@ -98,8 +98,8 @@ for systems using various PV technologies.
     ![](images/Logo_EUPL.svg.png){align=right height=100px width=100px}
 
     - :material-language-python: Python [API](#) based on :simple-numpy: NumPy
-    - :material-console: [CLI](#) based on Typer
     - :material-web: [Web API](#) based on :simple-fastapi: FastAPI
+    - :material-console: [CLI](#) based on Typer
     - :material-open-source-initiative: Open Source [License](#) EUPL-1.2
 
 
@@ -144,14 +144,14 @@ For a full list of features, see the [Features](overview/features.md) page.
 
     **For advanced users and programmers**
 
-    You may want work directly with the [PVGIS API](api/index.md) ?
+    Need to work programmatically with the [PVGIS API](api/index.md) ?
     Peek over relevant [API examples]() and the [source code](source_code/index.md) documentation.
 
 - Development
 
     ---
 
-    **Interested in contributing or developing new features ?**
+    **Interested in contributing ?**
 
     Head over to the [Development](development/index.md) section
     and check out :
