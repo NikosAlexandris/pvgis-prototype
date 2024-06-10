@@ -1,4 +1,4 @@
-from pandas import Timestamp, DatetimeIndex
+from pandas import DatetimeIndex
 from devtools import debug
 from typing import Union
 from zoneinfo import ZoneInfo
@@ -161,7 +161,7 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
 def calculate_solar_zenith_series_noaa(
     longitude: Longitude,
     latitude: Latitude,  # radians
-    timestamps: Union[Timestamp, DatetimeIndex],
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     # solar_hour_angle_series: SolarHourAngle,
     apply_atmospheric_refraction: bool = False,

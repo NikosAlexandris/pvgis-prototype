@@ -4,6 +4,7 @@ Timestamps
 Parameters that relate to the question "When ?".
 """
 
+from datetime import datetime
 import typer
 from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
@@ -52,7 +53,6 @@ typer_option_timestamps = typer.Option(
 #     default_factory=now_utc_datetimezone_series,
 )
 
-from datetime import datetime
 def convert_datetime_to_Timestamp(
         timestamp: datetime
         ):
