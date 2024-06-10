@@ -30,7 +30,7 @@ from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_r
 from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
 from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_irradiance
-from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer.irradiance import typer_option_apply_reflectivity_factor
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.earth_orbit import typer_option_solar_constant
@@ -63,7 +63,7 @@ from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
@@ -127,7 +127,7 @@ def get_ground_reflected_inclined_irradiance_series(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: Annotated[Optional[bool], typer_option_apply_reflectivity_factor] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SolarPositionModel.noaa,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
@@ -183,7 +183,7 @@ def get_ground_reflected_inclined_irradiance_series(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         albedo=albedo,
-        apply_angular_loss_factor=apply_angular_loss_factor,
+        apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
@@ -194,6 +194,7 @@ def get_ground_reflected_inclined_irradiance_series(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        fingerprint=fingerprint,
     )
     if not quiet:
         if verbose > 0:
@@ -205,7 +206,7 @@ def get_ground_reflected_inclined_irradiance_series(
                 latitude=latitude,
                 timestamps=timestamps,
                 dictionary=ground_reflected_inclined_irradiance_series.components,
-                title=REFLECTED_INCLINED_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNITS}',
+                title=REFLECTED_INCLINED_IRRADIANCE + f' in-plane irradiance series {IRRADIANCE_UNIT}',
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -244,7 +245,7 @@ def get_ground_reflected_inclined_irradiance_series(
             title = 'Global Horizontal Irradiance Series',
             label = 'Global Horizontal Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:

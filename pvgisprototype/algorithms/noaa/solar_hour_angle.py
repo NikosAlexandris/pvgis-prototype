@@ -49,9 +49,10 @@ def calculate_solar_hour_angle_series_noaa(
       - negative in the morning
       - positive in the afternoon.
 
-    Since the Earth rotates 15° per hour, each hour away from solar noon
-    corresponds to an angular motion of the sun in the sky of 15°.
-    Practically, the calculation converts a timestamp into a solar time.
+    Since the Earth rotates 15° per hour (or pi / 12 in radians), each hour
+    away from solar noon corresponds to an angular motion of the sun in the sky
+    of 15°. Practically, the calculation converts a timestamp into a solar
+    time.
 
     Parameters
     ----------

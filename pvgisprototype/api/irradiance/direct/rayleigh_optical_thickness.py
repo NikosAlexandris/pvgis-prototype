@@ -19,89 +19,20 @@ from pvgisprototype import SolarAltitude
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import OpticalAirMass
 from pvgisprototype import RayleighThickness
-from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import Elevation
-from pvgisprototype import Irradiance
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import AdjustElevationInputModel
 from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
-from pvgisprototype.api.position.models import validate_model
-from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
-from pvgisprototype.api.position.altitude import model_solar_altitude_series
-from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
-from pvgisprototype.api.position.incidence import model_solar_incidence_series
-from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
-from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_series
-from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
-from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME
-from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.constants import SOLAR_CONSTANT_COLUMN_NAME
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import PERIGEE_OFFSET_COLUMN_NAME
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
-from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
-from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
-from pvgisprototype.constants import LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME
-from pvgisprototype.constants import OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
-from pvgisprototype.constants import OPTICAL_AIR_MASS_COLUMN_NAME
 from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
-from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
-from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import DEGREES
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import IRRADIANCE_SOURCE_COLUMN_NAME
-from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
-from pvgisprototype.constants import HOFIERKA_2002
-from pvgisprototype.constants import LONGITUDE_COLUMN_NAME
-from pvgisprototype.constants import LATITUDE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE
-from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import LOSS_COLUMN_NAME
-from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
-from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
-from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
-from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
-from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
-from pvgisprototype.constants import INCIDENCE_DEFINITION
-from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
-from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 
 @log_function_call
@@ -229,9 +160,12 @@ def calculate_optical_air_mass_series(
     adjusted_elevation = adjust_elevation(elevation.value)
     degrees_plus_offset = refracted_solar_altitude_series.degrees + 6.07995
     # Handle negative values subjected to np.power()
-    power_values = np.where(
-        degrees_plus_offset > 0, np.power(degrees_plus_offset, -1.6364), 0
-    )
+    # ------------------------------------------------------------------------
+    # Review - Me : This is an ugly hack to avoid warning/s
+    # of either an invalid or a zero value subjected to np.power()
+    degrees_plus_offset = np.where(degrees_plus_offset <0, np.inf, degrees_plus_offset)
+    # ------------------------------------------------------------------------
+    power_values = np.power(degrees_plus_offset, -1.6364)
     optical_air_mass_series = adjusted_elevation.value / (
         np.sin(refracted_solar_altitude_series.radians)  # in radians for NumPy
         + 0.50572 * power_values

@@ -13,7 +13,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -31,7 +31,7 @@ from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.irradiance import typer_option_direct_horizontal_irradiance
 from pvgisprototype.cli.typer.irradiance import typer_option_global_horizontal_irradiance
-from pvgisprototype.cli.typer.irradiance import typer_option_apply_angular_loss_factor
+from pvgisprototype.cli.typer.irradiance import typer_option_apply_reflectivity_factor
 from pvgisprototype.cli.typer.time_series import typer_option_in_memory
 from pvgisprototype.cli.typer.time_series import typer_option_mask_and_scale
 from pvgisprototype.cli.typer.time_series import typer_option_nearest_neighbor_lookup
@@ -76,7 +76,7 @@ from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
@@ -150,7 +150,7 @@ def spectral_photovoltaic_power_output_series(
     apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[Optional[float], typer_option_refracted_solar_zenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Annotated[Optional[bool], typer_option_apply_angular_loss_factor] = True,
+    apply_reflectivity_factor: Annotated[Optional[bool], typer_option_apply_reflectivity_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, typer_option_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, typer_option_solar_incidence_model] = SolarIncidenceModel.iqbal,
     solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -162,7 +162,7 @@ def spectral_photovoltaic_power_output_series(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
+    power_model: Annotated[PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
@@ -211,7 +211,7 @@ def spectral_photovoltaic_power_output_series(
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         albedo=albedo,
-        apply_angular_loss_factor=apply_angular_loss_factor,
+        apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
         solar_time_model=solar_time_model,
@@ -237,7 +237,7 @@ def spectral_photovoltaic_power_output_series(
         #         latitude=latitude,
         #         timestamps=timestamps,
         #         dictionary=results,
-        #         title=title + f' irradiance series {IRRADIANCE_UNITS}',
+        #         title=title + f' irradiance series {IRRADIANCE_UNIT}',
         #         rounding_places=rounding_places,
         #         index=index,
         #         verbose=verbose,
