@@ -284,8 +284,16 @@ def photovoltaic_power_output_series(
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code:
         from pvgisprototype.cli.qr import print_quick_response_code
-        from pvgisprototype.constants import QUICK_RESPONSE_CODE_MOCKUP
-        print_quick_response_code(QUICK_RESPONSE_CODE_MOCKUP)
+        print_quick_response_code(
+            dictionary=photovoltaic_power_output_series.components,
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True,
+            surface_tilt=True,
+            timestamps=timestamps,
+            rounding_places=rounding_places,
+        )
         return
     if not quiet:
         if verbose > 0:
@@ -418,7 +426,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     multi_thread: Annotated[bool, typer_option_multi_thread] = MULTI_THREAD_FLAG_DEFAULT,
-    rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
+    rounding_places: Annotated[int, typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
@@ -516,7 +524,16 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     if quick_response_code:
         from pvgisprototype.cli.qr import print_quick_response_code
         from pvgisprototype.constants import QUICK_RESPONSE_CODE_MOCKUP
-        print_quick_response_code(QUICK_RESPONSE_CODE_MOCKUP)
+        print_quick_response_code(
+            dictionary=photovoltaic_power_output_series.components,
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True,
+            surface_tilt=True,
+            timestamps=timestamps,
+            rounding_places=rounding_places,
+        )
         return
 
     if not quiet:
