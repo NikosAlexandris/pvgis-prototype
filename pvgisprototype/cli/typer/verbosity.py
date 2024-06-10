@@ -12,7 +12,7 @@ def callback_analysis_of_performance(
     quick_response_code = ctx.params.get('quick_response_code')
     if analysis or quick_response_code:
         if verbose < 7:
-            verbose = 7
+            verbose = 9
     return verbose
 
 
