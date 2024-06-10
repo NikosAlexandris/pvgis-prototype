@@ -9,7 +9,8 @@ def callback_analysis_of_performance(
     """Callback function : set verbose to >=7 if analysis is requested !
     """
     analysis=ctx.params.get('analysis')
-    if analysis:
+    quick_response_code = ctx.params.get('quick_response_code')
+    if analysis or quick_response_code:
         if verbose < 7:
             verbose = 7
     return verbose
