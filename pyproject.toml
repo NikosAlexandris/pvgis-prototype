@@ -38,6 +38,7 @@ dependencies = [
   "cachetools",
   "orjson",
   "sparklines",
+  "qrcode",
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
