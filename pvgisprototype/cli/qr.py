@@ -113,7 +113,10 @@ def print_quick_response_code(
     # model_photovoltaic_module_performance = 'Huld 2011'
     # algorithm_positioning = 'NOAA'
     # algorithm_incidence = 'Iqbal 1992'
-    data += 'Fingerprint ' + dictionary.get(FINGERPRINT_COLUMN_NAME, None)
+    data += 'Fingerprint ' + dictionary.get(FINGERPRINT_COLUMN_NAME, None) + ', '
+
+    from pvgisprototype._version import __version__
+    data += f"PVGIS v6 ({__version__})"
 
     qr = qrcode.QRCode(
             version=1,
