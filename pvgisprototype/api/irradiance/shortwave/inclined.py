@@ -113,7 +113,7 @@ def calculate_global_inclined_irradiance_series(
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Optional[float] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
@@ -232,7 +232,7 @@ def calculate_global_inclined_irradiance_series(
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
-                apply_angular_loss_factor=apply_angular_loss_factor,
+                apply_reflectivity_factor=apply_reflectivity_factor,
                 solar_position_model=solar_position_model,
                 solar_incidence_model=solar_incidence_model,
                 solar_time_model=solar_time_model,
@@ -265,7 +265,7 @@ def calculate_global_inclined_irradiance_series(
             refracted_solar_zenith=refracted_solar_zenith,
             global_horizontal_component=global_horizontal_irradiance,  # time series optional
             direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
-            apply_angular_loss_factor=apply_angular_loss_factor,
+            apply_reflectivity_factor=apply_reflectivity_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
             solar_constant=solar_constant,
@@ -296,7 +296,7 @@ def calculate_global_inclined_irradiance_series(
             refracted_solar_zenith=refracted_solar_zenith,
             albedo=albedo,
             global_horizontal_component=global_horizontal_irradiance,  # time series, optional
-            apply_angular_loss_factor=apply_angular_loss_factor,
+            apply_reflectivity_factor=apply_reflectivity_factor,
             solar_position_model=solar_position_model,
             solar_time_model=solar_time_model,
             solar_constant=solar_constant,
