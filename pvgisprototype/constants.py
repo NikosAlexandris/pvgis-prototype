@@ -487,7 +487,6 @@ TOTAL_NET_EFFECT_DESCRIPTION = f"{EFFECTS_NAME} due to {REFLECTIVITY_NAME}, {SPE
  # TOTAL_NET_EFFECT_DESCRIPTION = f"Effects due to reflectivity, spectral effect, temperature, low irradiance",
 
 QUICK_RESPONSE_CODE_FLAG_DEFAULT = False
-QUICK_RESPONSE_CODE_MOCKUP = "Position: 45.812 8.628, Elevation: 214, Orientation: 180, Tilt: 0, Start: 2005-01-01, End: 2020-12-31, Zone: UTC, In-Plane Irradiance: 22735.7㎾/m², PV Power: 17494.6 ㎾, Loss: -5241.1 ㎾/m², Time of Min: 2005-01-01T00:00, Time of Max: 2006-05-30T11:00, Data sources: Irradiance: SARAH2 xxxx, Temperature & Wind Speed: ERA5 xxxx, Spectral factor: PVGIS 2013, Power Model: King xxxx, Positioning: NOAA Solar Geometry Equations, Incidence angle: Iqbal 1992, Fingerprint: e9bed6970bc502ae912bdbaf792ef694e449063d4bb6ccd77ab9621a045cbf26"
 STATISTICS_FLAG_DEFAULT = False
 GROUPBY_DEFAULT = None
 ANALYSIS_FLAG_DEFAULT = False
