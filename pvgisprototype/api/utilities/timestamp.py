@@ -303,20 +303,7 @@ def get_day_from_hour_of_year(year: int, hour_of_year: int):
     return day_of_year
 
 
-# Single timestamp
-
-def parse_timestamp(
-    ctx: typer.Context,
-    timestamp: str,
-    param: typer.CallbackParam,
-) -> datetime:
-    """
-    Parse a string and return a Pandas Timestamp
-    """
-    from pandas import to_datetime
-    return to_datetime(timestamp, errors='raise')
-
-
+    
 # Time series
 
 def get_days_in_year(year):
@@ -383,7 +370,7 @@ def get_days_in_years(years):
 
 def parse_timestamp_series(
     timestamps: str,
-):
+) -> 'DatetimeIndex | DatetimeScalar | NaTType | None':
     """
     Parse an input of type string and generate a Pandas Timestamp or
     DatetimeIndex [1]_.

@@ -175,14 +175,17 @@ class BaseTimestampModel(BaseModel):
 
 
 class BaseTimestampSeriesModel(BaseModel):
-    timestamps: Union[Timestamp, DatetimeIndex]
+    timestamps: DatetimeIndex
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamps')
     def check_type(cls, value):
-        if not isinstance(value, DatetimeIndex|Timestamp) :
-            raise TypeError("Timestamps must be a Pandas DatetimeIndex or Timestamp object")
-        return value
+        if isinstance(value, Timestamp) :
+            return DatetimeIndex(value)
+        elif isinstance(value, DatetimeIndex):
+            return value
+        else:
+            raise TypeError("Timestamps must be a Pandas DatetimeIndex object")
 
 
 class BaseTimeModel(BaseTimestampModel):
