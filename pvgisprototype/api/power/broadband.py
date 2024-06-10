@@ -315,9 +315,12 @@ def calculate_photovoltaic_power_output_series(
     # direct_inclined_reflectivity_factor_series = create_array(**array_parameters)
     # diffuse_inclined_reflectivity_factor_series = create_array(**array_parameters)
     # ground_reflected_inclined_reflectivity_factor_series = create_array(**array_parameters)
-    # direct_inclined_reflectivity_series = create_array(**array_parameters)
-    # diffuse_inclined_reflectivity_series = create_array(**array_parameters)
-    # ground_reflected_inclined_reflectivity_series = create_array(**array_parameters)
+    direct_inclined_reflectivity_series = create_array(**array_parameters)
+    diffuse_inclined_reflectivity_series = create_array(**array_parameters)
+    ground_reflected_inclined_reflectivity_series = create_array(**array_parameters)
+    direct_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
+    diffuse_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
+    ground_reflected_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
 
     # For very low sun angles
     direct_inclined_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
