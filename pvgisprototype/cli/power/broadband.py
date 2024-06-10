@@ -523,7 +523,6 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code:
         from pvgisprototype.cli.qr import print_quick_response_code
-        from pvgisprototype.constants import QUICK_RESPONSE_CODE_MOCKUP
         print_quick_response_code(
             dictionary=photovoltaic_power_output_series.components,
             longitude=longitude,
