@@ -53,7 +53,7 @@ def calculate_relative_longitude(
     """
     Notes
     -----
-    Hofierka, 2002 uses equations presented by Jenco :
+    Hofierka (2002) uses equations presented by Jenčo (1992) :
 
         tangent_relative_longitude =
             (

@@ -9,7 +9,7 @@ from rich import print
 from pvgisprototype.api.power.efficiency_coefficients import STANDARD_EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS
 from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.cli.typer.irradiance import typer_argument_irradiance_series
 from pvgisprototype import TemperatureSeries
@@ -32,7 +32,6 @@ from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.cli.typer.output import typer_option_index
 from pvgisprototype.cli.typer.photovoltaic import typer_option_photovoltaic_module_model
 from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
-from pvgisprototype.constants import EFFICIENCY
 from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
@@ -64,7 +63,7 @@ def photovoltaic_efficiency_series(
     standard_test_temperature: float = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[WindSpeedSeries, typer_option_wind_speed_series] = WIND_SPEED_DEFAULT,
     # wind_speed_series: Annotated[Path|WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
-    power_model: Annotated[PVModuleEfficiencyAlgorithm, typer_option_pv_power_algorithm] = PVModuleEfficiencyAlgorithm.king,
+    power_model: Annotated[PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,

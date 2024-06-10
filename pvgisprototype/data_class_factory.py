@@ -6,6 +6,7 @@ from typing import Optional, Union, Tuple
 import numpy as np
 from math import pi
 from pandas import DatetimeIndex
+from pydantic import ConfigDict
 
 
 type_mapping = {
@@ -178,7 +179,7 @@ def radians_property(self):
         return None
 
 
-def _custom_getattr(self, attr_name):
+def _custom_getattr(self, attribute_name):
     property_functions = {
         "radians": radians_property,
         "degrees": degrees_property,
@@ -190,13 +191,33 @@ def _custom_getattr(self, attr_name):
         "timestamp": timestamp_property,
         "as_hours": as_hours_property,
     }
-    value = property_functions.get(attr_name)
+    value = property_functions.get(attribute_name)
     if value:
         return value(self)
     else:
         raise AttributeError(
-            f"'{self.__class__.__name__}' object has no attribute '{attr_name}'"
+            f"'{self.__class__.__name__}' object has no attribute '{attribute_name}'"
         )
+
+
+def _custom_getstate(self):
+    state = self.__dict__.copy()
+    # Convert numpy arrays to bytes if necessary
+    if isinstance(state["value"], np.ndarray):
+        state["value"] = (
+            state["value"].tobytes(),
+            state["value"].dtype,
+            state["value"].shape,
+        )
+    return state
+
+
+def _custom_setstate(self, state):
+    if isinstance(state["value"], tuple) and len(state["value"]) == 3:
+        # Convert bytes back to numpy array
+        content, dtype, shape = state["value"]
+        state["value"] = np.frombuffer(content, dtype=dtype).reshape(shape)
+    self.__dict__.update(state)
 
 
 class DataClassFactory:
@@ -262,7 +283,6 @@ class DataClassFactory:
         default_values = {}
         fields = []
         use_numpy_model = False
-        # needs_custom_encoder = False
 
         for field_name, field_data in parameters[model_name].items():
 
@@ -279,19 +299,13 @@ class DataClassFactory:
         base_class = NumpyModel if use_numpy_model else BaseModel
         class_attributes = {
             "__getattr__": _custom_getattr,
+            "__getstate__": _custom_getstate,
+            "__setstate__": _custom_setstate,
             "__annotations__": annotations,
-            "__module__": __name__,
+            "__module__": __package__,
             "__qualname__": model_name,
             "__hash__": DataClassFactory._generate_hash_function(fields, annotations),
+            "model_config": ConfigDict(arbitrary_types_allowed=True),
             **default_values,
         }
-        # if needs_custom_encoder:
-        #     class_attributes['Config'] = type("Config", (), {
-        #         "arbitrary_types_allowed": True,
-        #         "json_encoders": {
-        #             np.ndarray: lambda x: x.tolist(),
-        #             NpNDArray: lambda x: x.tolist()
-        #         }
-        #     })
-
-        return base_class.__class__(model_name, (base_class,), class_attributes, arbitrary_types_allowed=True)
+        return base_class.__class__(model_name, (base_class,), class_attributes)

@@ -52,14 +52,28 @@ pvgis-prototype power broadband \
     --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
     --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
     --neighbor-lookup nearest \
-    --quiet \
-    --uniplot
+    --analysis \
+    --quiet
 ```
 
 !!! tip
 
     Just copy-and-paste the commands and follow along.
     This is one way to practice through this tutorial!
+
+Let's see a plot for this output time series 
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+    --neighbor-lookup nearest \
+    --uniplot \
+    --quiet
+```
 
 # Analysis
 

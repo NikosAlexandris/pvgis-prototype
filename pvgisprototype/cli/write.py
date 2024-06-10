@@ -29,7 +29,7 @@ from pvgisprototype.constants import (
     INCIDENCE_NAME,
     UNITS_COLUMN_NAME,
     UNITLESS,
-    UNITS_NAME,
+    UNIT_NAME,
     NOT_AVAILABLE,
     ROUNDING_PLACES_DEFAULT,
     RADIANS,
@@ -189,7 +189,7 @@ def write_solar_position_series_csv(
             altitude_value = safe_get_value(model_result, ALTITUDE_NAME, _index) if altitude else None
             azimuth_value = safe_get_value(model_result, AZIMUTH_NAME, _index) if azimuth else None
             incidence_value = safe_get_value(model_result, INCIDENCE_NAME, _index) if incidence else None
-            units = safe_get_value(model_result, UNITS_NAME, UNITLESS)
+            units = safe_get_value(model_result, UNIT_NAME, UNITLESS)
 
             row = []
             if index:
@@ -322,7 +322,7 @@ def write_solar_position_series_csv(
             surface_orientation = safe_get_value(model_result, SURFACE_ORIENTATION_NAME, _index) if surface_orientation else None
             surface_tilt = safe_get_value(model_result, SURFACE_TILT_NAME, _index) if surface_tilt else None
             incidence_value = safe_get_value(model_result, INCIDENCE_NAME, _index) if incidence else None
-            units = safe_get_value(model_result, UNITS_NAME, UNITLESS)
+            units = safe_get_value(model_result, UNIT_NAME, UNITLESS)
 
             row = []
             if index:

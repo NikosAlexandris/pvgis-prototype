@@ -51,7 +51,7 @@ from pvgisprototype.constants import INCIDENCE_ALGORITHM_NAME
 from pvgisprototype.constants import INCIDENCE_NAME
 from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
@@ -64,7 +64,7 @@ from pandas import DatetimeIndex
 from pvgisprototype.api.position.conversions import convert_north_to_south_radians_convention
 from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
 from pvgisprototype.log import log_function_call, logger
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 
 
 @log_function_call
@@ -263,7 +263,7 @@ def calculate_solar_incidence_series(
                     INCIDENCE_ALGORITHM_NAME: solar_incidence_series.incidence_algorithm if solar_incidence_series else NOT_AVAILABLE,
                     INCIDENCE_NAME: getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE) if solar_incidence_series else NOT_AVAILABLE,
                     INCIDENCE_DEFINITION: solar_incidence_series.definition if solar_incidence_series else NOT_AVAILABLE,
-                    UNITS_NAME: angle_output_units,
+                    UNIT_NAME: angle_output_units,
                     }
                 }
         results = results | solar_incidence_model_series

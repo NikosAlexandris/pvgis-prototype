@@ -76,11 +76,11 @@ from pvgisprototype.api.series.statistics import export_statistics_to_csv
 
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT, SYMBOL_CHART_CURVE, SYMBOL_GROUP, SYMBOL_PLOT, SYMBOL_SELECT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype import Longitude
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
@@ -98,7 +98,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f':chart: Work with time series',
+    help=f'{SYMBOL_CHART_CURVE} Work with time series',
 )
 
 
@@ -169,9 +169,9 @@ def select(
         start_time=start_time,
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
-        mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
@@ -185,9 +185,9 @@ def select(
         start_time=start_time,
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
-        mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
         in_memory=in_memory,
         variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
@@ -246,6 +246,7 @@ def select(
     if statistics:
         print_series_statistics(
             data_array=location_time_series,
+            timestamps=timestamps,
             groupby=groupby,
             title='Selected series',
             rounding_places=rounding_places,
@@ -265,7 +266,7 @@ def select(
 @app.command(
     'select-fast',
     no_args_is_help=True,
-    help='  Retrieve series over a location.-',
+    help=f'{SYMBOL_SELECT} Retrieve series over a location.-',
 )
 def select_fast(
     time_series: Annotated[Path, typer_argument_time_series],
@@ -298,7 +299,7 @@ def select_fast(
 
 @app.command(
     no_args_is_help=True,
-    help=f'󰾂  Group-by of time series over a location {NOT_IMPLEMENTED_CLI}',
+    help=f'{SYMBOL_GROUP} Group-by of time series over a location {NOT_IMPLEMENTED_CLI}',
  )
 def resample(
     indexer: str = None,  # The offset string or object representing target conversion.
@@ -324,7 +325,7 @@ def resample(
 
 @app.command(
     no_args_is_help=True,
-    help=f':chart_increasing: Plot time series',
+    help=f'{SYMBOL_PLOT} Plot time series',
 )
 def plot(
     time_series: Annotated[Path, typer_argument_time_series],
@@ -397,7 +398,7 @@ def uniplot(
     resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
     lines: Annotated[bool, typer_option_uniplot_lines] = True,
     title: Annotated[str, typer_option_uniplot_title] = None,
-    unit: Annotated[str, typer_option_uniplot_unit] = UNITS_NAME,  #" °C")
+    unit: Annotated[str, typer_option_uniplot_unit] = UNIT_NAME,  #" °C")
     terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -457,6 +458,7 @@ def uniplot(
             lines=lines,
             title=title if title else supertitle,
             y_unit=' ' + str(unit),
+            force_ascii=True,
         )
 
 

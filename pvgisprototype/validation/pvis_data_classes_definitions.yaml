@@ -284,7 +284,17 @@ TemperatureSeries:
     initial:
   unit:
     type: str
-    initial: Celsius
+    initial: ℃
+  symbol:
+    type: str
+    initial: 🌡 
+  description:
+    type: str
+    initial:
+  data_source:
+    type: str
+    description: Source of the data
+    initial:
 
 WindSpeedSeries:
   value:
@@ -292,7 +302,17 @@ WindSpeedSeries:
     initial:
   unit:
     type: str
-    initial: m/s
+    initial: ㎧
+  symbol:
+    type: str
+    initial: 🌬
+  description:
+    type: str
+    initial:
+  data_source:
+    type: str
+    description: Source of the data
+    initial:
 
 LinkeTurbidityFactor:
   value:
@@ -485,6 +505,16 @@ SpectralFactorSeries:
   unit:
     type: str
     initial: unitless
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial: "The spectral effect in photovoltaic (PV) systems refers to how the wavelength composition of sunlight affects the efficiency of a PV cell, as different wavelengths are converted into electrical current with varying efficiencies depending on the cell's spectral response. This effect is quantified by integrating the product of the spectral response and the light intensity over relevant wavelengths, impacting the cell's short-circuit current and overall power output."
+  data_source:
+    type: str
+    description: Source of the spectral factor data
+    initial:
 
 Irradiance:
   value:
@@ -522,6 +552,85 @@ Irradiance:
   components:
     type: dict
     initial: {}
+
+Efficiency:
+  value:
+    type: ndarray
+    initial:
+  dtype:
+    type: str
+    initial: float32
+  array_backend:
+    type: str
+    initial: NUMPY
+  unit:
+    type: str
+    initial: unitless
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial: "Photovoltaic (PV) module efficiency based on solar irradiance and PV technology-specific efficiency coefficients, the spectral effect factor, temperature and wind speed."
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial:
+  elevation:
+    type: Optional[Elevation]
+  surface_orientation:
+    type: Optional[SurfaceOrientation]
+  surface_tilt:
+    type: Optional[SurfaceTilt]
+  solar_positioning_algorithm:
+    type: str
+    initial:
+  solar_timing_algorithm:
+    type: str
+    initial:
+  data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+  components:
+    type: dict
+    initial: {}
+  photovoltaic_module:
+    # type: Optional[PhotovoltaicModuleModel]
+    type: str
+    # initial: PhotovoltaicModuleModel.CSI_FREE_STANDING
+    initial: "cSi Free standing"
+  photovoltaic_module_efficiency_coefficients:
+    type: list
+    initial: []
+  power_model:
+    # type: Optional[PVModuleEfficiencyAlgorithm]
+    type: str
+    # initial: PVModuleEfficiencyAlgorithm.king
+    initial: "King"
+  # spectral_factor_series:
+  #   type: Optional[SpectralFactorSeries]
+  #   initial: SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT)
+  radiation_cutoff_threshold:
+    type: float
+    initial: 30  # from PVGIS v5.2
+  temperature_model:
+    # type: Optional[ModuleTemperatureAlgorithm]
+    type: str
+    # initial: ModuleTemperatureAlgorithm.faiman
+    initial: "Faiman"
+  # temperature_series:
+  #   type: Optional[TemperatureSeries]
+  #   initial: TemperatureSeries(value=TEMPERATURE_DEFAULT)
+  # standard_test_temperature:
+  #   type: float
+  #   initial: TEMPERATURE_DEFAULT
+  # wind_speed_series:
+  #   type: Optional[WindSpeedSeries]
+  #   initial: np.array(WIND_SPEED_DEFAULT)
+  fingerprint:
+    type: str
+    initial: 
 
 # Photovoltaic Power
 

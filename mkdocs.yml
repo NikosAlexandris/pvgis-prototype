@@ -23,9 +23,9 @@ nav:
     - tutorials/index.md
     - tutorials/introduction.md
     - tutorials/solar_position.md
+    - Positioning Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
-    - notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
   - CLI:
     - cli/index.md
     - cli/features.md
@@ -33,9 +33,10 @@ nav:
     - cli/verbosity.md
     - cli/symbols.md
     - cli/timestamps.md
-    - cli/rounding.md
+    - cli/precision.md
     - cli/plots.md
     - cli/fingerprint.md
+    - cli/qrcode.md
     - cli/metadata.md
     - cli/numpy.md
     - cli/logging.md
