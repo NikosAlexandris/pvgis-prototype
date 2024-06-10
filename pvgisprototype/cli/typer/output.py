@@ -77,12 +77,26 @@ typer_option_quick_response = typer.Option(
 
 # Fingerprint
 
+def callback_fingerprint(
+    ctx: typer.Context,
+    fingerprint: bool,
+        ):
+    """Callback function : set verbose to >=7 if analysis is requested !
+    """
+    quick_response_code = ctx.params.get('quick_response_code')
+    if quick_response_code:
+        fingerprint = True
+    return fingerprint
+
+
 typer_option_fingerprint = typer.Option(
     '--fingerprint',
     '--fp',
     help='Fingerprint the output time series',
+    is_flag=True,
     show_default=True,
     rich_help_panel=rich_help_panel_output_metadata,
+    callback=callback_fingerprint,
 )
 
 # Layout
