@@ -6,6 +6,10 @@ tags:
   - Pytest
 ---
 
+!!! warning
+    
+    This page is under development.
+
 ## Running tests locally
 
 Tests can run locally using [pytest](https://docs.pytest.org/en/). Ensure that the package and the testing requirements listed in the pyproject.toml test section are installed in python environment. In order to install PVGIS with the testing dependencies a user can run:
