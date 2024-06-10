@@ -15,20 +15,10 @@ from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from pvgisprototype.cli.messages import TO_MERGE_WITH_SINGLE_VALUE_COMMAND
-from datetime import datetime
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-from math import sin
-from math import asin
-from math import cos
-from math import atan
+from zoneinfo import ZoneInfo
+from numpy import where
 import numpy as np
-from numpy import ndarray
-from typing import Annotated
 from typing import Optional
-from typing import Union
-from typing import Sequence
-from typing import List
 from pathlib import Path
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
@@ -39,10 +29,6 @@ from pvgisprototype import RayleighThickness
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import Elevation
 from pvgisprototype import Irradiance
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import AdjustElevationInputModel
-from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
-from pvgisprototype.api.position.models import validate_model
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
@@ -52,23 +38,16 @@ from pvgisprototype.api.position.models import SOLAR_INCIDENCE_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
-from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
 from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
-from pvgisprototype.api.irradiance.loss import calculate_angular_loss_factor_for_direct_irradiance_series
-from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-# from pvgisprototype.api.utilities.progress import progress
-# from rich.progress import Progress
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_factor_for_direct_irradiance_series
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_effect
+from pvgisprototype.api.irradiance.reflectivity import calculate_reflectivity_effect_percentage
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
+from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, REFLECTIVITY_COLUMN_NAME, REFLECTIVITY_FACTOR_COLUMN_NAME, REFLECTIVITY_PERCENTAGE_COLUMN_NAME, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -76,8 +55,6 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME
-from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import SOLAR_CONSTANT_COLUMN_NAME
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -87,7 +64,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import RADIANS
@@ -95,11 +72,11 @@ from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import LOSS_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.constants import AZIMUTH_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
@@ -108,11 +85,7 @@ from pandas import DatetimeIndex
 from cachetools import cached
 from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
-from rich import print
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 
 
@@ -135,7 +108,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
     apply_atmospheric_refraction: Optional[bool] = True,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_angular_loss_factor: Optional[bool] = True,
+    apply_reflectivity_factor: Optional[bool] = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
@@ -181,7 +154,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         Direct Inclined = Direct Horizontal * sin( Solar Incidence ) / sin( Solar Altitude )
 
     The implementation by Hofierka (2002) uses the solar incidence angle
-    between the sun-vector and the plane of the reference surface (as per Jenco,
+    between the sun-vector and the plane of the reference surface (as per Jenčo,
     1992). This is very important and relates to the hardcoded value `True` for
     the `complementary_incidence_angle` input parameter of the function. We
     call this angle (definition) the _complementary_ incidence angle.
@@ -189,8 +162,8 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     For the losses due to reflectivity, the incidence angle modifier by Martin
     & Ruiz (2005) expects the incidence angle between the sun-vector and the
     surface-normal. Hence, the respective call of the function
-    `calculate_angular_loss_factor_for_direct_irradiance_series()`,
-    expects the complement of the angle defined by Jenco (1992). We call the
+    `calculate_reflectivity_factor_for_direct_irradiance_series()`,
+    expects the complement of the angle defined by Jenčo (1992). We call the
     incidence angle expected by the incidence angle modifier by Martin & Ruiz
     (2005) the _typical_ incidence angle.
 
@@ -261,7 +234,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     # To add : ---------------------------------------------------------------
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
 
-    # Following, the _complementary_ solar incidence angle is used (Jenco, 1992)!
+    # Following, the _complementary_ solar incidence angle is used (Jenčo, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
     in_shade = is_surface_in_shade_series(
             solar_altitude_series,
@@ -337,23 +310,27 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
-    if apply_angular_loss_factor:
-
-        try:
-            # per Martin & Ruiz 2005,
-            # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
-            # which is the _complement_ of the incidence angle per Hofierka 2002
-            angular_loss_factor_series = (
-                calculate_angular_loss_factor_for_direct_irradiance_series(
-                    solar_incidence_series=(np.pi/2 - solar_incidence_series.radians),
-                    verbose=0,
-                )
+    if apply_reflectivity_factor:
+        # per Martin & Ruiz 2005,
+        # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
+        # which is the _complement_ of the incidence angle per Hofierka 2002
+        direct_irradiance_reflectivity_factor_series = (
+            calculate_reflectivity_factor_for_direct_irradiance_series(
+                solar_incidence_series=(np.pi/2 - solar_incidence_series.radians),
+                verbose=0,
             )
-            direct_inclined_irradiance_series *= angular_loss_factor_series
+        )
+        direct_inclined_irradiance_series *= direct_irradiance_reflectivity_factor_series
 
-        except ZeroDivisionError as e:
-            logger.error(f"Which Error? {e}")
-            raise ValueError
+        # --------------------------------------------------- Is this safe ? -
+        with np.errstate(divide='ignore', invalid='ignore'):
+            # this quantity is exclusively generated for the output dictionary !
+            direct_inclined_irradiance_before_reflectivity_series = where(
+                direct_irradiance_reflectivity_factor_series != 0,
+                direct_inclined_irradiance_series
+                / direct_irradiance_reflectivity_factor_series,
+                0,
+            )
 
     if np.any(direct_inclined_irradiance_series < 0):
         logger.info("\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]")
@@ -365,9 +342,16 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             RADIATION_MODEL_COLUMN_NAME: 'External data' if direct_horizontal_component else HOFIERKA_2002,
         },
 
+        'extended_2': lambda: {
+            REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(irradiance=direct_inclined_irradiance_before_reflectivity_series, reflectivity=direct_irradiance_reflectivity_factor_series),
+            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_effect_percentage(irradiance=direct_inclined_irradiance_before_reflectivity_series, reflectivity=direct_irradiance_reflectivity_factor_series),
+        } if verbose > 6 and apply_reflectivity_factor else {},
+
         'extended': lambda: {
-            LOSS_COLUMN_NAME: 1 - angular_loss_factor_series if apply_angular_loss_factor else np.nan,
-        } if verbose > 1 else {},
+            REFLECTIVITY_FACTOR_COLUMN_NAME: direct_irradiance_reflectivity_factor_series,
+            DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
+        # } if verbose > 1 and apply_reflectivity_factor else {},
+        } if apply_reflectivity_factor else {},
 
         'more_extended': lambda: {
             SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(surface_orientation, angle_output_units),
@@ -385,6 +369,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units),
             INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
             INCIDENCE_DEFINITION: solar_incidence_series.definition,  # Review Me ! Report the _complementary_ incidence angle series ?
+            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
         } if verbose > 4 else {},
         
@@ -416,7 +401,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
 
     return Irradiance(
             value=direct_inclined_irradiance_series,
-            unit=IRRADIANCE_UNITS,
+            unit=IRRADIANCE_UNIT,
             position_algorithm="",
             timing_algorithm="",
             elevation=elevation,

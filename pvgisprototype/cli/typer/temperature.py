@@ -11,7 +11,7 @@ from pvgisprototype import TemperatureSeries
 from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
-from pvgisprototype.constants import TEMPERATURE_UNIT
+from pvgisprototype.constants import SYMBOL_UNIT_TEMPERATURE
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_meteorological_series
 import numpy as np
 
@@ -83,7 +83,7 @@ def temperature_series_argument_callback(
         # Improve error message with useful hint/s ?
         raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(timestamps)}).")
 
-    return TemperatureSeries(value=temperature_series, unit=TEMPERATURE_UNIT)
+    return TemperatureSeries(value=temperature_series, unit=SYMBOL_UNIT_TEMPERATURE)
 
 
 def temperature_series_option_callback(
@@ -98,7 +98,7 @@ def temperature_series_option_callback(
     if temperature_series.size != len(reference_series):
         raise ValueError(f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
 
-    return TemperatureSeries(value=temperature_series, unit=TEMPERATURE_UNIT)
+    return TemperatureSeries(value=temperature_series, unit=SYMBOL_UNIT_TEMPERATURE)
 
 
 temperature_typer_help='Ambient temperature time series'

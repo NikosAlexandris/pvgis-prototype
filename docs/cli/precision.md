@@ -1,10 +1,12 @@
 ---
 icon: material/decimal-comma-decrease
-title: Rounding decimals
+title: Precision
 tags:
   - CLI
   - Precision
 ---
+
+## Rounding decimals
 
 For detailed outputs obtained via the verbosity flag/s,
 we can ask to round the output values down to a specific number of decimals
@@ -26,3 +28,8 @@ pvgis-prototype power broadband \
     -vvv \
     --rounding-places 1
 ```
+
+## Higher precision
+
+Do you really need higher precision?
+Head over to the [NumPy](../cli/numpy.md) section.

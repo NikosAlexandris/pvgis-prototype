@@ -143,10 +143,10 @@ def set_location_indexers(
         text_coordinates = f'{check_mark} Coordinates : {longitude}, {latitude}.'
 
     logger.info(text_coordinates)
-    if verbose > 0:
-        typer.echo(text_coordinates)
-    if verbose == 3:
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
+
     return indexers
 
 
@@ -231,7 +231,7 @@ def select_location_time_series(
         logger.error(f"{ERROR_IN_SELECTING_DATA} : {exception}")
         raise SystemExit(33)
 
-    if verbose == DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return location_time_series

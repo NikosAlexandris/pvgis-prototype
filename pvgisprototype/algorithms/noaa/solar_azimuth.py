@@ -17,7 +17,7 @@ from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAzimuth
 from pvgisprototype import SolarAzimuth
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
-from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT, RADIANS, VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
@@ -42,8 +42,8 @@ def calculate_solar_azimuth_series_noaa(
     apply_atmospheric_refraction: bool = True,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth angle (θ) for a time series at a specific
     geographic latitude and longitude.
