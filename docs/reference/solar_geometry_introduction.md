@@ -1,8 +1,8 @@
 ---
-title: Solar Geometry
+title: Solar Position
 tags:
   - Reference
-  - Solar Geometry
+  - Solar Position
   - Introduction
 hide:
   - toc
@@ -14,7 +14,7 @@ depends primarily on the ==Solar Incidence== angle.
 
 !!! tip
 
-    PVGIS CLI offers a primer on the solar geometry parameters.
+    PVGIS CLI offers a primer on the solar position parameters.
     Inform yourself using the `pvgis-prototype position intro` command.
     See [pvgis-prototype position intro](../cli/position/intro.md)
 
@@ -28,7 +28,7 @@ both of which are derived from the _Timestamp_ of interest.
 !!! hint 
 
     Practically speaking,
-    _solar geometry_
+    _solar position_
     consists of a series of angular measurements
     between the position of the sun in the sky
     and a location on the surface of the earth
@@ -80,4 +80,4 @@ and the _Perigee offset_.
 
     - Fractional year ⊂ Solar declination  **NOAA**
     or
-    - (Fractional year, Eccentricity correction, Perigee offset) ⊂ Solar declination  **PVIS**
+    - (Fractional year, Eccentricity correction, Perigee offset) ⊂ Solar declination  **Jenčo/Hofierka**

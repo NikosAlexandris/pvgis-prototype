@@ -1,6 +1,8 @@
 from pvgisprototype.api.series.hardcodings import x_mark
 
 
+NOT_COMPLETE = '[orange]Not complete. [bold]Yet![/bold][/orange]'
+NOT_COMPLETE_CLI = '[bold yellow]Yet not complete![/bold yellow]'
 NOT_IMPLEMENTED = '[red]Not implemented. [bold]Yet![/bold][/red]'
 NOT_IMPLEMENTED_CLI = '[bold red]Yet not implemented![/bold red]'
 TO_MERGE_WITH_SINGLE_VALUE_COMMAND = '[cyan]To merge with single-value command[/cyan]'

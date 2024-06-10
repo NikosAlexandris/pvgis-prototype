@@ -18,7 +18,7 @@ from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT, ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT
+from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.cli.typer.position import typer_option_zero_negative_solar_incidence_angle
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -226,7 +226,7 @@ async def get_photovoltaic_power_series_advanced(
     apply_angular_loss_factor: Annotated[Optional[bool], fastapi_query_apply_angular_loss_factor] = True,
     solar_position_model: Annotated[SolarPositionModel, fastapi_query_solar_position_model] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[SolarIncidenceModel, fastapi_query_solar_incidence_model] = SolarIncidenceModel.jenco,
-    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLES_DEFAULT,
+    zero_negative_solar_incidence_angle: Annotated[bool, typer_option_zero_negative_solar_incidence_angle] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: Annotated[SolarTimeModel, fastapi_query_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     time_offset_global: Annotated[float, fastapi_query_time_offset_global] = 0,
     hour_offset: Annotated[float, fastapi_query_hour_offset] = 0,

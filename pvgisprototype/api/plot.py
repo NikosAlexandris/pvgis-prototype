@@ -2,7 +2,7 @@ from devtools import debug
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, INCIDENCE_ALGORITHM_NAME, INCIDENCE_NAME
 from typing import List
 from pandas import DatetimeIndex
-from pvgisprototype.constants import AZIMUTH_ORIGIN_NAME, INCIDENCE_DEFINITION, NOT_AVAILABLE, UNITS_NAME, UNITLESS
+from pvgisprototype.constants import AZIMUTH_ORIGIN_NAME, INCIDENCE_DEFINITION, NOT_AVAILABLE, UNIT_NAME, UNITLESS
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.series.hardcodings import exclamation_mark
@@ -56,7 +56,7 @@ def uniplot_data_array_series(
     title: str = None,
     label: str = None,
     extra_legend_labels: List[str] | None = None,
-    unit: str = UNITS_NAME,
+    unit: str = UNIT_NAME,
     terminal_width_fraction: float = TERMINAL_WIDTH_FRACTION,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -122,6 +122,7 @@ def uniplot_data_array_series(
             lines=lines,
             title=title if title else supertitle,
             y_unit=' ' + str(unit),
+            force_ascii=True,
         )
     except IOError as e:
         raise IOError(
@@ -147,7 +148,7 @@ def uniplot_solar_position_series(
     title: str = None,
     label: str = None,
     legend_labels: str = None,
-    # unit: str = UNITS_NAME,
+    # unit: str = UNIT_NAME,
     terminal_width_fraction: float = TERMINAL_WIDTH_FRACTION,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     ):
@@ -210,7 +211,7 @@ def uniplot_solar_position_series(
             title=title,
             label=label,
             extra_legend_labels=individual_series_labels,
-            unit=model_result.get(UNITS_NAME, UNITLESS),
+            unit=model_result.get(UNIT_NAME, UNITLESS),
             terminal_width_fraction=terminal_width_fraction,
             verbose=verbose,
         )

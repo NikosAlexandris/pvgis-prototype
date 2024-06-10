@@ -7,7 +7,7 @@ from pathlib import Path
 import typer
 from typer import Context
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
-from pvgisprototype.constants import WIND_SPEED_UNIT
+from pvgisprototype.constants import SYMBOL_UNIT_WIND_SPEED
 from pvgisprototype import WindSpeedSeries
 from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -97,7 +97,7 @@ def wind_speed_series_argument_callback(
         # Improve error message with useful hint/s ?
         raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(timestamps)}).")
 
-    return WindSpeedSeries(value=wind_speed_series, unit=WIND_SPEED_UNIT)
+    return WindSpeedSeries(value=wind_speed_series, unit=SYMBOL_UNIT_WIND_SPEED)
 
 
 def wind_speed_series_callback(
@@ -120,7 +120,7 @@ def wind_speed_series_callback(
 
     if wind_speed_series.size != len(reference_series):
         raise ValueError(f"The number of wind_speed values ({wind_speed_series.size}) does not match the number of irradiance values ({len(reference_series)}).")
-    return WindSpeedSeries(value=wind_speed_series, unit=WIND_SPEED_UNIT)
+    return WindSpeedSeries(value=wind_speed_series, unit=SYMBOL_UNIT_WIND_SPEED)
 
 
 wind_speed_typer_help='Ambient wind_speed time series'

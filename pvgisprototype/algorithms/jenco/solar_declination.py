@@ -107,5 +107,5 @@ def calculate_solar_declination_series_jenco(
         value=solar_declination_series,
         unit=RADIANS,
         position_algorithm=SolarPositionModel.jenco,
-        timing_algorithm='Jenco',
+        timing_algorithm='Jenčo',
     )

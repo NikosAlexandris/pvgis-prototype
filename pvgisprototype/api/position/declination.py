@@ -9,7 +9,7 @@ from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_de
 from pvgisprototype.api.position.models import SolarDeclinationModel
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, DEBUG_AFTER_THIS_VERBOSITY_LEVEL, DECLINATION_NAME, HASH_AFTER_THIS_VERBOSITY_LEVEL, LOG_LEVEL_DEFAULT, NOT_AVAILABLE, POSITION_ALGORITHM_NAME, UNITS_NAME, VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, DEBUG_AFTER_THIS_VERBOSITY_LEVEL, DECLINATION_NAME, HASH_AFTER_THIS_VERBOSITY_LEVEL, LOG_LEVEL_DEFAULT, NOT_AVAILABLE, POSITION_ALGORITHM_NAME, UNIT_NAME, VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
@@ -125,7 +125,7 @@ def calculate_solar_declination_series(
                     DECLINATION_NAME: getattr(
                         solar_declination_series, angle_output_units, NOT_AVAILABLE
                     ),
-                    UNITS_NAME: angle_output_units,
+                    UNIT_NAME: angle_output_units,
                 }
             }
             results = results | solar_declination_model_series

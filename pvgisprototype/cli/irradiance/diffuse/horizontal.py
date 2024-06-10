@@ -56,7 +56,7 @@ from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
-from pvgisprototype.constants import IRRADIANCE_UNITS
+from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
@@ -156,7 +156,7 @@ def get_diffuse_horizontal_irradiance_series(
                 dictionary=diffuse_horizontal_irradiance_series.components,
                 title = (
                     DIFFUSE_HORIZONTAL_IRRADIANCE
-                    + f" in-plane irradiance series {IRRADIANCE_UNITS}"
+                    + f" in-plane irradiance series {IRRADIANCE_UNIT}"
                 ),
                 rounding_places=rounding_places,
                 index=index,
@@ -182,7 +182,7 @@ def get_diffuse_horizontal_irradiance_series(
             data_array=diffuse_horizontal_irradiance_series.value,
             timestamps=timestamps,
             groupby=groupby,
-            title=f"Diffuse horizontal irradiance {IRRADIANCE_UNITS}",
+            title=f"Diffuse horizontal irradiance {IRRADIANCE_UNIT}",
             rounding_places=rounding_places,
         )
     if uniplot:
@@ -197,7 +197,7 @@ def get_diffuse_horizontal_irradiance_series(
             title = 'Diffuse Horizontal Irradiance Series',
             label = 'Diffuse Horizontal Irradiance',
             extra_legend_labels=None,
-            unit = IRRADIANCE_UNITS,
+            unit = IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
