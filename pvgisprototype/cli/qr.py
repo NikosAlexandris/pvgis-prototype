@@ -6,7 +6,7 @@ import qrcode
 
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.cli.print import calculate_mean_of_series_per_time_unit, calculate_sum_and_percentage
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, FINGERPRINT_COLUMN_NAME, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, ROUNDING_PLACES_DEFAULT, SURFACE_ORIENTATION_COLUMN_NAME, SURFACE_TILT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, FINGERPRINT_COLUMN_NAME, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, IRRADIANCE_UNIT_K, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, POWER_UNIT, ROUNDING_PLACES_DEFAULT, SURFACE_ORIENTATION_COLUMN_NAME, SURFACE_TILT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME
 from datetime import datetime
 
 
@@ -31,8 +31,8 @@ def print_quick_response_code(
     Spectral factor: PVGIS 2013, Power Model: Huld 2011, Positioning: NOAA Solar Geometry Equations, Incidence angle: Iqbal 1992, Fingerprint: e9bed6970bc502ae912bdbaf792ef694e449063d4bb6ccd77ab9621a045cbf26"
     """
     # Get float values from dictionary
-    surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None) if surface_orientation else None
-    surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, '')
+    surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, '')
     # Get the "frequency" from the timestamps
     time_groupings = {
         'YE': 'Yearly',
@@ -97,14 +97,15 @@ def print_quick_response_code(
     data = ''
     data += 'Lat ' + str(round_float_values(latitude, rounding_places)) + ', '
     data += 'Lon ' + str(round_float_values(longitude, rounding_places)) + ', '
-    data += 'Elevation ' + str(round_float_values(elevation, 0)) + ', '
-    data += 'Orientation ' + str(surface_orientation) + ', '
-    data += 'Tilt ' + str(surface_tilt) + ', '
-    data += 'Start ' + str(timestamps[0]) + ', '
-    data += 'End' + str(timestamps[-1]) + ', '
-    data += 'Irradiance ' + str(inclined_irradiance_mean) + ', '
-    data += 'Power ' + str(photovoltaic_power_mean) + ', '
-    data += 'Loss ' + str(system_efficiency_change_mean) + ', '
+    # data += 'Elevation ' + str(round_float_values(elevation, 0)) + ', '
+    data += 'Elevation ' + str(int(elevation)) + ', '
+    data += 'Orientation ' + str(int(surface_orientation)) + ', '
+    data += 'Tilt ' + str(int(surface_tilt)) + ', '
+    data += 'Start ' + str(timestamps.strftime('%Y-%m-%d %H:%M').values[0]) + ', '
+    data += 'End ' + str(timestamps.strftime('%Y-%m-%d %H:%M').values[-1]) + ', '
+    data += 'Irradiance ' + str(round_float_values(inclined_irradiance_mean, 1)) + f' {IRRADIANCE_UNIT_K}, '
+    data += 'Power ' + str(round_float_values(photovoltaic_power_mean, 1)) + f' {POWER_UNIT}, '
+    data += 'Loss ' + str(round_float_values(system_efficiency_change_mean, 1)) + f' {IRRADIANCE_UNIT_K}, '
     # data_source_irradiance = str
     # data_source_temperature = str
     # data_source_wind_speed = str

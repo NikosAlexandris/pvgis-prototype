@@ -1414,8 +1414,8 @@ def print_change_percentages_panel(
             )
     time_table.add_column('Label', justify="right")
     time_table.add_column('Timestamp', justify="left")
-    time_table.add_row('Start', str(timestamps.values[0])),
-    time_table.add_row('End', str(timestamps.values[-1])),
+    time_table.add_row('Start', str(timestamps.strftime('%Y-%m-%d %H:%M').values[0])),
+    time_table.add_row('End', str(timestamps.strftime('%Y-%m-%d %H:%M').values[-1])),
 
     panels = []
     
