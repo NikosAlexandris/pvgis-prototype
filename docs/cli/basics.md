@@ -36,6 +36,19 @@ tags:
 
     - `[4]` and `[5]` are ***optional*** for [Orientation] [Tilt]
 
+- :material-console-line: __Working examples__
+
+    !!! example
+        
+        - Examples that should just work
+
+
+- :material-console-line: __Examples that fail__
+
+    !!! danger
+        
+        - Examples that fail so we know it is no-ones fault!
+
 </div>
 
 ## Generic Structure
@@ -249,7 +262,7 @@ and ideally should return meaninfgul error messages.
 
 !!! danger "Example that fails"
 
-    ``` bash exec="false" result="ansi" source="material-block"
+    ``` bash
     pvgis-prototype irradiance global inclined 8 45 214 170 '2010-01-27 12:00:00'
     ```
 
@@ -262,6 +275,10 @@ and ideally should return meaninfgul error messages.
     arguments, it is expected to follow strictly their order.
 
 !!! danger "Another failing example"
+
+    ``` bash
+    pvgis-prototype irradiance global inclined 8 45 214 44 '2010-01-27 12:00:00'
+    ```
 
     ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype irradiance global inclined 8 45 214 44 '2010-01-27 12:00:00'
