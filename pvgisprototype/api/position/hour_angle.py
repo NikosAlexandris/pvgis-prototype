@@ -27,14 +27,14 @@ from zoneinfo import ZoneInfo
 from pvgisprototype.api.position.models import SolarTimeModel
 from typing import List
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import HOUR_ANGLE_NAME
-from pvgisprototype.constants import UNITS_NAME
+from pvgisprototype.constants import UNIT_NAME
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
@@ -263,7 +263,7 @@ def calculate_solar_hour_angle_series(
                     POSITION_ALGORITHM_NAME: solar_position_model.value,
                     TIME_ALGORITHM_NAME: solar_hour_angle_series.timing_algorithm if solar_hour_angle_series else NOT_AVAILABLE,
                     HOUR_ANGLE_NAME: getattr(solar_hour_angle_series, angle_output_units, NOT_AVAILABLE) if solar_hour_angle_series else NOT_AVAILABLE,
-                    UNITS_NAME: angle_output_units,
+                    UNIT_NAME: angle_output_units,
                 }
             }
             results = results | solar_position_model_overview

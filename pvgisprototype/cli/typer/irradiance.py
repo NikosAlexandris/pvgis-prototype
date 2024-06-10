@@ -45,7 +45,7 @@ typer_argument_term_n_series = typer.Argument(
     help=the_term_n_series_typer_help,
     show_default=False,
     )
-typer_option_apply_angular_loss_factor = typer.Option(
+typer_option_apply_reflectivity_factor = typer.Option(
     help='Apply angular loss function',
     rich_help_panel=rich_help_panel_advanced_options,
 )
