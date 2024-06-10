@@ -4,7 +4,7 @@ from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from typing import Dict, List, Union, Sequence
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype import Longitude
@@ -43,7 +43,7 @@ from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 def model_solar_altitude_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: DatetimeIndex,
+    timestamps: DatetimeIndex | Timestamp | None,
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
