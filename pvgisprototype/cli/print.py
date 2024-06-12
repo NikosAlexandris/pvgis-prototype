@@ -1136,13 +1136,12 @@ def analyse_photovoltaic_performance(
     # ------------------------------------------------------------------------
 
     # Total change
-    total_change = (
-        photovoltaic_power - inclined_irradiance
-    )
+    total_change = photovoltaic_power - inclined_irradiance
     total_change_mean = photovoltaic_power_mean - inclined_irradiance_mean
-    total_change_percentage = (
-        (total_change / inclined_irradiance * 100) if inclined_irradiance != 0 else 0
-    )
+    with np.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
+        total_change_percentage = where(
+            inclined_irradiance != 0, total_change / inclined_irradiance * 100, 0
+        )
 
     return {
         f"[bold purple]{IN_PLANE_IRRADIANCE}": (            # Label
