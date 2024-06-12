@@ -5,6 +5,7 @@ import pandas
 from pandas.core.methods.describe import describe_categorical_1d
 from rich import print
 from datetime import datetime
+from numpy import where
 
 from sparklines import sparklines
 from typer.main import solve_typer_info_defaults
@@ -23,6 +24,7 @@ import numpy as np
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEGREES,
     EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME,
     EFFECTIVE_GLOBAL_IRRADIANCE_DESCRIPTION,
     EFFECTIVE_IRRADIANCE_COLUMN_NAME,
@@ -81,6 +83,7 @@ from pvgisprototype.constants import (
     SYSTEM_EFFICIENCY_DESCRIPTION,
     SYSTEM_LOSS,
     SYSTEM_LOSS_DESCRIPTION,
+    TECHNOLOGY_NAME,
     TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
     TEMPERATURE_AND_LOW_IRRADIANCE_DESCRIPTION,
     TITLE_KEY_NAME,
@@ -733,6 +736,7 @@ def print_irradiance_table_2(
             INCIDENCE_ALGORITHM_COLUMN_NAME,
             INCIDENCE_DEFINITION,
             RADIATION_MODEL_COLUMN_NAME,
+            TECHNOLOGY_NAME,
             POWER_MODEL_COLUMN_NAME,
             FINGERPRINT_COLUMN_NAME,
             SOLAR_CONSTANT_COLUMN_NAME,
@@ -942,11 +946,15 @@ def calculate_sum_and_percentage(
 ):
     """Calculate sum of a series and its percentage relative to a reference series."""
     total = np.nansum(series)
+    if isinstance(total, np.ndarray):
+        total = total.astype(dtype)
     percentage = (total / reference_series * 100) if reference_series != 0 else 0
+    if isinstance(percentage, np.ndarray):
+        percentage.astype(dtype)
     if rounding_places is not None:
         total = round_float_values(total, rounding_places)
         percentage = round_float_values(percentage, rounding_places)
-    return total.astype(dtype), percentage.astype(dtype)
+    return total, percentage
 
 
 def calculate_mean_of_series_per_time_unit(
@@ -1054,11 +1062,12 @@ def analyse_photovoltaic_performance(
         effective_irradiance
         - inclined_irradiance
     )
-    effective_irradiance_change_percentage = (
-        100
-        * effective_irradiance_change
-        / inclined_irradiance
-    )
+    with np.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
+        effective_irradiance_change_percentage = where(
+            inclined_irradiance != 0,
+            100 * effective_irradiance_change / inclined_irradiance,
+            0,
+        )
     # "Effective" Power without System Loss
     photovoltaic_power_without_system_loss_series = dictionary.get(
         PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, np.array([])
@@ -1086,18 +1095,24 @@ def analyse_photovoltaic_performance(
     temperature_and_low_irradiance_change_mean = (
         photovoltaic_power_without_system_loss_mean - effective_irradiance_mean
     )
-    temperature_and_low_irradiance_change_percentage = (
-        100
-        * temperature_and_low_irradiance_change
-        / effective_irradiance
-    )
+    with np.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
+        temperature_and_low_irradiance_change_percentage = where(
+            effective_irradiance != 0,
+            100 * temperature_and_low_irradiance_change / effective_irradiance,
+            0,
+        )
 
     # System efficiency
     system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None)
     system_efficiency = np.nanmedian(system_efficiency_series).astype(dtype)  # Just in case we ever get time series of `system_efficiency` !
     system_efficiency_change = photovoltaic_power_without_system_loss * system_efficiency - photovoltaic_power_without_system_loss
     system_efficiency_change_mean = calculate_mean_of_series_per_time_unit(photovoltaic_power_without_system_loss_mean * system_efficiency - photovoltaic_power_without_system_loss_mean, timestamps=timestamps, frequency=frequency)
-    system_efficiency_change_percentage = 100 * system_efficiency_change / photovoltaic_power_without_system_loss
+    with np.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
+        system_efficiency_change_percentage = where(
+            photovoltaic_power_without_system_loss != 0,
+            100 * system_efficiency_change / photovoltaic_power_without_system_loss,
+            0,
+        )
 
     # Photovoltaic Power
     photovoltaic_power_series = dictionary.get(PHOTOVOLTAIC_POWER_COLUMN_NAME, np.array([]))
@@ -1279,8 +1294,8 @@ def print_change_percentages_panel(
         'ME': 'Monthly',
         'W': 'Weekly',
         'D': 'Daily',
-        '3H': '3-Hourly',
-        'H': 'Hourly',
+        '3h': '3-Hourly',
+        'h': 'Hourly',
     }
     if timestamps.year.unique().size > 1:
         frequency = 'YE'
@@ -1377,16 +1392,19 @@ def print_change_percentages_panel(
             show_edge=False,
             pad_edge=False,
             )
+    positioning_rounding_places = 3
     position_table.add_column('Position', justify="right", style="none", no_wrap=True)
     position_table.add_column('Value', justify="right", style="none", no_wrap=True)
-    latitude = round_float_values(latitude, 3)#rounding_places)
+    latitude = round_float_values(latitude, positioning_rounding_places)#rounding_places)
     position_table.add_row(f"{LATITUDE_NAME}", f"[bold]{latitude}[/bold]")
-    longitude = round_float_values(longitude, 3)#rounding_places)
+    longitude = round_float_values(longitude, positioning_rounding_places)#rounding_places)
     position_table.add_row(f"{LONGITUDE_NAME}", f"[bold]{longitude}[/bold]")
     position_table.add_row(f"{ELEVATION_COLUMN_NAME}", f"[bold]{elevation}[/bold]")
     surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None) if surface_orientation else None
+    surface_orientation = round_float_values(surface_orientation, positioning_rounding_places)
     position_table.add_row(f"{SURFACE_ORIENTATION_COLUMN_NAME}", f"[bold]{surface_orientation}[/bold]")
     surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    surface_tilt = round_float_values(surface_tilt, positioning_rounding_places)
     position_table.add_row(f"{SURFACE_TILT_COLUMN_NAME}", f"[bold]{surface_tilt}[/bold]")
 
     # position_table.add_row("Time :", f"{timestamp[0]}")
@@ -1441,6 +1459,26 @@ def print_change_percentages_panel(
             padding=(0,2),
             )
     panels.append(time_panel)
+
+    photovoltaic_module , mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
+    photovoltaic_module_table = Table(
+            box=None,
+            show_header=False,
+            show_edge=False,
+            pad_edge=False,
+            )
+    photovoltaic_module_table.add_column('Technology', justify="right")
+    photovoltaic_module_table.add_column('Mount Type', justify="left")
+    photovoltaic_module_table.add_row(photovoltaic_module, mount_type)
+    photovoltaic_module_panel = Panel(
+            photovoltaic_module_table,
+            subtitle="Technology",
+            subtitle_align="right",
+            safe_box=True,
+            expand=True,
+            padding=(0,2),
+            )
+    panels.append(photovoltaic_module_panel)
 
     if fingerprint:
         print(f'{fingerprint=}')
