@@ -62,8 +62,9 @@ def callback_angle_output_units(
         ):
     """Callback function : set verbose to >=7 if analysis is requested !
     """
+    analysis=ctx.params.get('analysis')
     quick_response_code = ctx.params.get('quick_response_code')
-    if quick_response_code:
+    if analysis or quick_response_code:
         angle_output_units = DEGREES
     return angle_output_units
 
