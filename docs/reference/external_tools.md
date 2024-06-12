@@ -5,7 +5,11 @@ tags:
   - Tools
 ---
 
-# External Tools
+# External Services using PVGIS
+
+- https://forecast.solar/heatmap.html
+
+# Other Tools
 
 ## NREL (National Renewable Energy Laboratory)
 
