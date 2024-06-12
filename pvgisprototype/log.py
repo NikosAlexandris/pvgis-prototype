@@ -2,13 +2,13 @@
 Attention : This should be part of the main() function, that is : a global
 logging mechanism and configuration.
 """
+
 from loguru import logger
 logger.remove()
 from functools import wraps
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-import traceback
 
 
 from typer import Context
