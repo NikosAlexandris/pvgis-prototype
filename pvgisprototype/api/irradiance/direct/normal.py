@@ -151,14 +151,19 @@ def calculate_direct_normal_irradiance_series(
     )  # _quite_ high when the sun is below the horizon. Makes sense ?
 
     # Calculate
-    direct_normal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series.value
-        * np.exp(
+    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+        exponent = (
             corrected_linke_turbidity_factor_series.value
             * optical_air_mass_series.value
             * rayleigh_optical_thickness_series.value
         )
-    )
+        result = extraterrestrial_normal_irradiance_series.value * np.exp(exponent)
+        direct_normal_irradiance_series = np.where(
+            np.isinf(result), np.finfo(np.float64).max, result
+        )
+
+
+
     # Warning
     if (
         (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
