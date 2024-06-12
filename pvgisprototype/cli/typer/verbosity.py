@@ -16,6 +16,18 @@ def callback_analysis_of_performance(
     return verbose
 
 
+def callback_quiet(
+        ctx: typer.Context,
+        quiet: bool,
+        ) -> bool:
+    """
+    """
+    analysis=ctx.params.get('analysis')
+    if analysis and not quiet:
+        quiet = True
+    return quiet
+
+
 typer_option_verbose = typer.Option(
     '--verbose',
     '-v',
@@ -32,5 +44,6 @@ typer_option_quiet = typer.Option(
     is_flag=True,
     show_default=True,
     rich_help_panel=rich_help_panel_output,
+    callback=callback_quiet,
 )
 
