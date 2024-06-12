@@ -1306,9 +1306,9 @@ def print_change_percentages_panel(
     elif timestamps.day.unique().size > 1:
         frequency = 'D'
     elif timestamps.hour.unique().size < 24:
-        frequency = 'H'
+        frequency = 'h'
     else:
-        frequency = '3H'
+        frequency = '3h'
     frequency_label = time_groupings[frequency]
 
     results = analyse_photovoltaic_performance(
