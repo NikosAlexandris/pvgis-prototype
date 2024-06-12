@@ -42,6 +42,7 @@ Read also:
 - https://peps.python.org/pep-0615/
 """
 
+from pvgisprototype.log import logger
 from pandas import DatetimeIndex, Timestamp
 from pandas import date_range
 from datetime import datetime
@@ -439,6 +440,7 @@ def generate_timestamps_for_a_year(
 
     return timestamps
 
+
 def generate_datetime_series(
     start_time: Optional[str] = None,
     end_time: Optional[str] = None,
@@ -538,6 +540,12 @@ def callback_generate_datetime_series(
     # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
     start_time=ctx.params.get('start_time')
     end_time=ctx.params.get('end_time')
+    if start_time == end_time:
+        logger.warning(
+            (
+                f"[yellow bold]The start and end time are the same and will generate a single time stamp![/yellow bold]"
+            )
+        )
     periods=ctx.params.get('periods', None) 
     frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
     if start_time is not None and end_time is not None:
