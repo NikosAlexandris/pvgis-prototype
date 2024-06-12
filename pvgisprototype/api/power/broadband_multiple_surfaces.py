@@ -151,7 +151,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -224,7 +224,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         Apply atmospheric refraction option, by default REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
     albedo : Optional[float], optional
         Albedo, by default ALBEDO_DEFAULT
-    apply_angular_loss_factor : Optional[bool], optional
+    apply_reflectivity_factor : Optional[bool], optional
         Apply angular loss fator, by default True
     solar_position_model : SolarPositionModel, optional
         Solar position model, by default SOLAR_POSITION_ALGORITHM_DEFAULT
@@ -292,7 +292,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         "apply_atmospheric_refraction": apply_atmospheric_refraction,
         "refracted_solar_zenith": refracted_solar_zenith,
         "albedo": albedo,
-        "apply_angular_loss_factor": apply_angular_loss_factor,
+        "apply_reflectivity_factor": apply_reflectivity_factor,
         "solar_position_model": solar_position_model,
         "solar_incidence_model": solar_incidence_model,
         "zero_negative_solar_incidence_angle": zero_negative_solar_incidence_angle,
