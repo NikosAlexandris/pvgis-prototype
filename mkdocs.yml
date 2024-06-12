@@ -23,7 +23,7 @@ nav:
     - tutorials/index.md
     - tutorials/introduction.md
     - tutorials/solar_position.md
-    - Positioning Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
+    - 󰆊 Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
   - CLI:
@@ -100,7 +100,7 @@ nav:
     - development/topography.md
     - development/pytest.md
     # - development/state_and_future_of_pvgis.md
-    - "<p><i class='fas fa-flask'>&nbsp;</i> Coverage report</p>": coverage.md
+    - 󰦕 Test Coverage: coverage.md
   - Tags: includes/tags.md
 
 extra:
