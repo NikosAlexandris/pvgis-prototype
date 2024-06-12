@@ -129,7 +129,6 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     Calculate the direct irradiance on an inclined surface based on the
     solar radiation model by Hofierka, 2002. [1]_
 
-
     Notes
     -----
     Bic = B0c sin δexp (equation 11)
@@ -329,7 +328,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
                 direct_irradiance_reflectivity_factor_series != 0,
                 direct_inclined_irradiance_series
                 / direct_irradiance_reflectivity_factor_series,
-                0,
+                0
             )
 
     if np.any(direct_inclined_irradiance_series < 0):
