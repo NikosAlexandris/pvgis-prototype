@@ -21,9 +21,9 @@ from pvgisprototype import TemperatureSeries
 from pvgisprototype import WindSpeedSeries
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
-from pvgisprototype.constants import TEMPERATURE_UNIT
+from pvgisprototype.constants import SYMBOL_UNIT_TEMPERATURE
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
-from pvgisprototype.constants import WIND_SPEED_UNIT
+from pvgisprototype.constants import SYMBOL_UNIT_WIND_SPEED
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 
 
@@ -129,22 +129,22 @@ async def create_temperature_series(temperature_series: Optional[float] = None) 
     if isinstance(temperature_series, float):
         return TemperatureSeries(
             value=np.array(temperature_series),
-            unit=TEMPERATURE_UNIT)
+            unit=SYMBOL_UNIT_TEMPERATURE)
     
     return TemperatureSeries(
         value=np.array(TEMPERATURE_DEFAULT),
-        unit=TEMPERATURE_UNIT)
+        unit=SYMBOL_UNIT_TEMPERATURE)
 
 async def create_wind_speed_series(wind_speed_series: Optional[float] = None) -> WindSpeedSeries:
     
     if isinstance(wind_speed_series, float):
         return WindSpeedSeries(
             value=np.array(wind_speed_series),
-            unit=WIND_SPEED_UNIT)
+            unit=SYMBOL_UNIT_WIND_SPEED)
     
     return WindSpeedSeries(
         value=np.array(WIND_SPEED_DEFAULT),
-        unit=WIND_SPEED_UNIT)
+        unit=SYMBOL_UNIT_WIND_SPEED)
 
 async def create_spectral_factor_series(spectral_factor_series: Optional[float] = None) -> SpectralFactorSeries:
     
@@ -161,11 +161,11 @@ async def create_temperature_series(temperature_series: Optional[float] = None) 
     if isinstance(temperature_series, float):
         return TemperatureSeries(
             value=np.array(temperature_series, dtype=np.float32),
-            unit=TEMPERATURE_UNIT)
+            unit=SYMBOL_UNIT_TEMPERATURE)
     
     return TemperatureSeries(
         value=np.array(TEMPERATURE_DEFAULT, dtype=np.float32),
-        unit=TEMPERATURE_UNIT)
+        unit=SYMBOL_UNIT_TEMPERATURE)
 
 
 async def create_wind_speed_series(wind_speed_series: Optional[float] = None) -> WindSpeedSeries:
@@ -173,11 +173,11 @@ async def create_wind_speed_series(wind_speed_series: Optional[float] = None) ->
     if isinstance(wind_speed_series, float):
         return WindSpeedSeries(
             value=np.array(wind_speed_series),
-            unit=WIND_SPEED_UNIT)
+            unit=SYMBOL_UNIT_WIND_SPEED)
     
     return WindSpeedSeries(
         value=np.array(WIND_SPEED_DEFAULT),
-        unit=WIND_SPEED_UNIT)
+        unit=SYMBOL_UNIT_WIND_SPEED)
 
 
 async def create_spectral_factor_series(spectral_factor_series: Optional[float] = None) -> SpectralFactorSeries:
