@@ -372,13 +372,13 @@ def photovoltaic_power_output_series(
             unit=POWER_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
-    # if fingerprint:
-    #     from pvgisprototype.cli.print import print_finger_hash
-    #     print_finger_hash(dictionary=photovoltaic_power_output_series.components)
     if metadata:
         from pvgisprototype.cli.print import print_command_metadata
         import click
         print_command_metadata(context = click.get_current_context())
+    if fingerprint and not analysis:
+        from pvgisprototype.cli.print import print_finger_hash
+        print_finger_hash(dictionary=photovoltaic_power_output_series.components)
 
 
 @log_function_call
