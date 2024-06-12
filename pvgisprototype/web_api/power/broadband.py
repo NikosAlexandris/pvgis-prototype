@@ -14,7 +14,7 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.irradiance.models import PVModuleEfficiencyAlgorithm
+from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
@@ -235,7 +235,7 @@ async def get_photovoltaic_power_series_advanced(
     eccentricity_correction_factor: Annotated[float, fastapi_query_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Annotated[Optional[float], fastapi_query_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[Optional[PVModuleEfficiencyAlgorithm], fastapi_query_power_model] = PVModuleEfficiencyAlgorithm.king,
+    power_model: Annotated[Optional[PhotovoltaicModulePerformanceModel], fastapi_query_power_model] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], fastapi_query_efficiency] = EFFICIENCY_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -371,7 +371,7 @@ async def get_photovoltaic_power_series(
     # solar_time_model: Annotated[SolarTimeModel, fastapi_query_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Annotated[Optional[float], fastapi_query_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[Optional[PVModuleEfficiencyAlgorithm], fastapi_query_power_model] = PVModuleEfficiencyAlgorithm.king,
+    power_model: Annotated[Optional[PhotovoltaicModulePerformanceModel], fastapi_query_power_model] = PhotovoltaicModulePerformanceModel.king,
     # temperature_model: Annotated[ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     # efficiency: Annotated[Optional[float], fastapi_query_efficiency] = EFFICIENCY_DEFAULT,
     # rounding_places: Annotated[Optional[int], fastapi_query_rounding_places] = ROUNDING_PLACES_DEFAULT,
@@ -504,7 +504,7 @@ async def get_photovoltaic_power_series_monthly_average(
     # solar_time_model: Annotated[SolarTimeModel, fastapi_query_solar_time_model] = SOLAR_TIME_ALGORITHM_DEFAULT,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Annotated[Optional[float], fastapi_query_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[Optional[PVModuleEfficiencyAlgorithm], fastapi_query_power_model] = PVModuleEfficiencyAlgorithm.king,
+    power_model: Annotated[Optional[PhotovoltaicModulePerformanceModel], fastapi_query_power_model] = PhotovoltaicModulePerformanceModel.king,
     # temperature_model: Annotated[ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     # efficiency: Annotated[Optional[float], fastapi_query_efficiency] = EFFICIENCY_DEFAULT,
     # rounding_places: Annotated[Optional[int], fastapi_query_rounding_places] = ROUNDING_PLACES_DEFAULT,
@@ -644,7 +644,7 @@ async def get_photovoltaic_power_output_series_multi(
     eccentricity_correction_factor: Annotated[float, fastapi_query_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     system_efficiency: Annotated[Optional[float], fastapi_query_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[Optional[PVModuleEfficiencyAlgorithm], fastapi_query_power_model] = PVModuleEfficiencyAlgorithm.king,
+    power_model: Annotated[Optional[PhotovoltaicModulePerformanceModel], fastapi_query_power_model] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[Optional[float], fastapi_query_efficiency] = EFFICIENCY_DEFAULT,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
