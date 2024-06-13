@@ -1,16 +1,12 @@
-from os import times
-import sys
 from pandas import DatetimeIndex, to_datetime
 import pandas
-from pandas.core.methods.describe import describe_categorical_1d
+from pandas.io.xml import file_exists
 from rich import print
 from datetime import datetime
 from numpy import where
 
 from sparklines import sparklines
-from typer.main import solve_typer_info_defaults
 from pvgisprototype.api.position.models import SOLAR_POSITION_PARAMETER_COLUMN_NAMES, SolarPositionParameter
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from pvgisprototype.api.utilities.conversions import round_float_values
 from rich.console import Console
 from rich.table import Table
@@ -24,68 +20,34 @@ import numpy as np
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
-    DEGREES,
-    EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME,
-    EFFECTIVE_GLOBAL_IRRADIANCE_DESCRIPTION,
-    EFFECTIVE_IRRADIANCE_COLUMN_NAME,
     EFFECTIVE_IRRADIANCE_NAME,
-    EFFECTIVE_POWER_COLUMN_NAME,
-    EFFECTIVE_POWER_NAME,
-    EFFICIENCY_NAME,
-    EFFICIENCY_COLUMN_NAME,
-    EFFICIENCY_FACTOR_DESCRIPTION,
     ELEVATION_COLUMN_NAME,
-    ENERGY_UNIT,
-    GLOBAL_EFFECTIVE_IRRADIANCE,
-    GLOBAL_IN_PLANE_IRRADIANCE,
-    GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY,
-    GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY,
-    GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_DESCRIPTION,
-    GLOBAL_INCLINED_IRRADIANCE,
-    GLOBAL_INCLINED_IRRADIANCE_AFTER_REFLECTIVITY,
-    GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY,
-    GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_DESCRIPTION,
-    GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME,
+    ENERGY_NAME_WITH_SYMBOL,
     GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-    GLOBAL_IRRADIANCE_NAME,
     IN_PLANE_IRRADIANCE,
-    IN_PLANE_IRRADIANCE_NAME,
     IRRADIANCE_AFTER_REFLECTIVITY,
-    IRRADIANCE_AFTER_REFLECTIVITY_DESCRIPTION,
-    IRRADIANCE_COLUMN_NAME,
     IRRADIANCE_UNIT,
     IRRADIANCE_UNIT_K,
     LATITUDE_NAME,
     LONGITUDE_NAME,
-    PHOTOVOLTAIC_POWER_LONG_NAME,
+    PEAK_POWER_COLUMN_NAME,
+    PHOTOVOLTAIC_ENERGY_UNIT,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_UNIT,
-    PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS,
     PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
-    PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_DESCRIPTION,
+    POWER_NAME_WITH_SYMBOL,
     POWER_UNIT,
-    REFLECTIVITY_FACTOR_COLUMN_NAME,
+    POWER_UNIT_K,
     REFLECTIVITY,
     REFLECTIVITY_COLUMN_NAME,
-    REFLECTIVITY_DESCRIPTION,
-    REFLECTIVITY_PERCENTAGE,
-    REFLECTIVITY_PERCENTAGE_COLUMN_NAME,
-    SPECTRAL_EFFECT_DESCRIPTION,
-    SPECTRAL_FACTOR_COLUMN_NAME,
     SPECTRAL_EFFECT,
     SPECTRAL_EFFECT_COLUMN_NAME,
-    SPECTRAL_EFFECT_PERCENTAGE,
-    SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME,
     SYMBOL_LOSS,
     SYMBOL_SUMMATION,
-    SYSTEM_EFFICIENCY,
     SYSTEM_EFFICIENCY_COLUMN_NAME,
-    SYSTEM_EFFICIENCY_DESCRIPTION,
     SYSTEM_LOSS,
-    SYSTEM_LOSS_DESCRIPTION,
     TECHNOLOGY_NAME,
     TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
-    TEMPERATURE_AND_LOW_IRRADIANCE_DESCRIPTION,
     TITLE_KEY_NAME,
     LONGITUDE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
@@ -108,19 +70,13 @@ from pvgisprototype.constants import (
     PERIGEE_OFFSET_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
     NET_EFFECT,
-    TOTAL_NET_EFFECT,
-    TOTAL_NET_EFFECT_DESCRIPTION,
-    ZENITH_COLUMN_NAME,
     ZENITH_NAME,
-    ALTITUDE_COLUMN_NAME,
     ALTITUDE_NAME,
-    AZIMUTH_COLUMN_NAME,
     AZIMUTH_NAME,
     AZIMUTH_ORIGIN_COLUMN_NAME,
     AZIMUTH_ORIGIN_NAME,
     INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_ALGORITHM_NAME,
-    INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
     INCIDENCE_DEFINITION,
     UNITS_COLUMN_NAME,
@@ -130,8 +86,6 @@ from pvgisprototype.constants import (
     ANGLE_UNITS_COLUMN_NAME,
     NOT_AVAILABLE,
     ROUNDING_PLACES_DEFAULT,
-    RADIANS,
-    FINGERPRINT_NAME,
     FINGERPRINT_COLUMN_NAME,
 )
 
@@ -764,12 +718,6 @@ def print_irradiance_table_2(
             else:
                 table.add_column(key)
 
-
-            # if dictionary[key] is not None and key_sum:
-
-            # if dictionary[key] is not None:
-
-    
     # Zip series and timestamps
     filtered_dictionary = {key: value for key, value in dictionary.items() if key not in keys_to_exclude}
     zipped_series = zip(*filtered_dictionary.values())
@@ -818,27 +766,34 @@ def print_irradiance_table_2(
 
 
 def kilofy_unit(value, unit="W", threshold=1000):
-    """
-    Converts the unit of a given value to its kilo-equivalent if the absolute value is greater than or equal to 1000.
+    """ Converts the unit of a given value to its kilo-equivalent if the
+    absolute value is greater than or equal to 1000.
 
-    Args:
-        value (float): The numerical value to potentially convert.
-        unit (str): The current unit of the value, defaulting to 'W' (Watts).
+    Parameters
+    ----------
+    value : float
+        The numerical value to potentially convert.
+    unit : str
+        The current unit of the value, defaulting to 'W' (Watts).
 
-    Returns:
-        tuple: The converted value and its unit. If the value is 1000 or more, it converts the value and changes the unit to 'kW' (kilowatts).
+    Returns
+    -------
+    tuple :
+        The converted value and its unit. If the value is 1000 or more, it
+        converts the value and changes the unit to 'kW' (kilowatts).
 
-    Examples:
-        >>> kilofy_unit(1500, "W", 1000)
-        (1.5, "kW")
-        >>> kilofy_unit(500, "W", 1000)
-        (500, "W")
+    Examples
+    --------
+    >>> kilofy_unit(1500, "W", 1000)
+    (1.5, "kW")
+    >>> kilofy_unit(500, "W", 1000)
+    (500, "W")
     """
     if value is not None:
         if abs(value) >= threshold and unit == IRRADIANCE_UNIT:
             return value / 1000, IRRADIANCE_UNIT_K  # update to kilo
-        if abs(value) >= threshold:
-            return value / 1000, unit  # update to kilo
+        if abs(value) >= threshold and unit == POWER_UNIT:
+            return value / 1000, POWER_UNIT_K  # update to kilo
     return value, unit
 
 
@@ -846,8 +801,10 @@ def add_table_row(
     table,
     quantity,
     value,
+    unit,
     mean_value,
-    unit=IRRADIANCE_UNIT,
+    mean_value_unit,
+    standard_deviation=None,
     percentage=None,
     reference_quantity=None,
     series=np.array([]),
@@ -856,8 +813,9 @@ def add_table_row(
     source: str = None,
     quantity_style=None,
     value_style="cyan",
-    mean_value_style="cyan",
     unit_style="cyan",
+    mean_value_style="cyan",
+    mean_value_unit_style="cyan",
     percentage_style="dim",
     reference_quantity_style="white",
     rounding_places=1,
@@ -865,20 +823,32 @@ def add_table_row(
     """
     Adds a row to a table with automatic unit handling and optional percentage.
 
-    Args:
-        table: The table object to which the row will be added.
-        quantity: The name of the quantity being added.
-        value: The numerical value associated with the quantity.
-        base_unit: The base unit of measurement for the value.
-        percentage: Optional; the percentage change or related metric.
-        reference_quantity: Optional; the reference quantity for the percentage.
-        rounding_places: Optional; the number of decimal places to round the value.
+    Parameters
+    ----------
+    table :
+		The table object to which the row will be added.
+    quantity :
+		The name of the quantity being added.
+    value :
+		The numerical value associated with the quantity.
+    base_unit :
+		The base unit of measurement for the value.
+    percentage :
+		Optional; the percentage change or related metric.
+    reference_quantity :
+		Optional; the reference quantity for the percentage.
+    rounding_places :
+		Optional; the number of decimal places to round the value.
 
-    Processes:
-        - Rounds the value if rounding_places is specified.
-        - Converts units from base_unit to a larger unit if value exceeds 1000.
-        - Adds the row to the specified table.
+    Notes
+    -----
+    - Round value if rounding_places specified.
+    - Convert units from base_unit to a larger unit if value exceeds 1000.
+    - Add row to specified table.
+
     """
+    from devtools import debug
+    debug(locals())
     effects = {
         REFLECTIVITY,
         SPECTRAL_EFFECT,
@@ -886,19 +856,37 @@ def add_table_row(
         SYSTEM_LOSS,
         NET_EFFECT,
     }
-    value, unit = kilofy_unit(value=value, unit=unit, threshold=1000)
-    # value = f"[red]{value:.{rounding_places}f}" if value < 0 else f"[{value_style}]{value:.{rounding_places}f}"
-    styled_value = f"[{value_style}]{value:.{rounding_places}f}" if value_style else f"{value:.{rounding_places}f}"
-    signed_value = f"[{quantity_style}]+{styled_value}" if quantity in effects and value > 0 else styled_value
-    # need first the unstyled quantity for the `signed_value` :-)
+
+    if value is None or np.isnan(value):
+        signed_value = "-"  # this _is_ the variable added in a row !
+    else:
+        if isinstance(value, (float, np.float32, np.float64, int, np.int32, np.int64)):
+            styled_value = f"[{value_style}]{value:.{rounding_places}f}" if value_style else f"{value:.{rounding_places}f}"
+            signed_value = f"[{quantity_style}]+{styled_value}" if quantity in effects and value > 0 else styled_value
+        else:
+            raise TypeError(f"Unexpected type for value: {type(value)}")
+
+    # Need first the unstyled quantity for the `signed_value` :-)
     quantity = f"[{quantity_style}]{quantity}" if quantity_style else quantity
-    mean_value = f"[{mean_value_style}]{mean_value:.{rounding_places}f}" if mean_value_style else f"{mean_value:.{rounding_places}f}" 
+
+    # Mean value and unit
+    mean_value = f"[{mean_value_style}]{mean_value:.{rounding_places}f} {mean_value_unit}" if mean_value_style else f"{mean_value:.{rounding_places}f {mean_value_unit}}" 
+    if standard_deviation:
+        standard_deviation = f"[{mean_value_style}]{standard_deviation:.{rounding_places}f}" if mean_value_style else f"{standard_deviation:.{rounding_places}f }" 
+    else:
+        standard_deviation = ''
+
+    # Style the unit
     unit = f"[{unit_style}]{unit}" if unit_style else unit
+
+    # Get the reference quantity
     reference_quantity = f"[{reference_quantity_style}]{reference_quantity}" if reference_quantity_style else reference_quantity
+
+    # Build the sparkline
     sparkline = convert_series_to_sparkline(series, timestamps, frequency) if series.size > 0 else ''
 
     # Prepare the basic row data structure
-    row = [quantity, signed_value, mean_value, unit]
+    row = [quantity, signed_value, unit]
     
     # Add percentage and reference quantity if applicable
     if percentage is not None:
@@ -913,6 +901,10 @@ def add_table_row(
         row.extend(["", ""])
     if sparkline:
         row.extend([sparkline])
+    if mean_value:
+        if not sparkline:
+            row.extend([""])
+        row.extend([mean_value, str(standard_deviation)])
     else:
         row.extend([""])
     if source:
@@ -937,15 +929,21 @@ def calculate_percentage_change(value, reference_value):
         return 0
 
 
-def calculate_sum_and_percentage(
+def calculate_statistics(
     series,
+    timestamps,
+    frequency,
     reference_series,
     rounding_places=None,
     dtype=DATA_TYPE_DEFAULT,
     array_backend=ARRAY_BACKEND_DEFAULT,
 ):
-    """Calculate sum of a series and its percentage relative to a reference series."""
-    total = np.nansum(series)
+    """Calculate the sum, mean, standard deviation of a series based on a
+    specified frequency and its percentage relative to a reference series.
+    """
+    pandas_series = pandas.Series(series, timestamps)
+    resampled = pandas_series.resample(frequency)
+    total = resampled.sum().sum()
     if isinstance(total, np.ndarray):
         total = total.astype(dtype)
     percentage = (total / reference_series * 100) if reference_series != 0 else 0
@@ -954,32 +952,51 @@ def calculate_sum_and_percentage(
     if rounding_places is not None:
         total = round_float_values(total, rounding_places)
         percentage = round_float_values(percentage, rounding_places)
-    return total, percentage
+    mean = resampled.mean().mean()
+    std_dev = resampled.std().mean()  # Mean of standard deviations over the period
+    return total, mean, std_dev, percentage
 
 
 def calculate_mean_of_series_per_time_unit(
-    series: np.array([]),
+    series: np.array,
     timestamps: DatetimeIndex,
     frequency: str,
     ):
     """
     """
-    pandas_series = pandas.Series(series, timestamps)
-    # Review - Me ------------------------------------------------------------
-    mean_per_time_unit_series = pandas_series.resample(frequency).mean().mean()
-    # ------------------------------------------------------------------------
-    return mean_per_time_unit_series
+    pandas_series = pandas.Series(series, index=timestamps)
+    return pandas_series.resample(frequency).sum().mean()
 
 
 def analyse_photovoltaic_performance(
-        dictionary,
-        timestamps: DatetimeIndex,
-        frequency: str,
-        rounding_places=1,
-        dtype=DATA_TYPE_DEFAULT,  # Define default data types for array operations
-        array_backend=ARRAY_BACKEND_DEFAULT,
-        ):
-    """
+    dictionary,
+    timestamps: DatetimeIndex,
+    frequency: str,
+    rounding_places=1,
+    dtype=DATA_TYPE_DEFAULT,  # Define default data types for array operations
+    array_backend=ARRAY_BACKEND_DEFAULT,
+):
+    """Analyze the photovoltaic performance from time-series data.
+
+    Parameters
+    ----------
+    dictionary :
+		Data containing time-series for various PV metrics.
+    timestamps :
+		Timestamps corresponding to the data points.
+    frequency :
+		Resampling frequency for mean calculations.
+    rounding_places :
+		Decimal places for rounding results.
+    dtype :
+		Data type for numerical calculations.
+
+    Returns
+    -------
+    A dictionary with performance analysis results.
+
+    Notes
+    -----
     Workflow
 
     In-Plane Irradiance                           
@@ -1015,7 +1032,9 @@ def analyse_photovoltaic_performance(
     ------------
     Total Change
     ------------
+
     """
+        
     # In-Plane irradiance (before changes)
     # ------------------------------------------------------------------------
     # To Do : In-Plane "Irradiation" ?
@@ -1024,44 +1043,55 @@ def analyse_photovoltaic_performance(
     inclined_irradiance_series = dictionary.get(
         GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, np.array([])
     )
-    inclined_irradiance, _ = calculate_sum_and_percentage(
+    inclined_irradiance, inclined_irradiance_mean, inclined_irradiance_std, _ = calculate_statistics(
         inclined_irradiance_series,
+        timestamps,
+        frequency,
         1,
         rounding_places,
-    )  # Base value is dummy for total calculation
-    inclined_irradiance_mean = calculate_mean_of_series_per_time_unit(
-        inclined_irradiance_series, timestamps=timestamps, frequency=frequency
     )
+
+    # Reflectivity
 
     reflectivity_series = dictionary.get(REFLECTIVITY_COLUMN_NAME, np.array([]))
-    reflectivity_change, reflectivity_change_percentage = calculate_sum_and_percentage(
-        reflectivity_series, inclined_irradiance, rounding_places
-    )
-    reflectivity_change_mean = calculate_mean_of_series_per_time_unit(
-        reflectivity_series - inclined_irradiance_series, timestamps=timestamps, frequency=frequency
-    )
-    irradiance_after_reflectivity = inclined_irradiance + reflectivity_change
-    irradiance_after_reflectivity_mean = calculate_mean_of_series_per_time_unit(
-        inclined_irradiance_series + reflectivity_series, timestamps=timestamps, frequency=frequency
+    reflectivity_change, reflectivity_change_mean, reflectivity_change_std, reflectivity_change_percentage = calculate_statistics(
+            reflectivity_series,
+        timestamps,
+        frequency,
+            inclined_irradiance,
+            rounding_places,
     )
 
-    spectral_effect_series = dictionary.get(SPECTRAL_EFFECT_COLUMN_NAME, np.array([]))
-    spectral_effect, spectral_effect_percentage = calculate_sum_and_percentage(
-        spectral_effect_series, irradiance_after_reflectivity, rounding_places
+    # After reflectivity
+
+    irradiance_after_reflectivity = inclined_irradiance + reflectivity_change
+    irradiance_after_reflectivity_mean = calculate_mean_of_series_per_time_unit(
+        inclined_irradiance_series + reflectivity_series,
+        timestamps=timestamps,
+        frequency=frequency,
     )
-    spectral_effect_mean = calculate_mean_of_series_per_time_unit(
-        spectral_effect_series, timestamps=timestamps, frequency=frequency
+
+    # Spectral effect
+
+    spectral_effect_series = dictionary.get(SPECTRAL_EFFECT_COLUMN_NAME, np.array([]))
+    spectral_effect, spectral_effect_mean, spectral_effect_std, spectral_effect_percentage = calculate_statistics(
+        spectral_effect_series, 
+        timestamps,
+        frequency,
+        irradiance_after_reflectivity,
+        rounding_places,
     )
 
     effective_irradiance = irradiance_after_reflectivity + spectral_effect
     effective_irradiance_percentage = (
-        (effective_irradiance / inclined_irradiance * 100) if inclined_irradiance != 0 else 0
+        (effective_irradiance / inclined_irradiance * 100)
+        if inclined_irradiance != 0
+        else 0
     )
-    effective_irradiance_mean = irradiance_after_reflectivity_mean + spectral_effect_mean
-    effective_irradiance_change = (
-        effective_irradiance
-        - inclined_irradiance
+    effective_irradiance_mean = (
+        irradiance_after_reflectivity_mean + spectral_effect_mean
     )
+    effective_irradiance_change = effective_irradiance - inclined_irradiance
     with np.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
         effective_irradiance_change_percentage = where(
             inclined_irradiance != 0,
@@ -1072,19 +1102,14 @@ def analyse_photovoltaic_performance(
     photovoltaic_power_without_system_loss_series = dictionary.get(
         PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, np.array([])
     )
-    photovoltaic_power_without_system_loss, _ = calculate_sum_and_percentage(
+    photovoltaic_power_without_system_loss, photovoltaic_power_without_system_loss_mean, photovoltaic_power_without_system_loss_std, _ = calculate_statistics(
         photovoltaic_power_without_system_loss_series,
+        timestamps,
+        frequency,
         reference_series=1,
         rounding_places=rounding_places,
         dtype=dtype,
         array_backend=array_backend,
-    )
-    photovoltaic_power_without_system_loss_mean = (
-        calculate_mean_of_series_per_time_unit(
-            photovoltaic_power_without_system_loss_series,
-            timestamps=timestamps,
-            frequency=frequency,
-        )
     )
 
     # Temperature & Low Irradiance
@@ -1104,9 +1129,19 @@ def analyse_photovoltaic_performance(
 
     # System efficiency
     system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None)
-    system_efficiency = np.nanmedian(system_efficiency_series).astype(dtype)  # Just in case we ever get time series of `system_efficiency` !
-    system_efficiency_change = photovoltaic_power_without_system_loss * system_efficiency - photovoltaic_power_without_system_loss
-    system_efficiency_change_mean = calculate_mean_of_series_per_time_unit(photovoltaic_power_without_system_loss_mean * system_efficiency - photovoltaic_power_without_system_loss_mean, timestamps=timestamps, frequency=frequency)
+    system_efficiency = np.nanmedian(system_efficiency_series).astype(
+        dtype
+    )  # Just in case we ever get time series of `system_efficiency` !
+    system_efficiency_change = (
+        photovoltaic_power_without_system_loss * system_efficiency
+        - photovoltaic_power_without_system_loss
+    )
+    system_efficiency_change_mean = calculate_mean_of_series_per_time_unit(
+        photovoltaic_power_without_system_loss_mean * system_efficiency
+        - photovoltaic_power_without_system_loss_mean,
+        timestamps=timestamps,
+        frequency=frequency,
+    )
     with np.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
         system_efficiency_change_percentage = where(
             photovoltaic_power_without_system_loss != 0,
@@ -1115,22 +1150,20 @@ def analyse_photovoltaic_performance(
         )
 
     # Photovoltaic Power
-    photovoltaic_power_series = dictionary.get(PHOTOVOLTAIC_POWER_COLUMN_NAME, np.array([]))
-    photovoltaic_power_mean = calculate_mean_of_series_per_time_unit(
-        photovoltaic_power_series, timestamps=timestamps, frequency=frequency
+    photovoltaic_power_series = dictionary.get(
+        PHOTOVOLTAIC_POWER_COLUMN_NAME, np.array([])
     )
-    photovoltaic_power, _ = calculate_sum_and_percentage(
+    photovoltaic_power, photovoltaic_power_mean, photovoltaic_power_std, _ = calculate_statistics(
         photovoltaic_power_series,
+        timestamps,
+        frequency,
         1,
         rounding_places,
-    )  # Base value is dummy for total calculation
+    )
+    peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, np.array([]))
+    photovoltaic_energy_mean = photovoltaic_power_mean * peak_power
 
     # From PVGIS v5.2 --------------------------------------------------------
-    # 'H(i)_m': annual[i]['g_poa'] / 12,
-    # 'H(i)_y': annual[i]['g_poa'],
-    # 'E_d': annual[i]['y_dc_spec'] * data['peakpower'] / 365,
-    # 'E_m': annual[i]['y_dc_spec'] * data['peakpower'] / 12,
-    # 'E_y': annual[i]['y_dc_spec'] * data['peakpower'],
     # 'SD_m': annual[i]['y_dc_var'] * data['peakpower'] / 12,
     # 'SD_y': annual[i]['y_dc_var'] * data['peakpower'],
     # ------------------------------------------------------------------------
@@ -1143,12 +1176,90 @@ def analyse_photovoltaic_performance(
             inclined_irradiance != 0, total_change / inclined_irradiance * 100, 0
         )
 
+    # Handle units
+
+    inclined_irradiance, inclined_irradiance_unit = kilofy_unit(
+        inclined_irradiance, IRRADIANCE_UNIT
+    )
+    inclined_irradiance_mean, inclined_irradiance_mean_unit = kilofy_unit(
+        inclined_irradiance_mean, IRRADIANCE_UNIT
+    )
+
+    reflectivity_change, reflectivity_change_unit = kilofy_unit(
+        reflectivity_change, IRRADIANCE_UNIT
+    )
+    reflectivity_change_mean, reflectivity_change_mean_unit = kilofy_unit(
+        reflectivity_change_mean, IRRADIANCE_UNIT
+    )
+
+    irradiance_after_reflectivity, irradiance_after_reflectivity_unit = kilofy_unit(
+        irradiance_after_reflectivity, IRRADIANCE_UNIT
+    )
+    irradiance_after_reflectivity_mean, irradiance_after_reflectivity_mean_unit = (
+        kilofy_unit(irradiance_after_reflectivity_mean, IRRADIANCE_UNIT)
+    )
+
+    spectral_effect, spectral_effect_unit = kilofy_unit(
+        spectral_effect, IRRADIANCE_UNIT
+    )
+    spectral_effect_mean, spectral_effect_mean_unit = kilofy_unit(
+        spectral_effect_mean, IRRADIANCE_UNIT
+    )
+
+    effective_irradiance, effective_irradiance_unit = kilofy_unit(
+        effective_irradiance, IRRADIANCE_UNIT
+    )
+    effective_irradiance_mean, effective_irradiance_mean_unit = kilofy_unit(
+        effective_irradiance_mean, IRRADIANCE_UNIT
+    )
+
+    (
+        photovoltaic_power_without_system_loss,
+        photovoltaic_power_without_system_loss_unit,
+    ) = kilofy_unit(photovoltaic_power_without_system_loss, PHOTOVOLTAIC_POWER_UNIT)
+    (
+        photovoltaic_power_without_system_loss_mean,
+        photovoltaic_power_without_system_loss_mean_unit,
+    ) = kilofy_unit(
+        photovoltaic_power_without_system_loss_mean, PHOTOVOLTAIC_POWER_UNIT
+    )
+
+    (
+        temperature_and_low_irradiance_change,
+        temperature_and_low_irradiance_change_unit,
+    ) = kilofy_unit(temperature_and_low_irradiance_change, IRRADIANCE_UNIT)
+    (
+        temperature_and_low_irradiance_change_mean,
+        temperature_and_low_irradiance_change_mean_unit,
+    ) = kilofy_unit(temperature_and_low_irradiance_change_mean, IRRADIANCE_UNIT)
+
+    system_efficiency_change, system_efficiency_change_unit = kilofy_unit(
+        system_efficiency_change, PHOTOVOLTAIC_POWER_UNIT
+    )
+    system_efficiency_change_mean, system_efficiency_change_mean_unit = kilofy_unit(
+        system_efficiency_change_mean, PHOTOVOLTAIC_POWER_UNIT
+    )
+
+    photovoltaic_power, photovoltaic_power_unit = kilofy_unit(
+        photovoltaic_power, PHOTOVOLTAIC_POWER_UNIT
+    )
+    photovoltaic_power_mean, photovoltaic_power_mean_unit = kilofy_unit(
+        photovoltaic_power_mean, PHOTOVOLTAIC_POWER_UNIT
+    )
+
+    total_change, total_change_unit = kilofy_unit(total_change, IRRADIANCE_UNIT)
+    total_change_mean, total_change_mean_unit = kilofy_unit(
+        total_change_mean, IRRADIANCE_UNIT
+    )
+
     return {
         f"[bold purple]{IN_PLANE_IRRADIANCE}": (            # Label
             (inclined_irradiance, "bold purple"),           # Value, Style
+            (inclined_irradiance_unit, "purple"),
             (inclined_irradiance_mean, "bold purple"),      # Mean Value, Style
+            (inclined_irradiance_mean_unit, "purple"),
+            inclined_irradiance_std,
             None,                                           # %
-            (IRRADIANCE_UNIT, "purple"),                    # Unit
             "bold",                                         # Style for
             None,# f"100 {GLOBAL_IRRADIANCE_NAME}",         # % of (which) Quantity
             inclined_irradiance_series,                     # input series
@@ -1156,9 +1267,11 @@ def analyse_photovoltaic_performance(
         ),
         f"{REFLECTIVITY}": (
             (reflectivity_change, "magenta"),
+            (reflectivity_change_unit, "cyan dim"),
             (reflectivity_change_mean, "magenta"),
+            (reflectivity_change_mean_unit, "cyan dim"),
+            reflectivity_change_std,
             reflectivity_change_percentage,
-            (IRRADIANCE_UNIT, "cyan dim"),
             "bold",
             IN_PLANE_IRRADIANCE,
             reflectivity_series,
@@ -1166,9 +1279,11 @@ def analyse_photovoltaic_performance(
         ),
         f"[white dim]{IRRADIANCE_AFTER_REFLECTIVITY}": (
             (irradiance_after_reflectivity, "white dim"),
+            (irradiance_after_reflectivity_unit, "white dim"),
             (irradiance_after_reflectivity_mean, "white dim"),
+            (irradiance_after_reflectivity_mean_unit, "white dim"),
             None,
-            (IRRADIANCE_UNIT, "white dim"),
+            None,
             "bold",
             IN_PLANE_IRRADIANCE,
             np.array([], dtype=dtype),
@@ -1176,9 +1291,11 @@ def analyse_photovoltaic_performance(
         ),
         f"{SPECTRAL_EFFECT}": (
             (spectral_effect, "magenta"),
+            (spectral_effect_unit, "cyan dim"),
             (spectral_effect_mean, "magenta"),
+            (spectral_effect_mean_unit, "cyan dim"),
+            spectral_effect_std,
             spectral_effect_percentage,
-            (IRRADIANCE_UNIT, "cyan dim"),
             "bold",
             IN_PLANE_IRRADIANCE,
             spectral_effect_series,
@@ -1186,29 +1303,35 @@ def analyse_photovoltaic_performance(
         ),
         f"[white dim]{EFFECTIVE_IRRADIANCE_NAME}": (
             (effective_irradiance, "white dim"),
+            (effective_irradiance_unit, "white dim"),
             (effective_irradiance_mean, "white dim"),
-            None, # effective_irradiance_percentage,
-            (IRRADIANCE_UNIT, "white dim"),
+            (effective_irradiance_mean_unit, "white dim"),
+            None,
+            None,
             "bold",
-            None, # GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY,
+            None,
             np.array([]),
             None,
         ),
         f"{TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME}": (
             (temperature_and_low_irradiance_change, "magenta"),
+            (temperature_and_low_irradiance_change_unit, "cyan dim"),
             (temperature_and_low_irradiance_change_mean, "magenta"),
+            (temperature_and_low_irradiance_change_mean_unit, "cyan dim"),
+            None,
             temperature_and_low_irradiance_change_percentage,
-            (IRRADIANCE_UNIT, "cyan dim"),
             "bold",
             EFFECTIVE_IRRADIANCE_NAME,
             np.array([]),
-            photovoltaic_power_rating_model,
+            None,
         ),
         f"[white dim]{PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME}": (
             (photovoltaic_power_without_system_loss, "white dim"),
+            (photovoltaic_power_without_system_loss_unit, "white dim"),
             (photovoltaic_power_without_system_loss_mean, "white dim"),
+            (photovoltaic_power_without_system_loss_mean_unit, "white dim"),
+            photovoltaic_power_without_system_loss_std,
             None,
-            (PHOTOVOLTAIC_POWER_UNIT, "white dim"),
             "bold",
             EFFECTIVE_IRRADIANCE_NAME,
             photovoltaic_power_without_system_loss_series,
@@ -1216,29 +1339,47 @@ def analyse_photovoltaic_performance(
         ),
         f"{SYSTEM_LOSS}": (
             (system_efficiency_change, "magenta"),
+            (system_efficiency_change_unit, "cyan dim"),
             (system_efficiency_change_mean, "magenta"),
+            (system_efficiency_change_mean_unit, "cyan dim"),
+            None,
             system_efficiency_change_percentage,
-            (PHOTOVOLTAIC_POWER_UNIT, "cyan dim"),
             "bold",
             PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
             np.array([]),
             None,
         ),
-        f"[green bold]{PHOTOVOLTAIC_POWER_LONG_NAME}": (
-            (photovoltaic_power, "bold green"),
-            (photovoltaic_power_mean, "bold green"),
+        f"[white dim]{POWER_NAME_WITH_SYMBOL}": (
+            (photovoltaic_power, "white dim"),
+            (photovoltaic_power_unit, "white dim"),
+            (photovoltaic_power_mean, "white dim"),
+            (photovoltaic_power_mean_unit, "white dim"),
+            photovoltaic_power_std,
             None,
-            (PHOTOVOLTAIC_POWER_UNIT, "green"),
             "bold",
             EFFECTIVE_IRRADIANCE_NAME,
             photovoltaic_power_series,
             None,
         ),
+        f"[green bold]{ENERGY_NAME_WITH_SYMBOL}": (
+            (photovoltaic_power * peak_power, "green"),
+            (PHOTOVOLTAIC_ENERGY_UNIT, "green"),
+            (photovoltaic_energy_mean, "bold green"),
+            (PHOTOVOLTAIC_ENERGY_UNIT, "green"),
+            None,
+            None,
+            "bold",
+            EFFECTIVE_IRRADIANCE_NAME,
+            np.array([]),
+            None,
+        ),
         f"[white dim]{NET_EFFECT}": (
             (total_change, "white dim"),
+            (total_change_unit, "white dim"),
             (total_change_mean, "white dim"),
+            (total_change_mean_unit, "white dim"),
+            None,
             total_change_percentage,
-            (IRRADIANCE_UNIT, "white dim"),
             "dim",
             IN_PLANE_IRRADIANCE,
             np.array([]),
@@ -1246,7 +1387,168 @@ def analyse_photovoltaic_performance(
         ),
     }
 
+def determine_frequency(timestamps):
+    """
+    """
+    # First, get the "frequency" from the timestamps
+    time_groupings = {
+        'YE': 'Yearly',
+        'S': 'Seasonal',
+        'ME': 'Monthly',
+        'W': 'Weekly',
+        'D': 'Daily',
+        '3h': '3-Hourly',
+        'h': 'Hourly',
+    }
+    if timestamps.year.unique().size > 1:
+        frequency = 'YE'
+    elif timestamps.month.unique().size > 1:
+        frequency = 'ME'
+    elif timestamps.to_period().week.unique().size > 1:
+        frequency = 'W'
+    elif timestamps.day.unique().size > 1:
+        frequency = 'D'
+    elif timestamps.hour.unique().size < 24:
+        frequency = 'h'
+    else:
+        frequency = '3h'
+    frequency_label = time_groupings[frequency]
 
+    return frequency, frequency_label
+
+
+def build_performance_table(
+    frequency_label,
+    quantity_style,
+    value_style,
+    unit_style,
+    percentage_style,
+    reference_quantity_style,
+):
+    """
+    Setup the main performance table with appropriate columns.
+    """
+    table = Table(
+        # title="Photovoltaic Performance",
+        # caption="Detailed view of changes in photovoltaic performance.",
+        show_header=True,
+        header_style="bold magenta",
+        # show_footer=True,
+        # row_styles=["none", "dim"],
+        box=SIMPLE_HEAD,
+        highlight=True,
+    )
+    table.add_column(
+        "Quantity",
+        justify="left",
+        style=quantity_style,# style="magenta",
+        no_wrap=True,
+    )
+    table.add_column(
+        "Total",#f"{SYMBOL_SUMMATION}",
+        justify="right",
+        style=value_style,  # style="cyan",
+    )
+    table.add_column(
+        "Unit",
+        justify="right",
+        style=unit_style,  # style="magenta",
+    )
+    table.add_column(
+        "%",
+        justify="right",
+        style=percentage_style,#style="dim",
+    )
+    table.add_column(
+        "of",
+        justify="left",
+        style="dim",  # style=reference_quantity_style)
+    )
+    table.add_column(f"{frequency_label} Sums", style="dim", justify="center")
+    # table.add_column(f"{frequency_label} Mean", justify="right", style="white dim")#style=value_style)
+    table.add_column(f"Mean", justify="right", style="white dim")  # style=value_style)
+
+    table.add_column("Variability", justify="right", style="dim")  # New column for standard deviation
+    table.add_column("Source", style="dim", justify="left")
+
+    return table
+
+
+def build_position_table(
+        ):
+    """
+    """
+    position_table = Table(
+        box=None,
+        show_header=False,
+        show_edge=False,
+        pad_edge=False,
+    )
+    position_table.add_column("Position", justify="right", style="none", no_wrap=True)
+    position_table.add_column("Value", justify="right", style="none", no_wrap=True)
+
+    return position_table
+
+
+def build_time_table():
+    """
+    """
+    time_table = Table(
+            box=None,
+            show_header=False,
+            show_edge=False,
+            pad_edge=False,
+            )
+    time_table.add_column('Label', justify="right")
+    time_table.add_column('Timestamp', justify="left")
+
+    return time_table
+
+
+def build_photovoltaic_module_table():
+    """
+    """
+    photovoltaic_module_table = Table(
+            box=None,
+            show_header=False,
+            show_edge=False,
+            pad_edge=False,
+            )
+    photovoltaic_module_table.add_column('Label', justify="right")
+    photovoltaic_module_table.add_column('Value', justify="left")
+
+    return photovoltaic_module_table
+
+
+def build_photovoltaic_module_panel(photovoltaic_module_table):
+    """
+    """
+    photovoltaic_module_panel = Panel(
+            photovoltaic_module_table,
+            subtitle="PV Module",
+            subtitle_align="right",
+            safe_box=True,
+            expand=True,
+            padding=(0,2),
+            )
+
+    return photovoltaic_module_panel
+
+
+def build_fingerprint_panel(fingerprint):
+    """
+    """
+    fingerprint_panel = Panel(
+            Text(f"{fingerprint}", justify="center", style="bold yellow"),
+            subtitle="[reverse]Fingerprint[/reverse]",
+            subtitle_align="right",
+            border_style="dim",
+            style="dim",
+            # expand=True,
+            padding=(0,2),
+        )
+
+    return fingerprint_panel
 def print_change_percentages_panel(
     longitude = None,
     latitude = None,
@@ -1286,35 +1588,7 @@ def print_change_percentages_panel(
     degradation with age
 
     """
-    # First, get the "frequency" from the timestamps
-    time_groupings = {
-        'YE': 'Yearly',
-        'S': 'Seasonal',
-        'ME': 'Monthly',
-        'W': 'Weekly',
-        'D': 'Daily',
-        '3h': '3-Hourly',
-        'h': 'Hourly',
-    }
-    if timestamps.year.unique().size > 1:
-        frequency = 'YE'
-    elif timestamps.month.unique().size > 1:
-        frequency = 'ME'
-    elif timestamps.to_period().week.unique().size > 1:
-        frequency = 'W'
-    elif timestamps.day.unique().size > 1:
-        frequency = 'D'
-    elif timestamps.hour.unique().size < 24:
-        frequency = 'h'
-    else:
-        frequency = '3h'
-    frequency_label = time_groupings[frequency]
-
-    results = analyse_photovoltaic_performance(
-            dictionary=dictionary,
-            timestamps=timestamps,
-            frequency=frequency,
-            )
+    frequency, frequency_label = determine_frequency(timestamps=timestamps)
     add_empty_row_before = {
         # IN_PLANE_IRRADIANCE,
         REFLECTIVITY,
@@ -1325,50 +1599,46 @@ def print_change_percentages_panel(
         # PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
         SYSTEM_LOSS,
         # PHOTOVOLTAIC_POWER_LONG_NAME,
-        # f"[green bold]{PHOTOVOLTAIC_POWER_LONG_NAME}",
-        f"[white dim]{NET_EFFECT}",
+        # f"[white dim]{POWER_NAME}",
+        f"[green bold]{ENERGY_NAME_WITH_SYMBOL}",
+        # f"[white dim]{NET_EFFECT}",
     }
-    table = Table(
-        # title="Photovoltaic Performance",
-        # title="Analysis of Performance",
-        # caption="Caption text",
-        # caption="Detailed view of changes in photovoltaic performance.",
-        show_header=True,
-        header_style="bold magenta",
-        # show_footer=True,
-        # row_styles=["none", "dim"],
-        box=SIMPLE_HEAD,
-        highlight=True,
+    performance_table = build_performance_table(
+        frequency_label,
+        quantity_style,
+        value_style,
+        unit_style,
+        percentage_style,
+        reference_quantity_style,
     )
-    table.add_column("Quantity", justify="left", style="magenta", no_wrap=True)
-    # table.add_column(f"{SYMBOL_SUMMATION}", justify="right", style="cyan")
-    table.add_column("Total", justify="right", style="cyan")
-    table.add_column("Mean (FixMe!)", justify="right", style="cyan")
-    table.add_column("Unit", justify="right", style="magenta")
-    table.add_column("%", style="dim", justify="right")
-    table.add_column("of", style="dim", justify="left")
-    table.add_column(f"{frequency_label} sums", style="dim", justify="center")
-    table.add_column("Source", style="dim", justify="left")
-
-    # Adding rows based on the dictionary keys and their corresponding values
+    results = analyse_photovoltaic_performance(
+            dictionary=dictionary,
+            timestamps=timestamps,
+            frequency=frequency,
+            )
+    # Add rows based on the dictionary keys and corresponding values
     for label, (
         (value, value_style),
-        (mean_value, mean_value_style),
-        percentage,
         (unit, unit_style),
+        (mean_value, mean_value_style),
+        (mean_value_unit, mean_value_unit_style),
+        standard_deviation,
+        percentage,
         style,
         reference_quantity,
         input_series,
         source,
     ) in results.items():
         if label in add_empty_row_before:
-            table.add_row()
+            performance_table.add_row()
         add_table_row(
-            table=table,
+            table=performance_table,
             quantity=label,
             value=value,
-            mean_value=0,#,mean_value,
             unit=unit,
+            mean_value=mean_value,
+            mean_value_unit=mean_value_unit,
+            standard_deviation=standard_deviation,
             percentage=percentage,
             reference_quantity=reference_quantity,
             series=input_series,
@@ -1377,32 +1647,40 @@ def print_change_percentages_panel(
             source=source,
             quantity_style=quantity_style,
             value_style=value_style,
-            mean_value_style=mean_value_style,
             unit_style=unit_style,
+            mean_value_style=mean_value_style,
+            mean_value_unit_style=mean_value_unit_style,
             percentage_style=percentage_style,
             reference_quantity_style=reference_quantity_style,
             rounding_places=rounding_places,
         )
 
     # Positioning
-    position_table = Table(
-            box=None,
-            show_header=False,
-            show_edge=False,
-            pad_edge=False,
-            )
+    position_table = build_position_table()
     positioning_rounding_places = 3
-    position_table.add_column('Position', justify="right", style="none", no_wrap=True)
-    position_table.add_column('Value', justify="right", style="none", no_wrap=True)
-    latitude = round_float_values(latitude, positioning_rounding_places)#rounding_places)
+    latitude = round_float_values(
+        latitude, positioning_rounding_places
+    )  # rounding_places)
     position_table.add_row(f"{LATITUDE_NAME}", f"[bold]{latitude}[/bold]")
-    longitude = round_float_values(longitude, positioning_rounding_places)#rounding_places)
+    longitude = round_float_values(
+        longitude, positioning_rounding_places
+    )  # rounding_places)
     position_table.add_row(f"{LONGITUDE_NAME}", f"[bold]{longitude}[/bold]")
     position_table.add_row(f"{ELEVATION_COLUMN_NAME}", f"[bold]{elevation}[/bold]")
-    surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None) if surface_orientation else None
-    surface_orientation = round_float_values(surface_orientation, positioning_rounding_places)
-    position_table.add_row(f"{SURFACE_ORIENTATION_COLUMN_NAME}", f"[bold]{surface_orientation}[/bold]")
-    surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    surface_orientation = (
+        dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None)
+        if surface_orientation
+        else None
+    )
+    surface_orientation = round_float_values(
+        surface_orientation, positioning_rounding_places
+    )
+    position_table.add_row(
+        f"{SURFACE_ORIENTATION_COLUMN_NAME}", f"[bold]{surface_orientation}[/bold]"
+    )
+    surface_tilt = (
+        dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    )
     surface_tilt = round_float_values(surface_tilt, positioning_rounding_places)
     position_table.add_row(f"{SURFACE_TILT_COLUMN_NAME}", f"[bold]{surface_tilt}[/bold]")
 
@@ -1423,19 +1701,11 @@ def print_change_percentages_panel(
             if key == INCIDENCE_DEFINITION:
                 value = f"[yellow]{value}[/yellow]"
             position_table.add_row(padded_key, str(value))
-    time_table = Table(
-            box=None,
-            show_header=False,
-            show_edge=False,
-            pad_edge=False,
-            )
-    time_table.add_column('Label', justify="right")
-    time_table.add_column('Timestamp', justify="left")
+
+    time_table = build_time_table()
     time_table.add_row('Start', str(timestamps.strftime('%Y-%m-%d %H:%M').values[0])),
     time_table.add_row('End', str(timestamps.strftime('%Y-%m-%d %H:%M').values[-1])),
 
-    panels = []
-    
     position_panel = Panel(
             position_table,
             subtitle="Position",
@@ -1446,7 +1716,6 @@ def print_change_percentages_panel(
             expand=False,
             padding=(0, 2),
             )
-    panels.append(position_panel)
 
     time_panel = Panel(
             time_table,
@@ -1457,43 +1726,20 @@ def print_change_percentages_panel(
             expand=False,
             padding=(0,2),
             )
-    panels.append(time_panel)
+    photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
+    peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
+    photovoltaic_module_table = build_photovoltaic_module_table()
+    photovoltaic_module_table.add_row('Technology', photovoltaic_module)
+    photovoltaic_module_table.add_row('Peak Power', str(peak_power))
+    photovoltaic_module_table.add_row('Mount type', mount_type)
+    photovoltaic_module_panel = build_photovoltaic_module_panel(photovoltaic_module_table)
 
-    photovoltaic_module , mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
-    photovoltaic_module_table = Table(
-            box=None,
-            show_header=False,
-            show_edge=False,
-            pad_edge=False,
-            )
-    photovoltaic_module_table.add_column('Technology', justify="right")
-    photovoltaic_module_table.add_column('Mount Type', justify="left")
-    photovoltaic_module_table.add_row(photovoltaic_module, mount_type)
-    photovoltaic_module_panel = Panel(
-            photovoltaic_module_table,
-            subtitle="Technology",
-            subtitle_align="right",
-            safe_box=True,
-            expand=True,
-            padding=(0,2),
-            )
-    panels.append(photovoltaic_module_panel)
+    panels = [position_panel, time_panel, photovoltaic_module_panel]
 
     if fingerprint:
-        print(f'{fingerprint=}')
         fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
-        print(f'{fingerprint=}')
-        fingerprint_panel = Panel(
-            Text(f"{fingerprint}", justify="center", style="bold yellow"),
-            subtitle="[reverse]Fingerprint[/reverse]",
-            subtitle_align="right",
-            border_style="dim",
-            style="dim",
-            # expand=True,
-            padding=(0,2),
-        )
+        fingerprint_panel = build_fingerprint_panel(fingerprint)
         panels.append(fingerprint_panel)
-    # panels.append(position_panel)
 
     columns = Columns(
             panels,
@@ -1505,7 +1751,7 @@ def print_change_percentages_panel(
     from rich.console import Group
     panel_group = Group(
             Panel(
-                table,
+                performance_table,
                 title='Analysis of Performance',
                 expand=False,
                 # style="on black",
