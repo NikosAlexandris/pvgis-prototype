@@ -43,6 +43,7 @@ from pvgisprototype.constants import (
     GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
     DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
     DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+    PEAK_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
     REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_FACTOR_COLUMN_NAME,
@@ -171,6 +172,7 @@ def calculate_photovoltaic_power_output_series(
     angle_output_units: str = RADIANS,
     # horizon_heights: List[float] = None,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    peak_power: float = 1,
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
@@ -670,6 +672,7 @@ def calculate_photovoltaic_power_output_series(
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
             TECHNOLOGY_NAME: photovoltaic_module.value,
+            PEAK_POWER_COLUMN_NAME: peak_power,
             POWER_MODEL_COLUMN_NAME: power_model.value if power_model else NOT_AVAILABLE,
         },# if verbose > 0 else {},
 
