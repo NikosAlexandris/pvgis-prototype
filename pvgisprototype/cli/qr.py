@@ -1,4 +1,4 @@
-import numpy as np
+import numpy
 from pandas import DatetimeIndex
 import qrcode
 from pvgisprototype.api.utilities.conversions import round_float_values
@@ -59,13 +59,13 @@ def print_quick_response_code(
 
     # Process series
     inclined_irradiance_series = dictionary.get(
-        GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, np.array([])
+        GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, numpy.array([])
     )
     inclined_irradiance_mean = calculate_mean_of_series_per_time_unit(
         inclined_irradiance_series, timestamps=timestamps, frequency=frequency
     )
     photovoltaic_power_without_system_loss_series = dictionary.get(
-        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, np.array([])
+        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, numpy.array([])
     )
     photovoltaic_power_without_system_loss, _ = calculate_sum_and_percentage(
         photovoltaic_power_without_system_loss_series,
@@ -81,12 +81,12 @@ def print_quick_response_code(
             frequency=frequency,
         )
     )
-    photovoltaic_power_series = dictionary.get(PHOTOVOLTAIC_POWER_COLUMN_NAME, np.array([]))
+    photovoltaic_power_series = dictionary.get(PHOTOVOLTAIC_POWER_COLUMN_NAME, numpy.array([]))
     photovoltaic_power_mean = calculate_mean_of_series_per_time_unit(
         photovoltaic_power_series, timestamps=timestamps, frequency=frequency
     )
     system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None)
-    system_efficiency = np.nanmedian(system_efficiency_series).astype(dtype)  # Just in case we ever get time series of `system_efficiency` !
+    system_efficiency = numpy.nanmedian(system_efficiency_series).astype(dtype)  # Just in case we ever get time series of `system_efficiency` !
     system_efficiency_change = photovoltaic_power_without_system_loss * system_efficiency - photovoltaic_power_without_system_loss
     system_efficiency_change_mean = calculate_mean_of_series_per_time_unit(photovoltaic_power_without_system_loss_mean * system_efficiency - photovoltaic_power_without_system_loss_mean, timestamps=timestamps, frequency=frequency)
 
