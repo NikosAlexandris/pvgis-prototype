@@ -16,6 +16,7 @@ nav:
   - Overview:
     - Overview: index.md
     - Page tree: pagetree.md
+    - License: license.md
   - Installation:
     - install/index.md
     # - install/install.md
