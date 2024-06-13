@@ -32,14 +32,14 @@ Total loss (%): 	     -20.48
 from devtools import debug
 from rich.console import Console
 from typing import Union, Dict
-import numpy as np
+import numpy
 import xarray as xr
 from scipy.stats import mode
 from rich.table import Table
 from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 import csv
 from pvgisprototype.api.utilities.conversions import round_float_values
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, ROUNDING_PLACES_DEFAULT
 from pandas import DatetimeIndex
 # from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import PHOTOVOLTAIC_POWER_COLUMN_NAME
@@ -56,10 +56,72 @@ from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
 # from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
 # from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 # from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
+import pandas
+from pvgisprototype.api.utilities.conversions import round_float_values
+
+
+def calculate_sum_and_percentage(
+    series,
+    reference_series,
+    rounding_places=None,
+    dtype=DATA_TYPE_DEFAULT,
+    array_backend=ARRAY_BACKEND_DEFAULT,
+):
+    """Calculate sum of a series and its percentage relative to a reference series."""
+    total = numpy.nansum(series)
+    if isinstance(total, numpy.ndarray):
+        total = total.astype(dtype)
+    percentage = (total / reference_series * 100) if reference_series != 0 else 0
+    if isinstance(percentage, numpy.ndarray):
+        percentage.astype(dtype)
+    if rounding_places is not None:
+        total = round_float_values(total, rounding_places)
+        percentage = round_float_values(percentage, rounding_places)
+    return total, percentage
+
+
+def calculate_statistics(
+    series,
+    timestamps,
+    frequency,
+    reference_series,
+    rounding_places=None,
+    dtype=DATA_TYPE_DEFAULT,
+    array_backend=ARRAY_BACKEND_DEFAULT,
+):
+    """Calculate the sum, mean, standard deviation of a series based on a
+    specified frequency and its percentage relative to a reference series.
+    """
+    pandas_series = pandas.Series(series, timestamps)
+    resampled = pandas_series.resample(frequency)
+    total = resampled.sum().sum()
+    if isinstance(total, numpy.ndarray):
+        total = total.astype(dtype)
+    percentage = (total / reference_series * 100) if reference_series != 0 else 0
+    if isinstance(percentage, numpy.ndarray):
+        percentage.astype(dtype)
+    if rounding_places is not None:
+        total = round_float_values(total, rounding_places)
+        percentage = round_float_values(percentage, rounding_places)
+    mean = resampled.mean().mean()
+    std_dev = resampled.std().mean()  # Mean of standard deviations over the period
+    return total, mean, std_dev, percentage
+
+
+def calculate_mean_of_series_per_time_unit(
+    series: numpy.ndarray,
+    timestamps: DatetimeIndex,
+    frequency: str,
+    ):
+    """
+    """
+    pandas_series = pandas.Series(series, index=timestamps)
+    return pandas_series.resample(frequency).sum().mean()
+
 
 
 def calculate_series_statistics(
-    data_array: Union[np.ndarray, Dict[str, np.ndarray]],
+    data_array: Union[numpy.ndarray, Dict[str, numpy.ndarray]],
     timestamps: DatetimeIndex,
     groupby: str | None = None,
 ) -> dict:
@@ -102,7 +164,7 @@ def calculate_series_statistics(
             'Sum': data_xarray.sum().values,
         },
         'extended': lambda: {
-            '25th Percentile': np.percentile(data_xarray, 25),
+            '25th Percentile': numpy.percentile(data_xarray, 25),
             'Median': data_xarray.median().values,
             'Mode': mode(data_xarray.values.flatten())[0],
             'Variance': data_xarray.var().values,
@@ -152,7 +214,7 @@ def calculate_series_statistics(
 
 
 def print_series_statistics(
-    data_array: np.array,
+    data_array: numpy.array,
     timestamps: DatetimeIndex,
     title: str ='Time series',
     groupby: str = None,
