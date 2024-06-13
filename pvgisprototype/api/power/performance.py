@@ -1,48 +1,9 @@
 from pandas import DatetimeIndex
-import pandas
-from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, EFFECTIVE_IRRADIANCE_NAME, ENERGY_NAME_WITH_SYMBOL, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, IN_PLANE_IRRADIANCE, IRRADIANCE_AFTER_REFLECTIVITY, IRRADIANCE_UNIT, IRRADIANCE_UNIT_K, NET_EFFECT, PEAK_POWER_COLUMN_NAME, PHOTOVOLTAIC_ENERGY_UNIT, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_UNIT, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, POWER_MODEL_COLUMN_NAME, POWER_NAME_WITH_SYMBOL, POWER_UNIT_K, REFLECTIVITY, REFLECTIVITY_COLUMN_NAME, SPECTRAL_EFFECT, SPECTRAL_EFFECT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME, SYSTEM_LOSS, TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME
 import numpy
 from numpy import where
-
-
-def calculate_statistics(
-    series,
-    timestamps,
-    frequency,
-    reference_series,
-    rounding_places=None,
-    dtype=DATA_TYPE_DEFAULT,
-    array_backend=ARRAY_BACKEND_DEFAULT,
-):
-    """Calculate the sum, mean, standard deviation of a series based on a
-    specified frequency and its percentage relative to a reference series.
-    """
-    pandas_series = pandas.Series(series, timestamps)
-    resampled = pandas_series.resample(frequency)
-    total = resampled.sum().sum()
-    if isinstance(total, numpy.ndarray):
-        total = total.astype(dtype)
-    percentage = (total / reference_series * 100) if reference_series != 0 else 0
-    if isinstance(percentage, numpy.ndarray):
-        percentage.astype(dtype)
-    if rounding_places is not None:
-        total = round_float_values(total, rounding_places)
-        percentage = round_float_values(percentage, rounding_places)
-    mean = resampled.mean().mean()
-    std_dev = resampled.std().mean()  # Mean of standard deviations over the period
-    return total, mean, std_dev, percentage
-
-
-def calculate_mean_of_series_per_time_unit(
-    series: numpy.ndarray,
-    timestamps: DatetimeIndex,
-    frequency: str,
-    ):
-    """
-    """
-    pandas_series = pandas.Series(series, index=timestamps)
-    return pandas_series.resample(frequency).sum().mean()
+from pvgisprototype.api.series.statistics import calculate_mean_of_series_per_time_unit
+from pvgisprototype.api.series.statistics import calculate_statistics
 
 
 def kilofy_unit(value, unit="W", threshold=1000):
