@@ -1,11 +1,8 @@
-from re import S
-from sys import orig_argv
 import numpy as np
-from pandas import DatetimeIndex, Timestamp
+from pandas import DatetimeIndex
 import qrcode
-
 from pvgisprototype.api.utilities.conversions import round_float_values
-from pvgisprototype.cli.print import calculate_mean_of_series_per_time_unit, calculate_sum_and_percentage
+from pvgisprototype.api.series.statistics import calculate_mean_of_series_per_time_unit, calculate_sum_and_percentage
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, FINGERPRINT_COLUMN_NAME, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, IRRADIANCE_UNIT_K, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, POWER_UNIT, ROUNDING_PLACES_DEFAULT, SURFACE_ORIENTATION_COLUMN_NAME, SURFACE_TILT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME
 from datetime import datetime
 
