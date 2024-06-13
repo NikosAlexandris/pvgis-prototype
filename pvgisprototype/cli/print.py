@@ -847,8 +847,6 @@ def add_table_row(
     - Add row to specified table.
 
     """
-    from devtools import debug
-    debug(locals())
     effects = {
         REFLECTIVITY,
         SPECTRAL_EFFECT,
