@@ -34,7 +34,6 @@ from devtools import debug
 from typing import Dict, Optional
 from typing import List
 from pandas import DatetimeIndex
-from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_series_noaa
 from cachetools import cached
