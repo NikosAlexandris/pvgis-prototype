@@ -58,10 +58,10 @@ from pvgisprototype.cli.typer.position import typer_option_zero_negative_solar_i
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
 from pvgisprototype.cli.typer.refraction import typer_option_refracted_solar_zenith
-from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor
 from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
 from pvgisprototype.cli.typer.photovoltaic import typer_option_photovoltaic_module_model
+from pvgisprototype.cli.typer.photovoltaic import typer_option_photovoltaic_module_peak_power
 from pvgisprototype.cli.typer.efficiency import typer_option_pv_power_algorithm
 from pvgisprototype.cli.typer.efficiency import typer_option_module_temperature_algorithm
 from pvgisprototype.cli.typer.efficiency import typer_option_efficiency
@@ -72,7 +72,6 @@ from pvgisprototype.cli.typer.statistics import typer_option_statistics
 from pvgisprototype.cli.typer.statistics import typer_option_analysis
 from pvgisprototype.cli.typer.statistics import typer_option_nomenclature
 from pvgisprototype.cli.typer.statistics import typer_option_groupby
-from pvgisprototype.cli.typer.output import typer_option_time_output_units
 from pvgisprototype.cli.typer.output import typer_option_rounding_places
 from pvgisprototype.cli.typer.output import typer_option_index
 from pvgisprototype.cli.typer.output import typer_option_quick_response
@@ -85,9 +84,7 @@ from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT, NOMENCLATURE_FLAG_DEFAULT, RANDOM_TIMESTAMPS_FLAG_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import cPROFILE_FLAG_DEFAULT
-from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
@@ -100,9 +97,7 @@ from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
-from pvgisprototype.constants import ENERGY_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
@@ -182,6 +177,7 @@ def photovoltaic_power_output_series(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     photovoltaic_module: Annotated[PhotovoltaicModuleModel, typer_option_photovoltaic_module_model] = PHOTOVOLTAIC_MODULE_DEFAULT, #PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    peak_power: Annotated[float, typer_option_photovoltaic_module_peak_power] = 1,
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
@@ -268,6 +264,7 @@ def photovoltaic_power_output_series(
         angle_output_units=angle_output_units,
         # horizon_heights=horizon_heights,
         photovoltaic_module=photovoltaic_module,
+        peak_power=peak_power,
         system_efficiency=system_efficiency,
         power_model=power_model,
         temperature_model=temperature_model,
