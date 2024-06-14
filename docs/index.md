@@ -81,7 +81,7 @@ for systems using various PV technologies.
     - America :earth_americas:
     - Country/regional maps of solar resource & PV potential
 
-- :octicons-feed-public-16:{ .lg .middle } __Public Service__
+- :fontawesome-solid-people-group:{ .lg .middle } __Public Service__
 
     ---
 
@@ -91,7 +91,7 @@ for systems using various PV technologies.
     - :material-search-web: > 50K Web API requests / week
 
 
-- __Open Source__
+- :octicons-feed-public-16:{ .lg .middle } __Open by design__
 
     ---
 
