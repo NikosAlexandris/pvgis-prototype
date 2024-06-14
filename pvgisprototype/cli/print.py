@@ -1,9 +1,6 @@
 from pandas import DatetimeIndex, to_datetime
 import pandas
-from pandas.io.xml import file_exists
-from rich import print
 from datetime import datetime
-from numpy import where
 
 from sparklines import sparklines
 from pvgisprototype.api.position.models import SOLAR_POSITION_PARAMETER_COLUMN_NAMES, SolarPositionParameter
@@ -19,7 +16,7 @@ from typing import List, Sequence
 import numpy as np
 from pvgisprototype.api.power.performance import analyse_photovoltaic_performance
 from pvgisprototype.constants import (
-    ELEVATION_COLUMN_NAME,
+    ELEVATION_NAME,
     ENERGY_NAME_WITH_SYMBOL,
     LATITUDE_NAME,
     LONGITUDE_NAME,
@@ -42,7 +39,6 @@ from pvgisprototype.constants import (
     RADIATION_MODEL_COLUMN_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
-    SOLAR_TIME_COLUMN_NAME,
     DECLINATION_COLUMN_NAME,
     DECLINATION_NAME,
     HOUR_ANGLE_COLUMN_NAME,
@@ -404,37 +400,6 @@ def print_solar_position_series_table(
                 table_obj.add_row(*row)
 
             Console().print(table_obj)
-
-
-def print_hour_angle_table_2(
-    solar_time,
-    rounding_places,
-    hour_angle=None,
-    units=None,
-) -> None:
-    """ """
-    solar_time = round_float_values(solar_time, rounding_places)
-    hour_angle = round_float_values(hour_angle, rounding_places)
-
-    columns = [SOLAR_TIME_COLUMN_NAME]
-    if hour_angle is not None:
-        columns.append(HOUR_ANGLE_COLUMN_NAME)
-    columns.append(UNITS_COLUMN_NAME)
-
-    table = Table(
-        *columns,
-        box=SIMPLE_HEAD,
-        show_header=True,
-        header_style="bold magenta",
-    )
-
-    row = [str(solar_time)]
-    if hour_angle is not None:
-        row.append(str(hour_angle))
-    row.append(str(units))
-    table.add_row(*row)
-
-    Console().print(table)
 
 
 def print_hour_angle_table(
