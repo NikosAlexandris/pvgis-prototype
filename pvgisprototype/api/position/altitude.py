@@ -3,9 +3,8 @@ from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitu
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from typing import Dict, List, Union, Sequence
+from typing import Dict, List
 from pandas import DatetimeIndex, Timestamp
-from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
