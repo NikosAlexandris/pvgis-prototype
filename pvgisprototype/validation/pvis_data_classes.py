@@ -163,29 +163,23 @@ class BaseTimestampModel(BaseModel):
         if isinstance(value, np.ndarray):
             if value.dtype.type != np.datetime64:
                 raise ValueError("NumPy array must be of dtype 'datetime64'")
-        elif isinstance(value, np.datetime64):
-            pass
-        elif isinstance(value, Timestamp):
-            pass
-        elif isinstance(value, DatetimeIndex):
-            pass
-        else:
+        elif not isinstance(value, (np.datetime64, Timestamp, DatetimeIndex)):
             raise TypeError("Timestamp must be a NumPy datetime64, a Pandas DatetimeIndex, or a Pandas Timestamp")
         return value
 
 
 class BaseTimestampSeriesModel(BaseModel):
-    timestamps: DatetimeIndex
+    timestamps: DatetimeIndex | Timestamp
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator('timestamps')
     def check_type(cls, value):
         if isinstance(value, Timestamp) :
-            return DatetimeIndex(value)
+            return DatetimeIndex([value])
         elif isinstance(value, DatetimeIndex):
             return value
         else:
-            raise TypeError("Timestamps must be a Pandas DatetimeIndex object")
+            raise TypeError("Timestamps must be a Pandas object of either type DatetimeIndex or Timestamp")
 
 
 class BaseTimeModel(BaseTimestampModel):
