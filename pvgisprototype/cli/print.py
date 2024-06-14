@@ -783,7 +783,7 @@ def add_table_row(
     quantity = f"[{quantity_style}]{quantity}" if quantity_style else quantity
 
     # Mean value and unit
-    mean_value = f"[{mean_value_style}]{mean_value:.{rounding_places}f} {mean_value_unit}" if mean_value_style else f"{mean_value:.{rounding_places}f {mean_value_unit}}" 
+    mean_value = f"[{mean_value_style}]{mean_value:.{rounding_places}f}" if mean_value_style else f"{mean_value:.{rounding_places}f}" 
     if standard_deviation:
         standard_deviation = f"[{mean_value_style}]{standard_deviation:.{rounding_places}f}" if mean_value_style else f"{standard_deviation:.{rounding_places}f }" 
     else:
@@ -817,7 +817,7 @@ def add_table_row(
     if mean_value:
         if not sparkline:
             row.extend([""])
-        row.extend([mean_value, str(standard_deviation)])
+        row.extend([mean_value, mean_value_unit, (standard_deviation)])
     else:
         row.extend([""])
     if source:
@@ -869,6 +869,7 @@ def build_performance_table(
     quantity_style,
     value_style,
     unit_style,
+    mean_value_unit_style,
     percentage_style,
     reference_quantity_style,
 ):
@@ -898,7 +899,7 @@ def build_performance_table(
     )
     table.add_column(
         "Unit",
-        justify="right",
+        justify="left",
         style=unit_style,  # style="magenta",
     )
     table.add_column(
@@ -914,27 +915,52 @@ def build_performance_table(
     table.add_column(f"{frequency_label} Sums", style="dim", justify="center")
     # table.add_column(f"{frequency_label} Mean", justify="right", style="white dim")#style=value_style)
     table.add_column(f"Mean", justify="right", style="white dim")  # style=value_style)
+    table.add_column(
+        "Unit",  # for Mean values
+        justify="left",
+        style=mean_value_unit_style,
+    )
 
-    table.add_column("Variability", justify="right", style="dim")  # New column for standard deviation
+    table.add_column(
+        "Variability", justify="right", style="dim"
+    )  # New column for standard deviation
     table.add_column("Source", style="dim", justify="left")
 
     return table
 
 
-def build_position_table(
-        ):
+def build_position_table() -> Table:
     """
     """
     position_table = Table(
         box=None,
-        show_header=False,
+        show_header=True,
+        header_style="bold dim",
         show_edge=False,
         pad_edge=False,
     )
-    position_table.add_column("Position", justify="right", style="none", no_wrap=True)
-    position_table.add_column("Value", justify="right", style="none", no_wrap=True)
+    position_table.add_column(f"{LATITUDE_NAME}", justify="center", style="bold", no_wrap=True)
+    position_table.add_column(f"{LONGITUDE_NAME}", justify="center", style="bold", no_wrap=True)
+    position_table.add_column(f"{ELEVATION_NAME}", justify="center", style="bold", no_wrap=True)
+    position_table.add_column(f"{SURFACE_ORIENTATION_NAME}", justify="center", style="bold", no_wrap=True)
+    position_table.add_column(f"{SURFACE_TILT_NAME}", justify="center", style="bold", no_wrap=True)
 
     return position_table
+
+
+def build_position_panel(position_table) -> Panel:
+    """
+    """
+    return Panel(
+            position_table,
+            # subtitle="Position",
+            # subtitle_align="right",
+            # box=None,
+            safe_box=True,
+            style='',
+            expand=False,
+            padding=(0, 3),
+            )
 
 
 def build_time_table():
@@ -942,12 +968,13 @@ def build_time_table():
     """
     time_table = Table(
             box=None,
-            show_header=False,
+            show_header=True,
+            header_style=None,
             show_edge=False,
             pad_edge=False,
             )
-    time_table.add_column('Label', justify="right")
-    time_table.add_column('Timestamp', justify="left")
+    time_table.add_column('Start', justify="left", style="bold")
+    time_table.add_column('End', justify="left", style="dim bold")
 
     return time_table
 
@@ -957,12 +984,17 @@ def build_photovoltaic_module_table():
     """
     photovoltaic_module_table = Table(
             box=None,
-            show_header=False,
+            show_header=True,
+            header_style=None,
             show_edge=False,
             pad_edge=False,
             )
-    photovoltaic_module_table.add_column('Label', justify="right")
-    photovoltaic_module_table.add_column('Value', justify="left")
+    photovoltaic_module_table.add_column('Tech', justify="right",
+                                         style="bold")
+    photovoltaic_module_table.add_column('Peak-Power', justify="center",
+                                         style="bold")
+    photovoltaic_module_table.add_column('Mount Type', justify="left",
+                                         style="bold")
 
     return photovoltaic_module_table
 
@@ -982,21 +1014,43 @@ def build_photovoltaic_module_panel(photovoltaic_module_table):
     return photovoltaic_module_panel
 
 
+def build_pvgis_version_panel():
+    """
+    """
+    from pvgisprototype._version import __version__
+    pvgis_version = Text(
+            f"PVGIS v6 ({__version__})",
+            justify="center",
+            style="white dim",
+            )
+    return Panel(
+            pvgis_version,
+            # subtitle="[reverse]Fingerprint[/reverse]",
+            # subtitle_align="right",
+            border_style="dim",
+            # style="dim",
+            expand=False,
+            padding=(0,2),
+        )
+
+
 def build_fingerprint_panel(fingerprint):
     """
     """
-    fingerprint_panel = Panel(
-            Text(f"{fingerprint}", justify="center", style="bold yellow"),
+    fingerprint = Text(
+        f"{fingerprint}",
+        justify="center",
+        style="yellow bold",
+    )
+    return Panel(
+            fingerprint,
             subtitle="[reverse]Fingerprint[/reverse]",
             subtitle_align="right",
             border_style="dim",
             style="dim",
-            # expand=True,
+            expand=False,
             padding=(0,2),
         )
-
-    return fingerprint_panel
-
 
 
 def print_change_percentages_panel(
@@ -1054,18 +1108,20 @@ def print_change_percentages_panel(
         # f"[white dim]{NET_EFFECT}",
     }
     performance_table = build_performance_table(
-        frequency_label,
-        quantity_style,
-        value_style,
-        unit_style,
-        percentage_style,
-        reference_quantity_style,
+        frequency_label=frequency_label,
+        quantity_style=quantity_style,
+        value_style=value_style,
+        unit_style=unit_style,
+        mean_value_unit_style="white dim",
+        percentage_style=percentage_style,
+        reference_quantity_style=reference_quantity_style,
     )
     results = analyse_photovoltaic_performance(
             dictionary=dictionary,
             timestamps=timestamps,
             frequency=frequency,
             )
+
     # Add rows based on the dictionary keys and corresponding values
     for label, (
         (value, value_style),
@@ -1111,12 +1167,10 @@ def print_change_percentages_panel(
     latitude = round_float_values(
         latitude, positioning_rounding_places
     )  # rounding_places)
-    position_table.add_row(f"{LATITUDE_NAME}", f"[bold]{latitude}[/bold]")
+    # position_table.add_row(f"{LATITUDE_NAME}", f"[bold]{latitude}[/bold]")
     longitude = round_float_values(
         longitude, positioning_rounding_places
     )  # rounding_places)
-    position_table.add_row(f"{LONGITUDE_NAME}", f"[bold]{longitude}[/bold]")
-    position_table.add_row(f"{ELEVATION_COLUMN_NAME}", f"[bold]{elevation}[/bold]")
     surface_orientation = (
         dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None)
         if surface_orientation
@@ -1125,15 +1179,17 @@ def print_change_percentages_panel(
     surface_orientation = round_float_values(
         surface_orientation, positioning_rounding_places
     )
-    position_table.add_row(
-        f"{SURFACE_ORIENTATION_COLUMN_NAME}", f"[bold]{surface_orientation}[/bold]"
-    )
     surface_tilt = (
         dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
     )
     surface_tilt = round_float_values(surface_tilt, positioning_rounding_places)
-    position_table.add_row(f"{SURFACE_TILT_COLUMN_NAME}", f"[bold]{surface_tilt}[/bold]")
-
+    position_table.add_row(
+            f"{latitude}",
+            f"{longitude}",
+            f"{elevation}",
+            f"{surface_orientation}",
+            f"{surface_tilt}",
+            )
     # position_table.add_row("Time :", f"{timestamp[0]}")
     # position_table.add_row("Time zone :", f"{timezone}")
     
@@ -1152,26 +1208,18 @@ def print_change_percentages_panel(
                 value = f"[yellow]{value}[/yellow]"
             position_table.add_row(padded_key, str(value))
 
+    position_panel = build_position_panel(position_table)
+
     time_table = build_time_table()
-    time_table.add_row('Start', str(timestamps.strftime('%Y-%m-%d %H:%M').values[0])),
-    time_table.add_row('End', str(timestamps.strftime('%Y-%m-%d %H:%M').values[-1])),
-
-    position_panel = Panel(
-            position_table,
-            subtitle="Position",
-            subtitle_align="right",
-            # box=None,
-            safe_box=True,
-            style='',
-            expand=False,
-            padding=(0, 2),
-            )
-
+    time_table.add_row(
+        str(timestamps.strftime('%Y-%m-%d %H:%M').values[0]),
+        str(timestamps.strftime('%Y-%m-%d %H:%M').values[-1]),
+    )
     time_panel = Panel(
             time_table,
             # title="Time",
-            subtitle="Time",
-            subtitle_align="right",
+            # subtitle="Time",
+            # subtitle_align="right",
             safe_box=True,
             expand=False,
             padding=(0,2),
@@ -1179,41 +1227,70 @@ def print_change_percentages_panel(
     photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
     photovoltaic_module_table = build_photovoltaic_module_table()
-    photovoltaic_module_table.add_row('Technology', photovoltaic_module)
-    photovoltaic_module_table.add_row('Peak Power', str(peak_power))
-    photovoltaic_module_table.add_row('Mount type', mount_type)
-    photovoltaic_module_panel = build_photovoltaic_module_panel(photovoltaic_module_table)
-
-    panels = [position_panel, time_panel, photovoltaic_module_panel]
-
-    if fingerprint:
-        fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
-        fingerprint_panel = build_fingerprint_panel(fingerprint)
-        panels.append(fingerprint_panel)
-
-    columns = Columns(
-            panels,
-            # expand=False,
-            # equal=True,
-            # padding=1,
+    photovoltaic_module_table.add_row(
+            photovoltaic_module,
+            str(peak_power),
+            mount_type,
             )
 
-    from rich.console import Group
-    panel_group = Group(
-            Panel(
+    photovoltaic_module_panel = build_photovoltaic_module_panel(photovoltaic_module_table)
+    # panels = [position_panel, time_panel, photovoltaic_module_panel]
+
+    # columns = Columns(
+    #         panels,
+    #         # expand=True,
+    #         # equal=True,
+    #         padding=2,
+    #         )
+
+    performance_panel = Panel(
                 performance_table,
                 title='Analysis of Performance',
                 expand=False,
                 # style="on black",
-                ),
-            columns,
-        # Panel(table),
-        # Panel(position_panel),
-    #     Panel("World", style="on red"),
-            fit=False
-    )
+                )
+    photovoltaic_module_columns = Columns(
+            [position_panel,
+            time_panel,
+            photovoltaic_module_panel],
+            # expand=True,
+            # equal=True,
+            padding=3,
+            )
 
-    Console().print(panel_group)
+    from rich.console import group
+    @group()
+    def build_panels(fingerprint):
+        if fingerprint:
+            fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
+            yield build_fingerprint_panel(fingerprint)
+        yield build_pvgis_version_panel()
+
+    columns = Columns([build_panels(fingerprint)])
+
+    from rich.console import Group
+    group = Group(
+            performance_panel,
+            photovoltaic_module_columns,
+            columns,
+            )
+    # panel_group = Group(
+    #         Panel(
+    #             performance_table,
+    #             title='Analysis of Performance',
+    #             expand=False,
+    #             # style="on black",
+    #             ),
+    #         columns,
+    #     # Panel(table),
+    #     # Panel(position_panel),
+    # #     Panel("World", style="on red"),
+    #         fit=False
+    # )
+
+    # Console().print(panel_group)
+    # Console().print(Panel(performance_table))
+    Console().print(group)
 
 
 def print_finger_hash(dictionary: dict):
