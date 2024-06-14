@@ -11,6 +11,10 @@ tags:
 
 # Other Tools
 
+## Open Source Tools
+
+- [Open Source Tools for PV Modeling](https://openpvtools.readthedocs.io/en/latest/#), a catalog of open source tools in the domain of photovoltaics.
+
 ## NREL (National Renewable Energy Laboratory)
 
 - [NREL Solar Radiation Data Manual](https://www.nrel.gov/docs/fy08osti/34302.pdf)

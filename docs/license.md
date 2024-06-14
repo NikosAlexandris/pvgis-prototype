@@ -1,4 +1,5 @@
 ---
+icon: material/license
 title: EUPL-1.2
 subtitle: European Union Public License 1.2
 description: The European Union Public License version 1.2
