@@ -2,7 +2,7 @@
 body {
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 20px;
-    line-height: 1.5;
+    line-height: 1.2;
     background-color: #ffffff; /* Keeps the background consistent and light */
     color: #333333; /* Default text color for better readability */
 }
@@ -50,7 +50,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .md-content p, .md-content li {
-    line-height: 1.9; /* Increased line height for better readability */
+    line-height: 1.8; /* Increased line height for better readability */
     letter-spacing: 0.02em; /* Slight increase in letter spacing */
 }
 
