@@ -289,10 +289,14 @@ and ideally should return meaninfgul error messages.
 
 !!! danger "One more failing example"
 
+    ``` bash
+    pvgis-prototype irradiance global inclined 8 45 214 '2010-01-27 12:00:00'
+    ```
+
     ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype irradiance global inclined 8 45 214 '2010-01-27 12:00:00'
     ```
 
-    In the last example that fails,
-    both the surface orientation angle and tilt angles are missing followed by
-    a user-requested timestamp.
+    In the last failing example,
+    both the surface _orientation_ and _tilt_ angles are missing followed by
+    a user-requested _timestamp_.
