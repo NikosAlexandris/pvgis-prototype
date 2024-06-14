@@ -15,7 +15,7 @@ watch:
 nav:
   - Overview:
     - Overview: index.md
-    - Page tree: pagetree.md
+    - Site tree: site_tree.md
     - License: license.md
   - Installation:
     - install/index.md
