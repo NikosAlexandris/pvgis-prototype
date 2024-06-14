@@ -59,6 +59,7 @@ and use them as in the following example
 Let's see what is in the `longitude` variable
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
+>>> from rich import print
 >>> print(longitude)
 ```
 
@@ -111,7 +112,8 @@ We can see the required arguments to run the command
 
 ## Error Handling
 
-Let's give it a first try with some _reasonable_ inputs
+Let's give it a first try with some _reasonable_ input values for `longitude`,
+`latitude` and `timestamps` plus `timezone`
 
 !!! failure
 
@@ -119,7 +121,7 @@ Let's give it a first try with some _reasonable_ inputs
     >>> calculate_solar_altitude_series(8, 45, '2001-01-01 10:00:00', 'UTC')
     ```
 
-PVGIS' API is indeed idiomatic and our _reasonable_ inputs won't work.
+PVGIS' API is indeed idiomatic and our _reasonable_ inputs won't work !
 However,
 the input arguments are validated via Pydantic
 and thus we receive informative error messages.
@@ -134,10 +136,19 @@ Let's import the required modules
 >>> from pvgisprototype.api.utilities.conversions import convert_float_to_radians_if_requested
 ```
 
-And retry again
+Setting the input parameters
 
 ```pycon exec="1" source="console" session="solar-altitude"
->>> solar_altitude = calculate_solar_altitude_series(convert_float_to_radians_if_requested(8, 'radians'), convert_float_to_radians_if_requested(45, 'radians'), Timestamp('2001-01-01 10:00:00+00:00'), ZoneInfo('UTC'))
+>>> latitude=convert_float_to_radians_if_requested(8, 'radians')
+>>> longitude=convert_float_to_radians_if_requested(45, 'radians')
+>>> timestamps=Timestamp('2001-01-01 10:00:00+00:00')
+>>> timezone=ZoneInfo('UTC')
+```
+
+And re-run the calculation
+
+```pycon exec="1" source="console" session="solar-altitude"
+>>> solar_altitude = calculate_solar_altitude_series(longitude=longitude, latitude=latitude, timestamps=timestamps, timezone=timezone)
 >>> print(f"Solar altitude from PVGIS' API : {solar_altitude}")
 ```
 
