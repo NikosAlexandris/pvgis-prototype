@@ -1,5 +1,5 @@
 from pandas import DatetimeIndex
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, EFFECTIVE_IRRADIANCE_NAME, ENERGY_NAME_WITH_SYMBOL, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, IN_PLANE_IRRADIANCE, IRRADIANCE_AFTER_REFLECTIVITY, IRRADIANCE_UNIT, IRRADIANCE_UNIT_K, NET_EFFECT, PEAK_POWER_COLUMN_NAME, PHOTOVOLTAIC_ENERGY_UNIT, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_UNIT, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, POWER_MODEL_COLUMN_NAME, POWER_NAME_WITH_SYMBOL, POWER_UNIT_K, REFLECTIVITY, REFLECTIVITY_COLUMN_NAME, SPECTRAL_EFFECT, SPECTRAL_EFFECT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME, SYSTEM_LOSS, TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME
+from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, EFFECTIVE_IRRADIANCE_NAME, ENERGY_NAME_WITH_SYMBOL, ENERGY_UNIT, ENERGY_UNIT_K, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, IN_PLANE_IRRADIANCE, IRRADIANCE_AFTER_REFLECTIVITY, IRRADIANCE_UNIT, IRRADIANCE_UNIT_K, NET_EFFECT, PEAK_POWER_COLUMN_NAME, PHOTOVOLTAIC_ENERGY_UNIT, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_UNIT, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, POWER_MODEL_COLUMN_NAME, POWER_NAME_WITH_SYMBOL, POWER_UNIT, POWER_UNIT_K, REFLECTIVITY, REFLECTIVITY_COLUMN_NAME, SPECTRAL_EFFECT, SPECTRAL_EFFECT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME, SYSTEM_LOSS, TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME
 import numpy
 from numpy import where
 from pvgisprototype.api.series.statistics import calculate_mean_of_series_per_time_unit
@@ -33,8 +33,10 @@ def kilofy_unit(value, unit="W", threshold=1000):
     if value is not None:
         if abs(value) >= threshold and unit == IRRADIANCE_UNIT:
             return value / 1000, IRRADIANCE_UNIT_K  # update to kilo
-        if abs(value) >= threshold and unit == POWER_UNIT_K:
+        if abs(value) >= threshold and unit == POWER_UNIT:
             return value / 1000, POWER_UNIT_K  # update to kilo
+        if abs(value) >= threshold and unit == ENERGY_UNIT:
+            return value / 1000, ENERGY_UNIT_K  # update to kilo
     return value, unit
 
 
@@ -231,6 +233,7 @@ def analyse_photovoltaic_performance(
         rounding_places,
     )
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, numpy.array([]))
+    photovoltaic_energy = photovoltaic_power * peak_power
     photovoltaic_energy_mean = photovoltaic_power_mean * peak_power
 
     # From PVGIS v5.2 --------------------------------------------------------
@@ -315,6 +318,13 @@ def analyse_photovoltaic_performance(
     )
     photovoltaic_power_mean, photovoltaic_power_mean_unit = kilofy_unit(
         photovoltaic_power_mean, PHOTOVOLTAIC_POWER_UNIT
+    )
+
+    photovoltaic_energy, photovoltaic_energy_unit = kilofy_unit(
+        photovoltaic_energy, PHOTOVOLTAIC_ENERGY_UNIT
+    )
+    photovoltaic_energy_mean, photovoltaic_energy_mean_unit = kilofy_unit(
+        photovoltaic_energy_mean, PHOTOVOLTAIC_ENERGY_UNIT
     )
 
     total_change, total_change_unit = kilofy_unit(total_change, IRRADIANCE_UNIT)
@@ -432,10 +442,10 @@ def analyse_photovoltaic_performance(
             None,
         ),
         f"[green bold]{ENERGY_NAME_WITH_SYMBOL}": (
-            (photovoltaic_power * peak_power, "green"),
-            (PHOTOVOLTAIC_ENERGY_UNIT, "green"),
+            (photovoltaic_energy, "green"),
+            (photovoltaic_energy_unit, "green"),
             (photovoltaic_energy_mean, "bold green"),
-            (PHOTOVOLTAIC_ENERGY_UNIT, "green"),
+            (photovoltaic_energy_mean_unit, "green"),
             None,
             None,
             "bold",
