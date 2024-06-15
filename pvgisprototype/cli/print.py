@@ -1014,23 +1014,29 @@ def build_photovoltaic_module_panel(photovoltaic_module_table):
     return photovoltaic_module_panel
 
 
-def build_pvgis_version_panel():
+def build_pvgis_version_panel(
+        prefix_text = "PVGIS v6",
+        justify_text = "center",
+        style_text = "white dim",
+        border_style = "dim",
+        padding = (0, 2),
+        ) -> Panel:
     """
     """
     from pvgisprototype._version import __version__
     pvgis_version = Text(
-            f"PVGIS v6 ({__version__})",
-            justify="center",
-            style="white dim",
+            f"{prefix_text} ({__version__})",
+            justify=justify_text,
+            style=style_text,
             )
     return Panel(
             pvgis_version,
             # subtitle="[reverse]Fingerprint[/reverse]",
             # subtitle_align="right",
-            border_style="dim",
+            border_style=border_style,
             # style="dim",
             expand=False,
-            padding=(0,2),
+            padding=padding,
         )
 
 
@@ -1051,6 +1057,28 @@ def build_fingerprint_panel(fingerprint):
             expand=False,
             padding=(0,2),
         )
+
+
+# from rich.console import group
+# @group()
+def build_version_and_fingerprint_panels(fingerprint=None):
+    """Dynamically build panels based on available data."""
+    # Always yield version panel
+    panels = [build_pvgis_version_panel()]
+    # Yield fingerprint panel only if fingerprint is provided
+    if fingerprint:
+        panels.append(build_fingerprint_panel(fingerprint))
+
+    return panels
+
+
+def build_version_and_fingerprint_columns(fingerprint) -> Columns:
+    """Combine software version and fingerprint panels into a single Columns
+    object."""
+    version_and_fingeprint_panels = build_version_and_fingerprint_panels(
+        fingerprint=fingerprint
+    )
+    return Columns(version_and_fingeprint_panels, expand=False, padding=2)
 
 
 def print_change_percentages_panel(
@@ -1258,15 +1286,8 @@ def print_change_percentages_panel(
             padding=3,
             )
 
-    from rich.console import group
-    @group()
-    def build_panels(fingerprint):
-        if fingerprint:
-            fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
-            yield build_fingerprint_panel(fingerprint)
-        yield build_pvgis_version_panel()
-
-    columns = Columns([build_panels(fingerprint)])
+    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
+    columns = build_version_and_fingerprint_columns(fingerprint)
 
     from rich.console import Group
     group = Group(
