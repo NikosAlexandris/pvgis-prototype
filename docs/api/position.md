@@ -214,11 +214,15 @@ and print or re-use it for further processing
 >>> print(solar_azimuth_series)
 ```
 
-!!! tip "Convert output to degrees"
+!!! danger "Yet to implement!"
 
-    Note, most PVGIS data classes feature a standard `.degrees` method
-    -- it'll convert the values to geographic degrees :
+    !!! tip "Convert output to degrees"
 
-    ```pycon exec="true" session="azimuth-series" source="material-block"
-    >>> print(solar_azimuth_series.degrees)
-    ```
+        Note, most PVGIS data classes feature a standard `.degrees` method
+        -- it'll convert the values to geographic degrees :
+
+        ```pycon exec="true" session="azimuth-series" source="material-block"
+        >>> from rich import print
+        >>> print(solar_azimuth_series.degrees)
+        ```
+

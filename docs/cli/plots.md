@@ -9,6 +9,36 @@ tags:
   - Plots
 ---
 
+## Overview
+
+With `pvgis-prototype` we can generate plots : images that we can re-use or
+plot directly in the terminal for uninterrupted interactive work.
+
+<div class="grid cards" markdown>
+
+- :octicons-graph-16: __Plot__
+
+    ---
+
+    - use the command `series` + subcommand `plot`
+
+    - arbitrary single or multiple time series
+    
+    - user defined output filename
+    
+    - support for Tufte styled output
+
+
+- :material-console-line::octicons-graph-16: __Uniplot in the terminal !__
+
+    ---
+
+    - Use the `--uniplot` flag
+    - Support for single and multiple series
+    - Adjust output width via the `--terminal-width-fraction` flag
+
+</div>
+
 ## Time series
 
 ``` bash exec="true" result="ansi" source="material-block"

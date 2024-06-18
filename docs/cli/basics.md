@@ -8,11 +8,11 @@ tags:
   - CLI
 ---
 
-!!! info "Overview"
+## Overview
 
-    This section introduces the basic structure of the command line interface,
-    various commands, required arguments and optional parameters
-    as well as some insight into generating arbitrary series of Timestamps.
+This section introduces the basic structure of the command line interface,
+various commands, required arguments and optional parameters
+as well as some insight into generating arbitrary series of Timestamps.
 
 <div class="grid cards" markdown>
 

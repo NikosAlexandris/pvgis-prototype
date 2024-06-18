@@ -21,9 +21,7 @@ tags:
 
 <div class="grid cards" markdown>
 
-- :octicons-command-palette-24: [**`position`**]()
-
-    :material-sun-angle: Calculate solar position parameters
+- :octicons-command-palette-24: [**`position`**]() :material-sun-angle: Calculate solar position parameters
 
     ---
     
