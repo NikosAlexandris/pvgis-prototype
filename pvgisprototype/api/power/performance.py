@@ -1,4 +1,5 @@
 from pandas import DatetimeIndex
+from pandas._libs.tslibs import timestamps
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, EFFECTIVE_IRRADIANCE_NAME, ENERGY_NAME_WITH_SYMBOL, ENERGY_UNIT, ENERGY_UNIT_K, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, IN_PLANE_IRRADIANCE, IRRADIANCE_AFTER_REFLECTIVITY, IRRADIANCE_UNIT, IRRADIANCE_UNIT_K, NET_EFFECT, PEAK_POWER_COLUMN_NAME, PHOTOVOLTAIC_ENERGY_UNIT, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_UNIT, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, POWER_MODEL_COLUMN_NAME, POWER_NAME_WITH_SYMBOL, POWER_UNIT, POWER_UNIT_K, REFLECTIVITY, REFLECTIVITY_COLUMN_NAME, SPECTRAL_EFFECT, SPECTRAL_EFFECT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME, SYSTEM_LOSS, TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME
 import numpy
 from numpy import where
@@ -74,28 +75,28 @@ def analyse_photovoltaic_performance(
     In-Plane Irradiance                           
 
     ┌───────────┘
-    │ Reflectivity Loss             
+    │ Reflectivity Effect
     └┐─────────────────
      ▼
 
     Irradiance After Reflectivity Loss            
 
     ┌───────────┘
-    │ Spectral Effect               
+    │ Spectral Effect
     └┐───────────────
      ▼
 
-    Effective Irradiance                          
+    Effective Irradiance
 
     ┌───────────┘
-    │ Temp. & Low Irradiance Coefficients 
+    │ Temp. & Low Irradiance Coefficients
     └┐───────────────────────────────────
      ▼
 
-    Effective Power                                         
+    Effective Power                   
 
     ┌───────────┘
-    │ System Loss                   
+    │ System Loss
     └┐───────────
      ▼
 
@@ -331,19 +332,159 @@ def analyse_photovoltaic_performance(
     total_change_mean, total_change_mean_unit = kilofy_unit(
         total_change_mean, IRRADIANCE_UNIT
     )
+    performance_analysis = (
+        inclined_irradiance,
+        inclined_irradiance_unit,
+        inclined_irradiance_mean,
+        inclined_irradiance_mean_unit,
+        inclined_irradiance_std,
+        inclined_irradiance_series,
+        reflectivity_change,
+        reflectivity_change_unit,
+        reflectivity_change_mean,
+        reflectivity_change_mean_unit,
+        reflectivity_change_std,
+        reflectivity_change_percentage,
+        reflectivity_series,
+        irradiance_after_reflectivity,
+        irradiance_after_reflectivity_unit,
+        irradiance_after_reflectivity_mean,
+        irradiance_after_reflectivity_mean_unit,
+        spectral_effect,
+        spectral_effect_unit,
+        spectral_effect_mean,
+        spectral_effect_mean_unit,
+        spectral_effect_std,
+        spectral_effect_percentage,
+        spectral_effect_series,
+        effective_irradiance,
+        effective_irradiance_unit,
+        effective_irradiance_mean,
+        effective_irradiance_mean_unit,
+        temperature_and_low_irradiance_change,
+        temperature_and_low_irradiance_change_unit,
+        temperature_and_low_irradiance_change_mean,
+        temperature_and_low_irradiance_change_mean_unit,
+        temperature_and_low_irradiance_change_percentage,
+        photovoltaic_power_without_system_loss,
+        photovoltaic_power_without_system_loss_unit,
+        photovoltaic_power_without_system_loss_mean,
+        photovoltaic_power_without_system_loss_mean_unit,
+        photovoltaic_power_without_system_loss_std,
+        photovoltaic_power_without_system_loss_series,
+        system_efficiency_change,
+        system_efficiency_change_unit,
+        system_efficiency_change_mean,
+        system_efficiency_change_mean_unit,
+        system_efficiency_change_percentage,
+        photovoltaic_power,
+        photovoltaic_power_unit,
+        photovoltaic_power_mean,
+        photovoltaic_power_mean_unit,
+        photovoltaic_power_std,
+        photovoltaic_power_series,
+        photovoltaic_energy,
+        photovoltaic_energy_unit,
+        photovoltaic_energy_mean,
+        photovoltaic_energy_mean_unit,
+        total_change,
+        total_change_unit,
+        total_change_mean,
+        total_change_mean_unit,
+        total_change_percentage,
+    )
 
+    return performance_analysis
+
+
+def report_photovoltaic_performance(
+    dictionary,
+    timestamps: DatetimeIndex,
+    frequency: str,
+    rounding_places=1,
+    dtype=DATA_TYPE_DEFAULT,
+    array_backend=ARRAY_BACKEND_DEFAULT,
+):
+    (
+        inclined_irradiance,
+        inclined_irradiance_unit,
+        inclined_irradiance_mean,
+        inclined_irradiance_mean_unit,
+        inclined_irradiance_std,
+        inclined_irradiance_series,
+        reflectivity_change,
+        reflectivity_change_unit,
+        reflectivity_change_mean,
+        reflectivity_change_mean_unit,
+        reflectivity_change_std,
+        reflectivity_change_percentage,
+        reflectivity_series,
+        irradiance_after_reflectivity,
+        irradiance_after_reflectivity_unit,
+        irradiance_after_reflectivity_mean,
+        irradiance_after_reflectivity_mean_unit,
+        spectral_effect,
+        spectral_effect_unit,
+        spectral_effect_mean,
+        spectral_effect_mean_unit,
+        spectral_effect_std,
+        spectral_effect_percentage,
+        spectral_effect_series,
+        effective_irradiance,
+        effective_irradiance_unit,
+        effective_irradiance_mean,
+        effective_irradiance_mean_unit,
+        temperature_and_low_irradiance_change,
+        temperature_and_low_irradiance_change_unit,
+        temperature_and_low_irradiance_change_mean,
+        temperature_and_low_irradiance_change_mean_unit,
+        temperature_and_low_irradiance_change_percentage,
+        photovoltaic_power_without_system_loss,
+        photovoltaic_power_without_system_loss_unit,
+        photovoltaic_power_without_system_loss_mean,
+        photovoltaic_power_without_system_loss_mean_unit,
+        photovoltaic_power_without_system_loss_std,
+        photovoltaic_power_without_system_loss_series,
+        system_efficiency_change,
+        system_efficiency_change_unit,
+        system_efficiency_change_mean,
+        system_efficiency_change_mean_unit,
+        system_efficiency_change_percentage,
+        photovoltaic_power,
+        photovoltaic_power_unit,
+        photovoltaic_power_mean,
+        photovoltaic_power_mean_unit,
+        photovoltaic_power_std,
+        photovoltaic_power_series,
+        photovoltaic_energy,
+        photovoltaic_energy_unit,
+        photovoltaic_energy_mean,
+        photovoltaic_energy_mean_unit,
+        total_change,
+        total_change_unit,
+        total_change_mean,
+        total_change_mean_unit,
+        total_change_percentage,
+    ) = analyse_photovoltaic_performance(
+        dictionary=dictionary,
+        timestamps=timestamps,
+        frequency=frequency,
+        rounding_places=rounding_places,
+        dtype=dtype,
+        array_backend=ARRAY_BACKEND_DEFAULT,
+    )
     return {
-        f"[bold purple]{IN_PLANE_IRRADIANCE}": (            # Label
-            (inclined_irradiance, "bold purple"),           # Value, Style
+        f"[bold purple]{IN_PLANE_IRRADIANCE}": (  # Label
+            (inclined_irradiance, "bold purple"),  # Value, Style
             (inclined_irradiance_unit, "purple"),
-            (inclined_irradiance_mean, "bold purple"),      # Mean Value, Style
+            (inclined_irradiance_mean, "bold purple"),  # Mean Value, Style
             (inclined_irradiance_mean_unit, "purple"),
             inclined_irradiance_std,
-            None,                                           # %
-            "bold",                                         # Style for
-            None,# f"100 {GLOBAL_IRRADIANCE_NAME}",         # % of (which) Quantity
-            inclined_irradiance_series,                     # input series
-            None,                                           # source
+            None,  # %
+            "bold",  # Style for
+            None,  # f"100 {GLOBAL_IRRADIANCE_NAME}",         # % of (which) Quantity
+            inclined_irradiance_series,  # input series
+            None,  # source
         ),
         f"{REFLECTIVITY}": (
             (reflectivity_change, "magenta"),
