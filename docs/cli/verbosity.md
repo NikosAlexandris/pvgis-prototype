@@ -15,6 +15,34 @@ through the solar irradiance components up to the photovoltaic performance
 figures. The following simple examples demonstrate how it works and what sort
 of output we can get.
 
+<div class="grid cards" markdown>
+
+- :simple-levelsdotfyi: __Multiple verbosity levels__
+
+    Use the `-v` flag to keep it minimal or up to `-vvvvvvvvv`,
+    to get all of the calculation details!
+
+- __Index__
+
+    Use `--index` or simply `-i` to index the output.
+
+- :shushing_face: __Quiet__
+
+    Use `--quiet` to silence longer time series
+    that take some time to print in the terminal.
+
+- :material-bug: __Debugging__
+
+    If things don't work out, use `-vvvvvvvvvv`
+    <!-- ```python exec="true" -->
+    <!-- from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL -->
+    <!-- print(f"-{DEBUG_AFTER_THIS_VERBOSITY_LEVEL * 'v'}") -->
+    <!-- ``` -->
+    to get debugging details!
+
+</div>
+
+
 ## :simple-shortcut: Shortcut `-v`
 
 `-v` is a shortcut for `--verbose`.

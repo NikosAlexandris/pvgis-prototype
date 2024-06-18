@@ -1,9 +1,9 @@
 ---
-icon: material/sun-wireless
+icon: material/tools
 title: Irradiance
 tags:
-  - How-To
   - CLI
+  - Tools
   - Solar Irradiance
 hide:
   - toc
@@ -16,9 +16,7 @@ there are many parameters at your fingertips.
 
 <div class="grid cards" markdown>
 
-- :octicons-command-palette-24: [**`irradiance`**]()
-
-    :material-sun-wireless: Estimate the solar irradiance incident on a solar surface
+- :octicons-command-palette-24: [**`irradiance`**]() :material-sun-wireless: Estimate the solar irradiance incident on a solar surface
 
     ---
 

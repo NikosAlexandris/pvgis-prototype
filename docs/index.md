@@ -88,8 +88,7 @@ for systems using various PV technologies.
     - Supported by the 🇪🇺 European Commission
     - :material-currency-eur-off: Cost free
     - :material-lock-off: Open access
-    - :material-search-web: > 50K Web API requests / week
-
+    - :material-search-web: [> 50K Web API requests / week](reference/web_traffic.md)
 
 - :octicons-feed-public-16:{ .lg .middle } __Open by design__
 
