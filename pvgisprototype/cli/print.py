@@ -15,6 +15,7 @@ from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 from typing import List, Sequence
 import numpy as np
 from pvgisprototype.api.power.performance import analyse_photovoltaic_performance, report_photovoltaic_performance
+from pvgisprototype.api.power.performance import analyse_photovoltaic_performance, report_photovoltaic_performance
 from pvgisprototype.constants import (
     ELEVATION_NAME,
     LATITUDE_NAME,
@@ -1171,7 +1172,6 @@ def print_change_percentages_panel(
         percentage_style=percentage_style,
         reference_quantity_style=reference_quantity_style,
     )
-    results = report_photovoltaic_performance(
     results = report_photovoltaic_performance(
             dictionary=dictionary,
             timestamps=timestamps,

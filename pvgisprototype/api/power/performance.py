@@ -1,6 +1,7 @@
 from devtools import debug
 from pandas import DatetimeIndex
 from pandas._libs.tslibs import timestamps
+from pandas._libs.tslibs import timestamps
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, EFFECTIVE_IRRADIANCE_NAME, ENERGY_NAME_WITH_SYMBOL, ENERGY_UNIT, ENERGY_UNIT_K, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, IN_PLANE_IRRADIANCE, IRRADIANCE_AFTER_REFLECTIVITY, IRRADIANCE_UNIT, IRRADIANCE_UNIT_K, NET_EFFECT, PEAK_POWER_COLUMN_NAME, PHOTOVOLTAIC_ENERGY_UNIT, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_UNIT, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, POWER_MODEL_COLUMN_NAME, POWER_NAME_WITH_SYMBOL, POWER_UNIT, POWER_UNIT_K, REFLECTIVITY, REFLECTIVITY_COLUMN_NAME, SPECTRAL_EFFECT, SPECTRAL_EFFECT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME, SYSTEM_LOSS, TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME
 import numpy
 from numpy import where
@@ -79,7 +80,6 @@ def analyse_photovoltaic_performance(
 
     ┌───────────┘
     │ Reflectivity Effect
-    │ Reflectivity Effect
     └┐─────────────────
      ▼
 
@@ -87,24 +87,19 @@ def analyse_photovoltaic_performance(
 
     ┌───────────┘
     │ Spectral Effect
-    │ Spectral Effect
     └┐───────────────
      ▼
 
     Effective Irradiance
-    Effective Irradiance
 
     ┌───────────┘
-    │ Temp. & Low Irradiance Coefficients
     │ Temp. & Low Irradiance Coefficients
     └┐───────────────────────────────────
      ▼
 
     Effective Power                   
-    Effective Power                   
 
     ┌───────────┘
-    │ System Loss
     │ System Loss
     └┐───────────
      ▼
@@ -343,299 +338,9 @@ def analyse_photovoltaic_performance(
         photovoltaic_energy_mean, PHOTOVOLTAIC_ENERGY_UNIT
     )
 
-    total_effect, total_effect_unit = kilofy_unit(total_effect, IRRADIANCE_UNIT)
-    total_effect_mean, total_effect_mean_unit = kilofy_unit(
-        total_effect_mean, IRRADIANCE_UNIT
-    )
-    performance_analysis = {
-        TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: inclined_irradiance,
-        UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: inclined_irradiance_unit,
-        MEAN_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: inclined_irradiance_mean,
-        UNIT_FOR_MEAN_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: inclined_irradiance_mean_unit,
-        STANDARD_DEVIATION_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: inclined_irradiance_std,
-        GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: inclined_irradiance_series,
-        #
-        TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME: reflectivity_effect,
-        UNIT_FOR_TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME: reflectivity_effect_unit,
-        MEAN_REFLECTIVITY_EFFECT_COLUMN_NAME: reflectivity_effect_mean,
-        UNIT_FOR_MEAN_REFLECTIVITY_EFFECT_COLUMN_NAME: reflectivity_effect_mean_unit,
-        STANDARD_DEVIATION_REFLECTIVITY_EFFECT_COLUMN_NAME: reflectivity_effect_std,
-        REFLECTIVITY_EFFECT_PERCENTAGE_COLUMN_NAME: reflectivity_effect_percentage,
-        REFLECTIVITY_COLUMN_NAME: reflectivity_series,
-        #
-        GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: irradiance_after_reflectivity,
-        UNIT_FOR_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: irradiance_after_reflectivity_unit,
-        MEAN_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: irradiance_after_reflectivity_mean,
-        UNIT_FOR_MEAN_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: irradiance_after_reflectivity_mean_unit,
-        #
-        TOTAL_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect,
-        UNIT_FOR_MEAN_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_unit,
-        MEAN_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_mean,
-        UNIT_FOR_MEAN_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_mean_unit,
-        STANDARD_DEVIATION_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_std,
-        SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: spectral_effect_percentage,
-        SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_series,
-        #
-        EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance,
-        UNIT_FOR_EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_unit,
-        MEAN_EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_mean,
-        UNIT_FOR_MEAN_EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_mean_unit,
-        #
-        TOTAL_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME: temperature_and_low_irradiance_effect,
-        UNIT_FOR_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME: temperature_and_low_irradiance_effect_unit,
-        MEAN_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME: temperature_and_low_irradiance_effect_mean,
-        UNIT_FOR_MEAN_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME: temperature_and_low_irradiance_effect_mean_unit,
-        TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_PERCENTAGE_COLUMN_NAME: temperature_and_low_irradiance_effect_percentage,
-        #
-        TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss,
-        UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_unit,
-        MEAN_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_mean,
-        UNIT_FOR_MEAN_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_mean_unit,
-        STANDARD_DEVIATION_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_std,
-        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_series,
-        #
-        TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME: system_efficiency_effect,
-        UNIT_FOR_TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME: system_efficiency_effect_unit,
-        MEAN_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME: system_efficiency_effect_mean,
-        UNIT_FOR_MEAN_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME: system_efficiency_effect_mean_unit,
-        SYSTEM_EFFICIENCY_EFFECT_PERCENTAGE_COLUMN_NAME: system_efficiency_effect_percentage,
-        #
-        TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power,
-        UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_unit,
-        MEAN_PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_mean,
-        UNIT_FOR_MEAN_PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_mean_unit,
-        STANDARD_DEVIATION_PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_std,
-        PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_series,
-        #
-        PHOTOVOLTAIC_ENERGY_COLUMN_NAME: photovoltaic_energy,
-        UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME: photovoltaic_energy_unit,
-        MEAN_PHOTOVOLTAIC_ENERGY_COLUMN_NAME: photovoltaic_energy_mean,
-        UNIT_FOR_MEAN_PHOTOVOLTAIC_ENERGY_COLUMN_NAME: photovoltaic_energy_mean_unit,
-        #
-        TOTAL_EFFECT_COLUMN_NAME: total_effect,
-        UNIT_FOR_TOTAL_EFFECT_COLUMN_NAME: total_effect_unit,
-        MEAN_EFFECT_COLUMN_NAME: total_effect_mean,
-        UNIT_FOR_MEAN_EFFECT_COLUMN_NAME: total_effect_mean_unit,
-        EFFECT_PERCENTAGE_COLUMN_NAME: total_effect_percentage,
-    }
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
-    return performance_analysis
-
-
-def report_photovoltaic_performance(
-    dictionary,
-    timestamps: DatetimeIndex,
-    frequency: str,
-    rounding_places=1,
-    dtype=DATA_TYPE_DEFAULT,
-    verbose: int = VERBOSE_LEVEL_DEFAULT,
-):
-    """
-    """
-    photovoltaic_performance_analysis = analyse_photovoltaic_performance(
-        dictionary=dictionary,
-        timestamps=timestamps,
-        frequency=frequency,
-        rounding_places=rounding_places,
-        dtype=dtype,
-        array_backend=ARRAY_BACKEND_DEFAULT,
-        verbose=verbose,
-    )
-
-    inclined_irradiance = photovoltaic_performance_analysis.get(
-        TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, None
-    )
-    inclined_irradiance_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, None
-    )
-    inclined_irradiance_mean = photovoltaic_performance_analysis.get(
-        MEAN_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, None
-    )
-    inclined_irradiance_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_MEAN_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, None
-    )
-    inclined_irradiance_std = photovoltaic_performance_analysis.get(
-        STANDARD_DEVIATION_GLOBAL_IN_PLANE_IRRADIANCE_COLUMN_NAME, None
-    )
-    inclined_irradiance_series = photovoltaic_performance_analysis.get(
-        GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, None
-    )
-
-    reflectivity_change = photovoltaic_performance_analysis.get(
-        TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME, None
-    )
-    reflectivity_change_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME, None
-    )
-    reflectivity_change_mean = photovoltaic_performance_analysis.get(
-        MEAN_REFLECTIVITY_EFFECT_COLUMN_NAME, None
-    )
-    reflectivity_change_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_MEAN_REFLECTIVITY_EFFECT_COLUMN_NAME, None
-    )
-    reflectivity_change_std = photovoltaic_performance_analysis.get(
-        STANDARD_DEVIATION_REFLECTIVITY_EFFECT_COLUMN_NAME, None
-    )
-    reflectivity_change_percentage = photovoltaic_performance_analysis.get(
-        REFLECTIVITY_EFFECT_PERCENTAGE_COLUMN_NAME, None
-    )
-    reflectivity_series = photovoltaic_performance_analysis.get(
-        REFLECTIVITY_COLUMN_NAME, None
-    )
-
-    irradiance_after_reflectivity = photovoltaic_performance_analysis.get(
-        GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME, None
-    )
-    irradiance_after_reflectivity_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME, None
-    )
-    irradiance_after_reflectivity_mean = photovoltaic_performance_analysis.get(
-        MEAN_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME, None
-    )
-    irradiance_after_reflectivity_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME, None
-    )
-
-    spectral_effect = photovoltaic_performance_analysis.get(
-        TOTAL_SPECTRAL_EFFECT_COLUMN_NAME, None
-    )
-    spectral_effect_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_TOTAL_SPECTRAL_EFFECT_COLUMN_NAME, None
-    )
-    spectral_effect_mean = photovoltaic_performance_analysis.get(
-        MEAN_SPECTRAL_EFFECT_COLUMN_NAME, None
-    )
-    spectral_effect_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_MEAN_SPECTRAL_EFFECT_COLUMN_NAME, None
-    )
-    spectral_effect_std = photovoltaic_performance_analysis.get(
-        STANDARD_DEVIATION_SPECTRAL_EFFECT_COLUMN_NAME, None
-    )
-    spectral_effect_percentage = photovoltaic_performance_analysis.get(
-        SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, None
-    )
-    spectral_effect_series = photovoltaic_performance_analysis.get(
-        SPECTRAL_EFFECT_COLUMN_NAME, None
-    )
-
-    effective_irradiance = photovoltaic_performance_analysis.get(
-        EFFECTIVE_IRRADIANCE_COLUMN_NAME, None
-    )
-    effective_irradiance_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_EFFECTIVE_IRRADIANCE_COLUMN_NAME, None
-    )
-    effective_irradiance_mean = photovoltaic_performance_analysis.get(
-        MEAN_EFFECTIVE_IRRADIANCE_COLUMN_NAME, None
-    )
-    effective_irradiance_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_MEAN_EFFECTIVE_IRRADIANCE_COLUMN_NAME, None
-    )
-
-    temperature_and_low_irradiance_change = photovoltaic_performance_analysis.get(
-        TOTAL_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME, None
-    )
-    temperature_and_low_irradiance_change_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME, None
-    )
-    temperature_and_low_irradiance_change_mean = photovoltaic_performance_analysis.get(
-        MEAN_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME, None
-    )
-    temperature_and_low_irradiance_change_mean_unit = (
-        photovoltaic_performance_analysis.get(
-            UNIT_FOR_MEAN_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME, None
-        )
-    )
-    temperature_and_low_irradiance_change_percentage = (
-        photovoltaic_performance_analysis.get(
-            TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_PERCENTAGE_COLUMN_NAME, None
-        )
-    )
-
-    photovoltaic_power_without_system_loss = photovoltaic_performance_analysis.get(
-        TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
-    )
-    photovoltaic_power_without_system_loss_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
-    )
-    photovoltaic_power_without_system_loss_mean = photovoltaic_performance_analysis.get(
-        MEAN_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
-    )
-    photovoltaic_power_without_system_loss_mean_unit = (
-        photovoltaic_performance_analysis.get(
-            UNIT_FOR_MEAN_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
-        )
-    )
-    photovoltaic_power_without_system_loss_std = photovoltaic_performance_analysis.get(
-        STANDARD_DEVIATION_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
-    )
-    photovoltaic_power_without_system_loss_series = (
-        photovoltaic_performance_analysis.get(
-            PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
-        )
-    )
-
-    system_efficiency_change = photovoltaic_performance_analysis.get(
-        TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME, None
-    )
-    system_efficiency_change_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME, None
-    )
-    system_efficiency_change_mean = photovoltaic_performance_analysis.get(
-        MEAN_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME, None
-    )
-    system_efficiency_change_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_MEAN_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME, None
-    )
-    system_efficiency_change_percentage = photovoltaic_performance_analysis.get(
-        SYSTEM_EFFICIENCY_EFFECT_PERCENTAGE_COLUMN_NAME, None
-    )
-
-    photovoltaic_power = photovoltaic_performance_analysis.get(
-        TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME, None
-    )
-    photovoltaic_power_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME, None
-    )
-    photovoltaic_power_mean = photovoltaic_performance_analysis.get(
-        MEAN_PHOTOVOLTAIC_POWER_COLUMN_NAME, None
-    )
-    photovoltaic_power_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_MEAN_PHOTOVOLTAIC_POWER_COLUMN_NAME, None
-    )
-    photovoltaic_power_std = photovoltaic_performance_analysis.get(
-        STANDARD_DEVIATION_PHOTOVOLTAIC_POWER_COLUMN_NAME, None
-    )
-    photovoltaic_power_series = photovoltaic_performance_analysis.get(
-        PHOTOVOLTAIC_POWER_COLUMN_NAME, None
-    )
-
-    photovoltaic_energy = photovoltaic_performance_analysis.get(
-        PHOTOVOLTAIC_ENERGY_COLUMN_NAME, None
-    )
-    photovoltaic_energy_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME, None
-    )
-    photovoltaic_energy_mean = photovoltaic_performance_analysis.get(
-        MEAN_PHOTOVOLTAIC_ENERGY_COLUMN_NAME, None
-    )
-    photovoltaic_energy_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_MEAN_PHOTOVOLTAIC_ENERGY_COLUMN_NAME, None
-    )
-
-    total_change = photovoltaic_performance_analysis.get(TOTAL_EFFECT_COLUMN_NAME, None)
-    total_change_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_TOTAL_EFFECT_COLUMN_NAME, None
-    )
-    total_change_mean = photovoltaic_performance_analysis.get(
-        MEAN_EFFECT_COLUMN_NAME, None
-    )
-    total_change_mean_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_MEAN_EFFECT_COLUMN_NAME, None
-    )
-    total_change_percentage = photovoltaic_performance_analysis.get(
-        EFFECT_PERCENTAGE_COLUMN_NAME, None
+    total_change, total_change_unit = kilofy_unit(total_change, IRRADIANCE_UNIT)
+    total_change_mean, total_change_mean_unit = kilofy_unit(
+        total_change_mean, IRRADIANCE_UNIT
     )
     performance_analysis = (
         inclined_irradiance,
@@ -781,18 +486,10 @@ def report_photovoltaic_performance(
     return {
         f"[bold purple]{IN_PLANE_IRRADIANCE}": (  # Label
             (inclined_irradiance, "bold purple"),  # Value, Style
-        f"[bold purple]{IN_PLANE_IRRADIANCE}": (  # Label
-            (inclined_irradiance, "bold purple"),  # Value, Style
             (inclined_irradiance_unit, "purple"),
-            (inclined_irradiance_mean, "bold purple"),  # Mean Value, Style
             (inclined_irradiance_mean, "bold purple"),  # Mean Value, Style
             (inclined_irradiance_mean_unit, "purple"),
             inclined_irradiance_std,
-            None,  # %
-            "bold",  # Style for
-            None,  # f"100 {GLOBAL_IRRADIANCE_NAME}",         # % of (which) Quantity
-            inclined_irradiance_series,  # input series
-            None,  # source
             None,  # %
             "bold",  # Style for
             None,  # f"100 {GLOBAL_IRRADIANCE_NAME}",         # % of (which) Quantity
