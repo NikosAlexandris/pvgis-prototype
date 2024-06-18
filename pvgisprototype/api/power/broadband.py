@@ -157,7 +157,7 @@ def calculate_photovoltaic_power_output_series(
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Optional[float] = ALBEDO_DEFAULT,
@@ -254,7 +254,7 @@ def calculate_photovoltaic_power_output_series(
         import cProfile
         pr = cProfile.Profile()
         pr.enable()
-
+    
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info('i [bold]Modelling[/bold] the [magenta]solar altitude[/magenta] for the given timestamps ..')
     solar_altitude_series = model_solar_altitude_series(

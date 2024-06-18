@@ -99,7 +99,12 @@ from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
 from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
 from pvgisprototype.validation.arrays import create_array
 import cProfile, pstats, io
-
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.constants import DEGREES
+from pvgisprototype import TemperatureSeries
+from pvgisprototype.constants import SYMBOL_UNIT_TEMPERATURE, SYMBOL_UNIT_WIND_SPEED
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype import WindSpeedSeries
 
 def setup_profiler(enable_profiling):
     if enable_profiling:
@@ -372,6 +377,67 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         effective_reflected_irradiance_series += photovoltaic_power_output.components[
             EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
         ]
+
+    if isinstance(temperature_series, Path):
+        temperature_times_series = select_time_series(
+            time_series=temperature_series,
+            # longitude=longitude_for_selection,
+            # latitude=latitude_for_selection,
+            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+            timestamps=timestamps,
+            # convert_longitude_360=convert_longitude_360,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            verbose=0,  # no verbosity here by choice!
+            log=log,
+            ).to_numpy().astype(dtype=dtype)
+        temperature_series = TemperatureSeries(
+                value=temperature_times_series,
+                unit=SYMBOL_UNIT_TEMPERATURE,
+                data_source=temperature_series.name,
+                )
+    if isinstance(wind_speed_series, Path):
+        wind_speed_time_series = select_time_series(
+                    time_series=wind_speed_series,
+                    # longitude=longitude_for_selection,
+                    # latitude=latitude_for_selection,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    timestamps=timestamps,
+                    # convert_longitude_360=convert_longitude_360,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                    ).to_numpy().astype(dtype=dtype)
+        wind_speed_series = WindSpeedSeries(
+                value=wind_speed_time_series,
+                unit=SYMBOL_UNIT_WIND_SPEED,
+                data_source=wind_speed_series.name,
+                )
+
+    if isinstance(spectral_factor_series, Path):
+        spectral_factor_series = SpectralFactorSeries(
+                value = select_time_series(
+                    time_series=spectral_factor_series,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    timestamps=timestamps,
+                    remap_to_month_start=True,
+                    # convert_longitude_360=convert_longitude_360,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                    ).to_numpy().astype(dtype=dtype),
+                unit=UNITLESS)
 
     components_container = {
         'main': lambda: {
