@@ -534,16 +534,26 @@ def print_irradiance_table_2(
 
     caption = str()
     if longitude or latitude or elevation:
-        caption = f"[underline]Position[/underline]  "
+        caption = f"[underline]Location[/underline]  "
     if longitude and latitude:
         caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
     if elevation:
         caption += f"Elevation: [bold]{elevation} m[/bold]"
 
-    surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None) if surface_orientation else None
-    surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    surface_orientation = round_float_values(
+        (
+            dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None)
+            if surface_orientation
+            else None
+        ),
+        rounding_places,
+    )
+    surface_tilt = round_float_values(
+        dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None,
+        rounding_places,
+    )
     if surface_orientation or surface_tilt:
-        caption += f"\n[underline]Solar surface[/underline]  "
+        caption += f"\n[underline]Position[/underline]  "
 
     if surface_orientation is not None:
         caption += f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
@@ -555,12 +565,19 @@ def print_irradiance_table_2(
     if longitude or latitude or elevation or surface_orientation or surface_tilt and units is not None:
         caption += f"[[dim]{units}[/dim]]"
     
+    photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
+    peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
     algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
-    timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
-    position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
-    azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, NOT_AVAILABLE)
-    incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
+    timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, None)
+    position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, None)
+    azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, None)
+    incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
+
+    if photovoltaic_module:
+        caption += f"\n[underline]Module[/underline]  "
+        caption += f"{TECHNOLOGY_NAME}: {photovoltaic_module}, "
+        caption += f"{PEAK_POWER_COLUMN_NAME}: {peak_power}"
 
     if algorithms or radiation_model or timing_algorithm or position_algorithm:
         caption += f"\n[underline]Algorithms[/underline]  "
@@ -578,7 +595,7 @@ def print_irradiance_table_2(
         caption += f"Positioning : [bold]{position_algorithm}[/bold], "
 
     if azimuth_origin:
-        caption += f"\nAzimuth origin : [bold indigo]{azimuth_origin}[/bold indigo], "
+        caption += f"Azimuth origin : [bold indigo]{azimuth_origin}[/bold indigo], "
 
     if incidence_algorithm:
         caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
@@ -610,7 +627,7 @@ def print_irradiance_table_2(
     caption=caption.rstrip(', ')  # Remove trailing comma + space
     table = Table(
             title=title,
-            caption=caption.rstrip(', '),  # Remove trailing comma + space
+            # caption=caption.rstrip(', '),  # Remove trailing comma + space
             caption_justify="left",
             expand=False,
             padding=(0, 1),
@@ -634,15 +651,16 @@ def print_irradiance_table_2(
             ANGLE_UNITS_COLUMN_NAME,
             TIME_ALGORITHM_COLUMN_NAME,
             POSITIONING_ALGORITHM_COLUMN_NAME,
+            SOLAR_CONSTANT_COLUMN_NAME,
+            PERIGEE_OFFSET_COLUMN_NAME,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
             INCIDENCE_ALGORITHM_COLUMN_NAME,
             INCIDENCE_DEFINITION,
             RADIATION_MODEL_COLUMN_NAME,
             TECHNOLOGY_NAME,
+            PEAK_POWER_COLUMN_NAME,
             POWER_MODEL_COLUMN_NAME,
             FINGERPRINT_COLUMN_NAME,
-            SOLAR_CONSTANT_COLUMN_NAME,
-            PERIGEE_OFFSET_COLUMN_NAME,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
     }
 
     # add and process additional columns
@@ -710,6 +728,7 @@ def print_irradiance_table_2(
 
     if verbose:
         Console().print(table)
+        Console().print(Panel(caption, expand=False))
 
 
 def add_table_row(
