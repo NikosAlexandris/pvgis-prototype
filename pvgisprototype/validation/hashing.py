@@ -31,6 +31,8 @@ def generate_hash(output, person="PVGIS"):
         # last_node=False,
         usedforsecurity=False,
     )
-    hash.update(output.tobytes())
-
+    try:
+        hash.update(output.tobytes())
+    except AttributeError:
+        pass
     return hash.hexdigest()
