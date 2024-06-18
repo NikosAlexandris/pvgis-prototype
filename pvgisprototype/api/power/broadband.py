@@ -39,6 +39,8 @@ from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import (
+    POSITION_ALGORITHM_COLUMN_NAME,
+    TIME_ALGORITHM_COLUMN_NAME,
     EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME,
     GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
     DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
@@ -60,6 +62,8 @@ from pvgisprototype.constants import (
     TECHNOLOGY_NAME,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
+    SOLAR_CONSTANT_COLUMN_NAME,
+    PERIGEE_OFFSET_COLUMN_NAME,
     UNIT_NAME,
 )
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
@@ -77,23 +81,17 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import ALBEDO_DEFAULT
-from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
-from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
+from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
-from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
-from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
 from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -668,6 +666,15 @@ def calculate_photovoltaic_power_output_series(
         logger.info(f'i [bold]Building the output[/bold] ..')
 
     components_container = {
+
+        'Metadata': lambda: {
+            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
+            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+        },
+
         'Power': lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
