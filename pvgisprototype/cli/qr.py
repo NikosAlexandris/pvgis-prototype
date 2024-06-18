@@ -5,7 +5,8 @@ from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.api.series.statistics import calculate_mean_of_series_per_time_unit, calculate_sum_and_percentage
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, FINGERPRINT_COLUMN_NAME, GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, IRRADIANCE_UNIT_K, PHOTOVOLTAIC_POWER_COLUMN_NAME, PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, POWER_UNIT, ROUNDING_PLACES_DEFAULT, SURFACE_ORIENTATION_COLUMN_NAME, SURFACE_TILT_COLUMN_NAME, SYSTEM_EFFICIENCY_COLUMN_NAME
 from datetime import datetime
-
+from typing import Any
+from PIL.Image import Image
 
 def print_quick_response_code(
     dictionary: dict,
@@ -18,7 +19,8 @@ def print_quick_response_code(
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     dtype=DATA_TYPE_DEFAULT,
     array_backend=ARRAY_BACKEND_DEFAULT,
-) -> None:
+    image:bool = False,
+) -> Image | None:
     """
     QUICK_RESPONSE_CODE_MOCKUP = "Position: 45.812 8.628, Elevation: 214,
     Orientation: 180, Tilt: 0, Start: 2005-01-01, End: 2020-12-31, Zone: UTC,
@@ -114,7 +116,7 @@ def print_quick_response_code(
 
     from pvgisprototype._version import __version__
     data += f"PVGIS v6 ({__version__})"
-
+    
     qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -123,4 +125,9 @@ def print_quick_response_code(
             )
     qr.add_data(data)
     qr.make(fit=True)
-    qr.print_ascii()
+    if image:
+        return qr.make_image()
+    else:
+        qr.print_ascii()
+
+    return None
