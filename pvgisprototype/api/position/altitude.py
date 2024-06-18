@@ -1,5 +1,6 @@
 from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
+from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_series_pvlib
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
@@ -181,17 +182,17 @@ def model_solar_altitude_series(
         )
 
     if solar_position_model.value  == SolarPositionModel.pvlib:
-        pass
 
-    # if solar_position_model.value  == SolarPositionModel.pvlib:
+        solar_altitude_series = calculate_solar_altitude_series_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
 
-    #     solar_altitude = calculate_solar_altitude_pvlib(
-    #         longitude=longitude,
-    #         latitude=latitude,
-    #         timestamp=timestamp,
-    #         timezone=timezone,
-    #         verbose=verbose,
-    #     )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
