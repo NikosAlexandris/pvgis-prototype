@@ -83,14 +83,14 @@ class SolarDeclinationModel(str, Enum):
 
 
 class SolarPositionModel(str, Enum):
-    all = 'all'
-    noaa = 'NOAA'
-    hofierka = 'Hofierka'
-    jenco = 'Jenco'
-    pvlib = 'pvlib'
-    pysolar = 'pysolar'
-    skyfield = 'Skyfield'
-    suncalc = 'suncalc'
+    all = 'all' # FIXME This isn't working
+    noaa = 'NOAA' # Works
+    hofierka = 'Hofierka' # FIXME This isn't working
+    jenco = 'Jenco' # Works
+    pvlib = 'pvlib' # FIXME This isn't working
+    pysolar = 'pysolar' # FIXME This isn't working
+    skyfield = 'Skyfield' # FIXME This isn't working
+    suncalc = 'suncalc' # FIXME This isn't working
 
 
 class SolarIncidenceModel(str, Enum):
@@ -98,7 +98,7 @@ class SolarIncidenceModel(str, Enum):
     hofierka = 'Hofierka'
     jenco = 'Jenco'
     iqbal = 'Iqbal'  # NREL
-    pvis = 'PVIS'
+    pvis = 'PVIS' # FIXME This isn't working
     pvlib = 'pvlib'
 
 
