@@ -117,3 +117,23 @@ pvgis-prototype power broadband \
     --uniplot\
     --terminal-width-fraction 0.46
 ```
+
+## Analysis of Performance
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 180 0.1 \
+    --start-time '2013-01-01' \
+    --end-time '2013-12-31' \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+    --spectral-factor-series gitignore/spectraleffect_maps/spectral_effect_cSi_2013_x.nc \
+    --temperature-series era5_t2m_over_esti_jrc.nc \
+    --wind-speed-series era5_ws2m_over_esti_jrc.nc \
+    --analysis
+```
+
+!!! info "--analysis silences the time series output"
+
+    When asking for the analysis of performance,
+    the `--quiet` flag is automatically set.

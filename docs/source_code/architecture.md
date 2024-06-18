@@ -15,7 +15,6 @@ from contextlib import suppress
 
 from diagrams import Diagram, Cluster
 from diagrams.custom import Custom
-from urllib.request import urlretrieve
 from diagrams.programming.language import Python
 from diagrams.programming.framework import FastAPI
 
@@ -70,6 +69,7 @@ try:
             API >> CLI, WebAPI
 
             png = b64encode(diagram.dot.pipe(format="png")).decode()
+
     print(f'<img src="data:image/png;base64, {png}"/>')
 
 except Exception as e:
