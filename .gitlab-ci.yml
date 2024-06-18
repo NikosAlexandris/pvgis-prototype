@@ -83,7 +83,7 @@ pages:
   stage: deploy
   tags:
     - openshift-test
-  image: quay.apps.ocpt.jrc.ec.europa.eu/public/dockerhub/ubuntu:latest
+  image: quay.apps.ocpt.jrc.ec.europa.eu/public/dockerhub/python:3.11
   rules:
     - if: $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME == "main"
       exists:
@@ -103,7 +103,7 @@ pages:
     - pip install pdm
   script:
     - $HOME/.local/bin/pdm install
-    # - export COLUMNS=160
+    - export COLUMNS=160
     - $HOME/.local/bin/pdm run mkdocs build --verbose --site-dir public
   allow_failure: true
   artifacts:
