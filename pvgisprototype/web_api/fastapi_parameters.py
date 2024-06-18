@@ -13,6 +13,11 @@ from pvgisprototype.constants import LONGITUDE_MINIMUM
 from pvgisprototype.constants import LONGITUDE_MAXIMUM
 from pvgisprototype.constants import ELEVATION_MINIMUM
 from pvgisprototype.constants import ELEVATION_MAXIMUM
+from pvgisprototype.constants import SURFACE_TILT_MAXIMUM
+from pvgisprototype.constants import SURFACE_TILT_MINIMUM
+from pvgisprototype.constants import SURFACE_ORIENTATION_MAXIMUM
+from pvgisprototype.constants import SURFACE_ORIENTATION_MINIMUM
+from pvgisprototype.constants import TOLERANCE_MINIMUM
 from pvgisprototype.web_api.descriptions import longitude_description
 from pvgisprototype.web_api.descriptions import latitude_description
 from pvgisprototype.web_api.descriptions import elevation_description
@@ -39,7 +44,7 @@ from pvgisprototype.web_api.descriptions import linke_turbidity_description
 from pvgisprototype.web_api.descriptions import atmospheric_refraction_description
 from pvgisprototype.web_api.descriptions import solar_zenith_description
 from pvgisprototype.web_api.descriptions import albedo_description
-from pvgisprototype.web_api.descriptions import angular_loss_factor_description
+from pvgisprototype.web_api.descriptions import apply_reflectivity_factor_description
 from pvgisprototype.web_api.descriptions import solar_position_description
 from pvgisprototype.web_api.descriptions import solar_incidence_description
 from pvgisprototype.web_api.descriptions import solar_time_description
@@ -60,6 +65,24 @@ from pvgisprototype.web_api.descriptions import photovoltaic_module_description
 from pvgisprototype.web_api.descriptions import temperature_series_description
 from pvgisprototype.web_api.descriptions import wind_speed_series_description
 from pvgisprototype.web_api.descriptions import csv_description
+from pvgisprototype.web_api.descriptions import global_horizontal_irradiance_description
+from pvgisprototype.web_api.descriptions import direct_horizontal_irradiance_description
+from pvgisprototype.web_api.descriptions import statistics_description
+from pvgisprototype.web_api.descriptions import groupby_description
+from pvgisprototype.web_api.descriptions import uniplot_description
+from pvgisprototype.web_api.descriptions import terminal_width_description
+from pvgisprototype.web_api.descriptions import index_description
+from pvgisprototype.web_api.descriptions import quite_description
+from pvgisprototype.web_api.descriptions import analysis_description
+from pvgisprototype.web_api.descriptions import command_metadata_description
+from pvgisprototype.web_api.descriptions import profiling_description
+from pvgisprototype.web_api.descriptions import zero_negative_solar_incidence_angle_description
+from pvgisprototype.web_api.descriptions import angle_output_units_description
+from pvgisprototype.web_api.descriptions import peak_power_description
+from pvgisprototype.constants import RADIATION_CUTOFF_THRESHHOLD
+from pvgisprototype.web_api.descriptions import radiation_cutoff_threshold_description
+from pvgisprototype.web_api.descriptions import qr_description
+
 
 fastapi_query_longitude = Query(
     title="Longitude",
@@ -147,6 +170,7 @@ fastapi_query_neighbor_lookup = Query(
 )
 fastapi_query_tolerance = Query(
     description=tolerance_description,
+    ge=TOLERANCE_MINIMUM,
 )
 fastapi_query_in_memory = Query(
     # False,
@@ -155,10 +179,15 @@ fastapi_query_in_memory = Query(
 fastapi_query_surface_tilt = Query(
     # SURFACE_TILT_DEFAULT,
     description=surface_tilt_description,
+    ge=SURFACE_TILT_MINIMUM,
+    le=SURFACE_TILT_MAXIMUM,
+    
 )
 fastapi_query_surface_orientation = Query(
     # SURFACE_ORIENTATION_DEFAULT,
     description=surface_orientation_description,
+    ge=SURFACE_ORIENTATION_MINIMUM,
+    le=SURFACE_ORIENTATION_MAXIMUM,
 )
 fastapi_query_linke_turbidity_factor_series = Query(
     # LINKE_TURBIDITY_DEFAULT,
@@ -176,9 +205,9 @@ fastapi_query_albedo = Query(
     # 2,
     description=albedo_description,
 )
-fastapi_query_apply_angular_loss_factor = Query(
+fastapi_query_apply_reflectivity_factor = Query(
     # True,
-    description=angular_loss_factor_description,
+    description=apply_reflectivity_factor_description,
 )
 fastapi_query_solar_position_model = Query(
     # SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -215,6 +244,8 @@ fastapi_query_eccentricity_correction_factor = Query(
 fastapi_query_system_efficiency = Query(
     # SYSTEM_EFFICIENCY_DEFAULT,
     description=system_efficiency_description,
+    ge=0., # FIXME ADD VALUES TO CONSTANTS
+    le=1., # FIXME ADD VALUES TO CONSTANTS
 )
 fastapi_query_power_model = Query(
     # None,
@@ -223,6 +254,8 @@ fastapi_query_power_model = Query(
 fastapi_query_efficiency = Query(
     # None,
     description=efficiency_description,
+    ge=0., # FIXME ADD VALUES TO CONSTANTS
+    le=1., # FIXME ADD VALUES TO CONSTANTS
 )
 fastapi_query_rounding_places = Query(
     # 5,
@@ -254,38 +287,37 @@ fastapi_query_csv = Query(
     description=csv_description,
 )
 fastapi_query_global_horizontal_irradiance = Query(
-    description='Global horizontal irradiance',
+    description=global_horizontal_irradiance_description,
 )
 fastapi_query_direct_horizontal_irradiance = Query(
-    description='Direct horizontal irradiance',
+    description=direct_horizontal_irradiance_description,
 )
 fastapi_query_statistics = Query(
-    description='Statistics',
+    description=statistics_description,
 )
 fastapi_query_groupby = Query(
-    description='Group by',
+    description=groupby_description,
 )
 fastapi_query_uniplot = Query(
-    description='Uniplot',
+    description=uniplot_description,
 )
 fastapi_query_uniplot_terminal_width = Query(
-    description='Terminal width for Uniplot',
+    description=terminal_width_description,
 )
 fastapi_query_index = Query(
-    description='Index',
+    description=index_description,
 )
 fastapi_query_quiet = Query(
-    description='Quiet',
+    description=quite_description,
+)
+fastapi_query_analysis = Query(
+    description=analysis_description,
 )
 fastapi_query_command_metadata = Query(
-    description='Command metadata',
+    description=command_metadata_description,
 )
 fastapi_query_profiling = Query(
-    description='Profiling',
-)
-
-fastapi_query_surface_tilt_list = Query(
-    description=surface_tilt_description,
+    description=profiling_description,
 )
 fastapi_query_surface_orientation_list = Query(
     description=surface_orientation_description,
@@ -293,6 +325,20 @@ fastapi_query_surface_orientation_list = Query(
 fastapi_query_surface_tilt_list = Query(
     description=surface_tilt_description,
 )
-fastapi_query_surface_orientation_list = Query(
-    description=surface_orientation_description,
+fastapi_query_zero_negative_solar_incidence_angle = Query(
+    description=zero_negative_solar_incidence_angle_description,
+)
+fastapi_query_angle_output_units = Query(
+    description=angle_output_units_description,
+)
+fastapi_query_peak_power = Query(
+    description=peak_power_description,
+    ge=0., # FIXME ADD VALUES TO CONSTANTS
+)
+fastapi_query_radiation_cutoff_threshold = Query(
+    description=radiation_cutoff_threshold_description,
+    ge=RADIATION_CUTOFF_THRESHHOLD,
+)
+fastapi_query_qr = Query(
+    description=qr_description,
 )
