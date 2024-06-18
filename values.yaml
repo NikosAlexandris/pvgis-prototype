@@ -261,9 +261,9 @@ deployment:
   ## Route:
   ## Example 1
   # expose http route:
-  # route:
-  #   enabled: true
-  #   isOnDMZ: true # Enable this option if you're deploying on DMZ network
+  route:
+    enabled: true
+    isOnDMZ: true # Enable this option if you're deploying on DMZ network
   #   nameOverride: # optional, Route name override ( default appName )
   #   urlOverride: # optional, Web site url override
   #   targetPort: http # optional, target service port name (useful when having multiple service ports exposed)
