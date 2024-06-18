@@ -72,8 +72,7 @@ def calculate_fractional_year_series_noaa(
     -----
     The function calculates the fractional year considering leap years and
     converts the timestamps into fractional values considering their position
-    within the year. This is used in various solar energy calculations and
-    models.
+    within the year.
 
     See also
     --------
