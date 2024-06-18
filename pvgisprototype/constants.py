@@ -303,7 +303,7 @@ SYMBOL_PLUS_MINUS_NAME = "Plus Minus"
 SYMBOL_LOSS = "-"
 SYMBOL_LOSS_NAME = 'Loss'
 
-SYMBOL_REFLECTIVITY = "⭜"  # ☇
+SYMBOL_REFLECTIVITY = ""
 SYMBOL_REFLECTIVITY_NAME = "Reflectivity"
 
 SYMBOL_CHART_CURVE = "󰱐"
@@ -364,9 +364,7 @@ METADATA_FLAG_DEFAULT = False
 COMMAND_METADATA_DESCRIPTION = "Command metadata"
 
 DATA_TYPE_DEFAULT = 'float32'  # takes halve of the time to process than float64
-DATA_TYPE_DESCRIPTION = f'Data type for (array) calculations, default is `{DATA_TYPE_DEFAULT}`.'  # takes halve of the time to process than float64
-ARRAY_BACKEND_DEFAULT = 'numpy'  # OR 'CUPY', 'DASK'
-ARRAY_BACKEND_DESCRIPTION = f'Backend for (array) calculations, default is {ARRAY_BACKEND_DEFAULT}.'  # OR 'CUPY', 'DASK'
+ARRAY_BACKEND_DEFAULT = 'NUMPY'  # OR 'CUPY', 'DASK'
 MULTI_THREAD_FLAG_DEFAULT = True
 MULTI_THREAD_FLAG_DESCRIPTION = f'Perform calculations in a multi-thread context, default is {MULTI_THREAD_FLAG_DEFAULT}.'
 
@@ -384,10 +382,7 @@ cPROFILE_FLAG_DESCRIPTION = "Profiling"
 
 HASH_AFTER_THIS_VERBOSITY_LEVEL = 6
 DEBUG_AFTER_THIS_VERBOSITY_LEVEL = 10
-
 ROUNDING_PLACES_DEFAULT = 3
-ROUNDING_PLACES_DESCRIPTION = f"Number of decimal places for rounding (default is {ROUNDING_PLACES_DEFAULT})"
-
 TOLERANCE_DEFAULT = 0.1  # Is this a sane default ?
 TOLERANCE_MINIMUM = 0.1
 FIX_OUT_OF_RANGE_VALUES_POSITIVE = .99999
