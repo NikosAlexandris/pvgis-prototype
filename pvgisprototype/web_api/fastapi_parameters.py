@@ -1,88 +1,84 @@
-from typing import List
-from typing import Optional
 from fastapi import Query
-from fastapi import Depends
-from datetime import datetime
-from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
-from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import now_local_datetimezone
-from pvgisprototype.constants import LATITUDE_MINIMUM
-from pvgisprototype.constants import LATITUDE_MAXIMUM
-from pvgisprototype.constants import LONGITUDE_MINIMUM
-from pvgisprototype.constants import LONGITUDE_MAXIMUM
-from pvgisprototype.constants import ELEVATION_MINIMUM
-from pvgisprototype.constants import ELEVATION_MAXIMUM
-from pvgisprototype.constants import SURFACE_TILT_MAXIMUM
-from pvgisprototype.constants import SURFACE_TILT_MINIMUM
-from pvgisprototype.constants import SURFACE_ORIENTATION_MAXIMUM
-from pvgisprototype.constants import SURFACE_ORIENTATION_MINIMUM
-from pvgisprototype.constants import TOLERANCE_MINIMUM
-from pvgisprototype.web_api.descriptions import longitude_description
-from pvgisprototype.web_api.descriptions import latitude_description
-from pvgisprototype.web_api.descriptions import elevation_description
-from pvgisprototype.web_api.descriptions import timestamp_description
-from pvgisprototype.web_api.descriptions import timestamps_description
-from pvgisprototype.web_api.descriptions import start_time_description
-from pvgisprototype.web_api.descriptions import periods_description
-from pvgisprototype.web_api.descriptions import frequency_description
-from pvgisprototype.web_api.descriptions import end_time_description
-from pvgisprototype.web_api.descriptions import timezone_description
-from pvgisprototype.web_api.descriptions import local_time_description
-from pvgisprototype.web_api.descriptions import random_time_description
-from pvgisprototype.web_api.descriptions import random_day_description
-from pvgisprototype.web_api.descriptions import random_days_description
-from pvgisprototype.web_api.descriptions import time_series_description
-from pvgisprototype.web_api.descriptions import mask_and_scale_description
-from pvgisprototype.web_api.descriptions import nearest_neighbor_lookup_description
-from pvgisprototype.web_api.descriptions import inexact_matches_method_description
-from pvgisprototype.web_api.descriptions import tolerance_description
-from pvgisprototype.web_api.descriptions import in_memory_description
-from pvgisprototype.web_api.descriptions import surface_tilt_description
-from pvgisprototype.web_api.descriptions import surface_orientation_description
-from pvgisprototype.web_api.descriptions import linke_turbidity_description
-from pvgisprototype.web_api.descriptions import atmospheric_refraction_description
-from pvgisprototype.web_api.descriptions import solar_zenith_description
-from pvgisprototype.web_api.descriptions import albedo_description
-from pvgisprototype.web_api.descriptions import apply_reflectivity_factor_description
-from pvgisprototype.web_api.descriptions import solar_position_description
-from pvgisprototype.web_api.descriptions import solar_incidence_description
-from pvgisprototype.web_api.descriptions import solar_time_description
-from pvgisprototype.web_api.descriptions import time_offset_global_description
-from pvgisprototype.web_api.descriptions import hour_offset_description
-from pvgisprototype.web_api.descriptions import solar_constant_description
-from pvgisprototype.web_api.descriptions import perigee_offset_description
-from pvgisprototype.web_api.descriptions import eccentricity_correction_description
-from pvgisprototype.web_api.descriptions import system_efficiency_description
-from pvgisprototype.web_api.descriptions import power_model_description
-from pvgisprototype.web_api.descriptions import efficiency_description
-from pvgisprototype.web_api.descriptions import rounding_places_description
-from pvgisprototype.web_api.descriptions import verbose_description
-from pvgisprototype.web_api.descriptions import log_description
-from pvgisprototype.web_api.descriptions import fingerprint_description
-from pvgisprototype.web_api.descriptions import module_temperature_algorithm_description
-from pvgisprototype.web_api.descriptions import photovoltaic_module_description
-from pvgisprototype.web_api.descriptions import temperature_series_description
-from pvgisprototype.web_api.descriptions import wind_speed_series_description
-from pvgisprototype.web_api.descriptions import csv_description
-from pvgisprototype.web_api.descriptions import global_horizontal_irradiance_description
-from pvgisprototype.web_api.descriptions import direct_horizontal_irradiance_description
-from pvgisprototype.web_api.descriptions import statistics_description
-from pvgisprototype.web_api.descriptions import groupby_description
-from pvgisprototype.web_api.descriptions import uniplot_description
-from pvgisprototype.web_api.descriptions import terminal_width_description
-from pvgisprototype.web_api.descriptions import index_description
-from pvgisprototype.web_api.descriptions import quite_description
-from pvgisprototype.web_api.descriptions import analysis_description
-from pvgisprototype.web_api.descriptions import command_metadata_description
-from pvgisprototype.web_api.descriptions import profiling_description
-from pvgisprototype.web_api.descriptions import zero_negative_solar_incidence_angle_description
-from pvgisprototype.web_api.descriptions import angle_output_units_description
-from pvgisprototype.web_api.descriptions import peak_power_description
-from pvgisprototype.constants import RADIATION_CUTOFF_THRESHHOLD
-from pvgisprototype.web_api.descriptions import radiation_cutoff_threshold_description
-from pvgisprototype.web_api.descriptions import qr_description
 
+from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.constants import (
+    ELEVATION_MAXIMUM,
+    ELEVATION_MINIMUM,
+    LATITUDE_MAXIMUM,
+    LATITUDE_MINIMUM,
+    LONGITUDE_MAXIMUM,
+    LONGITUDE_MINIMUM,
+    RADIATION_CUTOFF_THRESHHOLD,
+    SURFACE_ORIENTATION_MAXIMUM,
+    SURFACE_ORIENTATION_MINIMUM,
+    SURFACE_TILT_MAXIMUM,
+    SURFACE_TILT_MINIMUM,
+    TOLERANCE_MINIMUM,
+)
+from pvgisprototype.web_api.descriptions import (
+    albedo_description,
+    analysis_description,
+    angle_output_units_description,
+    apply_reflectivity_factor_description,
+    atmospheric_refraction_description,
+    command_metadata_description,
+    csv_description,
+    direct_horizontal_irradiance_description,
+    eccentricity_correction_description,
+    efficiency_description,
+    elevation_description,
+    end_time_description,
+    fingerprint_description,
+    frequency_description,
+    global_horizontal_irradiance_description,
+    groupby_description,
+    hour_offset_description,
+    in_memory_description,
+    index_description,
+    latitude_description,
+    linke_turbidity_description,
+    local_time_description,
+    log_description,
+    longitude_description,
+    mask_and_scale_description,
+    module_temperature_algorithm_description,
+    nearest_neighbor_lookup_description,
+    peak_power_description,
+    perigee_offset_description,
+    periods_description,
+    photovoltaic_module_description,
+    power_model_description,
+    profiling_description,
+    qr_description,
+    quite_description,
+    radiation_cutoff_threshold_description,
+    random_day_description,
+    random_days_description,
+    random_time_description,
+    rounding_places_description,
+    solar_constant_description,
+    solar_incidence_description,
+    solar_position_description,
+    solar_time_description,
+    solar_zenith_description,
+    start_time_description,
+    statistics_description,
+    surface_orientation_description,
+    surface_tilt_description,
+    system_efficiency_description,
+    temperature_series_description,
+    terminal_width_description,
+    time_offset_global_description,
+    time_series_description,
+    timestamp_description,
+    timestamps_description,
+    timezone_description,
+    tolerance_description,
+    uniplot_description,
+    verbose_description,
+    wind_speed_series_description,
+    zero_negative_solar_incidence_angle_description,
+)
 
 fastapi_query_longitude = Query(
     title="Longitude",
@@ -181,7 +177,6 @@ fastapi_query_surface_tilt = Query(
     description=surface_tilt_description,
     ge=SURFACE_TILT_MINIMUM,
     le=SURFACE_TILT_MAXIMUM,
-    
 )
 fastapi_query_surface_orientation = Query(
     # SURFACE_ORIENTATION_DEFAULT,
@@ -244,8 +239,8 @@ fastapi_query_eccentricity_correction_factor = Query(
 fastapi_query_system_efficiency = Query(
     # SYSTEM_EFFICIENCY_DEFAULT,
     description=system_efficiency_description,
-    ge=0., # FIXME ADD VALUES TO CONSTANTS
-    le=1., # FIXME ADD VALUES TO CONSTANTS
+    ge=0.0,  # FIXME ADD VALUES TO CONSTANTS
+    le=1.0,  # FIXME ADD VALUES TO CONSTANTS
 )
 fastapi_query_power_model = Query(
     # None,
@@ -254,8 +249,8 @@ fastapi_query_power_model = Query(
 fastapi_query_efficiency = Query(
     # None,
     description=efficiency_description,
-    ge=0., # FIXME ADD VALUES TO CONSTANTS
-    le=1., # FIXME ADD VALUES TO CONSTANTS
+    ge=0.0,  # FIXME ADD VALUES TO CONSTANTS
+    le=1.0,  # FIXME ADD VALUES TO CONSTANTS
 )
 fastapi_query_rounding_places = Query(
     # 5,
@@ -333,7 +328,7 @@ fastapi_query_angle_output_units = Query(
 )
 fastapi_query_peak_power = Query(
     description=peak_power_description,
-    ge=0., # FIXME ADD VALUES TO CONSTANTS
+    ge=0.0,  # FIXME ADD VALUES TO CONSTANTS
 )
 fastapi_query_radiation_cutoff_threshold = Query(
     description=radiation_cutoff_threshold_description,
