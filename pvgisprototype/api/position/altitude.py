@@ -16,7 +16,6 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
 from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_series_noaa
 from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -31,7 +30,7 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
 from cachetools import cached
-from rich import print
+from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
