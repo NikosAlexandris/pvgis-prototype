@@ -13,60 +13,142 @@ tags:
 from base64 import b64encode
 from contextlib import suppress
 
-from diagrams import Diagram, Cluster
+from diagrams import Diagram, Edge, Cluster
 from diagrams.custom import Custom
 from diagrams.programming.language import Python
 from diagrams.programming.framework import FastAPI
 
 
-numpy_icon = "docs/logos/numpylogo.png"
-xarray_icon = "docs/logos/Xarray_Logo_RGB_Final.png"
-pydantic_icon = "docs/logos/pydantic_logo.png"
-loguru_icon = "docs/logos/loguru_logo.png"
-typer_icon = "docs/logos/typer_logo-margin.png"
-rich_icon = "docs/logos/rich_logo.png"
-
+user_icon = "docs/icons/noun-user-6616649.svg"
+numpy_icon = "docs/logos/numpy.svg"
+scipy_icon = "docs/logos/scipy.svg"
+xarray_icon = "docs/logos/Xarray_RGB.png"
+pydantic_icon = "docs/logos/pydantic.svg"
+loguru_icon = "docs/logos/loguru.png"
+typer_icon = "docs/logos/typer.svg"
+rich_icon = "docs/logos/rich.png"
+pvlib_logo = "docs/logos/pvlib.png"
+skyfield_logo = "docs/logos/skyfield.png"
+solar_position_icon = "docs/icons/sun-angle-outline.svg"
+solar_irradiance_icon = "docs/icons/sun-wireless-outline.svg"
+global_horizontal_irradiance_icon = "docs/icons/noun_global_horizontal_irradiance.svg"
+direct_horizontal_irradiance_icon = "docs/icons/noun_direct_horizontal_irradiance.svg"
+temperature_icon = "docs/icons/thermometer.svg"
+wind_speed_icon = "docs/icons/noun-windsock-4502486.svg"
+meteorological_variables_icon = "docs/icons/weather-partly-cloudy.svg"
+photovoltaic_power_icon = f"docs/icons/noun-solar-panel-6862742.svg"
 
 try:
     with suppress(FileNotFoundError):
         with Diagram("pvgis-prototype", direction="TB", show=False) as diagram:
             diagram.render = lambda: None
-            # pvis = Python("pv(g)is")
-            NumPy = Custom("", numpy_icon)
+
+            User = Custom("User", user_icon)
             Xarray = Custom("Input/Output", xarray_icon)
 
-            with Cluster("Algorithms"):
-                # Algorithms = Python("Algorithms")
-                Solar_Geometry = Python("Solar Geometry")
-                Solar_Irradiance = Python("Solar Irradiance")
-                Photovoltaic_Performance = Python("Photovoltaic_Performance")
-                External_Libraries = Python("External Libraries ?")
+            with Cluster("Libraries"):
+                python = Python("Python") # != Python
+                NumPy = Custom("NumPy", numpy_icon)
+                SciPy = Custom("SciPy", scipy_icon)
 
-            with Cluster("Validation & Debugging"):
+            with Cluster("Algorithms"):
+                Solar_Position = Custom("Solar Position", solar_position_icon)
+                Solar_Irradiance = Custom("Solar Irradiance", solar_irradiance_icon)
+                Meteorological_Variables = Custom("Meteorological\nVariables", meteorological_variables_icon)
+                Photovoltaic_Performance = Custom("Photovoltaic\nPerformance", photovoltaic_power_icon)
+
+            with Cluster("Optional External Libraries"):
+                pvlib = Custom("pvlib", pvlib_logo)
+                Skyfield = Custom("Skyfield", skyfield_logo)
+                Other = Custom("Other", '')
+
+            with Cluster("Validation"):
                 Pydantic = Custom("Pydantic", pydantic_icon)
-                Loguru = Custom("Loguru", loguru_icon)
+
+            #with Cluster("Debugging"):
+            #    Loguru = Custom("Loguru", loguru_icon)
 
             with Cluster(""):
                 API = Python("API")
 
-            with Cluster("Command Line Interface"):
-                CLI = Python("CLI")
-                Typer = Custom("Typer", typer_icon)
-                Rich = Custom("Rich", rich_icon)
+            #with Cluster("Command Line Interface"):
+            #    CLI = Python("CLI")
+            #    Typer = Custom("Typer", typer_icon)
+            #    Rich = Custom("Rich", rich_icon)
 
             WebAPI = FastAPI("WebAPI")
 
-            NumPy >> Solar_Geometry, Solar_Irradiance, Photovoltaic_Performance
-            Photovoltaic_Performance << Solar_Irradiance << Solar_Geometry
-            External_Libraries >> Solar_Geometry
+            #NumPy \
+            #<< Solar_Position \
+            #<< Solar_Irradiance \
+            #<< Photovoltaic_Performance
+            
+            #Photovoltaic_Performance \
+            #<< [
+            #    Solar_Irradiance,
+            #    Solar_Position,
+            #    ]
+            
+            #pvlib \
+            #>> Solar_Position
 
-            Xarray >> API
-            Pydantic >> API, CLI, WebAPI
-            Loguru >> API, CLI
+            #Xarray >> API
+            #Pydantic >> [API, CLI, WebAPI]
+            #Loguru >> [API, CLI]
 
-            Solar_Geometry, Solar_Irradiance, Photovoltaic_Performance >> API
-            CLI << Typer, Rich
-            API >> CLI, WebAPI
+            #Solar_Position, Solar_Irradiance, Photovoltaic_Performance >> API
+            #CLI - [Typer, Rich]
+            #API >> [CLI, WebAPI]
+
+
+            [Solar_Position, Photovoltaic_Performance] \
+            - Edge(color="lightgrey", style="dashed") \
+            - NumPy, SciPy
+
+            Solar_Position \
+            << Edge(color="grey", style="dashed") \
+            << [pvlib, Skyfield, Other]
+
+            with Cluster("SARAH 2/3 climate records - NetCDF files"):
+                Global_Horizontal_Irradiance = Custom("Global\nHorizontal\nIrradiance\n(GHI)", global_horizontal_irradiance_icon)
+                
+                Direct_Horizontal_Irradiance = Custom("Direct\nHorizontal\nIrradiance\n(DHI)", direct_horizontal_irradiance_icon)
+
+            Solar_Irradiance \
+            << Edge(color="magenta") \
+            << Xarray \
+            << Edge(style="dashed", color="magenta") \
+            << Global_Horizontal_Irradiance, Direct_Horizontal_Irradiance
+
+            with Cluster("Meteorological Time Series - NetCDF files"):
+                Temperature = Custom("Temperature", temperature_icon)
+                Wind_Speed = Custom("Wind Speed", wind_speed_icon)
+
+            Meteorological_Variables \
+            << Edge(color="magenta") \
+            << Xarray \
+            << Edge(style="dashed", color="magenta") \
+            << Temperature, Wind_Speed
+
+            User \
+            - Edge(style="dashed", color="blue") \
+            >> WebAPI \
+            >> Edge(style="dashed", color="blue") \
+            >> API \
+            >> Edge(style="dashed", color="blue") \
+            >> Solar_Position \
+            >> Edge(style="dashed", color="blue") \
+            >> Solar_Irradiance \
+            >> Edge(style="dashed", color="blue") \
+            >> Meteorological_Variables \
+            >> Edge(style="dashed", color="blue") \
+            >> Photovoltaic_Performance \
+            >> Edge(style="dashed", color="firebrick") \
+            >> WebAPI \
+            >> Edge(style="dashed", color="firebrick") \
+            >> User
+
+            WebAPI - Pydantic
 
             png = b64encode(diagram.dot.pipe(format="png")).decode()
 
