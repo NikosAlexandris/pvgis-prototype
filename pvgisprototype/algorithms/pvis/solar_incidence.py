@@ -37,9 +37,12 @@ from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype import SolarIncidence
 from pvgisprototype.api.position.models import SolarIncidenceModel
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
 def calculate_relative_longitude(
     latitude: Latitude,
