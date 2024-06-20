@@ -65,9 +65,12 @@ from pvgisprototype.api.position.conversions import convert_north_to_south_radia
 from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
 from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.constants import UNIT_NAME
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(ModelSolarIncidenceTimeSeriesInputModel)
 def model_solar_incidence_series(
     longitude: Longitude,
