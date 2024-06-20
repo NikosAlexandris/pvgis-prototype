@@ -1,8 +1,8 @@
 from enum import Enum
 
-from pvgisprototype.web_api.utilities import get_timezones
-
+#from pvgisprototype.web_api.utilities import get_timezones
 # Timezone = Enum('Timezone', {tz: tz for tz in get_timezones()}) # FIXME Add later when all timezones work properly
+
 
 class Timezone(Enum):
     ETC_GMT = "Etc/GMT"
@@ -43,20 +43,20 @@ class Timezone(Enum):
 
 
 class Frequency(Enum):
-    Y = "Y" # FIXME Does not seem to work
-    S = "S" # FIXME Does not seem to work
-    M = "M" # FIXME Does not seem to work
-    W = "W" # FIXME Does not seem to work
-    D = "D" # FIXME Does not seem to work
-    H = "h" # Works properly
+    Year = "Year"  # FIXME Does not seem to work
+    Season = "Season"  # FIXME Does not seem to work
+    Month = "Month"  # FIXME Does not seem to work
+    Week = "Week"  # FIXME Does not seem to work
+    Day = "Day"  # FIXME Does not seem to work
+    Hour = "Hour"  # Works properly
 
 
 class GroupBy(Enum):
-    Yealy = "Yearly"
+    Yearly = "Yearly"
     Seasonal = "Seasonal"
     Monthly = "Monthly"
     Weekly = "Weekly"
-    Daily = "Daily" 
+    Daily = "Daily"
     Hourly = "Hourly"
     N = "Do not group by"
 
