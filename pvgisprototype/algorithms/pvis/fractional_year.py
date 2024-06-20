@@ -28,37 +28,6 @@ import numpy
 from pvgisprototype.api.position.models import SolarPositionModel
 
 
-@validate_with_pydantic(CalculateFractionalYearPVISInputModel)
-def calculate_fractional_year_pvis(
-    timestamp: datetime,
-) -> FractionalYear:
-    """Calculate fractional year in radians
-
-    Notes
-    -----
-    In PVGIS' C source code, this is called `day_angle`
-
-    NOAA's corresponding equation:
-
-        fractional_year = (
-            2
-            * pi
-            / 365
-            * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
-        )
-    """
-    day_of_year = timestamp.timetuple().tm_yday
-    days_in_year = get_days_in_year(timestamp.year)
-    fractional_year = 2 * pi * day_of_year / days_in_year
-
-    if not ((isclose(FRACTIONAL_YEAR_MINIMUM, fractional_year) or FRACTIONAL_YEAR_MINIMUM < fractional_year) and 
-            (isclose(FRACTIONAL_YEAR_MAXIMUM, fractional_year) or fractional_year < FRACTIONAL_YEAR_MAXIMUM)):
-        raise ValueError(f'Calculated fractional year {fractional_year} is out of the expected range [{FRACTIONAL_YEAR_MINIMUM}, {FRACTIONAL_YEAR_MAXIMUM}] radians')
-    fractional_year = FractionalYear(value=fractional_year, unit=RADIANS)
-            
-    return fractional_year
-
-
 # @validate_with_pydantic(CalculateFractionalYearPVISInputModel)
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
@@ -99,6 +68,17 @@ def calculate_day_angle_series_hofierka(
     The day angle [0]_ is the same quantity called Fractional Year in NOAA's
     solar geometry equations, i.e. the function
     calculate_fractional_year_time_series_noaa().
+
+    In PVGIS' C source code, this is called `day_angle`
+
+    NOAA's corresponding equation:
+
+        fractional_year = (
+            2
+            * pi
+            / 365
+            * (timestamp.timetuple().tm_yday - 1 + float(timestamp.hour - 12) / 24)
+        )
 
     References
     ----------
