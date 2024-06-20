@@ -1,7 +1,4 @@
 from devtools import debug
-from math import isfinite
-from datetime import datetime
-
 import numpy
 from pvgisprototype import SolarHourAngle
 from pvgisprototype import HourAngleSunrise
@@ -13,66 +10,20 @@ from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarHourAnglePVISInputModel
 from pvgisprototype.validation.functions import CalculateEventHourAnglePVISInputModel
-from pvgisprototype.api.utilities.timestamp import timestamp_to_minutes
-from math import pi
-from pvgisprototype.constants import RADIANS
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, HASH_AFTER_THIS_VERBOSITY_LEVEL, RADIANS
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.log import logger
+from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_data_fingerprint
 
 
-@validate_with_pydantic(CalculateSolarHourAnglePVISInputModel)
-def calculate_solar_hour_angle_pvis(
-    solar_time:datetime,
-)-> SolarHourAngle:
-    """Calculate the hour angle ω'
-
-    ω = (ST / 3600 - 12) * 15 * pi / 180
-
-    Parameters
-    ----------
-
-    solar_time: float
-        The solar time (ST) is a calculation of the passage of time based on the
-        position of the Sun in the sky. It is expected to be decimal hours in a
-        24 hour format and measured internally in seconds. 
-
-    Returns
-    --------
-
-    hour_angle: float
-        The solar hour angle (ω) is the angle at any instant through which the
-        earth has to turn to bring the meridian of the observer directly in
-        line with the sun's rays measured in radian.
-
-    Notes
-    -----
-    If not mistaken, in PVGIS' C source code, the conversion function is:
-
-        hour_angle = (solar_time / 3600 - 12) * 15 * 0.0175
-
-        where the solar time was given in seconds.
-    """
-    # true_solar_time_minutes = timestamp_to_minutes(solar_time)
-    hour_angle = (solar_time.minutes / 60 - 12) * 15 * pi / 180
-    hour_angle = SolarHourAngle(
-        value=hour_angle,
-        unit=RADIANS,
-        position_algorithm='PVIS',
-        timing_algorithm='PVIS',
-    )
-    if (
-        not isfinite(hour_angle.degrees)
-        or not hour_angle.min_degrees <= hour_angle.degrees <= hour_angle.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar hour angle {hour_angle.degrees} is out of the expected range\
-            [{hour_angle.min_degrees}, {hour_angle.max_degrees}] degrees"
-        )
-    return hour_angle
-
-
+@log_function_call
+@cached(cache={}, key=custom_hashkey)
 def calculate_solar_hour_angle_series_hofierka(
     longitude: Longitude,
     timestamps: DatetimeIndex, 
@@ -129,6 +80,15 @@ def calculate_solar_hour_angle_series_hofierka(
     #         f"The calculated solar hour angle {hour_angle.degrees} is out of the expected range\
     #         [{hour_angle.min_degrees}, {hour_angle.max_degrees}] degrees"
     #     )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    log_data_fingerprint(
+        data=solar_hour_angle_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
     return SolarHourAngle(
         value=solar_hour_angle_series,
         unit=RADIANS,
@@ -187,7 +147,3 @@ def calculate_event_hour_angle_pvis(  # rename to: calculate_event_hour_angle
     )
 
     return hour_angle_sunrise
-
-
-if __name__ == "__main__":
-    typer.run(main)
