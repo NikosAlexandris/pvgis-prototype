@@ -16,6 +16,12 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
+from pvgisprototype.api.position.models import (
+    SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+    SOLAR_POSITION_ALGORITHM_DEFAULT,
+    SolarIncidenceModel,
+    SolarPositionModel,
+)
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 from pvgisprototype.api.utilities.timestamp import (
     generate_datetime_series,
@@ -48,6 +54,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_longitude,
     fastapi_query_periods,
     fastapi_query_refracted_solar_zenith,
+    fastapi_query_solar_incidence_model,
+    fastapi_query_solar_position_model,
     fastapi_query_start_time,
     fastapi_query_surface_orientation,
     fastapi_query_surface_orientation_list,
@@ -307,6 +315,52 @@ async def process_surface_orientation_list(
     ]
 
 
+async def process_series_solar_position_model(
+    solar_position_model: Annotated[
+        SolarPositionModel, fastapi_query_solar_position_model
+    ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+) -> SolarPositionModel:
+    NOT_IMPLEMENTED_MODELS = [
+        SolarPositionModel.hofierka,
+        SolarPositionModel.pvlib,
+        SolarPositionModel.pysolar,
+        SolarPositionModel.skyfield,
+        SolarPositionModel.suncalc,
+        SolarPositionModel.all,
+    ]
+    if solar_position_model in NOT_IMPLEMENTED_MODELS:
+        models_bad_choices = ", ".join(model.value for model in NOT_IMPLEMENTED_MODELS)
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=400,
+            detail=f"Models {models_bad_choices} are currently not supported.",
+        )
+
+    return solar_position_model
+
+
+async def process_series_solar_incidence_model(
+    solar_incidence_model: Annotated[
+        SolarIncidenceModel, fastapi_query_solar_incidence_model
+    ] = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
+) -> SolarIncidenceModel:
+    NOT_IMPLEMENTED_MODELS = [
+        SolarIncidenceModel.pvis,
+        SolarIncidenceModel.all,
+    ]
+    if solar_incidence_model in NOT_IMPLEMENTED_MODELS:
+        models_bad_choices = ", ".join(model.value for model in NOT_IMPLEMENTED_MODELS)
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=400,
+            detail=f"Models {models_bad_choices} are currently not supported.",
+        )
+
+    return solar_incidence_model
+
+
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_surface_orientation = Depends(process_surface_orientation)
@@ -323,3 +377,7 @@ fastapi_dependable_angle_output_units = Depends(process_angle_output_units)
 fastapi_dependable_refracted_solar_zenith = Depends(process_refracted_solar_zenith)
 fastapi_dependable_surface_orientation_list = Depends(process_surface_orientation_list)
 fastapi_dependable_surface_tilt_list = Depends(process_surface_tilt_list)
+fastapi_dependable_solar_position_models = Depends(process_series_solar_position_model)
+fastapi_dependable_solar_incidence_models = Depends(
+    process_series_solar_incidence_model
+)

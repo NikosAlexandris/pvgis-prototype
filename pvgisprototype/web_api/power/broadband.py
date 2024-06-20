@@ -56,11 +56,14 @@ from pvgisprototype.constants import (
 )
 from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_angle_output_units,
+    fastapi_dependable_frequency,
     fastapi_dependable_groupby,
     fastapi_dependable_latitude,
     fastapi_dependable_linke_turbidity_factor,
     fastapi_dependable_longitude,
     fastapi_dependable_refracted_solar_zenith,
+    fastapi_dependable_solar_incidence_models,
+    fastapi_dependable_solar_position_models,
     fastapi_dependable_spectral_factor_series,
     fastapi_dependable_surface_orientation,
     fastapi_dependable_surface_orientation_list,
@@ -68,7 +71,6 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_surface_tilt_list,
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
-    fastapi_dependable_frequency,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_albedo,
@@ -81,7 +83,6 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_elevation,
     fastapi_query_end_time,
     fastapi_query_fingerprint,
-    fastapi_query_frequency,
     fastapi_query_in_memory,
     fastapi_query_mask_and_scale,
     fastapi_query_module_temperature_algorithm,
@@ -95,8 +96,6 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_quiet,
     fastapi_query_radiation_cutoff_threshold,
     fastapi_query_solar_constant,
-    fastapi_query_solar_incidence_model,
-    fastapi_query_solar_position_model,
     fastapi_query_solar_time_model,
     fastapi_query_start_time,
     fastapi_query_statistics,
@@ -217,11 +216,11 @@ async def get_photovoltaic_power_series_advanced(
         bool, fastapi_query_apply_reflectivity_factor
     ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[
-        SolarPositionModel, fastapi_query_solar_position_model
+        SolarPositionModel, fastapi_dependable_solar_position_models
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[
-        SolarIncidenceModel, fastapi_query_solar_incidence_model
-    ] = SolarIncidenceModel.jenco,
+        SolarIncidenceModel, fastapi_dependable_solar_incidence_models
+    ] = SolarIncidenceModel.iqbal,
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -346,7 +345,7 @@ async def get_photovoltaic_power_series_advanced(
         streaming_data = [
             (str(timestamp), photovoltaic_power)
             for timestamp, photovoltaic_power in zip(
-                timestamps.tolist(), photovoltaic_power_output_series.value.tolist() # type: ignore
+                timestamps.tolist(), photovoltaic_power_output_series.value.tolist()  # type: ignore
             )
         ]
         filename = f"photovoltaic_power_output_{photovoltaic_power_output_series.components[FINGERPRINT_COLUMN_NAME]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
@@ -584,7 +583,7 @@ async def get_photovoltaic_power_series(
             image=True,
         )
         buffer = BytesIO()
-        image.save(buffer, format="PNG") # type: ignore
+        image.save(buffer, format="PNG")  # type: ignore
         image_bytes = buffer.getvalue()
         image_base64 = base64.b64encode(image_bytes).decode("utf-8")
         response["qr"] = (
@@ -726,7 +725,7 @@ async def get_photovoltaic_power_output_series_multi(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_dependable_frequency] =Frequency.Hour,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     spectral_factor_series: Annotated[
@@ -754,11 +753,11 @@ async def get_photovoltaic_power_output_series_multi(
         bool, fastapi_query_apply_reflectivity_factor
     ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[
-        SolarPositionModel, fastapi_query_solar_position_model
+        SolarPositionModel, fastapi_dependable_solar_position_models
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[
-        SolarIncidenceModel, fastapi_query_solar_incidence_model
-    ] = SolarIncidenceModel.jenco,
+        SolarIncidenceModel, fastapi_dependable_solar_incidence_models
+    ] = SolarIncidenceModel.iqbal,
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -883,7 +882,7 @@ async def get_photovoltaic_power_output_series_multi(
         streaming_data = [
             (str(timestamp), photovoltaic_power)
             for timestamp, photovoltaic_power in zip(
-                timestamps.tolist(), photovoltaic_power_output_series.value.tolist() # type: ignore
+                timestamps.tolist(), photovoltaic_power_output_series.value.tolist()  # type: ignore
             )
         ]
         filename = f"photovoltaic_power_output_{photovoltaic_power_output_series.components[FINGERPRINT_COLUMN_NAME]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
