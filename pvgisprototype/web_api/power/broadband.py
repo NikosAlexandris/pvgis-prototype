@@ -68,6 +68,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_surface_tilt_list,
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
+    fastapi_dependable_frequency,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_albedo,
@@ -182,7 +183,7 @@ async def get_photovoltaic_power_series_advanced(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.H,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     # global_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_global_horizontal_irradiance] = None,
@@ -451,7 +452,7 @@ async def get_photovoltaic_power_series(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.H,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     photovoltaic_module: Annotated[
@@ -614,7 +615,7 @@ async def get_photovoltaic_power_series_monthly_average(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.H,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     spectral_factor_series: Annotated[
@@ -725,7 +726,7 @@ async def get_photovoltaic_power_output_series_multi(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.H,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] =Frequency.Hour,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     spectral_factor_series: Annotated[
