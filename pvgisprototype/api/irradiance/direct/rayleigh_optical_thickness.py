@@ -36,6 +36,7 @@ from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(AdjustElevationInputModel)
 def adjust_elevation(
     elevation: float,

@@ -19,8 +19,11 @@ from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
 
 
+@cached(cache={}, key=custom_hashkey)
 @validate_with_pydantic(SolarHourAngleSeriesPVLIBInput)
 def calculate_solar_hour_angle_series_pvlib(
     longitude: Longitude,
