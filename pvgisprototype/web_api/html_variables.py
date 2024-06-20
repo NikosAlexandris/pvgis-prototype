@@ -1,3 +1,6 @@
+"""
+HTML for API
+"""
 
 html_root_page = """
     <!DOCTYPE html>
