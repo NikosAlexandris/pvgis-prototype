@@ -865,6 +865,8 @@ def determine_frequency(timestamps):
         'D': 'Daily',
         '3h': '3-Hourly',
         'h': 'Hourly',
+        'min': 'Minutely',
+        '8min': '8-Minutely',
     }
     if timestamps.year.unique().size > 1:
         frequency = 'YE'
@@ -874,10 +876,15 @@ def determine_frequency(timestamps):
         frequency = 'W'
     elif timestamps.day.unique().size > 1:
         frequency = 'D'
-    elif timestamps.hour.unique().size < 24:
-        frequency = 'h'
+    elif timestamps.hour.unique().size > 1:
+        if timestamps.hour.unique().size < 17:  # Explain Me !
+            frequency = 'h'
+        else:
+            frequency = '3h'
+    elif timestamps.minute.unique().size < 17:  # Explain Me !
+        frequency = 'min'
     else:
-        frequency = '3h'
+        frequency = '8min'  # by 8 characters for a sparkline if timestamps > 64 min
     frequency_label = time_groupings[frequency]
 
     return frequency, frequency_label
@@ -1276,7 +1283,7 @@ def print_change_percentages_panel(
     photovoltaic_module_table = build_photovoltaic_module_table()
     photovoltaic_module_table.add_row(
             photovoltaic_module,
-            str(peak_power),
+            f"[green]{peak_power}[/green]",
             mount_type,
             )
 

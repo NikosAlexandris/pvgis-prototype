@@ -343,6 +343,7 @@ def photovoltaic_power_output_series(
         print_change_percentages_panel(
             longitude=longitude,
             latitude=latitude,
+            elevation=elevation,
             timestamps=timestamps,
             dictionary=photovoltaic_power_output_series.components,
             # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
