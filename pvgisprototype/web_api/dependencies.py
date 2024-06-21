@@ -156,7 +156,7 @@ async def process_series_timestamp(
     if timestamps is not None and (not start_time or not end_time):
         try:
             timestamps_str = timestamps
-            timestamps = parse_timestamp_series(timestamps=timestamps)
+            timestamps = parse_timestamp_series(timestamps=timestamps)  # type: ignore
             if timestamps.isna().any():  # type: ignore
                 raise HTTPException(
                     status_code=400,
