@@ -2,6 +2,8 @@ from fastapi import Query
 
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.constants import (
+    ALBEDO_MAXIMUM,
+    ALBEDO_MINIMUM,
     ELEVATION_MAXIMUM,
     ELEVATION_MINIMUM,
     LATITUDE_MAXIMUM,
@@ -199,6 +201,8 @@ fastapi_query_refracted_solar_zenith = Query(
 fastapi_query_albedo = Query(
     # 2,
     description=albedo_description,
+    ge=ALBEDO_MINIMUM,
+    le=ALBEDO_MAXIMUM,
 )
 fastapi_query_apply_reflectivity_factor = Query(
     # True,

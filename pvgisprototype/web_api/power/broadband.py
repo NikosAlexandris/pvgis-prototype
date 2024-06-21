@@ -375,7 +375,7 @@ async def get_photovoltaic_power_series_advanced(
             )
         else:
             response = {
-                "Photovoltaic power output series": photovoltaic_power_output_series.value.tolist(),
+                "Photovoltaic power output series": photovoltaic_power_output_series.value,
             }
 
     if fingerprint:
@@ -397,7 +397,7 @@ async def get_photovoltaic_power_series_advanced(
         analysis_series = analyse_photovoltaic_performance(
             dictionary=photovoltaic_power_output_series.components,
             timestamps=timestamps,
-            frequency=frequency.value,
+            frequency=frequency,
         )
         response["analysis"] = convert_numpy_arrays_to_lists(analysis_series)
 
@@ -434,7 +434,7 @@ async def get_photovoltaic_power_series_advanced(
         "Content-Disposition": 'attachment; filename="pvgis_photovoltaic_power_series.json"'
     }
     return Response(
-        orjson.dumps(response), headers=headers, media_type="application/json"
+        orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
     )
 
 
@@ -539,7 +539,7 @@ async def get_photovoltaic_power_series(
             )
         else:
             response = {
-                "Photovoltaic power output series": photovoltaic_power_output_series.value.tolist(),
+                "Photovoltaic power output series": photovoltaic_power_output_series.value,
             }
 
     if fingerprint:
@@ -856,7 +856,7 @@ async def get_photovoltaic_power_output_series_multi(
             )
         else:
             response = {
-                "Photovoltaic power output series": photovoltaic_power_output_series.value.tolist(),
+                "Photovoltaic power output series": photovoltaic_power_output_series.value,
             }
 
     if fingerprint:
