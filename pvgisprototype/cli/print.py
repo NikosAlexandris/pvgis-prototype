@@ -14,15 +14,10 @@ from rich.text import Text
 from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 from typing import List, Sequence
 import numpy as np
-from pvgisprototype.api.power.performance import analyse_photovoltaic_performance
 from pvgisprototype.constants import (
-    ELEVATION_NAME,
-    ENERGY_NAME_WITH_SYMBOL,
-    LATITUDE_NAME,
-    LONGITUDE_NAME,
     PEAK_POWER_COLUMN_NAME,
     REFLECTIVITY,
-    SPECTRAL_EFFECT,
+    SPECTRAL_EFFECT_NAME,
     SYMBOL_LOSS,
     SYMBOL_SUMMATION,
     SYSTEM_LOSS,
@@ -534,16 +529,26 @@ def print_irradiance_table_2(
 
     caption = str()
     if longitude or latitude or elevation:
-        caption = f"[underline]Position[/underline]  "
+        caption = f"[underline]Location[/underline]  "
     if longitude and latitude:
         caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
     if elevation:
         caption += f"Elevation: [bold]{elevation} m[/bold]"
 
-    surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None) if surface_orientation else None
-    surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    surface_orientation = round_float_values(
+        (
+            dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None)
+            if surface_orientation
+            else None
+        ),
+        rounding_places,
+    )
+    surface_tilt = round_float_values(
+        dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None,
+        rounding_places,
+    )
     if surface_orientation or surface_tilt:
-        caption += f"\n[underline]Solar surface[/underline]  "
+        caption += f"\n[underline]Position[/underline]  "
 
     if surface_orientation is not None:
         caption += f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
@@ -555,12 +560,19 @@ def print_irradiance_table_2(
     if longitude or latitude or elevation or surface_orientation or surface_tilt and units is not None:
         caption += f"[[dim]{units}[/dim]]"
     
+    photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
+    peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
     algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
-    timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)  # If timing is a single value and not a list
-    position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
-    azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, NOT_AVAILABLE)
-    incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, NOT_AVAILABLE)
+    timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, None)
+    position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, None)
+    azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, None)
+    incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
+
+    if photovoltaic_module:
+        caption += f"\n[underline]Module[/underline]  "
+        caption += f"{TECHNOLOGY_NAME}: {photovoltaic_module}, "
+        caption += f"{PEAK_POWER_COLUMN_NAME}: {peak_power}"
 
     if algorithms or radiation_model or timing_algorithm or position_algorithm:
         caption += f"\n[underline]Algorithms[/underline]  "
@@ -578,7 +590,7 @@ def print_irradiance_table_2(
         caption += f"Positioning : [bold]{position_algorithm}[/bold], "
 
     if azimuth_origin:
-        caption += f"\nAzimuth origin : [bold indigo]{azimuth_origin}[/bold indigo], "
+        caption += f"Azimuth origin : [bold indigo]{azimuth_origin}[/bold indigo], "
 
     if incidence_algorithm:
         caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
@@ -610,7 +622,7 @@ def print_irradiance_table_2(
     caption=caption.rstrip(', ')  # Remove trailing comma + space
     table = Table(
             title=title,
-            caption=caption.rstrip(', '),  # Remove trailing comma + space
+            # caption=caption.rstrip(', '),  # Remove trailing comma + space
             caption_justify="left",
             expand=False,
             padding=(0, 1),
@@ -634,15 +646,16 @@ def print_irradiance_table_2(
             ANGLE_UNITS_COLUMN_NAME,
             TIME_ALGORITHM_COLUMN_NAME,
             POSITIONING_ALGORITHM_COLUMN_NAME,
+            SOLAR_CONSTANT_COLUMN_NAME,
+            PERIGEE_OFFSET_COLUMN_NAME,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
             INCIDENCE_ALGORITHM_COLUMN_NAME,
             INCIDENCE_DEFINITION,
             RADIATION_MODEL_COLUMN_NAME,
             TECHNOLOGY_NAME,
+            PEAK_POWER_COLUMN_NAME,
             POWER_MODEL_COLUMN_NAME,
             FINGERPRINT_COLUMN_NAME,
-            SOLAR_CONSTANT_COLUMN_NAME,
-            PERIGEE_OFFSET_COLUMN_NAME,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
     }
 
     # add and process additional columns
@@ -710,6 +723,7 @@ def print_irradiance_table_2(
 
     if verbose:
         Console().print(table)
+        Console().print(Panel(caption, expand=False))
 
 
 def add_table_row(
@@ -764,7 +778,7 @@ def add_table_row(
     """
     effects = {
         REFLECTIVITY,
-        SPECTRAL_EFFECT,
+        SPECTRAL_EFFECT_NAME,
         TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
         SYSTEM_LOSS,
         NET_EFFECT,
@@ -846,6 +860,8 @@ def determine_frequency(timestamps):
         'D': 'Daily',
         '3h': '3-Hourly',
         'h': 'Hourly',
+        'min': 'Minutely',
+        '8min': '8-Minutely',
     }
     if timestamps.year.unique().size > 1:
         frequency = 'YE'
@@ -855,10 +871,15 @@ def determine_frequency(timestamps):
         frequency = 'W'
     elif timestamps.day.unique().size > 1:
         frequency = 'D'
-    elif timestamps.hour.unique().size < 24:
-        frequency = 'h'
+    elif timestamps.hour.unique().size > 1:
+        if timestamps.hour.unique().size < 17:  # Explain Me !
+            frequency = 'h'
+        else:
+            frequency = '3h'
+    elif timestamps.minute.unique().size < 17:  # Explain Me !
+        frequency = 'min'
     else:
-        frequency = '3h'
+        frequency = '8min'  # by 8 characters for a sparkline if timestamps > 64 min
     frequency_label = time_groupings[frequency]
 
     return frequency, frequency_label
@@ -1014,23 +1035,29 @@ def build_photovoltaic_module_panel(photovoltaic_module_table):
     return photovoltaic_module_panel
 
 
-def build_pvgis_version_panel():
+def build_pvgis_version_panel(
+        prefix_text = "PVGIS v6",
+        justify_text = "center",
+        style_text = "white dim",
+        border_style = "dim",
+        padding = (0, 2),
+        ) -> Panel:
     """
     """
     from pvgisprototype._version import __version__
     pvgis_version = Text(
-            f"PVGIS v6 ({__version__})",
-            justify="center",
-            style="white dim",
+            f"{prefix_text} ({__version__})",
+            justify=justify_text,
+            style=style_text,
             )
     return Panel(
             pvgis_version,
             # subtitle="[reverse]Fingerprint[/reverse]",
             # subtitle_align="right",
-            border_style="dim",
+            border_style=border_style,
             # style="dim",
             expand=False,
-            padding=(0,2),
+            padding=padding,
         )
 
 
@@ -1053,13 +1080,35 @@ def build_fingerprint_panel(fingerprint):
         )
 
 
+# from rich.console import group
+# @group()
+def build_version_and_fingerprint_panels(fingerprint=None):
+    """Dynamically build panels based on available data."""
+    # Always yield version panel
+    panels = [build_pvgis_version_panel()]
+    # Yield fingerprint panel only if fingerprint is provided
+    if fingerprint:
+        panels.append(build_fingerprint_panel(fingerprint))
+
+    return panels
+
+
+def build_version_and_fingerprint_columns(fingerprint) -> Columns:
+    """Combine software version and fingerprint panels into a single Columns
+    object."""
+    version_and_fingeprint_panels = build_version_and_fingerprint_panels(
+        fingerprint=fingerprint
+    )
+    return Columns(version_and_fingeprint_panels, expand=False, padding=2)
+
+
 def print_change_percentages_panel(
     longitude = None,
     latitude = None,
     elevation = None,
     timestamps: DatetimeIndex | datetime = [datetime.now()],
     dictionary: dict = dict(),
-    title: str ='Changes',
+    title: str ='Analysis of Performance',
     rounding_places: int = 1,#ROUNDING_PLACES_DEFAULT,
     verbose = 1,
     index: bool = False,
@@ -1097,7 +1146,7 @@ def print_change_percentages_panel(
         # IN_PLANE_IRRADIANCE,
         REFLECTIVITY,
         # IRRADIANCE_AFTER_REFLECTIVITY,
-        SPECTRAL_EFFECT,
+        SPECTRAL_EFFECT_NAME,
         # EFFECTIVE_IRRADIANCE_NAME,
         TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
         # PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
@@ -1116,7 +1165,7 @@ def print_change_percentages_panel(
         percentage_style=percentage_style,
         reference_quantity_style=reference_quantity_style,
     )
-    results = analyse_photovoltaic_performance(
+    results = report_photovoltaic_performance(
             dictionary=dictionary,
             timestamps=timestamps,
             frequency=frequency,
@@ -1229,7 +1278,7 @@ def print_change_percentages_panel(
     photovoltaic_module_table = build_photovoltaic_module_table()
     photovoltaic_module_table.add_row(
             photovoltaic_module,
-            str(peak_power),
+            f"[green]{peak_power}[/green]",
             mount_type,
             )
 
@@ -1245,7 +1294,7 @@ def print_change_percentages_panel(
 
     performance_panel = Panel(
                 performance_table,
-                title='Analysis of Performance',
+                title=title,
                 expand=False,
                 # style="on black",
                 )
@@ -1258,15 +1307,8 @@ def print_change_percentages_panel(
             padding=3,
             )
 
-    from rich.console import group
-    @group()
-    def build_panels(fingerprint):
-        if fingerprint:
-            fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
-            yield build_fingerprint_panel(fingerprint)
-        yield build_pvgis_version_panel()
-
-    columns = Columns([build_panels(fingerprint)])
+    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
+    columns = build_version_and_fingerprint_columns(fingerprint)
 
     from rich.console import Group
     group = Group(

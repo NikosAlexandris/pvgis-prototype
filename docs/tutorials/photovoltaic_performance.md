@@ -60,19 +60,15 @@ The flow of calculations is :
 
 PVGIS uses a modified version of the power-rating model by King.
 
-!!! seealso
+??? seealso "Huld, 2011"
 
-    Thomas Huld, Gabi Friesen, Artur Skoczek, Robert P. Kenny, Tony Sample, Michael Field, Ewan D. Dunlop,
-    A power-rating model for crystalline silicon PV modules,
-    Solar Energy Materials and Solar Cells,
-    Volume 95, Issue 12,
-    2011,
-    Pages 3359-3369,
-    ISSN 0927-0248,
-    [doi.org/10.1016/j.solmat.2011.07.026](https://doi.org/10.1016/j.solmat.2011.07.026)
-    (https://www.sciencedirect.com/science/article/pii/S0927024811004442)
-    Abstract: A model for the performance of generic crystalline silicon photovoltaic (PV) modules is proposed. The model represents the output power of the module as a function of module temperature and in-plane irradiance, with a number of coefficients to be determined by fitting to measured performance data from indoor or outdoor measurements. The model has been validated using data from 3 different modules characterized through extensive measurements in outdoor conditions over several seasons. The model was then applied to indoor measurement data for 18 different PV modules to investigate the variability in modeled output from different module types. It was found that for a Central European climate the modeled output of the 18 modules varies with a standard deviation (SD) of 1.22%, but that the between-module variation is higher at low irradiance (SD of 3.8%). The variability between modules of different types is thus smaller than the uncertainty normally found in the total solar irradiation per year for a given site. We conclude that the model can therefore be used for generalized estimates of PV performance with only a relatively small impact on the overall uncertainty of such estimates resulting from different module types.
-    Keywords: Crystalline silicon; PV energy rating; PV performance; Performance rating
+    Thomas Huld, Gabi Friesen, Artur Skoczek, Robert P. Kenny, Tony Sample, Michael Field, Ewan D. Dunlop, A power-rating model for crystalline silicon PV modules, Solar Energy Materials and Solar Cells, Volume 95, Issue 12, 2011, Pages 3359-3369, ISSN 0927-0248, [doi.org/10.1016/j.solmat.2011.07.026](https://doi.org/10.1016/j.solmat.2011.07.026) (https://www.sciencedirect.com/science/article/pii/S0927024811004442)
+
+    **Abstract**
+
+    A model for the performance of generic crystalline silicon photovoltaic (PV) modules is proposed. The model represents the output power of the module as a function of module temperature and in-plane irradiance, with a number of coefficients to be determined by fitting to measured performance data from indoor or outdoor measurements. The model has been validated using data from 3 different modules characterized through extensive measurements in outdoor conditions over several seasons. The model was then applied to indoor measurement data for 18 different PV modules to investigate the variability in modeled output from different module types. It was found that for a Central European climate the modeled output of the 18 modules varies with a standard deviation (SD) of 1.22%, but that the between-module variation is higher at low irradiance (SD of 3.8%). The variability between modules of different types is thus smaller than the uncertainty normally found in the total solar irradiation per year for a given site. We conclude that the model can therefore be used for generalized estimates of PV performance with only a relatively small impact on the overall uncertainty of such estimates resulting from different module types.
+
+    **Keywords** Crystalline silicon; PV energy rating; PV performance; Performance rating
 
 
 We can _simulate_ the photovoltaic power output via
