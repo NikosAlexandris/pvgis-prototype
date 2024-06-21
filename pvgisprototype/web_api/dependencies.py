@@ -109,14 +109,13 @@ async def process_groupby(
 
     time_groupings = {
         "Yearly": "Y",
-        "Seasonly": "S",
+        "Seasonal": "S",
         "Monthly": "M",
         "Weekly": "W",
         "Daily": "D",
         "Hourly": "h",
         "Do not group by": None,
     }
-    print(time_groupings[group_by.value])
     return time_groupings[group_by.value]
 
 
@@ -125,12 +124,12 @@ async def process_frequency(
 ) -> str:
 
     time_groupings = {
-        "Year": "Y",
-        "Season": "S",
-        "Month": "M",
-        "Week": "W",
-        "Day": "D",
-        "Hour": "h",
+        "Yearly": "Y",
+        "Seasonal": "S",
+        "Monthly": "M",
+        "Weekly": "W",
+        "Daily": "D",
+        "Hourly": "h",
     }
     return time_groupings[frequency.value]
 
