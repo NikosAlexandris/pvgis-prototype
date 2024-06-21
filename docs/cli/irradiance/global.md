@@ -12,7 +12,7 @@ hide:
 This page overviews how-to work with
 the `irradiance global` sub-commands `inclined`, `horizontal` and `spectral`.
 
-!!! help `irradiance global`
+!!! help "`irradiance global`"
 
     ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype irradiance global
@@ -29,9 +29,16 @@ pvgis-prototype irradiance global inclined \
 
 ## Global horizontal
 
+!!! warning "Horizontal components"
+
+    Horizontal components
+    are independent of the positional setup of a solar surface.
+    Hence,
+    we only need to provide a location and define a series of timestamps.
+
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance global horizontal \
-    8.628 45.812 214 180 35 \
+    8.628 45.812 214 \
     '2010-01-01 12:00:00' \
     -vvv
 ```

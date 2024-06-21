@@ -23,35 +23,6 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
 
-@validate_with_pydantic(CalculateSolarZenithPVLIBInputModel)
-def calculate_solar_zenith_pvlib(
-        longitude: Longitude,   # degrees
-        latitude: Latitude,     # degrees
-        timestamp: datetime,
-        timezone: ZoneInfo,
-    )-> SolarZenith:
-    """Calculate the solar azimith (θ) in radians
-    """
-    solar_position = pvlib.solarposition.get_solarposition(timestamp, latitude.degrees, longitude.degrees)
-    solar_zenith = solar_position['zenith'].values[0]
-
-    solar_zenith = SolarZenith(
-            value=solar_zenith,
-            unit=DEGREES,
-            position_algorithm='pvlib',
-            timing_algorithm='pvlib',
-            )
-    if (
-        not isfinite(solar_zenith.degrees)
-        or not solar_zenith.min_degrees <= solar_zenith.degrees <= solar_zenith.max_degrees
-    ):
-        raise ValueError(
-            f"The calculated solar zenith angle {solar_zenith.degrees} is out of the expected range\
-            [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
-        )
-    return solar_zenith
-
-
 @log_function_call
 @cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(CalculateSolarZenithPVLIBInputModel)

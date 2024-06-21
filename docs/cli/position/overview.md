@@ -3,6 +3,7 @@ icon: material/sun-angle
 tags:
   - How-To
   - CLI
+  - Solar Position
   - Solar Incidence Angle
 hide:
   - toc

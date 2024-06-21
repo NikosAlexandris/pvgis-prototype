@@ -1,5 +1,6 @@
 from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
+from pvgisprototype.algorithms.pvlib.solar_altitude import calculate_solar_altitude_series_pvlib
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
@@ -15,7 +16,6 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
 from pvgisprototype.algorithms.noaa.solar_altitude import calculate_solar_altitude_series_noaa
 from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -30,7 +30,7 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
 from cachetools import cached
-from rich import print
+from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
@@ -181,17 +181,17 @@ def model_solar_altitude_series(
         )
 
     if solar_position_model.value  == SolarPositionModel.pvlib:
-        pass
 
-    # if solar_position_model.value  == SolarPositionModel.pvlib:
+        solar_altitude_series = calculate_solar_altitude_series_pvlib(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
 
-    #     solar_altitude = calculate_solar_altitude_pvlib(
-    #         longitude=longitude,
-    #         latitude=latitude,
-    #         timestamp=timestamp,
-    #         timezone=timezone,
-    #         verbose=verbose,
-    #     )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 

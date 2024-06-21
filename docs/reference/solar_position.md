@@ -1,4 +1,5 @@
 ---
+icon: material/sun-angle
 title: Solar Position
 tags:
   - Reference
@@ -39,6 +40,11 @@ is the calculation of the position of the Earth in its orbit around the sun
 expressed through the angle ==Fractional Year==
 measured in radians based solely on a moment in time (timestamp).
 
+!!! Notes
+
+    - The function that calculates the fractional year considers leap years and converts the timestamps into fractional values.
+    - Other solar positioning algorithms name this variable "the day angle"
+
 Second is
 the ==Equation of Time== measured in minutes that
 corrects for the eccentricity of the Earth's orbit and axial tilt.
@@ -64,6 +70,13 @@ the solar hour angle is :
     - negative in the morning
     - positive in the afternoon
 
+!!! note "Useful to know"
+
+    Since the Earth rotates 15° per hour (or pi / 12 in radians),
+    each hour away from solar noon
+    corresponds to an angular motion of the sun in the sky of 15°.
+    Practically, the calculation converts a timestamp into a solar time.
+
 !!! hint "Order of dependent calculations"
 
     - Fractional year ⊂ Equation of time ⊂ Time offset ⊂ True solar time ⊂ Solar hour angle
@@ -81,3 +94,17 @@ and the _Perigee offset_.
     - Fractional year ⊂ Solar declination  **NOAA**
     or
     - (Fractional year, Eccentricity correction, Perigee offset) ⊂ Solar declination  **Jenčo/Hofierka**
+
+## Default algoriths
+
+The default algoriths for
+solar timing,
+positioning
+and the definition of the incidence angle
+are :
+
+- `solar_time_model` is set to Milne1921 (see in pvgisprototype.constants: SOLAR_TIME_ALGORITHM_DEFAULT).
+    - Calculate the apparent solar time based on the equation of time by Milne 1921
+
+- `solar_position_model` is set to NOAA's equation for .. (see : SOLAR_POSITION_ALGORITHM_DEFAULT).
+- `solar_incidence_model` is set to Iqbal (see : SolarIncidenceModel.iqbal).
