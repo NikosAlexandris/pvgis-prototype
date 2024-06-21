@@ -90,8 +90,17 @@ def select_time_series(
             print(f"No data found for the given period {start_time} and {end_time}.")
 
     if remap_to_month_start:
+        def remap_to_2013(ts):
+            try:
+                return ts.replace(year=2013)
+            except ValueError:  # Handle February 29 for non-leap years
+                if ts.month == 2 and ts.day == 29:
+                    return ts.replace(year=2013, day=28)
+                else:
+                    raise
+        remapped_timestamps = timestamps.map(lambda ts: remap_to_2013(ts))
         from pandas import date_range
-        month_start_timestamps = date_range(start=timestamps.min().normalize(), end=timestamps.max(), freq='MS')
+        month_start_timestamps = date_range(start=remapped_timestamps.min().normalize(), end=remapped_timestamps.max(), freq='MS')
         try:
             location_time_series = location_time_series.sel(
                 time=month_start_timestamps, method=neighbor_lookup

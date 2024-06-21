@@ -44,9 +44,12 @@ from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.validation.arrays import create_array
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 def calculate_solar_incidence_series_iqbal(
     longitude: Longitude,
     latitude: Latitude,
