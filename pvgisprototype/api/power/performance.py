@@ -20,7 +20,6 @@ from pvgisprototype.constants import (
     MEAN_EFFECT_COLUMN_NAME,
     MEAN_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
     MEAN_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-    MEAN_GLOBAL_IN_PLANE_IRRADIANCE_COLUMN_NAME,
     MEAN_PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
     MEAN_PHOTOVOLTAIC_POWER_COLUMN_NAME,
     MEAN_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
@@ -60,6 +59,7 @@ from pvgisprototype.constants import (
     TOTAL_EFFECT_COLUMN_NAME,
     TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
     TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
+    TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
     TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME,
     TOTAL_SPECTRAL_EFFECT_COLUMN_NAME,
     TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME,
@@ -78,7 +78,7 @@ from pvgisprototype.constants import (
     UNIT_FOR_MEAN_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME,
     UNIT_FOR_MEAN_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME,
     UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
-    UNIT_FOR_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+    UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
     UNIT_FOR_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME,
     UNIT_FOR_TOTAL_EFFECT_COLUMN_NAME,
     UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
@@ -335,7 +335,6 @@ def analyse_photovoltaic_performance(
         total_effect_percentage = where(
             inclined_irradiance != 0, total_effect / inclined_irradiance * 100, 0
         )
-
     # Handle units
 
     inclined_irradiance, inclined_irradiance_unit = kilofy_unit(
@@ -458,8 +457,8 @@ def analyse_photovoltaic_performance(
         UNIT_FOR_MEAN_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME: temperature_and_low_irradiance_effect_mean_unit,
         TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_PERCENTAGE_COLUMN_NAME: temperature_and_low_irradiance_effect_percentage,
         #
-        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss,
-        UNIT_FOR_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_unit,
+        TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss,
+        UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_unit,
         MEAN_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_mean,
         UNIT_FOR_MEAN_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_mean_unit,
         STANDARD_DEVIATION_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_without_system_loss_std,
@@ -500,6 +499,8 @@ def report_photovoltaic_performance(
     rounding_places=1,
     dtype=DATA_TYPE_DEFAULT,
 ):
+    """
+    """
     photovoltaic_performance_analysis = analyse_photovoltaic_performance(
         dictionary=dictionary,
         timestamps=timestamps,
@@ -516,7 +517,7 @@ def report_photovoltaic_performance(
         UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, None
     )
     inclined_irradiance_mean = photovoltaic_performance_analysis.get(
-        MEAN_GLOBAL_IN_PLANE_IRRADIANCE_COLUMN_NAME, None
+        MEAN_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, None
     )
     inclined_irradiance_mean_unit = photovoltaic_performance_analysis.get(
         UNIT_FOR_MEAN_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, None
@@ -619,10 +620,10 @@ def report_photovoltaic_performance(
     )
 
     photovoltaic_power_without_system_loss = photovoltaic_performance_analysis.get(
-        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
+        TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
     )
     photovoltaic_power_without_system_loss_unit = photovoltaic_performance_analysis.get(
-        UNIT_FOR_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
+        UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
     )
     photovoltaic_power_without_system_loss_mean = photovoltaic_performance_analysis.get(
         MEAN_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
@@ -637,7 +638,7 @@ def report_photovoltaic_performance(
     )
     photovoltaic_power_without_system_loss_series = (
         photovoltaic_performance_analysis.get(
-            PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS, None
+            PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, None
         )
     )
 
