@@ -27,14 +27,14 @@ from pvgisprototype.api.power.broadband_multiple_surfaces import (
 )
 from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.power.performance import analyse_photovoltaic_performance, summarise_photovoltaic_performance
+from pvgisprototype.api.power.performance import summarise_photovoltaic_performance
 from pvgisprototype.constants import (
+    EFFICIENCY_FACTOR_DEFAULT,
     RADIATION_CUTOFF_THRESHHOLD,
     ALBEDO_DEFAULT,
     ANALYSIS_FLAG_DEFAULT,
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     ECCENTRICITY_CORRECTION_FACTOR,
-    EFFICIENCY_DEFAULT,
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
@@ -59,7 +59,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_frequency,
     fastapi_dependable_groupby,
     fastapi_dependable_latitude,
-    fastapi_dependable_linke_turbidity_factor,
+    fastapi_dependable_linke_turbidity_factor_series,
     fastapi_dependable_longitude,
     fastapi_dependable_refracted_solar_zenith,
     fastapi_dependable_solar_incidence_models,
@@ -93,7 +93,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_periods,
     fastapi_query_photovoltaic_module_model,
     fastapi_query_power_model,
-    fastapi_query_qr,
+    fastapi_query_quick_response_code,
     fastapi_query_quiet,
     fastapi_query_solar_constant,
     fastapi_query_solar_time_model,
@@ -203,7 +203,7 @@ async def get_photovoltaic_power_series_advanced(
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
-        float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor
+        float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Annotated[
         bool, fastapi_query_apply_atmospheric_refraction
@@ -251,7 +251,7 @@ async def get_photovoltaic_power_series_advanced(
     temperature_model: Annotated[
         ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm
     ] = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Annotated[float | None, fastapi_query_efficiency] = EFFICIENCY_DEFAULT,
+    efficiency: Annotated[float | None, fastapi_query_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     # dtype: str = DATA_TYPE_DEFAULT,
     # array_backend: str = ARRAY_BACKEND_DEFAULT,
     # multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
@@ -266,7 +266,7 @@ async def get_photovoltaic_power_series_advanced(
     quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
-    qr: Annotated[bool, fastapi_query_qr] = False,
+    quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = False,
 ):
     """Estimate the photovoltaic power output for a solar surface.
 
@@ -279,8 +279,8 @@ async def get_photovoltaic_power_series_advanced(
     if analysis:  # Force change to versosity level for the analysis
         verbose = 9
 
-    if qr:
-        verbose = 9  # Force change to versosity level for the qr
+    if quick_response_code:
+        verbose = 9  # Force change to versosity level for the quick_response_code
         fingerprint = True
 
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
@@ -402,7 +402,7 @@ async def get_photovoltaic_power_series_advanced(
                 )
         response["analysis"] = photovoltaic_performance_report
 
-    if qr:
+    if quick_response_code:
         import base64
         from io import BytesIO
 
@@ -424,7 +424,7 @@ async def get_photovoltaic_power_series_advanced(
         image.save(buffer, format="PNG")  # type: ignore
         image_bytes = buffer.getvalue()
         image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-        response["qr"] = (
+        response["QR"] = (
             f"data:image/png;base64,{image_base64}"  # This way the image is returned in the JSON as a server link
         )
 
@@ -443,27 +443,17 @@ async def get_photovoltaic_power_series(
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
-    surface_orientation: Annotated[
-        float, fastapi_dependable_surface_orientation
-    ] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Annotated[
-        float, fastapi_dependable_surface_tilt
-    ] = SURFACE_TILT_DEFAULT,
+    surface_orientation: Annotated[ float, fastapi_dependable_surface_orientation ] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[ float, fastapi_dependable_surface_tilt ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    photovoltaic_module: Annotated[
-        PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
-    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    system_efficiency: Annotated[
-        float, fastapi_query_system_efficiency
-    ] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[
-        PhotovoltaicModulePerformanceModel, fastapi_query_power_model
-    ] = PhotovoltaicModulePerformanceModel.king,
+    photovoltaic_module: Annotated[ PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    system_efficiency: Annotated[ float, fastapi_query_system_efficiency ] = SYSTEM_EFFICIENCY_DEFAULT,
+    power_model: Annotated[ PhotovoltaicModulePerformanceModel, fastapi_query_power_model ] = PhotovoltaicModulePerformanceModel.king,
     peak_power: Annotated[float, fastapi_query_peak_power] = 1.0,  # FIXME ADD CONSTANT?
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
@@ -472,12 +462,12 @@ async def get_photovoltaic_power_series(
     quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
-    qr: Annotated[bool, fastapi_query_qr] = False,
+    quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = False,
 ):
     if analysis:  # Force change to versosity level for the analysis
         verbose = 9
-    if qr:
-        verbose = 9  # Force change to versosity level for the qr
+    if quick_response_code:
+        verbose = 9  # Force change to versosity level for the quick_response_code
         fingerprint = True
 
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
@@ -573,7 +563,7 @@ async def get_photovoltaic_power_series(
             orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
         )
 
-    if qr:
+    if quick_response_code:
         import base64
         from io import BytesIO
 
@@ -594,7 +584,7 @@ async def get_photovoltaic_power_series(
         image.save(buffer, format="PNG")  # type: ignore
         image_bytes = buffer.getvalue()
         image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-        response["qr"] = (
+        response["QR"] = (
             f"data:image/png;base64,{image_base64}"  # This way the image is returned in the JSON as a server link
         )
 
@@ -658,7 +648,7 @@ async def get_photovoltaic_power_series_monthly_average(
         photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
         power_model=power_model,
-        efficiency=EFFICIENCY_DEFAULT,
+        efficiency=EFFICIENCY_FACTOR_DEFAULT,
         verbose=verbose,
         fingerprint=fingerprint,
     )
@@ -748,7 +738,7 @@ async def get_photovoltaic_power_output_series_multi(
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
-        float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor
+        float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Annotated[
         bool, fastapi_query_apply_atmospheric_refraction
@@ -794,7 +784,7 @@ async def get_photovoltaic_power_output_series_multi(
     temperature_model: Annotated[
         ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm
     ] = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Annotated[float | None, fastapi_query_efficiency] = EFFICIENCY_DEFAULT,
+    efficiency: Annotated[float | None, fastapi_query_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -802,7 +792,7 @@ async def get_photovoltaic_power_output_series_multi(
     quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     # analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
-    # qr: Annotated[bool, fastapi_query_qr] = False,
+    # quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = False,
     # multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
 ):
 
