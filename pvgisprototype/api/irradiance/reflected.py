@@ -27,7 +27,7 @@ from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import MEAN_GROUND_ALBEDO_DEFAULT
+from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
@@ -81,7 +81,7 @@ def calculate_ground_reflected_inclined_irradiance_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    albedo: Optional[float] = MEAN_GROUND_ALBEDO_DEFAULT,
+    albedo: Optional[float] = ALBEDO_DEFAULT,
     global_horizontal_component: Optional[Path] = None,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodForInexactMatches = None,
