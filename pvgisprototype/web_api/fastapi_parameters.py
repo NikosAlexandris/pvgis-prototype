@@ -351,5 +351,28 @@ fastapi_query_command_metadata = Query(
     description=COMMAND_METADATA_DESCRIPTION,
 )
 fastapi_query_profiling = Query(
-    description=cPROFILE_FLAG_DESCRIPTION,
+    description=profiling_description,
+)
+fastapi_query_surface_orientation_list = Query(
+    description=surface_orientation_description,
+)
+fastapi_query_surface_tilt_list = Query(
+    description=surface_tilt_description,
+)
+fastapi_query_zero_negative_solar_incidence_angle = Query(
+    description=zero_negative_solar_incidence_angle_description,
+)
+fastapi_query_angle_output_units = Query(
+    description=angle_output_units_description,
+)
+fastapi_query_peak_power = Query(
+    description=peak_power_description,
+    ge=0.0,  # FIXME ADD VALUES TO CONSTANTS
+)
+fastapi_query_radiation_cutoff_threshold = Query(
+    description=radiation_cutoff_threshold_description,
+    ge=RADIATION_CUTOFF_THRESHHOLD,
+)
+fastapi_query_quick_response_code = Query(
+    description=qr_description,
 )

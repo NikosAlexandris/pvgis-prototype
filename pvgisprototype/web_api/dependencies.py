@@ -64,8 +64,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timestamps,
     fastapi_query_timezone,
 )
-from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone
-from pvgisprototype.api.quick_response_code import QuickResponseCode
+from pvgisprototype.web_api.schemas import AngleOutputUnit, Frequency, GroupBy, Timezone
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quick_response_code
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quiet
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_verbose
@@ -392,44 +391,44 @@ async def process_series_solar_incidence_model(
 
 
 async def process_verbose(
-        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
+        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
         verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-        analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
+        analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
 ) -> int:
-    """
-    """
-    if analysis.value != AnalysisLevel.NoneValue:
-        verbose = 9
-
-    if quick_response_code.value != QuickResponseCode.NoneValue:
+    
+    if quick_response_code:
         verbose = 9
     
+    if analysis:
+        verbose = 9
+
     return verbose 
 
 
 async def process_quiet(
-        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
+        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
         quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
 ) -> bool:
-    """
-    """
-    if quick_response_code.value != QuickResponseCode.NoneValue:
+    
+    if quick_response_code:
         quiet = True
     
     return quiet
 
 
 async def process_fingerprint(
-        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
+        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
         fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-        csv: Annotated[str | None,fastapi_query_csv] = None,
+        csv: Annotated[bool,fastapi_query_csv] = False,
 ) -> bool:
     
-    if quick_response_code.value != QuickResponseCode.NoneValue or csv:
+    if quick_response_code:
+        fingerprint = True
+    
+    if csv:
         fingerprint = True
 
     return fingerprint
-
 
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
