@@ -1,6 +1,6 @@
 from datetime import datetime
 from fastapi import Depends, Query
-from pvgisprototype.api.position.overview import calculate_solar_geometry_overview_time_series
+from pvgisprototype.api.position.overview import calculate_solar_position_overview_series
 from typing import Optional
 from typing import List
 from pvgisprototype.constants import RADIANS
@@ -16,7 +16,7 @@ from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 
 
-async def get_calculate_solar_geometry_overview(
+async def get_calculate_solar_position_overview(
     longitude: float = Depends(process_longitude),
     latitude: float = Depends(process_latitude),
     timestamp: Optional[datetime] = Depends(process_single_timestamp),
@@ -32,7 +32,7 @@ async def get_calculate_solar_geometry_overview(
 ):
     """ """
     solar_position_models = select_models(SolarPositionModel, solar_position_models)  # Using a callback fails!
-    results = calculate_solar_geometry_overview_time_series(
+    results = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamp,
