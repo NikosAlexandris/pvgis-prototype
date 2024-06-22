@@ -104,7 +104,7 @@ async def process_timezone(
 
 
 async def process_groupby(
-    group_by: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.N,
+    groupby: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.N,
 ) -> str | None:
 
     time_groupings = {
@@ -116,7 +116,7 @@ async def process_groupby(
         "Hourly": "h",
         "Do not group by": None,
     }
-    return time_groupings[group_by.value]
+    return time_groupings[groupby.value]
 
 
 async def process_frequency(
@@ -224,12 +224,12 @@ async def create_spectral_factor_series(
     )
 
 
-async def process_linke_turbidity_factor(
-    linke_turbidity_factor: Annotated[
+async def process_linke_turbidity_factor_series(
+    linke_turbidity_factor_series: Annotated[
         float, fastapi_query_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
 ) -> LinkeTurbidityFactor:
-    return LinkeTurbidityFactor(value=linke_turbidity_factor)
+    return LinkeTurbidityFactor(value=linke_turbidity_factor_series)
 
 
 async def process_angle_output_units(
@@ -371,7 +371,7 @@ fastapi_dependable_wind_speed_series = Depends(create_wind_speed_series)
 fastapi_dependable_spectral_factor_series = Depends(create_spectral_factor_series)
 fastapi_dependable_groupby = Depends(process_groupby)
 fastapi_dependable_frequency = Depends(process_frequency)
-fastapi_dependable_linke_turbidity_factor = Depends(process_linke_turbidity_factor)
+fastapi_dependable_linke_turbidity_factor_series = Depends(process_linke_turbidity_factor_series)
 fastapi_dependable_angle_output_units = Depends(process_angle_output_units)
 fastapi_dependable_refracted_solar_zenith = Depends(process_refracted_solar_zenith)
 fastapi_dependable_surface_orientation_list = Depends(process_surface_orientation_list)

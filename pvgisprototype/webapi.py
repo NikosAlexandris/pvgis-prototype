@@ -13,10 +13,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi.openapi.utils import get_openapi
 from jinja2 import Template
 
+from pvgisprototype.web_api.input_parameters import FASTAPI_INPUT_PARAMETERS
+from pvgisprototype.web_api.performance.broadband import get_photovoltaic_performance_analysis
 from pvgisprototype.web_api.series.select import select
-# from pvgisprototype.web_api.geometry.overview import get_calculate_solar_geometry_overview
-# from pvgisprototype.web_api.geometry.solar_time import get_calculate_solar_time
-# from pvgisprototype.web_api.geometry.overview_series import overview_series
+# from pvgisprototype.web_api.position.overview import get_calculate_solar_position_overview
+# from pvgisprototype.web_api.position.solar_time import get_calculate_solar_time
+# from pvgisprototype.web_api.position.overview_series import overview_series
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_monthly_average
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_advanced
@@ -68,7 +70,7 @@ app = FastAPI(
     #     "url": "",
     # },
 )
-'''
+
 def reorder_params(api_spec, endpoint_path, params_order):
     parameters_list = api_spec["paths"][endpoint_path]["get"]["parameters"]
     print(f'{parameters_list=}')
@@ -90,124 +92,23 @@ def custom_openapi():
         reordered_openapi_schema = reorder_params(
             openapi_schema,
             "/calculate/power/broadband-advanced",
-            [
-                "longitude",
-                "latitude",
-                "elevation",
-                "surface_orientation",
-                "surface_tilt",
-                "timestamps",
-                "start_time",
-                "periods",
-                "frequency",
-                "end_time",
-                "timezone",
-                "global_horizontal_irradiance",
-                "direct_horizontal_irradiance",
-                "temperature_series",
-                "wind_speed_series",
-                "spectral_factor_series",
-                "neighbor_lookup",
-                "tolerance",
-                "mask_and_scale",
-                "in_memory",
-                "linke_turbidity_factor_series",
-                "apply_atmospheric_refraction",
-                "refracted_solar_zenith",
-                "albedo",
-                "apply_angular_loss_factor",
-                "solar_position_model",
-                "solar_incidence_model",
-                "zero_negative_solar_incidence_angle",
-                "solar_time_model",
-                "time_offset_global",
-                "hour_offset",
-                "solar_constant",
-                "perigee_offset",
-                "eccentricity_correction_factor",
-                "photovoltaic_module",
-                "system_efficiency",
-                "power_model",
-                "temperature_model",
-                "efficiency",
-                "dtype",
-                "array_backend",
-                "multi_thread",
-                "rounding_places",
-                "statistics",
-                "groupby",
-                "csv",
-                "verbose",
-                "quiet",
-                "log",
-                "fingerprint",
-                "metadata",
-                "profile",
-            ],
+            FASTAPI_INPUT_PARAMETERS,
         )
         reordered_openapi_schema = reorder_params(
             openapi_schema,
             "/calculate/power/broadband",
-            [
-                "longitude",
-                "latitude",
-                "elevation",
-                "surface_orientation",
-                "surface_tilt",
-                "timestamps",
-                "start_time",
-                "periods",
-                "frequency",
-                "end_time",
-                "timezone",
-                "global_horizontal_irradiance",
-                "direct_horizontal_irradiance",
-                "temperature_series",
-                "wind_speed_series",
-                "spectral_factor_series",
-                "neighbor_lookup",
-                "tolerance",
-                "mask_and_scale",
-                "in_memory",
-                "linke_turbidity_factor_series",
-                "apply_atmospheric_refraction",
-                "refracted_solar_zenith",
-                "albedo",
-                "apply_angular_loss_factor",
-                "solar_position_model",
-                "solar_incidence_model",
-                "zero_negative_solar_incidence_angle",
-                "solar_time_model",
-                "time_offset_global",
-                "hour_offset",
-                "solar_constant",
-                "perigee_offset",
-                "eccentricity_correction_factor",
-                "photovoltaic_module",
-                "system_efficiency",
-                "power_model",
-                "temperature_model",
-                "efficiency",
-                "dtype",
-                "array_backend",
-                "multi_thread",
-                "rounding_places",
-                "statistics",
-                "groupby",
-                "csv",
-                "verbose",
-                "quiet",
-                "log",
-                "fingerprint",
-                "metadata",
-                "profile",
-            ],
+            FASTAPI_INPUT_PARAMETERS,
+        )
+        reordered_openapi_schema = reorder_params(
+            openapi_schema,
+            "/calculate/performance/broadband",
+            FASTAPI_INPUT_PARAMETERS,
         )
         app.openapi_schema = reordered_openapi_schema
         return app.openapi_schema
 
 app.openapi = custom_openapi
-'''
+
 app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 templates = Jinja2Templates(directory="templates")
 
@@ -218,6 +119,7 @@ async def read_root():
     return html_root_page
 
 # irradiance
+app.get("/calculate/performance/broadband")(get_photovoltaic_performance_analysis)
 app.get("/calculate/power/broadband")(get_photovoltaic_power_series)
 app.get("/calculate/power/broadband_monthly_average")(get_photovoltaic_power_series_monthly_average)
 app.get("/calculate/power/broadband-advanced")(get_photovoltaic_power_series_advanced)
