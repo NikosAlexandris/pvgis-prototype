@@ -258,7 +258,7 @@ def analyse_photovoltaic_performance(
             inclined_irradiance != 0,
             100 * effective_irradiance_effect / inclined_irradiance,
             0,
-        )
+        ).item()  # get a Python float
     # "Effective" Power without System Loss
     photovoltaic_power_without_system_loss_series = dictionary.get(
         PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, numpy.array([])
@@ -286,7 +286,7 @@ def analyse_photovoltaic_performance(
             effective_irradiance != 0,
             100 * temperature_and_low_irradiance_effect / effective_irradiance,
             0,
-        )
+        ).item()  # get a Python float
 
     # System efficiency
     system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None)
@@ -308,7 +308,7 @@ def analyse_photovoltaic_performance(
             photovoltaic_power_without_system_loss != 0,
             100 * system_efficiency_effect / photovoltaic_power_without_system_loss,
             0,
-        )
+        ).item()  # get a Python float
 
     # Photovoltaic Power
     photovoltaic_power_series = dictionary.get(
@@ -336,7 +336,8 @@ def analyse_photovoltaic_performance(
     with numpy.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
         total_effect_percentage = where(
             inclined_irradiance != 0, total_effect / inclined_irradiance * 100, 0
-        )
+        ).item()
+
     # Handle units
 
     inclined_irradiance, inclined_irradiance_unit = kilofy_unit(
