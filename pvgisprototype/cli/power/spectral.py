@@ -74,7 +74,7 @@ from pvgisprototype.constants import ALBEDO_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import EFFICIENCY_DEFAULT
+from pvgisprototype.constants import EFFICIENCY_FACTOR_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
@@ -164,7 +164,7 @@ def spectral_photovoltaic_power_output_series(
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     rounding_places: Annotated[Optional[int], typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
