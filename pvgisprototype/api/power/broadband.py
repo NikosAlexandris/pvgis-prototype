@@ -90,7 +90,7 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
-from pvgisprototype.constants import EFFICIENCY_DEFAULT
+from pvgisprototype.constants import EFFICIENCY_FACTOR_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
@@ -175,7 +175,7 @@ def calculate_photovoltaic_power_output_series(
     power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Optional[float] = EFFICIENCY_DEFAULT,
+    efficiency: Optional[float] = EFFICIENCY_FACTOR_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
