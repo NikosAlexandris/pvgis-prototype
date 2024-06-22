@@ -27,8 +27,9 @@ from pvgisprototype.api.power.broadband_multiple_surfaces import (
 )
 from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.cli.print import analyse_photovoltaic_performance
+from pvgisprototype.api.power.performance import analyse_photovoltaic_performance, summarise_photovoltaic_performance
 from pvgisprototype.constants import (
+    RADIATION_CUTOFF_THRESHHOLD,
     ALBEDO_DEFAULT,
     ANALYSIS_FLAG_DEFAULT,
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
@@ -54,6 +55,7 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.web_api.dependencies import (
+    fastapi_dependable_angle_output_units,
     fastapi_dependable_frequency,
     fastapi_dependable_groupby,
     fastapi_dependable_latitude,
@@ -71,6 +73,9 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_timezone,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
+    fastapi_query_efficiency,
+    fastapi_query_module_temperature_algorithm,
+    fastapi_query_radiation_cutoff_threshold,
     fastapi_query_albedo,
     fastapi_query_analysis,
     fastapi_query_apply_atmospheric_refraction,
@@ -388,13 +393,14 @@ async def get_photovoltaic_power_series_advanced(
         )
         response["statistics"] = convert_numpy_arrays_to_lists(series_statistics)
 
+
     if analysis:
-        analysis_series = analyse_photovoltaic_performance(
+        photovoltaic_performance_report = summarise_photovoltaic_performance(
             dictionary=photovoltaic_power_output_series.components,
-            timestamps=timestamps,
-            frequency=frequency,
-        )
-        response["analysis"] = convert_numpy_arrays_to_lists(analysis_series)
+                timestamps=timestamps,
+                frequency=frequency,
+                )
+        response["analysis"] = photovoltaic_performance_report
 
     if qr:
         import base64
@@ -553,12 +559,19 @@ async def get_photovoltaic_power_series(
         response["statistics"] = convert_numpy_arrays_to_lists(series_statistics)
 
     if analysis:
-        analysis_series = analyse_photovoltaic_performance(
+        photovoltaic_performance_report = summarise_photovoltaic_performance(
             dictionary=photovoltaic_power_output_series.components,
-            timestamps=timestamps,
-            frequency=frequency.value,
+                timestamps=timestamps,
+                frequency=frequency,
+                )
+        response["analysis"] = photovoltaic_performance_report
+        # finally
+        headers = {
+            "Content-Disposition": 'attachment; filename="photovoltaic_performance_analysis.json"'
+        }
+        return Response(
+            orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
         )
-        response["analysis"] = convert_numpy_arrays_to_lists(analysis_series)
 
     if qr:
         import base64
@@ -592,7 +605,7 @@ async def get_photovoltaic_power_series(
         "Content-Disposition": 'attachment; filename="pvgis_photovoltaic_power_series.json"'
     }
     return Response(
-        orjson.dumps(response), headers=headers, media_type="application/json"
+        orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
     )
 
 
@@ -703,7 +716,7 @@ async def get_photovoltaic_power_series_monthly_average(
         "Content-Disposition": 'attachment; filename="pvgis_photovoltaic_power_series.json"'
     }
     return Response(
-        orjson.dumps(response), headers=headers, media_type="application/json"
+        orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
     )
 
 
@@ -902,5 +915,5 @@ async def get_photovoltaic_power_output_series_multi(
 
     headers = {"Content-Disposition": 'attachment; filename="data.json"'}
     return Response(
-        orjson.dumps(response), headers=headers, media_type="application/json"
+        orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
     )
