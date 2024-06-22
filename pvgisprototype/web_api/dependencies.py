@@ -65,6 +65,17 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timezone,
 )
 from pvgisprototype.web_api.schemas import AngleOutputUnit, Frequency, GroupBy, Timezone
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quick_response_code
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quiet
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_verbose
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_analysis
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_fingerprint
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_csv
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.constants import QUIET_FLAG_DEFAULT
+from pvgisprototype.constants import QUICK_RESPONSE_CODE_FLAG_DEFAULT
+from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT
 
 
 async def process_longitude(
@@ -360,6 +371,46 @@ async def process_series_solar_incidence_model(
     return solar_incidence_model
 
 
+async def process_verbose(
+        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+        verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+        analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
+) -> int:
+    
+    if quick_response_code:
+        verbose = 9
+    
+    if analysis:
+        verbose = 9
+
+    return verbose 
+
+
+async def process_quiet(
+        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+        quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
+) -> bool:
+    
+    if quick_response_code:
+        quiet = True
+    
+    return quiet
+
+
+async def process_fingerprint(
+        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+        fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+        csv: Annotated[bool,fastapi_query_csv] = False,
+) -> bool:
+    
+    if quick_response_code:
+        fingerprint = True
+    
+    if csv:
+        fingerprint = True
+
+    return fingerprint
+
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_surface_orientation = Depends(process_surface_orientation)
@@ -380,3 +431,6 @@ fastapi_dependable_solar_position_models = Depends(process_series_solar_position
 fastapi_dependable_solar_incidence_models = Depends(
     process_series_solar_incidence_model
 )
+fastapi_dependable_verbose = Depends(process_verbose)
+fastapi_dependable_quite = Depends(process_quiet)
+fastapi_dependable_fingerprint = Depends(process_fingerprint)
