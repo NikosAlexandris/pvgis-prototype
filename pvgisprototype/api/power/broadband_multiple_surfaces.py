@@ -53,7 +53,7 @@ from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
-from pvgisprototype.constants import EFFICIENCY_DEFAULT
+from pvgisprototype.constants import EFFICIENCY_FACTOR_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
@@ -169,7 +169,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = None,
     temperature_model: ModuleTemperatureAlgorithm = None,
-    efficiency: Optional[float] = EFFICIENCY_DEFAULT,
+    efficiency: Optional[float] = EFFICIENCY_FACTOR_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,

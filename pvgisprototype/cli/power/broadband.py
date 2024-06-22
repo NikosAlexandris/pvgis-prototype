@@ -82,7 +82,7 @@ from pvgisprototype.cli.typer.plot import typer_option_uniplot
 from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
-from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT, NOMENCLATURE_FLAG_DEFAULT, RANDOM_TIMESTAMPS_FLAG_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
+from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT, EFFICIENCY_FACTOR_DEFAULT, NOMENCLATURE_FLAG_DEFAULT, RANDOM_TIMESTAMPS_FLAG_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import cPROFILE_FLAG_DEFAULT
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -93,7 +93,6 @@ from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
-from pvgisprototype.constants import EFFICIENCY_DEFAULT
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
@@ -180,7 +179,7 @@ def photovoltaic_power_output_series(
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     multi_thread: Annotated[bool, typer_option_multi_thread] = MULTI_THREAD_FLAG_DEFAULT,
@@ -419,7 +418,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     system_efficiency: Annotated[Optional[float], typer_option_system_efficiency] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm] = PhotovoltaicModulePerformanceModel.king,
     temperature_model: Annotated[ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm] = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_DEFAULT,
+    efficiency: Annotated[Optional[float], typer_option_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     multi_thread: Annotated[bool, typer_option_multi_thread] = MULTI_THREAD_FLAG_DEFAULT,
