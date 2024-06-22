@@ -338,6 +338,6 @@ fastapi_query_radiation_cutoff_threshold = Query(
     description=radiation_cutoff_threshold_description,
     ge=RADIATION_CUTOFF_THRESHHOLD,
 )
-fastapi_query_qr = Query(
+fastapi_query_quick_response_code = Query(
     description=qr_description,
 )
