@@ -105,7 +105,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.web_api.schemas import AngleOutputUnit, Frequency, GroupBy, Timezone
-
+from pvgisprototype.web_api.dependencies import fastapi_dependable_verbose, fastapi_dependable_quite, fastapi_dependable_fingerprint
+from pvgisprototype.constants import QUICK_RESPONSE_CODE_FLAG_DEFAULT
 
 def convert_numpy_arrays_to_lists(data: Any) -> Any:
     """Convert all NumPy arrays and other NumPy types in the input to native Python types.
@@ -257,16 +258,16 @@ async def get_photovoltaic_power_series_advanced(
     # multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     # uniplot: Annotated[bool, fastapi_query_uniplot] = UNIPLOT_FLAG_DEFAULT,
     # terminal_width_fraction: Annotated[float, fastapi_query_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
-    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     # log: Annotated[int, fastapi_query_log] = LOG_LEVEL_DEFAULT,
     # profile: Annotated[bool, fastapi_query_profiling] = cPROFILE_FLAG_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
     csv: Annotated[bool, fastapi_query_csv] = False,
-    quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
-    fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
+    fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
-    quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = False,
+    quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
 ):
     """Estimate the photovoltaic power output for a solar surface.
 
@@ -275,14 +276,6 @@ async def get_photovoltaic_power_series_advanced(
     electricity grid (without battery storage) based on broadband solar
     irradiance, ambient temperature and wind speed.
     """
-
-    if analysis:  # Force change to versosity level for the analysis
-        verbose = 9
-
-    if quick_response_code:
-        verbose = 9  # Force change to versosity level for the quick_response_code
-        fingerprint = True
-
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
@@ -366,17 +359,34 @@ async def get_photovoltaic_power_series_advanced(
         )
         return response_csv
 
-    response = {}
-    if not quiet:
+    if quick_response_code:
+        from io import BytesIO
+        from pvgisprototype.cli.qr import print_quick_response_code
 
-        if verbose > 0:
-            response = convert_numpy_arrays_to_lists(
-                photovoltaic_power_output_series.components
-            )
-        else:
-            response = {
-                "Photovoltaic power output series": photovoltaic_power_output_series.value,
-            }
+        image = print_quick_response_code(
+            dictionary=photovoltaic_power_output_series.components,
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True,
+            surface_tilt=True,
+            timestamps=timestamps,
+            rounding_places=ROUNDING_PLACES_DEFAULT,
+            image=True,
+        )
+
+        buffer = BytesIO()
+        image.save(buffer, format="PNG")  # type: ignore
+        image_bytes = buffer.getvalue()
+        #import base64
+        #image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+        #response["qr"] = (
+        #    f"data:image/png;base64,{image_base64}"  # This way the image is returned in the JSON as a server link
+        #)
+
+        return Response(content=image_bytes, media_type="image/png")
+
+    response = {}
 
     if fingerprint:
         response["fingerprint"] = photovoltaic_power_output_series.components[
@@ -402,33 +412,15 @@ async def get_photovoltaic_power_series_advanced(
                 )
         response["analysis"] = photovoltaic_performance_report
 
-    if quick_response_code:
-        import base64
-        from io import BytesIO
-
-        from pvgisprototype.cli.qr import print_quick_response_code
-
-        image = print_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            surface_orientation=True,
-            surface_tilt=True,
-            timestamps=timestamps,
-            rounding_places=ROUNDING_PLACES_DEFAULT,
-            image=True,
-        )
-
-        buffer = BytesIO()
-        image.save(buffer, format="PNG")  # type: ignore
-        image_bytes = buffer.getvalue()
-        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-        response["QR"] = (
-            f"data:image/png;base64,{image_base64}"  # This way the image is returned in the JSON as a server link
-        )
-
-        # return Response(content=image_bytes, media_type="image/png")
+    if not quiet:
+        if verbose > 0:
+            response = convert_numpy_arrays_to_lists(
+                photovoltaic_power_output_series.components
+            )
+        else:
+            response["results"] = {
+                "Photovoltaic power output series": photovoltaic_power_output_series.value,
+            }
 
     # finally
     headers = {
@@ -458,18 +450,12 @@ async def get_photovoltaic_power_series(
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
     csv: Annotated[bool, fastapi_query_csv] = False,
-    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-    quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
-    fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
+    quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
+    fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
-    quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = False,
+    quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
 ):
-    if analysis:  # Force change to versosity level for the analysis
-        verbose = 9
-    if quick_response_code:
-        verbose = 9  # Force change to versosity level for the quick_response_code
-        fingerprint = True
-
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
@@ -530,7 +516,7 @@ async def get_photovoltaic_power_series(
             )
         else:
             response = {
-                "Photovoltaic power output series": photovoltaic_power_output_series.value,
+               "Photovoltaic power output series": photovoltaic_power_output_series.value,
             }
 
     if fingerprint:
@@ -587,8 +573,12 @@ async def get_photovoltaic_power_series(
         response["QR"] = (
             f"data:image/png;base64,{image_base64}"  # This way the image is returned in the JSON as a server link
         )
+        #image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+        #response["qr"] = (
+        #    f"data:image/png;base64,{image_base64}"  # This way the image is returned in the JSON as a server link
+        #)
 
-        # return Response(content=image_bytes, media_type="image/png")
+        return Response(content=image_bytes, media_type="image/png")
 
     # finally
     headers = {
