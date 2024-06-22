@@ -1,7 +1,9 @@
+from devtools import debug
 from pandas import DatetimeIndex
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     EFFECTIVE_IRRADIANCE_COLUMN_NAME,
     EFFECTIVE_IRRADIANCE_NAME,
     EFFECT_PERCENTAGE_COLUMN_NAME,
@@ -89,6 +91,7 @@ import numpy
 from numpy import where
 from pvgisprototype.api.series.statistics import calculate_mean_of_series_per_time_unit
 from pvgisprototype.api.series.statistics import calculate_statistics
+from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
 def kilofy_unit(value, unit="W", threshold=1000):
@@ -129,9 +132,10 @@ def analyse_photovoltaic_performance(
     dictionary,
     timestamps: DatetimeIndex,
     frequency: str,
-    rounding_places=1,
-    dtype=DATA_TYPE_DEFAULT,
-    array_backend=ARRAY_BACKEND_DEFAULT,
+    rounding_places = 1,
+    dtype = DATA_TYPE_DEFAULT,
+    array_backend = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Analyze the photovoltaic performance from time-series data.
 
@@ -486,6 +490,8 @@ def analyse_photovoltaic_performance(
         UNIT_FOR_MEAN_EFFECT_COLUMN_NAME: total_effect_mean_unit,
         EFFECT_PERCENTAGE_COLUMN_NAME: total_effect_percentage,
     }
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     return performance_analysis
 
@@ -496,6 +502,7 @@ def report_photovoltaic_performance(
     frequency: str,
     rounding_places=1,
     dtype=DATA_TYPE_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """
     """
@@ -506,6 +513,7 @@ def report_photovoltaic_performance(
         rounding_places=rounding_places,
         dtype=dtype,
         array_backend=ARRAY_BACKEND_DEFAULT,
+        verbose=verbose,
     )
 
     inclined_irradiance = photovoltaic_performance_analysis.get(
@@ -835,4 +843,43 @@ def report_photovoltaic_performance(
             numpy.array([]),
             None,
         ),
+    }
+
+
+def summarise_photovoltaic_performance(
+    dictionary,
+    timestamps: DatetimeIndex,
+    frequency: str,
+    rounding_places=1,
+    dtype=DATA_TYPE_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
+    """
+    Generate a simplified report for photovoltaic performance, focusing only on quantities and their values.
+    """
+    photovoltaic_performance_analysis = analyse_photovoltaic_performance(
+        dictionary=dictionary,
+        timestamps=timestamps,
+        frequency=frequency,
+        rounding_places=rounding_places,
+        dtype=dtype,
+        array_backend=ARRAY_BACKEND_DEFAULT,
+        verbose=verbose,
+    )
+
+    def get_value(key, default=None):
+        return photovoltaic_performance_analysis.get(key, default)
+
+    return {
+        TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: get_value(TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME),
+        TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME: get_value(TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME),
+        GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: get_value(GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME),
+        TOTAL_SPECTRAL_EFFECT_COLUMN_NAME: get_value(TOTAL_SPECTRAL_EFFECT_COLUMN_NAME),
+        EFFECTIVE_IRRADIANCE_COLUMN_NAME: get_value(EFFECTIVE_IRRADIANCE_COLUMN_NAME),
+        TOTAL_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME: get_value(TOTAL_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME),
+        TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: get_value(TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME),
+        TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME: get_value(TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME),
+        TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME: get_value(TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME),
+        PHOTOVOLTAIC_ENERGY_COLUMN_NAME: get_value(PHOTOVOLTAIC_ENERGY_COLUMN_NAME),
+        TOTAL_EFFECT_COLUMN_NAME: get_value(TOTAL_EFFECT_COLUMN_NAME),
     }
