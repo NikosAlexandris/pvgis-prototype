@@ -15,6 +15,9 @@ from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 from typing import List, Sequence
 import numpy as np
 from pvgisprototype.constants import (
+    ELEVATION_NAME,
+    LATITUDE_NAME,
+    LONGITUDE_NAME,
     PEAK_POWER_COLUMN_NAME,
     REFLECTIVITY,
     SPECTRAL_EFFECT_NAME,
@@ -43,6 +46,7 @@ from pvgisprototype.constants import (
     SOLAR_CONSTANT_COLUMN_NAME,
     PERIGEE_OFFSET_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
+    ENERGY_NAME_WITH_SYMBOL,
     NET_EFFECT,
     ZENITH_NAME,
     ALTITUDE_NAME,
@@ -62,6 +66,7 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     FINGERPRINT_COLUMN_NAME,
 )
+from pvgisprototype.api.power.performance import report_photovoltaic_performance
 
 
 def convert_series_to_sparkline(
@@ -1169,6 +1174,7 @@ def print_change_percentages_panel(
             dictionary=dictionary,
             timestamps=timestamps,
             frequency=frequency,
+            verbose=verbose,
             )
 
     # Add rows based on the dictionary keys and corresponding values
