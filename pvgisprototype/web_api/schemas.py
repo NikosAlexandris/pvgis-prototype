@@ -4,7 +4,7 @@ from enum import Enum
 # Timezone = Enum('Timezone', {tz: tz for tz in get_timezones()}) # FIXME Add later when all timezones work properly
 
 
-class Timezone(Enum):
+class Timezone(str, Enum):
     GMT = "Etc/GMT"
     GMT_PLUS_0 = "Etc/GMT+0"
     GMT_PLUS_1 = "Etc/GMT+1"
@@ -40,7 +40,7 @@ class Timezone(Enum):
     UNIVERSAL = "Universal"
 
 
-class Frequency(Enum):
+class Frequency(str, Enum):
     Year = "Yearly"
     Season = "Seasonal"
     Month = "Monthly"
@@ -49,16 +49,16 @@ class Frequency(Enum):
     Hour = "Hourly"
 
 
-class GroupBy(Enum):
+class GroupBy(str, Enum):
     Yearly = "Yearly"
     Seasonal = "Seasonal"
     Monthly = "Monthly"
     Weekly = "Weekly"
     Daily = "Daily"
     Hourly = "Hourly"
-    N = "Do not group by"
+    N = "Do not group-by"
 
 
-class AngleOutputUnit(Enum):
+class AngleOutputUnit(str, Enum):
     RADIANS = "Radians"
     DEGREES = "Degrees"
