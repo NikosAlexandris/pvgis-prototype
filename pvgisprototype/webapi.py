@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 #from fastapi import Query
 #from fastapi import Request
 from fastapi.responses import HTMLResponse
+from fastapi.responses import ORJSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.openapi.utils import get_openapi
 from jinja2 import Template
@@ -73,7 +74,6 @@ app = FastAPI(
 
 def reorder_params(api_spec, endpoint_path, params_order):
     parameters_list = api_spec["paths"][endpoint_path]["get"]["parameters"]
-    print(f'{parameters_list=}')
     ordered_parameters = sorted(
         parameters_list, key=lambda x: params_order.index(x["name"])
     )
@@ -119,7 +119,7 @@ async def read_root():
     return html_root_page
 
 # irradiance
-app.get("/calculate/performance/broadband")(get_photovoltaic_performance_analysis)
+app.get("/calculate/performance/broadband", response_class=ORJSONResponse)(get_photovoltaic_performance_analysis)
 app.get("/calculate/power/broadband")(get_photovoltaic_power_series)
 app.get("/calculate/power/broadband_monthly_average")(get_photovoltaic_power_series_monthly_average)
 app.get("/calculate/power/broadband-advanced")(get_photovoltaic_power_series_advanced)
