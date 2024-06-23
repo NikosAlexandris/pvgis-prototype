@@ -3,7 +3,7 @@ CLI module to calculate the photovoltaic power output over a
 location for a period in time.
 """
 
-from pvgisprototype.cli.qr import QuickResponseOutputType
+from pvgisprototype.cli.qr import QuickResponseCode
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from typing import Annotated
@@ -199,7 +199,7 @@ def photovoltaic_power_output_series(
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
-    quick_response_code: Annotated[QuickResponseOutputType, typer_option_quick_response] = QuickResponseOutputType.NoneValue,
+    quick_response_code: Annotated[QuickResponseCode, typer_option_quick_response] = QuickResponseCode.NoneValue,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
 ):
     """Estimate the photovoltaic power output for a location and a moment or period
@@ -278,7 +278,7 @@ def photovoltaic_power_output_series(
     )  # Re-Design Me ! ------------------------------------------------
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    if quick_response_code.value != QuickResponseOutputType.NoneValue:
+    if quick_response_code.value != QuickResponseCode.NoneValue:
         from pvgisprototype.cli.qr import print_quick_response_code
         print_quick_response_code(
             dictionary=photovoltaic_power_output_series.components,
@@ -519,7 +519,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
-    if quick_response_code.value != QuickResponseOutputType.NoneValue:
+    if quick_response_code.value != QuickResponseCode.NoneValue:
         from pvgisprototype.cli.qr import print_quick_response_code
         print_quick_response_code(
             dictionary=photovoltaic_power_output_series.components,
