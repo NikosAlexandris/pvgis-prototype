@@ -38,7 +38,13 @@ USER 0
 # Install dependencies and build the documentation
 
 # RUN apt-get update && apt-get install -y locales
-RUN pip install --upgrade pip \
+RUN apt-get update \
+    && apt-get install -y locales fonts-dejavu-core \
+    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+    && locale-gen en_US.UTF-8 \
+    && dpkg-reconfigure --frontend=noninteractive locales \
+    && update-locale LANG=en_US.UTF-8 \
+    && pip install --upgrade pip \
     && pip install pdm \
     && pdm install \
     && pdm run mkdocs build --verbose --site-dir public
