@@ -123,7 +123,7 @@ extra:
 
 theme:
   logo: images/pvgis_image_squared.png
-  font:
+  # font:
     # code: Source Code Pro
   icon:
     tag:
