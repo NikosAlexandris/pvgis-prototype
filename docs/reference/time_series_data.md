@@ -197,6 +197,8 @@ try:
 
 except Exception as e:
     print(f"An error occurred: {e}")
+    import traceback
+    traceback.print_exc()  # This prints the full traceback
 ```
 
 ## Icons
