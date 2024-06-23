@@ -43,7 +43,8 @@ USER pvgis-user
 # Set environment variables after locales are configured
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    FORCE_COLOR=1
+    FORCE_COLOR=1 \
+    PATH="/home/pvgis-user/.local/bin:${PATH}"
     # ENV COLUMNS=160
 
 WORKDIR /home/pvgis-user/documentation
