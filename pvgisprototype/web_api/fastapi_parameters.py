@@ -7,9 +7,15 @@ from pvgisprototype.constants import (
     ALBEDO_MINIMUM,
     ANALYSIS_DESCRIPTION,
     ANGLE_OUTPUT_UNITS_DESCRIPTION,
+    ARRAY_BACKEND_DEFAULT,
+    ARRAY_BACKEND_DESCRIPTION,
+    DATA_TYPE_DEFAULT,
+    DATA_TYPE_DESCRIPTION,
     ELEVATION_NAME,
     LATITUDE_NAME,
     LONGITUDE_NAME,
+    MULTI_THREAD_FLAG_DEFAULT,
+    MULTI_THREAD_FLAG_DESCRIPTION,
     REFLECTIVITY_EFFECT_DESCRIPTION,
     ATMOSPHERIC_REFRACTION_DESCRIPTION,
     COMMAND_METADATA_DESCRIPTION,
@@ -126,6 +132,24 @@ fastapi_query_elevation = Query(
     ge=ELEVATION_MINIMUM,
     le=ELEVATION_MAXIMUM,
 )
+fastapi_query_surface_orientation = Query(
+    # SURFACE_ORIENTATION_DEFAULT,
+    description=SURFACE_ORIENTATION_DESCRIPTION,
+    ge=SURFACE_ORIENTATION_MINIMUM,
+    le=SURFACE_ORIENTATION_MAXIMUM,
+)
+fastapi_query_surface_orientation_list = Query(
+    description=SURFACE_ORIENTATION_DESCRIPTION,
+)
+fastapi_query_surface_tilt = Query(
+    # SURFACE_TILT_DEFAULT,
+    description=SURFACE_TILT_DESCRIPTION,
+    ge=SURFACE_TILT_MINIMUM,
+    le=SURFACE_TILT_MAXIMUM,
+)
+fastapi_query_surface_tilt_list = Query(
+    description=SURFACE_TILT_DESCRIPTION,
+)
 fastapi_query_timestamp = Query(
     default_factory=now_utc_datetimezone,
     description=TIMESTAMP_DESCRIPTION,
@@ -170,8 +194,17 @@ fastapi_query_random_days = Query(
 fastapi_query_time_series_query = Query(
     description=TIME_SERIES_DESCRIPTION,
 )
-fastapi_query_mask_and_scale = Query(
-    description=MASK_AND_SCALE_DESCRIPTION,
+fastapi_query_global_horizontal_irradiance = Query(
+    description=GLOBAL_HORIZONTAL_IRRADIANCE_DESCRIPTION,
+)
+fastapi_query_direct_horizontal_irradiance = Query(
+    description=DIRECT_HORIZONTAL_IRRADIANCE_DESCRIPTION,
+)
+fastapi_query_temperature_series = Query(
+    description=TEMPERATURE_TIME_SERIES_DESCRIPTION,
+)
+fastapi_query_wind_speed_series = Query(
+    description=WIND_SPEED_TIME_SERIES_DESCRIPTION,
 )
 fastapi_query_neighbor_lookup = Query(
     description=NEAREST_NEIGHBOR_LOOKUP_DESCRIPTION,
@@ -180,21 +213,12 @@ fastapi_query_tolerance = Query(
     description=TOLERANCE_DESCRIPTION,
     ge=TOLERANCE_MINIMUM,
 )
+fastapi_query_mask_and_scale = Query(
+    description=MASK_AND_SCALE_DESCRIPTION,
+)
 fastapi_query_in_memory = Query(
     # IN_MEMORY_FLAG_DEFAULT,
     description=IN_MEMORY_DESCRIPTION,
-)
-fastapi_query_surface_tilt = Query(
-    # SURFACE_TILT_DEFAULT,
-    description=SURFACE_TILT_DESCRIPTION,
-    ge=SURFACE_TILT_MINIMUM,
-    le=SURFACE_TILT_MAXIMUM,
-)
-fastapi_query_surface_orientation = Query(
-    # SURFACE_ORIENTATION_DEFAULT,
-    description=SURFACE_ORIENTATION_DESCRIPTION,
-    ge=SURFACE_ORIENTATION_MINIMUM,
-    le=SURFACE_ORIENTATION_MAXIMUM,
 )
 fastapi_query_linke_turbidity_factor_series = Query(
     # LINKE_TURBIDITY_DEFAULT,
@@ -218,25 +242,9 @@ fastapi_query_apply_reflectivity_factor = Query(
     # ANGULAR_LOSS_FACTOR_FLAG_DEFAULT : To Be Renamed To : REFLECTIVITY_EFFECT_FLAG_DEFAULT
     description=REFLECTIVITY_EFFECT_DESCRIPTION,
 )
-fastapi_query_solar_position_model = Query(
-    # SOLAR_POSITION_ALGORITHM_DEFAULT,
-    description=POSITION_ALGORITHM_DESCRIPTION,
-)
-fastapi_query_solar_incidence_model = Query(
-    # SolarIncidenceModel.jenco,
-    description=INCIDENCE_ALGORITHM_DESCRIPTION,
-)
 fastapi_query_solar_time_model = Query(
     # SOLAR_TIME_ALGORITHM_DEFAULT,
     description=TIMING_ALGORITHM_DESCRIPTION,
-)
-fastapi_query_time_offset_global = Query(
-    # 0,
-    description=TIME_OFFSET_GLOBAL_DESCRIPTION,
-)
-fastapi_query_hour_offset = Query(
-    # 0,
-    description=HOUR_OFFSET_DESCRIPTION,
 )
 fastapi_query_solar_constant = Query(
     # SOLAR_CONSTANT,
@@ -250,6 +258,20 @@ fastapi_query_eccentricity_correction_factor = Query(
     # ECCENTRICITY_CORRECTION_FACTOR,
     description=ECCENTRICITY_CORRECTION_DESCRIPTION,
 )
+fastapi_query_solar_position_model = Query(
+    # SOLAR_POSITION_ALGORITHM_DEFAULT,
+    description=POSITION_ALGORITHM_DESCRIPTION,
+)
+fastapi_query_solar_incidence_model = Query(
+    # SolarIncidenceModel.jenco,
+    description=INCIDENCE_ALGORITHM_DESCRIPTION,
+)
+fastapi_query_zero_negative_solar_incidence_angle = Query(
+    description=ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
+)
+fastapi_query_photovoltaic_module_model = Query(
+    description=PHOTOVOLTAIC_MODULE_DESCRIPTION,
+)
 fastapi_query_system_efficiency = Query(
     # SYSTEM_EFFICIENCY_DEFAULT,
     description=SYSTEM_EFFICIENCY_DESCRIPTION,
@@ -260,15 +282,51 @@ fastapi_query_power_model = Query(
     # None,
     description=POWER_MODEL_DESCRIPTION,
 )
+fastapi_query_temperature_model = Query(
+    description=POWER_MODEL_LONG_DESCRIPTION,
+)
 fastapi_query_efficiency = Query(
     # EFFICIENCY_FACTOR_DEFAULT,
     description=EFFICIENCY_DESCRIPTION,
     ge=EFFICIENCY_FACTOR_MINIMUM,
     le=EFFICIENCY_FACTOR_MAXIMUM,
 )
+fastapi_query_peak_power = Query(
+    description=PEAK_POWER_DESCRIPTION,
+    ge=PEAK_POWER_MINIMUM,
+    alias='peak-power',
+)
+fastapi_query_radiation_cutoff_threshold = Query(
+    description=RADIATION_CUTOFF_THRESHOLD_DESCRIPTION,
+    ge=RADIATION_CUTOFF_THRESHHOLD,
+)
+fastapi_query_multi_thread = Query(
+    description=MULTI_THREAD_FLAG_DESCRIPTION,
+)
+fastapi_query_dtype = Query(
+    description=DATA_TYPE_DESCRIPTION,
+)
+fastapi_query_array_backend = Query(
+    description=ARRAY_BACKEND_DESCRIPTION,
+)
+fastapi_query_angle_output_units = Query(
+    description=ANGLE_OUTPUT_UNITS_DESCRIPTION,
+)
 fastapi_query_rounding_places = Query(
     # ROUNDING_PLACES_DEFAULT,
     description=ROUNDING_PLACES_DESCRIPTION,
+)
+fastapi_query_analysis = Query(
+    description=ANALYSIS_DESCRIPTION,
+)
+fastapi_query_statistics = Query(
+    description=STATISTICS_DESCRIPTION,
+)
+fastapi_query_groupby = Query(
+    description=GROUPBY_DESCRIPTION,
+)
+fastapi_query_csv = Query(
+    description=CSV_DESCRIPTION,
 )
 fastapi_query_verbose = Query(
     # VERBOSE_LEVEL_DEFAULT,
@@ -286,69 +344,12 @@ fastapi_query_log = Query(
 fastapi_query_fingerprint = Query(
     description=FINGERPRINT_DESCRIPTION,
 )
-fastapi_query_module_temperature_algorithm = Query(
-    description=POWER_MODEL_LONG_DESCRIPTION,
-)
-fastapi_query_photovoltaic_module_model = Query(
-    description=PHOTOVOLTAIC_MODULE_DESCRIPTION,
-)
-fastapi_query_temperature_series = Query(
-    description=TEMPERATURE_TIME_SERIES_DESCRIPTION,
-)
-fastapi_query_wind_speed_series = Query(
-    description=WIND_SPEED_TIME_SERIES_DESCRIPTION,
-)
-fastapi_query_csv = Query(
-    description=CSV_DESCRIPTION,
-)
-fastapi_query_global_horizontal_irradiance = Query(
-    description=GLOBAL_HORIZONTAL_IRRADIANCE_DESCRIPTION,
-)
-fastapi_query_direct_horizontal_irradiance = Query(
-    description=DIRECT_HORIZONTAL_IRRADIANCE_DESCRIPTION,
-)
-fastapi_query_statistics = Query(
-    description=STATISTICS_DESCRIPTION,
-)
-fastapi_query_groupby = Query(
-    description=GROUPBY_DESCRIPTION,
-)
-fastapi_query_uniplot = Query(
-    description=UNIPLOT_FLAG_DESCRIPTION,
-)
-fastapi_query_uniplot_terminal_width = Query(
-    description=TERMINAL_WIDTH_FRACTION_DESCRIPTION,
-)
-fastapi_query_analysis = Query(
-    description=ANALYSIS_DESCRIPTION,
+fastapi_query_quick_response_code = Query(
+    description=QUICK_RESPONSE_CODE_DESCRIPTION,
 )
 fastapi_query_command_metadata = Query(
     description=COMMAND_METADATA_DESCRIPTION,
 )
 fastapi_query_profiling = Query(
     description=cPROFILE_FLAG_DESCRIPTION,
-)
-fastapi_query_surface_orientation_list = Query(
-    description=SURFACE_ORIENTATION_DESCRIPTION,
-)
-fastapi_query_surface_tilt_list = Query(
-    description=SURFACE_TILT_DESCRIPTION,
-)
-fastapi_query_zero_negative_solar_incidence_angle = Query(
-    description=ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
-)
-fastapi_query_angle_output_units = Query(
-    description=ANGLE_OUTPUT_UNITS_DESCRIPTION,
-)
-fastapi_query_peak_power = Query(
-    description=PEAK_POWER_DESCRIPTION,
-    ge=PEAK_POWER_MINIMUM,
-    alias='peak-power',
-)
-fastapi_query_radiation_cutoff_threshold = Query(
-    description=RADIATION_CUTOFF_THRESHOLD_DESCRIPTION,
-    ge=RADIATION_CUTOFF_THRESHHOLD,
-)
-fastapi_query_quick_response_code = Query(
-    description=QUICK_RESPONSE_CODE_DESCRIPTION,
 )
