@@ -859,7 +859,7 @@ def report_photovoltaic_performance(
     }
 
 
-from pvgisprototype.web_api.schemas import Frequency
+from pvgisprototype.web_api.schemas import AnalysisLevel, Frequency
 
 
 def summarise_photovoltaic_performance(
@@ -874,7 +874,7 @@ def summarise_photovoltaic_performance(
     rounding_places=1,
     dtype=DATA_TYPE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    analysis: str = 'Simple',
+    analysis: AnalysisLevel = AnalysisLevel.Simple,
 ):
     """
     Generate a simplified report for photovoltaic performance, focusing only on quantities and their values.
@@ -941,7 +941,7 @@ def summarise_photovoltaic_performance(
                 PEAK_POWER_COLUMN_NAME: peak_power,
                 "Mount type": mount_type,
             }
-            if analysis == "Minimal"
+            if analysis.value == AnalysisLevel.Minimal
             else {}
         ),
         "Simple": lambda: (
@@ -962,42 +962,46 @@ def summarise_photovoltaic_performance(
                 PEAK_POWER_COLUMN_NAME: peak_power,
                 "Mount type": mount_type,
             }
-            if analysis == "Simple"
+            if analysis.value == AnalysisLevel.Simple
             else {}
         ),
-        "Advanced": lambda: {
-            TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: get_value(
-                TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-            ),
-            GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: get_value(
-                GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
-                UNIT_FOR_MEAN_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
-            ),
-            EFFECTIVE_IRRADIANCE_COLUMN_NAME: get_value(
-                EFFECTIVE_IRRADIANCE_COLUMN_NAME,
-                UNIT_FOR_EFFECTIVE_IRRADIANCE_COLUMN_NAME,
-            ),
-            TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: get_value(
-                TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
-                UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
-            ),
-            TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME: get_value(
-                TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
-                UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
-            ),
-            PHOTOVOLTAIC_ENERGY_COLUMN_NAME: get_value(
-                PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
-                UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
-            ),
-            TOTAL_EFFECT_COLUMN_NAME: get_value(
-                TOTAL_EFFECT_COLUMN_NAME,
-                UNIT_FOR_TOTAL_EFFECT_COLUMN_NAME,
-            ),
-            TECHNOLOGY_NAME: photovoltaic_module,
-            PEAK_POWER_COLUMN_NAME: peak_power,
-            "Mount type": mount_type,
-        },
+        "Advanced": lambda: (
+            {
+                TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: get_value(
+                    TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+                ),
+                GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: get_value(
+                    GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
+                    UNIT_FOR_MEAN_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
+                ),
+                EFFECTIVE_IRRADIANCE_COLUMN_NAME: get_value(
+                    EFFECTIVE_IRRADIANCE_COLUMN_NAME,
+                    UNIT_FOR_EFFECTIVE_IRRADIANCE_COLUMN_NAME,
+                ),
+                TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: get_value(
+                    TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+                ),
+                TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME: get_value(
+                    TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
+                ),
+                PHOTOVOLTAIC_ENERGY_COLUMN_NAME: get_value(
+                    PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
+                    UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
+                ),
+                TOTAL_EFFECT_COLUMN_NAME: get_value(
+                    TOTAL_EFFECT_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_EFFECT_COLUMN_NAME,
+                ),
+                TECHNOLOGY_NAME: photovoltaic_module,
+                PEAK_POWER_COLUMN_NAME: peak_power,
+                "Mount type": mount_type,
+            }
+            if analysis.value == AnalysisLevel.Advanced
+            else {}
+        ),
         "Extended": lambda: (
             {
                 TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: get_value(
@@ -1048,7 +1052,15 @@ def summarise_photovoltaic_performance(
                 PEAK_POWER_COLUMN_NAME: peak_power,
                 "Mount type": mount_type,
             }
-            if analysis == "Extended"
+            if analysis.value == AnalysisLevel.Extended
             else {}
         ),
     }
+    performance_analysis = {}
+    for _, level in performance_analysis_container.items():
+        performance_analysis.update(level())
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    return performance_analysis

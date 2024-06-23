@@ -75,7 +75,7 @@ from pvgisprototype.web_api.dependencies import (
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_efficiency,
-    fastapi_query_module_temperature_algorithm,
+    fastapi_query_temperature_model,
     fastapi_query_radiation_cutoff_threshold,
     fastapi_query_albedo,
     fastapi_query_analysis,
@@ -107,7 +107,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
 )
 from pvgisprototype.web_api.schemas import AngleOutputUnit, Frequency, GroupBy, Timezone
 from pvgisprototype.web_api.dependencies import fastapi_dependable_verbose, fastapi_dependable_quite, fastapi_dependable_fingerprint
-from pvgisprototype.constants import QUICK_RESPONSE_CODE_FLAG_DEFAULT
+from pvgisprototype.web_api.schemas import AnalysisLevel
+
 
 def convert_numpy_arrays_to_lists(data: Any) -> Any:
     """Convert all NumPy arrays and other NumPy types in the input to native Python types.
@@ -251,7 +252,7 @@ async def get_photovoltaic_power_series_advanced(
         float, fastapi_query_radiation_cutoff_threshold
     ] = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: Annotated[
-        ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm
+        ModuleTemperatureAlgorithm, fastapi_query_temperature_model,
     ] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[float | None, fastapi_query_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     # dtype: str = DATA_TYPE_DEFAULT,
@@ -267,7 +268,7 @@ async def get_photovoltaic_power_series_advanced(
     csv: Annotated[str | None, fastapi_query_csv] = None,
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-    analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
 ):
     """Estimate the photovoltaic power output for a solar surface.
@@ -330,6 +331,10 @@ async def get_photovoltaic_power_series_advanced(
         fingerprint=fingerprint,
         # profile=profile,
     )
+    # -------------------------------------------------------------- Important
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    # ------------------------------------------------------------------------
 
     if csv:
         from datetime import datetime
@@ -405,7 +410,7 @@ async def get_photovoltaic_power_series_advanced(
         response["statistics"] = convert_numpy_arrays_to_lists(series_statistics)
 
 
-    if analysis:
+    if analysis.value is not None:
         photovoltaic_performance_report = summarise_photovoltaic_performance(
             longitude=longitude,
             latitude=latitude,
@@ -416,7 +421,7 @@ async def get_photovoltaic_power_series_advanced(
             timestamps=timestamps,
             frequency=frequency,
         )
-        response["analysis"] = photovoltaic_performance_report
+        response["Performance Analysis"] = photovoltaic_performance_report
 
     if not quiet:
         if verbose > 0:
@@ -455,7 +460,7 @@ async def get_photovoltaic_power_series(
     peak_power: Annotated[float, fastapi_query_peak_power] = 1.0,  # FIXME ADD CONSTANT?
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
-    analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
@@ -540,13 +545,13 @@ async def get_photovoltaic_power_series(
         )
         response["statistics"] = convert_numpy_arrays_to_lists(series_statistics)
 
-    if analysis:
+    if analysis.value is not None:
         photovoltaic_performance_report = summarise_photovoltaic_performance(
             dictionary=photovoltaic_power_output_series.components,
                 timestamps=timestamps,
                 frequency=frequency,
                 )
-        response["analysis"] = photovoltaic_performance_report
+        response["Performance Analysis"] = photovoltaic_performance_report
         # finally
         headers = {
             "Content-Disposition": 'attachment; filename="photovoltaic_performance_analysis.json"'
@@ -740,7 +745,7 @@ async def get_photovoltaic_power_output_series_multi(
     ] = PhotovoltaicModulePerformanceModel.king,
     # radiation_cutoff_threshold: Annotated[float, fastapi_query_radiation_cutoff_threshold] = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: Annotated[
-        ModuleTemperatureAlgorithm, fastapi_query_module_temperature_algorithm
+        ModuleTemperatureAlgorithm, fastapi_query_temperature_model
     ] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[float | None, fastapi_query_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
@@ -749,9 +754,6 @@ async def get_photovoltaic_power_output_series_multi(
     csv: Annotated[str | None, fastapi_query_csv] = None,
     quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-    # analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
-    # quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = False,
-    # multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
 ):
 
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series_from_multiple_surfaces(
