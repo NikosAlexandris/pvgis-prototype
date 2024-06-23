@@ -124,7 +124,7 @@ extra:
 theme:
   logo: images/pvgis_image_squared.png
   font:
-    code: Source Code Pro
+    # code: Source Code Pro
   icon:
     tag:
       concepts: simple/blueprint
