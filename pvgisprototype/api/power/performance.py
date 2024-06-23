@@ -244,21 +244,22 @@ def analyse_photovoltaic_performance(
     )
 
     effective_irradiance = irradiance_after_reflectivity + spectral_effect
-    effective_irradiance_percentage = (
-        (effective_irradiance / inclined_irradiance * 100)
-        if inclined_irradiance != 0
-        else 0
-    )
+    # effective_irradiance_percentage = (
+    #     (effective_irradiance / inclined_irradiance * 100)
+    #     if inclined_irradiance != 0
+    #     else 0
+    # )
     effective_irradiance_mean = (
         irradiance_after_reflectivity_mean + spectral_effect_mean
     )
     effective_irradiance_effect = effective_irradiance - inclined_irradiance
-    with numpy.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
-        effective_irradiance_effect_percentage = where(
-            inclined_irradiance != 0,
-            100 * effective_irradiance_effect / inclined_irradiance,
-            0,
-        ).item()  # get a Python float
+    # with numpy.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
+    #     effective_irradiance_effect_percentage = where(
+    #         inclined_irradiance != 0,
+    #         100 * effective_irradiance_effect / inclined_irradiance,
+    #         0,
+    #     ).item()  # get a Python float
+
     # "Effective" Power without System Loss
     photovoltaic_power_without_system_loss_series = dictionary.get(
         PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, numpy.array([])
@@ -284,7 +285,7 @@ def analyse_photovoltaic_performance(
     with numpy.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
         temperature_and_low_irradiance_effect_percentage = where(
             effective_irradiance != 0,
-            100 * temperature_and_low_irradiance_effect / effective_irradiance,
+            100 * temperature_and_low_irradiance_effect / numpy.array(effective_irradiance),  # still need to handle the case when effective_irradiance == 0  <-- single float
             0,
         ).item()  # get a Python float
 
@@ -306,7 +307,8 @@ def analyse_photovoltaic_performance(
     with numpy.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
         system_efficiency_effect_percentage = where(
             photovoltaic_power_without_system_loss != 0,
-            100 * system_efficiency_effect / photovoltaic_power_without_system_loss,
+            100 * system_efficiency_effect /
+            numpy.array(photovoltaic_power_without_system_loss),  # still need to handle the case when photovoltaic_power_without_system_loss == 0  <-- single float
             0,
         ).item()  # get a Python float
 
@@ -335,7 +337,9 @@ def analyse_photovoltaic_performance(
     total_effect_mean = photovoltaic_power_mean - inclined_irradiance_mean
     with numpy.errstate(divide="ignore", invalid="ignore"):  # if irradiance == 0
         total_effect_percentage = where(
-            inclined_irradiance != 0, total_effect / inclined_irradiance * 100, 0
+            inclined_irradiance != 0,
+            total_effect / numpy.array(inclined_irradiance) * 100,  # still need to handle the case when inclined_irradiance == 0  <-- single floar
+            0
         ).item()
 
     # Handle units
