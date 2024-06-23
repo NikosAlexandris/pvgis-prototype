@@ -2,7 +2,7 @@ from enum import Enum
 import numpy
 from pandas import DatetimeIndex
 import qrcode
-from pvgisprototype.api.quick_response_code import QuickResponseOutputType
+from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.quick_response_code import generate_quick_response_code
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.api.series.statistics import calculate_mean_of_series_per_time_unit, calculate_sum_and_percentage
@@ -24,7 +24,7 @@ def print_quick_response_code(
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    output_type: QuickResponseOutputType = QuickResponseOutputType.Base64,
+    output_type: QuickResponseCode = QuickResponseCode.Base64,
 ) -> None:
     """
     """
@@ -39,8 +39,8 @@ def print_quick_response_code(
         rounding_places=ROUNDING_PLACES_DEFAULT,
         output_type=output_type,
     )
-    if output_type.value == QuickResponseOutputType.Base64:
+    if output_type.value == QuickResponseCode.Base64:
         print(quick_response_code)
 
-    if output_type.value == QuickResponseOutputType.Image:
+    if output_type.value == QuickResponseCode.Image:
         quick_response_code.print_ascii()
