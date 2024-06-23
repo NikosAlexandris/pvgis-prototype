@@ -31,9 +31,10 @@ from pvgisprototype.api.power.performance import summarise_photovoltaic_performa
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.constants import (
     EFFICIENCY_FACTOR_DEFAULT,
+    PEAK_POWER_DEFAULT,
+    PHOTOVOLTAIC_POWER_COLUMN_NAME,
     RADIATION_CUTOFF_THRESHHOLD,
     ALBEDO_DEFAULT,
-    ANALYSIS_FLAG_DEFAULT,
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_COLUMN_NAME,
@@ -241,7 +242,7 @@ async def get_photovoltaic_power_series_advanced(
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    peak_power: Annotated[float, fastapi_query_peak_power] = 1.0,  # FIXME ADD CONSTANT?
+    peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
         float, fastapi_query_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
@@ -395,7 +396,7 @@ async def get_photovoltaic_power_series_advanced(
     response = {}
 
     if fingerprint:
-        response["fingerprint"] = photovoltaic_power_output_series.components[
+        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[
             FINGERPRINT_COLUMN_NAME
         ]
 
@@ -457,7 +458,7 @@ async def get_photovoltaic_power_series(
     photovoltaic_module: Annotated[ PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     system_efficiency: Annotated[ float, fastapi_query_system_efficiency ] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[PhotovoltaicModulePerformanceModel, fastapi_query_power_model ] = PhotovoltaicModulePerformanceModel.king,
-    peak_power: Annotated[float, fastapi_query_peak_power] = 1.0,  # FIXME ADD CONSTANT?
+    peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
@@ -527,11 +528,11 @@ async def get_photovoltaic_power_series(
             )
         else:
             response = {
-               "Photovoltaic power output series": photovoltaic_power_output_series.value,
+               PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
             }
 
     if fingerprint:
-        response["fingerprint"] = photovoltaic_power_output_series.components[
+        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[
             FINGERPRINT_COLUMN_NAME
         ]
 
@@ -559,7 +560,6 @@ async def get_photovoltaic_power_series(
         return Response(
             orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
         )
-
 
 
 async def get_photovoltaic_power_series_monthly_average(
@@ -736,7 +736,7 @@ async def get_photovoltaic_power_output_series_multi(
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    peak_power: Annotated[float, fastapi_query_peak_power] = 1.0,  # FIXME ADD CONSTANT?
+    peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
         float, fastapi_query_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
@@ -814,11 +814,11 @@ async def get_photovoltaic_power_output_series_multi(
             )
         else:
             response = {
-                "Photovoltaic power output series": photovoltaic_power_output_series.value,
+                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
             }
 
     if fingerprint:
-        response["fingerprint"] = photovoltaic_power_output_series.components[
+        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[
             FINGERPRINT_COLUMN_NAME
         ]
 
@@ -830,7 +830,7 @@ async def get_photovoltaic_power_output_series_multi(
             timestamps=timestamps,
             groupby=groupby,  # type: ignore[arg-type]
         )
-        response["statistics"] = convert_numpy_arrays_to_lists(series_statistics)
+        response["Statistics"] = convert_numpy_arrays_to_lists(series_statistics)
 
     if csv:
         from datetime import datetime
