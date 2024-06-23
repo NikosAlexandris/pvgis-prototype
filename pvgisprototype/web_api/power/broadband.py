@@ -28,6 +28,7 @@ from pvgisprototype.api.power.broadband_multiple_surfaces import (
 from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.power.performance import summarise_photovoltaic_performance
+from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.constants import (
     EFFICIENCY_FACTOR_DEFAULT,
     RADIATION_CUTOFF_THRESHHOLD,
@@ -267,7 +268,7 @@ async def get_photovoltaic_power_series_advanced(
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
-    quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+    quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
 ):
     """Estimate the photovoltaic power output for a solar surface.
 
@@ -359,7 +360,7 @@ async def get_photovoltaic_power_series_advanced(
         )
         return response_csv
 
-    if quick_response_code:
+    if quick_response_code.value != QuickResponseCode.NoneValue:
         from io import BytesIO
         from pvgisprototype.cli.qr import print_quick_response_code
 
@@ -454,7 +455,7 @@ async def get_photovoltaic_power_series(
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
-    quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+    quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
 ):
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
@@ -549,36 +550,6 @@ async def get_photovoltaic_power_series(
             orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
         )
 
-    if quick_response_code:
-        import base64
-        from io import BytesIO
-
-        from pvgisprototype.cli.qr import print_quick_response_code
-
-        image = print_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            surface_orientation=True,
-            surface_tilt=True,
-            timestamps=timestamps,
-            rounding_places=ROUNDING_PLACES_DEFAULT,
-            image=True,
-        )
-        buffer = BytesIO()
-        image.save(buffer, format="PNG")  # type: ignore
-        image_bytes = buffer.getvalue()
-        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-        response["QR"] = (
-            f"data:image/png;base64,{image_base64}"  # This way the image is returned in the JSON as a server link
-        )
-        #image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-        #response["qr"] = (
-        #    f"data:image/png;base64,{image_base64}"  # This way the image is returned in the JSON as a server link
-        #)
-
-        return Response(content=image_bytes, media_type="image/png")
 
     # finally
     headers = {
