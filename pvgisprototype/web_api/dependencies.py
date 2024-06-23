@@ -64,7 +64,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timestamps,
     fastapi_query_timezone,
 )
-from pvgisprototype.web_api.schemas import AngleOutputUnit, Frequency, GroupBy, Timezone
+from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quick_response_code
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quiet
@@ -394,11 +394,11 @@ async def process_series_solar_incidence_model(
 async def process_verbose(
         quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
         verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-        analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
+        analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
 ) -> int:
     """
     """
-    if analysis:
+    if analysis.value != AnalysisLevel.NoneValue:
         verbose = 9
 
     if quick_response_code.value != QuickResponseCode.NoneValue:

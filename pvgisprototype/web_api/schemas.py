@@ -40,6 +40,14 @@ class Timezone(str, Enum):
     UNIVERSAL = "Universal"
 
 
+class AnalysisLevel(str, Enum):
+    Minimal = 'Minimal'
+    Simple = 'Simple'
+    Advanced = 'Advanced'
+    Extended = 'Extended'
+    NoneValue = None
+
+
 class Frequency(str, Enum):
     Year = "Yearly"
     Season = "Seasonal"
@@ -47,6 +55,7 @@ class Frequency(str, Enum):
     Week = "Weekly"
     Day = "Daily"
     Hour = "Hourly"
+    Minute = "Minutely"
 
 
 class GroupBy(str, Enum):
@@ -56,6 +65,7 @@ class GroupBy(str, Enum):
     Weekly = "Weekly"
     Daily = "Daily"
     Hourly = "Hourly"
+    Minutely = "Minutely"
     N = "Do not group-by"
 
 
