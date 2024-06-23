@@ -666,7 +666,7 @@ NOMENCLATURE_FLAG_DEFAULT = False
 
 CSV_FLAG_DEFAULT = False
 CSV_PATH_DEFAULT = None
-CSV_DESCRIPTION = "CSV output filename"
+CSV_DESCRIPTION = "CSV output filename. Will override all other output options!"
 
 UNIPLOT_FLAG_DEFAULT = False
 UNIPLOT_FLAG_DESCRIPTION = "Uniplot"
