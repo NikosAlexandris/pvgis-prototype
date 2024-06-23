@@ -264,7 +264,7 @@ async def get_photovoltaic_power_series_advanced(
     # profile: Annotated[bool, fastapi_query_profiling] = cPROFILE_FLAG_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
-    csv: Annotated[bool, fastapi_query_csv] = False,
+    csv: Annotated[str | None, fastapi_query_csv] = None,
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
@@ -407,10 +407,15 @@ async def get_photovoltaic_power_series_advanced(
 
     if analysis:
         photovoltaic_performance_report = summarise_photovoltaic_performance(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True if surface_orientation else False,
+            surface_tilt=True if surface_tilt else False,
             dictionary=photovoltaic_power_output_series.components,
-                timestamps=timestamps,
-                frequency=frequency,
-                )
+            timestamps=timestamps,
+            frequency=frequency,
+        )
         response["analysis"] = photovoltaic_performance_report
 
     if not quiet:
@@ -446,15 +451,15 @@ async def get_photovoltaic_power_series(
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     photovoltaic_module: Annotated[ PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     system_efficiency: Annotated[ float, fastapi_query_system_efficiency ] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[ PhotovoltaicModulePerformanceModel, fastapi_query_power_model ] = PhotovoltaicModulePerformanceModel.king,
+    power_model: Annotated[PhotovoltaicModulePerformanceModel, fastapi_query_power_model ] = PhotovoltaicModulePerformanceModel.king,
     peak_power: Annotated[float, fastapi_query_peak_power] = 1.0,  # FIXME ADD CONSTANT?
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
-    csv: Annotated[bool, fastapi_query_csv] = False,
+    analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
+    csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-    analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
     quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
 ):
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
@@ -551,14 +556,6 @@ async def get_photovoltaic_power_series(
         )
 
 
-    # finally
-    headers = {
-        "Content-Disposition": 'attachment; filename="pvgis_photovoltaic_power_series.json"'
-    }
-    return Response(
-        orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
-    )
-
 
 async def get_photovoltaic_power_series_monthly_average(
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
@@ -588,7 +585,7 @@ async def get_photovoltaic_power_series_monthly_average(
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, fastapi_query_power_model
     ] = PhotovoltaicModulePerformanceModel.king,
-    csv: bool = False,
+    csv: str | None = None,
     plot_statistics: bool = False,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
     fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
@@ -749,7 +746,7 @@ async def get_photovoltaic_power_output_series_multi(
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-    csv: Annotated[bool, fastapi_query_csv] = False,
+    csv: Annotated[str | None, fastapi_query_csv] = None,
     quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     # analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,

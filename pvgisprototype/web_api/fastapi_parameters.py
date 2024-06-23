@@ -85,7 +85,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DESCRIPTION,
     TOLERANCE_MINIMUM,
     UNIPLOT_FLAG_DESCRIPTION,
-    VERBOSE_LEVEL_DEFAULT,
+    VERBOSE_LEVEL_DESCRIPTION,
     WIND_SPEED_TIME_SERIES_DESCRIPTION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
@@ -272,7 +272,13 @@ fastapi_query_rounding_places = Query(
 )
 fastapi_query_verbose = Query(
     # VERBOSE_LEVEL_DEFAULT,
-    description=VERBOSE_LEVEL_DEFAULT,
+    description=VERBOSE_LEVEL_DESCRIPTION,
+)
+fastapi_query_index = Query(
+    description=INDEX_IN_TABLE_OUTPUT_FLAG_DESCRIPTION,
+)
+fastapi_query_quiet = Query(
+    description=QUIET_FLAG_DESCRIPTION,
 )
 fastapi_query_log = Query(
     description=LOG_LEVEL_DESCRIPTION,
@@ -313,12 +319,6 @@ fastapi_query_uniplot = Query(
 fastapi_query_uniplot_terminal_width = Query(
     description=TERMINAL_WIDTH_FRACTION_DESCRIPTION,
 )
-fastapi_query_index = Query(
-    description=INDEX_IN_TABLE_OUTPUT_FLAG_DESCRIPTION,
-)
-fastapi_query_quiet = Query(
-    description=QUIET_FLAG_DESCRIPTION,
-)
 fastapi_query_analysis = Query(
     description=ANALYSIS_DESCRIPTION,
 )
@@ -343,6 +343,7 @@ fastapi_query_angle_output_units = Query(
 fastapi_query_peak_power = Query(
     description=PEAK_POWER_DESCRIPTION,
     ge=PEAK_POWER_MINIMUM,
+    alias='peak-power',
 )
 fastapi_query_radiation_cutoff_threshold = Query(
     description=RADIATION_CUTOFF_THRESHOLD_DESCRIPTION,
