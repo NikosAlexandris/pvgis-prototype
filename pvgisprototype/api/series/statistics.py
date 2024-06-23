@@ -78,7 +78,7 @@ def calculate_sum_and_percentage(
     if isinstance(total, numpy.ndarray):
         total = total.astype(dtype).item()
 
-    percentage = (total / reference_series * 100).item() if reference_series != 0 else 0
+    percentage = (total / reference_series * 100) if reference_series != 0 else 0
     if isinstance(percentage, numpy.ndarray):
         percentage.astype(dtype)
     if rounding_places is not None:
