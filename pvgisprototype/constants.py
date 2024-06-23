@@ -355,8 +355,11 @@ METADATA_FLAG_DEFAULT = False
 COMMAND_METADATA_DESCRIPTION = "Command metadata"
 
 DATA_TYPE_DEFAULT = 'float32'  # takes halve of the time to process than float64
+DATA_TYPE_DESCRIPTION = f'Data type for (array) calculations, default is `{DATA_TYPE_DEFAULT}`.'  # takes halve of the time to process than float64
 ARRAY_BACKEND_DEFAULT = 'numpy'  # OR 'CUPY', 'DASK'
+ARRAY_BACKEND_DESCRIPTION = f'Backend for (array) calculations, default is {ARRAY_BACKEND_DEFAULT}.'  # OR 'CUPY', 'DASK'
 MULTI_THREAD_FLAG_DEFAULT = True
+MULTI_THREAD_FLAG_DESCRIPTION = f'Perform calculations in a multi-thread context, default is {MULTI_THREAD_FLAG_DEFAULT}.'
 
 VERBOSE_LEVEL_DEFAULT = 0
 VERBOSE_LEVEL_DESCRIPTION = f"{SYMBOL_VERBOSITY} Verbosity level, default is {VERBOSE_LEVEL_DEFAULT}"
