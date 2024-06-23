@@ -20,45 +20,39 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
       org.opencontainers.image.licenses='EUPL-1.2' \
       org.opencontainers.image.ref.name='PVGIS 6 Documentation'
 
-# Environment variables
-ENV LANG=en_US.UTF-8
-ENV LC_ALL=en_US.UTF-8
-# ENV COLUMNS=160
-ENV FORCE_COLOR=1
+# Set non-interactive installation to avoid debconf and other prompts
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Set the working directory ?
-WORKDIR /build
-
-# Copy project files to the container ?
-COPY ../ .
-
-# Who is user 0 ? ------------------------------------------------------------
+# Install dependencies and configure locale/s as root
 USER 0
-
-# Install dependencies and build the documentation
-
-# RUN apt-get update && apt-get install -y locales
 RUN apt-get update \
-    && apt-get install -y locales fonts-dejavu-core \
+    && apt-get install -y locales fonts-source-code-pro \
     && echo "LC_ALL=en_US.UTF-8" >> /etc/environment \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && echo "LANG=en_US.UTF-8" >> /etc/locale.conf \
     && locale-gen en_US.UTF-8 \
     && dpkg-reconfigure --frontend=noninteractive locales \
-    && update-locale LANG=en_US.UTF-8
+    && update-locale LANG=en_US.UTF-8 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Add new user for non-root level operations
 RUN useradd -m pvgis-user
 USER pvgis-user
-WORKDIR /home/pvgis-user/build
+
+# Set environment variables after locales are configured
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    FORCE_COLOR=1
+    # ENV COLUMNS=160
+
+WORKDIR /home/pvgis-user/documentation
+# COPY ../ .  # Why `../` ?
 COPY --chown=pvgis-user:pvgis-user . .
 RUN pip install --upgrade pip \
     && pip install --user pdm  \
     && pdm install \
-    && pdm run mkdocs build --verbose --site-dir public
-
-# Clean-up
-RUN apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
+    && pdm run mkdocs build --verbose --site-dir public \
     && pip cache purge
 
 # Final Stage
@@ -77,7 +71,7 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
       org.opencontainers.image.ref.name='PVGIS 6 Documentation'
 
 # Copy the built project from the build stage
-COPY --from=build /home/pvgis-user/public /opt/app-root/src
+COPY --from=build /home/pvgis-user/documentation/public /opt/app-root/src
 
 # run Nginx
 CMD ["/usr/libexec/s2i/run"]
