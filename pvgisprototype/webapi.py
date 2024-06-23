@@ -68,7 +68,7 @@ please refer to the
 
 tags_metadata = [
     {
-        "name": "welcome",
+        "name": "Welcome",
         "description": "Welcome message and similar functions.",
         "externalDocs": {
                     "description": "Items external docs",
@@ -76,11 +76,11 @@ tags_metadata = [
                 },
     },
     {
-        "name": "citation",
+        "name": "Citation",
         "description": "Functions related to the citation of PVGIS 6.",
     },
     {
-        "name": "performance",
+        "name": "Performance",
         "description": "Analysis of photovoltaic performance",
         "externalDocs": {
             "description": "See also relevant section in the interactive documentation",
@@ -88,7 +88,7 @@ tags_metadata = [
             },
     },
     {
-        "name": "power",
+        "name": "Power",
         "description": "Functions to calculate photovoltaic power/energy time series",
         "externalDocs": {
             "description": "See also relevant section in the interactive documentation",
@@ -181,18 +181,18 @@ async def read_root():
     return html_root_page
 
 
-@app.get("/welcome", tags=['welcome'])
+@app.get("/welcome", tags=['Welcome'])
 async def print_welcome_message():
     welcome_message = "Welcome to PVGIS 6"
     return welcome_message
 
 
-@app.get("/citation", tags=["citation"])
+@app.get("/citation", tags=["Citation"])
 async def print_citation_text():
     return generate_citation_text()
 
 
-@app.get("/download-citation", tags=["citation"])
+@app.get("/download-citation", tags=["Citation"])
 async def download_citation():
     citation = generate_citation_text()
     from fastapi.responses import FileResponse
@@ -210,16 +210,16 @@ async def download_citation():
 
 app.get(
         "/calculate/performance/broadband", 
-        tags=['performance'], response_class=ORJSONResponse,
+        tags=['Performance'], response_class=ORJSONResponse,
         summary="Analysis of Photovoltaic Performance",
         # description="Analyse the photovoltaic performance for a surface of a given technology at a specific location and period",
         response_description="Analysis of Photovoltaic Performance (JSON)",
         status_code=status.HTTP_201_CREATED,
 )(get_photovoltaic_performance_analysis)
-app.get("/calculate/power/broadband", tags=['power'])(get_photovoltaic_power_series)
-app.get("/calculate/power/broadband_monthly_average", tags=['power'])(get_photovoltaic_power_series_monthly_average)
-app.get("/calculate/power/broadband-advanced", tags=['power'])(get_photovoltaic_power_series_advanced)
-app.get("/calculate/power/broadband-multi", tags=['power', 'multiple surfaces'])(get_photovoltaic_power_output_series_multi)
+app.get("/calculate/power/broadband", tags=['Power'])(get_photovoltaic_power_series)
+app.get("/calculate/power/broadband_monthly_average", tags=['Power'])(get_photovoltaic_power_series_monthly_average)
+app.get("/calculate/power/broadband-advanced", tags=['Power'])(get_photovoltaic_power_series_advanced)
+app.get("/calculate/power/broadband-multi", tags=['Power', 'Multiple surfaces'])(get_photovoltaic_power_output_series_multi)
 
 
 if __name__ == "__main__":
