@@ -452,6 +452,5 @@ fastapi_dependable_solar_incidence_models = Depends(
     process_series_solar_incidence_model
 )
 fastapi_dependable_verbose = Depends(process_verbose)
-# fastapi_dependable_csv = Depends(process_csv)
 fastapi_dependable_quite = Depends(process_quiet)
 fastapi_dependable_fingerprint = Depends(process_fingerprint)
