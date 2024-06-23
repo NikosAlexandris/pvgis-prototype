@@ -206,6 +206,9 @@ def analyse_photovoltaic_performance(
     # To Do : In-Plane "Irradiation" ?
     # Add Standard Deviation in kWh ? Monthly, Yearly ?
     # ------------------------------------------------------------------------
+
+    # from devtools import debug
+    # debug(locals())
     inclined_irradiance_series = dictionary.get(
         GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, numpy.array([])
     )
@@ -857,6 +860,8 @@ def report_photovoltaic_performance(
 
 
 from pvgisprototype.web_api.schemas import Frequency
+
+
 def summarise_photovoltaic_performance(
     longitude = None,
     latitude = None,
@@ -869,7 +874,7 @@ def summarise_photovoltaic_performance(
     rounding_places=1,
     dtype=DATA_TYPE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    analysis: str = 'simple',
+    analysis: str = 'Simple',
 ):
     """
     Generate a simplified report for photovoltaic performance, focusing only on quantities and their values.
@@ -913,72 +918,54 @@ def summarise_photovoltaic_performance(
         unit = photovoltaic_performance_analysis.get(unit_key, default)
         return {"value": value, "unit": unit}
 
-    if analysis == 'extended':
-        return {
-                LATITUDE_COLUMN_NAME: {"value": latitude, "unit": "degrees"},
+    performance_analysis_container = {
+        "Location & Position": lambda: {
+            LATITUDE_COLUMN_NAME: {"value": latitude, "unit": "degrees"},
             LONGITUDE_COLUMN_NAME: {"value": longitude, "unit": "degrees"},
             ELEVATION_COLUMN_NAME: {"value": elevation, "unit": "meters"},
-            SURFACE_ORIENTATION_COLUMN_NAME: {"value": surface_orientation, "unit": "degrees"},
+            SURFACE_ORIENTATION_COLUMN_NAME: {
+                "value": surface_orientation,
+                "unit": "degrees",
+            },
             SURFACE_TILT_COLUMN_NAME: {"value": surface_tilt, "unit": "degrees"},
-            'Start time': str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
-            'End time': str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
-            TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: get_value(
-                TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-            ),
-            TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME: get_value(
-                TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME,
-                UNIT_FOR_TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME,
-            ),
-            GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: get_value(
-                GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
-                UNIT_FOR_MEAN_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
-            ),
-            TOTAL_SPECTRAL_EFFECT_COLUMN_NAME: get_value(
-                TOTAL_SPECTRAL_EFFECT_COLUMN_NAME,
-                UNIT_FOR_TOTAL_SPECTRAL_EFFECT_COLUMN_NAME,
-            ),
-            EFFECTIVE_IRRADIANCE_COLUMN_NAME: get_value(
-                EFFECTIVE_IRRADIANCE_COLUMN_NAME,
-                UNIT_FOR_EFFECTIVE_IRRADIANCE_COLUMN_NAME,
-            ),
-            TOTAL_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME: get_value(
-                TOTAL_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME,
-                UNIT_FOR_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME,
-            ),
-            TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: get_value(
-                TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
-                UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
-            ),
-            TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME: get_value(
-                TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME,
-                UNIT_FOR_TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME,
-            ),
-            TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME: get_value(
-                TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
-                UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
-            ),
-            PHOTOVOLTAIC_ENERGY_COLUMN_NAME: get_value(
-                PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
-                UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
-            ),
-            TOTAL_EFFECT_COLUMN_NAME: get_value(
-                TOTAL_EFFECT_COLUMN_NAME,
-                UNIT_FOR_TOTAL_EFFECT_COLUMN_NAME,
-            ),
-            TECHNOLOGY_NAME: photovoltaic_module,
-            PEAK_POWER_COLUMN_NAME: peak_power,
-            "Mount type": mount_type,
-        }
-    else:
-        return {
-                LATITUDE_COLUMN_NAME: {"value": latitude, "unit": "degrees"},
-            LONGITUDE_COLUMN_NAME: {"value": longitude, "unit": "degrees"},
-            ELEVATION_COLUMN_NAME: {"value": elevation, "unit": "meters"},
-            SURFACE_ORIENTATION_COLUMN_NAME: {"value": surface_orientation, "unit": "degrees"},
-            SURFACE_TILT_COLUMN_NAME: {"value": surface_tilt, "unit": "degrees"},
-            'Start time': str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
-            'End time': str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+            "Start time": str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
+            "End time": str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+        },
+        "Minimal": lambda: (
+            {
+                PHOTOVOLTAIC_ENERGY_COLUMN_NAME: get_value(
+                    PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
+                    UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
+                ),
+                TECHNOLOGY_NAME: photovoltaic_module,
+                PEAK_POWER_COLUMN_NAME: peak_power,
+                "Mount type": mount_type,
+            }
+            if analysis == "Minimal"
+            else {}
+        ),
+        "Simple": lambda: (
+            {
+                TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: get_value(
+                    TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+                ),
+                PHOTOVOLTAIC_ENERGY_COLUMN_NAME: get_value(
+                    PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
+                    UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
+                ),
+                TOTAL_EFFECT_COLUMN_NAME: get_value(
+                    TOTAL_EFFECT_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_EFFECT_COLUMN_NAME,
+                ),
+                TECHNOLOGY_NAME: photovoltaic_module,
+                PEAK_POWER_COLUMN_NAME: peak_power,
+                "Mount type": mount_type,
+            }
+            if analysis == "Simple"
+            else {}
+        ),
+        "Advanced": lambda: {
             TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: get_value(
                 TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
                 UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
@@ -1010,4 +997,58 @@ def summarise_photovoltaic_performance(
             TECHNOLOGY_NAME: photovoltaic_module,
             PEAK_POWER_COLUMN_NAME: peak_power,
             "Mount type": mount_type,
-        }
+        },
+        "Extended": lambda: (
+            {
+                TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: get_value(
+                    TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+                ),
+                TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME: get_value(
+                    TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_REFLECTIVITY_EFFECT_COLUMN_NAME,
+                ),
+                GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: get_value(
+                    GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
+                    UNIT_FOR_MEAN_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME,
+                ),
+                TOTAL_SPECTRAL_EFFECT_COLUMN_NAME: get_value(
+                    TOTAL_SPECTRAL_EFFECT_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_SPECTRAL_EFFECT_COLUMN_NAME,
+                ),
+                EFFECTIVE_IRRADIANCE_COLUMN_NAME: get_value(
+                    EFFECTIVE_IRRADIANCE_COLUMN_NAME,
+                    UNIT_FOR_EFFECTIVE_IRRADIANCE_COLUMN_NAME,
+                ),
+                TOTAL_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME: get_value(
+                    TOTAL_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME,
+                    UNIT_FOR_TEMPERATURE_AND_LOW_IRRADIANCE_EFFECT_COLUMN_NAME,
+                ),
+                TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: get_value(
+                    TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
+                ),
+                TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME: get_value(
+                    TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME,
+                ),
+                TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME: get_value(
+                    TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_PHOTOVOLTAIC_POWER_COLUMN_NAME,
+                ),
+                PHOTOVOLTAIC_ENERGY_COLUMN_NAME: get_value(
+                    PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
+                    UNIT_FOR_PHOTOVOLTAIC_ENERGY_COLUMN_NAME,
+                ),
+                TOTAL_EFFECT_COLUMN_NAME: get_value(
+                    TOTAL_EFFECT_COLUMN_NAME,
+                    UNIT_FOR_TOTAL_EFFECT_COLUMN_NAME,
+                ),
+                TECHNOLOGY_NAME: photovoltaic_module,
+                PEAK_POWER_COLUMN_NAME: peak_power,
+                "Mount type": mount_type,
+            }
+            if analysis == "Extended"
+            else {}
+        ),
+    }
