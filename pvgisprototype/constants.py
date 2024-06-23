@@ -128,6 +128,12 @@ ANGLE_OF_INCIDENCE_NAME = 'Angle of Incidence'
 # ⭸ ⭹
 
 # ⍼ # Mysterious symbol !
+SYMBOL_SILENCE = '🤫'
+SYMBOL_SILENCE_NAME = 'Quiet, Silence'
+
+SYMBOL_CALCULATOR = '🖩'
+SYMBOL_CALCULATOR_NAME = 'Calculation, Analysis'
+
 SYMBOL_INFORMATION = "🛈"
 SYMBOL_INFORMATION_NAME ="Information"
 SYMBOL_INTRODUCTION = SYMBOL_INFORMATION
@@ -317,6 +323,8 @@ SYMBOL_GROUP = "󰾂"
 SYMBOL_GROUP_NAME = "Group"
 
 SYMBOL_DESCRIPTIONS = {
+    SYMBOL_SILENCE: SYMBOL_SILENCE_NAME,
+    SYMBOL_CALCULATOR: SYMBOL_CALCULATOR_NAME,
     SYMBOL_POWER: SYMBOL_POWER_NAME,
     SYMBOL_IRRADIANCE: SYMBOL_IRRADIANCE_NAME,
     SYMBOL_EFFECTIVE: SYMBOL_EFFECTIVE_NAME,
@@ -334,6 +342,8 @@ SYMBOL_DESCRIPTIONS = {
     SYMBOL_LATITUDE: SYMBOL_LATITUDE_NAME,
     SYMBOL_TIMING: SYMBOL_TIMING_NAME,
     SYMBOL_FREQUENCY: SYMBOL_FREQUENCY_NAME,
+    SYMBOL_DEGREES: SYMBOL_DEGREES_NAME,
+    SYMBOL_RADIANS: SYMBOL_RADIANS_NAME,
     SYMBOL_DECLINATION: SYMBOL_DECLINATION_NAME,
     SYMBOL_HOUR_ANGLE: SYMBOL_HOUR_ANGLE_NAME, 
     SYMBOL_ZENITH: SYMBOL_ZENITH_NAME, 
@@ -347,8 +357,7 @@ SYMBOL_DESCRIPTIONS = {
     SYMBOL_FINGERPRINT: SYMBOL_FINGERPRINT_NAME,
     SYMBOL_SUMMATION: SYMBOL_SUMMATION_NAME,
     SYMBOL_PERCENTAGE: SYMBOL_PERCENTAGE_NAME,
-    SYMBOL_DEGREES: SYMBOL_DEGREES_NAME,
-    SYMBOL_RADIANS: SYMBOL_RADIANS_NAME,
+    SYMBOL_GROUP: SYMBOL_GROUP_NAME,
 }
 
 METADATA_FLAG_DEFAULT = False
@@ -362,10 +371,10 @@ MULTI_THREAD_FLAG_DEFAULT = True
 MULTI_THREAD_FLAG_DESCRIPTION = f'Perform calculations in a multi-thread context, default is {MULTI_THREAD_FLAG_DEFAULT}.'
 
 VERBOSE_LEVEL_DEFAULT = 0
-VERBOSE_LEVEL_DESCRIPTION = f"{SYMBOL_VERBOSITY} Verbosity level, default is {VERBOSE_LEVEL_DEFAULT}"
+VERBOSE_LEVEL_DESCRIPTION = f"{SYMBOL_VERBOSITY} Verbosity level : 0 returns list of values only, higher levels reveal intermediate calculations. Default is {VERBOSE_LEVEL_DEFAULT}."
 
 QUIET_FLAG_DEFAULT = False
-QUIET_FLAG_DESCRIPTION = "🤫 Silence output, useful for timing or partial output"
+QUIET_FLAG_DESCRIPTION = f"{SYMBOL_SILENCE} Silence output, useful for timing the duration of processes or partial output"
 
 LOG_LEVEL_DEFAULT = 0
 LOG_LEVEL_DESCRIPTION = "Log level"
@@ -389,7 +398,7 @@ FIX_OUT_OF_RANGE_VALUES_NEGATIVE = -.99999
 
 TIMESTAMP_NAME = 'Timestamp'
 TIMESTAMP_DESCRIPTION = "Date-timestamp of data to extract from series, ex. '2112-12-21 21:12:12'"
-TIMESTAMPS_DESCRIPTION = f"{SYMBOL_TIMING} Date-timestamps of data to extract from series, ex. '2112-12-21, 2112-12-21 12:21:21, 2112-12-21 21:12:12'"
+TIMESTAMPS_DESCRIPTION = f"{SYMBOL_TIMING} Specific comma-separated date-timestamp/s of data to extract from time series, ex. `2112-12-21`, `2112-12-21 12:21:21`, `2112-12-21 21:12:12`"
 
 TIME_SERIES_DESCRIPTION = "A time series dataset (any format supported by Xarray)"
 INEXACT_MATCHES_METHOD_DESCRIPTION = "Method for nearest neighbor (inexact) lookups. Read Xarray manual on nearest-neighbor-lookups"
@@ -402,8 +411,7 @@ START_NAME = 'Start'
 START_TIME_DESCRIPTION = f"{SYMBOL_START_TIME} {START_NAME} {TIMESTAMP_NAME}"
 
 PERIODS_NAME = 'Periods'
-PERIODS_DESCRIPTION = f"{SYMBOL_PERIODS} Number of {PERIODS_NAME} to generate"
-
+PERIODS_DESCRIPTION = f"{SYMBOL_PERIODS} Number of {PERIODS_NAME} to generate. Can be used with _either_ `start_time` _or_ `end_time` plus the frequency, or then _both_ start _and_ end time which will generate automatically the frequency (linearly spaced)."
 FREQUENCY_DESCRIPTION = f"{SYMBOL_FREQUENCY} Frequency for timestamp generation"
 END_NAME = 'End'
 END_TIME_DESCRIPTION = f"{SYMBOL_END_TIME} {END_NAME} {TIMESTAMP_NAME}"
@@ -553,7 +561,7 @@ ALBEDO_DESCRIPTION = "Albedo value for the surface"
 TECHNOLOGY_NAME = 'Technology'
 PHOTOVOLTAIC_MODULE_TECHNOLOGY = f'Photovoltaic Module {TECHNOLOGY_NAME}'
 PHOTOVOLTAIC_MODULE_DEFAULT = 'cSi:Free standing'
-PHOTOVOLTAIC_MODULE_DESCRIPTION = f"{SYMBOL_SILICON} Photovoltaic module"
+PHOTOVOLTAIC_MODULE_DESCRIPTION = f"{SYMBOL_SILICON} Photovoltaic module technology and mount type"
 
 PHOTOVOLTAIC_POWER_OUTPUT_FILENAME = 'photovoltaic_power_time_series'
 PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME = 'Photovoltaic Performance'
@@ -651,7 +659,7 @@ UNIT_FOR_MEAN_EFFECT_COLUMN_NAME = f'{UNIT_COLUMN_NAME_PREFIX} {MEAN_EFFECT_COLU
 EFFECT_PERCENTAGE_COLUMN_NAME = f'{EFFECT_COLUMN_NAME} {SYMBOL_PERCENTAGE}'
 
 QUICK_RESPONSE_CODE_FLAG_DEFAULT = False
-QUICK_RESPONSE_CODE_DESCRIPTION = f"{SYMBOL_QUICK_RESPONSE_TETRAGRAM} Quick Response code summarising inputs and performance"
+QUICK_RESPONSE_CODE_DESCRIPTION = f"{SYMBOL_QUICK_RESPONSE_TETRAGRAM} Quick-Response Code image (or a Base64 sequence) summarising inputs and performance"
 
 STATISTICS_FLAG_DEFAULT = False
 STATISTICS_DESCRIPTION = "Statistics"
@@ -660,7 +668,7 @@ GROUPBY_DESCRIPTION = "Group by"
 GROUPBY_DEFAULT = None
 
 ANALYSIS_FLAG_DEFAULT = False
-ANALYSIS_DESCRIPTION = "🖩 Analysis of performance. Will force verbose=9 (for detailed calculations) and quiet=True."
+ANALYSIS_DESCRIPTION = f"{SYMBOL_CALCULATOR} Analysis of performance. Will force detailed calculations internally (`verbose>=9`) and `quiet=True`."
 
 NOMENCLATURE_FLAG_DEFAULT = False
 
@@ -672,8 +680,8 @@ UNIPLOT_FLAG_DEFAULT = False
 UNIPLOT_FLAG_DESCRIPTION = "Uniplot"
 
 INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT = False
-INDEX_IN_TABLE_OUTPUT_FLAG_DESCRIPTION = "Index rows in output table (works with at least 1x -v)"
-INDEX_IN_TABLE_OUTPUT_FLAG_TYPER_HELP = "Index rows in output table (works with at least 1x -v)"
+INDEX_IN_TABLE_OUTPUT_FLAG_DESCRIPTION = "Index rows in output table (meaningful with at least `verbose >= 1`)"
+INDEX_IN_TABLE_OUTPUT_FLAG_TYPER_HELP = "Index rows in output table (meaningful with at least 1x -v)"
 
 FINGERPRINT_FLAG_DEFAULT = False
 
