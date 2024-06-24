@@ -65,7 +65,7 @@ try:
                 Solar_Position = Custom("Solar Position", solar_position_icon)
                 Solar_Irradiance = Custom("Solar Irradiance", solar_irradiance_icon)
                 Meteorological_Variables = Custom("Meteorological\nVariables", meteorological_variables_icon)
-                Photovoltaic_Performance = Custom("Photovoltaic\nPerformance", photovoltaic_power_icon)
+                Photovoltaic_Performance = Custom("Photovoltaic\nPerformance\nPVGIS 6", photovoltaic_power_icon)
 
             with Cluster("Optional External Libraries"):
                 pvlib = Custom("pvlib", pvlib_logo)
