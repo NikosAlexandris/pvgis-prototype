@@ -5,7 +5,7 @@ Output options
 import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output_metadata
-from pvgisprototype.constants import DEGREES, RADIANS
+from pvgisprototype.constants import DEGREES, INDEX_IN_TABLE_OUTPUT_FLAG_TYPER_HELP, RADIANS
 
 
 # Command metadata
@@ -21,7 +21,7 @@ typer_option_index = typer.Option(
     '--index',
     '--idx',
     '-i',
-    help="Index rows in output table (works only with at least 1x -v)",
+    help=INDEX_IN_TABLE_OUTPUT_FLAG_TYPER_HELP,
     show_default=True,
     show_choices=True,
     rich_help_panel=rich_help_panel_output,

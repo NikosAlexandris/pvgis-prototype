@@ -29,6 +29,7 @@ from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
@@ -37,9 +38,12 @@ from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype import SolarIncidence
 from pvgisprototype.api.position.models import SolarIncidenceModel
+from cachetools import cached
+from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
+@cached(cache={}, key=custom_hashkey)
 # @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
 def calculate_relative_longitude(
     latitude: Latitude,
@@ -159,88 +163,6 @@ def calculate_relative_longitude(
     )
 
 
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-# @validate_with_pydantic(CalculateSolarIncidencePVISInputModel)
-def calculate_solar_incidence_pvis(
-    longitude: Longitude,
-    latitude: Latitude,
-    timestamp: datetime,
-    timezone: ZoneInfo,
-    solar_time_model: SolarTimeModel = SolarTimeModel.milne,
-    surface_tilt: float = 0,
-    surface_orientation: float = 180,
-    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
-    log: int = 0,
-) -> SolarIncidence:
-    """Calculate the angle of incidence (θ) between the direction of the sun
-    ray and the line normal to the surface measured in radian.
-
-    θ =
-    acos(
-         sin(Φ)
-         * (
-           sin(δ) * cos(β) + cos(δ) * cos(γ) * cos(ω) * sin(β)
-           )
-         + cos(Φ) * (cos(δ) * cos(ω) * cos(β) - sin(δ) * cos(γ) * sin(β))
-         + cos(δ)
-         * sin(γ)
-         * sin(ω)
-         * sin(β)
-        )
-
-    Parameters
-    ----------
-
-    latitude: float
-        Latitude is the angle (Φ) between the sun's rays and its projection on
-        the horizontal surface measured in radian.
-
-    surface_tilt: float 
-        Surface tilt or slope is the angle (β) between the inclined slope and
-        the horizontal plane measured in radian.
-
-    surface_orientiation: float
-        Surface orientation or azimuth is the angle (γ) in the horizontal plane
-        between the line due south and the horizontal projection of the normal
-        to the inclined plane surface measured in radian.
-
-    Returns
-    -------
-    solar_incidence: float
-        The angle of incidence (θ) is the angle between the direction of the
-        sun ray and the line normal to the surface measured in radian.
-    """
-    solar_incidence = acos(
-        sin(latitude.radians)
-        * (
-            sin(solar_declination.radians)
-            * cos(surface_tilt.radians)
-            + cos(solar_declination.radians)
-            * cos(surface_orientation.radians)
-            * cos(hour_angle.radians)
-            * sin(surface_tilt.radians)
-        )
-        + cos(latitude.radians)
-        * (
-            cos(solar_declination.radians)
-            * cos(hour_angle.radians)
-            * cos(surface_tilt.radians)
-            - sin(solar_declination.radians)
-            * cos(surface_orientation.radians)
-            * sin(surface_tilt.radians)
-        )
-        + cos(solar_declination.radians)
-        * sin(surface_orientation.radians)
-        * sin(hour_angle.radians)
-        * sin(surface_tilt.radians)
-    )
-
-    return SolarIncidence(value=solar_incidence, unit=RADIANS)
-
-
 @log_function_call
 # @validate_with_pydantic(CalculateSolarIncidenceTimeSeriesPVISInputModel)
 def calculate_solar_incidence_series_hofierka(
@@ -304,22 +226,6 @@ def calculate_solar_incidence_series_hofierka(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
     )
-
-    # Idea for alternative solar time modelling, i.e. Milne 1921 -------------
-    # solar_time = model_solar_time(
-    #     longitude=longitude,
-    #     latitude=latitude,
-    #     timestamp=timestamp,
-    #     timezone=timezone,
-    #     solar_time_model=solar_time_model,  # returns datetime.time object
-    #     perigee_offset=perigee_offset,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
-    # )
-    # hour_angle = calculate_solar_hour_angle_pvis(
-    #         solar_time=solar_time,
-    # )
-    # ------------------------------------------------------------------------
-    
     solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
         longitude=longitude,
         timestamps=timestamps,
@@ -337,33 +243,6 @@ def calculate_solar_incidence_series_hofierka(
         verbose=verbose,
         log=log,
     )
-
-    # solar_incidence_series = numpy.arccos(
-    #     sin(latitude.radians)
-    #     * (
-    #         numpy.sin(solar_declination_series.radians)
-    #         * cos(surface_tilt.radians)
-    #         + numpy.cos(solar_declination_series.radians)
-    #         * cos(surface_orientation.radians)
-    #         * numpy.cos(solar_hour_angle_series.radians)
-    #         * sin(surface_tilt.radians)
-    #     )
-    #     + cos(latitude.radians)
-    #     * (
-    #         numpy.cos(solar_declination_series.radians)
-    #         * numpy.cos(solar_hour_angle_series.radians)
-    #         * cos(surface_tilt.radians)
-    #         - numpy.sin(solar_declination.radians)
-    #         * cos(surface_orientation.radians)
-    #         * sin(surface_tilt.radians)
-    #     )
-    #     + numpy.cos(solar_declination_series.radians)
-    #     * sin(surface_orientation.radians)
-    #     * numpy.sin(solar_hour_angle_series.radians)
-    #     * sin(surface_tilt.radians)
-    # )
-
-    # Prepare relevant quantities as in PVGIS v5.2
     sine_relative_inclined_latitude = (
         - cos(latitude.radians)
         * sin(surface_tilt.radians)             # cos(pi/2 - surface_tilt.radians)
@@ -385,7 +264,6 @@ def calculate_solar_incidence_series_hofierka(
     )
     sine_solar_incidence_series = (
         c_inclined_31_series * numpy.cos(-solar_hour_angle_series.radians - relative_longitude.radians)
-        # c_inclined_31_series * numpy.cos(solar_hour_angle_series.radians - relative_longitude.radians)
         + c_inclined_33_series
     )
     solar_incidence_series = numpy.arcsin(sine_solar_incidence_series)

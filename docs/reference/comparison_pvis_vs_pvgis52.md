@@ -1,4 +1,5 @@
 ---
+icon: material/compare-horizontal
 tags:
   - Reference
   - Comparison
@@ -8,7 +9,13 @@ tags:
   - Archived notes
 ---
 
-## PV(G)IS (v6) vs. PVGIS v5.2
+
+## Comprehensive Software Comparison
+
+This comparison aims to provide a detailed examination of the differences and enhancements from PVGIS 5 to PV(G)IS 6 across various aspects of functionality and technology.
+
+
+## PVGIS v6 vs. PVGIS v5.x
 
 ??? info "Capabilities & Functionality comparison"
 
@@ -30,7 +37,7 @@ tags:
     | Area-specific calculations                      | No                                                                      | Planned; Support custom raster and vector boundary maps          |
     | Select energy model                             |                                                                         |                                                                  |
     | Read / use elevation data                       |                                                                         | Any Xarray-supported data format                                 |
-    | Read / use horizon data                         |                                                                         | ❓                                                               |
+    | Read / use horizon data                         |                                                                         | Under development                                                |
     | Time series support                             | Set number of hours for iterations                                      | Timestamps via Pandas' DatetimeIndex                             |
     | Read external time series                       | SIS,SID time series; Restricted to custom time series format            | Any Xarray-supported data format (including NetCDF, Zarr, etc.)  |
     | Compute global irradiance                       |                                                                         | Any Xarray-supported data format (including NetCDF, Zarr, etc.)  |
@@ -38,13 +45,41 @@ tags:
     | Read temperature time series                    |                                                                         |                                                                  |
     | Read wind speed time series                     |                                                                         |                                                                  |
     | Calculate solar geometry variables              | Yes; Internal                                                           |                                                                  |
-    | Optimise slope if requested                     | Yes                                                                     | Planned                                                          |
-    | Optimise slope and aspect if requested          | Yes                                                                     | Planned                                                          |
+    | Optimise slope if requested                     | Yes                                                                     | Under development                                                |
+    | Optimise slope and aspect if requested          | Yes                                                                     | Under development                                                |
     | Set slope and aspect depending on tracking type | Yes                                                                     | Planned                                                          |
     | Bi-facial solar module support                  | No                                                                      | Planned                                                          |
     | Calculate total radiation                       | Yes; Internal; Needs irradiance time series in custom format            | `irradiance` command                                             |
-    | Calculate system performance                    | Yes; Modified Kind Model                                                | `power` command                                                  |
+    | Calculate system performance                    | Yes; Huld 2011 (Modified King model)                                    | `power` command; Huld 2011 (Modified King model)                 |
     | Spectral Mismatch effect                        | Yes; Internal; Bases on 2013 spectrally resolved irradiance time series | Planned; Testing                                                 |
+ 
+
+
+ ## Software Comparison
+
+| Feature Category       | Old Software          | New Software          |
+|------------------------|-----------------------|-----------------------|
+| **Models**             |                       |                       |
+| Solar Position         | Description Old       | Description New       |
+| Solar Irradiance       | Description Old       | Description New       |
+| Photovoltaic Performance | Description Old       | Description New       |
+| **Implementation**     |                       |                       |
+| Architecture           | Description Old       | Description New       |
+| Core Software          | Description Old       | Description New       |
+| CLI                    | Description Old       | Description New       |
+| API                    | Description Old       | Description New       |
+| Web API                | Description Old       | Description New       |
+| **Backend**            |                       |                       |
+| Implementation Language | Description Old       | Description New       |
+| Coding Style           | Description Old       | Description New       |
+| Testing                | Description Old       | Description New       |
+| **Data I/O**           |                       |                       |
+| File Formats Supported | Description Old       | Description New       |
+| **Performance**        | Description Old       | Description New       |
+| **Usability**          | Description Old       | Description New       |
+| **Security Features**  | Description Old       | Description New       |
+| **Integration**        | Description Old       | Description New       |
+| **Support and Documentation** | Description Old | Description New       |
 
 
 ## Correspondence to C/C++ PVGIS v.5.2

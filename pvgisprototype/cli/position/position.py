@@ -54,6 +54,7 @@ def main(
 
     app.debug_mode = debug
 
+
 app.command(
     name='introduction',
     help=f'{SYMBOL_INTRODUCTION} A short primer on solar position',

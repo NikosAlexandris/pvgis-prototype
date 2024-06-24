@@ -1,5 +1,5 @@
 ---
-icon: fontawesome/solid/diagram-project
+icon: material/language-python
 title: Architecture
 tags:
   - pvgisprototype

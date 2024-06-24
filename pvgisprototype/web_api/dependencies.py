@@ -64,7 +64,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timestamps,
     fastapi_query_timezone,
 )
-from pvgisprototype.web_api.schemas import AngleOutputUnit, Frequency, GroupBy, Timezone
+from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone
+from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quick_response_code
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quiet
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_verbose
@@ -114,46 +115,42 @@ async def process_timezone(
     return ZoneInfo(timezone.value)
 
 
-async def process_groupby(
-    group_by: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.N,
-) -> str | None:
+from typing import Annotated, Optional, Dict, TypeVar
+T = TypeVar("T", GroupBy, Frequency)
 
-    time_groupings = {
-        "Yearly": "Y",
-        "Seasonal": "S",
-        "Monthly": "M",
-        "Weekly": "W",
-        "Daily": "D",
-        "Hourly": "h",
-        "Do not group by": None,
-    }
-    return time_groupings[group_by.value]
+time_groupings: Dict[str, Optional[str]] = {
+    "Yearly": "Y",
+    "Seasonal": "S",
+    "Monthly": "M",
+    "Weekly": "W",
+    "Daily": "D",
+    "Hourly": "h",
+    "Do not group by": None,
+}
 
 
-async def process_frequency(
-    frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.Hour,
-) -> str:
+async def process_time_grouping(value: T) -> Optional[str]:
+    return time_groupings[value.value]
 
-    time_groupings = {
-        "Yearly": "Y",
-        "Seasonal": "S",
-        "Monthly": "M",
-        "Weekly": "W",
-        "Daily": "D",
-        "Hourly": "h",
-    }
-    return time_groupings[frequency.value]
+
+async def process_groupby(groupby: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.N) -> Optional[str]:
+    return await process_time_grouping(groupby)
+
+
+async def process_frequency(frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.Hour) -> str:
+    return await process_time_grouping(frequency)
 
 
 async def process_series_timestamp(
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = None,
+    start_time: Annotated[str | None, fastapi_query_start_time] = '2013-01-01',
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hour,
-    end_time: Annotated[str | None, fastapi_query_end_time] = None,
+    end_time: Annotated[str | None, fastapi_query_end_time] = '2013-01-02',
     timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> DatetimeIndex:
-
+    """
+    """
     if start_time is None and end_time is None and timestamps is None:
         raise HTTPException(
             status_code=400, detail="Provide a valid start and end time or a timestamp"
@@ -167,7 +164,7 @@ async def process_series_timestamp(
     if timestamps is not None and (not start_time or not end_time):
         try:
             timestamps_str = timestamps
-            timestamps = parse_timestamp_series(timestamps=timestamps)
+            timestamps = parse_timestamp_series(timestamps=timestamps)  # type: ignore
             if timestamps.isna().any():  # type: ignore
                 raise HTTPException(
                     status_code=400,
@@ -176,6 +173,11 @@ async def process_series_timestamp(
 
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
+
+    if end_time is not None and start_time is None:
+        raise HTTPException(
+            status_code=400, detail="Did you forget to eneter a start time ?"
+        )
 
     if start_time is not None and end_time is not None:
         try:
@@ -195,6 +197,8 @@ async def process_series_timestamp(
 async def create_temperature_series(
     temperature_series: Optional[float] = None,
 ) -> TemperatureSeries:
+    """
+    """
     if isinstance(temperature_series, float):
         return TemperatureSeries(
             value=np.array(temperature_series, dtype=np.float32),
@@ -210,7 +214,8 @@ async def create_temperature_series(
 async def create_wind_speed_series(
     wind_speed_series: Optional[float] = None,
 ) -> WindSpeedSeries:
-
+    """
+    """
     if isinstance(wind_speed_series, float):
         return WindSpeedSeries(
             value=np.array(wind_speed_series), unit=SYMBOL_UNIT_WIND_SPEED
@@ -224,7 +229,8 @@ async def create_wind_speed_series(
 async def create_spectral_factor_series(
     spectral_factor_series: float | None = None,
 ) -> SpectralFactorSeries:
-
+    """
+    """
     if isinstance(spectral_factor_series, float):
         return SpectralFactorSeries(
             value=np.array(spectral_factor_series, dtype=np.float32)
@@ -235,12 +241,14 @@ async def create_spectral_factor_series(
     )
 
 
-async def process_linke_turbidity_factor(
-    linke_turbidity_factor: Annotated[
+async def process_linke_turbidity_factor_series(
+    linke_turbidity_factor_series: Annotated[
         float, fastapi_query_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
 ) -> LinkeTurbidityFactor:
-    return LinkeTurbidityFactor(value=linke_turbidity_factor)
+    """
+    """
+    return LinkeTurbidityFactor(value=linke_turbidity_factor_series)
 
 
 async def process_angle_output_units(
@@ -248,6 +256,8 @@ async def process_angle_output_units(
         AngleOutputUnit, fastapi_query_angle_output_units
     ] = AngleOutputUnit.RADIANS
 ) -> str:
+    """
+    """
     if angle_output_units.value == AngleOutputUnit.RADIANS.value:
         return RADIANS
     else:
@@ -259,6 +269,8 @@ async def process_refracted_solar_zenith(
         float, fastapi_query_refracted_solar_zenith
     ] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT)
 ) -> float:
+    """
+    """
     return math.radians(refracted_solar_zenith)
 
 
@@ -270,6 +282,8 @@ async def process_surface_tilt_list(
         list[float], fastapi_query_surface_orientation_list
     ] = [float(SURFACE_ORIENTATION_DEFAULT)],
 ) -> list[float]:
+    """
+    """
     for surface_tilt_value in surface_tilt:
         if not SURFACE_TILT_MINIMUM <= surface_tilt_value <= SURFACE_TILT_MAXIMUM:
             from fastapi import HTTPException
@@ -298,6 +312,8 @@ async def process_surface_orientation_list(
         list[float], fastapi_query_surface_orientation_list
     ] = [float(SURFACE_ORIENTATION_DEFAULT)],
 ) -> list[float]:
+    """
+    """
     for surface_orientation_value in surface_orientation:
         if (
             not SURFACE_ORIENTATION_MINIMUM
@@ -330,6 +346,8 @@ async def process_series_solar_position_model(
         SolarPositionModel, fastapi_query_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
 ) -> SolarPositionModel:
+    """
+    """
     NOT_IMPLEMENTED_MODELS = [
         SolarPositionModel.hofierka,
         SolarPositionModel.pvlib,
@@ -355,6 +373,8 @@ async def process_series_solar_incidence_model(
         SolarIncidenceModel, fastapi_query_solar_incidence_model
     ] = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
 ) -> SolarIncidenceModel:
+    """
+    """
     NOT_IMPLEMENTED_MODELS = [
         SolarIncidenceModel.pvis,
         SolarIncidenceModel.all,
@@ -372,44 +392,44 @@ async def process_series_solar_incidence_model(
 
 
 async def process_verbose(
-        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
         verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-        analysis: Annotated[bool, fastapi_query_analysis] = ANALYSIS_FLAG_DEFAULT,
+        analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
 ) -> int:
-    
-    if quick_response_code:
-        verbose = 9
-    
-    if analysis:
+    """
+    """
+    if analysis.value != AnalysisLevel.NoneValue:
         verbose = 9
 
+    if quick_response_code.value != QuickResponseCode.NoneValue:
+        verbose = 9
+    
     return verbose 
 
 
 async def process_quiet(
-        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
         quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
 ) -> bool:
-    
-    if quick_response_code:
+    """
+    """
+    if quick_response_code.value != QuickResponseCode.NoneValue:
         quiet = True
     
     return quiet
 
 
 async def process_fingerprint(
-        quick_response_code: Annotated[bool, fastapi_query_quick_response_code] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
         fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-        csv: Annotated[bool,fastapi_query_csv] = False,
+        csv: Annotated[str | None,fastapi_query_csv] = None,
 ) -> bool:
     
-    if quick_response_code:
-        fingerprint = True
-    
-    if csv:
+    if quick_response_code.value != QuickResponseCode.NoneValue or csv:
         fingerprint = True
 
     return fingerprint
+
 
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
@@ -422,7 +442,7 @@ fastapi_dependable_wind_speed_series = Depends(create_wind_speed_series)
 fastapi_dependable_spectral_factor_series = Depends(create_spectral_factor_series)
 fastapi_dependable_groupby = Depends(process_groupby)
 fastapi_dependable_frequency = Depends(process_frequency)
-fastapi_dependable_linke_turbidity_factor = Depends(process_linke_turbidity_factor)
+fastapi_dependable_linke_turbidity_factor_series = Depends(process_linke_turbidity_factor_series)
 fastapi_dependable_angle_output_units = Depends(process_angle_output_units)
 fastapi_dependable_refracted_solar_zenith = Depends(process_refracted_solar_zenith)
 fastapi_dependable_surface_orientation_list = Depends(process_surface_orientation_list)

@@ -29,7 +29,6 @@ from pvgisprototype.constants import SOLAR_CONSTANT, ZERO_NEGATIVE_INCIDENCE_ANG
 from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.constants import UNITLESS
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
@@ -39,27 +38,19 @@ from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.constants import ALBEDO_DEFAULT
-from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
-from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
-from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
-from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import SYSTEM_EFFICIENCY_DEFAULT
-from pvgisprototype.constants import EFFICIENCY_DEFAULT
+from pvgisprototype.constants import EFFICIENCY_FACTOR_DEFAULT
 from pvgisprototype.constants import POWER_UNIT
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import TITLE_KEY_NAME
@@ -69,10 +60,8 @@ from pvgisprototype.constants import PHOTOVOLTAIC_MODULE_DEFAULT
 from pvgisprototype.constants import EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import EFFICIENCY_COLUMN_NAME
 from pvgisprototype.constants import POWER_MODEL_COLUMN_NAME
 from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
@@ -169,7 +158,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = None,
     temperature_model: ModuleTemperatureAlgorithm = None,
-    efficiency: Optional[float] = EFFICIENCY_DEFAULT,
+    efficiency: Optional[float] = EFFICIENCY_FACTOR_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
