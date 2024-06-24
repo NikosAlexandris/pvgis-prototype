@@ -67,10 +67,17 @@ def calculate_sum_and_percentage(
     dtype=DATA_TYPE_DEFAULT,
     array_backend=ARRAY_BACKEND_DEFAULT,
 ):
-    """Calculate sum of a series and its percentage relative to a reference series."""
-    total = numpy.nansum(series)
+    """Calculate sum of a series and its percentage relative to a reference series.
+
+    Notes
+    -----
+    
+    Uses .item() to convert NumPy numerics to standard Python types.
+    """
+    total = numpy.nansum(series).item()
     if isinstance(total, numpy.ndarray):
-        total = total.astype(dtype)
+        total = total.astype(dtype).item()
+
     percentage = (total / reference_series * 100) if reference_series != 0 else 0
     if isinstance(percentage, numpy.ndarray):
         percentage.astype(dtype)
@@ -94,16 +101,16 @@ def calculate_statistics(
     """
     pandas_series = pandas.Series(series, timestamps)
     resampled = pandas_series.resample(frequency)
-    total = resampled.sum().sum()
-    if isinstance(total, numpy.ndarray):
-        total = total.astype(dtype)
+    total = resampled.sum().sum().item()  # convert to Python float
+    # if isinstance(total, numpy.ndarray):
+    #     total = total.astype(dtype)
     percentage = (total / reference_series * 100) if reference_series != 0 else 0
-    if isinstance(percentage, numpy.ndarray):
-        percentage.astype(dtype)
+    # if isinstance(percentage, numpy.ndarray):
+    #     percentage.astype(dtype)
     if rounding_places is not None:
         total = round_float_values(total, rounding_places)
         percentage = round_float_values(percentage, rounding_places)
-    mean = resampled.mean().mean()
+    mean = resampled.mean().mean().item()  # convert to Python float
     std_dev = resampled.std().mean()  # Mean of standard deviations over the period
     return total, mean, std_dev, percentage
 
@@ -116,7 +123,7 @@ def calculate_mean_of_series_per_time_unit(
     """
     """
     pandas_series = pandas.Series(series, index=timestamps)
-    return pandas_series.resample(frequency).sum().mean()
+    return pandas_series.resample(frequency).sum().mean().item()  # convert to float
 
 
 

@@ -14,15 +14,13 @@ from rich.text import Text
 from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
 from typing import List, Sequence
 import numpy as np
-from pvgisprototype.api.power.performance import analyse_photovoltaic_performance, report_photovoltaic_performance
 from pvgisprototype.constants import (
     ELEVATION_NAME,
-    ENERGY_NAME_WITH_SYMBOL,
     LATITUDE_NAME,
     LONGITUDE_NAME,
     PEAK_POWER_COLUMN_NAME,
     REFLECTIVITY,
-    SPECTRAL_EFFECT,
+    SPECTRAL_EFFECT_NAME,
     SYMBOL_LOSS,
     SYMBOL_SUMMATION,
     SYSTEM_LOSS,
@@ -48,6 +46,7 @@ from pvgisprototype.constants import (
     SOLAR_CONSTANT_COLUMN_NAME,
     PERIGEE_OFFSET_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
+    ENERGY_NAME_WITH_SYMBOL,
     NET_EFFECT,
     ZENITH_NAME,
     ALTITUDE_NAME,
@@ -67,6 +66,7 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     FINGERPRINT_COLUMN_NAME,
 )
+from pvgisprototype.api.power.performance import report_photovoltaic_performance
 
 
 def convert_series_to_sparkline(
@@ -783,7 +783,7 @@ def add_table_row(
     """
     effects = {
         REFLECTIVITY,
-        SPECTRAL_EFFECT,
+        SPECTRAL_EFFECT_NAME,
         TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
         SYSTEM_LOSS,
         NET_EFFECT,
@@ -865,6 +865,8 @@ def determine_frequency(timestamps):
         'D': 'Daily',
         '3h': '3-Hourly',
         'h': 'Hourly',
+        'min': 'Minutely',
+        '8min': '8-Minutely',
     }
     if timestamps.year.unique().size > 1:
         frequency = 'YE'
@@ -874,10 +876,15 @@ def determine_frequency(timestamps):
         frequency = 'W'
     elif timestamps.day.unique().size > 1:
         frequency = 'D'
-    elif timestamps.hour.unique().size < 24:
-        frequency = 'h'
+    elif timestamps.hour.unique().size > 1:
+        if timestamps.hour.unique().size < 17:  # Explain Me !
+            frequency = 'h'
+        else:
+            frequency = '3h'
+    elif timestamps.minute.unique().size < 17:  # Explain Me !
+        frequency = 'min'
     else:
-        frequency = '3h'
+        frequency = '8min'  # by 8 characters for a sparkline if timestamps > 64 min
     frequency_label = time_groupings[frequency]
 
     return frequency, frequency_label
@@ -1104,14 +1111,14 @@ def print_change_percentages_panel(
     longitude = None,
     latitude = None,
     elevation = None,
+    surface_orientation: bool =True,
+    surface_tilt:bool = True,
     timestamps: DatetimeIndex | datetime = [datetime.now()],
     dictionary: dict = dict(),
-    title: str ='Changes',
+    title: str ='Analysis of Performance',
     rounding_places: int = 1,#ROUNDING_PLACES_DEFAULT,
     verbose = 1,
     index: bool = False,
-    surface_orientation: bool =True,
-    surface_tilt:bool = True,
     fingerprint: bool = False,
     quantity_style="magenta",
     value_style = "cyan",
@@ -1144,7 +1151,7 @@ def print_change_percentages_panel(
         # IN_PLANE_IRRADIANCE,
         REFLECTIVITY,
         # IRRADIANCE_AFTER_REFLECTIVITY,
-        SPECTRAL_EFFECT,
+        SPECTRAL_EFFECT_NAME,
         # EFFECTIVE_IRRADIANCE_NAME,
         TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
         # PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
@@ -1167,6 +1174,7 @@ def print_change_percentages_panel(
             dictionary=dictionary,
             timestamps=timestamps,
             frequency=frequency,
+            verbose=verbose,
             )
 
     # Add rows based on the dictionary keys and corresponding values
@@ -1276,7 +1284,7 @@ def print_change_percentages_panel(
     photovoltaic_module_table = build_photovoltaic_module_table()
     photovoltaic_module_table.add_row(
             photovoltaic_module,
-            str(peak_power),
+            f"[green]{peak_power}[/green]",
             mount_type,
             )
 
@@ -1292,7 +1300,7 @@ def print_change_percentages_panel(
 
     performance_panel = Panel(
                 performance_table,
-                title='Analysis of Performance',
+                title=title,
                 expand=False,
                 # style="on black",
                 )

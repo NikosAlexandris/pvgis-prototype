@@ -82,6 +82,7 @@ def write_irradiance_csv(
         header.append('Longitude')
     if latitude:
         header.append('Latitude')
+
     header.append('Time')
     header.extend(dictionary.keys())
 

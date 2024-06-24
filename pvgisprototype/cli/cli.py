@@ -14,6 +14,7 @@ from typing import Optional
 from rich import print
 from rich.panel import Panel
 
+from pvgisprototype.cli.citation import print_citation_text
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.version import typer_option_version
@@ -133,6 +134,12 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_reference,
 )
+app.command(
+    name='cite',
+    help='Generate citation text for PVGIS',
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_reference,
+)(print_citation_text)
 
 
 @app.callback(no_args_is_help=True)
