@@ -201,7 +201,9 @@ pvgis-prototype irradiance global inclined 8 45 214 170 44 -v
 Example that works with all positional parameters _including_ a timestamp:
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00'
+pvgis-prototype irradiance global inclined \
+    8 45 214 170 44 \
+    '2010-01-27 12:00:00'
 ```
 
 ### Arbitrary number of single timestamps
@@ -209,7 +211,9 @@ pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00'
 Example that works with all positional parameters including multiple timestamps:
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00'
+pvgis-prototype irradiance global inclined \
+    8 45 214 170 44 \
+    '2010-01-27 12:00:00, 2010-01-27 13:30:00, 2010-01-27 17:45:00'
 ```
 
 The same as above, with additional verbosity : 
