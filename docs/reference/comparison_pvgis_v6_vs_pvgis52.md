@@ -96,6 +96,7 @@ from diagrams.programming.language import C
 from diagrams.programming.language import Cpp
 from diagrams.programming.language import Python
 
+pvgis6_icon = "docs/logos/pvgis6_70px.png"
 irradiance_icon = "docs/icons/wiggly_vertical_line.svg"
 spectral_effect_icon = "docs/icons/noun-sun-525998.svg"
 temperature_icon = "docs/icons/thermometer.svg"
@@ -141,7 +142,7 @@ try:
             NetCDF = Custom("NetCDF", netcdf_icon)
             #with Cluster('*On Disk'):
                 #Zarr = Custom("Zarr store", zarr_icon)
-                Zarr = Custom("Ordinary store", zarr_icon)
+            Zarr = Custom("Ordinary store", zarr_icon)
 
             with Cluster("Time Series"):
 

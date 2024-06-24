@@ -60,7 +60,7 @@ mv example_series_plot_20050101000000_20200131000000.png docs/cli/
 ```
 
 <figure markdown="span">
-  ![Example series plot](example_series_plot_20050101000000_20200131000000.png){height=400px}
+  ![Example series plot](./example_series_plot_20050101000000_20200131000000.png){height=400px}
   <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption>
 </figure>
 
