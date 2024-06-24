@@ -17,5 +17,5 @@ pvgis-prototype power broadband \
     8 45 214 167 \
     --start-time '2000-01-01' \
     --end-time '2020-12-31' \
-    --qr
+    --qr Image
 ```
