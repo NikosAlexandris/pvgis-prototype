@@ -1,15 +1,7 @@
-#from devtools import debug
-#from typing import Optional
-#from typing import List
-from os import stat
-from matplotlib import interactive
-from pydantic import BaseModel
 from pathlib import Path
 
 from fastapi import FastAPI, status
 from fastapi.staticfiles import StaticFiles
-#from fastapi import Query
-#from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.responses import ORJSONResponse
 from fastapi.templating import Jinja2Templates
@@ -21,19 +13,17 @@ from pvgisprototype.web_api.input_parameters import FASTAPI_INPUT_PARAMETERS
 
 from pvgisprototype.api.citation import generate_citation_text
 from pvgisprototype.web_api.performance.broadband import get_photovoltaic_performance_analysis
-from pvgisprototype.web_api.series.select import select
+# from pvgisprototype.web_api.series.select import select
 # from pvgisprototype.web_api.position.overview import get_calculate_solar_position_overview
 # from pvgisprototype.web_api.position.solar_time import get_calculate_solar_time
-# from pvgisprototype.web_api.position.overview_series import overview_series
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_monthly_average
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_advanced
 # from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
 # from pvgisprototype.web_api.plot.plot_example import plot_example
 # from pvgisprototype.web_api.plot.plot_example import graph_example
-#from pvgisprototype.constants import RADIANS
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series_multi
-from pvgisprototype.web_api.html_variables import html_root_page, template_html
+from pvgisprototype.web_api.html_variables import template_html
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -176,23 +166,18 @@ templates = Jinja2Templates(directory="templates")
 template = Template(template_html)
 
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    return html_root_page
-
-
 @app.get("/welcome", tags=['Welcome'])
 async def print_welcome_message():
     welcome_message = "Welcome to PVGIS 6"
     return welcome_message
 
 
-@app.get("/citation", tags=["Citation"])
+@app.get("/citation", tags=["Reference"])
 async def print_citation_text():
     return generate_citation_text()
 
 
-@app.get("/download-citation", tags=["Citation"])
+@app.get("/download-citation", tags=["Reference"])
 async def download_citation():
     citation = generate_citation_text()
     from fastapi.responses import FileResponse
@@ -207,19 +192,29 @@ async def download_citation():
         tmp_path, media_type="application/json", filename="citation.json"
     )
 
+@app.get("/license", tags=["Reference"])
+async def print_citation_text():
+    return generate_citation_text()
+
 
 app.get(
-        "/calculate/performance/broadband", 
-        tags=['Performance'], response_class=ORJSONResponse,
-        summary="Analysis of Photovoltaic Performance",
-        # description="Analyse the photovoltaic performance for a surface of a given technology at a specific location and period",
-        response_description="Analysis of Photovoltaic Performance (JSON)",
-        status_code=status.HTTP_201_CREATED,
+    "/calculate/performance/broadband",
+    tags=["Performance"],
+    response_class=ORJSONResponse,
+    summary="Analysis of Photovoltaic Performance",
+    response_description="Analysis of Photovoltaic Performance (JSON)",
+    status_code=status.HTTP_201_CREATED,
 )(get_photovoltaic_performance_analysis)
-app.get("/calculate/power/broadband", tags=['Power'])(get_photovoltaic_power_series)
-app.get("/calculate/power/broadband_monthly_average", tags=['Power'])(get_photovoltaic_power_series_monthly_average)
-app.get("/calculate/power/broadband-advanced", tags=['Power'])(get_photovoltaic_power_series_advanced)
-app.get("/calculate/power/broadband-multi", tags=['Power', 'Multiple surfaces'])(get_photovoltaic_power_output_series_multi)
+app.get("/calculate/power/broadband", tags=["Power"])(get_photovoltaic_power_series)
+app.get("/calculate/power/broadband_monthly_average", tags=["Power"])(
+    get_photovoltaic_power_series_monthly_average
+)
+app.get("/calculate/power/broadband-advanced", tags=["Power"])(
+    get_photovoltaic_power_series_advanced
+)
+app.get("/calculate/power/broadband-multi", tags=["Power", "Multiple surfaces"])(
+    get_photovoltaic_power_output_series_multi
+)
 
 
 if __name__ == "__main__":
