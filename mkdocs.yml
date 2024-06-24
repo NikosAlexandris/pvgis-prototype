@@ -123,8 +123,7 @@ extra:
 
 theme:
   logo: images/pvgis_image_squared.png
-  # font:
-    # code: Source Code Pro
+  font: false
   icon:
     tag:
       concepts: simple/blueprint
