@@ -23,7 +23,7 @@ from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
 # from pvgisprototype.web_api.plot.plot_example import plot_example
 # from pvgisprototype.web_api.plot.plot_example import graph_example
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series_multi
-from pvgisprototype.web_api.html_variables import html_root_page, template_html
+from pvgisprototype.web_api.html_variables import template_html
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -104,8 +104,7 @@ app = FastAPI(
         "url": "https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12"
     },
     swagger_ui_parameters={
-        # "syntaxHighlight.theme": "obsidian",
-        "syntaxHighlight": False,
+        "syntaxHighlight.theme": "obsidian",
         # "defaultModelsExpandDepth": -1,  # Hide models section
         # "docExpansion": "none",  # expand only tags
         # "filter": True,  # filter tags
@@ -113,10 +112,6 @@ app = FastAPI(
         "showExtensions": True,  # Show vendor extensions
     },
 )
-
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)
-async def read_root():
-    return html_root_page
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
