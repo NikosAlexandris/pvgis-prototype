@@ -126,10 +126,10 @@ try:
 
             with Cluster("PVGIS <= 5.x"):
                 PVGIS_5 = C("")
-                PVGIS_5 = Cpp("")
+                PVGIS_5Cpp = Cpp("")
 
             with Cluster("PVGIS 6"):
-                PVGIS_6 = Python("PVGIS 6")
+                PVGIS_6 = Custom("PVGIS 6", pvgis6_icon)
                 NumPy = Custom("NumPy", numpy_icon)
                 Xarray = Custom("Input/Output", xarray_icon)
 
@@ -139,7 +139,9 @@ try:
             Data = Custom("Data / Observations", files_icon)
             Files = Custom("Data", files_icon)
             NetCDF = Custom("NetCDF", netcdf_icon)
-            Zarr = Custom("Ordinary store", zarr_icon)
+            #with Cluster('*On Disk'):
+                #Zarr = Custom("Zarr store", zarr_icon)
+                Zarr = Custom("Ordinary store", zarr_icon)
 
             with Cluster("Time Series"):
 
@@ -184,9 +186,10 @@ try:
                     PVGIS_Time_Series = Custom("Only\nPVGIS-Native\nTime Series Format", binary_data_icon)
 
             with Cluster("Photovoltaic Performance Analysis PVGIS <=5.x"):
-                Photovoltaic_Power_PVGIS_5 = Custom("Photovoltaic Power PVGIS 5", photovoltaic_power_icon)
+                #Photovoltaic_Power_PVGIS_5 = Custom("Photovoltaic Power PVGIS 5", photovoltaic_power_icon)
+                Photovoltaic_Power_PVGIS_5 = Custom("Photovoltaic Energy\nPVGIS 5", photovoltaic_power_icon)
 
-            # Workflow
+            # Workflow =======================================================
 
             # Format of Time Series Data
 
@@ -227,6 +230,25 @@ try:
             - Edge(label="Read with custom C code", color="blue", style="dashed") \
             >> PVGIS_5 \
             >> Photovoltaic_Power_PVGIS_5
+
+            # Alternative 
+
+            #Satellite_to_Data \
+            #>> NetCDF
+
+            #NetCDF \
+            #- Edge(label="Observations or modelled data", color="blue", style="dashed") \
+            #- Edge(label="Daily Data\nProducer's chunking", color="blue", style="dashed") \
+            #- Edge(
+            #        label="Rechunking to yearly time series\nMassive Transfer to Zarr Store\nData Duplication",
+            #        color="blue", style="dashed"
+            #      ) \
+            #- Zarr \
+            #- Edge(label="from (Massive!) Zarr store", color="blue", style="dashed") \
+            #- PVGIS_Time_Series \
+            #- Edge(label="PVGIS-Native time series format", color="blue", style="dashed") \
+            #>> PVGIS_5 \
+            #>> Photovoltaic_Power_PVGIS_5
 
 
             # Encode diagram as a PNG and print it in HTML Image format

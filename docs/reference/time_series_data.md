@@ -37,15 +37,19 @@ from contextlib import suppress
 from diagrams import Diagram, Cluster, Edge
 from diagrams.custom import Custom
 
-transmission_control_protocol_icon = "docs/icons/noun-transmission-control-protocol-6111114.svg"
-data_analysis_icon = "docs/icons/noun-data-analysis.svg"
-irradiance_icon = "docs/icons/wiggly_vertical_line.svg"
-global_irradiance_icon = "docs/icons/noun-sun-525998.svg"
-direc_irradiance_icon = "docs/icons/noun-sun-525998.svg"
-spectral_effect_icon = "docs/icons/noun-sun-525998.svg"
-temperature_icon = "docs/icons/thermometer.svg"
-photovoltaic_power_icon = "docs/icons/noun-solar-energy-853048.svg"
-wind_speed_icon = "docs/icons/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
+
+icons_path = "docs/icons"
+
+pvgis6_icon = "docs/logos/pvgis6_70px.png"
+transmission_control_protocol_icon = f"{icons_path}/noun-transmission-control-protocol-6111114.svg"
+data_analysis_icon = f"{icons_path}/noun-data-analysis.svg"
+irradiance_icon = f"{icons_path}/wiggly_vertical_line.svg"
+global_horizontal_irradiance_icon = f"{icons_path}/noun_global_horizontal_irradiance.svg"
+direct_horizontal_irradiance_icon = f"{icons_path}/noun_direct_horizontal_irradiance.svg"
+spectral_effect_icon = f"{icons_path}/noun-sun-525998_modified.svg"
+temperature_icon = f"{icons_path}/thermometer.svg"
+photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
+wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
 cupy_icon = "docs/logos/CuPy_300x300.png"
 xarray_icon = "docs/logos/Xarray_RGB.svg"
 netcdf_icon = "docs/logos/netcdf-400x400.png"
@@ -56,7 +60,7 @@ pydantic_icon = "docs/logos/pydantic.png"
 zarr_icon = "docs/logos/zarr.png"  # zarr_logo_x.png
 kerchunk_icon = "docs/logos/kerchunk.png"
 binary_data_icon = "docs/logos/pastebin.svg"
-files_icon = "docs/icons/files.svg"
+files_icon = f"{icons_path}/files.svg"
 pandas_icon = "docs/logos/pandas.svg"
 python = "docs/logos/python.svg"
 c_icon = "docs/logos/c.svg"
@@ -67,7 +71,6 @@ try:
     with suppress(FileNotFoundError):
         with Diagram("Analysis of Photovoltaic Performance", direction="TB", show=False) as diagram:
             diagram.render = lambda: None
-
 
 
             # "Raw" Data Acquisition & Production
@@ -83,11 +86,12 @@ try:
             Files = Custom("Data", files_icon)
             NetCDF = Custom("", netcdf_icon)
 
+
             with Cluster("Time Series"):
 
                 with Cluster("SARAH 2/3 climate records"):
-                    Global_Irradiance = Custom("Global Horizontal Irradiance\n(GHI)", irradiance_icon)
-                    Direct_Irradiance = Custom("Direct Horizontal Irradiance\n(DHI)", irradiance_icon)
+                    Global_Horizontal_Irradiance = Custom("Global Horizontal Irradiance\n(GHI)", global_horizontal_irradiance_icon)
+                    Direct_Horizontal_Irradiance = Custom("Direct Horizontal Irradiance\n(DHI)", direct_horizontal_irradiance_icon)
             
                 with Cluster("ERA5 Reanalysis Data"):
                     Temperature = Custom("Temperature", temperature_icon)
@@ -98,7 +102,8 @@ try:
 
             # Tools
 
-            # 
+            # Kerchunk
+
             Kerchunk = Custom("Kerchunk", kerchunk_icon)
             #In_Memory = Custom("First Call Read In Memory", '')
 
@@ -108,37 +113,29 @@ try:
             with Cluster('*First Call Read In-Memory'):
                 Index = Custom("Index", binary_data_icon)
 
-            with Cluster('*On Disk'):
-                Zarr = Custom("Zarr store", zarr_icon)
-
 
             # Input Data to PVGIS
             
             with Cluster("Time Series for Photovoltaic Analysis"):
 
                 Virtual_Zarr = Custom("Virtual Zarr store", zarr_icon)
-                PVGIS_Time_Series = Custom("PVGIS-Native\nTime Series Format", binary_data_icon)
 
 
             # Analysis of Photovoltaic Performance
 
             with Cluster("Photovoltaic Performance Analysis"):
-
-                # PVGIS software version 5/6
-                PVGIS_5 = Custom("PVGIS 5", '')
-                PVGIS_6 = Custom("PVGIS 6", '')
+                PVGIS_6 = Custom("PVGIS 6", pvgis6_icon)
 
 
-            with Cluster("Photovoltaic Power / Energy"):
-                Photovoltaic_Power = Custom("Photovoltaic Energy\nPVGIS 6", photovoltaic_power_icon)
-                Photovoltaic_Power_PVGIS_5 = Custom("Photovoltaic Energy\nPVGIS 5", photovoltaic_power_icon)
+            Photovoltaic_Power = Custom("Photovoltaic Energy\nPVGIS 6", photovoltaic_power_icon)
 
-            # Workflow
+
+            # Workflow =======================================================
 
             # Format of Time Series Data
 
-            Satellite_to_Data >> Global_Irradiance >> NetCDF
-            Satellite_to_Data >> Direct_Irradiance >> NetCDF
+            Satellite_to_Data >> Global_Horizontal_Irradiance >> NetCDF
+            Satellite_to_Data >> Direct_Horizontal_Irradiance >> NetCDF
 
             Satellite_to_Data \
             - Edge(label="+", style="dashed") \
@@ -167,26 +164,6 @@ try:
             >> Photovoltaic_Power
 
 
-            # PVGIS 5.x
-
-            Satellite_to_Data \
-            >> NetCDF
-
-            NetCDF \
-            - Edge(label="Observations or modelled data", color="blue", style="dashed") \
-            - Edge(label="Daily Data\nProducer's chunking", color="blue", style="dashed") \
-            - Edge(
-                    label="Rechunking to yearly time series\nMassive Transfer to Zarr Store\nData Duplication",
-                    color="blue", style="dashed"
-                  ) \
-            - Zarr \
-            - Edge(label="from (Massive!) Zarr store", color="blue", style="dashed") \
-            - PVGIS_Time_Series \
-            - Edge(label="PVGIS-Native time series format", color="blue", style="dashed") \
-            >> PVGIS_5 \
-            >> Photovoltaic_Power_PVGIS_5
-
-
             # Encode diagram as a PNG and print it in HTML Image format
 
             png = b64encode(diagram.dot.pipe(format="png")).decode()
@@ -201,7 +178,7 @@ except Exception as e:
     traceback.print_exc()  # This prints the full traceback
 ```
 
-## Icons
+### Icons
 
 - sun by Jolan Soens from <a href="https://thenounproject.com/browse/icons/term/sun/" target="_blank" title="sun Icons">Noun Project</a> (CC BY 3.0)
 
