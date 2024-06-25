@@ -299,8 +299,8 @@ class DataClassFactory:
         base_class = NumpyModel if use_numpy_model else BaseModel
         class_attributes = {
             "__getattr__": _custom_getattr,
-            "__getstate__": _custom_getstate,
-            "__setstate__": _custom_setstate,
+            #"__getstate__": _custom_getstate,
+            #"__setstate__": _custom_setstate,
             "__annotations__": annotations,
             "__module__": __package__,
             "__qualname__": model_name,

@@ -1,0 +1,80 @@
+import time
+from pvgisprototype import (
+    TemperatureSeries,
+    WindSpeedSeries,
+    SpectralFactorSeries,
+    LinkeTurbidityFactor,
+    Longitude,
+    Latitude,
+    Elevation,
+    SurfaceOrientation,
+    SurfaceTilt,
+)
+
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+import random
+import datetime
+from zoneinfo import ZoneInfo
+from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.helper_functions import OptimizerMethod, OptimizerMode
+
+
+def generate_random_date():
+    date = datetime.datetime(
+        random.randrange(2010, 2023),
+        random.randrange(1, 12),
+        random.randrange(1, 28),
+        00,
+        00,
+    )
+    return date
+
+
+# longitude_value = random.uniform(-180, 180)
+longitude = Longitude(value=8.628, unit="degrees")
+# latitude_value = random.uniform(-90, 90)
+latitude = Latitude(value=45.812, unit="degrees")
+elevation = random.randrange(0, 200)
+
+# surface_orientation_value = random.uniform(0, SurfaceOrientation().max_radians)
+import math
+# surface_orientation = (SurfaceOrientation(value=math.pi, unit="radians"),)
+surface_orientation = math.pi
+# surface_tilt = (
+#     SurfaceTilt(value=random.uniform(0, SurfaceTilt().max_radians), unit="radians"),
+# )
+surface_tilt = math.pi/4
+# start_time, end_time = generate_random_date(), generate_random_date()
+start_time='2005-01-01'
+end_time='2020-12-31'
+timezone=ZoneInfo('UTC')
+if start_time > end_time:
+    start_time, end_time = end_time, start_time
+# temperature_value = random.uniform(0, 35)
+temperature_value = 14
+# wind_value = random.uniform(0, 15)
+wind_value = 1
+
+
+result = optimize_angles(
+    longitude=longitude.radians,
+    latitude=latitude.radians,
+    elevation=elevation,  # Elevation(value=random.randrange(0,100), unit = 'meters'),
+    surface_orientation=surface_orientation,
+    surface_tilt=surface_tilt,
+    timestamps=generate_datetime_series(
+        start_time=str(start_time), end_time=str(end_time), frequency="h"
+    ),
+    timezone=timezone,
+    spectral_factor_series=SpectralFactorSeries(value=1),
+    photovoltaic_module=PhotovoltaicModuleModel.CIS_FREE_STANDING,
+    temperature_series=TemperatureSeries(value=temperature_value),
+    wind_speed_series=WindSpeedSeries(value=wind_value),
+    linke_turbidity_factor_series=LinkeTurbidityFactor(value=1),
+    method=OptimizerMethod.shgo,
+    mode=OptimizerMode.tilt,
+    workers=-1,
+    sampling_method_shgo="sobol",
+)
+print(result)
