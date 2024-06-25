@@ -45,7 +45,7 @@ class AnalysisLevel(str, Enum):
     Simple = 'Simple'
     Advanced = 'Advanced'
     Extended = 'Extended'
-    NoneValue = None
+    NoneValue = 'None'
 
 
 class Frequency(str, Enum):
