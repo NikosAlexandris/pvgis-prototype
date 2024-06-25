@@ -436,6 +436,112 @@ async def process_fingerprint(
 
     return fingerprint
 
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_optimise_surface_position
+from pvgisprototype.web_api.schemas import OptimiseMode
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_elevation
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
+from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.helper_functions import OptimizerMethod
+from pvgisprototype.api.surface.helper_functions import OptimizerMode
+
+
+async def process_optimise_surface_position(
+    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
+    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
+    elevation: Annotated[float, fastapi_query_elevation] = 214.0,
+    surface_orientation: Annotated[
+        float, Depends(process_surface_orientation)
+    ] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[float, Depends(process_surface_tilt)
+    ] = SURFACE_TILT_DEFAULT,
+    start_time: Annotated[str | None, fastapi_query_start_time] = None,
+    periods: Annotated[str | None, fastapi_query_periods] = None,
+    frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hour,
+    end_time: Annotated[str | None, fastapi_query_end_time] = None,
+    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
+    spectral_factor_series: Annotated[
+        SpectralFactorSeries, Depends(create_spectral_factor_series)
+    ] = None,
+    linke_turbidity_factor_series: Annotated[
+        float | LinkeTurbidityFactor, Depends(process_linke_turbidity_factor_series)
+    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    photovoltaic_module: Annotated[
+        PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
+    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    optimise_surface_position: Annotated[OptimiseMode, fastapi_query_optimise_surface_position] = OptimiseMode.NoneValue
+)->dict:
+    if optimise_surface_position == OptimiseMode.NoneValue:
+        return {}
+    else:
+        if optimise_surface_position == OptimiseMode.Orientation:
+            optimise_surface_position = optimize_angles(
+                longitude=longitude,
+                latitude=latitude,
+                elevation=elevation,
+                surface_orientation= surface_orientation,
+                surface_tilt=surface_tilt,
+                min_surface_orientation=SurfaceOrientation().min_radians,
+                max_surface_orientation=SurfaceOrientation().max_radians,
+                min_surface_tilt=SurfaceTilt().min_radians,
+                max_surface_tilt=SurfaceTilt().max_radians,
+                timestamps=timestamps,
+                timezone=timezone, # type: ignore
+                spectral_factor_series=spectral_factor_series,
+                temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
+                wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+                photovoltaic_module=photovoltaic_module, 
+                mode=OptimizerMode.orientation,
+                sampling_method_shgo = 'sobol'
+            )
+        elif optimise_surface_position == OptimiseMode.Tilt:
+            optimise_surface_position = optimize_angles(
+                    longitude=longitude,
+                    latitude=latitude,
+                    elevation=elevation,
+                    surface_orientation=surface_orientation,
+                    surface_tilt=surface_tilt,
+                    min_surface_orientation=SurfaceOrientation().min_radians,
+                    max_surface_orientation=SurfaceOrientation().max_radians,
+                    min_surface_tilt=SurfaceTilt().min_radians,
+                    max_surface_tilt=SurfaceTilt().max_radians,
+                    timestamps=timestamps,
+                    timezone=timezone, # type: ignore
+                    spectral_factor_series=spectral_factor_series,
+                    temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
+                    wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                    linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+                    photovoltaic_module=photovoltaic_module, 
+                    mode=OptimizerMode.tilt,
+                    sampling_method_shgo = 'sobol'
+            )
+        else:
+            optimise_surface_position = optimize_angles(
+                    longitude=longitude,
+                    latitude=latitude,
+                    elevation=elevation,
+                    surface_orientation=surface_orientation,
+                    surface_tilt=surface_tilt,
+                    min_surface_orientation=SurfaceOrientation().min_radians,
+                    max_surface_orientation=SurfaceOrientation().max_radians,
+                    min_surface_tilt=SurfaceTilt().min_radians,
+                    max_surface_tilt=SurfaceTilt().max_radians,
+                    timestamps=timestamps,
+                    timezone=timezone, # type: ignore
+                    spectral_factor_series=spectral_factor_series,
+                    temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
+                    wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                    linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+                    photovoltaic_module=photovoltaic_module, 
+                    mode=OptimizerMode.tilt_orientation,
+                    sampling_method_shgo = 'sobol'
+            )
+        
+        return optimise_surface_position # type: ignore
+
+
 
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
@@ -460,3 +566,4 @@ fastapi_dependable_solar_incidence_models = Depends(
 fastapi_dependable_verbose = Depends(process_verbose)
 fastapi_dependable_quite = Depends(process_quiet)
 fastapi_dependable_fingerprint = Depends(process_fingerprint)
+fastapi_dependable_optimise_surface_position = Depends(process_optimise_surface_position)
