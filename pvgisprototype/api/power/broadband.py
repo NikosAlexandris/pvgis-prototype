@@ -178,7 +178,6 @@ def calculate_photovoltaic_power_output_series(
     # horizon_heights: List[float] = None,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     peak_power: float = 1,
-    peak_power: float = 1,
     system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
@@ -361,8 +360,6 @@ def calculate_photovoltaic_power_output_series(
             logger.info(f'i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade ..')
         calculated_direct_inclined_irradiance_series = (
             calculate_direct_inclined_irradiance_series_pvgis(
-        calculated_direct_inclined_irradiance_series = (
-            calculate_direct_inclined_irradiance_series_pvgis(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -399,8 +396,7 @@ def calculate_photovoltaic_power_output_series(
                 numpy.array([]),
             )
         )
-            )
-        )
+
         direct_horizontal_irradiance_series = (
             calculated_direct_inclined_irradiance_series.components.get(
                 DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
@@ -428,9 +424,6 @@ def calculate_photovoltaic_power_output_series(
         )
 
     # Calculate diffuse and reflected irradiance for sun above horizon
-    if not numpy.any(mask_above_horizon):
-        logger.info(f'i [yellow bold]Apparently there is no moment of the sun above the horizon in the requested time series![/yellow bold] ')
-    else:
     if not numpy.any(mask_above_horizon):
         logger.info(f'i [yellow bold]Apparently there is no moment of the sun above the horizon in the requested time series![/yellow bold] ')
     else:
@@ -780,8 +773,6 @@ def calculate_photovoltaic_power_output_series(
         } if verbose > 5 and apply_reflectivity_factor else {},
         
         'Horizontal irradiance components': lambda: {
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series
             # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.components[REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME], Is zero for horizontal surfaces !
