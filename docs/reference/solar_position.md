@@ -108,3 +108,30 @@ are :
 
 - `solar_position_model` is set to NOAA's equation for .. (see : SOLAR_POSITION_ALGORITHM_DEFAULT).
 - `solar_incidence_model` is set to Iqbal (see : SolarIncidenceModel.iqbal).
+
+
+## Atmospheric refraction
+
+!!! warning "Review Me" 
+
+Following the NOAA solar geometry equations,
+the calculation of the solar incidence anlge
+requires all of the following angular quantities :
+
+- altitude which in turn requires the hour angle and the zenith angle
+- zenith which in turn requires the solar declination angle (sun-earth)
+- azimuth
+- surface tilt
+- latitude
+- hour angle
+- relative longitude
+
+Mathematicall speaking,
+the point where refraction plays a role is the solar zenith angle.
+The zenith angle is adjusted based on some method of atmospheric refraction
+and the solar altitude angle
+(high altitude above horizon, low altitude above horizon and altitude below horizon).
+While the adjustment isn't large in absolute terms,
+it is part of the solar geometry system and may impact the analysis,
+especially when it comes to the amount of irradiance
+close to sun- rise and set.
