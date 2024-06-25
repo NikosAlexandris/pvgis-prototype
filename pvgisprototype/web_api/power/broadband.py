@@ -186,7 +186,7 @@ async def get_photovoltaic_power_series_advanced(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     # global_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_global_horizontal_irradiance] = None,
@@ -265,7 +265,7 @@ async def get_photovoltaic_power_series_advanced(
     # log: Annotated[int, fastapi_query_log] = LOG_LEVEL_DEFAULT,
     # profile: Annotated[bool, fastapi_query_profiling] = cPROFILE_FLAG_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
+    groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
@@ -452,7 +452,7 @@ async def get_photovoltaic_power_series(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     photovoltaic_module: Annotated[ PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -460,7 +460,7 @@ async def get_photovoltaic_power_series(
     power_model: Annotated[PhotovoltaicModulePerformanceModel, fastapi_query_power_model ] = PhotovoltaicModulePerformanceModel.king,
     peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
+    groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -575,7 +575,7 @@ async def get_photovoltaic_power_series_monthly_average(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     spectral_factor_series: Annotated[
@@ -686,7 +686,7 @@ async def get_photovoltaic_power_output_series_multi(
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
+    frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     spectral_factor_series: Annotated[
@@ -749,7 +749,7 @@ async def get_photovoltaic_power_output_series_multi(
     ] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[float | None, fastapi_query_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
+    groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
