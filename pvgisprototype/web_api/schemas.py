@@ -1,7 +1,6 @@
 from enum import Enum
 
-#from pvgisprototype.web_api.utilities import get_timezones
-# Timezone = Enum('Timezone', {tz: tz for tz in get_timezones()}) # FIXME Add later when all timezones work properly
+
 
 
 class Timezone(str, Enum):
@@ -45,17 +44,17 @@ class AnalysisLevel(str, Enum):
     Simple = 'Simple'
     Advanced = 'Advanced'
     Extended = 'Extended'
-    NoneValue = None
+    NoneValue = 'None'
 
 
 class Frequency(str, Enum):
-    Year = "Yearly"
-    Season = "Seasonal"
-    Month = "Monthly"
-    Week = "Weekly"
-    Day = "Daily"
-    Hour = "Hourly"
-    Minute = "Minutely"
+    Yearly = "Yearly"
+    Seasonal = "Seasonal"
+    Monthly = "Monthly"
+    Weekly = "Weekly"
+    Daily = "Daily"
+    Hourly = "Hourly"
+    Minutely = "Minutely"
 
 
 class GroupBy(str, Enum):
@@ -66,7 +65,7 @@ class GroupBy(str, Enum):
     Daily = "Daily"
     Hourly = "Hourly"
     Minutely = "Minutely"
-    N = "Do not group-by"
+    NoneValue = "None"
 
 
 class AngleOutputUnit(str, Enum):
