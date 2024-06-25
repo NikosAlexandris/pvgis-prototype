@@ -870,7 +870,7 @@ def summarise_photovoltaic_performance(
     surface_tilt:bool = True,
     dictionary: dict = None,
     timestamps: DatetimeIndex | None = None,
-    frequency: str = Frequency.Hour,
+    frequency: str = Frequency.Hourly,
     rounding_places=1,
     dtype=DATA_TYPE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -930,6 +930,7 @@ def summarise_photovoltaic_performance(
             SURFACE_TILT_COLUMN_NAME: {"value": surface_tilt, "unit": "degrees"},
             "Start time": str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
             "End time": str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+            "Frequency": frequency,
         },
         "Minimal": lambda: (
             {
