@@ -1,5 +1,5 @@
 ---
-icon: fontawesome/solid/diagram-project
+icon: material/solar-power-variant
 title: Photovoltaic Performance
 tags:
   - pvgisprototype
