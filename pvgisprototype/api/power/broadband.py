@@ -310,22 +310,35 @@ def calculate_photovoltaic_power_output_series(
         "init_method": "zeros",
         "backend": array_backend,
     }  # Borrow shape from timestamps
+    
+    # direct
     direct_horizontal_irradiance_series = create_array(**array_parameters)
     direct_inclined_irradiance_series = create_array(**array_parameters)
-    calculated_diffuse_inclined_irradiance_series = {}
+    calculated_diffuse_inclined_irradiance_series = {}  # no-values without direct sunlight
+    
+    # diffuse (== sky-reflected)
     diffuse_horizontal_irradiance_series = create_array(**array_parameters)
     diffuse_inclined_irradiance_series = create_array(**array_parameters)
+    
+    # ground-reflected
+    # there is no ground-reflected horizontal component as such !
     ground_reflected_inclined_irradiance_series = create_array(**array_parameters)
-    direct_inclined_reflectivity_factor_series = create_array(**array_parameters)
-    diffuse_inclined_reflectivity_factor_series = create_array(**array_parameters)
-    ground_reflected_inclined_reflectivity_factor_series = create_array(**array_parameters)
-    direct_inclined_reflectivity_series = create_array(**array_parameters)
-    diffuse_inclined_reflectivity_series = create_array(**array_parameters)
-    ground_reflected_inclined_reflectivity_series = create_array(**array_parameters)
+    
+    # before reflectivity
     direct_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
     diffuse_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
     ground_reflected_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
 
+    # reflectivity effect factor/s
+    direct_inclined_reflectivity_factor_series = create_array(**array_parameters)
+    diffuse_inclined_reflectivity_factor_series = create_array(**array_parameters)
+    ground_reflected_inclined_reflectivity_factor_series = create_array(**array_parameters)
+    
+    # after reflectivity effect
+    direct_inclined_reflectivity_series = create_array(**array_parameters)
+    diffuse_inclined_reflectivity_series = create_array(**array_parameters)
+    ground_reflected_inclined_reflectivity_series = create_array(**array_parameters)
+    
     # For very low sun angles
     direct_inclined_irradiance_series[mask_low_angle] = 0  # Direct radiation is negligible
 
