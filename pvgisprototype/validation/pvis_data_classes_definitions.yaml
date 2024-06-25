@@ -475,6 +475,12 @@ SurfaceOrientation:
   max_degrees:
     type: float
     initial: 360
+  optimal:
+    type: bool
+    initial: False
+  optimizer:
+    type: str
+    initial:
 
 SurfaceTilt:
   value:
@@ -495,6 +501,12 @@ SurfaceTilt:
   max_degrees:
     type: float
     initial: 90
+  optimal:
+    type: bool
+    initial: False
+  optimizer:
+    type: str
+    initial:
 
 # Irradiance ?
 
@@ -655,6 +667,12 @@ PhotovoltaicPower:
     type: Elevation
   surface_orientation:
     type: SurfaceOrientation
+  optimal:
+    type: bool
+    initial: False
+  optimiser:
+    type: str
+    initial:
   surface_tilt:
     type: SurfaceTilt
   solar_positioning_algorithm:
