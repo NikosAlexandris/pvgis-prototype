@@ -77,6 +77,7 @@ from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import QUIET_FLAG_DEFAULT
 from pvgisprototype.constants import QUICK_RESPONSE_CODE_FLAG_DEFAULT
 from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT
+from typing import Annotated, Optional, Dict, TypeVar
 
 
 async def process_longitude(
@@ -115,7 +116,6 @@ async def process_timezone(
     return ZoneInfo(timezone.value)
 
 
-from typing import Annotated, Optional, Dict, TypeVar
 T = TypeVar("T", GroupBy, Frequency)
 
 time_groupings: Dict[str, Optional[str]] = {
@@ -125,7 +125,8 @@ time_groupings: Dict[str, Optional[str]] = {
     "Weekly": "W",
     "Daily": "D",
     "Hourly": "h",
-    "Do not group by": None,
+    "Minutely": "min",
+    "Do not group-by": None,
 }
 
 
@@ -143,10 +144,10 @@ async def process_frequency(frequency: Annotated[Frequency, fastapi_query_freque
 
 async def process_series_timestamp(
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = '2013-01-01',
+    start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hour,
-    end_time: Annotated[str | None, fastapi_query_end_time] = '2013-01-02',
+    end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> DatetimeIndex:
     """
@@ -168,7 +169,7 @@ async def process_series_timestamp(
             if timestamps.isna().any():  # type: ignore
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Timestamps {timestamps_str} is not a valid input.",
+                    detail=f"Timestamps {timestamps_str} is not a valid input",
                 )
 
         except Exception as e:
@@ -176,7 +177,7 @@ async def process_series_timestamp(
 
     if end_time is not None and start_time is None:
         raise HTTPException(
-            status_code=400, detail="Did you forget to eneter a start time ?"
+            status_code=400, detail="Provide a valid start and end time or a timestamp"
         )
 
     if start_time is not None and end_time is not None:
@@ -190,7 +191,12 @@ async def process_series_timestamp(
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
-
+    
+    if timestamps.empty: # type: ignore
+        raise HTTPException(
+            status_code=400, detail=f"Combination of options {start_time}, {end_time}, {frequency}, {periods} is not valid"
+        )
+    
     return timestamps
 
 
