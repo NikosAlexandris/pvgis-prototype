@@ -115,7 +115,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_tolerance,
     fastapi_query_zero_negative_solar_incidence_angle,
 )
-from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone, VerbosityLevel
+from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone#, VerbosityLevel
 
 
 def get_metadata(request: Request):
@@ -163,7 +163,7 @@ async def get_photovoltaic_performance_analysis(
     periods: Annotated[str | None, fastapi_query_periods] = None,  # Used by fastapi_query_periods
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hour,
     end_time: Annotated[str | None, fastapi_query_end_time] = '2013-12-31', # Used by fastapi_query_end_time
-    timestamps: Annotated[DatetimeIndex|None, fastapi_dependable_timestamps] = None,
+    timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     photovoltaic_module: Annotated[ PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     system_efficiency: Annotated[float, fastapi_query_system_efficiency ] = SYSTEM_EFFICIENCY_DEFAULT,
@@ -239,7 +239,6 @@ async def get_photovoltaic_performance_analysis(
 
     if csv:
         from datetime import datetime
-
         from fastapi.responses import StreamingResponse
 
         # streaming_data = [(str(timestamp), photovoltaic_power) for timestamp, photovoltaic_power in zip(timestamps.tolist(), photovoltaic_power_output_series.value.tolist())]  # type: ignore
@@ -262,7 +261,7 @@ async def get_photovoltaic_performance_analysis(
         fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
         # ------------------------------------------------------------- Important
 
-        header = []
+        header:list = []
         if index:
             header.insert(0, 'Index')
         if longitude:
@@ -276,13 +275,13 @@ async def get_photovoltaic_performance_analysis(
         # Convert single float or int values to arrays of the same length as timestamps
         for key, value in dictionary.items():
             if isinstance(value, (float, int)):
-                dictionary[key] = np.full(len(timestamps), value)
+                dictionary[key] = np.full(len(timestamps), value) # type: ignore
             if isinstance(value, str):
-                dictionary[key] = np.full(len(timestamps), str(value))
+                dictionary[key] = np.full(len(timestamps), str(value)) # type: ignore
         
         # Zip series and timestamps
         zipped_series = zip(*dictionary.values())
-        zipped_data = zip(timestamps, zipped_series)
+        zipped_data = zip(timestamps, zipped_series) # type: ignore
         
         rows = []
         for idx, (timestamp, values) in enumerate(zipped_data):
@@ -290,7 +289,7 @@ async def get_photovoltaic_performance_analysis(
             if index:
                 row.append(idx)
             if longitude and latitude:
-                row.extend([longitude, latitude])
+                row.extend([longitude, latitude]) # type: ignore
             row.append(timestamp.strftime('%Y-%m-%d %H:%M:%S'))
             row.extend(values)
             rows.append(row)
@@ -306,6 +305,10 @@ async def get_photovoltaic_performance_analysis(
         return response_csv
 
     response = {}
+    headers = {
+                "Content-Disposition": f'attachment; filename="{PHOTOVOLTAIC_POWER_OUTPUT_FILENAME}.json"'
+            }
+
     if fingerprint:
         response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[
             FINGERPRINT_COLUMN_NAME
@@ -320,21 +323,8 @@ async def get_photovoltaic_performance_analysis(
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
             }
-            headers = {
-                "Content-Disposition": f'attachment; filename="{PHOTOVOLTAIC_POWER_OUTPUT_FILENAME}.json"'
-            }
-
-    # if statistics:
-    #     from pvgisprototype.api.series.statistics import calculate_series_statistics
-
-    #     series_statistics = calculate_series_statistics(
-    #         data_array=photovoltaic_power_output_series.value,
-    #         timestamps=timestamps,
-    #         groupby=groupby,  # type: ignore[arg-type]
-    #     )
-    #     response["statistics"] = convert_numpy_arrays_to_lists(series_statistics)
-
-    if analysis.value is not None:
+            
+    if analysis.value != AnalysisLevel.NoneValue:
         photovoltaic_performance_report = summarise_photovoltaic_performance(
             longitude=longitude,
             latitude=latitude,
@@ -347,16 +337,6 @@ async def get_photovoltaic_performance_analysis(
             analysis=analysis,
         )
         response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report
-        # finally
-        header_key = 'Content-Disposition'
-        header_value = "attachment; filename=" + f"{PHOTOVOLTAIC_PERFORMANCE_ANALYSIS_OUTPUT_FILENAME}.json"
-        headers = {
-            header_key: header_value, 
-        }
-        # return Response(
-        #     orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
-        # )
-        # return ORJSONResponse([response], headers=headers, media_type="application/json")
 
     if metadata:
         response['Metadata'] = get_metadata(request=request)
@@ -378,7 +358,7 @@ async def get_photovoltaic_performance_analysis(
         elif quick_response_code.value == QuickResponseCode.Image:
             from io import BytesIO
             buffer = BytesIO()
-            image = quick_response.make_image()
+            image = quick_response.make_image() # type: ignore
             image.save(buffer, format="PNG")
             image_bytes = buffer.getvalue()
             return Response(content=image_bytes, media_type="image/png")
@@ -389,4 +369,4 @@ async def get_photovoltaic_performance_analysis(
     # return Response(
     #     orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
     # )
-    return ORJSONResponse([response], headers=headers, media_type="application/json")
+    return ORJSONResponse(response, headers=headers, media_type="application/json")
