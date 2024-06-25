@@ -154,9 +154,11 @@ def create_dictionary_for_result_optimizer(
 
         if method == OptimizerMethod.brute:
             result_dictionary["surface_tilt"] = SurfaceTilt(
-                value=result_optimizer, unit="radians"
+                value=result_optimizer,
+                unit="radians",
+                optimal=True,
+                optimizer=method,
             )
-            print(f'{location_parameters=}')
             result_dictionary["mean_power_output"] = (
                 - calculate_mean_negative_power_output(
                     surface_angle=result_optimizer,
@@ -166,7 +168,10 @@ def create_dictionary_for_result_optimizer(
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_tilt"] = SurfaceTilt(
-                value=result_optimizer.x[0], unit="radians"
+                value=result_optimizer.x[0],
+                unit="radians",
+                optimal=True,
+                optimizer=method,
             )
             result_dictionary["mean_power_output"] = -result_optimizer.fun
 
@@ -175,7 +180,10 @@ def create_dictionary_for_result_optimizer(
 
         if method == OptimizerMethod.brute:
             result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=result_optimizer, unit="radians"
+                value=result_optimizer,
+                unit="radians",
+                optimal=True,
+                optimizer=method,
             )
             result_dictionary["mean_power_output"] = (
                 - calculate_mean_negative_power_output(
@@ -186,7 +194,10 @@ def create_dictionary_for_result_optimizer(
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=result_optimizer.x[0], unit="radians"
+                value=result_optimizer.x[0],
+                unit="radians",
+                optimal=True,
+                optimizer=method,
             )
             result_dictionary["mean_power_output"] = -result_optimizer.fun
 
@@ -194,10 +205,16 @@ def create_dictionary_for_result_optimizer(
 
         if method == OptimizerMethod.brute:
             result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=result_optimizer[0], unit="radians"
+                value=result_optimizer[0],
+                unit="radians",
+                optimal=True,
+                optimizer=method,
             )
             result_dictionary["surface_tilt"] = SurfaceTilt(
-                value=result_optimizer[1], unit="radians"
+                value=result_optimizer[1],
+                unit="radians",
+                optimal=True,
+                optimizer=method,
             )
             result_dictionary["mean_power_output"] = (
                 -calculate_mean_negative_power_output(
@@ -208,10 +225,16 @@ def create_dictionary_for_result_optimizer(
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=result_optimizer.x[0], unit="radians"
+                value=result_optimizer.x[0],
+                unit="radians",
+                optimal=True,
+                optimizer=method,
             )
             result_dictionary["surface_tilt"] = SurfaceTilt(
-                value=result_optimizer.x[1], unit="radians"
+                value=result_optimizer.x[1],
+                unit="radians",
+                optimal=True,
+                optimizer=method,
             )
             result_dictionary["mean_power_output"] = -result_optimizer.fun
 
