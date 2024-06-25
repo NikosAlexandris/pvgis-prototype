@@ -5,15 +5,20 @@ from pvgisprototype import OpticalAirMass
 from pvgisprototype import RefractedSolarAltitude
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarHourAngle
-
+from pvgisprototype import SurfaceOrientation, SurfaceTilt
+import numpy
 
 def custom_hashkey(*args, **kwargs):
     args = tuple(
         (
+            # tuple(arg.tolist()) if isinstance(arg, numpy.ndarray)
+            # tuple(str(id(arg))) if isinstance(arg, numpy.ndarray)
+            # else str(arg)
             str(arg)
             if isinstance(
                 arg,
                 (
+                    numpy.ndarray,
                     DatetimeIndex,
                     LinkeTurbidityFactor,
                     OpticalAirMass,
@@ -21,6 +26,8 @@ def custom_hashkey(*args, **kwargs):
                     SolarAltitude,
                     Index,
                     SolarHourAngle,
+                    SurfaceOrientation,
+                    SurfaceTilt,
                 ),
             )
             else arg
@@ -29,10 +36,14 @@ def custom_hashkey(*args, **kwargs):
     )
     kwargs = {
         k: (
+            # tuple(v.tolist()) if isinstance(v, numpy.ndarray)
+            # tuple(str(id(v))) if isinstance(v, numpy.ndarray)
+            # else str(v)
             str(v)
             if isinstance(
                 v,
                 (
+                    numpy.ndarray,
                     DatetimeIndex,
                     LinkeTurbidityFactor,
                     OpticalAirMass,
@@ -40,6 +51,8 @@ def custom_hashkey(*args, **kwargs):
                     SolarAltitude,
                     Index,
                     SolarHourAngle,
+                    SurfaceOrientation,
+                    SurfaceTilt,
                 ),
             )
             else v
