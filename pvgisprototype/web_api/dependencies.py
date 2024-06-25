@@ -119,12 +119,13 @@ from typing import Annotated, Optional, Dict, TypeVar
 T = TypeVar("T", GroupBy, Frequency)
 
 time_groupings: Dict[str, Optional[str]] = {
-    "Yearly": "Y",
+    "Yearly": "YE",
     "Seasonal": "S",
-    "Monthly": "M",
+    "Monthly": "ME",
     "Weekly": "W",
     "Daily": "D",
     "Hourly": "h",
+    "Minutely": "min",
     "Do not group by": None,
 }
 
@@ -133,11 +134,11 @@ async def process_time_grouping(value: T) -> Optional[str]:
     return time_groupings[value.value]
 
 
-async def process_groupby(groupby: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.N) -> Optional[str]:
+async def process_groupby(groupby: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.NoneValue) -> Optional[str]:
     return await process_time_grouping(groupby)
 
 
-async def process_frequency(frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.Hour) -> str:
+async def process_frequency(frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.Hourly) -> str:
     return await process_time_grouping(frequency)
 
 
@@ -145,7 +146,7 @@ async def process_series_timestamp(
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = '2013-01-01',
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hour,
+    frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = '2013-01-02',
     timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> DatetimeIndex:
