@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, status
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.responses import ORJSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.openapi.utils import get_openapi
@@ -66,15 +66,15 @@ tags_metadata = [
                 },
     },
     {
-        "name": "Citation",
-        "description": "Functions related to the citation of PVGIS 6.",
+        "name": "Reference",
+        "description": "References, publications and citation for PVGIS 6.",
     },
     {
         "name": "Performance",
         "description": "Analysis of photovoltaic performance",
         "externalDocs": {
-            "description": "See also relevant section in the interactive documentation",
-            "url": "https://jrc-projects.apps.ocp.jrc.ec.europa.eu/pvgis/pvis-be-prototype",
+            "description": "See relevant section in the documentation",
+            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/reference/photovoltaic_performance/",
             },
     },
     {
@@ -82,7 +82,7 @@ tags_metadata = [
         "description": "Functions to calculate photovoltaic power/energy time series",
         "externalDocs": {
             "description": "See also relevant section in the interactive documentation",
-            "url": "https://jrc-projects.apps.ocp.jrc.ec.europa.eu/pvgis/pvis-be-prototype",
+            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/power/introduction/",
             },
     },
 ]
@@ -101,14 +101,14 @@ app = FastAPI(
     },
     license_info={
         "name": "EUPL-1.2",
-        "url": "https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12"
+        "url": "https://spdx.org/licenses/EUPL-1.2.html",
     },
     swagger_ui_parameters={
         # "syntaxHighlight.theme": "obsidian",
         "syntaxHighlight": False,
         # "defaultModelsExpandDepth": -1,  # Hide models section
         # "docExpansion": "none",  # expand only tags
-        # "filter": True,  # filter tags
+        "filter": True,  # filter tags
         "displayRequestDuration": True,  # Display request duration
         "showExtensions": True,  # Show vendor extensions
     },
@@ -117,6 +117,7 @@ app = FastAPI(
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def read_root():
     return html_root_page
+
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -139,13 +140,24 @@ def reorder_parameters(api_spec, endpoint_path, params_order):
 
 
 def custom_openapi():
+        if app.openapi_schema:
+            return app.openapi_schema
         openapi_schema = get_openapi(
             title=app.title,
             version=app.version,
             summary=app.summary,
             description=app.description,
             routes=app.routes,
+            terms_of_service=app.terms_of_service,
+            contact=app.contact,
+            license_info=app.license_info,
+            tags=tags_metadata,
         )
+        openapi_schema["info"]["x-logo"] = {
+            "url": "http://127.0.02:8000/assets/pvgis6_70px.png",
+            # "backgroundColor": "#FFFFFF",
+            "altText": "PVGIS 6 logo",
+        }
         reordered_openapi_schema = reorder_parameters(
             openapi_schema,
             "/calculate/power/broadband-advanced",
@@ -161,12 +173,13 @@ def custom_openapi():
             "/calculate/performance/broadband",
             FASTAPI_INPUT_PARAMETERS,
         )
-        return reordered_openapi_schema
+        app.openapi_schema = openapi_schema
+        return app.openapi_schema
 
 
 app.openapi = custom_openapi
 # app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
-# app.mount("/static", StaticFiles(directory=str(static_directory)), name="static")
+app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="static")
 templates = Jinja2Templates(directory="templates")
 template = Template(template_html)
 
@@ -177,12 +190,17 @@ async def print_welcome_message():
     return welcome_message
 
 
-@app.get("/citation", tags=["Reference"])
+@app.get("/references/license", tags=["Reference"])
+async def print_license_text():
+    return generate_citation_text()
+
+
+@app.get("/references/citation", tags=["Reference"])
 async def print_citation_text():
     return generate_citation_text()
 
 
-@app.get("/download-citation", tags=["Reference"])
+@app.get("/references/download-citation", tags=["Reference"])
 async def download_citation():
     citation = generate_citation_text()
     from fastapi.responses import FileResponse
@@ -197,9 +215,11 @@ async def download_citation():
         tmp_path, media_type="application/json", filename="citation.json"
     )
 
-@app.get("/license", tags=["Reference"])
-async def print_citation_text():
-    return generate_citation_text()
+
+@app.get("/references/publications", tags=["Reference"], response_class=FileResponse)
+async def print_references():
+    bibtex_file_path = assets_directory / "references.bib"
+    return FileResponse(bibtex_file_path, media_type='application/x-bibtex', filename="references.bib")
 
 
 app.get(
