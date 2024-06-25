@@ -457,7 +457,7 @@ async def process_optimise_surface_position(
     ] = SURFACE_TILT_DEFAULT,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
-    frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hour,
+    frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
