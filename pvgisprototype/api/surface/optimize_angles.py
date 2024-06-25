@@ -94,7 +94,6 @@ def optimize_angles(
         sampling_method_shgo=sampling_method_shgo,
     )
 
-    print(f'{result_optimizer=}')
     dictionary_optimized_angles = create_dictionary_for_result_optimizer(
         result_optimizer=result_optimizer,
         mode=mode,

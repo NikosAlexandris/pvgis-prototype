@@ -11,19 +11,20 @@ from pydantic import ConfigDict
 
 type_mapping = {
     'None': None,
-    'int': int,
-    'float': float,
-    'Optional[float]': Optional[float],
+    'bool': bool,
     'str': str,
     'list': list,
     'dict': dict,
+    'int': int,
+    'float': float,
+    'Optional[float]': Optional[float],
     'ndarray': NpNDArray,
     'Union[ndarray, float]': Union[NpNDArray, float],
     'Tuple[Longitude, Latitude]': Tuple[float, float],
+    'DatetimeIndex': DatetimeIndex,
     'Elevation': float,
     'SurfaceOrientation': float,
     'SurfaceTilt': float,
-    'DatetimeIndex': DatetimeIndex
 }
 
 
