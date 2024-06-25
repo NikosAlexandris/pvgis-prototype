@@ -58,4 +58,5 @@ FASTAPI_INPUT_PARAMETERS = [
     "quick_response_code",
     "metadata",
     "profile",
+    "optimise_surface_position",
 ]

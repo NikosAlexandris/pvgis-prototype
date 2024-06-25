@@ -115,7 +115,8 @@ from pvgisprototype.api.quick_response_code import generate_quick_response_code
 from pvgisprototype.constants import PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME
 from fastapi.responses import ORJSONResponse
 from pvgisprototype.api.series.statistics import calculate_series_statistics
-
+from pvgisprototype.web_api.schemas import OptimiseMode
+from pvgisprototype.web_api.dependencies import fastapi_dependable_optimise_surface_position
 
 def convert_numpy_arrays_to_lists(data: Any) -> Any:
     """Convert all NumPy arrays and other NumPy types in the input to native Python types.
@@ -277,6 +278,7 @@ async def get_photovoltaic_power_series_advanced(
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
+    optimise_surface_position: Annotated[OptimiseMode, fastapi_dependable_optimise_surface_position] = OptimiseMode.NoneValue
 ):
     """Estimate the photovoltaic power output for a solar surface.
 
@@ -285,6 +287,10 @@ async def get_photovoltaic_power_series_advanced(
     electricity grid (without battery storage) based on broadband solar
     irradiance, ambient temperature and wind speed.
     """
+    if optimise_surface_position:
+        surface_orientation = optimise_surface_position['surface_orientation'].value # type: ignore
+        surface_tilt = optimise_surface_position['surface_tilt'].value # type: ignore
+
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
