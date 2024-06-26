@@ -707,16 +707,7 @@ def calculate_photovoltaic_power_output_series(
             PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
             ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
         },
-
-
-        'Metadata': lambda: {
-            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
-            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
-            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        },
-
+        
         'Power': lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
