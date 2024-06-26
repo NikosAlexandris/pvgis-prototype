@@ -1,4 +1,3 @@
-import time
 from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
@@ -6,9 +5,8 @@ from pvgisprototype import (
     LinkeTurbidityFactor,
     Longitude,
     Latitude,
-    Elevation,
-    SurfaceOrientation,
-    SurfaceTilt,
+    # SurfaceOrientation,
+    # SurfaceTilt,
 )
 
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
@@ -17,7 +15,7 @@ import random
 import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.surface.optimize_angles import optimize_angles
-from pvgisprototype.api.surface.helper_functions import OptimizerMethod, OptimizerMode
+from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMethod, SurfacePositionOptimizerMode
 
 
 def generate_random_date():
@@ -72,8 +70,8 @@ result = optimize_angles(
     temperature_series=TemperatureSeries(value=temperature_value),
     wind_speed_series=WindSpeedSeries(value=wind_value),
     linke_turbidity_factor_series=LinkeTurbidityFactor(value=1),
-    method=OptimizerMethod.shgo,
-    mode=OptimizerMode.tilt,
+    method=SurfacePositionOptimizerMethod.shgo,
+    mode=SurfacePositionOptimizerMode.Tilt,
     workers=-1,
     sampling_method_shgo="sobol",
 )

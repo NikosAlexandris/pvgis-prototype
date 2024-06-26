@@ -115,8 +115,9 @@ from pvgisprototype.api.quick_response_code import generate_quick_response_code
 from pvgisprototype.constants import PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME
 from fastapi.responses import ORJSONResponse
 from pvgisprototype.api.series.statistics import calculate_series_statistics
-from pvgisprototype.web_api.schemas import OptimiseMode
+from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
 from pvgisprototype.web_api.dependencies import fastapi_dependable_optimise_surface_position
+
 
 def convert_numpy_arrays_to_lists(data: Any) -> Any:
     """Convert all NumPy arrays and other NumPy types in the input to native Python types.
@@ -278,7 +279,7 @@ async def get_photovoltaic_power_series_advanced(
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
-    optimise_surface_position: Annotated[OptimiseMode, fastapi_dependable_optimise_surface_position] = OptimiseMode.NoneValue
+    optimise_surface_position: Annotated[SurfacePositionOptimizerMode, fastapi_dependable_optimise_surface_position] = SurfacePositionOptimizerMode.NoneValue
 ):
     """Estimate the photovoltaic power output for a solar surface.
 
@@ -288,8 +289,8 @@ async def get_photovoltaic_power_series_advanced(
     irradiance, ambient temperature and wind speed.
     """
     if optimise_surface_position:
-        surface_orientation = optimise_surface_position['surface_orientation'].value # type: ignore
-        surface_tilt = optimise_surface_position['surface_tilt'].value # type: ignore
+        surface_orientation = optimise_surface_position['surface_orientation'] # type: ignore
+        surface_tilt = optimise_surface_position['surface_tilt'] # type: ignore
 
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
@@ -813,7 +814,6 @@ async def get_photovoltaic_power_output_series_multi(
     efficiency: Annotated[float | None, fastapi_query_efficiency] = EFFICIENCY_FACTOR_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
-    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,

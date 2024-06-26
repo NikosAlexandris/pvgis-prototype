@@ -6,7 +6,6 @@ from pvgisprototype import (
     LinkeTurbidityFactor,
     Longitude,
     Latitude,
-    Elevation,
     SurfaceOrientation,
     SurfaceTilt,
 )
@@ -19,22 +18,21 @@ from pvgisprototype.constants import (
 
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 
-# from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-# from pvgisprototype.api.utilities.timestamp import generate_datetime_series
-# from typing import Optional
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.surface.helper_functions import (
+from pvgisprototype.api.surface.parameter_models import (
+    SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMode,
+)
+from pvgisprototype.api.surface.helpers import (
     create_dictionary_for_location_parameters,
     create_bounds_for_optimizer,
     calculate_mean_negative_power_output,
-    OptimizerMethod,
-    OptimizerMode,
     create_dictionary_for_result_optimizer,
 )
-
-from pvgisprototype.algorithms.optimization.optimizer import optimizer
+from pvgisprototype.api.surface.optimizer import optimizer
 import math
+
 
 def optimize_angles(
     longitude: Longitude,
@@ -53,8 +51,8 @@ def optimize_angles(
     wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
-    mode: OptimizerMode = OptimizerMode.tilt,
-    method: OptimizerMethod = OptimizerMethod.shgo, 
+    mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
+    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo, 
     workers : int = 1,
     sampling_method_shgo = 'sobol'
 ):

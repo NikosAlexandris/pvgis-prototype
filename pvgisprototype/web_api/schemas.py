@@ -1,8 +1,6 @@
 from enum import Enum
 
 
-
-
 class Timezone(str, Enum):
     GMT = "Etc/GMT"
     GMT_PLUS_0 = "Etc/GMT+0"
@@ -71,10 +69,3 @@ class GroupBy(str, Enum):
 class AngleOutputUnit(str, Enum):
     RADIANS = "Radians"
     DEGREES = "Degrees"
-
-
-class OptimiseMode(str, Enum):
-    Orientation = "Surface orientation"
-    Tilt = "Surface tilt"
-    Both = "Surface orientation & surface tilt"
-    NoneValue = "None"
