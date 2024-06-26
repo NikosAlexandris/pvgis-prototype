@@ -423,10 +423,14 @@ async def process_verbose(
 async def process_quiet(
         quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
         quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
+        analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
 ) -> bool:
     """
     """
     if quick_response_code.value != QuickResponseCode.NoneValue:
+        quiet = True
+    
+    if analysis.value != AnalysisLevel.NoneValue:
         quiet = True
     
     return quiet
@@ -537,8 +541,13 @@ async def process_optimise_surface_position(
                     sampling_method_shgo = 'sobol'
             )
         
+        if (optimise_surface_position["surface_tilt"] is None) or (optimise_surface_position["surface_orientation"] is None): # type: ignore
+            raise HTTPException(
+                status_code=400,
+                detail="Using combination of input could not find optimal surface position",
+            )
+       
         return optimise_surface_position # type: ignore
-
 
 
 fastapi_dependable_longitude = Depends(process_longitude)
