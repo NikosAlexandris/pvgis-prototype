@@ -417,7 +417,7 @@ END_NAME = 'End'
 END_TIME_DESCRIPTION = f"{SYMBOL_END_TIME} {END_NAME} {TIMESTAMP_NAME} **Attention**: if not given, the defaul time is `00:00:00`."
 
 TIMEZONE_NAME = 'Timezone'
-TIMEZONE_DESCRIPTION = f"{TIMEZONE_NAME} (ex. 'UTC')"
+TIMEZONE_DESCRIPTION = f"{TIMEZONE_NAME} (ex. 'UTC') supported by [the IANA Time Zone Database](https://www.iana.org/time-zones). See [list of valid IANA time zone (TZ) identifiers](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List)."
 
 LOCAL_TIME_DESCRIPTION = "Use the system's local time zone"
 
