@@ -139,8 +139,8 @@ def calculate_ground_reflected_inclined_irradiance_series(
         ground_view_fraction = create_array(**array_parameters)
         ground_reflected_irradiance_reflectivity_factor_series = create_array(**array_parameters)
         ground_reflected_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
-        reflectivity_loss = create_array(**array_parameters)
-        reflectivity_loss_percentage = create_array(**array_parameters)
+        reflectivity_effect = create_array(**array_parameters)
+        reflectivity_effect_percentage = create_array(**array_parameters)
 
     else:
         # based on external global irradiance time series
