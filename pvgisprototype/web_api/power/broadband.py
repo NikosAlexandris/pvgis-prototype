@@ -289,8 +289,8 @@ async def get_photovoltaic_power_series_advanced(
     irradiance, ambient temperature and wind speed.
     """
     if optimise_surface_position:
-        surface_orientation = optimise_surface_position['surface_orientation'] # type: ignore
-        surface_tilt = optimise_surface_position['surface_tilt'] # type: ignore
+        surface_orientation = optimise_surface_position['surface_orientation'].value # type: ignore
+        surface_tilt = optimise_surface_position['surface_tilt'].value # type: ignore
 
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
