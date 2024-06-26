@@ -100,8 +100,8 @@ def calculate_mean_negative_power_output(surface_angle, location_parameters, mod
         )
 
     if mode ==SurfacePositionOptimizerMode.Orientation:
-        from devtools import debug
-        debug(locals())
+        #from devtools import debug
+        #debug(locals())
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_orientation=surface_angle,
             **location_parameters,
@@ -135,7 +135,10 @@ def create_dictionary_for_result_optimizer(
     }
 
     if mode ==SurfacePositionOptimizerMode.Tilt:
-        result_dictionary["surface_orientation"] = surface_orientation
+        if isinstance(surface_orientation, SurfaceOrientation): # FIXME THIS SHOULD ONLY BE A SurfaceOrientation OBJECT
+            result_dictionary["surface_orientation"] = surface_orientation
+        else:
+            result_dictionary["surface_orientation"] = SurfaceOrientation(value = surface_orientation, unit = "radians")
 
         if method == SurfacePositionOptimizerMethod.brute:
             result_dictionary["surface_tilt"] = SurfaceTilt(
@@ -161,7 +164,10 @@ def create_dictionary_for_result_optimizer(
             result_dictionary["mean_power_output"] = -result_optimizer.fun
 
     if mode ==SurfacePositionOptimizerMode.Orientation:
-        result_dictionary["surface_tilt"] = surface_tilt
+        if isinstance(surface_orientation, SurfaceTilt): #FIXME THIS SHOULD ONLY BE A SurfaceTilt OBJECT
+            result_dictionary["surface_tilt"] = surface_tilt
+        else:
+            result_dictionary["surface_tilt"] = SurfaceOrientation(value = surface_tilt, unit = "radians")
 
         if method == SurfacePositionOptimizerMethod.brute:
             result_dictionary["surface_orientation"] = SurfaceOrientation(
