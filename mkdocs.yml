@@ -121,6 +121,7 @@ extra:
     To Do: todo
     See-Also: seealso
 
+use_directory_urls: false
 theme:
   logo: images/pvgis_image_squared.png
   font: false

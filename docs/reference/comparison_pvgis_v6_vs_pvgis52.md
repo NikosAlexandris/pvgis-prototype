@@ -96,26 +96,29 @@ from diagrams.programming.language import C
 from diagrams.programming.language import Cpp
 from diagrams.programming.language import Python
 
-pvgis6_icon = "docs/logos/pvgis6_70px.png"
-irradiance_icon = "docs/icons/wiggly_vertical_line.svg"
-spectral_effect_icon = "docs/icons/noun-sun-525998.svg"
-temperature_icon = "docs/icons/thermometer.svg"
-photovoltaic_power_icon = "docs/icons/noun-solar-energy-853048.svg"
-wind_speed_icon = "docs/icons/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
-cupy_icon = "docs/logos/CuPy_300x300.png"
-xarray_icon = "docs/logos/Xarray_RGB.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
-numpy_icon = "docs/logos/numpy.svg"
-dask_icon = "docs/logos/dask.svg"
-pydantic_icon = "docs/logos/pydantic.png"
-zarr_icon = "docs/logos/zarr.png"  # zarr_logo_x.png
-kerchunk_icon = "docs/logos/kerchunk.png"
-binary_data_icon = "docs/logos/pastebin.svg"
-files_icon = "docs/icons/files.svg"
-pandas_icon = "docs/logos/pandas.svg"
-python = "docs/logos/python.svg"
-c_icon = "docs/logos/c.svg"
-cplusplus_icon = "docs/logos/cplusplus.svg"
+path_to_icons = '../icons'
+path_to_logos = '../logos'
+
+pvgis6_icon = "{path_to_logos}/pvgis6_70px.png"
+irradiance_icon = "{path_to_icons}/wiggly_vertical_line.svg"
+spectral_effect_icon = "{path_to_icons}/noun-sun-525998.svg"
+temperature_icon = "{path_to_icons}/thermometer.svg"
+photovoltaic_power_icon = "{path_to_icons}/noun-solar-energy-853048.svg"
+wind_speed_icon = "{path_to_icons}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
+cupy_icon = "{path_to_logos}/CuPy_300x300.png"
+xarray_icon = "{path_to_logos}/Xarray_RGB.svg"
+netcdf_icon = "{path_to_logos}/netcdf-400x400.png"
+numpy_icon = "{path_to_logos}/numpy.svg"
+dask_icon = "{path_to_logos}/dask.svg"
+pydantic_icon = "{path_to_logos}/pydantic.png"
+zarr_icon = "{path_to_logos}/zarr.png"  # zarr_logo_x.png
+kerchunk_icon = "{path_to_logos}/kerchunk.png"
+binary_data_icon = "{path_to_logos}/pastebin.svg"
+files_icon = "{path_to_icons}/files.svg"
+pandas_icon = "{path_to_logos}/pandas.svg"
+python = "{path_to_logos}/python.svg"
+c_icon = "{path_to_logos}/c.svg"
+cplusplus_icon = "{path_to_logos}/cplusplus.svg"
 
 
 try:

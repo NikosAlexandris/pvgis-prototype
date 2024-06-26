@@ -18,29 +18,31 @@ from diagrams.custom import Custom
 from diagrams.programming.language import Python
 from diagrams.programming.framework import FastAPI
 
+path_to_icons = '../icons'
+path_to_logos = '../logos'
 
-user_icon = "docs/icons/noun-user-6616649.svg"
-pydantic_icon = "docs/logos/pydantic.svg"
-xarray_icon = "docs/logos/Xarray_RGB.png"
-pandas_icon = "docs/logos/pandas.svg"
-data_array_icon = "docs/logos/data_array.svg"
-numpy_icon = "docs/logos/numpy.svg"
-scipy_icon = "docs/logos/scipy.svg"
-dask_icon = "docs/logos/dask.svg"
-cupy_icon = "docs/logos/CuPy_300x300.png"
-loguru_icon = "docs/logos/loguru.png"
-typer_icon = "docs/logos/typer.svg"
-rich_icon = "docs/logos/rich.png"
-pvlib_logo = "docs/logos/pvlib.png"
-skyfield_logo = "docs/logos/skyfield.png"
-solar_position_icon = "docs/icons/sun-angle-outline.svg"
-solar_irradiance_icon = "docs/icons/sun-wireless-outline.svg"
-global_horizontal_irradiance_icon = "docs/icons/noun_global_horizontal_irradiance.svg"
-direct_horizontal_irradiance_icon = "docs/icons/noun_direct_horizontal_irradiance.svg"
-temperature_icon = "docs/icons/thermometer.svg"
-wind_speed_icon = "docs/icons/noun-windsock-4502486.svg"
-meteorological_variables_icon = "docs/icons/weather-partly-cloudy.svg"
-photovoltaic_power_icon = f"docs/icons/noun-solar-panel-6862742.svg"
+user_icon = "{path_to_icons}/noun-user-6616649.svg"
+pydantic_icon = "{path_to_logos}/pydantic.svg"
+xarray_icon = "{path_to_logos}/Xarray_RGB.png"
+pandas_icon = "{path_to_logos}/pandas.svg"
+data_array_icon = "{path_to_logos}/data_array.svg"
+numpy_icon = "{path_to_logos}/numpy.svg"
+scipy_icon = "{path_to_logos}/scipy.svg"
+dask_icon = "{path_to_logos}/dask.svg"
+cupy_icon = "{path_to_logos}/CuPy_300x300.png"
+loguru_icon = "{path_to_logos}/loguru.png"
+typer_icon = "{path_to_logos}/typer.svg"
+rich_icon = "{path_to_logos}/rich.png"
+pvlib_logo = "{path_to_logos}/pvlib.png"
+skyfield_logo = "{path_to_logos}/skyfield.png"
+solar_position_icon = "{path_to_icons}/sun-angle-outline.svg"
+solar_irradiance_icon = "{path_to_icons}/sun-wireless-outline.svg"
+global_horizontal_irradiance_icon = "{path_to_icons}/noun_global_horizontal_irradiance.svg"
+direct_horizontal_irradiance_icon = "{path_to_icons}/noun_direct_horizontal_irradiance.svg"
+temperature_icon = "{path_to_icons}/thermometer.svg"
+wind_speed_icon = "{path_to_icons}/noun-windsock-4502486.svg"
+meteorological_variables_icon = "{path_to_icons}/weather-partly-cloudy.svg"
+photovoltaic_power_icon = f"{path_to_icons}/noun-solar-panel-6862742.svg"
 
 
 try:

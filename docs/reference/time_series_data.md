@@ -36,33 +36,34 @@ from diagrams import Diagram, Cluster, Edge
 from diagrams.custom import Custom
 
 
-icons_path = "docs/icons"
+path_to_icons = "../icons"
+path_to_logos = '../logos'
 
-pvgis6_icon = "docs/logos/pvgis6_70px.png"
-transmission_control_protocol_icon = f"{icons_path}/noun-transmission-control-protocol-6111114.svg"
-data_analysis_icon = f"{icons_path}/noun-data-analysis.svg"
-irradiance_icon = f"{icons_path}/wiggly_vertical_line.svg"
-global_horizontal_irradiance_icon = f"{icons_path}/noun_global_horizontal_irradiance.svg"
-direct_horizontal_irradiance_icon = f"{icons_path}/noun_direct_horizontal_irradiance.svg"
-spectral_effect_icon = f"{icons_path}/noun-sun-525998_modified.svg"
-temperature_icon = f"{icons_path}/thermometer.svg"
-photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
-wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
-cupy_icon = "docs/logos/CuPy_300x300.png"
-xarray_icon = "docs/logos/Xarray_RGB.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
-data_array_icon = "docs/logos/data_array.svg"
-numpy_icon = "docs/logos/numpy.svg"
-dask_icon = "docs/logos/dask.svg"
-pydantic_icon = "docs/logos/pydantic.png"
-zarr_icon = "docs/logos/zarr.png"  # zarr_logo_x.png
-kerchunk_icon = "docs/logos/kerchunk.png"
-binary_data_icon = "docs/logos/pastebin.svg"
-files_icon = f"{icons_path}/files.svg"
-pandas_icon = "docs/logos/pandas.svg"
-python = "docs/logos/python.svg"
-c_icon = "docs/logos/c.svg"
-cplusplus_icon = "docs/logos/cplusplus.svg"
+pvgis6_icon = "{path_to_logos}/pvgis6_70px.png"
+transmission_control_protocol_icon = f"{path_to_icons}/noun-transmission-control-protocol-6111114.svg"
+data_analysis_icon = f"{path_to_icons}/noun-data-analysis.svg"
+irradiance_icon = f"{path_to_icons}/wiggly_vertical_line.svg"
+global_horizontal_irradiance_icon = f"{path_to_icons}/noun_global_horizontal_irradiance.svg"
+direct_horizontal_irradiance_icon = f"{path_to_icons}/noun_direct_horizontal_irradiance.svg"
+spectral_effect_icon = f"{path_to_icons}/noun-sun-525998_modified.svg"
+temperature_icon = f"{path_to_icons}/thermometer.svg"
+photovoltaic_power_icon = f"{path_to_icons}/noun-solar-energy-853048.svg"
+wind_speed_icon = f"{path_to_icons}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
+cupy_icon = "{path_to_logos}/CuPy_300x300.png"
+xarray_icon = "{path_to_logos}/Xarray_RGB.svg"
+netcdf_icon = "{path_to_logos}/netcdf-400x400.png"
+data_array_icon = "{path_to_logos}/data_array.svg"
+numpy_icon = "{path_to_logos}/numpy.svg"
+dask_icon = "{path_to_logos}/dask.svg"
+pydantic_icon = "{path_to_logos}/pydantic.png"
+zarr_icon = "{path_to_logos}/zarr.png"  # zarr_logo_x.png
+kerchunk_icon = "{path_to_logos}/kerchunk.png"
+binary_data_icon = "{path_to_logos}/pastebin.svg"
+files_icon = f"{path_to_icons}/files.svg"
+pandas_icon = "{path_to_logos}/pandas.svg"
+python = "{path_to_logos}/python.svg"
+c_icon = "{path_to_logos}/c.svg"
+cplusplus_icon = "{path_to_logos}/cplusplus.svg"
 
 
 try:
@@ -142,41 +143,41 @@ from diagrams import Diagram, Cluster, Edge
 from diagrams.custom import Custom
 
 
-icons_path = "docs/icons"
+path_to_icons = "{path_to_icons}"
 
-pvgis6_icon = "docs/logos/pvgis6_70px.png"
-transmission_control_protocol_icon = f"{icons_path}/noun-transmission-control-protocol-6111114.svg"
-data_analysis_icon = f"{icons_path}/noun-data-analysis.svg"
-irradiance_icon = f"{icons_path}/wiggly_vertical_line.svg"
-global_horizontal_irradiance_icon = f"{icons_path}/noun_global_horizontal_irradiance.svg"
-direct_horizontal_irradiance_icon = f"{icons_path}/noun_direct_horizontal_irradiance.svg"
-spectral_effect_icon = f"{icons_path}/noun-sun-525998_modified.svg"
-temperature_icon = f"{icons_path}/thermometer.svg"
-photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
-wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
+pvgis6_icon = "{path_to_logos}/pvgis6_70px.png"
+transmission_control_protocol_icon = f"{path_to_icons}/noun-transmission-control-protocol-6111114.svg"
+data_analysis_icon = f"{path_to_icons}/noun-data-analysis.svg"
+irradiance_icon = f"{path_to_icons}/wiggly_vertical_line.svg"
+global_horizontal_irradiance_icon = f"{path_to_icons}/noun_global_horizontal_irradiance.svg"
+direct_horizontal_irradiance_icon = f"{path_to_icons}/noun_direct_horizontal_irradiance.svg"
+spectral_effect_icon = f"{path_to_icons}/noun-sun-525998_modified.svg"
+temperature_icon = f"{path_to_icons}/thermometer.svg"
+photovoltaic_power_icon = f"{path_to_icons}/noun-solar-energy-853048.svg"
+wind_speed_icon = f"{path_to_icons}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
 
-data_array_icon = "docs/logos/data_array.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
+data_array_icon = "{path_to_logos}/data_array.svg"
+netcdf_icon = "{path_to_logos}/netcdf-400x400.png"
 
-kerchunk_icon = "docs/logos/kerchunk.png"
-binary_data_icon = "docs/logos/pastebin.svg"
-json_icon = "docs/logos/json.svg"
-parquet_icon = "docs/logos/apacheparquet.svg"
-zarr_icon = "docs/logos/zarr.png"  # zarr_logo_x.png
-xarray_icon = "docs/logos/Xarray_RGB.svg"
+kerchunk_icon = "{path_to_logos}/kerchunk.png"
+binary_data_icon = "{path_to_logos}/pastebin.svg"
+json_icon = "{path_to_logos}/json.svg"
+parquet_icon = "{path_to_logos}/apacheparquet.svg"
+zarr_icon = "{path_to_logos}/zarr.png"  # zarr_logo_x.png
+xarray_icon = "{path_to_logos}/Xarray_RGB.svg"
 
-pydantic_icon = "docs/logos/pydantic.png"
+pydantic_icon = "{path_to_logos}/pydantic.png"
 
-pandas_icon = "docs/logos/pandas.svg"
-numpy_icon = "docs/logos/numpy.svg"
-dask_icon = "docs/logos/dask.svg"
-cupy_icon = "docs/logos/CuPy_300x300.png"
+pandas_icon = "{path_to_logos}/pandas.svg"
+numpy_icon = "{path_to_logos}/numpy.svg"
+dask_icon = "{path_to_logos}/dask.svg"
+cupy_icon = "{path_to_logos}/CuPy_300x300.png"
 
-files_icon = f"{icons_path}/files.svg"
+files_icon = f"{path_to_icons}/files.svg"
 
-python = "docs/logos/python.svg"
-c_icon = "docs/logos/c.svg"
-cplusplus_icon = "docs/logos/cplusplus.svg"
+python = "{path_to_logos}/python.svg"
+c_icon = "{path_to_logos}/c.svg"
+cplusplus_icon = "{path_to_logos}/cplusplus.svg"
 
 
 try:
@@ -260,38 +261,40 @@ from diagrams import Diagram, Cluster, Edge
 from diagrams.custom import Custom
 
 
-icons_path = "docs/icons"
+path_to_icons = 'icons'
+path_to_logos = 'logos'
 
-pvgis6_icon = "docs/logos/pvgis6_70px.png"
-transmission_control_protocol_icon = f"{icons_path}/noun-transmission-control-protocol-6111114.svg"
-data_analysis_icon = f"{icons_path}/noun-data-analysis.svg"
-irradiance_icon = f"{icons_path}/wiggly_vertical_line.svg"
-global_horizontal_irradiance_icon = f"{icons_path}/noun_global_horizontal_irradiance.svg"
-direct_horizontal_irradiance_icon = f"{icons_path}/noun_direct_horizontal_irradiance.svg"
-spectral_effect_icon = f"{icons_path}/noun-sun-525998_modified.svg"
-temperature_icon = f"{icons_path}/thermometer.svg"
-photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
-wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
-cupy_icon = "docs/logos/CuPy_300x300.png"
-xarray_icon = "docs/logos/Xarray_RGB.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
-data_array_icon = "docs/logos/data_array.svg"
-numpy_icon = "docs/logos/numpy.svg"
-dask_icon = "docs/logos/dask.svg"
-pydantic_icon = "docs/logos/pydantic.png"
-zarr_icon = "docs/logos/zarr.png"  # zarr_logo_x.png
-kerchunk_icon = "docs/logos/kerchunk.png"
-binary_data_icon = "docs/logos/pastebin.svg"
-files_icon = f"{icons_path}/files.svg"
-pandas_icon = "docs/logos/pandas.svg"
-python = "docs/logos/python.svg"
-c_icon = "docs/logos/c.svg"
-cplusplus_icon = "docs/logos/cplusplus.svg"
+pvgis6_icon = "{path_to_logos}/pvgis6_70px.png"
+transmission_control_protocol_icon = f"{path_to_icons}/noun-transmission-control-protocol-6111114.svg"
+data_analysis_icon = f"{path_to_icons}/noun-data-analysis.svg"
+irradiance_icon = f"{path_to_icons}/wiggly_vertical_line.svg"
+global_horizontal_irradiance_icon = f"{path_to_icons}/noun_global_horizontal_irradiance.svg"
+direct_horizontal_irradiance_icon = f"{path_to_icons}/noun_direct_horizontal_irradiance.svg"
+spectral_effect_icon = f"{path_to_icons}/noun-sun-525998_modified.svg"
+temperature_icon = f"{path_to_icons}/thermometer.svg"
+photovoltaic_power_icon = f"{path_to_icons}/noun-solar-energy-853048.svg"
+wind_speed_icon = f"{path_to_icons}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
+cupy_icon = "{path_to_logos}/CuPy_300x300.png"
+xarray_icon = "{path_to_logos}/Xarray_RGB.svg"
+netcdf_icon = "{path_to_logos}/netcdf-400x400.png"
+data_array_icon = "{path_to_logos}/data_array.svg"
+numpy_icon = "{path_to_logos}/numpy.svg"
+dask_icon = "{path_to_logos}/dask.svg"
+pydantic_icon = "{path_to_logos}/pydantic.png"
+zarr_icon = "{path_to_logos}/zarr.png"  # zarr_logo_x.png
+kerchunk_icon = "{path_to_logos}/kerchunk.png"
+binary_data_icon = "{path_to_logos}/pastebin.svg"
+files_icon = f"{path_to_icons}/files.svg"
+pandas_icon = "{path_to_logos}/pandas.svg"
+python = "{path_to_logos}/python.svg"
+c_icon = "{path_to_logos}/c.svg"
+cplusplus_icon = "{path_to_logos}/cplusplus.svg"
 
 
 try:
     with suppress(FileNotFoundError):
-        with Diagram("Analysis of Photovoltaic Performance", direction="TB", show=False) as diagram:
+        graph_attr = {"splines":"spline"}
+        with Diagram("Analysis of Photovoltaic Performance", direction="TB", show=False, graph_attr=graph_attr) as diagram:
             diagram.render = lambda: None
 
 
