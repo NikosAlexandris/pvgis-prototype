@@ -1,9 +1,8 @@
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
+from pvgisprototype import SurfaceTilt
 from scipy import optimize
-from pvgisprototype.api.surface.helper_functions import (
-    OptimizerMethod,
-    OptimizerMode,
-    calculate_mean_negative_power_output,
+from pvgisprototype.api.surface.parameter_models import (
+    SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMode,
 )
 from typing import Callable
 
@@ -11,16 +10,16 @@ from typing import Callable
 def optimizer(
     location_parameters: dict,
     func: Callable,
-    method: OptimizerMethod = OptimizerMethod.shgo,
+    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     iterations: int = 100,
-    mode: OptimizerMode = OptimizerMode.tilt,
+    mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     bounds: optimize.Bounds = optimize.Bounds(
         lb=SurfaceTilt().min_radians, ub=SurfaceTilt().max_radians
     ),
     workers: int = 1,
     sampling_method_shgo: str = "sobol",
 ):
-    if method == OptimizerMethod.shgo:
+    if method == SurfacePositionOptimizerMethod.shgo:
         result = optimize.shgo(
             func=func,
             bounds=bounds,
@@ -31,7 +30,7 @@ def optimizer(
             options={"disp": True},
         )
 
-    if method == OptimizerMethod.brute:
+    if method == SurfacePositionOptimizerMethod.brute:
         result = optimize.brute(
             func=func,
             ranges=bounds,
