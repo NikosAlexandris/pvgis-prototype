@@ -38,6 +38,8 @@ on :
 """
 
 description = """
+<span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>.
+
 The **PVGIS Web API**
 is a public service
 supported by the
