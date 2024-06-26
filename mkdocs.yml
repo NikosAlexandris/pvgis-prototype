@@ -257,6 +257,8 @@ extra_javascript:
   - js/extra-loader.js
 
 plugins:
+  - privacy:
+      enabled: !ENV [CI, false]
   - search
   - badges
   - pagetree
