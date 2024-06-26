@@ -187,7 +187,9 @@ async def get_photovoltaic_performance_analysis(
 
     # Features
 
+    - A symbol nomenclature for easy identification of quantities, units, and more -- see [Symbols](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/symbols/)
     - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html) 
+    - Valid time zone identifiers from [the IANA Time Zone Database](https://www.iana.org/time-zones)
     - Surface position optimisation supported by [SciPy](https://docs.scipy.org/doc/scipy/reference/optimize.html) (**pending integration**)
     - Get from simple to detailed output in form of **JSON**, **CSV** and **Excel** (the latter **pending implementation**)
     - Share a **QR-Code** with a summary of the analysis

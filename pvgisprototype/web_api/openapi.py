@@ -4,16 +4,20 @@ from fastapi import FastAPI
 
 tags_metadata = [
     {
-        "name": "Welcome",
-        "description": "Welcome message and similar functions.",
+        "name": "Features",
+        "description": "A detailed overview of features and capabilities.",
         "externalDocs": {
             "description": "See also : PVGIS Overview",
-            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/overview/",
+            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/",
         },
     },
     {
         "name": "Reference",
         "description": "References, publications and citation for PVGIS 6.",
+        "externalDocs": {
+            "description": "See relevant documentation",
+            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/reference/",
+        },
     },
     {
         "name": "Performance",
