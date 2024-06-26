@@ -116,7 +116,7 @@ async def process_timezone(
     return ZoneInfo(timezone.value)
 
 
-T = TypeVar("T", GroupBy, Frequency)
+TimeUnit = TypeVar("TimeUnit", GroupBy, Frequency)
 
 time_groupings: Dict[str, Optional[str]] = {
     "Yearly": "YE",
@@ -126,12 +126,12 @@ time_groupings: Dict[str, Optional[str]] = {
     "Daily": "D",
     "Hourly": "h",
     "Minutely": "min",
-    "Do not group-by": None,
+    "None": None,
 }
 
 
-async def process_time_grouping(value: T) -> Optional[str]:
-    return time_groupings[value.value]
+async def process_time_grouping(time_unit: TimeUnit) -> Optional[str]:
+    return time_groupings[time_unit.value]
 
 
 async def process_groupby(groupby: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.NoneValue) -> Optional[str]:
@@ -437,13 +437,13 @@ async def process_fingerprint(
     return fingerprint
 
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_optimise_surface_position
-from pvgisprototype.web_api.schemas import OptimiseMode
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_elevation
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
 from pvgisprototype.api.surface.optimize_angles import optimize_angles
-from pvgisprototype.api.surface.helper_functions import OptimizerMethod
-from pvgisprototype.api.surface.helper_functions import OptimizerMode
+from pvgisprototype.api.surface.parameter_models import (
+    SurfacePositionOptimizerMode,
+)
 
 
 async def process_optimise_surface_position(
@@ -470,12 +470,12 @@ async def process_optimise_surface_position(
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    optimise_surface_position: Annotated[OptimiseMode, fastapi_query_optimise_surface_position] = OptimiseMode.NoneValue
+    optimise_surface_position: Annotated[SurfacePositionOptimizerMode, fastapi_query_optimise_surface_position] = SurfacePositionOptimizerMode.NoneValue
 )->dict:
-    if optimise_surface_position == OptimiseMode.NoneValue:
+    if optimise_surface_position == SurfacePositionOptimizerMode.NoneValue:
         return {}
     else:
-        if optimise_surface_position == OptimiseMode.Orientation:
+        if optimise_surface_position == SurfacePositionOptimizerMode.Orientation:
             optimise_surface_position = optimize_angles(
                 longitude=longitude,
                 latitude=latitude,
@@ -493,10 +493,10 @@ async def process_optimise_surface_position(
                 wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
                 linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
                 photovoltaic_module=photovoltaic_module, 
-                mode=OptimizerMode.orientation,
+                mode=SurfacePositionOptimizerMode.Orientation,
                 sampling_method_shgo = 'sobol'
             )
-        elif optimise_surface_position == OptimiseMode.Tilt:
+        elif optimise_surface_position == SurfacePositionOptimizerMode.Tilt:
             optimise_surface_position = optimize_angles(
                     longitude=longitude,
                     latitude=latitude,
@@ -514,7 +514,7 @@ async def process_optimise_surface_position(
                     wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
                     linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
                     photovoltaic_module=photovoltaic_module, 
-                    mode=OptimizerMode.tilt,
+                    mode=SurfacePositionOptimizerMode.Tilt,
                     sampling_method_shgo = 'sobol'
             )
         else:
@@ -535,7 +535,7 @@ async def process_optimise_surface_position(
                     wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
                     linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
                     photovoltaic_module=photovoltaic_module, 
-                    mode=OptimizerMode.tilt_orientation,
+                    mode=SurfacePositionOptimizerMode.Tilt_and_Orientation,
                     sampling_method_shgo = 'sobol'
             )
         
