@@ -371,7 +371,7 @@ MULTI_THREAD_FLAG_DEFAULT = True
 MULTI_THREAD_FLAG_DESCRIPTION = f'Perform calculations in a multi-thread context, default is {MULTI_THREAD_FLAG_DEFAULT}.'
 
 VERBOSE_LEVEL_DEFAULT = 0
-VERBOSE_LEVEL_DESCRIPTION = f"{SYMBOL_VERBOSITY} Verbosity level : 0 returns list of values only, higher levels reveal intermediate calculations. Default is {VERBOSE_LEVEL_DEFAULT}."
+VERBOSE_LEVEL_DESCRIPTION = f"{SYMBOL_VERBOSITY} Verbosity level : 0 returns list of values only, higher levels reveal intermediate calculations."
 
 QUIET_FLAG_DEFAULT = False
 QUIET_FLAG_DESCRIPTION = f"{SYMBOL_SILENCE} Silence output, useful for timing the duration of processes or partial output"
@@ -408,13 +408,13 @@ MASK_AND_SCALE_DESCRIPTION = "Mask and scale the series"
 IN_MEMORY_DESCRIPTION = "Whether to process data in memory"
 
 START_NAME = 'Start'
-START_TIME_DESCRIPTION = f"{SYMBOL_START_TIME} {START_NAME} {TIMESTAMP_NAME}"
+START_TIME_DESCRIPTION = f"{SYMBOL_START_TIME} {START_NAME} {TIMESTAMP_NAME}. **Attention**: if not given, the defaul time is `00:00:00`."
 
 PERIODS_NAME = 'Periods'
 PERIODS_DESCRIPTION = f"{SYMBOL_PERIODS} Number of {PERIODS_NAME} to generate. Can be used with _either_ `start_time` _or_ `end_time` plus the frequency, or then _both_ start _and_ end time which will generate automatically the frequency (linearly spaced)."
 FREQUENCY_DESCRIPTION = f"{SYMBOL_FREQUENCY} Frequency for timestamp generation"
 END_NAME = 'End'
-END_TIME_DESCRIPTION = f"{SYMBOL_END_TIME} {END_NAME} {TIMESTAMP_NAME}"
+END_TIME_DESCRIPTION = f"{SYMBOL_END_TIME} {END_NAME} {TIMESTAMP_NAME} **Attention**: if not given, the defaul time is `00:00:00`."
 
 TIMEZONE_NAME = 'Timezone'
 TIMEZONE_DESCRIPTION = f"{TIMEZONE_NAME} (ex. 'UTC')"
@@ -715,13 +715,11 @@ TITLE_KEY_NAME = 'Title'
 
 LONGITUDE_COLUMN_NAME = LONGITUDE_NAME + f' {SYMBOL_LONGITUDE}'
 # LONGITUDE_DESCRIPTION = f"{SYMBOL_LONGITUDE} Longitude in decimal degrees ranging in [{LONGITUDE_MINIMUM}, {LONGITUDE_MAXIMUM}]"
-LONGITUDE_DESCRIPTION = f"{SYMBOL_LONGITUDE} Longitude in decimal"
+LONGITUDE_DESCRIPTION = f"{SYMBOL_LONGITUDE} Longitude in decimal {DEGREES}{SYMBOL_DEGREES}"
 
 LATITUDE_COLUMN_NAME = LATITUDE_NAME + f' {SYMBOL_LATITUDE}'
-LATITUDE_DESCRIPTION = (
-    # f"{SYMBOL_LATITUDE} Latitude in decimal degrees ranging in [{LATITUDE_MINIMUM}, {LATITUDE_MAXIMUM}]"
-    f"{SYMBOL_LATITUDE} Latitude in decimal degrees"
-)
+# LATITUDE_DESCRIPTION = f"{SYMBOL_LATITUDE} Latitude in decimal degrees ranging in [{LATITUDE_MINIMUM}, {LATITUDE_MAXIMUM}]"
+LATITUDE_DESCRIPTION = f"{SYMBOL_LATITUDE} Latitude in decimal {DEGREES}{SYMBOL_DEGREES}"
 
 ELEVATION_COLUMN_NAME = f'{ELEVATION_NAME} {SYMBOL_ELEVATION}'
 ELEVATION_DESCRIPTION = f"{SYMBOL_ELEVATION} Topographical {ELEVATION_NAME} in {SYMBOL_UNIT_ELEVATION_LONG}"
