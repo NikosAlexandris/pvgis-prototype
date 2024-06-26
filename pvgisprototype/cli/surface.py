@@ -122,9 +122,9 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import QUICK_RESPONSE_CODE_FLAG_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import METADATA_FLAG_DEFAULT
-from pvgisprototype.api.surface.helper_functions import OptimizerMethod
-from pvgisprototype.api.surface.helper_functions import OptimizerMode
+from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMethod, SurfacePositionOptimizerMode
 from pvgisprototype.cli.typer.log import typer_option_log
+
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -243,8 +243,8 @@ def optmise_surface_position(
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     quick_response_code: Annotated[bool, typer_option_quick_response] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
-    mode: OptimizerMode = OptimizerMode.tilt,
-    method: OptimizerMethod = OptimizerMethod.shgo, 
+    mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
+    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo, 
     workers : int = 1,
     sampling_method_shgo = 'sobol'
 ):
@@ -267,7 +267,7 @@ def optmise_surface_position(
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        method=OptimizerMethod.shgo,
+        method=SurfacePositionOptimizerMethod.shgo,
         mode=mode,
         sampling_method_shgo="sobol",
     )
