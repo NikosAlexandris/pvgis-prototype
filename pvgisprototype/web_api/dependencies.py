@@ -78,7 +78,14 @@ from pvgisprototype.constants import QUIET_FLAG_DEFAULT
 from pvgisprototype.constants import QUICK_RESPONSE_CODE_FLAG_DEFAULT
 from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT
 from typing import Annotated, Optional, Dict, TypeVar
-
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_optimise_surface_position
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_elevation
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
+from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.parameter_models import (
+    SurfacePositionOptimizerMode,
+)
 
 async def process_longitude(
     longitude: Annotated[float, fastapi_query_longitude] = 8.628,
@@ -435,15 +442,6 @@ async def process_fingerprint(
         fingerprint = True
 
     return fingerprint
-
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_optimise_surface_position
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_elevation
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
-from pvgisprototype.api.surface.optimize_angles import optimize_angles
-from pvgisprototype.api.surface.parameter_models import (
-    SurfacePositionOptimizerMode,
-)
 
 
 async def process_optimise_surface_position(
