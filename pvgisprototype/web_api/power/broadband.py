@@ -288,6 +288,7 @@ async def get_photovoltaic_power_series_advanced(
     electricity grid (without battery storage) based on broadband solar
     irradiance, ambient temperature and wind speed.
     """
+
     if optimise_surface_position:
         surface_orientation = optimise_surface_position['surface_orientation'].value # type: ignore
         surface_tilt = optimise_surface_position['surface_tilt'].value # type: ignore
