@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Optional
+from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pvgisprototype import (
     TemperatureSeries,
@@ -10,8 +13,12 @@ from pvgisprototype import (
     SurfaceTilt,
 )
 from pvgisprototype.constants import (
+    IN_MEMORY_FLAG_DEFAULT,
+    MASK_AND_SCALE_FLAG_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
     SPECTRAL_FACTOR_DEFAULT,
     TEMPERATURE_DEFAULT,
+    TOLERANCE_DEFAULT,
     WIND_SPEED_DEFAULT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
 )
@@ -46,9 +53,15 @@ def optimize_angles(
     max_surface_tilt: float = SurfaceTilt().max_radians,
     timestamps: DatetimeIndex = str(now_utc_datetimezone()),
     timezone: ZoneInfo = ZoneInfo('UTC'),
+    global_horizontal_irradiance: Optional[Path] = None,
+    direct_horizontal_irradiance: Optional[Path] = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
     wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+    neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
@@ -63,11 +76,6 @@ def optimize_angles(
         elevation=elevation,
         timestamps=timestamps,
         timezone=timezone,
-        spectral_factor_series=spectral_factor_series,
-        photovoltaic_module=photovoltaic_module,
-        temperature_series=temperature_series,
-        wind_speed_series=wind_speed_series,
-        linke_turbidity_factor_series=linke_turbidity_factor_series,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         mode=mode,
@@ -85,6 +93,11 @@ def optimize_angles(
     result_optimizer = optimizer(
         location_parameters=location_parameters,
         func=calculate_mean_negative_power_output,
+        spectral_factor_series=spectral_factor_series,
+        photovoltaic_module=photovoltaic_module,
+        temperature_series=temperature_series,
+        wind_speed_series=wind_speed_series,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
         method=method,
         mode=mode,
         bounds=bounds,

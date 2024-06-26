@@ -13,11 +13,6 @@ def create_dictionary_for_location_parameters(
     elevation,
     timestamps,
     timezone,
-    spectral_factor_series,
-    photovoltaic_module,
-    temperature_series,
-    wind_speed_series,
-    linke_turbidity_factor_series,
     surface_orientation,
     surface_tilt,
     mode,
@@ -29,11 +24,6 @@ def create_dictionary_for_location_parameters(
         "elevation": elevation,
         "timestamps": timestamps,
         "timezone": timezone,
-        "spectral_factor_series": spectral_factor_series,
-        "photovoltaic_module": photovoltaic_module,
-        "temperature_series": temperature_series,
-        "wind_speed_series": wind_speed_series,
-        "linke_turbidity_factor_series": linke_turbidity_factor_series,
     }
     if mode ==SurfacePositionOptimizerMode.Tilt:
         dictionary_for_location_parameters["surface_orientation"] = surface_orientation
@@ -88,7 +78,22 @@ def create_bounds_for_optimizer(
         return bounds
 
 
-def calculate_mean_negative_power_output(surface_angle, location_parameters, mode):
+def calculate_mean_negative_power_output(
+    surface_angle,
+    location_parameters,
+    global_horizontal_irradiance,  # time series optional
+    direct_horizontal_irradiance,  # time series, optional
+    spectral_factor_series,
+    temperature_series,
+    wind_speed_series,
+    neighbor_lookup,
+    tolerance,
+    mask_and_scale,
+    in_memory,
+    linke_turbidity_factor_series,
+    photovoltaic_module,
+    mode
+):
     """
     """
     # from devtools import debug
@@ -96,6 +101,17 @@ def calculate_mean_negative_power_output(surface_angle, location_parameters, mod
     if mode ==SurfacePositionOptimizerMode.Tilt:
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_tilt=surface_angle,
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            spectral_factor_series=spectral_factor_series,
+            temperature_series=temperature_series,
+            wind_speed_series=wind_speed_series,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            photovoltaic_module=photovoltaic_module,
             **location_parameters,
         )
 
