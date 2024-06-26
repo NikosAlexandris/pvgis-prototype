@@ -820,7 +820,52 @@ async def get_photovoltaic_power_output_series_multi(
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
 ):
+    """Calculate the total photovoltaic power/energy generated for a series of
+    surface orientation and tilt angle pairs, optionally for various
+    technologies, free-standing or building-integrated, at a specific location
+    and a given period.
 
+    ### Algorithms & Models
+
+    - Solar radiation model by Hofierka, 2002
+    - Photovoltaic efficiency coefficients by ESTI, C2, JRC, European Commission
+    - Solar positioning based on NOAA's solar geometry equations
+    - Reflectivity effect as a function of the solar incidence angle by Martin and Ruiz, 2005
+    - Spectal mismatch effect by Huld, 2011
+    - Overall system efficiency pre-set to 0.86, in other words 14% of loss for material degradation, aging, etc.
+
+    ### Input data
+
+    This function consumes internally :
+    
+    - time series data limited to the period **2005** - **2023**.
+    - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
+    - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
+    - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
+
+    ### **Important Notes**
+
+    - The function expects pairs of surface orientation
+      (`surface_orientation`) and tilt (`surface_tilt`) angles, that is the
+      number of requested orientation angles should equal the number of
+      requested tilt angles.
+
+    - The default time, if not given, regardless of the `frequency` is
+      `00:00:00`. It is then expected to get `0` incoming solar irradiance and
+      subsequently photovoltaic power/energy output.
+
+    ### Features
+
+    - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html) 
+    - Optional algorithms for solar timing, positioning and the estimation of the solar incidence angle
+    - Optionally Disable the atmospheric refraction for solar positioning
+    - Optional power-rating models on top of optional module temperature models (pending integration of alternatives)
+    - Get from simple to detailed output in form of **JSON**, **CSV** and **Excel** (the latter **pending implementation**)
+    - Share a **QR-Code** with a summary of the analysis
+    - **Fingerprint** your analysis
+    - Document your analysis including all **input metadata**
+
+    """
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         longitude=longitude,
         latitude=latitude,
