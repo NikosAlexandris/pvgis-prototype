@@ -5,23 +5,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.responses import ORJSONResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.openapi.utils import get_openapi
 from jinja2 import Template
 
 from fastapi.openapi.docs import get_swagger_ui_html
-from pvgisprototype.web_api.input_parameters import FASTAPI_INPUT_PARAMETERS
 
 from pvgisprototype.api.citation import generate_citation_text
 from pvgisprototype.web_api.performance.broadband import get_photovoltaic_performance_analysis
-# from pvgisprototype.web_api.series.select import select
-# from pvgisprototype.web_api.position.overview import get_calculate_solar_position_overview
-# from pvgisprototype.web_api.position.solar_time import get_calculate_solar_time
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_monthly_average
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_advanced
-# from pvgisprototype.plot.plot_solar_declination import plot_solar_declination_one_year_bokeh
-# from pvgisprototype.web_api.plot.plot_example import plot_example
-# from pvgisprototype.web_api.plot.plot_example import graph_example
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series_multi
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
 
@@ -56,36 +48,8 @@ please refer to the
 [PVGIS Documentation](https://jrc-projects.apps.ocp.jrc.ec.europa.eu/pvgis/pvis-be-prototype/).
 """
 
-tags_metadata = [
-    {
-        "name": "Welcome",
-        "description": "Welcome message and similar functions.",
-        "externalDocs": {
-                    "description": "Items external docs",
-                    "url": "https://fastapi.tiangolo.com/",
-                },
-    },
-    {
-        "name": "Reference",
-        "description": "References, publications and citation for PVGIS 6.",
-    },
-    {
-        "name": "Performance",
-        "description": "Analysis of photovoltaic performance",
-        "externalDocs": {
-            "description": "See relevant section in the documentation",
-            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/reference/photovoltaic_performance/",
-            },
-    },
-    {
-        "name": "Power",
-        "description": "Functions to calculate photovoltaic power/energy time series",
-        "externalDocs": {
-            "description": "See also relevant section in the interactive documentation",
-            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/power/introduction/",
-            },
-    },
-]
+
+from pvgisprototype.web_api.openapi import tags_metadata
 
 app = FastAPI(
     title="PVGIS Web API",
@@ -107,7 +71,7 @@ app = FastAPI(
         # "syntaxHighlight.theme": "obsidian",
         "syntaxHighlight": False,
         # "defaultModelsExpandDepth": -1,  # Hide models section
-        # "docExpansion": "none",  # expand only tags
+        "docExpansion": "none",  # expand only tags
         "filter": True,  # filter tags
         "displayRequestDuration": True,  # Display request duration
         "showExtensions": True,  # Show vendor extensions
@@ -129,55 +93,8 @@ async def custom_swagger_ui_html():
     )
 
 
-def reorder_parameters(api_spec, endpoint_path, params_order):
-    if "parameters" in api_spec["paths"][endpoint_path]["get"]:
-        parameters_list = api_spec["paths"][endpoint_path]["get"]["parameters"]
-        ordered_parameters = sorted(
-            parameters_list, key=lambda x: params_order.index(x["name"])
-        )
-        api_spec["paths"][endpoint_path]["get"]["parameters"] = ordered_parameters
-    return api_spec
 
 
-def custom_openapi():
-        if app.openapi_schema:
-            return app.openapi_schema
-        openapi_schema = get_openapi(
-            title=app.title,
-            version=app.version,
-            summary=app.summary,
-            description=app.description,
-            routes=app.routes,
-            terms_of_service=app.terms_of_service,
-            contact=app.contact,
-            license_info=app.license_info,
-            tags=tags_metadata,
-        )
-        openapi_schema["info"]["x-logo"] = {
-            "url": "http://127.0.02:8000/assets/pvgis6_70px.png",
-            # "backgroundColor": "#FFFFFF",
-            "altText": "PVGIS 6 logo",
-        }
-        reordered_openapi_schema = reorder_parameters(
-            openapi_schema,
-            "/calculate/power/broadband-advanced",
-            FASTAPI_INPUT_PARAMETERS,
-        )
-        reordered_openapi_schema = reorder_parameters(
-            openapi_schema,
-            "/calculate/power/broadband",
-            FASTAPI_INPUT_PARAMETERS,
-        )
-        reordered_openapi_schema = reorder_parameters(
-            openapi_schema,
-            "/calculate/performance/broadband",
-            FASTAPI_INPUT_PARAMETERS,
-        )
-        app.openapi_schema = openapi_schema
-        return app.openapi_schema
-
-
-app.openapi = custom_openapi
 # app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -240,6 +157,10 @@ app.get("/calculate/power/broadband-advanced", tags=["Power"])(
 app.get("/calculate/power/broadband-multi", tags=["Power", "Multiple surfaces"])(
     get_photovoltaic_power_output_series_multi
 )
+
+
+from pvgisprototype.web_api.openapi import customise_openapi
+app.openapi = customise_openapi(app)
 
 
 if __name__ == "__main__":
