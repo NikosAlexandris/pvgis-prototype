@@ -115,7 +115,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_tolerance,
     fastapi_query_zero_negative_solar_incidence_angle,
 )
-from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone#, VerbosityLevel
+from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone
 
 
 def get_metadata(request: Request):
@@ -185,14 +185,29 @@ async def get_photovoltaic_performance_analysis(
     technologies, free-standing or building-integrated, at a specific location
     and a given period.
 
-    ### Input time series
+    ### Algorithms & Models
+
+    - Solar radiation model by Hofierka, 2002
+    - Photovoltaic efficiency coefficients by ESTI, C2, JRC, European Commission
+    - Solar positioning based on NOAA's solar geometry equations
+    - Reflectivity effect as a function of the solar incidence angle by Martin and Ruiz, 2005
+    - Spectal mismatch effect by Huld, 2011
+    - Overall system efficiency pre-set to 0.86, in other words 14% of loss for material degradation, aging, etc.
+
+    ### Input data
 
     This function consumes internally :
     
     - time series data limited to the period **2005** - **2023**.
-    - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003) (produced by the German Weather Service)
+    - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
     - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
+
+    ### **Important Notes**
+
+    - The default time, if not given, regardless of the `frequency` is
+      `00:00:00`. It is then expected to get `0` incoming solar irradiance and
+      subsequently photovoltaic power/energy output.
 
     ### Features
 
