@@ -412,7 +412,7 @@ START_TIME_DESCRIPTION = f"{SYMBOL_START_TIME} {START_NAME} {TIMESTAMP_NAME}. **
 
 PERIODS_NAME = 'Periods'
 PERIODS_DESCRIPTION = f"{SYMBOL_PERIODS} Number of {PERIODS_NAME} to generate. Can be used with _either_ `start_time` _or_ `end_time` plus the frequency, or then _both_ start _and_ end time which will generate automatically the frequency (linearly spaced)."
-FREQUENCY_DESCRIPTION = f"{SYMBOL_FREQUENCY} Frequency for timestamp generation"
+FREQUENCY_DESCRIPTION = f"{SYMBOL_FREQUENCY} Frequency for the generation of timestamps given _either_ 1) a `start_time` and `end_time` _or_ 2) `start_time` plus `periods` _or 3) `end_time` plus the `periods`. See also relevant notes in Pandas documentation."
 END_NAME = 'End'
 END_TIME_DESCRIPTION = f"{SYMBOL_END_TIME} {END_NAME} {TIMESTAMP_NAME} **Attention**: if not given, the defaul time is `00:00:00`."
 
