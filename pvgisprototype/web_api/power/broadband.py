@@ -288,6 +288,7 @@ async def get_photovoltaic_power_series_advanced(
     electricity grid (without battery storage) based on broadband solar
     irradiance, ambient temperature and wind speed.
     """
+
     if optimise_surface_position:
         surface_orientation = optimise_surface_position['surface_orientation'].value # type: ignore
         surface_tilt = optimise_surface_position['surface_tilt'].value # type: ignore
@@ -819,6 +820,8 @@ async def get_photovoltaic_power_output_series_multi(
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
+
 ):
     """Calculate the total photovoltaic power/energy generated for a series of
     surface orientation and tilt angle pairs, optionally for various
@@ -1003,6 +1006,21 @@ async def get_photovoltaic_power_output_series_multi(
             groupby=groupby,  # type: ignore[arg-type]
         )
         response["Statistics"] = convert_numpy_arrays_to_lists(series_statistics)
+
+    if analysis.value != AnalysisLevel.NoneValue:
+        photovoltaic_performance_report = summarise_photovoltaic_performance(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True if surface_orientation else False,
+            surface_tilt=True if surface_tilt else False,
+            dictionary=photovoltaic_power_output_series.components,
+            timestamps=timestamps,
+            frequency=frequency,
+            analysis=analysis,
+        )
+        response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report
+
 
     if not quiet:
         if verbose > 0:
