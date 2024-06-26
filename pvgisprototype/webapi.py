@@ -16,6 +16,7 @@ from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_advanced
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series_multi
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
+from pvgisprototype.web_api.openapi import tags_metadata
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -47,11 +48,102 @@ supported by the
 European Commission. 🇪🇺
 For detailed information and structured content,
 please refer to the
-[PVGIS Documentation](https://jrc-projects.apps.ocp.jrc.ec.europa.eu/pvgis/pvis-be-prototype/).
+[PVGIS Documentation](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/).
+"""
+
+pvgis6_features = """
+# Overview of Features
+
+PVGIS 6
+is a public service in the domain of photovoltaic performance analysis.
+It introduces a series of advanced features and improvement over its predecessor.
+Built with modern technologies and a user-centric design,
+PVGIS 6 enhances user experience and broadens the scope of functionality,
+making solar data more accessible.
+This version is tailored to meet the needs of
+researchers, developers, and prosumers,
+offering comprehensive tools for detailed solar analysis.
+
+# Algorithms & Models
+
+- Optional solar positioning and incidence angle algorithms -- Default is NOAA's solar geometry set of equations (**under review**)
+- Capability to disable atmospheric refraction for solar positioning.
+- Surface position optimization supported by SciPy
+- The same solar radiation model as in PVGIS 5.x (Hofierka, 2002), however based on tested calculations.
+- From simple to fully analytical output of photovoltaic performance (power/energy) figures
+- Reflectivity effect as a function of the solar incidence angle by Martin and Ruiz, 2005
+- Spectal mismatch effect by Huld, 2011 based on the reference year 2013
+- Photovoltaic efficiency coefficients by ESTI, C2, JRC, European Commission
+- Overall system efficiency pre-set to 0.86, in other words 14% of loss for material degradation, aging, etc.
+- Improved TMY engine, default is the ISO 15927-4 method as in PVGIS 5 and optionally the NREL and Sandia methods along with enhanced plots.
+
+# Components
+
+- Algorithmic repository based on Python and NumPy
+- Core Application Programming Interface (API) for advance programmatic work
+- Command Line Interface (CLI) through an expanded set of commands to support scripting, automation and exploratory research
+- Web API: Offers a robust Web API compliant with modern standards for integration with other applications and automated retrieval of relevant time series
+
+# Architecture & Development
+
+- Custom Data Classes
+- Duck Typing for interoperability between array computing backends (Work In-Progress)
+- Comprehensive logging framework for troubleshooting and development support.
+- Development Roadmap and Contribution Guidelines: Transparent development process with clear guidelines for contributors.
+
+# Documentation
+
+- A symbol system for quick reference of terms, quantities, units, data types and more items used throughout the application -- see [Symbols](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/symbols/)
+- API, CLI, and Web API Documentation: Detailed documentation supports all functionalities, ensuring ease of use and accessibility.
+- Rich metadata support for each calculation to support detailed documentation.
+
+# Technical features
+
+In :
+
+- Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html) 
+- Valid time zone identifiers from [the IANA Time Zone Database](https://www.iana.org/time-zones)
+- Precision control of numerical outputs, would you ever need it!
+
+Process :
+
+- Optional algorithms for solar timing, positioning and the estimation of the solar incidence angle
+- Disable atmospheric refraction for solar positioning
+- Surface position optimisation supported by [SciPy](https://docs.scipy.org/doc/scipy/reference/optimize.html) (**pending integration**)
+- Simpler power-rating model as well as module temperature model (**under review**)
+
+Output Management
+
+- Verbose output control for quick summaries and analytical output in form of **JSON**, **CSV** and **Excel** (the latter **pending implementation**)
+- Built-in capability to generate visual plots directly in the command-line or to export as image file.
+- **Fingerprint** each output for verification and tracing, enhancing data integrity and reproducibility.
+- **QR Code** generation for easy sharing of results as an image or a Base64 string
+
+## **Important Notes**
+
+- The default time, if not given, regardless of the `frequency` is
+  `00:00:00`. It is then expected to get `0` incoming solar irradiance and
+  subsequently photovoltaic power/energy output.
+
+- Of the four parameters `start_time`, `end_time`, `periods`, and
+  `frequency`, exactly three must be specified. If `frequency` is omitted,
+  the resulting timestamps (a Pandas `DatetimeIndex` object)
+  will have `periods` linearly spaced elements between `start_time` and
+  `end_time` (closed on both sides). Learn more about frequency strings at
+  [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
+
+# Input data
+
+The application can read any Xarray-supported data format.
+Notwithstanding, the default input data sources are :
+
+- time series data limited to the period **2005** - **2023**.
+- solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
+- temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
+- spectral effect factor time series (Huld, 2011) _for the reference year 2013_
 """
 
 
-from pvgisprototype.web_api.openapi import tags_metadata
 
 app = FastAPI(
     title="PVGIS Web API",
@@ -95,18 +187,15 @@ async def custom_swagger_ui_html():
     )
 
 
-
-
 # app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="static")
 templates = Jinja2Templates(directory="templates")
 template = Template(template_html)
 
 
-@app.get("/welcome", tags=['Welcome'])
+@app.get("/welcome", tags=['Features'])
 async def print_welcome_message():
-    welcome_message = "Welcome to PVGIS 6"
-    return welcome_message
+    return pvgis6_features
 
 
 @app.get("/references/license", tags=["Reference"])
