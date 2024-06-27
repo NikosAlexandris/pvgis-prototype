@@ -2,6 +2,7 @@ from fastapi.openapi.utils import get_openapi
 from pvgisprototype.web_api.input_parameters import FASTAPI_INPUT_PARAMETERS
 from fastapi import FastAPI
 
+
 tags_metadata = [
     {
         "name": "Features",
@@ -15,7 +16,15 @@ tags_metadata = [
         "name": "Reference",
         "description": "References, publications and citation for PVGIS 6.",
         "externalDocs": {
-            "description": "See relevant documentation",
+            "description": "See also: PVGIS Reference",
+            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/reference/",
+        },
+    },
+    {
+        "name": "Data catalog",
+        "description": "Data and artefacts consumed and served by PVGIS 6.",
+        "externalDocs": {
+            "description": "See also: PVGIS Data catalog",
             "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/reference/",
         },
     },
@@ -23,7 +32,7 @@ tags_metadata = [
         "name": "Performance",
         "description": "Analysis of photovoltaic performance",
         "externalDocs": {
-            "description": "See relevant documentation",
+            "description": "See also: PVGIS 6 Photovoltaic Performance",
             "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/reference/photovoltaic_performance/",
         },
     },
