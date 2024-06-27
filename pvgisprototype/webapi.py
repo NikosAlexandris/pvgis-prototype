@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.responses import ORJSONResponse
@@ -17,10 +17,12 @@ from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
 from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series_multi
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
 from pvgisprototype.web_api.openapi import tags_metadata
+import yaml
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
 static_directory = current_file.parent / "web_api/static"
+data_directory = current_file.parent / "web_api/data"
 
 summary = """
 PVGIS
@@ -172,6 +174,7 @@ app = FastAPI(
     },
 )
 
+
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def read_root():
     return html_root_page
@@ -189,12 +192,13 @@ async def custom_swagger_ui_html():
 
 # app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="static")
+app.mount("/data_catalog", StaticFiles(directory=str(data_directory)), name="data_catalog")
 templates = Jinja2Templates(directory="templates")
 template = Template(template_html)
 
 
-@app.get("/welcome", tags=['Features'])
-async def print_welcome_message():
+@app.get("/features", tags=['Features'])
+async def get_features():
     return pvgis6_features
 
 
@@ -228,6 +232,31 @@ async def download_citation():
 async def print_references():
     bibtex_file_path = assets_directory / "references.bib"
     return FileResponse(bibtex_file_path, media_type='application/x-bibtex', filename="references.bib")
+
+
+@app.get("/get-data-catalog", response_class=ORJSONResponse, tags=["Data catalog"])
+async def get_catalog():
+    file_path = data_directory / "pvgis_intake_data_catalog.yml"
+    print(f'{file_path=}')
+    try:
+        with open(file_path, 'r') as file:
+            catalog_data = yaml.safe_load(file)
+            return catalog_data
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Catalog file not found")
+    except yaml.YAMLError as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing YAML file: {str(e)}")
+
+
+@app.get("/download-data-catalog", response_class=FileResponse, tags=["Data catalog"])
+async def download_catalog():
+    print(f'{data_directory=}')
+    file_path = data_directory / "pvgis_intake_data_catalog.yml"  # Update this path to where the file is stored on your server
+    print(f'{file_path=}')
+    try:
+        return FileResponse(file_path, media_type='application/x-yaml', filename="pvgis6_catalog.yaml")
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Catalog file not found")
 
 
 app.get(
