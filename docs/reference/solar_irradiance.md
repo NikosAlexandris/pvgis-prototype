@@ -16,14 +16,9 @@ Solar irradiance is measured in watts per square metre (W/m2) in SI units.
 (source: Wikipedia)
 
 
-Ewan, just an update after our last discussion (at my office).
-
-
-
 PVGIS calculates the global in-plane (or inclined) irradiance as follows:
 
     Global (inclined) = Direct + Diffuse + Reflected.
-
 
 The default source for the global and direct horizontal irradiance components
 is SARAH2/2 products.
@@ -110,7 +105,7 @@ sky_reflected_diffuse_irradiance_icon = f"{icons_path}/noun-scattered-material-3
 ground_reflected_diffuse_irradiance_icon = f"{icons_path}/noun_ground_reflected_irradiance.svg"
 
 reflectivity_icon = f"{icons_path}/noun-reflection-5746443.svg"
-spectral_effect_icon = f"{icons_path}/noun-sun-525998.svg"
+spectral_effect_icon = f"{icons_path}/noun-sun-525998_modified.svg"
 effective_irradiance_icon = f"{icons_path}/noun-solar-energy-6700671.svg"
 
 thermometer_icon = f"{icons_path}/thermometer.svg"
