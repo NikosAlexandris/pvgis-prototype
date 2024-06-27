@@ -107,8 +107,14 @@ def generate_quick_response_code(
     data += 'Lon ' + str(round_float_values(longitude, rounding_places)) + ', '
     # data += 'Elevation ' + str(round_float_values(elevation, 0)) + ', '
     data += 'Elevation ' + str(int(elevation)) + ', '
-    data += 'Orientation ' + str(int(surface_orientation)) + ', '
-    data += 'Tilt ' + str(int(surface_tilt)) + ', '
+    if isinstance(surface_orientation, list):
+        data += 'Tilt ' + ','.join([str(int(value)) for value in surface_orientation]) + ', '
+    else:
+        data += 'Orientation ' + str(int(surface_orientation)) + ', '
+    if isinstance(surface_tilt, list):
+        data += 'Tilt ' + ','.join([str(int(value)) for value in surface_tilt]) + ', '
+    else:
+        data += 'Tilt ' + str(int(surface_tilt)) + ', '
     data += 'Start ' + str(timestamps.strftime('%Y-%m-%d %H:%M').values[0]) + ', '
     data += 'End ' + str(timestamps.strftime('%Y-%m-%d %H:%M').values[-1]) + ', '
     data += 'Irradiance ' + str(round_float_values(inclined_irradiance_mean, 1)) + f' {IRRADIANCE_UNIT_K}, '
