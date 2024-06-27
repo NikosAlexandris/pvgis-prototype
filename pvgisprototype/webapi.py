@@ -29,19 +29,20 @@ PVGIS
 offers open-access insights
 on :
 
-- solar radiation ☀
+- solar radiation ☀ ;
 
 - and location-specific estimates of
 
-- photovoltaic performance 📈,
+    - photovoltaic performance 📈,
 
-- for various technologies 🔌🔋
+    - for various technologies 🔌🔋
 
-- over Europe & Africa 🌍, largely Asia 🌏 and the Americas 🌎.
+    - over Europe & Africa 🌍, largely Asia 🌏 and the Americas 🌎.
 """
 
 description = """
-<span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>.
+<span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
+**limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
 
 The **PVGIS Web API**
 is a public service
@@ -148,7 +149,7 @@ Notwithstanding, the default input data sources are :
 
 
 app = FastAPI(
-    title="PVGIS Web API",
+    title="PVGIS Web API Proof-of-Concept",
     description=description,
     summary=summary,
     version="6",
