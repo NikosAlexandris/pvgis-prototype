@@ -512,8 +512,8 @@ def calculate_pv_efficiency_series(
 
         'power_model_results': lambda: {
             EFFICIENCY_FACTOR_COLUMN_NAME: efficiency_series.value if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.king) else NOT_AVAILABLE,
-            DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE,
-            VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE,
+            #DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
+            #VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
         } if verbose > 1 else {},
 
         'more_extended': lambda: {
