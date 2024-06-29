@@ -6,7 +6,7 @@ from pvgisprototype.algorithms.pvis.power import calculate_spectrally_resolved_g
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.cli.typer.location import typer_argument_longitude
