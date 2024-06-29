@@ -11,6 +11,7 @@ different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
 
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -82,15 +83,13 @@ from pvgisprototype.constants import INCIDENCE_DEFINITION
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pandas import DatetimeIndex
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_direct_inclined_irradiance_series_pvgis(
     longitude: float,
     latitude: float,

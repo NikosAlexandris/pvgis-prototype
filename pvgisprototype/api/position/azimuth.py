@@ -28,6 +28,7 @@ Input South  │     180     │  │     90     │  │     0      │
 
 from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_series_jenco
 from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimuth_series_pvlib
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
@@ -36,8 +37,6 @@ from typing import List
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
 from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_series_noaa
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAzimuthTimeSeriesInputModel
 from pvgisprototype import Longitude
@@ -63,7 +62,7 @@ from pvgisprototype.constants import NOT_AVAILABLE
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(ModelSolarAzimuthTimeSeriesInputModel)
 def model_solar_azimuth_series(
     longitude: Longitude,

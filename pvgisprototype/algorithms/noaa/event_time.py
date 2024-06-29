@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 import numpy as np
 from devtools import debug
 
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateEventTimeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
@@ -26,12 +27,10 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateEventTimeTimeSeriesNOAAInput)
 def calculate_event_time_series_noaa(
     longitude: Longitude,

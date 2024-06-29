@@ -12,6 +12,7 @@ irradiance. The remaining part is the _direct_ irradiance.
 """
 
 from pathlib import Path
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -32,7 +33,6 @@ from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSerie
 from pvgisprototype.api.position.models import validate_model
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype.api.irradiance.models import DirectIrradianceComponents
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
@@ -43,7 +43,7 @@ from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterres
 from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, IN_MEMORY_FLAG_DEFAULT, MASK_AND_SCALE_FLAG_DEFAULT, NEIGHBOR_LOOKUP_DEFAULT
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, IN_MEMORY_FLAG_DEFAULT, MASK_AND_SCALE_FLAG_DEFAULT, NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import TITLE_KEY_NAME
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -55,43 +55,32 @@ from pvgisprototype.constants import PERIGEE_OFFSET_COLUMN_NAME
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
 from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
 from pvgisprototype.constants import LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME
 from pvgisprototype.constants import OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
-from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
 from pvgisprototype.constants import OPTICAL_AIR_MASS_COLUMN_NAME
-from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
 from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import IRRADIANCE_UNIT
 from pvgisprototype.constants import ANGLE_UNITS_COLUMN_NAME
-from pvgisprototype.constants import DEGREES
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import IRRADIANCE_SOURCE_COLUMN_NAME
 from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
 from pvgisprototype.constants import HOFIERKA_2002
 from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE
 from pvgisprototype.constants import DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
 from pandas import DatetimeIndex
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
 from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pvgisprototype.api.position.models import SOLAR_TIME_ALGORITHM_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from typing import Optional
 from zoneinfo import ZoneInfo
@@ -99,7 +88,7 @@ from pvgisprototype.api.series.select import select_time_series
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_direct_normal_irradiance_series(
     timestamps: DatetimeIndex = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -110,8 +99,8 @@ def calculate_direct_normal_irradiance_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
-    fingerprint: bool = False,
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ) -> Irradiance:
     """Calculate the direct normal irradiance.
 
@@ -161,8 +150,6 @@ def calculate_direct_normal_irradiance_series(
         direct_normal_irradiance_series = np.where(
             np.isinf(result), np.finfo(np.float64).max, result
         )
-
-
 
     # Warning
     if (
@@ -249,7 +236,7 @@ def calculate_direct_normal_irradiance_series(
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_direct_normal_from_horizontal_irradiance_series(
     direct: Path,
     longitude: Longitude,

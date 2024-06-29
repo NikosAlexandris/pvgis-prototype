@@ -15,15 +15,13 @@ from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
-from pvgisprototype.log import logger
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_solar_hour_angle_series_hofierka(
     longitude: Longitude,
     timestamps: DatetimeIndex, 

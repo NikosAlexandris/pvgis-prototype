@@ -1,9 +1,4 @@
 from devtools import debug
-from math import pi
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from math import isfinite
-import numpy
 import pvlib
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype import SurfaceOrientation
@@ -15,13 +10,11 @@ from pvgisprototype import Latitude
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarIncidence
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
-from pvgisprototype.constants import RADIANS
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
 from pandas import DatetimeIndex
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -30,8 +23,6 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.algorithms.pvlib.solar_zenith import calculate_solar_zenith_series_pvlib
@@ -40,7 +31,7 @@ from pvgisprototype.log import logger
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 # @validate_with_pydantic(CalculateSolarIncidencePVLIBInputModel)
 def calculate_solar_incidence_series_pvlib(
     longitude: Longitude,
@@ -48,7 +39,6 @@ def calculate_solar_incidence_series_pvlib(
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = now_utc_datetimezone(),
-    # timezone: ZoneInfo | None = None,
     # apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
