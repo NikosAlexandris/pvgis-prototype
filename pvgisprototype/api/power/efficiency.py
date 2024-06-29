@@ -37,7 +37,7 @@ from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.validation.arrays import create_array
