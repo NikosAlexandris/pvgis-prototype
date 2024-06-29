@@ -3,8 +3,7 @@ from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
 from math import cos
@@ -14,7 +13,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
-from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype import SolarAltitude
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
 from pvgisprototype.constants import RADIANS
@@ -26,7 +25,7 @@ import numpy
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 # @validate_with_pydantic(CalculateSolarAltitudePVISInputModel)
 def calculate_solar_altitude_series_hofierka(
     longitude: Longitude,

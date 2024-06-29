@@ -1,7 +1,6 @@
 from pvgisprototype.log import logger
 from pandas import DatetimeIndex
 from devtools import debug
-from numpy import number
 import numpy
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -10,7 +9,6 @@ from pvgisprototype import SolarIncidence
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pvgisprototype import RelativeLongitude
-from datetime import datetime
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.constants import PERIGEE_OFFSET, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
@@ -18,12 +16,11 @@ from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
-from math import pi, sin, asin, cos, acos
+from math import pi, sin, asin, cos
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
@@ -38,12 +35,11 @@ from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
 from pvgisprototype import SolarIncidence
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 # @validate_with_pydantic(CalculateRelativeLongitudeInputModel)
 def calculate_relative_longitude(
     latitude: Latitude,

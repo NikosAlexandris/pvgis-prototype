@@ -5,6 +5,7 @@ from datetime import datetime
 from math import isfinite
 import numpy
 
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarZenithPVLIBInputModel
 from pvgisprototype import SolarZenith
@@ -13,8 +14,6 @@ from pvgisprototype import Latitude
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -24,7 +23,7 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 # @validate_with_pydantic(CalculateSolarZenithPVLIBInputModel)
 def calculate_solar_zenith_series_pvlib(
     longitude: Longitude,  # degrees

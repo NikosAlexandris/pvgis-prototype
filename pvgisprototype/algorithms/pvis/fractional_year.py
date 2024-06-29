@@ -2,19 +2,13 @@ from devtools import debug
 from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.log import log_function_call
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from pvgisprototype.api.utilities.timestamp import get_days_in_years
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
-from datetime import date, datetime
 from pvgisprototype import FractionalYear
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import FRACTIONAL_YEAR_MINIMUM
-from pvgisprototype.constants import FRACTIONAL_YEAR_MAXIMUM
 from math import pi
-from math import isclose
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -30,7 +24,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 
 # @validate_with_pydantic(CalculateFractionalYearPVISInputModel)
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_day_angle_series_hofierka(
     timestamps: DatetimeIndex,
     dtype: str = DATA_TYPE_DEFAULT,
