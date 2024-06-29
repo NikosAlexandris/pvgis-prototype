@@ -4,10 +4,50 @@ import numpy as np
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.api.utilities.timestamp import get_days_in_year
-from pvgisprototype.api.utilities.timestamp import generate_timestamps_for_a_year
 import random
 from datetime import datetime
 from datetime import timedelta
+
+
+def generate_timestamps_for_a_year(
+    year: int = None,
+    frequency: str = 'h',  # default to hourly timestamps
+    random: bool = False,
+):
+    """
+    Generate timestamps for a given or random year.
+
+    Parameters
+    ----------
+    year: int, optional
+        The year for which to generate timestamps. If not specified, a random
+        year is chosen.
+
+    frequency: str
+        The frequency of timestamps to generate, e.g., 'h' for hourly. Defaults
+        to 'h'.
+
+    Returns:
+    - DatetimeIndex: A Pandas DatetimeIndex of timestamps for the specified or
+      random year
+
+    """
+    if random:
+        year = randint(2005, 2024)  # Relating to PVGIS' 2005 starting year
+
+    start_time = f"{year}-01-01 00:00:00"
+    end_time = f"{year+1}-01-01 00:00:00"
+
+    timestamps = date_range(
+        start=start_time,
+        end=end_time,
+        freq=frequency,
+        inclusive='left'  # Exclude the end_time to keep within the year
+    )
+
+    return timestamps
+
+
 
 
 def plot_extraterrestrial_irradiance(
