@@ -133,14 +133,19 @@ def select_time_series(
 
     if remap_to_month_start:
         remapped_timestamps = timestamps.map(lambda ts: remap_to_2013(ts))
-        from pandas import date_range
-        month_start_timestamps = date_range(start=remapped_timestamps.min().normalize(), end=remapped_timestamps.max(), freq='MS')
-        try:
-            location_time_series = location_time_series.sel(
-                time=month_start_timestamps, method=neighbor_lookup
-            )
-        except Exception as e:
-            logger.exception(f"No data found for the given 'month start' timestamps {month_start_timestamps}.")
+        if not remapped_timestamps.empty:
+            from pandas import date_range
+            month_start_timestamps = date_range(start=remapped_timestamps.min().normalize(), end=remapped_timestamps.max(), freq='MS')
+            try:
+                location_time_series = location_time_series.sel(
+                    time=month_start_timestamps, method=neighbor_lookup
+                )
+            except Exception as e:
+                logger.exception(f"No data found for the given 'month start' timestamps {month_start_timestamps}.")
+        else:
+            error_message = "Remapped timestamps are empty, cannot proceed with date range creation."
+            logger.error(error_message)
+            raise ValueError(error_message)
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
