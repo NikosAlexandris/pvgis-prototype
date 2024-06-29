@@ -66,7 +66,7 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     FINGERPRINT_COLUMN_NAME,
 )
-from pvgisprototype.api.power.performance import report_photovoltaic_performance
+from pvgisprototype.api.performance.report import report_photovoltaic_performance
 
 
 def convert_series_to_sparkline(
