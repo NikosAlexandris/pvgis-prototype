@@ -5,6 +5,7 @@ The time offset based on NOAA's General Solar Position Calculations.
 from devtools import debug
 from zoneinfo import ZoneInfo
 
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype import Longitude
 from pvgisprototype import TimeOffset
@@ -21,13 +22,11 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateTimeOffsetTimeSeriesNOAAInput)
 def calculate_time_offset_series_noaa(
     longitude: Longitude,

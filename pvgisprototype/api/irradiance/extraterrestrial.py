@@ -1,10 +1,8 @@
-from pvgisprototype.log import logger
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from typing import Optional
 from typing import Union
-from datetime import datetime
 from pvgisprototype import Irradiance
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import IRRADIANCE_UNIT
@@ -15,7 +13,6 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -27,8 +24,6 @@ from pvgisprototype.constants import DISTANCE_CORRECTION_COLUMN_NAME
 from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
 import numpy as np
 from pandas import DatetimeIndex
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 
 
 def get_days_per_year(years):
@@ -36,7 +31,7 @@ def get_days_per_year(years):
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_extraterrestrial_normal_irradiance_series(
     timestamps: DatetimeIndex,
     solar_constant: float = SOLAR_CONSTANT,

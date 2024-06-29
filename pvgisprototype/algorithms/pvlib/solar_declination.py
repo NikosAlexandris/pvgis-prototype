@@ -6,11 +6,10 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationSeriesPVLIBInput
 from pvgisprototype import SolarDeclination
 from pvgisprototype.constants import RADIANS
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 
 
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateSolarDeclinationSeriesPVLIBInput)
 def calculate_solar_declination_series_pvlib(
         timestamps: DatetimeIndex,

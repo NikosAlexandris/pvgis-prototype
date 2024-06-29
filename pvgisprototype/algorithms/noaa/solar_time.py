@@ -4,6 +4,7 @@ The true solar time based on NOAA's General Solar Position Calculations.
 
 from devtools import debug
 from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
@@ -17,19 +18,16 @@ from zoneinfo import ZoneInfo
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateTrueSolarTimeTimeSeriesNOAAInput)
 def calculate_true_solar_time_series_noaa(
     longitude: Longitude,  # radians

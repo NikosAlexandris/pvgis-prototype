@@ -1,13 +1,12 @@
 from devtools import debug
 from pvgisprototype.api.utilities.timestamp import get_days_in_years
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearTimeSeriesNOAAInput
 from pvgisprototype import FractionalYear
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.constants import RADIANS
 import numpy as np
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
@@ -15,7 +14,6 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.log import logger
 from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.log import log_function_call
 from pvgisprototype.validation.arrays import create_array
@@ -23,7 +21,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateFractionalYearTimeSeriesNOAAInput)
 def calculate_fractional_year_series_noaa(
     timestamps: DatetimeIndex,

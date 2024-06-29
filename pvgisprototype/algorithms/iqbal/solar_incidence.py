@@ -11,7 +11,6 @@ import numpy
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pandas import DatetimeIndex 
-from typing import Optional
 from zoneinfo import ZoneInfo
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt
@@ -27,7 +26,6 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_series_noaa
 from pvgisprototype.log import logger
@@ -43,13 +41,11 @@ from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.validation.arrays import create_array
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_solar_incidence_series_iqbal(
     longitude: Longitude,
     latitude: Latitude,

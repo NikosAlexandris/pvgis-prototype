@@ -13,8 +13,7 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pandas import DatetimeIndex
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -26,7 +25,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_series_noaa(
     longitude: Longitude,

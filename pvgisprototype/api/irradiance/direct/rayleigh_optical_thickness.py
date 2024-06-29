@@ -31,12 +31,11 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEGREES
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(AdjustElevationInputModel)
 def adjust_elevation(
     elevation: float,
@@ -73,7 +72,7 @@ def adjust_elevation(
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_refracted_solar_altitude_series(
     solar_altitude_series: SolarAltitude,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -126,7 +125,7 @@ def calculate_refracted_solar_altitude_series(
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateOpticalAirMassTimeSeriesInputModel)
 def calculate_optical_air_mass_series(
     elevation: float,
@@ -187,7 +186,7 @@ def calculate_optical_air_mass_series(
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_rayleigh_optical_thickness_series(
     optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     dtype: str = DATA_TYPE_DEFAULT,

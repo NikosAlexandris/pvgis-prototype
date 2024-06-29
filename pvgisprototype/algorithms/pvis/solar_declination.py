@@ -2,8 +2,7 @@ from devtools import debug
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 from pandas import DatetimeIndex
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
@@ -25,7 +24,7 @@ from pvgisprototype.api.position.models import SolarPositionModel
 
 # @validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_solar_declination_series_hofierka(
     timestamps: DatetimeIndex,
     perigee_offset: float = PERIGEE_OFFSET,

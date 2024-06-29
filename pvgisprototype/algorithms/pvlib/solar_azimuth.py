@@ -16,8 +16,7 @@ from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -27,7 +26,7 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 # @validate_with_pydantic(CalculateSolarAzimuthPVLIBInputModel)
 def calculate_solar_azimuth_series_pvlib(
     longitude: Longitude,  # degrees
