@@ -476,14 +476,37 @@ def generate_datetime_series(
                '2010-06-01 08:00:00', '2010-06-01 09:00:00'],
               dtype='datetime64[ns]', freq='H')
     """
-    timestamps = date_range(
-        start=start_time,
-        end=end_time,
-        periods=periods,
-        freq=frequency,
-        tz=timezone,
-        name=name,
+    # Validate input parameters --
+    # Can we do this with a callback and at the Context level ?
+    number_of_parameters = sum(
+        parameter is not None for parameter in [start_time, end_time, periods]
     )
+    if number_of_parameters < 2:
+        error_message = (
+            f"Insufficient parameters to generate timestamps. "
+            f"User input is : start_time={start_time}, end_time={end_time}, periods={periods}. "
+            f"At least two of these must be non-null!"
+        )
+        logger.error(error_message)
+        raise ValueError(error_message)
+
+    try:
+        timestamps = date_range(
+            start=start_time,
+            end=end_time,
+            periods=periods,
+            freq=frequency,
+            tz=timezone,
+            name=name,
+        )
+    except Exception as e:
+        logger.exception("Failed to generate datetime series.")
+        raise ValueError(f"Failed to generate datetime series: {str(e)}")
+
+    if timestamps.empty:
+        error_message = "The generated DatetimeIndex is empty! You might want to check the relevant timestamp parameters for accuracy."
+        logger.error(error_message)
+        raise ValueError(error_message)
 
     return timestamps
 
