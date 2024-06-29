@@ -1,9 +1,8 @@
-from os import times
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
-from typing import Any
 from typing import Optional
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
@@ -16,10 +15,6 @@ from pvgisprototype.api.series.utilities import select_location_time_series
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.utilities import get_scale_and_offset
 from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.api.series.hardcodings import check_mark
-from pvgisprototype.api.series.hardcodings import x_mark
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
 
 
@@ -65,7 +60,7 @@ def remap_to_2013(ts):
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def select_time_series(
     time_series: Path,
     longitude: Longitude,

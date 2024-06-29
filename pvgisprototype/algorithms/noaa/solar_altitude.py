@@ -1,8 +1,7 @@
 from devtools import debug
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitudeTimeSeriesNOAAInput
 from pvgisprototype import Longitude
@@ -24,7 +23,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateSolarAltitudeTimeSeriesNOAAInput)
 def calculate_solar_altitude_series_noaa(
     longitude: Longitude,

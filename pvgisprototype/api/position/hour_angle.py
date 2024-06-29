@@ -1,8 +1,6 @@
 from devtools import debug
-from math import radians
 from math import acos
 from math import tan
-from math import isfinite
 from pvgisprototype import HourAngleSunrise
 from pvgisprototype import Latitude
 from pvgisprototype import SolarHourAngle
@@ -12,11 +10,11 @@ from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour
 from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
 from pvgisprototype.algorithms.pvlib.solar_hour_angle import calculate_solar_hour_angle_series_pvlib
 from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, RADIANS
 from pvgisprototype.validation.functions import CalculateSolarHourAngleSeriesInputModel
 from pvgisprototype.validation.functions import CalculateEventHourAngleInputModel
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.api.utilities.timestamp import timestamp_to_decimal_hours
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -41,13 +39,10 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 # @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def model_solar_hour_angle_series(
     longitude: Longitude,
