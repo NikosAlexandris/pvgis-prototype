@@ -18,7 +18,7 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype import PhotovoltaicPower
 from pvgisprototype import PhotovoltaicPowerMultipleModules
-from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import SolarDeclinationModel
