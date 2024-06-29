@@ -9,6 +9,7 @@ from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_de
 from pvgisprototype.api.position.models import SolarDeclinationModel
 from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
 from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, DEBUG_AFTER_THIS_VERBOSITY_LEVEL, DECLINATION_NAME, HASH_AFTER_THIS_VERBOSITY_LEVEL, LOG_LEVEL_DEFAULT, NOT_AVAILABLE, POSITION_ALGORITHM_NAME, UNIT_NAME, VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
@@ -16,12 +17,10 @@ from pvgisprototype.constants import RADIANS
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def model_solar_declination_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo = ZoneInfo('UTC'),

@@ -1,6 +1,6 @@
 from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 from devtools import debug
 from typing import Dict, List
 from pandas import DatetimeIndex
@@ -15,7 +15,6 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
 from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
@@ -23,20 +22,18 @@ from pvgisprototype.constants import TIME_ALGORITHM_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_NAME
 from pvgisprototype.constants import ZENITH_NAME
 from pvgisprototype.constants import UNIT_NAME
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import NOT_AVAILABLE
 from pvgisprototype.constants import RADIANS
-from cachetools import cached
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(ModelSolarAltitudeTimeSeriesInputModel)
 def model_solar_zenith_series(
     longitude: Longitude,

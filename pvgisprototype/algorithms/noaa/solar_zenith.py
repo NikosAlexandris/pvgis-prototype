@@ -10,10 +10,8 @@ from math import degrees
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype import AtmosphericRefraction
-from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import CalculateSolarZenithTimeSeriesNOAAInput
 from pvgisprototype.algorithms.noaa.function_models import AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput
-from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
 from pvgisprototype import SolarZenith
 from pvgisprototype import SolarAltitude
 from pvgisprototype import Longitude
@@ -23,11 +21,9 @@ import numpy as np
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 
@@ -156,7 +152,7 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(CalculateSolarZenithTimeSeriesNOAAInput)
 def calculate_solar_zenith_series_noaa(
     longitude: Longitude,

@@ -10,6 +10,7 @@ During a cloudy day the sunlight will be partially absorbed and scattered by
 different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
@@ -68,8 +69,6 @@ from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
 from pvgisprototype.constants import POSITION_ALGORITHM_COLUMN_NAME
 from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pandas import DatetimeIndex
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
@@ -77,7 +76,7 @@ from pvgisprototype.validation.arrays import create_array
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_direct_horizontal_irradiance_series(
     longitude: float,
     latitude: float,

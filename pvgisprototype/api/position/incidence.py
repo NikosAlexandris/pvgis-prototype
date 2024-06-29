@@ -11,19 +11,18 @@ calculated angles. See also the API azimuth.py module.
 
 from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_series_hofierka
 from pvgisprototype.algorithms.pvlib.solar_incidence import calculate_solar_incidence_series_pvlib
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import ModelSolarIncidenceTimeSeriesInputModel
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from typing import Dict, Optional
 from typing import List
-from typing import Union
 from zoneinfo import ZoneInfo
 from pvgisprototype import SurfaceTilt
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype import RefractedSolarZenith
 from pvgisprototype.constants import DATA_TYPE_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
@@ -62,15 +61,12 @@ from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_inci
 from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_series_iqbal
 from pandas import DatetimeIndex
 from pvgisprototype.api.position.conversions import convert_north_to_south_radians_convention
-from pvgisprototype.api.position.conversions import convert_north_to_east_radians_convention
-from pvgisprototype.log import log_function_call, logger
+from pvgisprototype.log import log_function_call
 from pvgisprototype.constants import UNIT_NAME
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(ModelSolarIncidenceTimeSeriesInputModel)
 def model_solar_incidence_series(
     longitude: Longitude,
