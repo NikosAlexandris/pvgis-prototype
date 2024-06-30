@@ -63,7 +63,7 @@ from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import QUIET_FLAG_DEFAULT
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pandas import DatetimeIndex
 from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
 from pvgisprototype.constants import CSV_PATH_DEFAULT

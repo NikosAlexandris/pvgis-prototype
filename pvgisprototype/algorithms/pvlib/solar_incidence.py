@@ -10,7 +10,7 @@ from pvgisprototype import Latitude
 from pvgisprototype import SolarAltitude
 from pvgisprototype import SolarIncidence
 from pvgisprototype.constants import NO_SOLAR_INCIDENCE
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pandas import DatetimeIndex
 from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint

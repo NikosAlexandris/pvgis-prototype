@@ -3,7 +3,7 @@ from typing import Optional
 from typing import List
 from pvgisprototype.cli.typer.irradiance import typer_argument_term_n_series
 from pvgisprototype.cli.typer.position import typer_argument_surface_tilt
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_sky_irradiance_series
+from pvgisprototype.api.irradiance.diffuse.altitude import calculate_diffuse_sky_irradiance_series
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from math import radians
 from numpy import array as numpy_array

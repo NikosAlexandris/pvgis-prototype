@@ -54,7 +54,7 @@ from pvgisprototype.constants import CSV_PATH_DEFAULT, QUIET_FLAG_DEFAULT, TERMI
 from pvgisprototype.cli.typer.output import typer_option_index
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_periods

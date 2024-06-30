@@ -5,7 +5,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 from math import pi, sin, cos, asin
 from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_series_jenco
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
 from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_series_jenco
 from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
@@ -28,11 +28,8 @@ from pvgisprototype.constants import RANDOM_DAY_SERIES_FLAG_DEFAULT, ZERO_NEGATI
 from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
 from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
-from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
 from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT

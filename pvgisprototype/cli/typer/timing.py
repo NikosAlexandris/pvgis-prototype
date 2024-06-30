@@ -4,7 +4,7 @@ Typer definitions for input parameters related to Solar time
 
 import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-from pvgisprototype.api.utilities.timestamp import convert_hours_to_datetime_time
+from pvgisprototype.api.datetime.conversion import convert_hours_to_datetime_time
 
 
 typer_option_solar_time_model = typer.Option(

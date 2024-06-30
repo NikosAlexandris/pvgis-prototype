@@ -70,6 +70,8 @@ def calculate_solar_declination_series_jenco(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
+        verbose=verbose,
+        log=log,
     )
     solar_declination_series = numpy.arcsin(
         0.3978

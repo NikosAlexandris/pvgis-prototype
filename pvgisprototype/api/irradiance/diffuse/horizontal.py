@@ -77,8 +77,8 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import diffuse_transmission_function_series
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_solar_altitude_function_series
+from pvgisprototype.api.irradiance.diffuse.altitude import diffuse_transmission_function_series
+from pvgisprototype.api.irradiance.diffuse.altitude import calculate_diffuse_solar_altitude_function_series
 
 
 @log_function_call

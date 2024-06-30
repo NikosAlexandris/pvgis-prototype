@@ -63,7 +63,7 @@ from pvgisprototype.log import log_function_call
 import typer
 from pandas import DatetimeIndex
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT

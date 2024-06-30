@@ -85,7 +85,7 @@ from rich import print
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
