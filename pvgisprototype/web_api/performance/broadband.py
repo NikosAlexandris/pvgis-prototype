@@ -1,4 +1,3 @@
-from datetime import date
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -12,95 +11,48 @@ from pandas import DatetimeIndex, to_datetime
 
 
 from pvgisprototype import LinkeTurbidityFactor, SpectralFactorSeries
-from pvgisprototype.api.irradiance.models import (
-    MethodForInexactMatches,
-    ModuleTemperatureAlgorithm,
-)
-from pvgisprototype.api.position.models import (
-    SOLAR_POSITION_ALGORITHM_DEFAULT,
-    SOLAR_TIME_ALGORITHM_DEFAULT,
-    SolarIncidenceModel,
-    SolarPositionModel,
-    SolarTimeModel,
-)
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
-from pvgisprototype.api.power.broadband_multiple_surfaces import (
-    calculate_photovoltaic_power_output_series_from_multiple_surfaces,
-)
-from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.power.performance import summarise_photovoltaic_performance
+from pvgisprototype.api.performance.report import summarise_photovoltaic_performance
 from pvgisprototype.api.quick_response_code import generate_quick_response_code
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.constants import (
-    CSV_FLAG_DEFAULT,
     DEGREES,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     METADATA_FLAG_DEFAULT,
     NOT_AVAILABLE,
     PEAK_POWER_DEFAULT,
-    PHOTOVOLTAIC_PERFORMANCE_ANALYSIS_OUTPUT_FILENAME,
     PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_OUTPUT_FILENAME,
-    QUICK_RESPONSE_CODE_FLAG_DEFAULT,
-    RADIATION_CUTOFF_THRESHHOLD,
-    ALBEDO_DEFAULT,
-    ANALYSIS_FLAG_DEFAULT,
-    ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
-    IN_MEMORY_FLAG_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    MASK_AND_SCALE_FLAG_DEFAULT,
-    NEIGHBOR_LOOKUP_DEFAULT,
-    PERIGEE_OFFSET,
-    QUIET_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
-    SOLAR_CONSTANT,
-    STATISTICS_FLAG_DEFAULT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     SYSTEM_EFFICIENCY_DEFAULT,
-    TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
-    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.web_api.dependencies import (
-    fastapi_dependable_angle_output_units,
     fastapi_dependable_frequency,
-    fastapi_dependable_groupby,
     fastapi_dependable_latitude,
-    fastapi_dependable_linke_turbidity_factor_series,
     fastapi_dependable_longitude,
-    fastapi_dependable_refracted_solar_zenith,
-    fastapi_dependable_solar_position_models,
-    fastapi_dependable_spectral_factor_series,
     fastapi_dependable_surface_orientation,
-    fastapi_dependable_surface_orientation_list,
     fastapi_dependable_surface_tilt,
-    fastapi_dependable_surface_tilt_list,
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
-    # fastapi_dependable_csv,
     fastapi_dependable_verbose,
     fastapi_dependable_fingerprint,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
-    fastapi_query_efficiency,
-    fastapi_query_temperature_model,
-    fastapi_query_radiation_cutoff_threshold,
-    fastapi_query_albedo,
     fastapi_query_analysis,
     fastapi_query_csv,
     fastapi_query_elevation,
     fastapi_query_end_time,
-    fastapi_query_fingerprint,
     fastapi_query_peak_power,
     fastapi_query_periods,
     fastapi_query_photovoltaic_module_model,
@@ -108,14 +60,10 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_quick_response_code,
     fastapi_query_index,
     fastapi_query_quiet,
-    fastapi_query_solar_time_model,
     fastapi_query_start_time,
-    fastapi_query_statistics,
     fastapi_query_system_efficiency,
-    fastapi_query_tolerance,
-    fastapi_query_zero_negative_solar_incidence_angle,
 )
-from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone
+from pvgisprototype.web_api.schemas import AnalysisLevel, Frequency, Timezone
 
 
 def get_metadata(request: Request):
