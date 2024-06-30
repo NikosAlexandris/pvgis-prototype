@@ -44,7 +44,7 @@ from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
 
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT

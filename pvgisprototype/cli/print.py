@@ -565,7 +565,8 @@ def print_irradiance_table_2(
     if longitude or latitude or elevation or surface_orientation or surface_tilt and units is not None:
         caption += f"[[dim]{units}[/dim]]"
     
-    photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
+    technology_name_and_type = dictionary.get(TECHNOLOGY_NAME, None)
+    photovoltaic_module, mount_type = technology_name_and_type.split(':') if technology_name_and_type else (None, None)
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
     algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
@@ -577,6 +578,7 @@ def print_irradiance_table_2(
     if photovoltaic_module:
         caption += f"\n[underline]Module[/underline]  "
         caption += f"{TECHNOLOGY_NAME}: {photovoltaic_module}, "
+        caption += f"Mount type: {mount_type}, "
         caption += f"{PEAK_POWER_COLUMN_NAME}: {peak_power}"
 
     if algorithms or radiation_model or timing_algorithm or position_algorithm:

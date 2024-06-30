@@ -65,14 +65,12 @@ from pvgisprototype.constants import SURFACE_TILT_DEFAULT
 from pvgisprototype.constants import SOLAR_CONSTANT
 from pvgisprototype.constants import PERIGEE_OFFSET
 from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import TERMINAL_WIDTH_FRACTION
 from pvgisprototype.constants import IRRADIANCE_UNIT
-from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT

@@ -110,7 +110,7 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.constants import METADATA_FLAG_DEFAULT
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps

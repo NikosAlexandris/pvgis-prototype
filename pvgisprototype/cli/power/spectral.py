@@ -110,7 +110,7 @@ from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 from pvgisprototype.constants import MINUTES
 from pvgisprototype.constants import RADIANS
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.cli.typer.data_processing import typer_option_dtype

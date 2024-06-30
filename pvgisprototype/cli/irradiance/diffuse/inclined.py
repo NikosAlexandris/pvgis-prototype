@@ -78,7 +78,7 @@ from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
 from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT

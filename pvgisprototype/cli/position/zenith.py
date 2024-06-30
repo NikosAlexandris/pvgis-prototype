@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 
 from pandas import DatetimeIndex
 
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.cli.typer.location import typer_argument_longitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
@@ -39,7 +39,7 @@ from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if
 from pvgisprototype.api.position.zenith import calculate_solar_zenith_series
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT

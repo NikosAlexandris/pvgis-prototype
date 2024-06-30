@@ -130,7 +130,7 @@ from pandas import DatetimeIndex
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 import typer
 from pvgisprototype.cli.typer.log import typer_option_log
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
 from pvgisprototype.cli.typer.data_processing import typer_option_dtype
 from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
@@ -436,7 +436,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-    quick_response_code: Annotated[bool, typer_option_quick_response] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+    quick_response_code: Annotated[QuickResponseCode, typer_option_quick_response] = QuickResponseCode.NoneValue,
     metadata: Annotated[bool, typer_option_command_metadata] = False,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
     ):
