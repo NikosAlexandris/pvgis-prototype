@@ -341,9 +341,10 @@ def write_solar_position_series_csv(
 
            # Redesign Me! =======================================================
             if (
-                user_requested_timestamps is not None
+                user_requested_timestamps.tz is None
                 and user_requested_timezone is not None
             ):
+                user_requested_timestamps = user_requested_timestamps.tz_localize(user_requested_timezone)
                 row.extend(
                     [
                         str(user_requested_timestamps.get_loc(timestamp)),
