@@ -1,4 +1,4 @@
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,

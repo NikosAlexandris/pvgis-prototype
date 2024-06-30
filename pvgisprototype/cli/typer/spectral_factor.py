@@ -7,7 +7,7 @@ from pvgisprototype import SpectralFactorSeries
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
 from pvgisprototype.constants import UNITLESS
-from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
 from pvgisprototype.cli.typer.path import validate_path
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
 

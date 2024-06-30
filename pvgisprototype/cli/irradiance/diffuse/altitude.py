@@ -4,8 +4,8 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.cli.typer.linke_turbidity import typer_argument_linke_turbidity_factor
 from pvgisprototype.cli.typer.linke_turbidity import typer_option_linke_turbidity_factor_series
 from pvgisprototype.cli.typer.position import typer_argument_solar_altitude_series
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_solar_altitude_coefficients_series
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_solar_altitude_function_series
+from pvgisprototype.api.irradiance.diffuse.altitude import calculate_diffuse_solar_altitude_coefficients_series
+from pvgisprototype.api.irradiance.diffuse.altitude import calculate_diffuse_solar_altitude_function_series
 from pvgisprototype.log import logger
 from pvgisprototype.log import log_function_call
 

@@ -23,7 +23,7 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
 )
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
-from pvgisprototype.api.utilities.timestamp import (
+from pvgisprototype.api.datetime.datetimeindex import (
     generate_datetime_series,
     parse_timestamp_series,
 )

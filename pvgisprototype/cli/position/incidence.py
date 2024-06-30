@@ -51,7 +51,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 from math import pi
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.incidence import calculate_solar_incidence_series
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype import SurfaceTilt

@@ -3,7 +3,7 @@ from devtools import debug
 import typer
 from typing_extensions import Annotated
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import now_datetime
+from pvgisprototype.api.datetime.now import now_datetime
 from typing import Optional
 from typing import List
 from typing import Tuple

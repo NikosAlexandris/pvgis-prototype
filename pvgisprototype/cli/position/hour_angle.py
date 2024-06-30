@@ -48,7 +48,7 @@ from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
 from pvgisprototype.cli.typer.timestamps import typer_option_end_time
 from pvgisprototype.cli.typer.timestamps import typer_option_timezone
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from datetime import datetime
 from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
