@@ -23,7 +23,13 @@ pvgis-prototype position overview 8.627626 45.812233 --start-time '2020-01-01' -
 We can export the results in widely known and machine readable CSV format
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype position overview 8.627626 45.812233 --start-time '2020-01-01' --end-time '2020-01-02' -r2 -aou degrees --csv solar_incidence_angle_sample.csv
+pvgis-prototype position overview \
+    8.627626 45.812233 \
+    --start-time '2020-01-01' \
+    --end-time '2020-01-02' \
+    -r2 \
+    -aou degrees \
+    --csv solar_incidence_angle_sample.csv
 ```
 
 Let's verify it worked well

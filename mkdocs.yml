@@ -98,15 +98,17 @@ nav:
   - Development:
     - development/index.md
     - development/gantt.md
-    - development/roadmap_and_progress.md
+    - Roadmap:
+      - development/roadmap_and_progress.md
+      - Components:
+        - development/solar_position.md
+        - development/solar_irradiance.md
+        - development/photovoltaic_performance.md
+        - development/topography.md
     - development/conventions.md
     - development/optimisation.md
     - development/contribution_guidelines.md
     - development/adding_new_features.md
-    - development/photovoltaic_performance.md
-    - development/solar_irradiance.md
-    - development/solar_geometry.md
-    - development/topography.md
     - development/pytest.md
     # - development/state_and_future_of_pvgis.md
     - 󰦕 Test Coverage: coverage.md
@@ -123,7 +125,9 @@ extra:
 
 theme:
   logo: images/pvgis_image_squared.png
-  font: false
+  font:
+    text: false
+    code: false
   icon:
     tag:
       concepts: simple/blueprint

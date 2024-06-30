@@ -67,7 +67,9 @@ is particularly effective for crystalline silicon photovoltaic (PV) modules
 and incorporates various coefficients determined through both indoor and
 outdoor performance data established in [ESTI](https://joint-research-centre.ec.europa.eu/european-solar-test-installation_en).
 
-![Photovoltaic Performance](analysis_of_photovoltaic_performance.png)
+```python exec="true" html="true"
+--8<-- "docs/reference/photovoltaic_performance_diagram.py"
+```
 
 ### Icons
 
