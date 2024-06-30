@@ -350,21 +350,22 @@ FIXME: Decide if datetime.datetime or datetime.time, and also change the
 callback function convert_hours_to_datetime_time() in typer_argument_true_solar_time()
 '''
 class SolarTimeModel(BaseModel):
-    solar_time: Union[datetime, time]             # FIXME: Temporal solution for datetime.datetime AND datetime.time                                       
+    solar_time: Union[
+        datetime, time
+    ]  # FIXME: Temporal solution for datetime.datetime AND datetime.time
     model_config = ConfigDict(
-        description="""The solar time (ST) is a calculation of the passage of time based
-        on the position of the Sun in the sky. It is expected to be decimal hours in a
-        24 hour format and measured internally in seconds.""",
+        description="""The solar time (ST) is a calculation of the passage of time based on the position of the Sun in the sky. It is expected to be decimal hours in a 24 hour format and measured internally in seconds.""",
     )
 
 
 # Solar surface
 
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = SURFACE_TILT_DEFAULT
+    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = (
+        SURFACE_TILT_DEFAULT
+    )
     model_config = ConfigDict(
-        description="""Surface tilt (or slope) (β) is the angle between the inclined
-        surface (slope) and the horizontal plane.""",
+        description="""Surface tilt (or slope) (β) is the angle between the inclined surface (slope) and the horizontal plane.""",
     )
 
     @field_validator("surface_tilt")
