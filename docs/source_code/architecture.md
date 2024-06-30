@@ -8,4 +8,6 @@ tags:
   - Dependency Tree
 ---
 
-![Architecture](architecture.png)
+```python exec="true" html="true"
+--8<-- "docs/source_code/architecture_diagram.py"
+```

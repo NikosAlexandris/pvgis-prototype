@@ -18,7 +18,7 @@ while aiming to cover all capabilities of the previous generation.
 
 ## Target audience & License
 
-???+ info "Scope & Target audience"
+??? info "Scope & Target audience"
 
     | Category    | 5                                                                | 6   |
     |-------------|------------------------------------------------------------------|-----|
@@ -30,7 +30,7 @@ while aiming to cover all capabilities of the previous generation.
 
     [r.sun]: https://grass.osgeo.org/grass83/manuals/r.sun.html
 
-???+ "Licensing"
+??? "Licensing"
 
     | License           | 5                                  | 6                                  |
     |-------------------|------------------------------------|------------------------------------|
@@ -42,7 +42,7 @@ while aiming to cover all capabilities of the previous generation.
 
 ## Functionality
 
-???+ info "Capabilities & Functionality Comparison"
+??? info "Capabilities & Functionality Comparison"
 
     | Functionality            | 5                                                                                    | 6                                                                 |
     |--------------------------|--------------------------------------------------------------------------------------|-------------------------------------------------------------------|
@@ -53,7 +53,7 @@ while aiming to cover all capabilities of the previous generation.
 
 ## Architecture
 
-???+ note "Implementation Details"
+??? note "Implementation Details"
 
     | Component     | 5                                    | 6                                                                    |
     |---------------|--------------------------------------|----------------------------------------------------------------------|
@@ -84,14 +84,15 @@ while aiming to cover all capabilities of the previous generation.
 
 [^Xarray data IO]: https://docs.xarray.dev/en/stable/user-guide/io.html
 
-
 ### Time Series Data Workflow
 
-![Time Series Data Workflow](time_series_data_workflow_comparison_pvgis_v6_vs_v52.png)
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_workflow_comparison_pvgis_v6_vs_v52.py"
+```
 
 ## Performance
 
-???+ note "Efficienct & Reliability"
+??? note "Efficienct & Reliability"
 
     | Metric            | 5                                           | 6                                                |
     |-------------------|---------------------------------------------|--------------------------------------------------|
@@ -110,7 +111,7 @@ while aiming to cover all capabilities of the previous generation.
 
 [^SPA]: https://pvlib-python.readthedocs.io/en/stable/reference/generated/pvlib.spa.html
 
-???+ info "Customisation & Reliability"
+??? info "Customisation & Reliability"
 
     | Question                  | 5                                                       | 6                                                                        |
     |---------------------------|---------------------------------------------------------|--------------------------------------------------------------------------|
@@ -121,7 +122,7 @@ while aiming to cover all capabilities of the previous generation.
 
 ## Capabilities
 
-???+ info "Scientific Functionality"
+??? info "Scientific Functionality"
 
     | Photovoltaic system | Software A | Software B |
     |---------------------|------------|------------|
@@ -129,7 +130,7 @@ while aiming to cover all capabilities of the previous generation.
     | Off-Grid            | Yes        | Planned    |
     | Tracking            | Yes        | Planned    |
 
-???+ note "Other capabilities"
+??? note "Other capabilities"
 
     | Capabilities                 | 5   | 6                |
     |------------------------------|-----|------------------|
