@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Annotated, Any
 
 import numpy as np
-import orjson
 from fastapi.responses import Response
 from pandas import to_datetime
 
@@ -25,9 +24,9 @@ from pvgisprototype.api.power.broadband import (
 from pvgisprototype.api.power.broadband_multiple_surfaces import (
     calculate_photovoltaic_power_output_series_from_multiple_surfaces,
 )
-from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.power.performance import summarise_photovoltaic_performance
+from pvgisprototype.api.performance.report import summarise_photovoltaic_performance
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.constants import (
     EFFICIENCY_FACTOR_DEFAULT,
@@ -96,7 +95,6 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_photovoltaic_module_model,
     fastapi_query_power_model,
     fastapi_query_quick_response_code,
-    fastapi_query_quiet,
     fastapi_query_solar_constant,
     fastapi_query_solar_time_model,
     fastapi_query_start_time,
