@@ -35,6 +35,13 @@ both of which are derived from the _Timestamp_ of interest.
     and a location on the surface of the earth
     for a moment or series of moments in time.
 
+
+```python exec="true" html="true"
+--8<-- "docs/reference/solar_position_diagram.py"
+```
+
+### Fractional Year
+
 First in order
 is the calculation of the position of the Earth in its orbit around the sun
 expressed through the angle ==Fractional Year==
@@ -45,9 +52,13 @@ measured in radians based solely on a moment in time (timestamp).
     - The function that calculates the fractional year considers leap years and converts the timestamps into fractional values.
     - Other solar positioning algorithms name this variable "the day angle"
 
+### Equation of Time
+
 Second is
 the ==Equation of Time== measured in minutes that
 corrects for the eccentricity of the Earth's orbit and axial tilt.
+
+### Time Offset
 
 The ==Time Offset== measured in minutes,
 incorporates the ==Equation of Time==
@@ -55,10 +66,14 @@ and accounts for the variation of the ==Local Solar Time== (LST)
 within a given time zone
 due to the longitude variations within the time zone.
 
+### True Solar Time
+
 Next is
 the ==True solar time==,
 also known as the _Apparent solar time_
 upon which depends the calculation of the ==Solar hour== angle.
+
+### Solar Hour
 
 The ==Solar Hour== angle
 measures the Earth's rotation
@@ -81,6 +96,8 @@ the solar hour angle is :
 
     - Fractional year ⊂ Equation of time ⊂ Time offset ⊂ True solar time ⊂ Solar hour angle
     - Solar declination ⊂ Solar zenith ⊂ Solar altitude ⊂ Solar azimuth
+
+### Solar Declination
 
 The ==Solar Declination== angle,
 depending on the algorithm,
