@@ -76,7 +76,7 @@ Prepate a series of timestamps as a Pandas DatetimeIndex,
 using _our_ helper function `generate_datetime_series`
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
->>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+>>> from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
 
 >>> timestamps = generate_datetime_series(start_time="2010-01-27 08:00:00", end_time="2010-01-27 18:00:00", frequency="h")
 ```
@@ -182,7 +182,7 @@ after the function name and without space
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
 >>> from math import radians
->>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+>>> from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
 >>> timestamps = generate_datetime_series(start_time='2010-01-27', end_time='2010-01-28')
 >>> from zoneinfo import ZoneInfo
 ```
