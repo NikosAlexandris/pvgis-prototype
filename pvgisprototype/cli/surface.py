@@ -80,7 +80,7 @@ from pvgisprototype import WindSpeedSeries
 from pvgisprototype import SpectralFactorSeries
 from pandas import DatetimeIndex
 from datetime import datetime
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT, EFFICIENCY_FACTOR_DEFAULT, NOMENCLATURE_FLAG_DEFAULT, RANDOM_TIMESTAMPS_FLAG_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import cPROFILE_FLAG_DEFAULT
 from pvgisprototype.constants import RADIANS

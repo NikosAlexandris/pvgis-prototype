@@ -75,7 +75,7 @@ from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
 from rich import print
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.cli.typer.output import typer_option_command_metadata
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT

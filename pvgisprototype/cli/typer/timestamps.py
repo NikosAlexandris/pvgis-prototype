@@ -5,19 +5,82 @@ Parameters that relate to the question "When ?".
 """
 
 from datetime import datetime
+from pandas import DatetimeIndex
 import typer
-from pvgisprototype.api.utilities.timestamp import ctx_attach_requested_timezone
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.api.utilities.timestamp import parse_timestamp_series
-from pvgisprototype.api.utilities.timestamp import callback_generate_datetime_series
-from pvgisprototype.api.utilities.timestamp import callback_generate_naive_datetime_series
-from pvgisprototype.api.utilities.timestamp import ctx_convert_to_timezone
-from pvgisprototype.api.utilities.timestamp import now_local_datetimezone
+from pvgisprototype.api.datetime.datetimeindex import parse_timestamp_series
+from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
+from pvgisprototype.api.datetime.timezone import ctx_attach_requested_timezone
+from pvgisprototype.api.datetime.timezone import ctx_convert_to_timezone
+from pvgisprototype.api.datetime.now import now_local_datetimezone
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
+from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
+from pvgisprototype.log import logger
 
 
 timestamp_typer_help = "Quoted date-time string of data to extract from series, example: [yellow]'2112-12-21 21:12:12'[/yellow]'"
 timestamps_typer_help = "Quoted date-time strings of data to extract from series, example: [yellow]'2112-12-21, 2112-12-21 12:21:21, 2112-12-21 21:12:12'[/yellow]'"
+
+
+def callback_generate_datetime_series(
+    ctx: typer.Context,
+    timestamps: DatetimeIndex,
+    # timestamps: List[datetime],
+    # value: Union[str, datetime, List[datetime]],
+    # param: typer.CallbackParam,
+):
+    # print(f'[yellow]i[/yellow] Context: {ctx.params}')
+    # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
+    # print("[yellow]i[/yellow] Executing callback_generate_datetime_series()")
+    # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
+    start_time=ctx.params.get('start_time')
+    end_time=ctx.params.get('end_time')
+    if start_time == end_time:
+        logger.warning(
+            (
+                f"[yellow bold]The start and end time are the same and will generate a single time stamp![/yellow bold]"
+            )
+        )
+    periods=ctx.params.get('periods', None) 
+    frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
+    if start_time is not None and end_time is not None:
+        timestamps = generate_datetime_series(
+            start_time=start_time,
+            end_time=end_time,
+            periods=periods,
+            frequency=frequency,
+            timezone=ctx.params.get('timezone'),
+            name=ctx.params.get('datetimeindex_name', None)
+        )
+    # from pandas import to_datetime
+    # -----------------------------------------------------------------------
+    # If we do the following, we need to take care of external naive time series!
+    # timezone_aware_timestamps = [
+    #     attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
+    # ]
+    # return to_datetime(timezone_aware_timestamps, format="mixed")
+    # -----------------------------------------------------------------------
+    return timestamps
+
+
+def callback_generate_naive_datetime_series(
+    ctx: typer.Context,
+    timestamps: str,
+):
+    start_time=ctx.params.get('start_time')
+    end_time=ctx.params.get('end_time')
+    periods=ctx.params.get('periods', None) 
+    frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
+    if start_time is not None and end_time is not None:
+        timestamps = generate_datetime_series(
+            start_time=start_time,
+            end_time=end_time,
+            periods=periods,
+            frequency=frequency,
+            timezone=None,
+            name=ctx.params.get('datetimeindex_name', None)
+        )
+    return timestamps
+
 
 typer_argument_timestamp = typer.Argument(
     help=timestamp_typer_help,

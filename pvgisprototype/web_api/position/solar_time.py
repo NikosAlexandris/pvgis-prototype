@@ -4,7 +4,7 @@ from typing import List
 from pvgisprototype.api.position.solar_time import calculate_solar_time
 from pvgisprototype.api.position.models import SolarTimeModel
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 from datetime import datetime
 from pvgisprototype.constants import RADIANS

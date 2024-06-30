@@ -85,7 +85,7 @@ from pvgisprototype.constants import TIME_ALGORITHM_COLUMN_NAME
 from pandas import DatetimeIndex
 from pvgisprototype.validation.hashing import generate_hash
 from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 
 
 @log_function_call
