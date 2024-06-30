@@ -8,7 +8,7 @@ from typing import Union
 from pathlib import Path
 from pvgisprototype.cli.typer.path import validate_path
 from pvgisprototype import TemperatureSeries
-from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import TEMPERATURE_DEFAULT
 from pvgisprototype.constants import SYMBOL_UNIT_TEMPERATURE

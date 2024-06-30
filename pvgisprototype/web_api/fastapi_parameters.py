@@ -1,6 +1,6 @@
 from fastapi import Query
 
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.constants import (
     ALBEDO_DESCRIPTION,
     ALBEDO_MAXIMUM,

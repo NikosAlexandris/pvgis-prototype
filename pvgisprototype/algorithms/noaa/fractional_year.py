@@ -1,5 +1,5 @@
 from devtools import debug
-from pvgisprototype.api.utilities.timestamp import get_days_in_years
+from pvgisprototype.api.datetime.helpers import get_days_in_years
 from pvgisprototype.caching import custom_cached
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.algorithms.noaa.function_models import CalculateFractionalYearTimeSeriesNOAAInput

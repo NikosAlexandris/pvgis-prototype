@@ -2,7 +2,7 @@ from devtools import debug
 from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.log import log_function_call
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import get_days_in_years
+from pvgisprototype.api.datetime.helpers import get_days_in_years
 from pvgisprototype.validation.functions import validate_with_pydantic
 from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
 from pvgisprototype import FractionalYear

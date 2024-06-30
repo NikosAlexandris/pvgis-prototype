@@ -4,7 +4,7 @@ from typing import Optional
 from pathlib import Path
 from datetime import datetime
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
 from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time

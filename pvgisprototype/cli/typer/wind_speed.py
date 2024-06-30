@@ -9,7 +9,7 @@ from typer import Context
 from pvgisprototype.constants import WIND_SPEED_DEFAULT
 from pvgisprototype.constants import SYMBOL_UNIT_WIND_SPEED
 from pvgisprototype import WindSpeedSeries
-from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_meteorological_series
