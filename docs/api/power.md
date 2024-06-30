@@ -67,7 +67,8 @@ Prepate a series of timestamps as a Pandas DatetimeIndex,
 using _our_ helper function `generate_datetime_series`
 
 ```pycon exec="true" session="power-series" source="material-block"
->>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+>>> from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
+
 
 >>> timestamps = generate_datetime_series(start_time="2010-01-27 08:00:00", end_time="2010-01-27 18:00:00", frequency="h")
 ```
@@ -76,6 +77,7 @@ and the default UTC timezone as a `ZoneInfo` object
 
 ```pycon exec="true" session="power-series" source="material-block"
 >>> from zoneinfo import ZoneInfo
+
 
 >>> utc_zone = ZoneInfo("UTC")
 ```
@@ -96,6 +98,7 @@ Linke turbidity
 ```pycon exec="true" session="power-series" source="material-block"
 >>> from pvgisprototype import LinkeTurbidityFactor
 
+
 >>> linke_turbidity_factor_series = LinkeTurbidityFactor(value=1)
 ```
 
@@ -103,6 +106,7 @@ Type of the photovoltaic module
 
 ```pycon exec="true" session="power-series" source="material-block"
 >>> from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+
 
 >>> photovoltaic_module = PhotovoltaicModuleModel.CIS_FREE_STANDING
 ```
@@ -120,6 +124,7 @@ Spectral factor series
 
 ```pycon exec="true" session="power-series" source="material-block"
 >>> from pvgisprototype import SpectralFactorSeries
+
 >>> spectral_factor_series=SpectralFactorSeries(value=1)
 ```
 
@@ -246,7 +251,7 @@ and again inspect the `power` output
 The easier way to replicate the above examples is an all-in-one code-block :
 
 ```pycon exec="true" session="power-series-all-in-one" source="material-block"
->>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+>>> from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
 >>> from zoneinfo import ZoneInfo
 >>> from pvgisprototype import LinkeTurbidityFactor
 >>> from pvgisprototype import TemperatureSeries, WindSpeedSeries
