@@ -62,9 +62,9 @@ def layout_panels_with_categories(symbol_group_descriptions):
 
 
 with open(os.devnull, "w") as devnull:
-    # console = Console(record=True, width=150, file=devnull)
+    console = Console(record=True, width=150, file=devnull)
     # console.print(create_symbols_table(), markup=True, highlight=False)
     panels = layout_panels_with_categories(SYMBOL_GROUPS_DESCRIPTIONS)
-    Console().print(panels, markup=True, highlight=False)
+    console.print(panels, markup=True, highlight=False)
 
-print(Console().export_html(inline_styles=True, code_format="<pre><code>{code}</code></pre>"))
+print(console.export_html(inline_styles=True, code_format="<pre><code>{code}</code></pre>"))
