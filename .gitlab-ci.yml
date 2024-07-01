@@ -31,9 +31,9 @@ pages:
   stage: deploy
   image: python:3.11.6
   script:
-    - $HOME/.local/bin/pdm install
+    - pdm install
     - export COLUMNS=160
-    - $HOME/.local/bin/pdm run mkdocs build --verbose --site-dir public
+    - pdm run mkdocs build --verbose --site-dir public
     - mkdocs build --site-dir public
   allow_failure: true
   artifacts:
