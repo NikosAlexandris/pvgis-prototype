@@ -158,7 +158,6 @@ def build_caption(
         f"\n[underline]Algorithms[/underline]  " # ---------------------------
         f"Timing : [bold]{rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
         f"Zone : {timezone}, "
-        f"Local zone : {user_requested_timezone if user_requested_timezone else 'N/A'}, "
 
         # f"Positioning: {rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)}, "
         # f"Incidence: {rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)}\n"
@@ -167,6 +166,10 @@ def build_caption(
         # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
         # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
     )
+    if user_requested_timezone != timezone and user_requested_timezone is not None:
+        caption += (
+            f"Local zone : {user_requested_timezone}, "
+        )
     return caption
 
 
@@ -340,7 +343,7 @@ def print_solar_position_series_table(
             model_caption += f"Positioning : [bold]{position_algorithm}[/bold], "
             
             incidence_algorithm = get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
-            model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
+            model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold]"
             
             model_caption += f"\n[underline]Definitions[/underline]  " # -----------
 
@@ -353,7 +356,7 @@ def print_solar_position_series_table(
             table_obj = Table(
                 *columns,
                 title=title,
-                caption=model_caption,
+                # caption=model_caption,
                 box=SIMPLE_HEAD,
             )
 
@@ -400,6 +403,7 @@ def print_solar_position_series_table(
                 table_obj.add_row(*row)
 
             Console().print(table_obj)
+            Console().print(Panel(model_caption, expand=False))
 
 
 def print_hour_angle_table(
