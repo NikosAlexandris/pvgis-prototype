@@ -52,6 +52,7 @@ WORKDIR /home/pvgis-user/documentation
 COPY --chown=pvgis-user:pvgis-user . .
 RUN pip install --upgrade pip \
     && pip install --user pdm  \
+    && pip install .[docs] \
     && pdm install \
     && pdm run mkdocs build --verbose --site-dir public \
     && pip cache purge
