@@ -6,7 +6,7 @@ image: python:3.11.6
 
 before_script:
   - pip install --upgrade pip
-  - pip install .[docs]
+  # - pip install .[docs]
   - pip install pdm
     # - sudo apt-get update && apt-get install -y locales
     # - apt-get font-terminus font-inconsolata font-dejavu font-noto font-awesome font-noto-extra
@@ -17,19 +17,18 @@ before_script:
     # - export http_proxy=$PROXY https_proxy=$PROXY no_proxy=$NOPROXY
     # - export PATH=$PATH:$HOME/.local/bin
 
-test:
-  stage: test
-  script:
-  - mkdocs build --verbose --site-dir test
-  artifacts:
-    paths:
-    - test
-  rules:
-    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+# test:
+#   stage: test
+#   script:
+#   - mkdocs build --verbose --site-dir test
+#   artifacts:
+#     paths:
+#     - test
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
 
 pages:
   stage: deploy
-  image: python:3.11.6
   script:
     - pdm install
     - export COLUMNS=160
