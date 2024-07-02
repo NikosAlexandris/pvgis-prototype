@@ -33,7 +33,6 @@ pages:
     - pdm install
     - export COLUMNS=160
     - pdm run mkdocs build --verbose --site-dir public
-    - mkdocs build --site-dir public
   allow_failure: true
   artifacts:
     paths:
