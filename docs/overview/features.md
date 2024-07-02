@@ -31,8 +31,8 @@ Below is an overview of some of the key features:
 !!! hint
 
     For detailed information on how to use these features,
-    refer to the [Tutorials](tutorials/index.md) and [How-To](how_to/index.md)
+    refer to the [Tutorials](../tutorials/index.md) and [How-To](../how_to/index.md)
     documentation pages.
 
     Interested for the source code ?
-    Refer to [Code Reference](code_reference/index.md).
+    Refer to [Source Code](../source_code/index.md).
