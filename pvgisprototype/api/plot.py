@@ -121,7 +121,6 @@ def uniplot_data_array_series(
             title=title if title else supertitle,
             y_unit=' ' + str(unit),
             force_ascii=True,
-            color=False,
         )
     except IOError as e:
         raise IOError(
