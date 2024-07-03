@@ -281,54 +281,67 @@ def calculate_ground_reflected_inclined_irradiance_series(
             REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },
-        "extended_2": lambda: {
-            # Attention : input irradiance _before_ reflectivity effect !
-            REFLECTIVITY_COLUMN_NAME: reflectivity_effect,
-            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: reflectivity_effect_percentage,
-        }
-        if verbose > 6 and apply_reflectivity_factor
-        else {},
-        "extended": lambda: {
-            # REFLECTIVITY_FACTOR_COLUMN_NAME: where(ground_reflected_irradiance_reflectivity_factor_series <= 0, 0, (1 - ground_reflected_irradiance_reflectivity_factor_series)),
-            REFLECTIVITY_FACTOR_COLUMN_NAME: ground_reflected_irradiance_reflectivity_factor_series,
-            REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_irradiance_before_reflectivity_series,
-            # } if verbose > 1 and apply_reflectivity_factor else {},
-        }
-        if apply_reflectivity_factor
-        else {},
-        "more_extended": lambda: {
-            VIEW_FRACTION_COLUMN_NAME: ground_view_fraction,
-            ALBEDO_COLUMN_NAME: albedo,
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
-        }
-        if verbose > 2
-        else {},
-        "even_more_extended": lambda: {
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_tilt, angle_output_units
-            ),
-            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_orientation, angle_output_units
-            ),
-            ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-        }
-        if verbose > 3
-        else {},
-        "and_even_more_extended": lambda: {
-            TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE + " & horizontal components",
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-        }
-        if verbose > 4
-        else {},
+        "extended_2": lambda: (
+            {
+                # Attention : input irradiance _before_ reflectivity effect !
+                REFLECTIVITY_COLUMN_NAME: reflectivity_effect,
+                REFLECTIVITY_PERCENTAGE_COLUMN_NAME: reflectivity_effect_percentage,
+            }
+            if verbose > 6 and apply_reflectivity_factor
+            else {}
+        ),
+        "extended": lambda: (
+            {
+                # REFLECTIVITY_FACTOR_COLUMN_NAME: where(ground_reflected_irradiance_reflectivity_factor_series <= 0, 0, (1 - ground_reflected_irradiance_reflectivity_factor_series)),
+                REFLECTIVITY_FACTOR_COLUMN_NAME: ground_reflected_irradiance_reflectivity_factor_series,
+                REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_irradiance_before_reflectivity_series,
+                # } if verbose > 1 and apply_reflectivity_factor else {},
+            }
+            if apply_reflectivity_factor
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                VIEW_FRACTION_COLUMN_NAME: ground_view_fraction,
+                ALBEDO_COLUMN_NAME: albedo,
+                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "even_more_extended": lambda: (
+            {
+                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_tilt, angle_output_units
+                ),
+                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_orientation, angle_output_units
+                ),
+                ANGLE_UNITS_COLUMN_NAME: angle_output_units,
+            }
+            if verbose > 3
+            else {}
+        ),
+        "and_even_more_extended": lambda: (
+            {
+                TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE
+                + " & horizontal components",
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            }
+            if verbose > 4
+            else {}
+        ),
         "extra": lambda: {} if verbose > 5 else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(
-                ground_reflected_inclined_irradiance_series
-            ),
-        }
-        if fingerprint
-        else {},
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    ground_reflected_inclined_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
