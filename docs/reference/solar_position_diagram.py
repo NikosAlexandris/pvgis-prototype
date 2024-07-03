@@ -1,9 +1,7 @@
 from base64 import b64encode
 from contextlib import suppress
-from types import DynamicClassAttribute
-from diagrams import Diagram, Edge, Cluster
+from diagrams import Diagram, Edge
 from diagrams.custom import Custom
-from diagrams.programming.flowchart import Action
 
 
 path_to_icons = "docs/icons"

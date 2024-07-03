@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from math import cos, radians, sin
 
-import numpy
+import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
 from rich import print
@@ -180,9 +180,9 @@ def calculate_apparent_solar_time_series_milne1921(
     days_of_year = timestamps.dayofyear
     days_in_years = get_days_in_years(timestamps.year)
     # In the original equation : days_in_years = 365
-    b = numpy.radians(360 / days_in_years * (days_of_year - 81))
+    b = np.radians(360 / days_in_years * (days_of_year - 81))
     equation_of_time = (
-        9.87 * numpy.sin(2 * b) - 7.53 * numpy.cos(b) - 1.5 * numpy.sin(b)
+        9.87 * np.sin(2 * b) - 7.53 * np.cos(b) - 1.5 * np.sin(b)
     )
 
     # In the original equation : time_correction_factor = 4 * (longitude - local_standard_time_meridian) + equation_of_time  in hours
@@ -195,7 +195,7 @@ def calculate_apparent_solar_time_series_milne1921(
     true_solar_time_series = (
         timestamps - timestamps.normalize()
     ).total_seconds() + time_correction_factor_minutes * 60
-    true_solar_time_series_in_minutes = numpy.mod(
+    true_solar_time_series_in_minutes = np.mod(
         true_solar_time_series.astype(dtype) / 60, 1440
     )
 
