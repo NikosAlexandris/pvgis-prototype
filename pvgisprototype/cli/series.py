@@ -232,9 +232,11 @@ def select(
     }
     if location_time_series_2 is not None:
         more_results = {
-            location_time_series_2.name: location_time_series_2.to_numpy()
-            if location_time_series_2 is not None
-            else None
+            location_time_series_2.name: (
+                location_time_series_2.to_numpy()
+                if location_time_series_2 is not None
+                else None
+            )
         }
         results = results | more_results
 

@@ -244,66 +244,66 @@ def calculate_global_inclined_irradiance_series(
     # Calculate diffuse and reflected irradiance for sun above horizon
     if np.any(mask_above_horizon):
         # if given, will read from external time series
-        diffuse_inclined_irradiance_series[mask_above_horizon] = (
-            calculate_diffuse_inclined_irradiance_series(
-                longitude=longitude,
-                latitude=latitude,
-                elevation=elevation,
-                surface_tilt=surface_tilt,
-                surface_orientation=surface_orientation,
-                timestamps=timestamps,
-                timezone=timezone,
-                linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
-                global_horizontal_component=global_horizontal_irradiance,  # time series optional
-                direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
-                apply_reflectivity_factor=apply_reflectivity_factor,
-                solar_position_model=solar_position_model,
-                solar_time_model=solar_time_model,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                angle_output_units=angle_output_units,
-                neighbor_lookup=neighbor_lookup,
-                dtype=dtype,
-                array_backend=array_backend,
-                multi_thread=multi_thread,
-                verbose=0,  # no verbosity here by choice!
-                log=log,
-            ).value[  # Important !
-                mask_above_horizon
-            ]
-        )
-        reflected_inclined_irradiance_series[mask_above_horizon] = (
-            calculate_ground_reflected_inclined_irradiance_series(
-                longitude=longitude,
-                latitude=latitude,
-                elevation=elevation,
-                surface_tilt=surface_tilt,
-                surface_orientation=surface_orientation,
-                timestamps=timestamps,
-                timezone=timezone,
-                linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
-                albedo=albedo,
-                global_horizontal_component=global_horizontal_irradiance,  # time series, optional
-                apply_reflectivity_factor=apply_reflectivity_factor,
-                solar_position_model=solar_position_model,
-                solar_time_model=solar_time_model,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                angle_output_units=angle_output_units,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=0,  # no verbosity here by choice!
-                log=log,
-            ).value[  # Important !
-                mask_above_horizon
-            ]
-        )
+        diffuse_inclined_irradiance_series[
+            mask_above_horizon
+        ] = calculate_diffuse_inclined_irradiance_series(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+            timestamps=timestamps,
+            timezone=timezone,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
+            global_horizontal_component=global_horizontal_irradiance,  # time series optional
+            direct_horizontal_component=direct_horizontal_irradiance,  # time series, optional
+            apply_reflectivity_factor=apply_reflectivity_factor,
+            solar_position_model=solar_position_model,
+            solar_time_model=solar_time_model,
+            solar_constant=solar_constant,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            angle_output_units=angle_output_units,
+            neighbor_lookup=neighbor_lookup,
+            dtype=dtype,
+            array_backend=array_backend,
+            multi_thread=multi_thread,
+            verbose=0,  # no verbosity here by choice!
+            log=log,
+        ).value[  # Important !
+            mask_above_horizon
+        ]
+        reflected_inclined_irradiance_series[
+            mask_above_horizon
+        ] = calculate_ground_reflected_inclined_irradiance_series(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_tilt=surface_tilt,
+            surface_orientation=surface_orientation,
+            timestamps=timestamps,
+            timezone=timezone,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
+            albedo=albedo,
+            global_horizontal_component=global_horizontal_irradiance,  # time series, optional
+            apply_reflectivity_factor=apply_reflectivity_factor,
+            solar_position_model=solar_position_model,
+            solar_time_model=solar_time_model,
+            solar_constant=solar_constant,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,  # no verbosity here by choice!
+            log=log,
+        ).value[  # Important !
+            mask_above_horizon
+        ]
 
     # sum components
     global_inclined_irradiance_series = (
@@ -329,37 +329,47 @@ def calculate_global_inclined_irradiance_series(
             GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },  # if verbose > 0 else {},
-        "extended": lambda: {
-            TITLE_KEY_NAME: GLOBAL_INCLINED_IRRADIANCE + " & relevant components",
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_tilt, angle_output_units
-            ),
-            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_orientation, angle_output_units
-            ),
-        }
-        if verbose > 1
-        else {},
-        "more_extended": lambda: {
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
-            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
-            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_inclined_irradiance_series,
-        }
-        if verbose > 2
-        else {},
-        "even_more_extended": lambda: {
-            SHADE_COLUMN_NAME: in_shade,
-            ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
-            LOW_ANGLE_COLUMN_NAME: mask_low_angle,
-            BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
-        }
-        if verbose > 3
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(global_inclined_irradiance_series),
-        }
-        if fingerprint
-        else {},
+        "extended": lambda: (
+            {
+                TITLE_KEY_NAME: GLOBAL_INCLINED_IRRADIANCE + " & relevant components",
+                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_tilt, angle_output_units
+                ),
+                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_orientation, angle_output_units
+                ),
+            }
+            if verbose > 1
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
+                DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
+                REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: reflected_inclined_irradiance_series,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "even_more_extended": lambda: (
+            {
+                SHADE_COLUMN_NAME: in_shade,
+                ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
+                LOW_ANGLE_COLUMN_NAME: mask_low_angle,
+                BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
+            }
+            if verbose > 3
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    global_inclined_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}

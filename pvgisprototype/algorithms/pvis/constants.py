@@ -65,7 +65,6 @@ BAND_LIMITS = np.array(
     ]
 )
 
-import numpy as np
 
 EXTRATERRESTRIAL_NORMAL_IRRADIANCE = np.array(
     [

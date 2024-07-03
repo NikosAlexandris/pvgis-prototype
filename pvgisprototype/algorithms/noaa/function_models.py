@@ -28,7 +28,6 @@ from pvgisprototype.validation.pvis_data_classes import (
 # Units?
 
 
-
 # In order of dependency:
 # Fractional year  < Equation of time  < Time offset  < True solar time  < Solar hour angle
 # Solar declination  < Solar zenith  < Solar altitude  < Solar azimuth
