@@ -1,3 +1,4 @@
+from math import pi
 from typing import Dict, List
 from zoneinfo import ZoneInfo
 
@@ -14,7 +15,7 @@ from pvgisprototype.algorithms.noaa.solar_zenith import (
 from pvgisprototype.algorithms.pvis.solar_altitude import (
     calculate_solar_altitude_series_hofierka,
 )
-from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -212,7 +213,7 @@ def calculate_solar_zenith_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
-    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
+    # solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -246,15 +247,17 @@ def calculate_solar_zenith_series(
             )
             solar_position_model_overview = {
                 solar_position_model.name: {
-                    TIME_ALGORITHM_NAME: solar_zenith_series.timing_algorithm
-                    if solar_zenith_series
-                    else NOT_AVAILABLE,
+                    TIME_ALGORITHM_NAME: (
+                        solar_zenith_series.timing_algorithm
+                        if solar_zenith_series
+                        else NOT_AVAILABLE
+                    ),
                     POSITION_ALGORITHM_NAME: solar_position_model.value,
-                    ZENITH_NAME: getattr(
-                        solar_zenith_series, angle_output_units, NOT_AVAILABLE
-                    )
-                    if solar_zenith_series
-                    else NOT_AVAILABLE,
+                    ZENITH_NAME: (
+                        getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE)
+                        if solar_zenith_series
+                        else NOT_AVAILABLE
+                    ),
                     UNIT_NAME: None,
                 }
             }

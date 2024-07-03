@@ -539,131 +539,156 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
             TECHNOLOGY_NAME: photovoltaic_module.value,
             PEAK_POWER_COLUMN_NAME: peak_power,
-            POWER_MODEL_COLUMN_NAME: power_model.value
-            if power_model
-            else NOT_AVAILABLE,
+            POWER_MODEL_COLUMN_NAME: (
+                power_model.value if power_model else NOT_AVAILABLE
+            ),
         },
-        "Power extended": lambda: {
-            PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_output_without_system_loss_series,
-        }
-        if verbose > 1
-        else {},
-        "System loss": lambda: {
-            EFFICIENCY_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                EFFICIENCY_COLUMN_NAME
-            ],
-            SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
-        }
-        if verbose > 2
-        else {},
-        "Effective irradiance": lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & effective components",
-            EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: total_effective_global_irradiance,
-            EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: total_effective_direct_irradiance,
-            EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: total_effective_diffuse_irradiance,
-            EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: total_effective_reflected_inclined_irradiance,
-            SPECTRAL_EFFECT_COLUMN_NAME: total_spectral_effect,
-            SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: total_spectral_effect_percentage,
-            SPECTRAL_FACTOR_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                0
-            ].components[SPECTRAL_FACTOR_COLUMN_NAME],
-        }
-        if verbose > 3
-        else {},
-        "Reflectivity": lambda: {
-            REFLECTIVITY_COLUMN_NAME: total_global_inclined_reflectivity,
-            DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_direct_inclined_reflectivity_factor,
-            DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_diffuse_inclined_reflectivity_factor,
-            REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_ground_reflected_inclined_reflectivity_factor,
-        }
-        if verbose > 6 and apply_reflectivity_factor
-        else {},
-        "Inclined irradiance components": lambda: {
-            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: total_global_inclined_irradiance,
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: total_direct_inclined_irradiance,
-            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: total_diffuse_inclined_irradiance,
-            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: total_ground_reflected_inclined_irradiance,
-        }
-        if verbose > 4
-        else {},
-        "more_extended_2": lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + ", effective & in-plane components",
-            GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_global_inclined_irradiance_before_reflectivity,
-            DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_direct_inclined_irradiance_before_reflectivity,
-            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_diffuse_inclined_irradiance_before_reflectivity,
-            REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_ground_reflected_inclined_irradiance_before_reflectivity,
-        }
-        if verbose > 5 and apply_reflectivity_factor
-        else {},
-        "Horizontal irradiance components": lambda: {
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: total_direct_horizontal_irradiance,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: total_diffuse_horizontal_irradiance,
-        }
-        if verbose > 6
-        else {},
-        "Meteorological variables": lambda: {
-            TEMPERATURE_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                0
-            ].components[TEMPERATURE_COLUMN_NAME],
-            WIND_SPEED_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                WIND_SPEED_COLUMN_NAME
-            ],
-        }
-        if verbose > 7
-        else {},
-        "Surface position": lambda: {
-            SURFACE_ORIENTATION_COLUMN_NAME: [
-                convert_float_to_degrees_if_requested(
-                    surface_orientation_value, angle_output_units
-                )
-                for surface_orientation_value in surface_orientation
-            ],
-            SURFACE_TILT_COLUMN_NAME: [
-                convert_float_to_degrees_if_requested(
-                    surface_tilt_value, angle_output_units
-                )
-                for surface_tilt_value in surface_tilt
-            ],
-            ABOVE_HORIZON_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                0
-            ].components[ABOVE_HORIZON_COLUMN_NAME],
-            LOW_ANGLE_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                LOW_ANGLE_COLUMN_NAME
-            ],
-            BELOW_HORIZON_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                0
-            ].components[BELOW_HORIZON_COLUMN_NAME],
-            SHADE_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                SHADE_COLUMN_NAME
-            ],
-        }
-        if verbose > 8
-        else {},
-        "Solar position": lambda: {
-            INCIDENCE_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                INCIDENCE_COLUMN_NAME
-            ],
-            INCIDENCE_ALGORITHM_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                0
-            ].components[INCIDENCE_ALGORITHM_COLUMN_NAME],
-            INCIDENCE_DEFINITION: individual_photovoltaic_power_outputs[0].components[
-                INCIDENCE_DEFINITION
-            ],
-            ALTITUDE_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                ALTITUDE_COLUMN_NAME
-            ],
-            AZIMUTH_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                AZIMUTH_COLUMN_NAME
-            ],
-            UNIT_NAME: angle_output_units,
-        }
-        if verbose > 9
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
-        }
-        if fingerprint
-        else {},
+        "Power extended": lambda: (
+            {
+                PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_output_without_system_loss_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "System loss": lambda: (
+            {
+                EFFICIENCY_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[EFFICIENCY_COLUMN_NAME],
+                SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "Effective irradiance": lambda: (
+            {
+                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & effective components",
+                EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: total_effective_global_irradiance,
+                EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: total_effective_direct_irradiance,
+                EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: total_effective_diffuse_irradiance,
+                EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: total_effective_reflected_inclined_irradiance,
+                SPECTRAL_EFFECT_COLUMN_NAME: total_spectral_effect,
+                SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: total_spectral_effect_percentage,
+                SPECTRAL_FACTOR_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[SPECTRAL_FACTOR_COLUMN_NAME],
+            }
+            if verbose > 3
+            else {}
+        ),
+        "Reflectivity": lambda: (
+            {
+                REFLECTIVITY_COLUMN_NAME: total_global_inclined_reflectivity,
+                DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_direct_inclined_reflectivity_factor,
+                DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_diffuse_inclined_reflectivity_factor,
+                REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_ground_reflected_inclined_reflectivity_factor,
+            }
+            if verbose > 6 and apply_reflectivity_factor
+            else {}
+        ),
+        "Inclined irradiance components": lambda: (
+            {
+                GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: total_global_inclined_irradiance,
+                DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: total_direct_inclined_irradiance,
+                DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: total_diffuse_inclined_irradiance,
+                REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: total_ground_reflected_inclined_irradiance,
+            }
+            if verbose > 4
+            else {}
+        ),
+        "more_extended_2": lambda: (
+            {
+                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER
+                + ", effective & in-plane components",
+                GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_global_inclined_irradiance_before_reflectivity,
+                DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_direct_inclined_irradiance_before_reflectivity,
+                DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_diffuse_inclined_irradiance_before_reflectivity,
+                REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_ground_reflected_inclined_irradiance_before_reflectivity,
+            }
+            if verbose > 5 and apply_reflectivity_factor
+            else {}
+        ),
+        "Horizontal irradiance components": lambda: (
+            {
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: total_direct_horizontal_irradiance,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: total_diffuse_horizontal_irradiance,
+            }
+            if verbose > 6
+            else {}
+        ),
+        "Meteorological variables": lambda: (
+            {
+                TEMPERATURE_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[TEMPERATURE_COLUMN_NAME],
+                WIND_SPEED_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[WIND_SPEED_COLUMN_NAME],
+            }
+            if verbose > 7
+            else {}
+        ),
+        "Surface position": lambda: (
+            {
+                SURFACE_ORIENTATION_COLUMN_NAME: [
+                    convert_float_to_degrees_if_requested(
+                        surface_orientation_value, angle_output_units
+                    )
+                    for surface_orientation_value in surface_orientation
+                ],
+                SURFACE_TILT_COLUMN_NAME: [
+                    convert_float_to_degrees_if_requested(
+                        surface_tilt_value, angle_output_units
+                    )
+                    for surface_tilt_value in surface_tilt
+                ],
+                ABOVE_HORIZON_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[ABOVE_HORIZON_COLUMN_NAME],
+                LOW_ANGLE_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[LOW_ANGLE_COLUMN_NAME],
+                BELOW_HORIZON_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[BELOW_HORIZON_COLUMN_NAME],
+                SHADE_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
+                    SHADE_COLUMN_NAME
+                ],
+            }
+            if verbose > 8
+            else {}
+        ),
+        "Solar position": lambda: (
+            {
+                INCIDENCE_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[INCIDENCE_COLUMN_NAME],
+                INCIDENCE_ALGORITHM_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[INCIDENCE_ALGORITHM_COLUMN_NAME],
+                INCIDENCE_DEFINITION: individual_photovoltaic_power_outputs[
+                    0
+                ].components[INCIDENCE_DEFINITION],
+                ALTITUDE_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[ALTITUDE_COLUMN_NAME],
+                AZIMUTH_COLUMN_NAME: individual_photovoltaic_power_outputs[
+                    0
+                ].components[AZIMUTH_COLUMN_NAME],
+                UNIT_NAME: angle_output_units,
+            }
+            if verbose > 9
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    photovoltaic_power_output_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}

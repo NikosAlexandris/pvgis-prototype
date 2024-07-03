@@ -239,15 +239,19 @@ def calculate_solar_altitude_series(
             )
             solar_position_model_overview = {
                 solar_position_model.name: {
-                    TIME_ALGORITHM_NAME: solar_altitude_series.timing_algorithm
-                    if solar_altitude_series
-                    else NOT_AVAILABLE,
+                    TIME_ALGORITHM_NAME: (
+                        solar_altitude_series.timing_algorithm
+                        if solar_altitude_series
+                        else NOT_AVAILABLE
+                    ),
                     POSITION_ALGORITHM_NAME: solar_position_model.value,
-                    ALTITUDE_NAME: getattr(
-                        solar_altitude_series, angle_output_units, NOT_AVAILABLE
-                    )
-                    if solar_altitude_series
-                    else NOT_AVAILABLE,
+                    ALTITUDE_NAME: (
+                        getattr(
+                            solar_altitude_series, angle_output_units, NOT_AVAILABLE
+                        )
+                        if solar_altitude_series
+                        else NOT_AVAILABLE
+                    ),
                     UNIT_NAME: None,
                 }
             }

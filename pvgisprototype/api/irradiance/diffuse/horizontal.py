@@ -140,37 +140,48 @@ def calculate_diffuse_horizontal_irradiance_series(
             TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
         },  # if verbose > 0 else {},
-        "extended": lambda: {
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        }
-        if verbose > 1
-        else {},
-        "more_extended": lambda: {
-            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE + " & relevant components",
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units)
-            if solar_altitude_series
-            else None,
-            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-        }
-        if verbose > 2
-        else {},
+        "extended": lambda: (
+            {
+                RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
+                + " & relevant components",
+                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
+                ALTITUDE_COLUMN_NAME: (
+                    getattr(solar_altitude_series, angle_output_units)
+                    if solar_altitude_series
+                    else None
+                ),
+                LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+            }
+            if verbose > 2
+            else {}
+        ),
         "even_more_extended": lambda: {} if verbose > 3 else {},
         "and_even_more_extended": lambda: {} if verbose > 4 else {},
         "extra": lambda: {} if verbose > 5 else {},
-        "out-of-range": lambda: {
-            # OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range,
-            # OUT_OF_RANGE_INDICES_COLUMN_NAME + ' i': out_of_range_indices,
-        }
-        if out_of_range_indices[0].size > 0
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(
-                diffuse_horizontal_irradiance_series
-            ),
-        }
-        if fingerprint
-        else {},
+        "out-of-range": lambda: (
+            {
+                # OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range,
+                # OUT_OF_RANGE_INDICES_COLUMN_NAME + ' i': out_of_range_indices,
+            }
+            if out_of_range_indices[0].size > 0
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    diffuse_horizontal_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
