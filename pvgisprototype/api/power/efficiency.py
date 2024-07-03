@@ -290,27 +290,33 @@ def calculate_efficiency_factor_series(
             TITLE_KEY_NAME: EFFICIENCY_NAME,
             EFFICIENCY_FACTOR_COLUMN_NAME: efficiency_factor_series,
         },  # if verbose > 0 else {},
-        "more_extended": lambda: {
-            TITLE_KEY_NAME: EFFICIENCY_NAME + " & components",
-            LOG_RELATIVE_IRRADIANCE_COLUMN_NAME: log_relative_irradiance_series,
-            TEMPERATURE_DEVIATION_COLUMN_NAME: temperature_deviation_series,
-        }
-        if verbose > 2
-        else {},
-        "even_more_extended": lambda: {
-            RELATIVE_IRRADIANCE_COLUMN_NAME: relative_irradiance_series,
-            "Radiation cutoff": radiation_cutoff_loss_percentage_series,
-            LOW_IRRADIANCE_COLUMN_NAME: relative_irradiance_series
-            <= radiation_cutoff_threshold,
-            IRRADIANCE_COLUMN_NAME: irradiance_series,
-        }
-        if verbose > 3
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(efficiency_factor_series),
-        }
-        if fingerprint
-        else {},
+        "more_extended": lambda: (
+            {
+                TITLE_KEY_NAME: EFFICIENCY_NAME + " & components",
+                LOG_RELATIVE_IRRADIANCE_COLUMN_NAME: log_relative_irradiance_series,
+                TEMPERATURE_DEVIATION_COLUMN_NAME: temperature_deviation_series,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "even_more_extended": lambda: (
+            {
+                RELATIVE_IRRADIANCE_COLUMN_NAME: relative_irradiance_series,
+                "Radiation cutoff": radiation_cutoff_loss_percentage_series,
+                LOW_IRRADIANCE_COLUMN_NAME: relative_irradiance_series
+                <= radiation_cutoff_threshold,
+                IRRADIANCE_COLUMN_NAME: irradiance_series,
+            }
+            if verbose > 3
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(efficiency_factor_series),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
@@ -387,17 +393,23 @@ def calculate_spectrally_corrected_effective_irradiance(
             TITLE_KEY_NAME: EFFECTIVE_IRRADIANCE_NAME,
             EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
         },  # if verbose > 0 else {},
-        "extended": lambda: {
-            SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor_series.value,
-            SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_series
-            if (verbose > 1 and spectral_effect_series.size > 0)
-            else NOT_AVAILABLE,
-            SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: spectral_effect_percentage_series
-            if (verbose > 1 and spectral_effect_percentage_series.size > 0)
-            else NOT_AVAILABLE,
-        }
-        if verbose > 1
-        else {},
+        "extended": lambda: (
+            {
+                SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor_series.value,
+                SPECTRAL_EFFECT_COLUMN_NAME: (
+                    spectral_effect_series
+                    if (verbose > 1 and spectral_effect_series.size > 0)
+                    else NOT_AVAILABLE
+                ),
+                SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: (
+                    spectral_effect_percentage_series
+                    if (verbose > 1 and spectral_effect_percentage_series.size > 0)
+                    else NOT_AVAILABLE
+                ),
+            }
+            if verbose > 1
+            else {}
+        ),
     }
 
     components = {}
@@ -552,50 +564,66 @@ def calculate_pv_efficiency_series(
             POWER_MODEL_COLUMN_NAME: power_model.value,
             TEMPERATURE_ALGORITHM_COLUMN_NAME: temperature_model.value,
         },  # if verbose > 0 else {},
-        "extended": lambda: {
-            # EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME: efficiency_series.photovoltaic_module_efficiency_coefficients,
-        }
-        if verbose > 1
-        else {},
-        "power_model_results": lambda: {
-            EFFICIENCY_FACTOR_COLUMN_NAME: efficiency_series.value
-            if (
-                verbose > 1
-                and power_model.value == PhotovoltaicModulePerformanceModel.king
-            )
-            else NOT_AVAILABLE,
-            # DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
-            # VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
-        }
-        if verbose > 1
-        else {},
-        "more_extended": lambda: {
-            TITLE_KEY_NAME: EFFICIENCY_NAME + " & components",
-            TEMPERATURE_DEVIATION_COLUMN_NAME: efficiency_series.components[
-                TEMPERATURE_DEVIATION_COLUMN_NAME
-            ],
-        }
-        if verbose > 2
-        else {},
-        "even_more_extended": lambda: {
-            IRRADIANCE_COLUMN_NAME: irradiance_series,
-        }
-        if verbose > 3
-        else {},
-        "and_even_more_extended": lambda: {
-            TEMPERATURE_ADJUSTED_COLUMN_NAME: temperature_adjusted_series.value,
-            TEMPERATURE_COLUMN_NAME: temperature_series.value,
-            WIND_SPEED_COLUMN_NAME: wind_speed_series.value
-            if wind_speed_series is not None
-            else NOT_AVAILABLE,
-        }
-        if verbose > 4
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(efficiency_series.value),
-        }
-        if fingerprint
-        else {},
+        "extended": lambda: (
+            {
+                # EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME: efficiency_series.photovoltaic_module_efficiency_coefficients,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "power_model_results": lambda: (
+            {
+                EFFICIENCY_FACTOR_COLUMN_NAME: (
+                    efficiency_series.value
+                    if (
+                        verbose > 1
+                        and power_model.value == PhotovoltaicModulePerformanceModel.king
+                    )
+                    else NOT_AVAILABLE
+                ),
+                # DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
+                # VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
+            }
+            if verbose > 1
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                TITLE_KEY_NAME: EFFICIENCY_NAME + " & components",
+                TEMPERATURE_DEVIATION_COLUMN_NAME: efficiency_series.components[
+                    TEMPERATURE_DEVIATION_COLUMN_NAME
+                ],
+            }
+            if verbose > 2
+            else {}
+        ),
+        "even_more_extended": lambda: (
+            {
+                IRRADIANCE_COLUMN_NAME: irradiance_series,
+            }
+            if verbose > 3
+            else {}
+        ),
+        "and_even_more_extended": lambda: (
+            {
+                TEMPERATURE_ADJUSTED_COLUMN_NAME: temperature_adjusted_series.value,
+                TEMPERATURE_COLUMN_NAME: temperature_series.value,
+                WIND_SPEED_COLUMN_NAME: (
+                    wind_speed_series.value
+                    if wind_speed_series is not None
+                    else NOT_AVAILABLE
+                ),
+            }
+            if verbose > 4
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(efficiency_series.value),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = efficiency_series.components

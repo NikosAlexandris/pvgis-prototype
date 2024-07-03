@@ -370,71 +370,91 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         "main": lambda: {
             TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
-            RADIATION_MODEL_COLUMN_NAME: "External data"
-            if direct_horizontal_component
-            else HOFIERKA_2002,
+            RADIATION_MODEL_COLUMN_NAME: (
+                "External data" if direct_horizontal_component else HOFIERKA_2002
+            ),
         },
-        "extended_2": lambda: {
-            REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(
-                irradiance=direct_inclined_irradiance_before_reflectivity_series,
-                reflectivity=direct_irradiance_reflectivity_factor_series,
-            ),
-            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_effect_percentage(
-                irradiance=direct_inclined_irradiance_before_reflectivity_series,
-                reflectivity=direct_irradiance_reflectivity_factor_series,
-            ),
-        }
-        if verbose > 6 and apply_reflectivity_factor
-        else {},
-        "extended": lambda: {
-            REFLECTIVITY_FACTOR_COLUMN_NAME: direct_irradiance_reflectivity_factor_series,
-            DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
-            # } if verbose > 1 and apply_reflectivity_factor else {},
-        }
-        if apply_reflectivity_factor
-        else {},
-        "more_extended": lambda: {
-            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_orientation, angle_output_units
-            ),
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_tilt, angle_output_units
-            ),
-            ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-        }
-        if verbose > 2
-        else {},
-        "even_more_extended": lambda: {
-            TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-            + " & relevant components",
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            # "Shade": in_shade,
-        }
-        if verbose > 3
-        else {},
-        "and_even_more_extended": lambda: {
-            INCIDENCE_COLUMN_NAME: getattr(solar_incidence_series, angle_output_units),
-            INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
-            INCIDENCE_DEFINITION: solar_incidence_series.definition,  # Review Me ! Report the _complementary_ incidence angle series ?
-            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
-        }
-        if verbose > 4
-        else {},
-        "extra": lambda: {
-            POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
-            TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
-            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        }
-        if verbose > 5
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(direct_inclined_irradiance_series),
-        }
-        if fingerprint
-        else {},
+        "extended_2": lambda: (
+            {
+                REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(
+                    irradiance=direct_inclined_irradiance_before_reflectivity_series,
+                    reflectivity=direct_irradiance_reflectivity_factor_series,
+                ),
+                REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_effect_percentage(
+                    irradiance=direct_inclined_irradiance_before_reflectivity_series,
+                    reflectivity=direct_irradiance_reflectivity_factor_series,
+                ),
+            }
+            if verbose > 6 and apply_reflectivity_factor
+            else {}
+        ),
+        "extended": lambda: (
+            {
+                REFLECTIVITY_FACTOR_COLUMN_NAME: direct_irradiance_reflectivity_factor_series,
+                DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
+                # } if verbose > 1 and apply_reflectivity_factor else {},
+            }
+            if apply_reflectivity_factor
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_orientation, angle_output_units
+                ),
+                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_tilt, angle_output_units
+                ),
+                ANGLE_UNITS_COLUMN_NAME: angle_output_units,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "even_more_extended": lambda: (
+            {
+                TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
+                + " & relevant components",
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                # "Shade": in_shade,
+            }
+            if verbose > 3
+            else {}
+        ),
+        "and_even_more_extended": lambda: (
+            {
+                INCIDENCE_COLUMN_NAME: getattr(
+                    solar_incidence_series, angle_output_units
+                ),
+                INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
+                INCIDENCE_DEFINITION: solar_incidence_series.definition,  # Review Me ! Report the _complementary_ incidence angle series ?
+                AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
+                ALTITUDE_COLUMN_NAME: getattr(
+                    solar_altitude_series, angle_output_units
+                ),
+            }
+            if verbose > 4
+            else {}
+        ),
+        "extra": lambda: (
+            {
+                POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
+                TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
+                SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+                PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+                ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+            }
+            if verbose > 5
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    direct_inclined_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}

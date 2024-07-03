@@ -152,7 +152,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
     )
 
     if not np.any(sun_above_horizon):
-        spectrally_resolved_photovoltaic_power = 0
+        spectrally_resolved_global_irradiance_series = 0
 
     else:  # if np.any(positive_solar_altitude)
         # We don't need a for loop! ==========================================
@@ -178,10 +178,8 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
         if not np.any(
             positive_solar_incidence_and_surface_not_in_shade
         ):  # get the direct irradiance
-            # direct_spectral_power[spectral_band_number] = 0.0
-            direct_spectral_power = 0
-            # direct_horizontal_component = 0.0
-            direct_horizontal_component = 0
+            spectrally_resolved_direct_irradiance_series = 0
+            spectrally_resolved_direct_horizontal_irradiance_series = 0
 
         else:
             # sunRadVar["cbh"] = global_spectral_radiation[spectral_band_number]
@@ -229,7 +227,9 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
                     angle_output_units=angle_output_units,
                     verbose=0,  # no verbosity here by choice!
                 )
-            )[positive_solar_incidence_and_surface_not_in_shade]
+            )[
+                positive_solar_incidence_and_surface_not_in_shade
+            ]
 
         # Calculate diffuse and reflected irradiance for sun above horizon
         spectrally_resolved_diffuse_irradiance_series[sun_above_horizon] = (

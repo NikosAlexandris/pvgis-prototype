@@ -2,6 +2,7 @@ from . import numeric as math
 """
 This file's content based on a copy of https://github.com/pingswept/pysolar/blob/ed75beb5ccfe9eeb2d4a6a410f5f953214e8d19f/pysolar/radiation.py
 """
+
 #    Copyright Brandon Stafford
 #
 #    This file is part of Pysolar.
