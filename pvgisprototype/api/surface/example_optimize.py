@@ -16,8 +16,8 @@ from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMode,
 )
-from pvgisprototype.api.utilities.timestamp import generate_datetime_series
-
+from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
+import math
 
 def generate_random_date():
     date = datetime.datetime(
@@ -37,7 +37,6 @@ latitude = Latitude(value=45.812, unit="degrees")
 elevation = random.randrange(0, 200)
 
 # surface_orientation_value = random.uniform(0, SurfaceOrientation().max_radians)
-import math
 
 # surface_orientation = (SurfaceOrientation(value=math.pi, unit="radians"),)
 surface_orientation = math.pi
