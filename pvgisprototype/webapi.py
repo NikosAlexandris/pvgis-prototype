@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse, HTMLResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from jinja2 import Template
-
+from pvgisprototype.web_api.openapi import customise_openapi
 from pvgisprototype.api.citation import generate_citation_text
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
 from pvgisprototype.web_api.openapi import tags_metadata
@@ -291,8 +291,6 @@ app.get("/calculate/power/broadband-multi", tags=["Power", "Multiple surfaces"])
     get_photovoltaic_power_output_series_multi
 )
 
-
-from pvgisprototype.web_api.openapi import customise_openapi
 
 app.openapi = customise_openapi(app)
 

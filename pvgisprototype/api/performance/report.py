@@ -1,7 +1,7 @@
 import numpy
 from devtools import debug
 from pandas import DatetimeIndex
-
+from pvgisprototype.web_api.schemas import AnalysisLevel, Frequency
 from pvgisprototype.api.performance.analysis import analyse_photovoltaic_performance
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -435,8 +435,6 @@ def report_photovoltaic_performance(
         ),
     }
 
-
-from pvgisprototype.web_api.schemas import AnalysisLevel, Frequency
 
 
 def summarise_photovoltaic_performance(
