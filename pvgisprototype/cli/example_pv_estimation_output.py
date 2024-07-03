@@ -1,7 +1,6 @@
 import csv
 
-
-csv_filename = 'example_pv_estimation_output.csv'
+csv_filename = "example_pv_estimation_output.csv"
 
 
 def csv_to_list_of_dictionaries(csv_file):

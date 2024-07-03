@@ -2,40 +2,35 @@
 Photovoltaic electricity generation potential for different technologies & configurations
 """
 
-from importlib.metadata import version
 from pathlib import Path
-import sys
+from typing import Annotated, Optional
+
 import typer
 import typer.completion
-from typer._completion_shared import Shells
-from click import Context
-from typing import Annotated
-from typing import Optional
 from rich import print
 from rich.panel import Panel
+from typer._completion_shared import Shells
 
+from pvgisprototype.cli import manual, series, surface, time, utilities
 from pvgisprototype.cli.citation import print_citation_text
-from pvgisprototype.cli.typer.group import OrderCommands
-from pvgisprototype.cli.typer.verbosity import typer_option_verbose
-from pvgisprototype.cli.typer.version import typer_option_version
-from pvgisprototype.cli.typer.log import typer_option_log
-from pvgisprototype.cli.typer.log import typer_option_log_rich_handler
-from pvgisprototype.cli.typer.log import typer_option_logfile
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_position
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
-
-from pvgisprototype.cli.power import power
-from pvgisprototype.cli import series
 from pvgisprototype.cli.irradiance import irradiance
 from pvgisprototype.cli.position import position
-from pvgisprototype.cli import time
-from pvgisprototype.cli import surface
-from pvgisprototype.cli import utilities
-from pvgisprototype.cli import manual
-
+from pvgisprototype.cli.power import power
+from pvgisprototype.cli.rich_help_panel_names import (
+    rich_help_panel_performance,
+    rich_help_panel_position,
+    rich_help_panel_reference,
+    rich_help_panel_series,
+    rich_help_panel_toolbox,
+)
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.cli.typer.log import (
+    typer_option_log,
+    typer_option_log_rich_handler,
+    typer_option_logfile,
+)
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.typer.version import typer_option_version
 
 state = {"verbose": False}
 
@@ -61,7 +56,7 @@ app = typer.Typer(
     add_help_option=True,
     rich_markup_mode="rich",
     # pretty_exceptions_enable=False,
-    help=f"PVGIS Command Line Interface [bold][magenta]prototype[/magenta][/bold]",
+    help="PVGIS Command Line Interface [bold][magenta]prototype[/magenta][/bold]",
 )
 app_completion = typer.Typer(
     help="Generate and install completion scripts.",
@@ -135,8 +130,8 @@ app.add_typer(
     rich_help_panel=rich_help_panel_reference,
 )
 app.command(
-    name='cite',
-    help='Generate citation text for PVGIS',
+    name="cite",
+    help="Generate citation text for PVGIS",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_reference,
 )(print_citation_text)
@@ -158,7 +153,7 @@ def main(
         state["verbose"] = True
 
     if log:
-        print(f'Log = {log}')
+        print(f"Log = {log}")
 
 
 if __name__ == "__main__":
