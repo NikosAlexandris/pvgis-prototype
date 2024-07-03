@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
+from random import randint
 
 import matplotlib.pyplot as plt
+from pandas import date_range
 
 from pvgisprototype.api.irradiance.extraterrestrial import (
     calculate_extraterrestrial_normal_irradiance_time_series,
