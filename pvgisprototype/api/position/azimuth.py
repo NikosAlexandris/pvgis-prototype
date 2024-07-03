@@ -255,20 +255,26 @@ def calculate_solar_azimuth_series(
             )
             solar_azimuth_model_series = {
                 solar_position_model.name: {
-                    TIME_ALGORITHM_NAME: solar_azimuth_series.timing_algorithm
-                    if solar_azimuth_series
-                    else NOT_AVAILABLE,
-                    POSITION_ALGORITHM_NAME: solar_azimuth_series.position_algorithm
-                    if solar_azimuth_series
-                    else NOT_AVAILABLE,
-                    AZIMUTH_NAME: getattr(
-                        solar_azimuth_series, angle_output_units, NOT_AVAILABLE
-                    )
-                    if solar_azimuth_series
-                    else NOT_AVAILABLE,
-                    AZIMUTH_ORIGIN_NAME: solar_azimuth_series.origin
-                    if solar_azimuth_series
-                    else NOT_AVAILABLE,
+                    TIME_ALGORITHM_NAME: (
+                        solar_azimuth_series.timing_algorithm
+                        if solar_azimuth_series
+                        else NOT_AVAILABLE
+                    ),
+                    POSITION_ALGORITHM_NAME: (
+                        solar_azimuth_series.position_algorithm
+                        if solar_azimuth_series
+                        else NOT_AVAILABLE
+                    ),
+                    AZIMUTH_NAME: (
+                        getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE)
+                        if solar_azimuth_series
+                        else NOT_AVAILABLE
+                    ),
+                    AZIMUTH_ORIGIN_NAME: (
+                        solar_azimuth_series.origin
+                        if solar_azimuth_series
+                        else NOT_AVAILABLE
+                    ),
                     UNIT_NAME: angle_output_units,
                 }
             }

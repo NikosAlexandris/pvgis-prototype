@@ -163,30 +163,28 @@ def get_direct_normal_from_horizontal_irradiance_series(
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ) -> None:
     # with progress:
-    direct_normal_irradiance_series = (
-        calculate_direct_normal_from_horizontal_irradiance_series(
-            direct=direct,
-            # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-            longitude=longitude,
-            latitude=latitude,
-            # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-            timestamps=timestamps,
-            timezone=timezone,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            mask_and_scale=mask_and_scale,
-            in_memory=in_memory,
-            solar_time_model=solar_time_model,
-            solar_position_model=solar_position_model,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            angle_output_units=angle_output_units,
-            dtype=dtype,
-            array_backend=array_backend,
-            verbose=verbose,
-            log=log,
-            fingerprint=fingerprint,
-        )
+    direct_normal_irradiance_series = calculate_direct_normal_from_horizontal_irradiance_series(
+        direct=direct,
+        # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+        longitude=longitude,
+        latitude=latitude,
+        # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+        timestamps=timestamps,
+        timezone=timezone,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
+        solar_time_model=solar_time_model,
+        solar_position_model=solar_position_model,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
     )
     if not quiet:
         if verbose > 0:

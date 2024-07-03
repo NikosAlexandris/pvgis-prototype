@@ -333,7 +333,9 @@ def calculate_photovoltaic_power_output_series(
     # direct
     direct_horizontal_irradiance_series = create_array(**array_parameters)
     direct_inclined_irradiance_series = create_array(**array_parameters)
-    calculated_diffuse_inclined_irradiance_series = {}  # no-values without direct sunlight
+    calculated_diffuse_inclined_irradiance_series = (
+        {}
+    )  # no-values without direct sunlight
 
     # diffuse (== sky-reflected)
     diffuse_horizontal_irradiance_series = create_array(**array_parameters)
@@ -777,6 +779,9 @@ def calculate_photovoltaic_power_output_series(
             POWER_MODEL_COLUMN_NAME: power_model.value
             if power_model
             else NOT_AVAILABLE,
+            POWER_MODEL_COLUMN_NAME: (
+                power_model.value if power_model else NOT_AVAILABLE
+            ),
         },  # if verbose > 0 else {},
         "Power extended": lambda: {
             PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_output_without_system_loss_series,

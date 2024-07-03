@@ -187,45 +187,59 @@ def calculate_direct_horizontal_irradiance_series(
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
             IRRADIANCE_SOURCE_COLUMN_NAME: "Simulation",
         },
-        "extended": lambda: {
-            TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-            + " & relevant components",
-            DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series.value,  # Important
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
-            ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-        }
-        if verbose > 1
-        else {},
-        "more_extended": lambda: {
-            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-            OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
-            REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME: refracted_solar_altitude_series.value
-            if apply_atmospheric_refraction
-            else np.full_like(
-                refracted_solar_altitude_series.value, np.nan
-            ),  # else np.array(["-"]),
-        }
-        if verbose > 2
-        else {},
-        "even_more_extended": lambda: {
-            POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
-            TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
-            # "Shade": in_shade,
-        }
-        if verbose > 3
-        else {},
-        "and_even_more_extended": lambda: {
-            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        }
-        if verbose > 4
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(direct_horizontal_irradiance_series),
-        }
-        if fingerprint
-        else {},
+        "extended": lambda: (
+            {
+                TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+                + " & relevant components",
+                DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series.value,  # Important
+                ALTITUDE_COLUMN_NAME: getattr(
+                    solar_altitude_series, angle_output_units
+                ),
+                ANGLE_UNITS_COLUMN_NAME: angle_output_units,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+                OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
+                REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME: (
+                    refracted_solar_altitude_series.value
+                    if apply_atmospheric_refraction
+                    else np.full_like(refracted_solar_altitude_series.value, np.nan)
+                ),  # else np.array(["-"]),
+            }
+            if verbose > 2
+            else {}
+        ),
+        "even_more_extended": lambda: (
+            {
+                POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
+                TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
+                # "Shade": in_shade,
+            }
+            if verbose > 3
+            else {}
+        ),
+        "and_even_more_extended": lambda: (
+            {
+                SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+                PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+                ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+            }
+            if verbose > 4
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    direct_horizontal_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}

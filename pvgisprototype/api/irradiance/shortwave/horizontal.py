@@ -173,27 +173,37 @@ def calculate_global_horizontal_irradiance_series(
             GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },  # if verbose > 0 else {},
-        "extended": lambda: {
-            TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components",
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-        }
-        if verbose > 1
-        else {},
-        "more_extended": lambda: {
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units)
-            if solar_altitude_series
-            else None,
-            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-        }
-        if verbose > 2
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(global_horizontal_irradiance_series),
-        }
-        if fingerprint
-        else {},
+        "extended": lambda: (
+            {
+                TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components",
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
+                ALTITUDE_COLUMN_NAME: (
+                    getattr(solar_altitude_series, angle_output_units)
+                    if solar_altitude_series
+                    else None
+                ),
+                LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    global_horizontal_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
