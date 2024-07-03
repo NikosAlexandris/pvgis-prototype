@@ -122,6 +122,3 @@ irradiance
 the efficiency coefficients.
 
 """
-
-
-

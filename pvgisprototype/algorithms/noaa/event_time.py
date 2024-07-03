@@ -1,32 +1,31 @@
-from datetime import time
-from datetime import timedelta
-from pandas import DatetimeIndex
+from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
-import numpy as np
-from devtools import debug
 
+from devtools import debug
+from pandas import DatetimeIndex
+
+from pvgisprototype import EventTime, Latitude, Longitude, RefractedSolarZenith
+from pvgisprototype.algorithms.noaa.equation_of_time import (
+    calculate_equation_of_time_series_noaa,
+)
+from pvgisprototype.algorithms.noaa.event_hour_angle import (
+    calculate_event_hour_angle_series_noaa,
+)
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateEventTimeTimeSeriesNOAAInput,
+)
 from pvgisprototype.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    NOT_AVAILABLE,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateEventTimeTimeSeriesNOAAInput
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from datetime import datetime
-from pvgisprototype import RefractedSolarZenith
-from pvgisprototype import EventTime
-from pvgisprototype.constants import NOT_AVAILABLE
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.algorithms.noaa.event_hour_angle import calculate_event_hour_angle_series_noaa
-from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_series_noaa
-from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 
 
 @log_function_call
@@ -44,7 +43,7 @@ def calculate_event_time_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-)-> EventTime:
+) -> EventTime:
     """Calculate the sunrise or sunset
 
     For the special case of sunrise or sunset, the zenith is set to 90.833 deg.
@@ -97,12 +96,26 @@ def calculate_event_time_series_noaa(
     timezone_offset_hours_utc = timezone_offset_timedelta.total_seconds() / 3600
 
     event_calculations = {
-        'sunrise': 720 - (longitude.as_minutes + event_hour_angle_series.as_minutes) - equation_of_time_series.minutes + timezone_offset_hours_utc * 60,
-        'noon': (720 - longitude.as_minutes - equation_of_time_series.minutes + timezone_offset_hours_utc * 60),
-        'sunset': 720 - (longitude.as_minutes - event_hour_angle_series.as_minutes) - equation_of_time_series.minutes + timezone_offset_hours_utc * 60,
+        "sunrise": 720
+        - (longitude.as_minutes + event_hour_angle_series.as_minutes)
+        - equation_of_time_series.minutes
+        + timezone_offset_hours_utc * 60,
+        "noon": (
+            720
+            - longitude.as_minutes
+            - equation_of_time_series.minutes
+            + timezone_offset_hours_utc * 60
+        ),
+        "sunset": 720
+        - (longitude.as_minutes - event_hour_angle_series.as_minutes)
+        - equation_of_time_series.minutes
+        + timezone_offset_hours_utc * 60,
     }
     event_time_series = event_calculations.get(event.lower(), NOT_AVAILABLE)
-    event_datetimes = [datetime.combine(ts.date(), time(0)) + timedelta(minutes=et) for ts, et in zip(timestamps, event_time_series.tolist())]
+    event_datetimes = [
+        datetime.combine(ts.date(), time(0)) + timedelta(minutes=et)
+        for ts, et in zip(timestamps, event_time_series.tolist())
+    ]
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

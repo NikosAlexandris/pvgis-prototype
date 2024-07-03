@@ -1,10 +1,15 @@
-from scipy import optimize
 import math
+
+from scipy import optimize
+
+from pvgisprototype import SurfaceOrientation, SurfaceTilt
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
-from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode, SurfacePositionOptimizerMethod
+from pvgisprototype.api.surface.parameter_models import (
+    SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMode,
+)
 
 
 def create_dictionary_for_location_parameters(
@@ -22,7 +27,6 @@ def create_dictionary_for_location_parameters(
     surface_tilt,
     mode,
 ):
-
     dictionary_for_location_parameters = {
         "longitude": longitude,
         "latitude": latitude,
@@ -35,10 +39,10 @@ def create_dictionary_for_location_parameters(
         "wind_speed_series": wind_speed_series,
         "linke_turbidity_factor_series": linke_turbidity_factor_series,
     }
-    if mode ==SurfacePositionOptimizerMode.Tilt:
+    if mode == SurfacePositionOptimizerMode.Tilt:
         dictionary_for_location_parameters["surface_orientation"] = surface_orientation
 
-    if mode ==SurfacePositionOptimizerMode.Orientation:
+    if mode == SurfacePositionOptimizerMode.Orientation:
         dictionary_for_location_parameters["surface_tilt"] = surface_tilt
 
     return dictionary_for_location_parameters
@@ -52,8 +56,7 @@ def create_bounds_for_optimizer(
     mode,
     method,
 ):
-    """
-    """
+    """ """
     brute_force_precision = math.radians(1)
     range_surface_orientation = slice(
         min_surface_orientation, max_surface_orientation, brute_force_precision
@@ -62,19 +65,19 @@ def create_bounds_for_optimizer(
         min_surface_tilt, max_surface_tilt, brute_force_precision
     )
 
-    if mode ==SurfacePositionOptimizerMode.Tilt:
+    if mode == SurfacePositionOptimizerMode.Tilt:
         bounds = optimize.Bounds(
             lb=range_surface_tilt.start, ub=range_surface_tilt.stop
         )
         range = (range_surface_tilt,)
 
-    if mode ==SurfacePositionOptimizerMode.Orientation:
+    if mode == SurfacePositionOptimizerMode.Orientation:
         bounds = optimize.Bounds(
             lb=range_surface_orientation.start, ub=range_surface_orientation.stop
         )
         range = (range_surface_orientation,)
 
-    if mode ==SurfacePositionOptimizerMode.Tilt_and_Orientation:
+    if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
         bounds = optimize.Bounds(
             lb=[range_surface_orientation.start, range_surface_tilt.start],
             ub=[range_surface_orientation.stop, range_surface_tilt.stop],
@@ -89,25 +92,24 @@ def create_bounds_for_optimizer(
 
 
 def calculate_mean_negative_power_output(surface_angle, location_parameters, mode):
-    """
-    """
+    """ """
     # from devtools import debug
     # debug(locals())
-    if mode ==SurfacePositionOptimizerMode.Tilt:
+    if mode == SurfacePositionOptimizerMode.Tilt:
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_tilt=surface_angle,
             **location_parameters,
         )
 
-    if mode ==SurfacePositionOptimizerMode.Orientation:
-        #from devtools import debug
-        #debug(locals())
+    if mode == SurfacePositionOptimizerMode.Orientation:
+        # from devtools import debug
+        # debug(locals())
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_orientation=surface_angle,
             **location_parameters,
         )
 
-    if mode ==SurfacePositionOptimizerMode.Tilt_and_Orientation:
+    if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_orientation=surface_angle[0],
             surface_tilt=surface_angle[1],
@@ -127,18 +129,21 @@ def create_dictionary_for_result_optimizer(
     surface_tilt,
     location_parameters,
 ):
-
     result_dictionary = {
         "surface_orientation": None,
         "surface_tilt": None,
         "mean_power_output": None,
     }
 
-    if mode ==SurfacePositionOptimizerMode.Tilt:
-        if isinstance(surface_orientation, SurfaceOrientation): # FIXME THIS SHOULD ONLY BE A SurfaceOrientation OBJECT
+    if mode == SurfacePositionOptimizerMode.Tilt:
+        if isinstance(
+            surface_orientation, SurfaceOrientation
+        ):  # FIXME THIS SHOULD ONLY BE A SurfaceOrientation OBJECT
             result_dictionary["surface_orientation"] = surface_orientation
         else:
-            result_dictionary["surface_orientation"] = SurfaceOrientation(value = surface_orientation, unit = "radians")
+            result_dictionary["surface_orientation"] = SurfaceOrientation(
+                value=surface_orientation, unit="radians"
+            )
 
         if method == SurfacePositionOptimizerMethod.brute:
             result_dictionary["surface_tilt"] = SurfaceTilt(
@@ -147,12 +152,12 @@ def create_dictionary_for_result_optimizer(
                 optimal=True,
                 optimizer=method,
             )
-            result_dictionary["mean_power_output"] = (
-                - calculate_mean_negative_power_output(
-                    surface_angle=result_optimizer,
-                    location_parameters=location_parameters,
-                    mode=mode,
-                )
+            result_dictionary[
+                "mean_power_output"
+            ] = -calculate_mean_negative_power_output(
+                surface_angle=result_optimizer,
+                location_parameters=location_parameters,
+                mode=mode,
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_tilt"] = SurfaceTilt(
@@ -163,11 +168,15 @@ def create_dictionary_for_result_optimizer(
             )
             result_dictionary["mean_power_output"] = -result_optimizer.fun
 
-    if mode ==SurfacePositionOptimizerMode.Orientation:
-        if isinstance(surface_orientation, SurfaceTilt): #FIXME THIS SHOULD ONLY BE A SurfaceTilt OBJECT
+    if mode == SurfacePositionOptimizerMode.Orientation:
+        if isinstance(
+            surface_orientation, SurfaceTilt
+        ):  # FIXME THIS SHOULD ONLY BE A SurfaceTilt OBJECT
             result_dictionary["surface_tilt"] = surface_tilt
         else:
-            result_dictionary["surface_tilt"] = SurfaceOrientation(value = surface_tilt, unit = "radians")
+            result_dictionary["surface_tilt"] = SurfaceOrientation(
+                value=surface_tilt, unit="radians"
+            )
 
         if method == SurfacePositionOptimizerMethod.brute:
             result_dictionary["surface_orientation"] = SurfaceOrientation(
@@ -176,12 +185,12 @@ def create_dictionary_for_result_optimizer(
                 optimal=True,
                 optimizer=method,
             )
-            result_dictionary["mean_power_output"] = (
-                - calculate_mean_negative_power_output(
-                    surface_angle=result_optimizer,
-                    location_parameters=location_parameters,
-                    mode=mode,
-                )
+            result_dictionary[
+                "mean_power_output"
+            ] = -calculate_mean_negative_power_output(
+                surface_angle=result_optimizer,
+                location_parameters=location_parameters,
+                mode=mode,
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_orientation"] = SurfaceOrientation(
@@ -192,8 +201,7 @@ def create_dictionary_for_result_optimizer(
             )
             result_dictionary["mean_power_output"] = -result_optimizer.fun
 
-    if mode ==SurfacePositionOptimizerMode.Tilt_and_Orientation:
-
+    if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
         if method == SurfacePositionOptimizerMethod.brute:
             result_dictionary["surface_orientation"] = SurfaceOrientation(
                 value=result_optimizer[0],
@@ -207,12 +215,12 @@ def create_dictionary_for_result_optimizer(
                 optimal=True,
                 optimizer=method,
             )
-            result_dictionary["mean_power_output"] = (
-                -calculate_mean_negative_power_output(
-                    surface_angle=result_optimizer,
-                    location_parameters=location_parameters,
-                    mode=mode,
-                )
+            result_dictionary[
+                "mean_power_output"
+            ] = -calculate_mean_negative_power_output(
+                surface_angle=result_optimizer,
+                location_parameters=location_parameters,
+                mode=mode,
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_orientation"] = SurfaceOrientation(

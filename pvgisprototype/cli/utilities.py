@@ -1,29 +1,30 @@
 import typer
-from typing_extensions import Annotated
-from typing import Optional
 from rich import print
-from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.typer.group import OrderCommands
-from pvgisprototype.cli.typer.location import typer_argument_longitude
-from pvgisprototype.cli.typer.location import typer_argument_latitude
-from pvgisprototype.cli.typer.photovoltaic import typer_argument_area
-from pvgisprototype.cli.typer.efficiency import typer_argument_conversion_efficiency
+from typing_extensions import Annotated
 
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
+from pvgisprototype.cli.typer.efficiency import typer_argument_conversion_efficiency
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.cli.typer.location import (
+    typer_argument_latitude,
+    typer_argument_longitude,
+)
+from pvgisprototype.cli.typer.photovoltaic import typer_argument_area
 
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":toolbox:  Diagnostic functions",
+    help=":toolbox:  Diagnostic functions",
 )
 
 
 @app.command(
-    'get-horizon',
+    "get-horizon",
     no_args_is_help=True,
-    help=f'⦩⦬ Calculate the horizon angle height around a single point based on a digital elevation model {NOT_IMPLEMENTED_CLI}',
- )
+    help=f"⦩⦬ Calculate the horizon angle height around a single point based on a digital elevation model {NOT_IMPLEMENTED_CLI}",
+)
 def get_horizon(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -39,7 +40,7 @@ def get_horizon(
           Starting at north and moving clockwise. The series 0, 10, 20, 30, 40,
           15, 25, 5 would mean the horizon height is 0° due north, 10° for
           north-east, 20° for east, 30° for south-east, and so on. Optional,
-          Depends on `userhorizon=1`, 
+          Depends on `userhorizon=1`,
         - outputformat, str, [csv, basic, json], csv, Output format. csv: CSV with text explanations, basic: CSV. Optional
         - browser, bool, 0, 1, 0, Setting browser=1 and accessing the service through a web browser, will save the retrieved data to a file. Optional
     """
@@ -47,10 +48,10 @@ def get_horizon(
 
 
 @app.command(
-    'get-elevation',
+    "get-elevation",
     no_args_is_help=True,
-    help=f'Retrieve the location elevation from digital elevation data {NOT_IMPLEMENTED_CLI}',
- )
+    help=f"Retrieve the location elevation from digital elevation data {NOT_IMPLEMENTED_CLI}",
+)
 def get_elevation(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
@@ -72,9 +73,9 @@ def get_elevation(
 
 
 @app.command(
-    'list-databases',
+    "list-databases",
     no_args_is_help=True,
-    help=f'List solar irradiance databases {NOT_IMPLEMENTED_CLI}',
+    help=f"List solar irradiance databases {NOT_IMPLEMENTED_CLI}",
 )
 def list_databases(
     longitude: Annotated[float, typer_argument_longitude],
@@ -91,16 +92,26 @@ def list_databases(
         - Based on the original C program `gisbinextract` and a file called `tilecoverage_dbname`
         - Variable, Type, M/O, Range, Default, Dependencies
         -lat, float, M, [-90, 90], -, -
-        -lon, float, M, [-180, 180], -, -, 
+        -lon, float, M, [-180, 180], -, -,
         -raddatabase, str, [[PVGIS-SARAH2](database:datasets:solar-radiation-data:sarah2), <br>[PVGIS-SARAH](database:datasets:solar-radiation-data:sarah), <br>[PVGIS-ERA5](database:datasets:solar-radiation-data:era5), <br>[PVGIS-CMSAF](database:datasets:solar-radiation-data:cmsaf), <br>[PVGIS-COSMO](database:datasets:solar-radiation-data:cosmo), <br>[PVGIS-NSRDB](database:datasets:solar-radiation-data:nsrdb)], Defaultdatabase, Optional
     """
-    databases = ['PVGIS-SARAH2', 'PVGIS-SARAH', 'PVGIS-ERA5', 'PVGIS-CMSAF', 'PVGIS-COSMO', 'PVGIS-NSRDB']
+    databases = [
+        "PVGIS-SARAH2",
+        "PVGIS-SARAH",
+        "PVGIS-ERA5",
+        "PVGIS-CMSAF",
+        "PVGIS-COSMO",
+        "PVGIS-NSRDB",
+    ]
     if longitude is None and latitude is None:
-        print(f'PVGIS databases:\n{databases}')
+        print(f"PVGIS databases:\n{databases}")
     else:
-        try: 
+        try:
             location = (longitude, latitude)
-            typer.secho(f"The available databases for the requested location {location} are:\n {databases}", fg=typer.colors.MAGENTA)
+            typer.secho(
+                f"The available databases for the requested location {location} are:\n {databases}",
+                fg=typer.colors.MAGENTA,
+            )
             return 0
         except Exception as exc:
             typer.echo(f"Something went wrong: {str(exc)}")
@@ -108,11 +119,11 @@ def list_databases(
 
 
 @app.command(
-    'peak-power',
+    "peak-power",
     no_args_is_help=True,
-    help=f'Calculate the peak power in kW based on area and conversion efficiency {NOT_IMPLEMENTED_CLI}',
+    help=f"Calculate the peak power in kW based on area and conversion efficiency {NOT_IMPLEMENTED_CLI}",
 )
-def  calculate_peak_power(
+def calculate_peak_power(
     area: Annotated[float, typer_argument_area],
     conversion_efficiency: Annotated[float, typer_argument_conversion_efficiency],
 ):
