@@ -1,15 +1,21 @@
+from pathlib import Path
+from typing import Union
+
+import numpy as np
 import typer
 from typer import Context
-from typing import Union
-from pathlib import Path
-import numpy as np
+
 from pvgisprototype import SpectralFactorSeries
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import SPECTRAL_FACTOR_DEFAULT
-from pvgisprototype.constants import UNITLESS
 from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
+from pvgisprototype.cli.rich_help_panel_names import (
+    rich_help_panel_atmospheric_properties,
+)
 from pvgisprototype.cli.typer.path import validate_path
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
+from pvgisprototype.constants import (
+    DATA_TYPE_DEFAULT,
+    SPECTRAL_FACTOR_DEFAULT,
+    UNITLESS,
+)
 
 
 def parse_spectral_factor_series(
@@ -22,7 +28,10 @@ def parse_spectral_factor_series(
 
     """
     try:
-        if isinstance(spectral_factor_input, (str, Path)) and Path(spectral_factor_input).exists():
+        if (
+            isinstance(spectral_factor_input, (str, Path))
+            and Path(spectral_factor_input).exists()
+        ):
             return Path(spectral_factor_input)
 
         # -------------------------------------------------------------- FIXME
@@ -30,7 +39,7 @@ def parse_spectral_factor_series(
         #   either 12 monthly values  or  a full time series ?
 
         if isinstance(spectral_factor_input, str):
-            spectral_factor_input = np.fromstring(spectral_factor_input, sep=',')
+            spectral_factor_input = np.fromstring(spectral_factor_input, sep=",")
         # --------------------------------------------------------------------
 
         return spectral_factor_input
@@ -44,48 +53,63 @@ def spectral_factor_series_argument_callback(
     ctx: Context,
     spectral_factor_series: SpectralFactorSeries,
 ):
-    """
-    """
+    """ """
     if isinstance(spectral_factor_series, Path):
         return validate_path(spectral_factor_series)
 
     from pvgisprototype.log import logger
-    timestamps = ctx.params.get('timestamps', None)
-    start_time=ctx.params.get('start_time')
-    end_time=ctx.params.get('end_time')
+
+    timestamps = ctx.params.get("timestamps", None)
+    start_time = ctx.params.get("start_time")
+    end_time = ctx.params.get("end_time")
     if timestamps is None and start_time is not None and end_time is not None:
-        periods=ctx.params.get('periods', None) 
+        periods = ctx.params.get("periods", None)
         from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
-        frequency=ctx.params.get('frequency', TIMESTAMPS_FREQUENCY_DEFAULT) if not periods else None
+
+        frequency = (
+            ctx.params.get("frequency", TIMESTAMPS_FREQUENCY_DEFAULT)
+            if not periods
+            else None
+        )
         if start_time is not None and end_time is not None:
             timestamps = generate_datetime_series(
                 start_time=start_time,
                 end_time=end_time,
                 periods=periods,
                 frequency=frequency,
-                timezone=ctx.params.get('timezone'),
-                name=ctx.params.get('datetimeindex_name', None)
+                timezone=ctx.params.get("timezone"),
+                name=ctx.params.get("datetimeindex_name", None),
             )
         else:
-            logger.error(f'Did you provide both a start and an end time ?')
+            logger.error("Did you provide both a start and an end time ?")
 
     # How to use print(ctx.get_parameter_source('spectral_factor_series')) ?
     # See : class click.core.ParameterSource(value)
 
-    if isinstance(spectral_factor_series, int) and spectral_factor_series == SPECTRAL_FACTOR_DEFAULT:
-        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
-        if timestamps is None:  # This is to get photovoltaic_efficiency_time_series() going !
+    if (
+        isinstance(spectral_factor_series, int)
+        and spectral_factor_series == SPECTRAL_FACTOR_DEFAULT
+    ):
+        dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
+        if (
+            timestamps is None
+        ):  # This is to get photovoltaic_efficiency_time_series() going !
             from pandas import DatetimeIndex
+
             timestamps = DatetimeIndex([]) if timestamps is None else timestamps
             spectral_factor_series = np.full(12, SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
         else:
-            spectral_factor_series = np.full(len(timestamps), SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
+            spectral_factor_series = np.full(
+                len(timestamps), SPECTRAL_FACTOR_DEFAULT, dtype=dtype
+            )
 
     # at this point, spectral_factor_series should be an array of size =12 or =timestamps !
-    if spectral_factor_series is not None and not any([
+    if spectral_factor_series is not None and not any(
+        [
             spectral_factor_series.size == 12,
-            spectral_factor_series.size == timestamps.size
-        ]):
+            spectral_factor_series.size == timestamps.size,
+        ]
+    ):
         message = f"The number of `spectral_factor` values ({spectral_factor_series.size}) is neither 12 (monthly values) nor does it match the number of timestamps ({timestamps.size})."
         logger.error(message)
         raise ValueError(message)
@@ -97,13 +121,13 @@ def spectral_factor_series_option_callback(
     ctx: Context,
     spectral_factor_series: SpectralFactorSeries,
 ):
-    """
-    """
+    """ """
     if spectral_factor_series is None:
-        return np.ndarray([]) 
+        return np.ndarray([])
 
-    reference_series = ctx.params.get('irradiance_series')
+    reference_series = ctx.params.get("irradiance_series")
     from pvgisprototype.log import logger
+
     if spectral_factor_series is not None and any(
         spectral_factor_series.size
         != 12 | spectral_factor_series.size
@@ -116,7 +140,7 @@ def spectral_factor_series_option_callback(
     return SpectralFactorSeries(value=spectral_factor_series, unit=UNITLESS)
 
 
-spectral_factor_typer_help='Spectral factor time series'
+spectral_factor_typer_help = "Spectral factor time series"
 
 
 typer_argument_spectral_factor_series = typer.Option(

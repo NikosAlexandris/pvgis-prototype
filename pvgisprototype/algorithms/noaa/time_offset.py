@@ -2,27 +2,32 @@
 The time offset based on NOAA's General Solar Position Calculations.
 """
 
-from devtools import debug
 from zoneinfo import ZoneInfo
 
-from pvgisprototype.caching import custom_cached
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype import Longitude
-from pvgisprototype import TimeOffset
-from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTimeSeriesNOAAInput
-from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_series_noaa
 import numpy as np
+from devtools import debug
 from pandas import DatetimeIndex
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import MINUTES
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
+
+from pvgisprototype import Longitude, TimeOffset
+from pvgisprototype.algorithms.noaa.equation_of_time import (
+    calculate_equation_of_time_series_noaa,
+)
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateTimeOffsetTimeSeriesNOAAInput,
+)
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    MINUTES,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 @log_function_call
@@ -31,7 +36,7 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 def calculate_time_offset_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo = ZoneInfo('UTC'),
+    timezone: ZoneInfo = ZoneInfo("UTC"),
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -196,7 +201,9 @@ def calculate_time_offset_series_noaa(
             (time_offset_series_in_minutes < TimeOffset().min_radians)
             | (time_offset_series_in_minutes > TimeOffset().max_radians)
         )
-        out_of_range_values = time_offset_series_in_minutes[index_of_out_of_range_values]
+        out_of_range_values = time_offset_series_in_minutes[
+            index_of_out_of_range_values
+        ]
         raise ValueError(
             f"{WARNING_OUT_OF_RANGE_VALUES} "
             f"[{TimeOffset().min_radians}, {TimeOffset().max_radians}] radians"

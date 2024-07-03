@@ -25,9 +25,9 @@ from . import numeric as math
 
 def get_air_mass_ratio(altitude_deg):
     # from Masters, p. 412
-    try :
+    try:
         result = 1 / math.sin(math.radians(altitude_deg))
-    except ZeroDivisionError :
+    except ZeroDivisionError:
         result = float("inf")
 
     return result
@@ -45,7 +45,7 @@ def get_optical_depth(day):
 
 def get_radiation_direct(when, altitude_deg):
     # from Masters, p. 412
-    is_daytime = (altitude_deg > 0)
+    is_daytime = altitude_deg > 0
     day = math.tm_yday(when)
     flux = get_apparent_extraterrestrial_flux(day)
     optical_depth = get_optical_depth(day)
