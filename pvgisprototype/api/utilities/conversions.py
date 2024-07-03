@@ -16,7 +16,7 @@ def convert_to_radians(
     """Convert floating point angular measurement from degrees to radians."""
     if ctx.resilient_parsing:
         return
-    if type(angle) != float:
+    if not isinstance(angle, float):
         raise typer.BadParameter("Input should be a float!")
 
     return np.radians(angle)
@@ -28,7 +28,7 @@ def convert_to_degrees(
     """Convert angle to degrees."""
     if ctx.resilient_parsing:
         return
-    if type(angle) != float:
+    if not isinstance(angle, float):
         raise typer.BadParameter(
             "The input value {angle} for an angular measurement is not of the expected type float!"
         )
@@ -38,7 +38,7 @@ def convert_to_degrees(
 
 def convert_to_radians_fastapi(angle: float) -> float:
     """Convert angle to radians."""
-    if type(angle) != float:
+    if not isinstance(angle, float):
         raise typer.BadParameter("Latitude should be a float!")
 
     return np.radians(angle)

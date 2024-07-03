@@ -1,3 +1,6 @@
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
+from math import pi
+
 """
 This file `constants.py` contains important hard-coded values for
 `pvgisprototype`'s components.
@@ -509,7 +512,6 @@ ANGLE_OUTPUT_UNITS_DESCRIPTION = "Output units for angles"
 
 IN_MEMORY_FLAG_DEFAULT = False
 MASK_AND_SCALE_FLAG_DEFAULT = False
-from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 
 NEIGHBOR_LOOKUP_DEFAULT = MethodForInexactMatches.nearest
 
@@ -552,7 +554,6 @@ RANDOM_DAY_FLAG_DEFAULT = False
 RANDOM_DAY_SERIES_FLAG_DEFAULT = False
 RANDOM_TIMESTAMPS_FLAG_DEFAULT = False
 FRACTIONAL_YEAR_MINIMUM = 0
-from math import pi
 
 FRACTIONAL_YEAR_MAXIMUM = 2 * pi
 DAY_OF_YEAR_COLUMN_NAME = "Day of year"
