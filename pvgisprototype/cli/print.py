@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Sequence
-
+from click import Context
 import numpy as np
 import pandas
 from pandas import DatetimeIndex, to_datetime
@@ -1440,10 +1440,6 @@ def print_finger_hash(dictionary: dict):
             style="dim",
         )
         Console().print(fingerprint_panel)
-
-
-from click import Context
-
 
 def print_command_metadata(context: Context):
     """ """
