@@ -8,7 +8,24 @@ def model_fractional_year():
     pass
 
 
-def calculate_fractional_year():
+def calculate_fractional_year(longitude,
+                            latitude,
+                            timestamp,
+                            timezone,
+                            model,
+                            apply_atmospheric_refraction,
+                            refracted_solar_zenith,
+                            solar_time_model,
+                            time_offset_global,
+                            hour_offset,
+                            perigee_offset,
+                            eccentricity_correction_factor,
+                            time_output_units,
+                            angle_units,
+                            angle_output_units,
+                            models,
+                            SolarPositionModels,
+                            ):
     pass
     results = []
     for model in models:
@@ -32,9 +49,6 @@ def calculate_fractional_year():
             )
             results.append(
                 {
-                    POSITION_ALGORITHM_NAME: model.value,
-                    ALTITUDE_NAME: getattr(fractional_year, angle_output_units),
-                    UNIT_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
                     POSITION_ALGORITHM_NAME: model.value,
                     ALTITUDE_NAME: getattr(fractional_year, angle_output_units),
                     UNIT_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
