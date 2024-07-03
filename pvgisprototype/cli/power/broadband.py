@@ -193,7 +193,7 @@ def photovoltaic_power_output_series(
     surface_tilt: Annotated[
         Optional[float], typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = now_utc_datetimezone(),
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[
         Optional[datetime], typer_option_start_time
     ] = None,  # Used by a callback function
@@ -508,7 +508,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     surface_tilt: Annotated[Optional[list], typer_option_surface_tilt_multi] = [
         float(SURFACE_TILT_DEFAULT)
     ],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = now_utc_datetimezone(),
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
