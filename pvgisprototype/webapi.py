@@ -10,7 +10,7 @@ from jinja2 import Template
 
 from pvgisprototype.api.citation import generate_citation_text
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
-from pvgisprototype.web_api.openapi import tags_metadata
+from pvgisprototype.web_api.openapi import customise_openapi, tags_metadata
 from pvgisprototype.web_api.performance.broadband import (
     get_photovoltaic_performance_analysis,
 )
@@ -292,7 +292,6 @@ app.get("/calculate/power/broadband-multi", tags=["Power", "Multiple surfaces"])
 )
 
 
-from pvgisprototype.web_api.openapi import customise_openapi
 
 app.openapi = customise_openapi(app)
 
