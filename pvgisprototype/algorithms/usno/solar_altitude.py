@@ -14,5 +14,7 @@ def compute_altitude(LHA, delta, latitude):
     LHA_rad = np.radians(LHA)
     delta_rad = np.radians(delta)
     latitude_rad = np.radians(latitude)
-    sin_altitude = np.cos(LHA_rad) * np.cos(delta_rad) * np.cos(latitude_rad) + np.sin(delta_rad) * np.sin(latitude_rad)
+    sin_altitude = np.cos(LHA_rad) * np.cos(delta_rad) * np.cos(latitude_rad) + np.sin(
+        delta_rad
+    ) * np.sin(latitude_rad)
     return np.degrees(np.arcsin(sin_altitude))

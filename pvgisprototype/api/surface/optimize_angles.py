@@ -1,62 +1,71 @@
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
-from pvgisprototype import (
-    TemperatureSeries,
-    WindSpeedSeries,
-    SpectralFactorSeries,
-    LinkeTurbidityFactor,
-    Longitude,
-    Latitude,
-    SurfaceOrientation,
-    SurfaceTilt,
-)
-from pvgisprototype.constants import (
-    SPECTRAL_FACTOR_DEFAULT,
-    TEMPERATURE_DEFAULT,
-    WIND_SPEED_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-)
-
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+import math
+from zoneinfo import ZoneInfo
 
 from pandas import DatetimeIndex
-from zoneinfo import ZoneInfo
+
+from pvgisprototype import (
+    Latitude,
+    LinkeTurbidityFactor,
+    Longitude,
+    SpectralFactorSeries,
+    SurfaceOrientation,
+    SurfaceTilt,
+    TemperatureSeries,
+    WindSpeedSeries,
+)
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.surface.helpers import (
+    calculate_mean_negative_power_output,
+    create_bounds_for_optimizer,
+    create_dictionary_for_location_parameters,
+    create_dictionary_for_result_optimizer,
+)
+from pvgisprototype.api.surface.optimizer import optimizer
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMode,
 )
-from pvgisprototype.api.surface.helpers import (
-    create_dictionary_for_location_parameters,
-    create_bounds_for_optimizer,
-    calculate_mean_negative_power_output,
-    create_dictionary_for_result_optimizer,
+from pvgisprototype.constants import (
+    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    SPECTRAL_FACTOR_DEFAULT,
+    TEMPERATURE_DEFAULT,
+    WIND_SPEED_DEFAULT,
 )
-from pvgisprototype.api.surface.optimizer import optimizer
-import math
 
 
 def optimize_angles(
     longitude: Longitude,
     latitude: Latitude,
-    elevation: float, #change it to Elevation
-    surface_orientation: SurfaceOrientation = SurfaceOrientation(value=math.radians(180), unit = 'radians'), #SurfaceOrientation().default_radians
-    surface_tilt: SurfaceTilt = SurfaceTilt(value=math.radians(45), unit = 'radians'), #SurfaceTilt().default_radians
+    elevation: float,  # change it to Elevation
+    surface_orientation: SurfaceOrientation = SurfaceOrientation(
+        value=math.radians(180), unit="radians"
+    ),  # SurfaceOrientation().default_radians
+    surface_tilt: SurfaceTilt = SurfaceTilt(
+        value=math.radians(45), unit="radians"
+    ),  # SurfaceTilt().default_radians
     min_surface_orientation: float = SurfaceOrientation().min_radians,
     max_surface_orientation: float = SurfaceOrientation().max_radians,
     min_surface_tilt: float = SurfaceTilt().min_radians,
     max_surface_tilt: float = SurfaceTilt().max_radians,
     timestamps: DatetimeIndex = str(now_utc_datetimezone()),
-    timezone: ZoneInfo = ZoneInfo('UTC'),
-    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
-    temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
+    timezone: ZoneInfo = ZoneInfo("UTC"),
+    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
+        value=SPECTRAL_FACTOR_DEFAULT
+    ),
+    temperature_series: TemperatureSeries = TemperatureSeries(
+        value=TEMPERATURE_DEFAULT
+    ),
     wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
-    photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
+        value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+    ),
+    photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
-    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo, 
-    workers : int = 1,
-    sampling_method_shgo = 'sobol'
+    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
+    workers: int = 1,
+    sampling_method_shgo="sobol",
 ):
-    
     location_parameters = create_dictionary_for_location_parameters(
         longitude=longitude,
         latitude=latitude,

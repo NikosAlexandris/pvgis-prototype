@@ -1,16 +1,16 @@
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from numpy import array as numpy_array
 from devtools import debug
+from numpy import array as numpy_array
+
+from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LINKE_TURBIDITY_UNIT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
@@ -38,7 +38,9 @@ def correct_linke_turbidity_factor_series(
         objects or a single object.
 
     """
-    corrected_linke_turbidity_factors = -0.8662 * numpy_array(linke_turbidity_factor_series.value, dtype=dtype)
+    corrected_linke_turbidity_factors = -0.8662 * numpy_array(
+        linke_turbidity_factor_series.value, dtype=dtype
+    )
 
     log_data_fingerprint(
         data=corrected_linke_turbidity_factors,

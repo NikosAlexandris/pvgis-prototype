@@ -1,10 +1,12 @@
-from pvgisprototype import SurfaceTilt
+from typing import Callable
+
 from scipy import optimize
+
+from pvgisprototype import SurfaceTilt
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMode,
 )
-from typing import Callable
 
 
 def optimizer(
