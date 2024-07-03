@@ -22,6 +22,7 @@ dependencies = [
   "pandas",
   "xarray",
   "loguru",
+  "richuru",
   "xarray_extras",
   "pydantic",
   "pydantic_numpy",
