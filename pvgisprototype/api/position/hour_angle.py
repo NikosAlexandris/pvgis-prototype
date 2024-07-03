@@ -252,14 +252,18 @@ def calculate_solar_hour_angle_series(
             solar_position_model_overview = {
                 solar_position_model.name: {
                     POSITION_ALGORITHM_NAME: solar_position_model.value,
-                    TIME_ALGORITHM_NAME: solar_hour_angle_series.timing_algorithm
-                    if solar_hour_angle_series
-                    else NOT_AVAILABLE,
-                    HOUR_ANGLE_NAME: getattr(
-                        solar_hour_angle_series, angle_output_units, NOT_AVAILABLE
-                    )
-                    if solar_hour_angle_series
-                    else NOT_AVAILABLE,
+                    TIME_ALGORITHM_NAME: (
+                        solar_hour_angle_series.timing_algorithm
+                        if solar_hour_angle_series
+                        else NOT_AVAILABLE
+                    ),
+                    HOUR_ANGLE_NAME: (
+                        getattr(
+                            solar_hour_angle_series, angle_output_units, NOT_AVAILABLE
+                        )
+                        if solar_hour_angle_series
+                        else NOT_AVAILABLE
+                    ),
                     UNIT_NAME: angle_output_units,
                 }
             }

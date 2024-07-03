@@ -20,6 +20,7 @@ def calculate_sunrise_sunset(location, year=2019, month=1, day=1):
     t1 = ts.utc(t0.utc_datetime() + timedelta(days=1))
     t, y = almanac.find_discrete(t0, t1, almanac.sunrise_sunset(ephemeris, location))
     sunrise = None
+    sunset = None
     for time, is_sunrise in zip(t, y):
         if is_sunrise:
             sunrise = dateutil.parser.parse(time.utc_iso())
@@ -31,7 +32,7 @@ def calculate_sunrise_sunset(location, year=2019, month=1, day=1):
 # Compute sunrise & sunset for random location near Munich
 location = api.Topos("48.324777 N", "11.405610 E", elevation_m=519)
 now = datetime.now()
-sunrise, sunset = compute_sunrise_sunset(location, now.year, now.month, now.day)
+sunrise, sunset = calculate_sunrise_sunset(location, now.year, now.month, now.day)
 
 
 # Print result (example)

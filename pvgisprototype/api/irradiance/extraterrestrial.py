@@ -74,20 +74,24 @@ def calculate_extraterrestrial_normal_irradiance_series(
             TITLE_KEY_NAME: EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
         },
-        "extended": lambda: {
-            DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
-            DAY_ANGLE_SERIES: day_angle_series,
-            DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
-        }
-        if verbose > 1
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(
-                extraterrestrial_normal_irradiance_series
-            ),
-        }
-        if fingerprint
-        else {},
+        "extended": lambda: (
+            {
+                DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
+                DAY_ANGLE_SERIES: day_angle_series,
+                DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    extraterrestrial_normal_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}

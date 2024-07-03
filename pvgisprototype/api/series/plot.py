@@ -179,7 +179,7 @@ def plot_series(
                 transform=ax.transAxes,  # ensure positioning is relative to axes size
             )
             supertitle_right_bbox = supertitle_right.get_window_extent()
-            supertitle_right_height = supertitle_right_bbox.height
+            # supertitle_right_height = supertitle_right_bbox.height
             # semi-transparent background box for legibility ?
             ax.text(
                 text_x_position,  # maximum_timestamp,

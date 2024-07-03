@@ -50,10 +50,6 @@ EXTREMELY_RARE_LIMITS = {
         "Min": -2,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.2 * mu0**1.2 + 50,
     },
-    "Global SWdn": {
-        "Min": -2,
-        "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.2 * mu0**1.2 + 50,
-    },
     "Diffuse SW": {
         "Min": -2,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 0.75 * mu0**1.2

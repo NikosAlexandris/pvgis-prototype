@@ -195,3 +195,7 @@ filterwarnings = [
     'ignore:distutils Version classes are deprecated. Use packaging.version instead:DeprecationWarning',
     'ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning',
 ]
+
+[tool.ruff]
+extend-exclude = ["pvgisprototype/plot/", "pvgisprototype/algorithms/pvis/power.py", "pvgisprototype/algorithms/pvis/average_photon_energy.py"]
+force-exclude = true

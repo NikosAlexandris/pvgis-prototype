@@ -221,22 +221,26 @@ def calculate_diffuse_horizontal_component_from_sarah(
             TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
         },
-        "extended": lambda: {
-            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
-            + " & other horizontal components",
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,  # .to_numpy(),
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,  # .to_numpy(),
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        }
-        if verbose > 1
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(
-                diffuse_horizontal_irradiance_series
-            ),
-        }
-        if fingerprint
-        else {},
+        "extended": lambda: (
+            {
+                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
+                + " & other horizontal components",
+                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,  # .to_numpy(),
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,  # .to_numpy(),
+                RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    diffuse_horizontal_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
