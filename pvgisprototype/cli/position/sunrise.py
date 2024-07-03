@@ -98,6 +98,6 @@ def sunrise(
         rounding_places=rounding_places,
         surface_tilt=surface_tilt,
         declination=solar_declination,
-        hour_angle=hour_angle,
+        hour_angle=event_hour_angle_series,
         units=angle_output_units,
     )

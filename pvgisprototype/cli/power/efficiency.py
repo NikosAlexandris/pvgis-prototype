@@ -51,7 +51,6 @@ from pvgisprototype.constants import (
     TEMPERATURE_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
     UNIPLOT_FLAG_DEFAULT,
-    UNITLESS,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
 )
@@ -145,22 +144,22 @@ def photovoltaic_efficiency_series(
     #         filename=csv,
     #     )
     #
-    if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_series
+    # if uniplot:
+    #     from pvgisprototype.api.plot import uniplot_data_array_series
 
-        uniplot_data_array_series(
-            data_array=photovoltaic_efficiency_series.value,
-            list_extra_data_arrays=None,
-            timestamps=timestamps,
-            resample_large_series=resample_large_series,
-            lines=True,
-            supertitle="Efficiency Coefficients Series",
-            title="Efficiency Coefficients Series",
-            label="Efficiency Coefficients",
-            extra_legend_labels=None,
-            unit=UNITLESS,
-            terminal_width_fraction=terminal_width_fraction,
-        )
+    #     uniplot_data_array_series(
+    #         data_array=photovoltaic_efficiency_series.value,
+    #         list_extra_data_arrays=None,
+    #         timestamps=timestamps,
+    #         resample_large_series=resample_large_series,
+    #         lines=True,
+    #         supertitle="Efficiency Coefficients Series",
+    #         title="Efficiency Coefficients Series",
+    #         label="Efficiency Coefficients",
+    #         extra_legend_labels=None,
+    #         unit=UNITLESS,
+    #         terminal_width_fraction=terminal_width_fraction,
+    #     )
     if fingerprint:
         from pvgisprototype.cli.print import print_finger_hash
 

@@ -779,9 +779,6 @@ def calculate_photovoltaic_power_output_series(
             POWER_MODEL_COLUMN_NAME: power_model.value
             if power_model
             else NOT_AVAILABLE,
-            POWER_MODEL_COLUMN_NAME: (
-                power_model.value if power_model else NOT_AVAILABLE
-            ),
         },  # if verbose > 0 else {},
         "Power extended": lambda: {
             PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_output_without_system_loss_series,
