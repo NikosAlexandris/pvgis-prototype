@@ -1,6 +1,6 @@
 from typing import Dict, List
 from zoneinfo import ZoneInfo
-
+import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
 
@@ -193,7 +193,7 @@ def model_solar_zenith_series(
     #     )
     if isinstance(solar_altitude_series, SolarAltitude):
         solar_zenith_series = SolarZenith(
-            value=solar_altitude_series.radians - (pi / 2),
+            value=solar_altitude_series.radians - (np.pi / 2),
             unit=RADIANS,
             position_algorithm=solar_altitude_series.position_algorithm,
             timing_algorithm=solar_altitude_series.timing_algorithm,
