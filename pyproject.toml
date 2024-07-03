@@ -13,6 +13,8 @@ readme = {file = "ReadMe.md", content-type = "text/markdown"}
 authors = [
     { name = 'Nikos Alexandris', email = 'Nikos.Alexandris@ec.europa.eu' },
     { name = 'Olympia Gounari', email = '' },
+    { name = 'Alekos Falagas', email = ''},
+    { name = 'Alba Santos Rodriguez', email = ''},
 ]
 requires-python = "<3.12,>=3.11"
 dependencies = [
