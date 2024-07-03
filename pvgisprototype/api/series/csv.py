@@ -75,8 +75,8 @@ def to_csv(x: xarray.DataArray, path: str | Path, *, nogil: bool = True, **kwarg
     if not isinstance(path, Path):
         try:
             path = Path(path)
-        except:
-            raise ValueError("path_or_buf must be a file path")
+        except Exception as e:
+            raise ValueError(f"{e} : `path_or_buf` must be a file path")
 
     if x.ndim not in (1, 2):
         raise ValueError(

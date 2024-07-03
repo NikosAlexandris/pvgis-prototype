@@ -193,9 +193,7 @@ def photovoltaic_power_output_series(
     surface_tilt: Annotated[
         Optional[float], typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = now_utc_datetimezone(),
     start_time: Annotated[
         Optional[datetime], typer_option_start_time
     ] = None,  # Used by a callback function
@@ -510,9 +508,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     surface_tilt: Annotated[Optional[list], typer_option_surface_tilt_multi] = [
         float(SURFACE_TILT_DEFAULT)
     ],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = now_utc_datetimezone(),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
@@ -599,6 +595,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     rounding_places: Annotated[
         int, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
+    analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
