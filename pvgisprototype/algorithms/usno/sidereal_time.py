@@ -1,4 +1,5 @@
 from math import cos, fmod, radians, sin
+import numpy as np
 
 
 def calculate_gmst(julian_date_universal_time, H, use_precise_formula=True):

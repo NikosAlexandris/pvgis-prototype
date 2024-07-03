@@ -1,3 +1,4 @@
+from . import numeric as math
 """
 This file's content based on a copy of https://github.com/pingswept/pysolar/blob/ed75beb5ccfe9eeb2d4a6a410f5f953214e8d19f/pysolar/radiation.py
 """
@@ -19,8 +20,6 @@ This file's content based on a copy of https://github.com/pingswept/pysolar/blob
 #    with Pysolar. If not, see <http://www.gnu.org/licenses/>.
 
 """Calculate different kinds of radiation components via default values"""
-
-from . import numeric as math
 
 
 def get_air_mass_ratio(altitude_deg):

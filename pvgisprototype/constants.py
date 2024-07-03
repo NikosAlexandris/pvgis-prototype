@@ -1,6 +1,5 @@
-from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from math import pi
-
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 """
 This file `constants.py` contains important hard-coded values for
 `pvgisprototype`'s components.
