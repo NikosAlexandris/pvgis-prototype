@@ -1,6 +1,6 @@
 from datetime import datetime, time
 from functools import wraps
-from numpy import np
+import numpy as np
 from rich import print
 
 
