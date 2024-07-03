@@ -134,5 +134,5 @@ def calculate_peak_power(
     Returns:
         Power in kWp
     """
-    power = 1 / m2 * area * conversion_efficiency / 100
+    power = 1 / area * conversion_efficiency / 100
     return power

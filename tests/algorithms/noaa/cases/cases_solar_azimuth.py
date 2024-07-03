@@ -1,15 +1,12 @@
 from pandas import DatetimeIndex, Timestamp
 from numpy import array as numpy_array
 
-from math import radians
 from zoneinfo import ZoneInfo
 from pvgisprototype import SolarAzimuth
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import MINUTES
 
 cases = [
     ({
