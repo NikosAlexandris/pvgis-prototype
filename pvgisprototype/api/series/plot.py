@@ -152,8 +152,8 @@ def plot_series(
         # ax.set_ylabel(data_array[y].units, fontsize=18)
 
         # Do not plot the 'normal' title
-        fig.suptitle(None)
-        plt.title(None)
+        fig.suptitle('')
+        plt.title('')
 
         # Plot title on the side
         if getattr(data_array, "long_name", None):
@@ -168,17 +168,17 @@ def plot_series(
             text_background_box = dict(
                 facecolor="white", alpha=0.5, edgecolor="none", boxstyle="round,pad=0.5"
             )
-            supertitle_right = ax.text(
-                text_x_position,  # maximum_timestamp,
-                1,  # maximum_value,
-                f"{data_array.long_name}",
-                fontsize="x-large",
-                bbox=text_background_box,
-                va="top",
-                ha="right",
-                transform=ax.transAxes,  # ensure positioning is relative to axes size
-            )
-            supertitle_right_bbox = supertitle_right.get_window_extent()
+            # supertitle_right = ax.text(
+            #     text_x_position,  # maximum_timestamp,
+            #     1,  # maximum_value,
+            #     f"{data_array.long_name}",
+            #     fontsize="x-large",
+            #     bbox=text_background_box,
+            #     va="top",
+            #     ha="right",
+            #     transform=ax.transAxes,  # ensure positioning is relative to axes size
+            # )
+            # supertitle_right_bbox = supertitle_right.get_window_extent()
             # supertitle_right_height = supertitle_right_bbox.height
             # semi-transparent background box for legibility ?
             ax.text(
@@ -222,7 +222,7 @@ def plot_series(
                 .replace(" ", "_")
                 .lower()
             )
-            figure_name = Path(f"{figure_name}_{name_suffix}")
+            figure_name = f"{figure_name}_{name_suffix}"
 
         # Handle time-based naming
         if isinstance(time, (list, tuple)) and len(time) == 1:
@@ -234,7 +234,7 @@ def plot_series(
             end_time = data_array.time.to_series().iloc[-1].strftime("%Y%m%d%H%M%S")
             time_string = f"{start_time}_{end_time}"
 
-        figure_name = Path(f"{figure_name}_{time_string}")
+        figure_name = f"{figure_name}_{time_string}"
 
     else:
         figure_name = "series_plot"  # the long name of the input data array ?
@@ -286,7 +286,7 @@ def plot_outliers(
     """
     Plot outliers in location series
     """
-    fig, ax = plt.subplots(figsize=(16, 9))
+    _, ax = plt.subplots(figsize=(16, 9))
     data_array.plot(alpha=0.7)
     outliers.plot.line(
         "rd", ms=7, label=f"Outliers (sensitivity : {sensitivity_factor})"

@@ -197,5 +197,14 @@ filterwarnings = [
 ]
 
 [tool.ruff]
-extend-exclude = ["pvgisprototype/plot/", "pvgisprototype/algorithms/pvis/power.py", "pvgisprototype/algorithms/pvis/average_photon_energy.py"]
+extend-exclude = [
+    "pvgisprototype/plot/",
+    "pvgisprototype/algorithms/pvis/power.py",
+    "pvgisprototype/algorithms/pvis/average_photon_energy.py",
+    "pvgisprototype/web_api/plot/plot_example.py",
+    "pvgisprototype/algorithms/usno/",
+    "pvgisprototype/api/position/hour_angle.py",
+    "pvgisprototype/cli/position/sunrise.py",
+    "pvgisprototype/api/spark.py",
+]
 force-exclude = true
