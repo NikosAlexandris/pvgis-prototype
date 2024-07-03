@@ -42,7 +42,7 @@ Read also:
 - https://peps.python.org/pep-0615/
 """
 
-from pandas import DatetimeIndex, date_range
+from pandas import DatetimeIndex, Timestamp, date_range
 
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.log import logger
@@ -50,7 +50,7 @@ from pvgisprototype.log import logger
 
 def parse_timestamp_series(
     timestamps: str,
-) -> "DatetimeIndex | DatetimeScalar | NaTType | None":
+) -> "DatetimeIndex | Timestamp | None":
     """
     Parse an input of type string and generate a Pandas Timestamp or
     DatetimeIndex [1]_.
