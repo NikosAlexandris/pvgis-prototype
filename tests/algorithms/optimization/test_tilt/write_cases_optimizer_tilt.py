@@ -1,5 +1,5 @@
 from pvgisprototype import (TemperatureSeries, WindSpeedSeries, SpectralFactorSeries, LinkeTurbidityFactor,
-                             Longitude, Latitude, Elevation, SurfaceOrientation, SurfaceTilt,
+                             Longitude, Latitude, SurfaceOrientation,
                             )
 from pvgisprototype.api.utilities.timestamp import generate_datetime_series
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
