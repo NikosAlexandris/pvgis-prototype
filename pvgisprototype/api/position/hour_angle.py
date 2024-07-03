@@ -277,6 +277,10 @@ def calculate_event_hour_angle_series(
     latitude: Latitude,
     surface_tilt: float = 0,
     solar_declination: float = 0,
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
 ) -> HourAngleSunrise:
     """Calculate the hour angle (ω) at sunrise and sunset
 
@@ -306,12 +310,13 @@ def calculate_event_hour_angle_series(
 
     Notes
     -----
-    Hour angle = acos(-tan(Latitude Angle-Tilt Angle)*tan(Declination Angle))
+    Hour angle = acos( -tan * ( Latitude Angle - Tilt Angle ) * tan( Declination Angle ) )
 
     The hour angle (ω) at sunrise and sunset measures the angular distance
     between the sun at the local solar time and the sun at solar noon.
 
     ω = acos(-tan(Φ-β)*tan(δ))
+
     """
     hour_angle_sunrise = acos(
         -tan(latitude.radians - surface_tilt.radians) * tan(solar_declination.radians)
