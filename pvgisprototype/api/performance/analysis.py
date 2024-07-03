@@ -433,7 +433,6 @@ def analyse_photovoltaic_performance(
         TOTAL_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect,
         UNIT_FOR_MEAN_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_unit,
         MEAN_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_mean,
-        UNIT_FOR_MEAN_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_mean_unit,
         STANDARD_DEVIATION_SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_std,
         SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: spectral_effect_percentage,
         SPECTRAL_EFFECT_COLUMN_NAME: spectral_effect_series,
