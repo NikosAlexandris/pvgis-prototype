@@ -1,3 +1,4 @@
+import numpy as np
 def compute_altitude(LHA, delta, latitude):
     """Function to calculate the Altitude (a)
 

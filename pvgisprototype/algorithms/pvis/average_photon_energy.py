@@ -3,7 +3,7 @@ from pvgisprototype.algorithms.pvis.constants import (
     ELECTRON_CHARGE,
     PHOTON_ENERGIES,
 )
-
+import numpy as np
 
 def calculate_average_photon_energy(  # series ?
     spectrally_resolved_global_irradiance_series,
