@@ -1,3 +1,4 @@
+import numpy as np
 def calculate_azimuth(local_hour_angle, delta, latitude):
     """Calculate the Azimuth (A)
 
