@@ -5,7 +5,7 @@ from typing import Annotated, Optional
 import typer
 from pandas import DatetimeIndex
 from rich.console import Console
-
+from pvgisprototype import SurfaceOrientation, SurfaceTilt
 from pvgisprototype import (
     LinkeTurbidityFactor,
     SpectralFactorSeries,
@@ -217,7 +217,6 @@ def surface_tilt():
     print("Not implemented")
 
 
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
 
 
 @app.command(
