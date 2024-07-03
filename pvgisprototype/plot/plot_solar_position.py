@@ -1,4 +1,19 @@
 import logging
+from datetime import datetime, time, timedelta, timezone
+from typing import List
+import matplotlib.pyplot as plt
+import numpy as np
+from pvgisprototype.algorithms.pvgis.solar_geometry import (
+    calculate_solar_position_pvgis,
+)
+from pvgisprototype.api.geometry.models import SolarPositionModel
+from pvgisprototype.api.geometry.overview import model_solar_geometry_overview
+from pvgisprototype.constants import ALTITUDE_NAME, AZIMUTH_NAME
+# from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
+# from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_position_skyfield
+# from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
+# from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
+
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -9,23 +24,6 @@ logging.basicConfig(
         logging.StreamHandler(),  # Print log to the console
     ],
 )
-from datetime import datetime, time, timedelta, timezone
-from typing import List
-
-# from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_position_skyfield
-# from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
-# from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
-import matplotlib.pyplot as plt
-import numpy as np
-
-# from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
-from pvgisprototype.algorithms.pvgis.solar_geometry import (
-    calculate_solar_position_pvgis,
-)
-from pvgisprototype.api.geometry.models import SolarPositionModel
-from pvgisprototype.api.geometry.overview import model_solar_geometry_overview
-from pvgisprototype.constants import ALTITUDE_NAME, AZIMUTH_NAME
-
 
 def plot_daily_solar_altitude(
     longitude: float,

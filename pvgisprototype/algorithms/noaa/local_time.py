@@ -19,6 +19,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 
 from .event_time import calculate_event_time_time_series_noaa
 
+import numpy as np
 
 @validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
 def calculate_local_solar_time_noaa(
@@ -83,7 +84,7 @@ def calculate_local_solar_time_noaa(
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
-    local_solar_time_delta = numpy.where(
+    local_solar_time_delta = np.where(
         timestamps < solar_noon_series,
         timestamps - (solar_noon_series - timedelta(days=1)),
         timestamps - solar_noon_series,
