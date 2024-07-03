@@ -179,20 +179,18 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
         direct_horizontal_irradiance_series = horizontal_irradiance_components[
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
         ]
-        diffuse_horizontal_irradiance_series = (
-            calculate_diffuse_horizontal_component_from_sarah(
-                global_horizontal_irradiance_series=global_horizontal_irradiance_series,
-                direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
-                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                # timestamps=timestamps,
-                # neighbor_lookup=neighbor_lookup,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=verbose,
-                log=log,
-                fingerprint=fingerprint,
-            )
+        diffuse_horizontal_irradiance_series = calculate_diffuse_horizontal_component_from_sarah(
+            global_horizontal_irradiance_series=global_horizontal_irradiance_series,
+            direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
+            # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+            # timestamps=timestamps,
+            # neighbor_lookup=neighbor_lookup,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
         )
 
     if not quiet:

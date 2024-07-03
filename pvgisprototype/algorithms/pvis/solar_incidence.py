@@ -131,17 +131,20 @@ def calculate_relative_longitude(
     #     surface_orientation.radians
     # )
     # -----------------------------------------------------------------------
-    tangent_relative_longitude_numerator = (
-        -sin(surface_tilt.radians)  # cos(pi/2 - surface_tilt.radians)
-        * -sin(surface_orientation.radians)  # cos(pi/2 + surface_orientation.radians)
-    )
-    tangent_relative_longitude_denominator = (
-        sin(latitude.radians)
-        * sin(surface_tilt.radians)  # cos(pi/2 - surface_tilt.radians)
-        * cos(surface_orientation.radians)  # sin(pi/2 + surface_orientation.radians)
-        + cos(latitude.radians)
-        * cos(surface_tilt.radians)  # sin(pi/2 - surface_tilt.radians)
-    )
+    tangent_relative_longitude_numerator = -sin(
+        surface_tilt.radians
+    ) * -sin(  # cos(pi/2 - surface_tilt.radians)
+        surface_orientation.radians
+    )  # cos(pi/2 + surface_orientation.radians)
+    tangent_relative_longitude_denominator = sin(latitude.radians) * sin(
+        surface_tilt.radians
+    ) * cos(  # cos(pi/2 - surface_tilt.radians)
+        surface_orientation.radians
+    ) + cos(  # sin(pi/2 + surface_orientation.radians)
+        latitude.radians
+    ) * cos(
+        surface_tilt.radians
+    )  # sin(pi/2 - surface_tilt.radians)
     # force dtype !
     relative_longitude = numpy.array(
         [
@@ -251,13 +254,15 @@ def calculate_solar_incidence_series_hofierka(
         verbose=verbose,
         log=log,
     )
-    sine_relative_inclined_latitude = (
-        -cos(latitude.radians)
-        * sin(surface_tilt.radians)  # cos(pi/2 - surface_tilt.radians)
-        * cos(surface_orientation.radians)  # sin(pi/2 + surface_orientation.radians)
-        + sin(latitude.radians)
-        * cos(surface_tilt.radians)  # sin(pi/2 - surface_tilt.radians)
-    )
+    sine_relative_inclined_latitude = -cos(latitude.radians) * sin(
+        surface_tilt.radians
+    ) * cos(  # cos(pi/2 - surface_tilt.radians)
+        surface_orientation.radians
+    ) + sin(  # sin(pi/2 + surface_orientation.radians)
+        latitude.radians
+    ) * cos(
+        surface_tilt.radians
+    )  # sin(pi/2 - surface_tilt.radians)
     relative_inclined_latitude = asin(sine_relative_inclined_latitude)
     c_inclined_31_series = cos(relative_inclined_latitude) * numpy.cos(
         solar_declination_series.radians

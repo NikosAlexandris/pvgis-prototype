@@ -254,30 +254,42 @@ def calculate_solar_incidence_series(
             )
             solar_incidence_model_series = {
                 solar_incidence_model.name: {
-                    TIME_ALGORITHM_NAME: solar_incidence_series.timing_algorithm
-                    if solar_incidence_series
-                    else NOT_AVAILABLE,
-                    POSITION_ALGORITHM_NAME: solar_incidence_series.position_algorithm
-                    if solar_incidence_series
-                    else NOT_AVAILABLE,
+                    TIME_ALGORITHM_NAME: (
+                        solar_incidence_series.timing_algorithm
+                        if solar_incidence_series
+                        else NOT_AVAILABLE
+                    ),
+                    POSITION_ALGORITHM_NAME: (
+                        solar_incidence_series.position_algorithm
+                        if solar_incidence_series
+                        else NOT_AVAILABLE
+                    ),
                     # ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
                     # AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
-                    AZIMUTH_ORIGIN_NAME: solar_incidence_series.azimuth_origin
-                    if solar_incidence_series
-                    else NOT_AVAILABLE,
+                    AZIMUTH_ORIGIN_NAME: (
+                        solar_incidence_series.azimuth_origin
+                        if solar_incidence_series
+                        else NOT_AVAILABLE
+                    ),
                     # SURFACE_ORIENTATION_NAME: getattr(surface_orientation, angle_output_units, NOT_AVAILABLE) if surface_orientation else None,
                     # SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
-                    INCIDENCE_ALGORITHM_NAME: solar_incidence_series.incidence_algorithm
-                    if solar_incidence_series
-                    else NOT_AVAILABLE,
-                    INCIDENCE_NAME: getattr(
-                        solar_incidence_series, angle_output_units, NOT_AVAILABLE
-                    )
-                    if solar_incidence_series
-                    else NOT_AVAILABLE,
-                    INCIDENCE_DEFINITION: solar_incidence_series.definition
-                    if solar_incidence_series
-                    else NOT_AVAILABLE,
+                    INCIDENCE_ALGORITHM_NAME: (
+                        solar_incidence_series.incidence_algorithm
+                        if solar_incidence_series
+                        else NOT_AVAILABLE
+                    ),
+                    INCIDENCE_NAME: (
+                        getattr(
+                            solar_incidence_series, angle_output_units, NOT_AVAILABLE
+                        )
+                        if solar_incidence_series
+                        else NOT_AVAILABLE
+                    ),
+                    INCIDENCE_DEFINITION: (
+                        solar_incidence_series.definition
+                        if solar_incidence_series
+                        else NOT_AVAILABLE
+                    ),
                     UNIT_NAME: angle_output_units,
                 }
             }

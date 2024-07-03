@@ -333,7 +333,9 @@ def calculate_photovoltaic_power_output_series(
     # direct
     direct_horizontal_irradiance_series = create_array(**array_parameters)
     direct_inclined_irradiance_series = create_array(**array_parameters)
-    calculated_diffuse_inclined_irradiance_series = {}  # no-values without direct sunlight
+    calculated_diffuse_inclined_irradiance_series = (
+        {}
+    )  # no-values without direct sunlight
 
     # diffuse (== sky-reflected)
     diffuse_horizontal_irradiance_series = create_array(**array_parameters)
@@ -774,127 +776,157 @@ def calculate_photovoltaic_power_output_series(
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
             TECHNOLOGY_NAME: photovoltaic_module.value,
             PEAK_POWER_COLUMN_NAME: peak_power,
-            TECHNOLOGY_NAME: photovoltaic_module.value,
-            PEAK_POWER_COLUMN_NAME: peak_power,
-            POWER_MODEL_COLUMN_NAME: power_model.value
-            if power_model
-            else NOT_AVAILABLE,
+            POWER_MODEL_COLUMN_NAME: (
+                power_model.value if power_model else NOT_AVAILABLE
+            ),
         },  # if verbose > 0 else {},
-        "Power extended": lambda: {
-            PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_output_without_system_loss_series,
-        }
-        if verbose > 1
-        else {},
-        "System loss": lambda: {
-            EFFICIENCY_COLUMN_NAME: efficiency_factor_series,
-            SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
-        }
-        if verbose > 2
-        else {},
-        "Effective irradiance": lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & effective components",
-            EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series
-            * efficiency_factor_series,
-            EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series
-            * efficiency_factor_series,
-            EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series
-            * efficiency_factor_series,
-            EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series
-            * efficiency_factor_series,
-            SPECTRAL_EFFECT_COLUMN_NAME: effective_global_irradiance_series.components.get(
-                SPECTRAL_EFFECT_COLUMN_NAME, numpy.array([])
-            ),
-            SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: effective_global_irradiance_series.components.get(
-                SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, numpy.array([])
-            ),
-            SPECTRAL_FACTOR_COLUMN_NAME: effective_global_irradiance_series.components.get(
-                SPECTRAL_FACTOR_COLUMN_NAME, numpy.array([])
-            ),
-        }
-        if verbose > 3
-        else {},
-        "Reflectivity": lambda: {
-            REFLECTIVITY_COLUMN_NAME: global_inclined_reflectivity_series,
-            REFLECTIVITY_COLUMN_NAME: global_inclined_reflectivity_series,
-            # REFLECTIVITY_PERCENTAGE_COLUMN_NAME: global_inclined_reflectivity_loss_percentage_series if global_inclined_reflectivity_loss_percentage_series.size > 1 else NOT_AVAILABLE,
-            # REFLECTIVITY_FACTOR_COLUMN_NAME: global_reflectivity_factor_series if global_reflectivity_factor_series.size > 1 else NOT_AVAILABLE,
-            DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: direct_inclined_reflectivity_factor_series,
-            DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_reflectivity_factor_series,
-            REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_reflectivity_factor_series,
-        }
-        if verbose > 6 and apply_reflectivity_factor
-        else {},
-        "Inclined irradiance components": lambda: {
-            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series,
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
-            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
-            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
-        }
-        if verbose > 4
-        else {},
-        "more_extended_2": lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + ", effective & in-plane components",
-            GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: global_inclined_irradiance_before_reflectivity_series,
-            DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
-            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
-            REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_irradiance_before_reflectivity_series,
-        }
-        if verbose > 5 and apply_reflectivity_factor
-        else {},
-        "Horizontal irradiance components": lambda: {
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-            # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.components[REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME], Is zero for horizontal surfaces !
-        }
-        if verbose > 6
-        else {},
-        "Meteorological variables": lambda: {
-            TEMPERATURE_COLUMN_NAME: temperature_series.value,
-            WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
-        }
-        if verbose > 7
-        else {},
-        "Surface position": lambda: {
-            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_orientation, angle_output_units
-            ),
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_tilt, angle_output_units
-            ),
-            ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
-            LOW_ANGLE_COLUMN_NAME: mask_low_angle,
-            BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
-            SHADE_COLUMN_NAME: in_shade,
-        }
-        if verbose > 8
-        else {},
-        "Solar position": lambda: {
-            INCIDENCE_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[
-                INCIDENCE_COLUMN_NAME
-            ]
-            if calculated_direct_inclined_irradiance_series.components
-            else NOT_AVAILABLE,
-            INCIDENCE_ALGORITHM_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[
-                INCIDENCE_ALGORITHM_COLUMN_NAME
-            ]
-            if calculated_direct_inclined_irradiance_series.components
-            else NOT_AVAILABLE,
-            INCIDENCE_DEFINITION: calculated_direct_inclined_irradiance_series.components[
-                INCIDENCE_DEFINITION
-            ]
-            if calculated_direct_inclined_irradiance_series.components
-            else NOT_AVAILABLE,
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
-            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
-            UNIT_NAME: angle_output_units,
-        }
-        if verbose > 9
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
-        }
-        if fingerprint
-        else {},
+        "Power extended": lambda: (
+            {
+                PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: photovoltaic_power_output_without_system_loss_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "System loss": lambda: (
+            {
+                EFFICIENCY_COLUMN_NAME: efficiency_factor_series,
+                SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "Effective irradiance": lambda: (
+            {
+                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & effective components",
+                EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series
+                * efficiency_factor_series,
+                EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series
+                * efficiency_factor_series,
+                EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series
+                * efficiency_factor_series,
+                EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series
+                * efficiency_factor_series,
+                SPECTRAL_EFFECT_COLUMN_NAME: effective_global_irradiance_series.components.get(
+                    SPECTRAL_EFFECT_COLUMN_NAME, numpy.array([])
+                ),
+                SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: effective_global_irradiance_series.components.get(
+                    SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, numpy.array([])
+                ),
+                SPECTRAL_FACTOR_COLUMN_NAME: effective_global_irradiance_series.components.get(
+                    SPECTRAL_FACTOR_COLUMN_NAME, numpy.array([])
+                ),
+            }
+            if verbose > 3
+            else {}
+        ),
+        "Reflectivity": lambda: (
+            {
+                REFLECTIVITY_COLUMN_NAME: global_inclined_reflectivity_series,
+                # REFLECTIVITY_PERCENTAGE_COLUMN_NAME: global_inclined_reflectivity_loss_percentage_series if global_inclined_reflectivity_loss_percentage_series.size > 1 else NOT_AVAILABLE,
+                # REFLECTIVITY_FACTOR_COLUMN_NAME: global_reflectivity_factor_series if global_reflectivity_factor_series.size > 1 else NOT_AVAILABLE,
+                DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: direct_inclined_reflectivity_factor_series,
+                DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_reflectivity_factor_series,
+                REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_reflectivity_factor_series,
+            }
+            if verbose > 6 and apply_reflectivity_factor
+            else {}
+        ),
+        "Inclined irradiance components": lambda: (
+            {
+                GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series,
+                DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
+                DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
+                REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
+            }
+            if verbose > 4
+            else {}
+        ),
+        "more_extended_2": lambda: (
+            {
+                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER
+                + ", effective & in-plane components",
+                GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: global_inclined_irradiance_before_reflectivity_series,
+                DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
+                DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
+                REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: ground_reflected_inclined_irradiance_before_reflectivity_series,
+            }
+            if verbose > 5 and apply_reflectivity_factor
+            else {}
+        ),
+        "Horizontal irradiance components": lambda: (
+            {
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+                # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.components[REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME], Is zero for horizontal surfaces !
+            }
+            if verbose > 6
+            else {}
+        ),
+        "Meteorological variables": lambda: (
+            {
+                TEMPERATURE_COLUMN_NAME: temperature_series.value,
+                WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
+            }
+            if verbose > 7
+            else {}
+        ),
+        "Surface position": lambda: (
+            {
+                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_orientation, angle_output_units
+                ),
+                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_tilt, angle_output_units
+                ),
+                ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
+                LOW_ANGLE_COLUMN_NAME: mask_low_angle,
+                BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
+                SHADE_COLUMN_NAME: in_shade,
+            }
+            if verbose > 8
+            else {}
+        ),
+        "Solar position": lambda: (
+            {
+                INCIDENCE_COLUMN_NAME: (
+                    calculated_direct_inclined_irradiance_series.components[
+                        INCIDENCE_COLUMN_NAME
+                    ]
+                    if calculated_direct_inclined_irradiance_series.components
+                    else NOT_AVAILABLE
+                ),
+                INCIDENCE_ALGORITHM_COLUMN_NAME: (
+                    calculated_direct_inclined_irradiance_series.components[
+                        INCIDENCE_ALGORITHM_COLUMN_NAME
+                    ]
+                    if calculated_direct_inclined_irradiance_series.components
+                    else NOT_AVAILABLE
+                ),
+                INCIDENCE_DEFINITION: (
+                    calculated_direct_inclined_irradiance_series.components[
+                        INCIDENCE_DEFINITION
+                    ]
+                    if calculated_direct_inclined_irradiance_series.components
+                    else NOT_AVAILABLE
+                ),
+                ALTITUDE_COLUMN_NAME: getattr(
+                    solar_altitude_series, angle_output_units
+                ),
+                AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
+                UNIT_NAME: angle_output_units,
+            }
+            if verbose > 9
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    photovoltaic_power_output_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
