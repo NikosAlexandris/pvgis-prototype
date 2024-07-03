@@ -5,30 +5,35 @@ by the NOAA Global Monitoring Division.
 See also: https://unpkg.com/solar-calculator@0.1.0/index.js
 """
 
-from devtools import debug
-from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
-from pvgisprototype.caching import custom_cached
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateEquationOfTimeTimeSeriesNOAAInput
-from pvgisprototype import EquationOfTime
 import numpy as np
-from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_series_noaa 
-from pvgisprototype.constants import MINUTES
+from devtools import debug
 from pandas import DatetimeIndex
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
+
+from pvgisprototype import EquationOfTime
+from pvgisprototype.algorithms.noaa.fractional_year import (
+    calculate_fractional_year_series_noaa,
+)
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateEquationOfTimeTimeSeriesNOAAInput,
+)
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    MINUTES,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 @log_function_call
 @custom_cached
-@validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput) 
+@validate_with_pydantic(CalculateEquationOfTimeTimeSeriesNOAAInput)
 def calculate_equation_of_time_series_noaa(
     timestamps: DatetimeIndex,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -73,11 +78,11 @@ def calculate_equation_of_time_series_noaa(
         debug(locals())
 
     log_data_fingerprint(
-            data=equation_of_time_series,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=equation_of_time_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-    
+
     return EquationOfTime(
         value=equation_of_time_series,
         unit=MINUTES,
