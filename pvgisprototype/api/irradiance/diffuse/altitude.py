@@ -1,16 +1,17 @@
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from devtools import debug
-from typing import Optional
-from typing import List
+from math import cos, pi, sin
+from typing import List, Optional
+
 import numpy as np
-from math import cos, sin, pi
+from devtools import debug
+
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
@@ -39,7 +40,9 @@ def calculate_term_n_series(
         debug(locals())
 
     kb_series = np.array(kb_series, dtype=dtype)
-    term_n_series = 0.00263 - (0.712 * kb_series) - (0.6883 * np.power(kb_series, 2, dtype=dtype))
+    term_n_series = (
+        0.00263 - (0.712 * kb_series) - (0.6883 * np.power(kb_series, 2, dtype=dtype))
+    )
 
     log_data_fingerprint(
         data=term_n_series,
@@ -86,8 +89,7 @@ def calculate_diffuse_sky_irradiance_series(
     # sky_view_fraction = (1 + cos(surface_tilt)) / 2
     diffuse_sky_irradiance_series = ((1 + cos(surface_tilt)) / 2) + (
         sin(surface_tilt)
-        - surface_tilt
-        * cos(surface_tilt)
+        - surface_tilt * cos(surface_tilt)
         - pi * np.power((sin(surface_tilt / 2)), 2)
     ) * n_series
 
@@ -102,13 +104,13 @@ def diffuse_transmission_function_series(
     verbose: int = 0,
     log: int = 0,
 ) -> np.array:
-    """ Diffuse transmission function over a period of time
+    """Diffuse transmission function over a period of time
 
     Notes
     -----
     From r.pv's source code:
     tn = -0.015843 + locLinke * (0.030543 + 0.0003797 * locLinke);
-    
+
     From Hofierka (2002) :
 
         The estimate of the transmission function Tn(TLK) gives a theoretical
@@ -155,8 +157,12 @@ def calculate_diffuse_solar_altitude_coefficients_series(
     -------
 
     """
-    linke_turbidity_factor_series_squared_array = np.power(linke_turbidity_factor_series.value, 2)
-    diffuse_transmission_series = diffuse_transmission_function_series(linke_turbidity_factor_series)
+    linke_turbidity_factor_series_squared_array = np.power(
+        linke_turbidity_factor_series.value, 2
+    )
+    diffuse_transmission_series = diffuse_transmission_function_series(
+        linke_turbidity_factor_series
+    )
     diffuse_transmission_series_array = np.array(diffuse_transmission_series)
     a1_prime_series = (
         0.26463
@@ -164,9 +170,9 @@ def calculate_diffuse_solar_altitude_coefficients_series(
         + 0.0031408 * linke_turbidity_factor_series_squared_array
     )
     a1_series = np.where(
-        a1_prime_series * diffuse_transmission_series < 0.0022, 
-        np.maximum(0.0022 / diffuse_transmission_series_array, a1_prime_series), 
-        a1_prime_series
+        a1_prime_series * diffuse_transmission_series < 0.0022,
+        np.maximum(0.0022 / diffuse_transmission_series_array, a1_prime_series),
+        a1_prime_series,
     )
     a2_series = (
         2.04020
@@ -199,8 +205,10 @@ def calculate_diffuse_solar_altitude_function_series(
     Other symbol: function Fd
 
     """
-    a1_series, a2_series, a3_series = calculate_diffuse_solar_altitude_coefficients_series(
-        linke_turbidity_factor_series
+    a1_series, a2_series, a3_series = (
+        calculate_diffuse_solar_altitude_coefficients_series(
+            linke_turbidity_factor_series
+        )
     )
 
     return (
