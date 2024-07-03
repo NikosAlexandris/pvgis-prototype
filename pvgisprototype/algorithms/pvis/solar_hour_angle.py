@@ -1,5 +1,5 @@
 from zoneinfo import ZoneInfo
-
+from math import acos,tan
 import numpy
 from devtools import debug
 from pandas import DatetimeIndex
