@@ -10,6 +10,24 @@ tags:
     
     This page is under development.
 
+<div class="grid cards" markdown>
+
+- __Running tests locally__
+
+    Installation of testing dependencies and running the implemented tests.
+
+- __Testing framework__
+
+    Explanation of the current testing framework and addition of test cases.
+    
+</div>
+
+
+![Pytest testing framework](../images/testing_framework.png "Pytest testing framework")
+
+
+
+
 ## Running tests locally
 
 Tests can run locally using [pytest](https://docs.pytest.org/en/). Ensure that the package and the testing requirements listed in the pyproject.toml test section are installed in python environment. In order to install PVGIS with the testing dependencies a user can run:
