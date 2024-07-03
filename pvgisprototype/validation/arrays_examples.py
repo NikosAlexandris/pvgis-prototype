@@ -1,16 +1,17 @@
-from rich import print
-import numpy as np
 import dask.array as da
+import numpy as np
+from rich import print
 
 # Attempt to import CuPy, handle the case where it is not available
 try:
     import cupy as cp
+
     CUPY_AVAILABLE = True
 except ImportError:
     CUPY_AVAILABLE = False
 
-from pvgisprototype.validation.arrays import NDArrayBackend
-from pvgisprototype.validation.arrays import create_array
+from pvgisprototype.validation.arrays import NDArrayBackend, create_array
+
 
 def process_array(array):
     backend = NDArrayBackend.from_object(array)
@@ -33,22 +34,23 @@ def process_array(array):
     else:
         raise ValueError("Unknown array backend")
 
-# Example use
-print(f'[underline]Example[/underline]')
-shape = (10, 10)
-dtype = 'float64'
-init_method = 'ones'
-backend = 'numpy'
 
-message = f'Create an array of :\n'
-message += f'  shape [code]{shape}[/code]\n'
-message += f'  method [code]{init_method}[/code]\n'
-message += f'  of type [code]{dtype}[/code]\n'
-message += f'  using the [code]{backend}[/code] backend.'
+# Example use
+print("[underline]Example[/underline]")
+shape = (10, 10)
+dtype = "float64"
+init_method = "ones"
+backend = "numpy"
+
+message = "Create an array of :\n"
+message += f"  shape [code]{shape}[/code]\n"
+message += f"  method [code]{init_method}[/code]\n"
+message += f"  of type [code]{dtype}[/code]\n"
+message += f"  using the [code]{backend}[/code] backend."
 print(message)
 
 array = create_array(shape, dtype=dtype, init_method=init_method, backend=backend)
-print(f'Array : {array}')
+print(f"Array : {array}")
 
 numpy_array = np.ones((3, 3))
 process_array(numpy_array)  # Outputs: Processing a NumPy array

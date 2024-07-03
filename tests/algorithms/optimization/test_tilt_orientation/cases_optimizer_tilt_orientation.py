@@ -1,15 +1,11 @@
-import random 
-import datetime 
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.utilities.timestamp import generate_datetime_series 
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype import (
-    Longitude, Latitude, Elevation,
-    TemperatureSeries, WindSpeedSeries,
+    Longitude, Latitude, TemperatureSeries, WindSpeedSeries,
     LinkeTurbidityFactor, SpectralFactorSeries,
     SurfaceOrientation, SurfaceTilt,
     )
-from pvgisprototype.api.surface.optimize_angles import optimize_angles 
 from pvgisprototype.api.surface.helper_functions import OptimizerMethod, OptimizerMode
 
 cases = [ 
