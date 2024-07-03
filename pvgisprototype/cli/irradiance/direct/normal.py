@@ -103,7 +103,9 @@ def get_direct_normal_irradiance_series(
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     optical_air_mass_series: Annotated[
         OpticalAirMass, typer_option_optical_air_mass_series
-    ] = [OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT],  # REVIEW-ME + ?
+    ] = [
+        OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
+    ],  # REVIEW-ME + ?
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[

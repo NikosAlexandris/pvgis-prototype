@@ -152,12 +152,12 @@ def create_dictionary_for_result_optimizer(
                 optimal=True,
                 optimizer=method,
             )
-            result_dictionary[
-                "mean_power_output"
-            ] = -calculate_mean_negative_power_output(
-                surface_angle=result_optimizer,
-                location_parameters=location_parameters,
-                mode=mode,
+            result_dictionary["mean_power_output"] = (
+                -calculate_mean_negative_power_output(
+                    surface_angle=result_optimizer,
+                    location_parameters=location_parameters,
+                    mode=mode,
+                )
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_tilt"] = SurfaceTilt(
@@ -185,12 +185,12 @@ def create_dictionary_for_result_optimizer(
                 optimal=True,
                 optimizer=method,
             )
-            result_dictionary[
-                "mean_power_output"
-            ] = -calculate_mean_negative_power_output(
-                surface_angle=result_optimizer,
-                location_parameters=location_parameters,
-                mode=mode,
+            result_dictionary["mean_power_output"] = (
+                -calculate_mean_negative_power_output(
+                    surface_angle=result_optimizer,
+                    location_parameters=location_parameters,
+                    mode=mode,
+                )
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_orientation"] = SurfaceOrientation(
@@ -215,12 +215,12 @@ def create_dictionary_for_result_optimizer(
                 optimal=True,
                 optimizer=method,
             )
-            result_dictionary[
-                "mean_power_output"
-            ] = -calculate_mean_negative_power_output(
-                surface_angle=result_optimizer,
-                location_parameters=location_parameters,
-                mode=mode,
+            result_dictionary["mean_power_output"] = (
+                -calculate_mean_negative_power_output(
+                    surface_angle=result_optimizer,
+                    location_parameters=location_parameters,
+                    mode=mode,
+                )
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_orientation"] = SurfaceOrientation(

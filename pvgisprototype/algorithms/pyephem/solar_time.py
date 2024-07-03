@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from math import pi
-import logging
 import ephem
-import typer
+from log import logger
+
 from pvgisprototype import Latitude, Longitude
 from pvgisprototype.validation.functions import (
     CalculateSolarTimeEphemInputModel,
@@ -89,7 +89,7 @@ def calculate_solar_time_ephem(
         try:
             timestamp = timestamp.astimezone(timezone)
         except Exception as e:
-            logging.warning(f"Error setting tzinfo for timestamp = {timestamp}: {e}")
+            logger.warning(f"Error setting tzinfo for timestamp = {timestamp}: {e}")
     # Handle Me during input validation? -------------------------------------
 
     observer = ephem.Observer()
@@ -100,7 +100,7 @@ def calculate_solar_time_ephem(
 
     sun = ephem.Sun()  # a Sun object
     sun.compute(observer)  # sun position for observer's location and time
-    sun_right_ascension = sun.ra
+    # sun_right_ascension = sun.ra
 
     # hour_angle = sidereal_time - sun_right_ascension
     hour_angle = sun.ha
@@ -116,16 +116,16 @@ def calculate_solar_time_ephem(
     # mean solar time = UTC + longitude | solar time = mean solar time + equation of time
     mean_solar_time = ephem.date(observer.date + (observer.lon / pi * 12) * ephem.hour)
     hour, minute, second = mean_solar_time.tuple()[3:]
-    mean_solar_time_decimal_hours = (
-        hour + minute / 60 + second / 3600
-    )  # to decimal hours
+    # mean_solar_time_decimal_hours = (
+    #     hour + minute / 60 + second / 3600
+    # )  # to decimal hours
 
     # solar time = hour angle + 12 hrs
     solar_time_alternative = ephem.date(
         base_date + (hour_angle + ephem.hours("12:00")) / (2 * pi)
     )
     hour, minute, second = solar_time_alternative.tuple()[3:]
-    solar_time_alternative_decimal_hours = hour + minute / 60 + second / 3600
+    # solar_time_alternative_decimal_hours = hour + minute / 60 + second / 3600
     # ------------------------------------------------------------------------
 
     # norm -> normalise to 24h
@@ -138,10 +138,10 @@ def calculate_solar_time_ephem(
     )  # FIXME: solar_time_hours or solar_time_decimal_hours ?
 
     if verbose:
-        typer.echo(f"Local sidereal time: {sidereal_time}")
-        typer.echo(f"Sun right ascension: {sun.ra}")
-        typer.echo(f"Hour angle: {hour_angle}")
-        typer.echo(f"Sun transit: {ephem.localtime(observer.date)}")
-        typer.echo(f"Mean solar time: {mean_solar_time}")
+        logger.info(f"Local sidereal time: {sidereal_time}")
+        logger.info(f"Sun right ascension: {sun.ra}")
+        logger.info(f"Hour angle: {hour_angle}")
+        logger.info(f"Sun transit: {ephem.localtime(observer.date)}")
+        logger.info(f"Mean solar time: {mean_solar_time}")
 
     return solar_time_datetime

@@ -24,7 +24,7 @@ def integrate_spectrum_response(
     nu_low = spectral_response_frequencies[0]
 
     number_of_response_values = len(spectral_response_frequencies)
-    number_of_kato_limits = len(kato_limits)
+    # number_of_kato_limits = len(kato_limits)
 
     while n < number_of_response_values - 1:
         if spectral_response_frequencies[n + 1] < kato_limits[m + 1]:
@@ -37,7 +37,9 @@ def integrate_spectrum_response(
                 nu_high - spectral_response_frequencies[n]
             ) / (
                 spectral_response_frequencies[n + 1] - spectral_response_frequencies[n]
-            ) * (spectral_response[n + 1] - spectral_response[n])
+            ) * (
+                spectral_response[n + 1] - spectral_response[n]
+            )
         photovoltaic_power += (
             spectral_power_density[m]
             * 0.5
@@ -80,6 +82,8 @@ def calculate_minimum_spectral_mismatch(
       (2002). Influence of Spectral Effects on the Performance of Multijunction
       Amorphous Silicon Cells. to be published.
     """
+    minimum_spectral_mismatch = 0  # FixMe
+    minimum_junction = 1  # FixMe
     for junction in range(number_of_junctions):
         spectral_mismatch = integrate_spectrum_response(
             spectral_response_frequencies=response_wavelengths,
