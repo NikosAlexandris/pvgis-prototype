@@ -6,9 +6,7 @@ from zoneinfo import ZoneInfo
 from fastapi import Depends, Query
 
 from pvgisprototype.api.position.models import (
-    SolarPositionModel,
     SolarTimeModel,
-    select_models,
 )
 from pvgisprototype.api.position.overview import (
     calculate_solar_geometry_overview_time_series,
@@ -83,19 +81,12 @@ async def overview_series(
         user_requested_timezone = timezone
 
         # timestamps = timestamps.tz_convert(utc_zoneinfo)
-        from pvgisprototype.api.utilities.timestamp import attach_requested_timezone
 
-        timezone_aware_timestamps = [
-            attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
-        ]
         timezone = utc_zoneinfo
         print(
             f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
         )
 
-    solar_position_models = select_models(
-        SolarPositionModel, model
-    )  # Using a callback fails!
     solar_position_series = calculate_solar_geometry_overview_time_series(
         longitude=longitude,
         latitude=latitude,

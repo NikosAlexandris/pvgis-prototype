@@ -4,8 +4,6 @@ logging mechanism and configuration.
 """
 
 from loguru import logger
-
-logger.remove()
 from functools import wraps
 
 from typer import Context
@@ -16,6 +14,7 @@ from pvgisprototype.constants import (
 )
 from pvgisprototype.validation.hashing import generate_hash
 
+logger.remove()
 
 def initialize_logger(
     ctx: Context,

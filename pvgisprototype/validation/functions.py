@@ -246,16 +246,6 @@ class SolarHourAngleSkyfieldInput(
     pass
 
 
-class SolarHourAngleSkyfieldInput(
-    BaseCoordinatesModel,
-    BaseTimestampModel,
-):
-    pass
-
-
-# Solar geometry
-
-
 class CalculateSolarAltitudePVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
