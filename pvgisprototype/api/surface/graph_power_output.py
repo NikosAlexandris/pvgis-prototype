@@ -62,10 +62,10 @@ def graph_power_output(longitude: Longitude,
         plt.plot(surface_tilt_values_degrees, mean_power_output_values)
         plt.plot(math.degrees(optimal_surface_tilt), optimal_pv_power,'ro',markersize=10)
         plt.xlabel("Tilt angle (degrees)", fontsize=12)
-        #plt.ylabel("Power (kW)", fontsize=12)     
+        plt.ylabel("Power (kW)", fontsize=12)     
         plt.yticks(fontsize=12)
         plt.xticks(fontsize=12)
-        #plt.legend(["PV power","Max PV power for optimal tilt"], loc="lower right")
+        plt.legend(["PV power","Max PV power for optimal tilt"], loc="lower right")
         plt.show()
         
 
@@ -91,7 +91,7 @@ def graph_power_output(longitude: Longitude,
         plt.plot(surface_tilt_values, mean_power_output_values)
         plt.plot(optimal_surface_tilt, optimal_pv_power,'ro')
         plt.xlabel("Tilt angle (radians)", fontsize=12)
-        #plt.ylabel("Power (kW)", fontsize=12)     
+        plt.ylabel("Power (kW)", fontsize=12)     
         plt.yticks(fontsize=12)
         plt.xticks(fontsize=12)
         plt.legend(["PV power","Max PV power for optimal tilt"], loc="lower right")
