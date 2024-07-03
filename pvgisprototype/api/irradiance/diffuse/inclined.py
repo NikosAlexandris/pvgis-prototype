@@ -258,20 +258,18 @@ def calculate_diffuse_inclined_irradiance_series(
         direct_horizontal_irradiance_series = horizontal_irradiance_components[
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
         ]
-        diffuse_horizontal_irradiance_series = (
-            calculate_diffuse_horizontal_component_from_sarah(
-                global_horizontal_irradiance_series=global_horizontal_irradiance_series,
-                direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
-                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                # timestamps=timestamps,
-                # neighbor_lookup=neighbor_lookup,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=0,
-                log=log,
-            ).value
-        )  # Important !
+        diffuse_horizontal_irradiance_series = calculate_diffuse_horizontal_component_from_sarah(
+            global_horizontal_irradiance_series=global_horizontal_irradiance_series,
+            direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
+            # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+            # timestamps=timestamps,
+            # neighbor_lookup=neighbor_lookup,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=0,
+            log=log,
+        ).value  # Important !
 
     else:  # OR from the model
         if verbose > 0:
@@ -405,17 +403,16 @@ def calculate_diffuse_inclined_irradiance_series(
         #     solar_azimuth_series_array = None
         #     # ----------------------------------------------------------------
         if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
-            diffuse_inclined_irradiance_series[mask_sunlit_surface_series] = (
-                diffuse_horizontal_irradiance_series[mask_sunlit_surface_series]
-                * (
-                    diffuse_sky_irradiance_series[mask_sunlit_surface_series]
-                    * (1 - kb_series[mask_sunlit_surface_series])
-                    + kb_series[mask_sunlit_surface_series]
-                    * np.sin(
-                        solar_incidence_series.radians[mask_sunlit_surface_series]
-                    )  # Should be the _complementary_ incidence angle!
-                    / np.sin(solar_altitude_series.radians[mask_sunlit_surface_series])
-                )
+            diffuse_inclined_irradiance_series[
+                mask_sunlit_surface_series
+            ] = diffuse_horizontal_irradiance_series[mask_sunlit_surface_series] * (
+                diffuse_sky_irradiance_series[mask_sunlit_surface_series]
+                * (1 - kb_series[mask_sunlit_surface_series])
+                + kb_series[mask_sunlit_surface_series]
+                * np.sin(
+                    solar_incidence_series.radians[mask_sunlit_surface_series]
+                )  # Should be the _complementary_ incidence angle!
+                / np.sin(solar_altitude_series.radians[mask_sunlit_surface_series])
             )
 
         # else:  # if solar altitude < 0.1 : potentially sunlit surface series
@@ -517,85 +514,105 @@ def calculate_diffuse_inclined_irradiance_series(
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },  # if verbose > 0 else {},
-        "extended_2": lambda: {
-            REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(
-                irradiance=diffuse_inclined_irradiance_before_reflectivity_series,
-                reflectivity=diffuse_irradiance_reflectivity_factor_series,
-            ),
-            REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_effect_percentage(
-                irradiance=diffuse_inclined_irradiance_before_reflectivity_series,
-                reflectivity=diffuse_irradiance_reflectivity_factor_series,
-            ),
-        }
-        if verbose > 6 and apply_reflectivity_factor
-        else {},
-        "extended": lambda: {
-            # REFLECTIVITY_FACTOR_COLUMN_NAME: where(diffuse_irradiance_loss_factor_series <= 0, 0, (1 - diffuse_irradiance_loss_factor_series)),
-            REFLECTIVITY_FACTOR_COLUMN_NAME: diffuse_irradiance_reflectivity_factor_series,
-            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
-            # } if verbose > 1 and apply_reflectivity_factor else {},
-        }
-        if apply_reflectivity_factor
-        else {},
-        "more_extended": lambda: {
-            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_orientation, angle_output_units
-            ),
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_tilt, angle_output_units
-            ),
-            ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-            TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE + " & relevant components",
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-            DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_sky_irradiance_series,
-        }
-        if verbose > 2
-        else {},
-        "even_more_extended": lambda: {
-            TERM_N_COLUMN_NAME: n_series,
-            KB_RATIO_COLUMN_NAME: kb_series,
-            AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(
-                azimuth_difference_series_array, angle_output_units, np.nan
-            ),
-            AZIMUTH_COLUMN_NAME: getattr(
-                solar_azimuth_series_array, angle_output_units, NOT_AVAILABLE
-            ),
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units)
-            if solar_altitude_series
-            else None,  # Altitude should be always there! If not, something is wrong.  This is why this entry does not need the NOT_AVAILABLE fallback.
-        }
-        if verbose > 3
-        else {},
-        "and_even_more_extended": lambda: {
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_horizontal_irradiance_series,
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
-            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-        }
-        if verbose > 4
-        else {},
-        "extra": lambda: {
-            INCIDENCE_COLUMN_NAME: getattr(
-                solar_incidence_series, angle_output_units, NOT_AVAILABLE
-            )
-            if solar_incidence_series
-            else None,
-            INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
-        }
-        if verbose > 5
-        else {},
-        "out-of-range": lambda: {
-            OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range,
-            OUT_OF_RANGE_INDICES_COLUMN_NAME + " i": out_of_range_indices,
-        }
-        if out_of_range_indices[0].size > 0
-        else {},
-        "fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(diffuse_inclined_irradiance_series),
-        }
-        if fingerprint
-        else {},
+        "extended_2": lambda: (
+            {
+                REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(
+                    irradiance=diffuse_inclined_irradiance_before_reflectivity_series,
+                    reflectivity=diffuse_irradiance_reflectivity_factor_series,
+                ),
+                REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_effect_percentage(
+                    irradiance=diffuse_inclined_irradiance_before_reflectivity_series,
+                    reflectivity=diffuse_irradiance_reflectivity_factor_series,
+                ),
+            }
+            if verbose > 6 and apply_reflectivity_factor
+            else {}
+        ),
+        "extended": lambda: (
+            {
+                # REFLECTIVITY_FACTOR_COLUMN_NAME: where(diffuse_irradiance_loss_factor_series <= 0, 0, (1 - diffuse_irradiance_loss_factor_series)),
+                REFLECTIVITY_FACTOR_COLUMN_NAME: diffuse_irradiance_reflectivity_factor_series,
+                DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
+                # } if verbose > 1 and apply_reflectivity_factor else {},
+            }
+            if apply_reflectivity_factor
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_orientation, angle_output_units
+                ),
+                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_tilt, angle_output_units
+                ),
+                ANGLE_UNITS_COLUMN_NAME: angle_output_units,
+                TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE + " & relevant components",
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+                DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_sky_irradiance_series,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "even_more_extended": lambda: (
+            {
+                TERM_N_COLUMN_NAME: n_series,
+                KB_RATIO_COLUMN_NAME: kb_series,
+                AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(
+                    azimuth_difference_series_array, angle_output_units, np.nan
+                ),
+                AZIMUTH_COLUMN_NAME: getattr(
+                    solar_azimuth_series_array, angle_output_units, NOT_AVAILABLE
+                ),
+                ALTITUDE_COLUMN_NAME: (
+                    getattr(solar_altitude_series, angle_output_units)
+                    if solar_altitude_series
+                    else None
+                ),  # Altitude should be always there! If not, something is wrong.  This is why this entry does not need the NOT_AVAILABLE fallback.
+            }
+            if verbose > 3
+            else {}
+        ),
+        "and_even_more_extended": lambda: (
+            {
+                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_horizontal_irradiance_series,
+                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
+                LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+            }
+            if verbose > 4
+            else {}
+        ),
+        "extra": lambda: (
+            {
+                INCIDENCE_COLUMN_NAME: (
+                    getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE)
+                    if solar_incidence_series
+                    else None
+                ),
+                INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
+            }
+            if verbose > 5
+            else {}
+        ),
+        "out-of-range": lambda: (
+            {
+                OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range,
+                OUT_OF_RANGE_INDICES_COLUMN_NAME + " i": out_of_range_indices,
+            }
+            if out_of_range_indices[0].size > 0
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    diffuse_inclined_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
