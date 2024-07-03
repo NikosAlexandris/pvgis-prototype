@@ -48,7 +48,7 @@ ENV LANG=en_US.UTF-8 \
     # ENV COLUMNS=160
 
 WORKDIR /home/pvgis-user/
-COPY --chown=pvgis-user:pvgis-user docs/ /home/pvgis-user/docs/
+COPY --chown=pvgis-user:pvgis-user ./ /home/pvgis-user/
 RUN pip install --upgrade pip \
     && pip install --user pdm  \
     && pip install .[docs] \
