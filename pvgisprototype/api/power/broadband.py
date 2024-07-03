@@ -774,8 +774,6 @@ def calculate_photovoltaic_power_output_series(
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
             TECHNOLOGY_NAME: photovoltaic_module.value,
             PEAK_POWER_COLUMN_NAME: peak_power,
-            TECHNOLOGY_NAME: photovoltaic_module.value,
-            PEAK_POWER_COLUMN_NAME: peak_power,
             POWER_MODEL_COLUMN_NAME: power_model.value
             if power_model
             else NOT_AVAILABLE,
@@ -814,7 +812,6 @@ def calculate_photovoltaic_power_output_series(
         if verbose > 3
         else {},
         "Reflectivity": lambda: {
-            REFLECTIVITY_COLUMN_NAME: global_inclined_reflectivity_series,
             REFLECTIVITY_COLUMN_NAME: global_inclined_reflectivity_series,
             # REFLECTIVITY_PERCENTAGE_COLUMN_NAME: global_inclined_reflectivity_loss_percentage_series if global_inclined_reflectivity_loss_percentage_series.size > 1 else NOT_AVAILABLE,
             # REFLECTIVITY_FACTOR_COLUMN_NAME: global_reflectivity_factor_series if global_reflectivity_factor_series.size > 1 else NOT_AVAILABLE,

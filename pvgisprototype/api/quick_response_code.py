@@ -58,17 +58,19 @@ def generate_quick_response_code(
     surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, "")
     surface_tilt = dictionary.get(SURFACE_TILT_COLUMN_NAME, "")
     # Get the "frequency" from the timestamps
-    time_groupings = {
-        "YE": "Yearly",
-        "S": "Seasonal",
-        "ME": "Monthly",
-        "W": "Weekly",
-        "D": "Daily",
-        "3H": "3-Hourly",
-        "H": "Hourly",
-    }
+    
+    #time_groupings = {
+    #    "YE": "Yearly",
+    #    "S": "Seasonal",
+    #    "ME": "Monthly",
+    #    "W": "Weekly",
+    #    "D": "Daily",
+    #    "3H": "3-Hourly",
+    #    "H": "Hourly",
+    #}
+    
     frequency = timestamps.freqstr
-    if timestamps.inferred_freq == None:
+    if timestamps.inferred_freq is None:
         frequency = "H"
     if timestamps.year.unique().size > 1:
         frequency = "YE"
@@ -82,7 +84,7 @@ def generate_quick_response_code(
         frequency = "H"
     else:
         frequency = "3H"
-    frequency_label = time_groupings[frequency]
+    #frequency_label = time_groupings[frequency]
 
     # Process series
     inclined_irradiance_series = dictionary.get(
@@ -119,10 +121,10 @@ def generate_quick_response_code(
     system_efficiency = numpy.nanmedian(system_efficiency_series).astype(
         dtype
     )  # Just in case we ever get time series of `system_efficiency` !
-    system_efficiency_change = (
-        photovoltaic_power_without_system_loss * system_efficiency
-        - photovoltaic_power_without_system_loss
-    )
+    #system_efficiency_change = (
+    #    photovoltaic_power_without_system_loss * system_efficiency
+    #    - photovoltaic_power_without_system_loss
+    #)
     system_efficiency_change_mean = calculate_mean_of_series_per_time_unit(
         photovoltaic_power_without_system_loss_mean * system_efficiency
         - photovoltaic_power_without_system_loss_mean,
