@@ -16,6 +16,9 @@ from pvgisprototype.validation.hashing import generate_hash
 
 logger.remove()
 
+logger.remove()
+
+
 def initialize_logger(
     ctx: Context,
     log_level: None | int = None,
