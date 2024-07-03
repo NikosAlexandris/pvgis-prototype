@@ -1,5 +1,5 @@
 from typing import Dict, List
-from numpy import np
+import numpy as np
 from zoneinfo import ZoneInfo
 from devtools import debug
 from pandas import DatetimeIndex
