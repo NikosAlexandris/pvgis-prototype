@@ -1,7 +1,7 @@
-from fastapi.openapi.utils import get_openapi
-from pvgisprototype.web_api.input_parameters import FASTAPI_INPUT_PARAMETERS
 from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 
+from pvgisprototype.web_api.input_parameters import FASTAPI_INPUT_PARAMETERS
 
 tags_metadata = [
     {
@@ -59,39 +59,40 @@ def reorder_parameters(api_spec, endpoint_path, params_order):
 
 def customise_openapi(app: FastAPI):
     def custom_openapi():
-            if app.openapi_schema:
-                return app.openapi_schema
-            openapi_schema = get_openapi(
-                title=app.title,
-                version=app.version,
-                summary=app.summary,
-                description=app.description,
-                routes=app.routes,
-                terms_of_service=app.terms_of_service,
-                contact=app.contact,
-                license_info=app.license_info,
-                tags=app.openapi_tags,
-            )
-            openapi_schema["info"]["x-logo"] = {
-                "url": "http://127.0.02:8000/assets/pvgis6_70px.png",
-                # "backgroundColor": "#FFFFFF",
-                "altText": "PVGIS 6 logo",
-            }
-            reordered_openapi_schema = reorder_parameters(
-                openapi_schema,
-                "/calculate/power/broadband-advanced",
-                FASTAPI_INPUT_PARAMETERS,
-            )
-            reordered_openapi_schema = reorder_parameters(
-                openapi_schema,
-                "/calculate/power/broadband",
-                FASTAPI_INPUT_PARAMETERS,
-            )
-            reordered_openapi_schema = reorder_parameters(
-                openapi_schema,
-                "/calculate/performance/broadband",
-                FASTAPI_INPUT_PARAMETERS,
-            )
-            app.openapi_schema = reordered_openapi_schema
+        if app.openapi_schema:
             return app.openapi_schema
+        openapi_schema = get_openapi(
+            title=app.title,
+            version=app.version,
+            summary=app.summary,
+            description=app.description,
+            routes=app.routes,
+            terms_of_service=app.terms_of_service,
+            contact=app.contact,
+            license_info=app.license_info,
+            tags=app.openapi_tags,
+        )
+        openapi_schema["info"]["x-logo"] = {
+            "url": "http://127.0.02:8000/assets/pvgis6_70px.png",
+            # "backgroundColor": "#FFFFFF",
+            "altText": "PVGIS 6 logo",
+        }
+        reordered_openapi_schema = reorder_parameters(
+            openapi_schema,
+            "/calculate/power/broadband-advanced",
+            FASTAPI_INPUT_PARAMETERS,
+        )
+        reordered_openapi_schema = reorder_parameters(
+            openapi_schema,
+            "/calculate/power/broadband",
+            FASTAPI_INPUT_PARAMETERS,
+        )
+        reordered_openapi_schema = reorder_parameters(
+            openapi_schema,
+            "/calculate/performance/broadband",
+            FASTAPI_INPUT_PARAMETERS,
+        )
+        app.openapi_schema = reordered_openapi_schema
+        return app.openapi_schema
+
     return custom_openapi

@@ -1,6 +1,7 @@
-import numpy as np
 import hashlib
 import json
+
+import numpy as np
 
 
 def ndarray_to_list(obj):

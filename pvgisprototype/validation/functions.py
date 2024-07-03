@@ -1,63 +1,52 @@
 # Generic input/output
-from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.validation.pvis_data_classes import VerbosityModel
-from pvgisprototype.validation.pvis_data_classes import LoggingModel
-from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
-from pvgisprototype.validation.pvis_data_classes import ArrayBackendModel
-
-# Where?
-from pvgisprototype.validation.pvis_data_classes import LatitudeModel
-from pvgisprototype.validation.pvis_data_classes import LongitudeModel
-from pvgisprototype.validation.pvis_data_classes import BaseCoordinatesModel
-from pvgisprototype.validation.pvis_data_classes import ElevationModel
-
-# When?
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimeModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimeSeriesModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
-
-# Atmospheric effects
-from pvgisprototype.validation.pvis_data_classes import ApplyAtmosphericRefractionModel
-from pvgisprototype.validation.pvis_data_classes import RefractedSolarZenithModel
-
-# Earth orbit
-from pvgisprototype.validation.pvis_data_classes import EarthOrbitModel
-
-# Solar time
-from pvgisprototype.validation.pvis_data_classes import SolarTimeModelModel
-from pvgisprototype.validation.pvis_data_classes import SolarTimeModel
-from pvgisprototype.validation.pvis_data_classes import TimeOffsetModel
-from pvgisprototype.validation.pvis_data_classes import HourOffsetModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimeOutputUnitsModel
-
-# Solar geometry
-from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeModel
-from pvgisprototype.validation.pvis_data_classes import RefractedSolarAltitudeSeriesModel
-from pvgisprototype.validation.pvis_data_classes import SolarDeclinationModel
-from pvgisprototype.validation.pvis_data_classes import SolarPositionModelModel
-from pvgisprototype.validation.pvis_data_classes import SolarPositionModelModels
-from pvgisprototype.validation.pvis_data_classes import SolarHourAngleModel
-from pvgisprototype.validation.pvis_data_classes import ComplementaryIncidenceAngleModel
-
-# Solar Surface
-from pvgisprototype.validation.pvis_data_classes import SurfaceOrientationModel
-from pvgisprototype.validation.pvis_data_classes import SurfaceTiltModel
-
-# Incidence
-from pvgisprototype.validation.pvis_data_classes import SolarIncidenceModel
-from pvgisprototype.validation.pvis_data_classes import ZeroNegativeSolarIncidenceAngleModel
-
-# Output
-from pvgisprototype.validation.pvis_data_classes import BaseAngleUnitsModel
-from pvgisprototype.validation.pvis_data_classes import BaseAngleInternalUnitsModel
-from pvgisprototype.validation.pvis_data_classes import BaseAngleOutputUnitsModel
+from functools import wraps
 
 # Validator
-from typing import Type
+from typing import Callable, Type
+
 from pydantic import BaseModel
-from typing import Callable
-from functools import wraps
+
+# Output
+# Incidence
+# Solar Surface
+# Solar geometry
+# Solar time
+# Earth orbit
+# Atmospheric effects
+# When?
+# Where?
+from pvgisprototype.validation.pvis_data_classes import (
+    ApplyAtmosphericRefractionModel,
+    ArrayTypeModel,
+    BaseAngleOutputUnitsModel,
+    BaseCoordinatesModel,
+    BaseTimeModel,
+    BaseTimeSeriesModel,
+    BaseTimestampModel,
+    BaseTimestampSeriesModel,
+    ComplementaryIncidenceAngleModel,
+    EarthOrbitModel,
+    ElevationModel,
+    HourOffsetModel,
+    LatitudeModel,
+    LoggingModel,
+    LongitudeModel,
+    RefractedSolarAltitudeModel,
+    RefractedSolarAltitudeSeriesModel,
+    RefractedSolarZenithModel,
+    SolarDeclinationModel,
+    SolarHourAngleModel,
+    SolarIncidenceModel,
+    SolarPositionModelModel,
+    SolarPositionModelModels,
+    SolarTimeModel,
+    SolarTimeModelModel,
+    SurfaceOrientationModel,
+    SurfaceTiltModel,
+    TimeOffsetModel,
+    VerbosityModel,
+    ZeroNegativeSolarIncidenceAngleModel,
+)
 
 
 def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
@@ -72,14 +61,18 @@ def validate_with_pydantic(input_model: Type[BaseModel]) -> Callable:
                 # **dict(zip(func.__annotations__.keys(), args))}  # Not supported by Numba's nonpython mode!
                 input_data = {}  # an empty dictionary
                 input_data.update(kwargs)  # update with kwargs
-                input_data.update(dict(zip(func.__annotations__.keys(), args)))  # update with zipped annotations and args
+                input_data.update(
+                    dict(zip(func.__annotations__.keys(), args))
+                )  # update with zipped annotations and args
                 validated_input = input_model(**input_data)
             dictionary_input = {}
             for k, v in validated_input:
                 dictionary_input[k] = v
             return func(**dictionary_input)
             # return func(**validated_input.dict())  # Use .dict() to convert Pydantic model to dictionary
+
         return wrapper
+
     return decorator
 
 
@@ -87,6 +80,7 @@ class CalculateFractionalYearPVISInputModel(
     BaseTimestampModel,
 ):
     pass
+
 
 class CalculateFractionalYearPVGISInputModel(
     BaseTimestampModel,
@@ -123,6 +117,7 @@ class ModelSolarDeclinationInputModel(
 
 # Solar time
 
+
 class ModelSolarTimeInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
@@ -152,7 +147,7 @@ class CalculateSolarTimePVGISInputModel(
     VerbosityModel,
 ):
     pass
- 
+
 
 class CalculateSolarTimeMilne1921InputModel(
     LongitudeModel,
@@ -191,6 +186,7 @@ class CalculateEquationOfTimeNOAAInput(
 
 
 # Hour angle
+
 
 class CalculateSolarHourAngleSeriesInputModel(
     LongitudeModel,
@@ -259,6 +255,7 @@ class SolarHourAngleSkyfieldInput(
 
 # Solar geometry
 
+
 class CalculateSolarAltitudePVISInputModel(
     BaseCoordinatesModel,
     BaseTimeModel,
@@ -291,9 +288,7 @@ class CalculateSolarAltitudeAzimuthSkyfieldInputModel(
     pass
 
 
-class CalculateSolarAzimuthPVLIBInputModel(
-    CalculateSolarAltitudePVLIBInputModel
-):
+class CalculateSolarAzimuthPVLIBInputModel(CalculateSolarAltitudePVLIBInputModel):
     pass
 
 
@@ -310,9 +305,7 @@ class CalculateSolarDeclinationSkyfieldInput(
     pass
 
 
-class CalculateSolarZenithPVLIBInputModel(
-    CalculateSolarAltitudePVLIBInputModel
-):
+class CalculateSolarZenithPVLIBInputModel(CalculateSolarAltitudePVLIBInputModel):
     pass
 
 
@@ -401,6 +394,7 @@ class ModelSolarPositionOverviewSeriesInputModel(
 
 
 # Solar incidence angle
+
 
 class CalculateRelativeLongitudeInputModel(
     LatitudeModel,
@@ -496,6 +490,7 @@ class ModelSolarIncidenceTimeSeriesInputModel(
 
 
 # Direct irradiance
+
 
 class AdjustElevationInputModel(
     ElevationModel,

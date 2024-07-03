@@ -1,5 +1,5 @@
 import math
-from typing import Annotated, Optional
+from typing import Annotated, Dict, Optional, TypeVar
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -16,20 +16,26 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
+from pvgisprototype.api.datetime.datetimeindex import (
+    generate_datetime_series,
+    parse_timestamp_series,
+)
 from pvgisprototype.api.position.models import (
     SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SolarIncidenceModel,
     SolarPositionModel,
 )
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.quick_response_code import QuickResponseCode
+from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
-from pvgisprototype.api.datetime.datetimeindex import (
-    generate_datetime_series,
-    parse_timestamp_series,
-)
 from pvgisprototype.constants import (
     DEGREES,
+    FINGERPRINT_FLAG_DEFAULT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    QUIET_FLAG_DEFAULT,
     RADIANS,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SPECTRAL_FACTOR_DEFAULT,
@@ -42,17 +48,26 @@ from pvgisprototype.constants import (
     SYMBOL_UNIT_TEMPERATURE,
     SYMBOL_UNIT_WIND_SPEED,
     TEMPERATURE_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
+    fastapi_query_analysis,
     fastapi_query_angle_output_units,
+    fastapi_query_csv,
+    fastapi_query_elevation,
     fastapi_query_end_time,
+    fastapi_query_fingerprint,
     fastapi_query_frequency,
     fastapi_query_groupby,
     fastapi_query_latitude,
     fastapi_query_linke_turbidity_factor_series,
     fastapi_query_longitude,
+    fastapi_query_optimise_surface_position,
     fastapi_query_periods,
+    fastapi_query_photovoltaic_module_model,
+    fastapi_query_quick_response_code,
+    fastapi_query_quiet,
     fastapi_query_refracted_solar_zenith,
     fastapi_query_solar_incidence_model,
     fastapi_query_solar_position_model,
@@ -63,29 +78,16 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_surface_tilt_list,
     fastapi_query_timestamps,
     fastapi_query_timezone,
+    fastapi_query_verbose,
 )
-from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone
-from pvgisprototype.api.quick_response_code import QuickResponseCode
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quick_response_code
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_quiet
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_verbose
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_analysis
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_fingerprint
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_csv
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
-from pvgisprototype.constants import QUIET_FLAG_DEFAULT
-from pvgisprototype.constants import QUICK_RESPONSE_CODE_FLAG_DEFAULT
-from pvgisprototype.constants import ANALYSIS_FLAG_DEFAULT
-from typing import Annotated, Optional, Dict, TypeVar
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_optimise_surface_position
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_elevation
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.web_api.fastapi_parameters import fastapi_query_photovoltaic_module_model
-from pvgisprototype.api.surface.optimize_angles import optimize_angles
-from pvgisprototype.api.surface.parameter_models import (
-    SurfacePositionOptimizerMode,
+from pvgisprototype.web_api.schemas import (
+    AnalysisLevel,
+    AngleOutputUnit,
+    Frequency,
+    GroupBy,
+    Timezone,
 )
+
 
 async def process_longitude(
     longitude: Annotated[float, fastapi_query_longitude] = 8.628,
@@ -141,24 +143,27 @@ async def process_time_grouping(time_unit: TimeUnit) -> Optional[str]:
     return time_groupings[time_unit.value]
 
 
-async def process_groupby(groupby: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.NoneValue) -> Optional[str]:
+async def process_groupby(
+    groupby: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.NoneValue,
+) -> Optional[str]:
     return await process_time_grouping(groupby)
 
 
-async def process_frequency(frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.Hourly) -> str:
+async def process_frequency(
+    frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.Hourly,
+) -> str:
     return await process_time_grouping(frequency)
 
 
 async def process_series_timestamp(
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = '2013-01-01',
+    start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = '2013-12-31',
+    end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> DatetimeIndex:
-    """
-    """
+    """ """
     if start_time is None and end_time is None and timestamps is None:
         raise HTTPException(
             status_code=400, detail="Provide a valid start and end time or a timestamp"
@@ -198,20 +203,20 @@ async def process_series_timestamp(
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
-    
-    if timestamps.empty: # type: ignore
+
+    if timestamps.empty:  # type: ignore
         raise HTTPException(
-            status_code=400, detail=f"Combination of options {start_time}, {end_time}, {frequency}, {periods} is not valid"
+            status_code=400,
+            detail=f"Combination of options {start_time}, {end_time}, {frequency}, {periods} is not valid",
         )
-    
+
     return timestamps
 
 
 async def create_temperature_series(
     temperature_series: Optional[float] = None,
 ) -> TemperatureSeries:
-    """
-    """
+    """ """
     if isinstance(temperature_series, float):
         return TemperatureSeries(
             value=np.array(temperature_series, dtype=np.float32),
@@ -227,8 +232,7 @@ async def create_temperature_series(
 async def create_wind_speed_series(
     wind_speed_series: Optional[float] = None,
 ) -> WindSpeedSeries:
-    """
-    """
+    """ """
     if isinstance(wind_speed_series, float):
         return WindSpeedSeries(
             value=np.array(wind_speed_series), unit=SYMBOL_UNIT_WIND_SPEED
@@ -242,8 +246,7 @@ async def create_wind_speed_series(
 async def create_spectral_factor_series(
     spectral_factor_series: float | None = None,
 ) -> SpectralFactorSeries:
-    """
-    """
+    """ """
     if isinstance(spectral_factor_series, float):
         return SpectralFactorSeries(
             value=np.array(spectral_factor_series, dtype=np.float32)
@@ -259,18 +262,16 @@ async def process_linke_turbidity_factor_series(
         float, fastapi_query_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
 ) -> LinkeTurbidityFactor:
-    """
-    """
+    """ """
     return LinkeTurbidityFactor(value=linke_turbidity_factor_series)
 
 
 async def process_angle_output_units(
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_query_angle_output_units
-    ] = AngleOutputUnit.RADIANS
+    ] = AngleOutputUnit.RADIANS,
 ) -> str:
-    """
-    """
+    """ """
     if angle_output_units.value == AngleOutputUnit.RADIANS.value:
         return RADIANS
     else:
@@ -280,10 +281,9 @@ async def process_angle_output_units(
 async def process_refracted_solar_zenith(
     refracted_solar_zenith: Annotated[
         float, fastapi_query_refracted_solar_zenith
-    ] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT)
+    ] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
 ) -> float:
-    """
-    """
+    """ """
     return math.radians(refracted_solar_zenith)
 
 
@@ -295,8 +295,7 @@ async def process_surface_tilt_list(
         list[float], fastapi_query_surface_orientation_list
     ] = [float(SURFACE_ORIENTATION_DEFAULT)],
 ) -> list[float]:
-    """
-    """
+    """ """
     for surface_tilt_value in surface_tilt:
         if not SURFACE_TILT_MINIMUM <= surface_tilt_value <= SURFACE_TILT_MAXIMUM:
             from fastapi import HTTPException
@@ -325,8 +324,7 @@ async def process_surface_orientation_list(
         list[float], fastapi_query_surface_orientation_list
     ] = [float(SURFACE_ORIENTATION_DEFAULT)],
 ) -> list[float]:
-    """
-    """
+    """ """
     for surface_orientation_value in surface_orientation:
         if (
             not SURFACE_ORIENTATION_MINIMUM
@@ -359,8 +357,7 @@ async def process_series_solar_position_model(
         SolarPositionModel, fastapi_query_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
 ) -> SolarPositionModel:
-    """
-    """
+    """ """
     NOT_IMPLEMENTED_MODELS = [
         SolarPositionModel.hofierka,
         SolarPositionModel.pvlib,
@@ -386,8 +383,7 @@ async def process_series_solar_incidence_model(
         SolarIncidenceModel, fastapi_query_solar_incidence_model
     ] = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
 ) -> SolarIncidenceModel:
-    """
-    """
+    """ """
     NOT_IMPLEMENTED_MODELS = [
         SolarIncidenceModel.pvis,
         SolarIncidenceModel.all,
@@ -405,43 +401,46 @@ async def process_series_solar_incidence_model(
 
 
 async def process_verbose(
-        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
-        verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-        analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
 ) -> int:
-    """
-    """
+    """ """
     if analysis.value != AnalysisLevel.NoneValue:
         verbose = 9
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         verbose = 9
-    
-    return verbose 
+
+    return verbose
 
 
 async def process_quiet(
-        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
-        quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
-        analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
+    quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
 ) -> bool:
-    """
-    """
+    """ """
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quiet = True
-    
+
     if analysis.value != AnalysisLevel.NoneValue:
         quiet = True
-    
+
     return quiet
 
 
 async def process_fingerprint(
-        quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
-        fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-        csv: Annotated[str | None,fastapi_query_csv] = None,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
+    fingerprint: Annotated[bool, fastapi_query_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    csv: Annotated[str | None, fastapi_query_csv] = None,
 ) -> bool:
-    
     if quick_response_code.value != QuickResponseCode.NoneValue or csv:
         fingerprint = True
 
@@ -455,7 +454,8 @@ async def process_optimise_surface_position(
     surface_orientation: Annotated[
         float, Depends(process_surface_orientation)
     ] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Annotated[float, Depends(process_surface_tilt)
+    surface_tilt: Annotated[
+        float, Depends(process_surface_tilt)
     ] = SURFACE_TILT_DEFAULT,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
@@ -472,8 +472,10 @@ async def process_optimise_surface_position(
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    optimise_surface_position: Annotated[SurfacePositionOptimizerMode, fastapi_query_optimise_surface_position] = SurfacePositionOptimizerMode.NoneValue
-)->dict:
+    optimise_surface_position: Annotated[
+        SurfacePositionOptimizerMode, fastapi_query_optimise_surface_position
+    ] = SurfacePositionOptimizerMode.NoneValue,
+) -> dict:
     if optimise_surface_position == SurfacePositionOptimizerMode.NoneValue:
         return {}
     else:
@@ -482,72 +484,80 @@ async def process_optimise_surface_position(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
-                surface_orientation= surface_orientation,
+                surface_orientation=surface_orientation,
                 surface_tilt=surface_tilt,
                 min_surface_orientation=SurfaceOrientation().min_radians,
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
                 timestamps=timestamps,
-                timezone=timezone, # type: ignore
+                timezone=timezone,  # type: ignore
                 spectral_factor_series=spectral_factor_series,
                 temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
                 wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-                linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
-                photovoltaic_module=photovoltaic_module, 
+                linke_turbidity_factor_series=LinkeTurbidityFactor(
+                    value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+                ),
+                photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Orientation,
-                sampling_method_shgo = 'sobol'
+                sampling_method_shgo="sobol",
             )
         elif optimise_surface_position == SurfacePositionOptimizerMode.Tilt:
             optimise_surface_position = optimize_angles(
-                    longitude=longitude,
-                    latitude=latitude,
-                    elevation=elevation,
-                    surface_orientation=surface_orientation,
-                    surface_tilt=surface_tilt,
-                    min_surface_orientation=SurfaceOrientation().min_radians,
-                    max_surface_orientation=SurfaceOrientation().max_radians,
-                    min_surface_tilt=SurfaceTilt().min_radians,
-                    max_surface_tilt=SurfaceTilt().max_radians,
-                    timestamps=timestamps,
-                    timezone=timezone, # type: ignore
-                    spectral_factor_series=spectral_factor_series,
-                    temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
-                    wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-                    linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
-                    photovoltaic_module=photovoltaic_module, 
-                    mode=SurfacePositionOptimizerMode.Tilt,
-                    sampling_method_shgo = 'sobol'
+                longitude=longitude,
+                latitude=latitude,
+                elevation=elevation,
+                surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
+                min_surface_orientation=SurfaceOrientation().min_radians,
+                max_surface_orientation=SurfaceOrientation().max_radians,
+                min_surface_tilt=SurfaceTilt().min_radians,
+                max_surface_tilt=SurfaceTilt().max_radians,
+                timestamps=timestamps,
+                timezone=timezone,  # type: ignore
+                spectral_factor_series=spectral_factor_series,
+                temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
+                wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                linke_turbidity_factor_series=LinkeTurbidityFactor(
+                    value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+                ),
+                photovoltaic_module=photovoltaic_module,
+                mode=SurfacePositionOptimizerMode.Tilt,
+                sampling_method_shgo="sobol",
             )
         else:
             optimise_surface_position = optimize_angles(
-                    longitude=longitude,
-                    latitude=latitude,
-                    elevation=elevation,
-                    surface_orientation=surface_orientation,
-                    surface_tilt=surface_tilt,
-                    min_surface_orientation=SurfaceOrientation().min_radians,
-                    max_surface_orientation=SurfaceOrientation().max_radians,
-                    min_surface_tilt=SurfaceTilt().min_radians,
-                    max_surface_tilt=SurfaceTilt().max_radians,
-                    timestamps=timestamps,
-                    timezone=timezone, # type: ignore
-                    spectral_factor_series=spectral_factor_series,
-                    temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
-                    wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-                    linke_turbidity_factor_series=LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
-                    photovoltaic_module=photovoltaic_module, 
-                    mode=SurfacePositionOptimizerMode.Tilt_and_Orientation,
-                    sampling_method_shgo = 'sobol'
+                longitude=longitude,
+                latitude=latitude,
+                elevation=elevation,
+                surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
+                min_surface_orientation=SurfaceOrientation().min_radians,
+                max_surface_orientation=SurfaceOrientation().max_radians,
+                min_surface_tilt=SurfaceTilt().min_radians,
+                max_surface_tilt=SurfaceTilt().max_radians,
+                timestamps=timestamps,
+                timezone=timezone,  # type: ignore
+                spectral_factor_series=spectral_factor_series,
+                temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
+                wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                linke_turbidity_factor_series=LinkeTurbidityFactor(
+                    value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+                ),
+                photovoltaic_module=photovoltaic_module,
+                mode=SurfacePositionOptimizerMode.Tilt_and_Orientation,
+                sampling_method_shgo="sobol",
             )
-        
-        if (optimise_surface_position["surface_tilt"] is None) or (optimise_surface_position["surface_orientation"] is None): # type: ignore
+
+        if (optimise_surface_position["surface_tilt"] is None) or (
+            optimise_surface_position["surface_orientation"] is None
+        ):  # type: ignore
             raise HTTPException(
                 status_code=400,
                 detail="Using combination of input could not find optimal surface position",
             )
-       
-        return optimise_surface_position # type: ignore
+
+        return optimise_surface_position  # type: ignore
 
 
 fastapi_dependable_longitude = Depends(process_longitude)
@@ -561,7 +571,9 @@ fastapi_dependable_wind_speed_series = Depends(create_wind_speed_series)
 fastapi_dependable_spectral_factor_series = Depends(create_spectral_factor_series)
 fastapi_dependable_groupby = Depends(process_groupby)
 fastapi_dependable_frequency = Depends(process_frequency)
-fastapi_dependable_linke_turbidity_factor_series = Depends(process_linke_turbidity_factor_series)
+fastapi_dependable_linke_turbidity_factor_series = Depends(
+    process_linke_turbidity_factor_series
+)
 fastapi_dependable_angle_output_units = Depends(process_angle_output_units)
 fastapi_dependable_refracted_solar_zenith = Depends(process_refracted_solar_zenith)
 fastapi_dependable_surface_orientation_list = Depends(process_surface_orientation_list)
@@ -573,4 +585,6 @@ fastapi_dependable_solar_incidence_models = Depends(
 fastapi_dependable_verbose = Depends(process_verbose)
 fastapi_dependable_quite = Depends(process_quiet)
 fastapi_dependable_fingerprint = Depends(process_fingerprint)
-fastapi_dependable_optimise_surface_position = Depends(process_optimise_surface_position)
+fastapi_dependable_optimise_surface_position = Depends(
+    process_optimise_surface_position
+)

@@ -1,7 +1,7 @@
-from datetime import datetime
-from datetime import time
-from rich import print
+from datetime import datetime, time
 from functools import wraps
+
+from rich import print
 
 
 def timer(func):
@@ -11,19 +11,23 @@ def timer(func):
         result = func(*args, **kwargs)
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print(f"'{func.__name__}' executed in {elapsed_time:.6f} seconds (or {elapsed_time:.2f} seconds).")
+        print(
+            f"'{func.__name__}' executed in {elapsed_time:.6f} seconds (or {elapsed_time:.2f} seconds)."
+        )
         return result
+
     return wrapper
 
 
 # Time
 
+
 def get_day_from_hour_of_year(year: int, hour_of_year: int):
     """Get day of year from hour of year."""
-    start_of_year = np.datetime64(f'{year}-01-01')
-    date_and_time = start_of_year + np.timedelta64(hour_of_year, 'h')
+    start_of_year = np.datetime64(f"{year}-01-01")
+    date_and_time = start_of_year + np.timedelta64(hour_of_year, "h")
     date_and_time = date_and_time.astype(datetime.datetime)
-    day_of_year = int(date_and_time.strftime('%j'))
+    day_of_year = int(date_and_time.strftime("%j"))
     # month = int(date_and_time.strftime('%m'))  # Month
     # day_of_month = int(date_and_time.strftime('%d'))
     # hour_of_day = int(date_and_time.strftime('%H'))
@@ -33,8 +37,9 @@ def get_day_from_hour_of_year(year: int, hour_of_year: int):
 
 # Time series
 
+
 def get_days_in_year(year):
-    """ Calculate the number of days in a given year, accounting for leap years.
+    """Calculate the number of days in a given year, accounting for leap years.
 
     Parameters
     ----------
@@ -60,7 +65,7 @@ def get_days_in_year(year):
 
 
 def get_days_in_years(years):
-    """ Calculate the number of days in a given year, accounting for leap years.
+    """Calculate the number of days in a given year, accounting for leap years.
 
     Parameters
     ----------
@@ -78,7 +83,8 @@ def get_days_in_years(years):
     Index([366, 365], dtype='int64')
     """
     import pandas as pd
-    end_dates = pd.to_datetime(years, format='%Y') + pd.offsets.YearEnd(0)
+
+    end_dates = pd.to_datetime(years, format="%Y") + pd.offsets.YearEnd(0)
     start_dates = end_dates - pd.DateOffset(years=1)
 
     # Cannot serialise an index ! -------------------------------
