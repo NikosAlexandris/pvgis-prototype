@@ -9,60 +9,65 @@ measuring azimuthal angles will obvisouly impact the direction of the
 calculated angles. See also the API azimuth.py module.
 """
 
-from pvgisprototype.algorithms.pvis.solar_incidence import calculate_solar_incidence_series_hofierka
-from pvgisprototype.algorithms.pvlib.solar_incidence import calculate_solar_incidence_series_pvlib
-from pvgisprototype.caching import custom_cached
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarIncidenceTimeSeriesInputModel
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from typing import Dict, Optional
-from typing import List
+from typing import Dict, List, Optional
 from zoneinfo import ZoneInfo
-from pvgisprototype import SurfaceTilt
-from pvgisprototype import SurfaceOrientation
-from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.constants import DATA_TYPE_DEFAULT, ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import TIME_ALGORITHM_NAME
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME
-from pvgisprototype.constants import AZIMUTH_ORIGIN_NAME
-from pvgisprototype.constants import INCIDENCE_ALGORITHM_NAME
-from pvgisprototype.constants import INCIDENCE_NAME
-from pvgisprototype.constants import INCIDENCE_DEFINITION
-from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.constants import UNIT_NAME
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import NOT_AVAILABLE
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+
 from devtools import debug
-from pvgisprototype import SolarIncidence
-from pvgisprototype.algorithms.jenco.solar_incidence import calculate_solar_incidence_series_jenco
-from pvgisprototype.algorithms.iqbal.solar_incidence import calculate_solar_incidence_series_iqbal
 from pandas import DatetimeIndex
-from pvgisprototype.api.position.conversions import convert_north_to_south_radians_convention
+
+from pvgisprototype import (
+    Latitude,
+    Longitude,
+    SolarIncidence,
+    SurfaceOrientation,
+    SurfaceTilt,
+)
+from pvgisprototype.algorithms.iqbal.solar_incidence import (
+    calculate_solar_incidence_series_iqbal,
+)
+from pvgisprototype.algorithms.jenco.solar_incidence import (
+    calculate_solar_incidence_series_jenco,
+)
+from pvgisprototype.algorithms.pvis.solar_incidence import (
+    calculate_solar_incidence_series_hofierka,
+)
+from pvgisprototype.algorithms.pvlib.solar_incidence import (
+    calculate_solar_incidence_series_pvlib,
+)
+from pvgisprototype.api.position.conversions import (
+    convert_north_to_south_radians_convention,
+)
+from pvgisprototype.api.position.models import SolarIncidenceModel, SolarTimeModel
+from pvgisprototype.caching import custom_cached
+from pvgisprototype.constants import (
+    ANGLE_OUTPUT_UNITS_DEFAULT,
+    ARRAY_BACKEND_DEFAULT,
+    ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    AZIMUTH_ORIGIN_NAME,
+    COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    INCIDENCE_ALGORITHM_NAME,
+    INCIDENCE_DEFINITION,
+    INCIDENCE_NAME,
+    LOG_LEVEL_DEFAULT,
+    NOT_AVAILABLE,
+    PERIGEE_OFFSET,
+    POSITION_ALGORITHM_NAME,
+    RADIANS,
+    SURFACE_ORIENTATION_DEFAULT,
+    SURFACE_TILT_DEFAULT,
+    TIME_ALGORITHM_NAME,
+    UNIT_NAME,
+    VERBOSE_LEVEL_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+)
 from pvgisprototype.log import log_function_call
-from pvgisprototype.constants import UNIT_NAME
+from pvgisprototype.validation.functions import (
+    ModelSolarIncidenceTimeSeriesInputModel,
+    validate_with_pydantic,
+)
 
 
 @log_function_call
@@ -87,12 +92,10 @@ def model_solar_incidence_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarIncidence:
-    """
-    """
+    """ """
     solar_incidence_series = None
 
     if solar_incidence_model.value == SolarIncidenceModel.jenco:
-
         # Update-Me ----------------------------------------------------------
         # Hofierka (2002) measures azimuth angles from East !
         # Convert the user-defined North-based surface orientation angle to East-based
@@ -135,7 +138,6 @@ def model_solar_incidence_series(
         )
 
     if solar_incidence_model.value == SolarIncidenceModel.iqbal:
-
         # Iqbal (1983) measures azimuthal angles from South !
         surface_orientation_south_convention = SurfaceOrientation(
             value=convert_north_to_south_radians_convention(
@@ -160,7 +162,6 @@ def model_solar_incidence_series(
         )
 
     if solar_incidence_model.value == SolarIncidenceModel.hofierka:
-
         surface_orientation_south_convention = SurfaceOrientation(
             value=convert_north_to_south_radians_convention(
                 north_based_angle=surface_orientation
@@ -185,7 +186,6 @@ def model_solar_incidence_series(
         )
 
     if solar_incidence_model.value == SolarIncidenceModel.pvlib:
-
         solar_incidence_series = calculate_solar_incidence_series_pvlib(
             longitude=longitude,
             latitude=latitude,
@@ -231,40 +231,56 @@ def calculate_solar_incidence_series(
     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
     results = {}
     for solar_incidence_model in solar_incidence_models:
-        if solar_incidence_model != SolarIncidenceModel.all:  # ignore 'all' in the enumeration
+        if (
+            solar_incidence_model != SolarIncidenceModel.all
+        ):  # ignore 'all' in the enumeration
             solar_incidence_series = model_solar_incidence_series(
-                    longitude=longitude,
-                    latitude=latitude,
-                    timestamps=timestamps,
-                    timezone=timezone,
-                    surface_orientation=surface_orientation,
-                    surface_tilt=surface_tilt,
-                    # solar_time_model=solar_time_model,
-                    solar_incidence_model=solar_incidence_model,
-                    complementary_incidence_angle=complementary_incidence_angle,
-                    zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-                    perigee_offset=perigee_offset,
-                    eccentricity_correction_factor=eccentricity_correction_factor,
-                    dtype=dtype,
-                    array_backend=array_backend,
-                    verbose=verbose,
-                    log=log,
-                    )
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                timezone=timezone,
+                surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
+                # solar_time_model=solar_time_model,
+                solar_incidence_model=solar_incidence_model,
+                complementary_incidence_angle=complementary_incidence_angle,
+                zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
+                dtype=dtype,
+                array_backend=array_backend,
+                verbose=verbose,
+                log=log,
+            )
             solar_incidence_model_series = {
                 solar_incidence_model.name: {
-                    TIME_ALGORITHM_NAME: solar_incidence_series.timing_algorithm if solar_incidence_series else NOT_AVAILABLE,
-                    POSITION_ALGORITHM_NAME: solar_incidence_series.position_algorithm if solar_incidence_series else NOT_AVAILABLE,
+                    TIME_ALGORITHM_NAME: solar_incidence_series.timing_algorithm
+                    if solar_incidence_series
+                    else NOT_AVAILABLE,
+                    POSITION_ALGORITHM_NAME: solar_incidence_series.position_algorithm
+                    if solar_incidence_series
+                    else NOT_AVAILABLE,
                     # ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
                     # AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
-                    AZIMUTH_ORIGIN_NAME: solar_incidence_series.azimuth_origin if solar_incidence_series else NOT_AVAILABLE,
+                    AZIMUTH_ORIGIN_NAME: solar_incidence_series.azimuth_origin
+                    if solar_incidence_series
+                    else NOT_AVAILABLE,
                     # SURFACE_ORIENTATION_NAME: getattr(surface_orientation, angle_output_units, NOT_AVAILABLE) if surface_orientation else None,
                     # SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
-                    INCIDENCE_ALGORITHM_NAME: solar_incidence_series.incidence_algorithm if solar_incidence_series else NOT_AVAILABLE,
-                    INCIDENCE_NAME: getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE) if solar_incidence_series else NOT_AVAILABLE,
-                    INCIDENCE_DEFINITION: solar_incidence_series.definition if solar_incidence_series else NOT_AVAILABLE,
+                    INCIDENCE_ALGORITHM_NAME: solar_incidence_series.incidence_algorithm
+                    if solar_incidence_series
+                    else NOT_AVAILABLE,
+                    INCIDENCE_NAME: getattr(
+                        solar_incidence_series, angle_output_units, NOT_AVAILABLE
+                    )
+                    if solar_incidence_series
+                    else NOT_AVAILABLE,
+                    INCIDENCE_DEFINITION: solar_incidence_series.definition
+                    if solar_incidence_series
+                    else NOT_AVAILABLE,
                     UNIT_NAME: angle_output_units,
-                    }
                 }
+            }
         results = results | solar_incidence_model_series
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:

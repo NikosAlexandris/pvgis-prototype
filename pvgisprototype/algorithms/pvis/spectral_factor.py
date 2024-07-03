@@ -1,6 +1,9 @@
 import numpy as np
 from numpy.typing import NDArray
-from pvgisprototype.algorithms.pvis.constants import STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE
+
+from pvgisprototype.algorithms.pvis.constants import (
+    STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE,
+)
 
 
 def integrate_spectrum_response(
@@ -34,9 +37,7 @@ def integrate_spectrum_response(
                 nu_high - spectral_response_frequencies[n]
             ) / (
                 spectral_response_frequencies[n + 1] - spectral_response_frequencies[n]
-            ) * (
-                spectral_response[n + 1] - spectral_response[n]
-            )
+            ) * (spectral_response[n + 1] - spectral_response[n])
         photovoltaic_power += (
             spectral_power_density[m]
             * 0.5
@@ -81,10 +82,10 @@ def calculate_minimum_spectral_mismatch(
     """
     for junction in range(number_of_junctions):
         spectral_mismatch = integrate_spectrum_response(
-                spectral_response_frequencies=response_wavelengths,
-                spectral_response=spectral_response,
-                kato_limits=junction,
-                spectral_power_density=spectral_power_density,
+            spectral_response_frequencies=response_wavelengths,
+            spectral_response=spectral_response,
+            kato_limits=junction,
+            spectral_power_density=spectral_power_density,
         )
         if spectral_mismatch < minimum_spectral_mismatch:
             minimum_spectral_mismatch = spectral_mismatch
@@ -112,8 +113,9 @@ def calculate_spectral_factor(
         spectral_power_density=spectral_power_density,
     )
     spectral_factor = (
-        minimum_spectral_mismatch * STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE /
-        (global_total_power * standard_conditions_response)
+        minimum_spectral_mismatch
+        * STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE
+        / (global_total_power * standard_conditions_response)
     )
 
     return spectral_factor

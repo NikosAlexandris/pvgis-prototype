@@ -42,14 +42,15 @@ Read also:
 - https://peps.python.org/pep-0615/
 """
 
+from pandas import DatetimeIndex, date_range
+
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.log import logger
-from pandas import DatetimeIndex, date_range
 
 
 def parse_timestamp_series(
     timestamps: str,
-) -> 'DatetimeIndex | DatetimeScalar | NaTType | None':
+) -> "DatetimeIndex | DatetimeScalar | NaTType | None":
     """
     Parse an input of type string and generate a Pandas Timestamp or
     DatetimeIndex [1]_.
@@ -73,11 +74,14 @@ def parse_timestamp_series(
     .. [2] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
     """
     from pandas import to_datetime
+
     if isinstance(timestamps, str):
         # return to_datetime(timestamps.split(','), format='mixed', utc=True)
-        return to_datetime(timestamps.split(','), format='mixed')
+        return to_datetime(timestamps.split(","), format="mixed")
     else:
-        raise ValueError("The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function")
+        raise ValueError(
+            "The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function"
+        )
 
 
 def generate_datetime_series(
@@ -136,7 +140,7 @@ def generate_datetime_series(
     spaced elements between ``start`` and ``end`` (closed on both sides).
 
     Common time series frequencies are indexed via a set of string (also
-    referred to as offset) aliases described at 
+    referred to as offset) aliases described at
     <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases>`__.
 
     Example
@@ -147,7 +151,7 @@ def generate_datetime_series(
     >>> generate_datetime_series(start_time, end_time, frequency)
     DatetimeIndex(['2010-06-01 06:00:00', '2010-06-01 07:00:00', '2010-06-01 08:00:00'], dtype='datetime64[ns]', freq=None)
 
-    Using the periods input parameter to define the number of timesteps to generate : 
+    Using the periods input parameter to define the number of timesteps to generate :
 
     >>> generate_datetime_series(start_time=start_time, periods=4, frequency=frequency)
     DatetimeIndex(['2010-06-01 06:00:00', '2010-06-01 07:00:00',

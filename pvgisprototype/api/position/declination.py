@@ -1,29 +1,47 @@
 from typing import Dict, List
-from devtools import debug
 from zoneinfo import ZoneInfo
 
+from devtools import debug
 from pandas import DatetimeIndex
+
 from pvgisprototype import SolarDeclination
-from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
-from pvgisprototype.algorithms.pvlib.solar_declination import calculate_solar_declination_series_pvlib
+from pvgisprototype.algorithms.noaa.solar_declination import (
+    calculate_solar_declination_series_noaa,
+)
+from pvgisprototype.algorithms.pvis.solar_declination import (
+    calculate_solar_declination_series_hofierka,
+)
+from pvgisprototype.algorithms.pvlib.solar_declination import (
+    calculate_solar_declination_series_pvlib,
+)
 from pvgisprototype.api.position.models import SolarDeclinationModel
-from pvgisprototype.api.utilities.conversions import convert_series_to_degrees_if_requested
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
+from pvgisprototype.api.utilities.conversions import (
+    convert_series_to_degrees_if_requested,
+)
 from pvgisprototype.caching import custom_cached
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, DEBUG_AFTER_THIS_VERBOSITY_LEVEL, DECLINATION_NAME, HASH_AFTER_THIS_VERBOSITY_LEVEL, LOG_LEVEL_DEFAULT, NOT_AVAILABLE, POSITION_ALGORITHM_NAME, UNIT_NAME, VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DECLINATION_NAME,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    NOT_AVAILABLE,
+    PERIGEE_OFFSET,
+    POSITION_ALGORITHM_NAME,
+    RADIANS,
+    UNIT_NAME,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
 @custom_cached
 def model_solar_declination_series(
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo = ZoneInfo('UTC'),
+    timezone: ZoneInfo = ZoneInfo("UTC"),
     solar_declination_model: SolarDeclinationModel = SolarDeclinationModel.pvis,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -37,7 +55,6 @@ def model_solar_declination_series(
     solar_declination_series = None
 
     if solar_declination_model.value == SolarDeclinationModel.noaa:
-
         solar_declination_series = calculate_solar_declination_series_noaa(
             timestamps=timestamps,
             dtype=dtype,
@@ -50,8 +67,8 @@ def model_solar_declination_series(
             angle_output_units,
         )
 
-    if solar_declination_model.value  == SolarDeclinationModel.pvis:
-    # if solar_position_model.value == SolarPositionModel.hofierka:
+    if solar_declination_model.value == SolarDeclinationModel.pvis:
+        # if solar_position_model.value == SolarPositionModel.hofierka:
 
         solar_declination_series = calculate_solar_declination_series_hofierka(
             timestamps=timestamps,
@@ -61,11 +78,10 @@ def model_solar_declination_series(
             log=log,
         )
 
-    if solar_declination_model.value  == SolarDeclinationModel.hargreaves:
+    if solar_declination_model.value == SolarDeclinationModel.hargreaves:
         pass
 
-    if solar_declination_model.value  == SolarDeclinationModel.pvlib:
-
+    if solar_declination_model.value == SolarDeclinationModel.pvlib:
         solar_declination_series = calculate_solar_declination_series_pvlib(
             timestamps=timestamps,
             # dtype=dtype,
@@ -89,7 +105,9 @@ def model_solar_declination_series(
 def calculate_solar_declination_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    solar_declination_models: List[SolarDeclinationModel] = [SolarDeclinationModel.pvis],
+    solar_declination_models: List[SolarDeclinationModel] = [
+        SolarDeclinationModel.pvis
+    ],
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
@@ -106,7 +124,9 @@ def calculate_solar_declination_series(
     """
     results = {}
     for solar_declination_model in solar_declination_models:
-        if solar_declination_model != SolarDeclinationModel.all:  # ignore 'all' in the enumeration
+        if (
+            solar_declination_model != SolarDeclinationModel.all
+        ):  # ignore 'all' in the enumeration
             solar_declination_series = model_solar_declination_series(
                 timestamps=timestamps,
                 timezone=timezone,
