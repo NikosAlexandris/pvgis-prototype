@@ -1,0 +1,1418 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   viewBox="0 0 160 80"
+   width="80mm"
+   height="40mm"
+   id="svg178"
+   sodipodi:docname="series_continuous_in_time.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview178"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="1.9261668"
+     inkscape:cx="204.29176"
+     inkscape:cy="71.644886"
+     inkscape:window-width="1920"
+     inkscape:window-height="1034"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg178"
+     showgrid="false"
+     showguides="true"
+     inkscape:document-units="mm">
+    <inkscape:grid
+       id="grid198"
+       units="px"
+       originx="-414.92419"
+       originy="-469.08395"
+       spacingx="0.49999999"
+       spacingy="0.50000001"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14902"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="false" />
+    <sodipodi:guide
+       position="-13.711917,114.15352"
+       orientation="1,0"
+       id="guide198"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="-6.4287632,113.20295"
+       orientation="1,0"
+       id="guide199"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <!-- svg-source:excalidraw -->
+  <defs
+     id="defs1">
+    <style
+       class="style-fonts"
+       id="style1">
+      @font-face {
+        font-family: &quot;Virgil&quot;;
+        src: url(&quot;https://excalidraw.com/Virgil.woff2&quot;);
+      }
+      @font-face {
+        font-family: &quot;Cascadia&quot;;
+        src: url(&quot;https://excalidraw.com/Cascadia.woff2&quot;);
+      }
+      @font-face {
+        font-family: &quot;Assistant&quot;;
+        src: url(&quot;https://excalidraw.com/Assistant-Regular.woff2&quot;);
+      }
+    </style>
+    <style
+       class="style-fonts"
+       id="style1-8">
+      @font-face {
+        font-family: &quot;Virgil&quot;;
+        src: url(&quot;https://excalidraw.com/Virgil.woff2&quot;);
+      }
+      @font-face {
+        font-family: &quot;Cascadia&quot;;
+        src: url(&quot;https://excalidraw.com/Cascadia.woff2&quot;);
+      }
+      @font-face {
+        font-family: &quot;Assistant&quot;;
+        src: url(&quot;https://excalidraw.com/Assistant-Regular.woff2&quot;);
+      }
+    </style>
+    <style
+       class="style-fonts"
+       id="style1-7">
+      @font-face {
+        font-family: &quot;Virgil&quot;;
+        src: url(&quot;https://excalidraw.com/Virgil.woff2&quot;);
+      }
+      @font-face {
+        font-family: &quot;Cascadia&quot;;
+        src: url(&quot;https://excalidraw.com/Cascadia.woff2&quot;);
+      }
+      @font-face {
+        font-family: &quot;Assistant&quot;;
+        src: url(&quot;https://excalidraw.com/Assistant-Regular.woff2&quot;);
+      }
+    </style>
+  </defs>
+  <mask
+     id="mask2" />
+  <mask
+     id="mask4" />
+  <mask
+     id="mask6" />
+  <mask
+     id="mask8" />
+  <mask
+     id="mask10" />
+  <mask
+     id="mask12" />
+  <mask
+     id="mask14" />
+  <mask
+     id="mask16" />
+  <mask
+     id="mask18" />
+  <mask
+     id="mask20" />
+  <mask
+     id="mask22" />
+  <mask
+     id="mask24" />
+  <mask
+     id="mask26" />
+  <mask
+     id="mask28" />
+  <mask
+     id="mask30" />
+  <mask
+     id="mask32" />
+  <mask
+     id="mask34" />
+  <mask
+     id="mask36" />
+  <mask
+     id="mask38" />
+  <mask
+     id="mask40" />
+  <mask
+     id="mask42" />
+  <mask
+     id="mask44" />
+  <mask
+     id="mask46" />
+  <mask
+     id="mask48" />
+  <mask
+     id="mask50" />
+  <mask
+     id="mask52" />
+  <mask
+     id="mask54" />
+  <mask
+     id="mask56" />
+  <mask
+     id="mask61" />
+  <mask
+     id="mask63" />
+  <mask
+     id="mask65" />
+  <mask
+     id="mask67" />
+  <mask
+     id="mask69" />
+  <mask
+     id="mask71" />
+  <mask
+     id="mask73" />
+  <mask
+     id="mask75" />
+  <mask
+     id="mask77" />
+  <mask
+     id="mask79" />
+  <mask
+     id="mask81" />
+  <mask
+     id="mask83" />
+  <mask
+     id="mask88" />
+  <mask
+     id="mask90" />
+  <mask
+     id="mask92" />
+  <mask
+     id="mask94" />
+  <mask
+     id="mask96" />
+  <mask
+     id="mask98" />
+  <mask
+     id="mask100" />
+  <mask
+     id="mask102" />
+  <mask
+     id="mask104" />
+  <mask
+     id="mask106" />
+  <mask
+     id="mask108" />
+  <mask
+     id="mask110" />
+  <mask
+     id="mask113" />
+  <mask
+     id="mask115" />
+  <mask
+     id="mask117" />
+  <mask
+     id="mask119" />
+  <mask
+     id="mask121" />
+  <mask
+     id="mask123" />
+  <mask
+     id="mask125" />
+  <mask
+     id="mask127" />
+  <mask
+     id="mask129" />
+  <mask
+     id="mask131" />
+  <mask
+     id="mask133" />
+  <mask
+     id="mask135" />
+  <mask
+     id="mask156" />
+  <mask
+     id="mask158" />
+  <mask
+     id="mask160" />
+  <mask
+     id="mask162" />
+  <mask
+     id="mask164" />
+  <mask
+     id="mask166" />
+  <mask
+     id="mask168" />
+  <mask
+     id="mask170" />
+  <mask
+     id="mask172" />
+  <mask
+     id="mask174" />
+  <mask
+     id="mask176" />
+  <mask
+     id="mask178" />
+  <!-- svg-source:excalidraw -->
+  <mask
+     id="mask2-7" />
+  <mask
+     id="mask4-9" />
+  <mask
+     id="mask6-2" />
+  <mask
+     id="mask8-0" />
+  <mask
+     id="mask10-2" />
+  <mask
+     id="mask12-3" />
+  <mask
+     id="mask14-7" />
+  <mask
+     id="mask16-5" />
+  <mask
+     id="mask18-9" />
+  <mask
+     id="mask20-2" />
+  <mask
+     id="mask22-2" />
+  <mask
+     id="mask24-8" />
+  <mask
+     id="mask26-9" />
+  <mask
+     id="mask28-7" />
+  <mask
+     id="mask30-3" />
+  <mask
+     id="mask32-6" />
+  <mask
+     id="mask34-1" />
+  <mask
+     id="mask36-2" />
+  <mask
+     id="mask38-9" />
+  <mask
+     id="mask40-3" />
+  <mask
+     id="mask42-1" />
+  <mask
+     id="mask44-9" />
+  <mask
+     id="mask46-4" />
+  <mask
+     id="mask48-7" />
+  <mask
+     id="mask50-8" />
+  <mask
+     id="mask52-4" />
+  <mask
+     id="mask54-5" />
+  <mask
+     id="mask56-0" />
+  <mask
+     id="mask58" />
+  <mask
+     id="mask60" />
+  <mask
+     id="mask62" />
+  <mask
+     id="mask64" />
+  <mask
+     id="mask66" />
+  <mask
+     id="mask68" />
+  <mask
+     id="mask70" />
+  <mask
+     id="mask72" />
+  <mask
+     id="mask74" />
+  <mask
+     id="mask76" />
+  <mask
+     id="mask78" />
+  <mask
+     id="mask80" />
+  <mask
+     id="mask82" />
+  <mask
+     id="mask84" />
+  <mask
+     id="mask86" />
+  <mask
+     id="mask88-3" />
+  <mask
+     id="mask90-6" />
+  <mask
+     id="mask92-1" />
+  <mask
+     id="mask94-0" />
+  <mask
+     id="mask96-6" />
+  <mask
+     id="mask98-3" />
+  <mask
+     id="mask100-2" />
+  <mask
+     id="mask102-0" />
+  <mask
+     id="mask104-6" />
+  <mask
+     id="mask106-1" />
+  <mask
+     id="mask108-5" />
+  <mask
+     id="mask110-5" />
+  <mask
+     id="mask112" />
+  <mask
+     id="mask114" />
+  <mask
+     id="mask116" />
+  <mask
+     id="mask118" />
+  <mask
+     id="mask120" />
+  <mask
+     id="mask122" />
+  <mask
+     id="mask124" />
+  <mask
+     id="mask126" />
+  <mask
+     id="mask128" />
+  <mask
+     id="mask130" />
+  <mask
+     id="mask132" />
+  <mask
+     id="mask134" />
+  <mask
+     id="mask136" />
+  <mask
+     id="mask138" />
+  <mask
+     id="mask140" />
+  <mask
+     id="mask142" />
+  <mask
+     id="mask144" />
+  <mask
+     id="mask146" />
+  <mask
+     id="mask148" />
+  <mask
+     id="mask150" />
+  <mask
+     id="mask152" />
+  <mask
+     id="mask154" />
+  <mask
+     id="mask156-4" />
+  <mask
+     id="mask158-7" />
+  <mask
+     id="mask160-6" />
+  <mask
+     id="mask162-5" />
+  <mask
+     id="mask164-6" />
+  <mask
+     id="mask166-9" />
+  <mask
+     id="mask168-3" />
+  <mask
+     id="mask170-7" />
+  <mask
+     id="mask172-4" />
+  <mask
+     id="mask174-5" />
+  <mask
+     id="mask176-2" />
+  <mask
+     id="mask178-5" />
+  <mask
+     id="mask180" />
+  <mask
+     id="mask182" />
+  <mask
+     id="mask184" />
+  <mask
+     id="mask186" />
+  <mask
+     id="mask188" />
+  <mask
+     id="mask190" />
+  <mask
+     id="mask192" />
+  <mask
+     id="mask194" />
+  <mask
+     id="mask196" />
+  <mask
+     id="mask198" />
+  <mask
+     id="mask200" />
+  <mask
+     id="mask202" />
+  <mask
+     id="mask204" />
+  <mask
+     id="mask206" />
+  <mask
+     id="mask208" />
+  <mask
+     id="mask210" />
+  <mask
+     id="mask212" />
+  <mask
+     id="mask214" />
+  <mask
+     id="mask216" />
+  <!-- svg-source:excalidraw -->
+  <mask
+     id="mask2-4" />
+  <mask
+     id="mask4-4" />
+  <mask
+     id="mask6-3" />
+  <mask
+     id="mask8-07" />
+  <mask
+     id="mask10-8" />
+  <mask
+     id="mask12-6" />
+  <mask
+     id="mask14-8" />
+  <mask
+     id="mask16-8" />
+  <mask
+     id="mask18-4" />
+  <mask
+     id="mask20-3" />
+  <mask
+     id="mask22-1" />
+  <mask
+     id="mask24-4" />
+  <mask
+     id="mask26-92" />
+  <mask
+     id="mask28-0" />
+  <mask
+     id="mask30-6" />
+  <mask
+     id="mask32-8" />
+  <mask
+     id="mask34-9" />
+  <mask
+     id="mask36-26" />
+  <mask
+     id="mask38-6" />
+  <mask
+     id="mask40-4" />
+  <mask
+     id="mask42-9" />
+  <mask
+     id="mask44-5" />
+  <mask
+     id="mask46-0" />
+  <mask
+     id="mask48-4" />
+  <mask
+     id="mask50-87" />
+  <mask
+     id="mask52-1" />
+  <mask
+     id="mask54-7" />
+  <mask
+     id="mask56-2" />
+  <mask
+     id="mask58-7" />
+  <mask
+     id="mask60-2" />
+  <mask
+     id="mask62-2" />
+  <mask
+     id="mask64-6" />
+  <mask
+     id="mask66-1" />
+  <mask
+     id="mask68-0" />
+  <mask
+     id="mask70-6" />
+  <mask
+     id="mask72-1" />
+  <mask
+     id="mask74-5" />
+  <mask
+     id="mask76-9" />
+  <mask
+     id="mask78-4" />
+  <mask
+     id="mask80-9" />
+  <mask
+     id="mask82-0" />
+  <mask
+     id="mask84-9" />
+  <mask
+     id="mask86-1" />
+  <mask
+     id="mask88-7" />
+  <mask
+     id="mask90-7" />
+  <mask
+     id="mask92-11" />
+  <mask
+     id="mask94-5" />
+  <mask
+     id="mask96-9" />
+  <mask
+     id="mask98-7" />
+  <mask
+     id="mask100-7" />
+  <mask
+     id="mask102-6" />
+  <mask
+     id="mask104-7" />
+  <mask
+     id="mask106-3" />
+  <g
+     id="g217"
+     transform="matrix(0.64887575,0,0,0.64887575,39.678091,24.885802)">
+    <g
+       stroke-linecap="round"
+       id="g2"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,221.81327,-79.241777)"
+         id="g1">
+        <path
+           d="M 0,0 C 13.02,-0.01 26.04,-0.03 57.93,-0.06 M 0,0 c 21.19,-0.02 42.38,-0.04 57.93,-0.06"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path1" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g4"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,265.5987,-184.94915)"
+         id="g3">
+        <path
+           d="M 0,0 C 11.76,0.07 23.53,0.13 55.47,0.32 M 0,0 c 13.62,0.08 27.24,0.16 55.47,0.32"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path2" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g6"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,370.85115,-140.97529)"
+         id="g5">
+        <path
+           d="M 0,0 C 14.42,0.04 28.85,0.08 58.15,0.16 M 0,0 c 17,0.05 34.01,0.1 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path4" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g8"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,327.37287,-36.00945)"
+         id="g7">
+        <path
+           d="M 0,0 C 16.72,-0.05 33.45,-0.11 59.21,-0.19"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path6" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g10"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(121,133.63629)"
+         id="g9">
+        <path
+           d="M 0,0 C 31.97,0 63.95,0 87.3,0 M 0,0 c 18.14,0 36.27,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path8" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g12"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(121.34782,220.94066)"
+         id="g11">
+        <path
+           d="M 0,0 C 24.73,0 49.47,0 87.3,0 M 0,0 c 26.13,0 52.26,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path10" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g14"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,-6.1442327,127.49205)"
+         id="g13">
+        <path
+           d="M 0,0 C 25.7,0 51.4,0 87.3,0 M 0,0 c 34.91,0 69.82,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path12" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g16"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,37.334041,170.97033)"
+         id="g15">
+        <path
+           d="M 0,0 C 24.5,0 48.99,0 87.3,0 M 0,0 c 18.51,0 37.03,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path14" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g18"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,192.82189,-149.23316)"
+         id="g17">
+        <path
+           d="M 0,0 C 15.21,-0.01 30.42,-0.03 57.93,-0.06 M 0,0 c 20.24,-0.02 40.48,-0.04 57.93,-0.06"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path16" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g20"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,236.60732,-254.94053)"
+         id="g19">
+        <path
+           d="M 0,0 C 32.82,0.09 65.63,0.18 116.04,0.32 M 0,0 c 29.19,0.08 58.38,0.16 116.04,0.32"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path18" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g22"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,341.85977,-210.96667)"
+         id="g21">
+        <path
+           d="M 0,0 C 12.55,0.04 25.1,0.07 58.15,0.16 M 0,0 c 23.26,0.07 46.51,0.13 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path20" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g24"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,298.3815,-106.00083)"
+         id="g23">
+        <path
+           d="M 0,0 C 13.17,-0.04 26.34,-0.08 59.21,-0.19"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path22" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g26"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,163.83051,-219.22453)"
+         id="g25">
+        <path
+           d="M 0,0 C 17.35,0.05 34.69,0.1 59.05,0.17 M 0,0 c 14.03,0.04 28.05,0.08 59.05,0.17"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path24" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g28"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(244.95711,10.045636)"
+         id="g27">
+        <path
+           d="M 0,0 C 28.28,0 56.56,0 87.3,0 M 0,0 c 26.12,0 52.23,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path26" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g30"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(245.30493,97.350005)"
+         id="g29">
+        <path
+           d="M 0,0 C 29.34,0 58.67,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path28" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g32"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,117.62965,127.67528)"
+         id="g31">
+        <path
+           d="M 0,0 C 30.37,0 60.75,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path30" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g34"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,161.10792,171.15356)"
+         id="g33">
+        <path
+           d="M 0,0 C 32.02,0 64.05,0 87.3,0 M 0,0 c 28.75,0 57.51,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path32" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g36"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,312.86839,-280.95804)"
+         id="g35">
+        <path
+           d="M 0,0 C 15.29,0.04 30.59,0.09 58.15,0.16 M 0,0 c 17.36,0.05 34.72,0.1 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path34" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g38"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,166.31327,54.747075)"
+         id="g37">
+        <path
+           d="M 0,0 C 14.36,-0.01 28.73,-0.03 57.93,-0.06 M 0,0 c 14.6,-0.01 29.19,-0.03 57.93,-0.06"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path36" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g40"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,210.0987,-50.960301)"
+         id="g39">
+        <path
+           d="M 0,0 C 16.04,0.09 32.08,0.18 55.47,0.32 M 0,0 c 22.14,0.13 44.28,0.25 55.47,0.32"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path38" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g42"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,315.35115,-6.9864361)"
+         id="g41">
+        <path
+           d="M 0,0 C 12.32,0.03 24.63,0.07 58.15,0.16 M 0,0 c 14.75,0.04 29.5,0.08 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path40" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g44"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,271.87287,97.979403)"
+         id="g43">
+        <path
+           d="M 0,0 C 22.19,-0.07 44.38,-0.14 59.21,-0.19"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path42" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g46"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(10,133.63629)"
+         id="g45">
+        <path
+           d="M 0,0 C 18.66,0 37.32,0 87.3,0 M 0,0 c 22.18,0 44.36,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path44" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g48"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(10.347821,220.94066)"
+         id="g47">
+        <path
+           d="M 0,0 C 33.6,0 67.2,0 87.3,0 M 0,0 c 22.14,0 44.27,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path46" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g50"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,-61.644233,71.992053)"
+         id="g49">
+        <path
+           d="M 0,0 C 26.95,0 53.9,0 87.3,0 M 0,0 c 33.19,0 66.38,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path48" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g52"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,-18.165959,115.47033)"
+         id="g51">
+        <path
+           d="M 0,0 C 27.38,0 54.77,0 87.3,0 M 0,0 c 20.34,0 40.68,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path50" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g54"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,137.32189,-15.244303)"
+         id="g53">
+        <path
+           d="M 0,0 C 22.01,-0.02 44.02,-0.04 57.93,-0.06 M 0,0 c 16.27,-0.02 32.55,-0.03 57.93,-0.06"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path52" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g56"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,181.10732,-120.95168)"
+         id="g55">
+        <path
+           d="M 0,0 C 32.88,0.09 65.76,0.18 116.04,0.32 M 0,0 c 25.49,0.07 50.97,0.14 116.04,0.32"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path54" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g58"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,286.35977,-76.977814)"
+         id="g57">
+        <path
+           d="M 0,0 C 19.7,0.06 39.39,0.11 58.15,0.16 M 0,0 c 19.02,0.05 38.04,0.11 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path56" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g60"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,242.8815,27.988025)"
+         id="g59">
+        <path
+           d="M 0,0 C 20.38,-0.06 40.76,-0.13 59.21,-0.19"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path58" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g62"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,108.33051,-85.235681)"
+         id="g61">
+        <path
+           d="M 0,0 C 19.16,0.05 38.32,0.11 59.05,0.17 M 0,0 c 12.47,0.04 24.94,0.07 59.05,0.17"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path60" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g64"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(133.95711,10.045636)"
+         id="g63">
+        <path
+           d="M 0,0 C 23.99,0 47.98,0 87.3,0 M 0,0 c 22.99,0 45.99,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path62" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g66"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(134.30493,97.350005)"
+         id="g65">
+        <path
+           d="M 0,0 C 26.6,0 53.19,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path64" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g68"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,62.129647,72.175284)"
+         id="g67">
+        <path
+           d="M 0,0 C 33.32,0 66.63,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path66" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g70"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,105.60792,115.65356)"
+         id="g69">
+        <path
+           d="M 0,0 C 24,0 48.01,0 87.3,0 M 0,0 c 23.86,0 47.72,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path68" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g72"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,257.36839,-146.96919)"
+         id="g71">
+        <path
+           d="M 0,0 C 17.41,0.05 34.82,0.1 58.15,0.16 M 0,0 c 17.49,0.05 34.98,0.1 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path70" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g74"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,278.31327,-215.64484)"
+         id="g73">
+        <path
+           d="M 0,0 C 17.64,-0.02 35.27,-0.03 57.93,-0.06 M 0,0 c 11.72,-0.01 23.45,-0.02 57.93,-0.06"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path72" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g76"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,322.0987,-321.35222)"
+         id="g75">
+        <path
+           d="M 0,0 C 12.33,0.07 24.66,0.14 55.47,0.32 M 0,0 c 19.23,0.11 38.46,0.22 55.47,0.32"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path74" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g78"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,427.35115,-277.37836)"
+         id="g77">
+        <path
+           d="M 0,0 C 21.26,0.06 42.52,0.12 58.15,0.16 M 0,0 c 14.54,0.04 29.08,0.08 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path76" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g80"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,383.87287,-172.41252)"
+         id="g79">
+        <path
+           d="M 0,0 C 23.35,-0.07 46.71,-0.15 59.21,-0.19"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path78" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g82"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(234,133.63629)"
+         id="g81">
+        <path
+           d="M 0,0 C 18.69,0 37.37,0 87.3,0 M 0,0 c 32.13,0 64.25,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path80" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g84"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(234.34782,220.94066)"
+         id="g83">
+        <path
+           d="M 0,0 C 27.86,0 55.73,0 87.3,0 M 0,0 c 25.91,0 51.82,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path82" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g86"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,50.355767,183.99205)"
+         id="g85">
+        <path
+           d="M 0,0 C 29.46,0 58.92,0 87.3,0 M 0,0 c 28.42,0 56.83,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path84" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g88"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,93.834041,227.47033)"
+         id="g87">
+        <path
+           d="M 0,0 C 32.59,0 65.19,0 87.3,0 M 0,0 c 18.46,0 36.93,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path86" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g90"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,249.32189,-285.63622)"
+         id="g89">
+        <path
+           d="M 0,0 C 20.38,-0.02 40.76,-0.04 57.93,-0.06 M 0,0 c 18.16,-0.02 36.33,-0.04 57.93,-0.06"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path88" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g92"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,293.10732,-391.3436)"
+         id="g91">
+        <path
+           d="M 0,0 C 42.01,0.11 84.02,0.23 116.04,0.32 M 0,0 c 40.39,0.11 80.78,0.22 116.04,0.32"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path90" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g94"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,398.35977,-347.36973)"
+         id="g93">
+        <path
+           d="M 0,0 C 11.7,0.03 23.4,0.07 58.15,0.16 M 0,0 c 20.07,0.06 40.14,0.11 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path92" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g96"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,354.8815,-242.40389)"
+         id="g95">
+        <path
+           d="M 0,0 C 18.85,-0.06 37.7,-0.12 59.21,-0.19"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path94" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g98"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,220.33051,-355.6276)"
+         id="g97">
+        <path
+           d="M 0,0 C 21.14,0.06 42.27,0.12 59.05,0.17 M 0,0 c 15.07,0.04 30.13,0.09 59.05,0.17"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path96" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g100"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(357.95711,10.045636)"
+         id="g99">
+        <path
+           d="M 0,0 C 26.51,0 53.02,0 87.3,0 M 0,0 c 17.81,0 35.63,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path98" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g102"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="translate(358.30493,97.350005)"
+         id="g101">
+        <path
+           d="M 0,0 C 19.41,0 38.81,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path100" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g104"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,174.12965,184.17528)"
+         id="g103">
+        <path
+           d="M 0,0 C 18.1,0 36.19,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1.5"
+           fill="none"
+           stroke-dasharray="8, 9"
+           id="path102" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g106"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(90,217.60792,227.65356)"
+         id="g105">
+        <path
+           d="M 0,0 C 28.17,0 56.35,0 87.3,0 M 0,0 c 31.32,0 62.65,0 87.3,0"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path104" />
+      </g>
+    </g>
+    <g
+       stroke-linecap="round"
+       id="g108"
+       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+      <g
+         transform="rotate(-45,369.36839,-417.36111)"
+         id="g107">
+        <path
+           d="M 0,0 C 20.16,0.06 40.33,0.11 58.15,0.16 M 0,0 c 18.51,0.05 37.01,0.1 58.15,0.16"
+           stroke="#1e1e1e"
+           stroke-width="1"
+           fill="none"
+           id="path106" />
+      </g>
+    </g>
+  </g>
+  <mask
+     id="mask108-6" />
+</svg>
