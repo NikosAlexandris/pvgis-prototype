@@ -19,11 +19,10 @@ photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
 wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
 
 data_array_icon = "docs/logos/data_array.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
-netcdf_chunked_series_icon = "docs/overrides/.icons/custom/series_chunked.svg"
+# netcdf_icon = "docs/logos/netcdf-400x400.png"
+netcdf_icon = "docs/overrides/.icons/custom/series_chunked.svg"
 netcdf_continuous_in_time_icon = "docs/overrides/.icons/custom/series_continuous_in_time.svg"
 
-mapserver_icon = "docs/logos/mapserver.svg"
 kerchunk_icon = "docs/logos/kerchunk.png"
 binary_data_icon = "docs/logos/pastebin.svg"
 json_icon = "docs/logos/json.svg"
@@ -48,61 +47,33 @@ cplusplus_icon = "docs/logos/cplusplus.svg"
 try:
     with suppress(FileNotFoundError):
         graph_attr = {"splines":"spline"}
-        with Diagram("Reading Time Series - Alternative Workflow", direction="LR", show=False, graph_attr=graph_attr) as diagram:
+        with Diagram("Reading Time Series", direction="LR", show=False, graph_attr=graph_attr) as diagram:
             diagram.render = lambda: None
 
             # Data
 
-            NetCDF1 = Custom("1", netcdf_chunked_series_icon)
-            NetCDF2 = Custom("2", netcdf_chunked_series_icon)
-            NetCDFx = Custom("..x", netcdf_chunked_series_icon)
-
-            NetCDF1_Rechunked = Custom("1", netcdf_continuous_in_time_icon)
-            NetCDF2_Rechunked = Custom("2", netcdf_continuous_in_time_icon)
-            NetCDFx_Rechunked = Custom("..x", netcdf_continuous_in_time_icon)
-
-            NetCDF_Large_Time_Series1 = Custom("Large Time Series a", netcdf_icon)
-            NetCDF_Large_Time_Series2 = Custom("Large Time Series b", netcdf_icon)
-            NetCDF_Large_Time_Seriesx = Custom("Large Time Series c", netcdf_icon)
-
-            MapServer_tileindex = Custom("MapServer tileindex", mapserver_icon)
-            VRT = Custom("GDAL VRT", '')
-
-            # Tools
-
-            rioXarray = Custom("rioxarray", '')
+            NetCDF1 = Custom("1", netcdf_icon)
+            NetCDF2 = Custom("2", netcdf_icon)
+            NetCDFx = Custom("..x", netcdf_icon)
 
             # Input Data to PVGIS
-            
+            Zarr = Custom("Store", zarr_icon)
+
+            # Tools
+            Xarray = Custom("", xarray_icon)
+
             # Analysis of Photovoltaic Performance
-
             PVGIS_6 = Custom("PVGIS 6", pvgis6_icon)
-
 
             # Workflow =======================================================
 
-            NetCDF1 - Edge(label='Rechunk', style="dashed") >> NetCDF1_Rechunked
-            NetCDF2 - Edge(label='Rechunk', style="dashed") >> NetCDF2_Rechunked
-            NetCDFx - Edge(label='Rechunk', style="dashed") >> NetCDFx_Rechunked
+            NetCDF1 - Edge(label='Rechunk continuous in time', style="dashed") >> Zarr
+            NetCDF2 - Edge(label='Rechunk .. in time', style="dashed") >> Zarr
+            NetCDFx - Edge(label='Rechunk .. in time', style="dashed") >> Zarr
 
-            Empty2 = Custom("", '')
-            Emptyx = Custom("", '')
-            Empty2 - Edge(style="dashed") - NetCDF_Large_Time_Series2
-            Emptyx - Edge(style="dashed") - NetCDF_Large_Time_Seriesx
-
-            [NetCDF_Large_Time_Series1, NetCDF_Large_Time_Series2, NetCDF_Large_Time_Seriesx] \
-            - Edge(label='Create tileindex record',  style='dashed') \
-            - MapServer_tileindex \
-            - Edge(label='Build VRT',  style='dashed') \
-            >> VRT
-
-
-            [NetCDF1_Rechunked, NetCDF2_Rechunked, NetCDFx_Rechunked] \
-            - Edge(label="Read", color="firebrick", style="dashed") \
-            - NetCDF_Large_Time_Series1
-
-            VRT \
-            - rioXarray \
+            Zarr \
+            - Edge(label="Read with Zarr engine", color="firebrick", style="dashed") \
+            - Xarray \
             - Edge(label="", color="firebrick") \
             >> PVGIS_6
 
