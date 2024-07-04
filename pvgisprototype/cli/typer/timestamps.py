@@ -153,7 +153,7 @@ typer_option_periods = typer.Option(
 )
 typer_option_frequency = typer.Option(
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
-    help="A common date/time frequency unit optionally with a multiples number, such as [code]H[/code](hourly), [code]min[/code](utely), [code]S[/code](econdly), [code]D[/code](aily), [code]W[/code](eekly), [code]M[/code](onth end), [code]Y[/code](early) or [code]30m[/code]. See Pandas time series offset aliases.",
+    help="A common date/time frequency unit optionally with a multiples number, such as [code]H[/code](hourly), [code]min[/code](utely), [code]S[/code](econdly), [code]D[/code](aily), [code]W[/code](eekly), [code]M[/code](onth end), [code]Y[/code](early) or [code]30min[/code]. See Pandas time series offset aliases.",
     rich_help_panel=rich_help_panel_time_series,
     is_eager=True,
 )
