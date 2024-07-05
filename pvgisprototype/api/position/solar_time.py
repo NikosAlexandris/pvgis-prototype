@@ -1,23 +1,24 @@
-from devtools import debug
-from typing import Union
-from typing import Sequence
-from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from pandas import DatetimeIndex
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarTimeTimeSeriesInputModel
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from .models import SolarTimeModel
-from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_series_noaa
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+
+from pvgisprototype import Latitude, Longitude
+from pvgisprototype.algorithms.noaa.solar_time import (
+    calculate_true_solar_time_series_noaa,
+)
+from pvgisprototype.constants import (
+    ECCENTRICITY_CORRECTION_FACTOR,
+    LOG_LEVEL_DEFAULT,
+    PERIGEE_OFFSET,
+    VERBOSE_LEVEL_DEFAULT,
+)
 from pvgisprototype.log import log_function_call
+from pvgisprototype.validation.functions import (
+    ModelSolarTimeTimeSeriesInputModel,
+    validate_with_pydantic,
+)
+
+from .models import SolarTimeModel
 
 
 @log_function_call
@@ -26,7 +27,7 @@ def model_solar_time_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo = ZoneInfo('UTC'),
+    timezone: ZoneInfo = ZoneInfo("UTC"),
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -48,7 +49,6 @@ def model_solar_time_series(
     # if local and timestamp is not None and timezone is not None:
     #     timestamp = timezone.localize(timestamp)
     if solar_time_model.value == SolarTimeModel.milne:
-
         pass
 
         # solar_time = calculate_apparent_solar_time_milne1921(
@@ -58,7 +58,6 @@ def model_solar_time_series(
         # )
 
     if solar_time_model.value == SolarTimeModel.ephem:
-
         pass
 
         # solar_time = calculate_solar_time_ephem(
@@ -70,13 +69,11 @@ def model_solar_time_series(
         # )
 
     if solar_time_model.value == SolarTimeModel.pvgis:
-
         # Requires : time_offset_global, hour_offset
 
         pass
 
     if solar_time_model.value == SolarTimeModel.noaa:
-
         solar_time_series = calculate_true_solar_time_series_noaa(
             longitude=longitude,
             timestamps=timestamps,
@@ -85,7 +82,6 @@ def model_solar_time_series(
         )
 
     if solar_time_model.value == SolarTimeModel.skyfield:
-
         pass
 
         # # vvv vvv vvv --------------------------------------- expects degrees!
@@ -101,11 +97,11 @@ def model_solar_time_series(
     return solar_time_series
 
 
-def calculate_solar_time_series(
-        ):
-    """
-    """
+def calculate_solar_time_series():
+    """ """
     pass
+
+
 #     longitude: Longitude,
 #     latitude: Latitude,
 #     timestamp: datetime,
@@ -119,7 +115,7 @@ def calculate_solar_time_series(
 
 #     Parameters
 #     ----------
-    
+
 #     Returns
 #     -------
 

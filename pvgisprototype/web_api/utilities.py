@@ -1,6 +1,8 @@
 import zoneinfo
 from functools import lru_cache
+
 import numpy as np
+
 
 @lru_cache(maxsize=None)
 def get_timezones():
