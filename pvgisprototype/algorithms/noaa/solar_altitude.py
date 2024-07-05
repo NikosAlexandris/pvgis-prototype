@@ -1,25 +1,29 @@
-from devtools import debug
-from pvgisprototype.caching import custom_cached
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAltitudeTimeSeriesNOAAInput
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
 from zoneinfo import ZoneInfo
-from pvgisprototype import SolarAltitude
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT, RADIANS, VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
+
 import numpy as np
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
-import numpy as np
+from devtools import debug
 from pandas import DatetimeIndex
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.log import logger
+
+from pvgisprototype import Latitude, Longitude, SolarAltitude
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateSolarAltitudeTimeSeriesNOAAInput,
+)
+from pvgisprototype.algorithms.noaa.solar_zenith import (
+    calculate_solar_zenith_series_noaa,
+)
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    RADIANS,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 @log_function_call
@@ -68,9 +72,9 @@ def calculate_solar_altitude_series_noaa(
         debug(locals())
 
     log_data_fingerprint(
-            data=solar_altitude_series,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=solar_altitude_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return SolarAltitude(

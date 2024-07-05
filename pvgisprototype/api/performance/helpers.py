@@ -1,8 +1,15 @@
-from pvgisprototype.constants import ENERGY_UNIT, ENERGY_UNIT_K, IRRADIANCE_UNIT, IRRADIANCE_UNIT_K, POWER_UNIT, POWER_UNIT_K
+from pvgisprototype.constants import (
+    ENERGY_UNIT,
+    ENERGY_UNIT_K,
+    IRRADIANCE_UNIT,
+    IRRADIANCE_UNIT_K,
+    POWER_UNIT,
+    POWER_UNIT_K,
+)
 
 
 def kilofy_unit(value, unit="W", threshold=1000):
-    """ Converts the unit of a given value to its kilo-equivalent if the
+    """Converts the unit of a given value to its kilo-equivalent if the
     absolute value is greater than or equal to 1000.
 
     Parameters
