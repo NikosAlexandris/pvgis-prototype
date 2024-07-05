@@ -36,7 +36,7 @@ cplusplus_icon = "docs/logos/cplusplus.svg"
 
 try:
     with suppress(FileNotFoundError):
-        with Diagram("Analysis of Photovoltaic Performance", direction="TB", show=False) as diagram:
+        with Diagram("Time Series Data for Photovoltaic Performance Analysis", direction="TB", show=False) as diagram:
             diagram.render = lambda: None
 
 
