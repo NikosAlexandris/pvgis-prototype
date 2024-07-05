@@ -1,16 +1,13 @@
-import typer
-from rich.table import Table
-from rich.progress import track
-from rich import box
-from math import degrees
-from math import radians
-from math import pi
-import numpy as np
-from typing import List
-from typing import Any
-from typing import List
-from pvgisprototype.constants import RADIANS, DEGREES
 from enum import Enum
+from math import degrees, pi, radians
+from typing import Any, List
+
+import numpy as np
+import typer
+from rich import box
+from rich.table import Table
+
+from pvgisprototype.constants import DEGREES, RADIANS
 
 
 def convert_to_radians(
@@ -19,7 +16,7 @@ def convert_to_radians(
     """Convert floating point angular measurement from degrees to radians."""
     if ctx.resilient_parsing:
         return
-    if type(angle) != float:
+    if not isinstance(angle, float):
         raise typer.BadParameter("Input should be a float!")
 
     return np.radians(angle)
@@ -31,7 +28,7 @@ def convert_to_degrees(
     """Convert angle to degrees."""
     if ctx.resilient_parsing:
         return
-    if type(angle) != float:
+    if not isinstance(angle, float):
         raise typer.BadParameter(
             "The input value {angle} for an angular measurement is not of the expected type float!"
         )
@@ -41,7 +38,7 @@ def convert_to_degrees(
 
 def convert_to_radians_fastapi(angle: float) -> float:
     """Convert angle to radians."""
-    if type(angle) != float:
+    if not isinstance(angle, float):
         raise typer.BadParameter("Latitude should be a float!")
 
     return np.radians(angle)
@@ -215,20 +212,32 @@ def round_float_values(data, decimal_places=3):
     if isinstance(data, float):
         return round(data, decimal_places)
 
-    if (isinstance(data, np.floating)):
-        return np.around(data, decimals=decimal_places)  # See also Notes in numpy.round?
+    if isinstance(data, np.floating):
+        return np.around(
+            data, decimals=decimal_places
+        )  # See also Notes in numpy.round?
 
     if isinstance(data, np.ndarray) and data.dtype.kind in "if":
         # if not data.size == 1:
-        return np.around(data, decimals=decimal_places)  # See also Notes in numpy.round?
+        return np.around(
+            data, decimals=decimal_places
+        )  # See also Notes in numpy.round?
         # else:
         #     return np.format_float_positional(data, precision=decimal_places)
 
     if isinstance(data, dict):
-        return {key: round_float_values(value, decimal_places) for key, value in data.items() if not isinstance(value, Enum)}
+        return {
+            key: round_float_values(value, decimal_places)
+            for key, value in data.items()
+            if not isinstance(value, Enum)
+        }
 
     if isinstance(data, list):
-        return [round_float_values(item, decimal_places) for item in data if not isinstance(item, Enum)]
+        return [
+            round_float_values(item, decimal_places)
+            for item in data
+            if not isinstance(item, Enum)
+        ]
 
     if hasattr(data, "__dict__") and not isinstance(data, Enum):
         for key, value in vars(data).items():
@@ -237,7 +246,7 @@ def round_float_values(data, decimal_places=3):
 
     return data
 
-    
+
 def convert_south_to_north_degrees_convention(azimuth_south_degrees):
     return (azimuth_south_degrees + 180) % 360
 

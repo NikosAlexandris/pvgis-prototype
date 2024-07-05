@@ -1,34 +1,50 @@
-from math import sin
-from math import cos
-from math import radians
-from math import fmod
+from math import cos, fmod, radians, sin
+import numpy as np
 
 
 def calculate_gmst(julian_date_universal_time, H, use_precise_formula=True):
     """Compute the Greenwich mean sidereal time (GMST)"""
-    difference_universal_time_minus_20000101120000 = julian_date_universal_time - 2451545.0
+    difference_universal_time_minus_20000101120000 = (
+        julian_date_universal_time - 2451545.0
+    )
     T = difference_universal_time_minus_20000101120000 / 36525.0
     if use_precise_formula:
         GMST = fmod(
-            6.697375 + 0.065709824279 * difference_universal_time_minus_20000101120000 + 1.0027379 * H + 0.0000258 * T**2, 24
+            6.697375
+            + 0.065709824279 * difference_universal_time_minus_20000101120000
+            + 1.0027379 * H
+            + 0.0000258 * T**2,
+            24,
         )
     else:
-        GMST = fmod(18.697375 + 24.065709824279 * difference_universal_time_minus_20000101120000, 24)
+        GMST = fmod(
+            18.697375
+            + 24.065709824279 * difference_universal_time_minus_20000101120000,
+            24,
+        )
     return GMST
 
 
 def calculate_gmst_time_series(julian_date_universal_time, H, use_precise_formula=True):
     """Calculate the Greenwich mean sidereal time (GMST) using NumPy"""
-    difference_universal_time_minus_20000101120000 = julian_date_universal_time - 2451545.0
+    difference_universal_time_minus_20000101120000 = (
+        julian_date_universal_time - 2451545.0
+    )
     centuries_since_2000 = difference_universal_time_minus_20000101120000 / 36525.0
     if use_precise_formula:
         GMST = np.mod(
-            6.697375 + 0.065709824279 *
-            difference_universal_time_minus_20000101120000 + 1.0027379 * H +
-            0.0000258 * centuries_since_2000**2, 24
+            6.697375
+            + 0.065709824279 * difference_universal_time_minus_20000101120000
+            + 1.0027379 * H
+            + 0.0000258 * centuries_since_2000**2,
+            24,
         )
     else:
-        GMST = np.mod(18.697375 + 24.065709824279 * difference_universal_time_minus_20000101120000, 24)
+        GMST = np.mod(
+            18.697375
+            + 24.065709824279 * difference_universal_time_minus_20000101120000,
+            24,
+        )
     return GMST
 
 
@@ -97,11 +113,15 @@ def calculate_apparent_sidereal_time_time_series(
     julian_date_universal_time, H, local_longitude_deg, use_precise_formula=True
 ):
     """Calculate the apparent sidereal time"""
-    GMST = calculate_GMST_time_series(julian_date_universal_time, H, use_precise_formula)
+    GMST = calculate_GMST_time_series(
+        julian_date_universal_time, H, use_precise_formula
+    )
     DTT = julian_date_universal_time - 2451545.0
     eqeq = calculate_eqeq_time_series(DTT)
     GAST = calculate_GAST_time_series(GMST, eqeq)
-    local_sidereal_time = calculate_local_sidereal_time_time_series(GAST, local_longitude_deg)
+    local_sidereal_time = calculate_local_sidereal_time_time_series(
+        GAST, local_longitude_deg
+    )
     return {
         "GMST": GMST,
         "eqeq": eqeq,

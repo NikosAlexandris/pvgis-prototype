@@ -26,7 +26,8 @@ nav:
     - tutorials/introduction.md
     - Solar Position:
       - tutorials/solar_position.md
-      - 󰆊 Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
+      - Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
+      - Comparing with USNO: notebooks/solar_position_pvgis_noaa_vs_usno.ipynb
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
   - CLI:
@@ -245,6 +246,9 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - overrides/.icons
 
 extra_javascript:
   - javascripts/mathjax.js
