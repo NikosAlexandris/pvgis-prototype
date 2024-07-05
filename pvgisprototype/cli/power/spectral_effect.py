@@ -1,8 +1,7 @@
-from pvgisprototype.cli.typer.group import OrderCommands
-from pvgisprototype.algorithms.pvis.spectral_factor import calculate_minimum_spectral_mismatch
-from pvgisprototype.algorithms.pvis.spectral_factor import calculate_spectral_factor
-from pvgisprototype.algorithms.pvis.constants import ELECTRON_CHARGE
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance_toolbox
+from pvgisprototype.algorithms.pvis.spectral_factor import (
+    calculate_minimum_spectral_mismatch,
+    calculate_spectral_factor,
+)
 
 
 def spectral_factor(
@@ -24,10 +23,9 @@ def spectral_mismatch(  # series ?
     response_wavelengths,
     spectral_response,
     number_of_junctions: int,
-    spectral_power_density,#=spectral_power_density_up_to_1050,
+    spectral_power_density,  # =spectral_power_density_up_to_1050,
 ):
-    """
-    """
+    """ """
     (
         minimum_spectral_mismatch,
         minimum_junction,

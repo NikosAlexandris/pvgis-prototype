@@ -19,7 +19,9 @@ photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
 wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
 
 data_array_icon = "docs/logos/data_array.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
+# netcdf_icon = "docs/logos/netcdf-400x400.png"
+netcdf_icon = "docs/overrides/.icons/custom/series_chunked.svg"
+netcdf_continuous_in_time_icon = "docs/overrides/.icons/custom/series_continuous_in_time.svg"
 
 kerchunk_icon = "docs/logos/kerchunk.png"
 binary_data_icon = "docs/logos/pastebin.svg"
@@ -44,7 +46,7 @@ cplusplus_icon = "docs/logos/cplusplus.svg"
 try:
     with suppress(FileNotFoundError):
         graph_attr = {"splines":"spline"}
-        with Diagram("Pre-Processing of Time Series", direction="LR", show=False, graph_attr=graph_attr) as diagram:
+        with Diagram("One-Off Pre-Processing of Time Series", direction="LR", show=False, graph_attr=graph_attr) as diagram:
             diagram.render = lambda: None
 
             # Data
@@ -53,9 +55,9 @@ try:
             NetCDF2 = Custom("2", netcdf_icon)
             NetCDFx = Custom("..x", netcdf_icon)
 
-            NetCDF1_Rechunked = Custom("1", netcdf_icon)
-            NetCDF2_Rechunked = Custom("2", netcdf_icon)
-            NetCDFx_Rechunked = Custom("..x", netcdf_icon)
+            NetCDF1_Rechunked = Custom("1", netcdf_continuous_in_time_icon)
+            NetCDF2_Rechunked = Custom("2", netcdf_continuous_in_time_icon)
+            NetCDFx_Rechunked = Custom("..x", netcdf_continuous_in_time_icon)
 
             # Tools
 
@@ -75,19 +77,19 @@ try:
             Index - Edge(style="dashed") - Parquet
             Index - Edge(style="dashed") - JSON
 
-            NetCDF1 - Edge(label='Rechunk', style="dashed") >> NetCDF1_Rechunked
-            NetCDF2 - Edge(label='Rechunk', style="dashed") >> NetCDF2_Rechunked
-            NetCDFx - Edge(label='Rechunk', style="dashed") >> NetCDFx_Rechunked
+            NetCDF1 - Edge(label='Rechunk continuous in time', style="dashed") >> NetCDF1_Rechunked
+            NetCDF2 - Edge(label='Rechunk .. in time', style="dashed") >> NetCDF2_Rechunked
+            NetCDFx - Edge(label='Rechunk .. in time', style="dashed") >> NetCDFx_Rechunked
 
             [NetCDF1_Rechunked, NetCDF2_Rechunked, NetCDFx_Rechunked] \
-            - Edge(label="Read", color="firebrick", style="dashed") \
+            - Edge(label="Scan", color="firebrick", style="dashed") \
             - Kerchunk \
             - Edge(
                    label="Generate Index /\nVirtual Zarr",
                    color="firebrick",
                    style="dashed"
                   ) \
-            >> Index \
+            >> Index
 
             # Encode diagram as a PNG and print it in HTML Image format
 

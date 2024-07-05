@@ -13,6 +13,8 @@ readme = {file = "ReadMe.md", content-type = "text/markdown"}
 authors = [
     { name = 'Nikos Alexandris', email = 'Nikos.Alexandris@ec.europa.eu' },
     { name = 'Olympia Gounari', email = '' },
+    { name = 'Alekos Falagas', email = ''},
+    { name = 'Alba Santos Rodriguez', email = ''},
 ]
 requires-python = "<3.12,>=3.11"
 dependencies = [
@@ -22,6 +24,7 @@ dependencies = [
   "pandas",
   "xarray",
   "loguru",
+  "richuru",
   "xarray_extras",
   "pydantic",
   "pydantic_numpy",
@@ -192,3 +195,16 @@ filterwarnings = [
     'ignore:distutils Version classes are deprecated. Use packaging.version instead:DeprecationWarning',
     'ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning',
 ]
+
+[tool.ruff]
+extend-exclude = [
+    "pvgisprototype/plot/",
+    "pvgisprototype/algorithms/pvis/power.py",
+    "pvgisprototype/algorithms/pvis/average_photon_energy.py",
+    "pvgisprototype/web_api/plot/plot_example.py",
+    "pvgisprototype/algorithms/usno/",
+    "pvgisprototype/api/position/hour_angle.py",
+    "pvgisprototype/cli/position/sunrise.py",
+    "pvgisprototype/api/spark.py",
+]
+force-exclude = true
