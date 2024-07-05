@@ -1,7 +1,10 @@
 from pathlib import Path
 from typing import Optional
+import math
+from zoneinfo import ZoneInfo
+from pandas import DatetimeIndex
 from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype import (
     Latitude,
     LinkeTurbidityFactor,
@@ -98,6 +101,8 @@ def optimize_angles(
     result_optimizer = optimizer(
         location_parameters=location_parameters,
         func=calculate_mean_negative_power_output,
+        global_horizontal_irradiance=global_horizontal_irradiance,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
         spectral_factor_series=spectral_factor_series,
         photovoltaic_module=photovoltaic_module,
         temperature_series=temperature_series,
