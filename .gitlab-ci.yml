@@ -1,8 +1,21 @@
-# image: python:3.11.6
+stages:
+  # - test
+  - deploy
 
-# before_script:
-#   - pip install --upgrade pip
-#   - pip install .[docs]
+image: python:3.11.6
+
+before_script:
+  - pip install --upgrade pip
+  # - pip install .[docs]
+  - pip install pdm
+    # - sudo apt-get update && apt-get install -y locales
+    # - apt-get font-terminus font-inconsolata font-dejavu font-noto font-awesome font-noto-extra
+    # - locale-gen en_US.UTF-8
+    # - update-locale LANG=en_US.UTF-8
+    # - export LANG=en_US.UTF-8
+    # - export LC_ALL=en_US.UTF-8
+    # - export http_proxy=$PROXY https_proxy=$PROXY no_proxy=$NOPROXY
+    # - export PATH=$PATH:$HOME/.local/bin
 
 # test:
 #   stage: test
@@ -14,98 +27,18 @@
 #   rules:
 #     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
 
-# pages:
-#   stage: deploy
-#   image: python:3.11.6
-#   script:
-#     - mkdocs build --site-dir public
-#   artifacts:
-#     paths:
-#       - public
-#   rules:
-#     # - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-#     - if: $CI_COMMIT_REF_NAME == 'main'
-#
-# GitLab pages image for MkDocs ?
-stages:
-  - test
-  - deploy
-
-include:
-  - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
-  - local: 'gitlab/dependency-scans.yaml'
-
-semgrep-sast:
-  variables:
-    SECURE_LOG_LEVEL: "debug"
-    HOME: "/tmp"
-  tags:
-    - openshift-test
-
-sast:
-  tags:
-    - openshift-test
-
-secret_detection:
-  rules:
-    - if: $SAST_DISABLED == 'true' || $SAST_DISABLED == '1'
-      when: never
-    - when: always
-  tags:
-    - openshift-test
-
-dependency_scanning:
-  tags:
-    - openshift-test
-  variables:
-    HTTPS_PROXY: $PROXY
-    NO_PROXY: $NOPROXY
-    PROXY_JAVA: "-Dhttps.proxyHost=proxy.jrc.it -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy.jrc.it -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts='localhost|*.jrc.ec.europa.eu|*.jrc.it|*.jrc.org|*.jrc|*.cluster.local'" 
-    SECURE_LOG_LEVEL: debug
-    GRADLE_CLI_OPTS: $PROXY_JAVA
-    MAVEN_CLI_OPTS: "-DproxySet=true $PROXY_JAVA"
-
-.gemnasium-fix:
-  before_script:
-    - git config --global --add safe.directory '*'
-
-gemnasium-maven-dependency_scanning:
-  before_script: !reference ['.gemnasium-fix', before_script]
-
-gemnasium-dependency_scanning:
-  before_script: !reference ['.gemnasium-fix', before_script]
-
-gemnasium-python-dependency_scanning:
-  before_script: !reference ['.gemnasium-fix', before_script]
-
 pages:
   stage: deploy
-  tags:
-    - openshift-test
-  image: quay.apps.ocpt.jrc.ec.europa.eu/public/dockerhub/python:3.11
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME == "main"
-      exists:
-        - mkdocs.yml
-  variables:
-    HOME: /tmp
-  before_script:
-    # - sudo apt-get update && apt-get install -y locales
-    # - apt-get font-terminus font-inconsolata font-dejavu font-noto font-awesome font-noto-extra
-    # - locale-gen en_US.UTF-8
-    # - update-locale LANG=en_US.UTF-8
-    - export LANG=en_US.UTF-8
-    - export LC_ALL=en_US.UTF-8
-    - export http_proxy=$PROXY https_proxy=$PROXY no_proxy=$NOPROXY
-    - export PATH=$PATH:$HOME/.local/bin
-    - pip install --upgrade pip
-    - pip install pdm
   script:
-    - $HOME/.local/bin/pdm install
+    - pdm install
     - export COLUMNS=160
-    - $HOME/.local/bin/pdm run mkdocs build --verbose --site-dir public
+    - pdm run mkdocs build --verbose --site-dir public
   allow_failure: true
   artifacts:
     paths:
       - public
+  rules:
+    # - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == 'mkdocs'
+      exists:
+        - mkdocs.yml
