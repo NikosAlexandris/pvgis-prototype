@@ -1,42 +1,41 @@
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from devtools import debug
-from typing import Optional
 from typing import Union
-from datetime import datetime
-from pvgisprototype import Irradiance
-from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import IRRADIANCE_UNIT
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
-from pvgisprototype.constants import DAY_ANGLE_SERIES
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import TITLE_KEY_NAME
-from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE
-from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DAY_OF_YEAR_COLUMN_NAME
-from pvgisprototype.constants import DISTANCE_CORRECTION_COLUMN_NAME
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
+
 import numpy as np
+from devtools import debug
 from pandas import DatetimeIndex
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+
+from pvgisprototype import Irradiance
+from pvgisprototype.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DAY_ANGLE_SERIES,
+    DAY_OF_YEAR_COLUMN_NAME,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DISTANCE_CORRECTION_COLUMN_NAME,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
+    EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
+    FINGERPRINT_COLUMN_NAME,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    IRRADIANCE_UNIT,
+    PERIGEE_OFFSET,
+    SOLAR_CONSTANT,
+    TITLE_KEY_NAME,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.hashing import generate_hash
 
 
 def get_days_per_year(years):
-    return 365 + ((years % 4 == 0) & ((years % 100 != 0) | (years % 400 == 0))).astype(int)
+    return 365 + ((years % 4 == 0) & ((years % 100 != 0) | (years % 400 == 0))).astype(
+        int
+    )
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def calculate_extraterrestrial_normal_irradiance_series(
     timestamps: DatetimeIndex,
     solar_constant: float = SOLAR_CONSTANT,
@@ -63,24 +62,36 @@ def calculate_extraterrestrial_normal_irradiance_series(
     day_of_year_series = timestamps.dayofyear.to_numpy().astype(dtype)
     # day angle == fractional year, hence : use model_fractional_year_series()
     day_angle_series = 2 * np.pi * day_of_year_series / days_in_years
-    distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(day_angle_series - perigee_offset)
-    extraterrestrial_normal_irradiance_series = solar_constant * distance_correction_factor_series
+    distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(
+        day_angle_series - perigee_offset
+    )
+    extraterrestrial_normal_irradiance_series = (
+        solar_constant * distance_correction_factor_series
+    )
 
     components_container = {
-        'main': lambda: {
+        "main": lambda: {
             TITLE_KEY_NAME: EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
             EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
         },
-
-        'extended': lambda: {
-            DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
-            DAY_ANGLE_SERIES: day_angle_series,
-            DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
-        } if verbose > 1 else {},
-
-        'fingerprint': lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(extraterrestrial_normal_irradiance_series),
-        } if fingerprint else {},
+        "extended": lambda: (
+            {
+                DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
+                DAY_ANGLE_SERIES: day_angle_series,
+                DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    extraterrestrial_normal_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
@@ -97,12 +108,12 @@ def calculate_extraterrestrial_normal_irradiance_series(
     )
 
     return Irradiance(
-            value=extraterrestrial_normal_irradiance_series,
-            unit=IRRADIANCE_UNIT,
-            position_algorithm="",
-            timing_algorithm="",
-            elevation=None,
-            surface_orientation=None,
-            surface_tilt=None,
-            components=components,
-            )
+        value=extraterrestrial_normal_irradiance_series,
+        unit=IRRADIANCE_UNIT,
+        position_algorithm="",
+        timing_algorithm="",
+        elevation=None,
+        surface_orientation=None,
+        surface_tilt=None,
+        components=components,
+    )

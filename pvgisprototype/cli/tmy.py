@@ -1,25 +1,55 @@
+from pathlib import Path
+from typing import Tuple
+
 import typer
 from typing_extensions import Annotated
-from typing import Tuple
-from typing import Optional
-from pathlib import Path
-
 
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=':thermometer:  Generate a Typical Meteorological Year', 
+    help=":thermometer:  Generate a Typical Meteorological Year",
 )
 
 
 def calculate_degree_days(
-        location: Annotated[Tuple[float, float], typer.Argument(..., help='Latitude, longitude [°]')],
-        years: Annotated[Tuple[float, float], typer.Argument(..., min=2005, max=2020, help='First and last year of calculations')],
-        meteo: Annotated[Path, typer.Argument( ..., exists=True, file_okay=True, dir_okay=False, writable=False, readable=True, resolve_path=True, help='Directory containing the meteorological data',)],
-        elevation: Annotated[Path, typer.Argument( ..., exists=True, file_okay=True, dir_okay=False, writable=False, readable=True, resolve_path=True, help='Directory containing the digital elevation data')],
-        monthly: bool = typer.Option(False, is_flag=True, help='Print monthly averages'),
-        ):
+    location: Annotated[
+        Tuple[float, float], typer.Argument(..., help="Latitude, longitude [°]")
+    ],
+    years: Annotated[
+        Tuple[float, float],
+        typer.Argument(
+            ..., min=2005, max=2020, help="First and last year of calculations"
+        ),
+    ],
+    meteo: Annotated[
+        Path,
+        typer.Argument(
+            ...,
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            writable=False,
+            readable=True,
+            resolve_path=True,
+            help="Directory containing the meteorological data",
+        ),
+    ],
+    elevation: Annotated[
+        Path,
+        typer.Argument(
+            ...,
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            writable=False,
+            readable=True,
+            resolve_path=True,
+            help="Directory containing the digital elevation data",
+        ),
+    ],
+    monthly: bool = typer.Option(False, is_flag=True, help="Print monthly averages"),
+):
     """Calculate the cooling/heating degree days
 
     Args:
@@ -44,7 +74,7 @@ def calculate_degree_days(
     pass
 
 
-@app.command('tmy')
+@app.command("tmy")
 def generate_tmy():
     """Generate the Typical Meteorological Year
 
@@ -57,5 +87,5 @@ def generate_tmy():
     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app()

@@ -36,6 +36,7 @@ as well as some insight into generating arbitrary series of Timestamps.
 
     - `[4]` and `[5]` are ***optional*** for [Orientation] [Tilt]
 
+
 - :material-console-line: __Working examples__
 
     !!! example
@@ -50,6 +51,7 @@ as well as some insight into generating arbitrary series of Timestamps.
         - Examples that fail so we know it is no-ones fault!
 
 </div>
+
 
 ## Generic Structure
 

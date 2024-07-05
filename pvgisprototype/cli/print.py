@@ -1,72 +1,76 @@
-from pandas import DatetimeIndex, to_datetime
-import pandas
 from datetime import datetime
-
-from sparklines import sparklines
-from pvgisprototype.api.position.models import SOLAR_POSITION_PARAMETER_COLUMN_NAMES, SolarPositionParameter
-from pvgisprototype.api.utilities.conversions import round_float_values
-from rich.console import Console
-from rich.table import Table
+from typing import List, Sequence
+from click import Context
+import numpy as np
+import pandas
+from pandas import DatetimeIndex, to_datetime
+from rich.box import HORIZONTALS, ROUNDED, SIMPLE_HEAD
 from rich.columns import Columns
+from rich.console import Console
 from rich.panel import Panel
 from rich.pretty import Pretty
+from rich.table import Table
 from rich.text import Text
-from rich.box import SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, ROUNDED, HORIZONTALS
-from typing import List, Sequence
-import numpy as np
+from sparklines import sparklines
+
+from pvgisprototype.api.performance.report import report_photovoltaic_performance
+from pvgisprototype.api.position.models import (
+    SOLAR_POSITION_PARAMETER_COLUMN_NAMES,
+    SolarPositionParameter,
+)
+from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
+    ALTITUDE_NAME,
+    ANGLE_UNIT_NAME,
+    ANGLE_UNITS_COLUMN_NAME,
+    AZIMUTH_NAME,
+    AZIMUTH_ORIGIN_COLUMN_NAME,
+    AZIMUTH_ORIGIN_NAME,
+    DECLINATION_COLUMN_NAME,
+    DECLINATION_NAME,
+    ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
     ELEVATION_NAME,
+    ENERGY_NAME_WITH_SYMBOL,
+    FINGERPRINT_COLUMN_NAME,
+    HOUR_ANGLE_COLUMN_NAME,
+    HOUR_ANGLE_NAME,
+    INCIDENCE_ALGORITHM_COLUMN_NAME,
+    INCIDENCE_ALGORITHM_NAME,
+    INCIDENCE_DEFINITION,
+    INCIDENCE_NAME,
+    LATITUDE_COLUMN_NAME,
     LATITUDE_NAME,
+    LONGITUDE_COLUMN_NAME,
     LONGITUDE_NAME,
+    NET_EFFECT,
+    NOT_AVAILABLE,
     PEAK_POWER_COLUMN_NAME,
+    PERIGEE_OFFSET_COLUMN_NAME,
+    POSITIONING_ALGORITHM_COLUMN_NAME,
+    POSITIONING_ALGORITHM_NAME,
+    POWER_MODEL_COLUMN_NAME,
+    RADIATION_MODEL_COLUMN_NAME,
     REFLECTIVITY,
+    ROUNDING_PLACES_DEFAULT,
+    SOLAR_CONSTANT_COLUMN_NAME,
     SPECTRAL_EFFECT_NAME,
+    SURFACE_ORIENTATION_COLUMN_NAME,
+    SURFACE_ORIENTATION_NAME,
+    SURFACE_TILT_COLUMN_NAME,
+    SURFACE_TILT_NAME,
     SYMBOL_LOSS,
     SYMBOL_SUMMATION,
     SYSTEM_LOSS,
     TECHNOLOGY_NAME,
     TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
-    TITLE_KEY_NAME,
-    LONGITUDE_COLUMN_NAME,
-    LATITUDE_COLUMN_NAME,
-    SURFACE_ORIENTATION_COLUMN_NAME,
-    SURFACE_ORIENTATION_NAME,
-    SURFACE_TILT_COLUMN_NAME,
-    SURFACE_TILT_NAME,
-    POWER_MODEL_COLUMN_NAME,
-    RADIATION_MODEL_COLUMN_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
-    DECLINATION_COLUMN_NAME,
-    DECLINATION_NAME,
-    HOUR_ANGLE_COLUMN_NAME,
-    HOUR_ANGLE_NAME,
-    POSITIONING_ALGORITHM_COLUMN_NAME,
-    POSITIONING_ALGORITHM_NAME,
-    SOLAR_CONSTANT_COLUMN_NAME,
-    PERIGEE_OFFSET_COLUMN_NAME,
-    ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
-    ENERGY_NAME_WITH_SYMBOL,
-    NET_EFFECT,
-    ZENITH_NAME,
-    ALTITUDE_NAME,
-    AZIMUTH_NAME,
-    AZIMUTH_ORIGIN_COLUMN_NAME,
-    AZIMUTH_ORIGIN_NAME,
-    INCIDENCE_ALGORITHM_COLUMN_NAME,
-    INCIDENCE_ALGORITHM_NAME,
-    INCIDENCE_NAME,
-    INCIDENCE_DEFINITION,
-    UNITS_COLUMN_NAME,
-    UNITLESS,
+    TITLE_KEY_NAME,
     UNIT_NAME,
-    ANGLE_UNIT_NAME,
-    ANGLE_UNITS_COLUMN_NAME,
-    NOT_AVAILABLE,
-    ROUNDING_PLACES_DEFAULT,
-    FINGERPRINT_COLUMN_NAME,
+    UNITLESS,
+    UNITS_COLUMN_NAME,
+    ZENITH_NAME,
 )
-from pvgisprototype.api.power.performance import report_photovoltaic_performance
 
 
 def convert_series_to_sparkline(
@@ -74,8 +78,7 @@ def convert_series_to_sparkline(
     timestamps: DatetimeIndex,
     frequency: str,
 ):
-    """
-    """
+    """ """
     pandas_series = pandas.Series(series, timestamps)
     yearly_sum_series = pandas_series.resample(frequency).sum()
     sparkline = sparklines(yearly_sum_series)[0]
@@ -83,7 +86,7 @@ def convert_series_to_sparkline(
     return sparkline
 
 
-def style_value(value, style_if_negative='dim'):
+def style_value(value, style_if_negative="dim"):
     if value is not None:
         if value < 0:
             return f"[{style_if_negative}]{value}[/]"
@@ -93,11 +96,11 @@ def style_value(value, style_if_negative='dim'):
 
 
 def get_scalar(value, index, places):
-    """Safely get a scalar value from an array or return the value itself """
+    """Safely get a scalar value from an array or return the value itself"""
     if isinstance(value, np.ndarray):
         if value.size > 1:
             return value[index]
-        else: 
+        else:
             return value[0]
 
     return value
@@ -154,19 +157,17 @@ def build_caption(
         f"Orientation : [bold blue]{rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None)}[/bold blue], "
         f"Tilt : [bold blue]{rounded_table[first_model].get(SURFACE_TILT_NAME, None)}[/bold blue] "
         f"[[dim]{rounded_table[first_model].get(UNIT_NAME, UNITLESS)}[/dim]]"
-
-        f"\n[underline]Algorithms[/underline]  " # ---------------------------
+        f"\n[underline]Algorithms[/underline]  "  # ---------------------------
         f"Timing : [bold]{rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
         f"Zone : {timezone}, "
-        f"Local zone : {user_requested_timezone if user_requested_timezone else 'N/A'}, "
-
         # f"Positioning: {rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)}, "
         # f"Incidence: {rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)}\n"
-        
         # f"[underline]Definitions[/underline]  "
         # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
         # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
     )
+    if user_requested_timezone != timezone and user_requested_timezone is not None:
+        caption += f"Local zone : {user_requested_timezone}, "
     return caption
 
 
@@ -176,15 +177,14 @@ def print_solar_position_table_panels(
     timestamp,
     timezone,
     solar_position_table,
-    rounding_places = ROUNDING_PLACES_DEFAULT,
-    position_parameters = SolarPositionParameter.all,
-    surface_orientation = True,
-    surface_tilt = True,
-    user_requested_timestamp = None,
-    user_requested_timezone = None,
+    rounding_places=ROUNDING_PLACES_DEFAULT,
+    position_parameters=SolarPositionParameter.all,
+    surface_orientation=True,
+    surface_tilt=True,
+    user_requested_timestamp=None,
+    user_requested_timezone=None,
 ) -> None:
-    """
-    """
+    """ """
     first_model = solar_position_table[next(iter(solar_position_table))]
     panels = []
 
@@ -198,31 +198,30 @@ def print_solar_position_table_panels(
     table.add_row("Time zone :", f"{timezone}")
     longest_label_length = max(len(key) for key in first_model.keys())
     surface_position_keys = {
-            SURFACE_ORIENTATION_NAME,
-            SURFACE_TILT_NAME,
-            ANGLE_UNIT_NAME,
-            INCIDENCE_DEFINITION,
-            UNIT_NAME,
-            }
+        SURFACE_ORIENTATION_NAME,
+        SURFACE_TILT_NAME,
+        ANGLE_UNIT_NAME,
+        INCIDENCE_DEFINITION,
+        UNIT_NAME,
+    }
     for key, value in first_model.items():
         if key in surface_position_keys:
-            padded_key = f"{key} :".ljust(longest_label_length + 3, ' ')
+            padded_key = f"{key} :".ljust(longest_label_length + 3, " ")
             if key == INCIDENCE_DEFINITION:
                 value = f"[yellow]{value}[/yellow]"
             table.add_row(padded_key, str(value))
     position_panel = Panel(
-            table,
-            title="Surface Position",
-            box=HORIZONTALS,
-            style='',
-            expand=False,
-            padding=(0, 2),
-            )
+        table,
+        title="Surface Position",
+        box=HORIZONTALS,
+        style="",
+        expand=False,
+        padding=(0, 2),
+    )
     panels.append(position_panel)
 
     # solar position Panel/s
     for model_result in solar_position_table.values():
-
         table = Table(box=None, show_header=False, show_edge=False, pad_edge=False)
         table.add_column(justify="right", style="none", no_wrap=True)
         table.add_column(justify="left")
@@ -231,7 +230,9 @@ def print_solar_position_table_panels(
         _index = 0
         position_parameter_values = {
             SolarPositionParameter.declination: lambda idx=_index: get_scalar(
-                get_value_or_default(model_result, DECLINATION_NAME), idx, rounding_places
+                get_value_or_default(model_result, DECLINATION_NAME),
+                idx,
+                rounding_places,
             ),
             # SolarPositionParameter.timing: lambda idx=_index: str(get_value_or_default(
             #     model_result, TIME_ALGORITHM_NAME
@@ -240,7 +241,9 @@ def print_solar_position_table_panels(
             #     model_result, POSITIONING_ALGORITHM_NAME
             # )),
             SolarPositionParameter.hour_angle: lambda idx=_index: get_scalar(
-                get_value_or_default(model_result, HOUR_ANGLE_NAME), idx, rounding_places
+                get_value_or_default(model_result, HOUR_ANGLE_NAME),
+                idx,
+                rounding_places,
             ),
             SolarPositionParameter.zenith: lambda idx=_index: get_scalar(
                 get_value_or_default(model_result, ZENITH_NAME), idx, rounding_places
@@ -251,26 +254,28 @@ def print_solar_position_table_panels(
             SolarPositionParameter.azimuth: lambda idx=_index: get_scalar(
                 get_value_or_default(model_result, AZIMUTH_NAME), idx, rounding_places
             ),
-            SolarPositionParameter.incidence: lambda idx=_index: get_scalar(get_value_or_default(model_result, INCIDENCE_NAME), idx, rounding_places,
+            SolarPositionParameter.incidence: lambda idx=_index: get_scalar(
+                get_value_or_default(model_result, INCIDENCE_NAME),
+                idx,
+                rounding_places,
             ),
         }
         for parameter in position_parameters:
             if parameter in position_parameter_values:
-                padded_key = f"{parameter.value} :".ljust(longest_label_length + 1, ' ')
+                padded_key = f"{parameter.value} :".ljust(longest_label_length + 1, " ")
                 value = position_parameter_values[parameter]()
                 if parameter == AZIMUTH_ORIGIN_NAME:
                     value = f"[yellow]{value}[/yellow]"
                 table.add_row(padded_key, str(value))
 
-
         title = f"[bold]{get_value_or_default(model_result, POSITIONING_ALGORITHM_NAME)}[/bold]"
         panel = Panel(
-                table,
-                title=title,
-                box=ROUNDED,
-                # style=panel_style,
-                padding=(0, 2),
-                )
+            table,
+            title=title,
+            box=ROUNDED,
+            # style=panel_style,
+            padding=(0, 2),
+        )
         panels.append(panel)
 
     columns = Columns(panels, expand=True, equal=True, padding=2)
@@ -284,7 +289,7 @@ def print_solar_position_series_table(
     timezone,
     table,
     position_parameters: Sequence[SolarPositionParameter] = SolarPositionParameter.all,
-    title='Solar position overview',
+    title="Solar position overview",
     index: bool = False,
     surface_orientation=None,
     surface_tilt=None,
@@ -299,6 +304,7 @@ def print_solar_position_series_table(
     if panels:
         if timestamps.size == 1:
             from pvgisprototype.cli.print import print_solar_position_table_panels
+
             print_solar_position_table_panels(
                 longitude=longitude,
                 latitude=latitude,
@@ -307,19 +313,18 @@ def print_solar_position_series_table(
                 solar_position_table=rounded_table,
                 position_parameters=position_parameters,
                 rounding_places=rounding_places,
-                user_requested_timestamp=user_requested_timestamps, 
-                user_requested_timezone=user_requested_timezone
+                user_requested_timestamp=user_requested_timestamps,
+                user_requested_timezone=user_requested_timezone,
             )
     else:
         longitude = round_float_values(longitude, rounding_places)
         latitude = round_float_values(latitude, rounding_places)
 
-
         columns = []
         if index:
             columns.append("Index")
         if timestamps is not None:
-            columns.append('Time')
+            columns.append("Time")
 
         for parameter in position_parameters:
             if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
@@ -335,25 +340,37 @@ def print_solar_position_series_table(
 
         for _, model_result in rounded_table.items():
             model_caption = caption
-            
-            position_algorithm = get_value_or_default(model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)
-            model_caption += f"Positioning : [bold]{position_algorithm}[/bold], "
-            
-            incidence_algorithm = get_value_or_default(model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)
-            model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
-            
-            model_caption += f"\n[underline]Definitions[/underline]  " # -----------
 
-            azimuth_origin = get_value_or_default(model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)
-            model_caption += f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "
-            
-            incidence_angle_definition = get_value_or_default(model_result, INCIDENCE_DEFINITION, None) if incidence else None
+            position_algorithm = get_value_or_default(
+                model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE
+            )
+            model_caption += f"Positioning : [bold]{position_algorithm}[/bold], "
+
+            incidence_algorithm = get_value_or_default(
+                model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE
+            )
+            model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold]"
+
+            model_caption += "\n[underline]Definitions[/underline]  "  # -----------
+
+            azimuth_origin = get_value_or_default(
+                model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE
+            )
+            model_caption += (
+                f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "
+            )
+
+            incidence_angle_definition = (
+                get_value_or_default(model_result, INCIDENCE_DEFINITION, None)
+                if incidence
+                else None
+            )
             model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
             table_obj = Table(
                 *columns,
                 title=title,
-                caption=model_caption,
+                # caption=model_caption,
                 box=SIMPLE_HEAD,
             )
 
@@ -365,7 +382,9 @@ def print_solar_position_series_table(
 
                 position_parameter_values = {
                     SolarPositionParameter.declination: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, DECLINATION_NAME), idx, rounding_places
+                        get_value_or_default(model_result, DECLINATION_NAME),
+                        idx,
+                        rounding_places,
                     ),
                     # SolarPositionParameter.timing: lambda idx=_index: str(get_value_or_default(
                     #     model_result, TIME_ALGORITHM_NAME
@@ -374,18 +393,29 @@ def print_solar_position_series_table(
                     #     model_result, POSITIONING_ALGORITHM_NAME
                     # )),
                     SolarPositionParameter.hour_angle: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, HOUR_ANGLE_NAME), idx, rounding_places
+                        get_value_or_default(model_result, HOUR_ANGLE_NAME),
+                        idx,
+                        rounding_places,
                     ),
                     SolarPositionParameter.zenith: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, ZENITH_NAME), idx, rounding_places
+                        get_value_or_default(model_result, ZENITH_NAME),
+                        idx,
+                        rounding_places,
                     ),
                     SolarPositionParameter.altitude: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, ALTITUDE_NAME), idx, rounding_places
+                        get_value_or_default(model_result, ALTITUDE_NAME),
+                        idx,
+                        rounding_places,
                     ),
                     SolarPositionParameter.azimuth: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, AZIMUTH_NAME), idx, rounding_places
+                        get_value_or_default(model_result, AZIMUTH_NAME),
+                        idx,
+                        rounding_places,
                     ),
-                    SolarPositionParameter.incidence: lambda idx=_index: get_scalar(get_value_or_default(model_result, INCIDENCE_NAME), idx, rounding_places,
+                    SolarPositionParameter.incidence: lambda idx=_index: get_scalar(
+                        get_value_or_default(model_result, INCIDENCE_NAME),
+                        idx,
+                        rounding_places,
                     ),
                 }
 
@@ -400,6 +430,7 @@ def print_solar_position_series_table(
                 table_obj.add_row(*row)
 
             Console().print(table_obj)
+            Console().print(Panel(model_caption, expand=False))
 
 
 def print_hour_angle_table(
@@ -433,7 +464,7 @@ def print_hour_angle_table(
         header_style="bold magenta",
     )
 
-    row = [str(latitude), 'Event']
+    row = [str(latitude), "Event"]
     if surface_tilt is not None:
         row.append(str(surface_tilt))
     if declination is not None:
@@ -448,14 +479,14 @@ def print_hour_angle_table(
 
 def print_quantity_table(
     dictionary: dict = dict(),
-    title: str ='Series',
+    title: str = "Series",
     main_key: str = None,
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     verbose=1,
     index: bool = False,
 ) -> None:
     table = Table(title=title, box=SIMPLE_HEAD)
-    
+
     if index:
         table.add_column("Index")
 
@@ -470,7 +501,7 @@ def print_quantity_table(
     for key in dictionary.keys():
         if dictionary[key] is not None:
             table.add_column(key)
-    
+
     if not main_key:  # consider the 1st key of having the "valid" number of values
         main_key = list(dictionary.keys())[0]
 
@@ -481,7 +512,7 @@ def print_quantity_table(
 
         if isinstance(value, str):
             dictionary[key] = np.full(len(dictionary[main_key]), str(value))
-    
+
     # Zip series
     zipped_series = zip(*dictionary.values())
 
@@ -496,12 +527,17 @@ def print_quantity_table(
 
         for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
             if idx == 0:  # assuming after 'Time' is the value of main interest
-                bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
+                bold_value = Text(
+                    str(round_float_values(value, rounding_places)), style="bold"
+                )
                 row.append(bold_value)
             else:
                 if not isinstance(value, str):
                     if SYMBOL_LOSS in column_name:
-                        red_value = Text(str(round_float_values(value, rounding_places)), style="bold red")
+                        red_value = Text(
+                            str(round_float_values(value, rounding_places)),
+                            style="bold red",
+                        )
                         row.append(red_value)
                     else:
                         row.append(str(round_float_values(value, rounding_places)))
@@ -519,22 +555,21 @@ def print_irradiance_table_2(
     elevation=None,
     timestamps: datetime = [datetime.now()],
     dictionary: dict = dict(),
-    title: str ='Irradiance series',
+    title: str = "Irradiance series",
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     verbose=1,
     index: bool = False,
     surface_orientation=True,
     surface_tilt=True,
 ) -> None:
-    """
-    """
+    """ """
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
-    elevation = round_float_values(elevation, 0)#rounding_places)
+    elevation = round_float_values(elevation, 0)  # rounding_places)
 
     caption = str()
     if longitude or latitude or elevation:
-        caption = f"[underline]Location[/underline]  "
+        caption = "[underline]Location[/underline]  "
     if longitude and latitude:
         caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
     if elevation:
@@ -553,19 +588,33 @@ def print_irradiance_table_2(
         rounding_places,
     )
     if surface_orientation or surface_tilt:
-        caption += f"\n[underline]Position[/underline]  "
+        caption += "\n[underline]Position[/underline]  "
 
     if surface_orientation is not None:
-        caption += f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
+        caption += (
+            f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
+        )
 
     if surface_tilt is not None:
         caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold] "
 
     units = dictionary.get(ANGLE_UNITS_COLUMN_NAME, UNITLESS)
-    if longitude or latitude or elevation or surface_orientation or surface_tilt and units is not None:
+    if (
+        longitude
+        or latitude
+        or elevation
+        or surface_orientation
+        or surface_tilt
+        and units is not None
+    ):
         caption += f"[[dim]{units}[/dim]]"
-    
-    photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
+
+    technology_name_and_type = dictionary.get(TECHNOLOGY_NAME, None)
+    photovoltaic_module, mount_type = (
+        technology_name_and_type.split(":")
+        if technology_name_and_type
+        else (None, None)
+    )
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
     algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
@@ -575,12 +624,13 @@ def print_irradiance_table_2(
     incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
 
     if photovoltaic_module:
-        caption += f"\n[underline]Module[/underline]  "
+        caption += "\n[underline]Module[/underline]  "
         caption += f"{TECHNOLOGY_NAME}: {photovoltaic_module}, "
+        caption += f"Mount type: {mount_type}, "
         caption += f"{PEAK_POWER_COLUMN_NAME}: {peak_power}"
 
     if algorithms or radiation_model or timing_algorithm or position_algorithm:
-        caption += f"\n[underline]Algorithms[/underline]  "
+        caption += "\n[underline]Algorithms[/underline]  "
 
     if algorithms:
         caption += f"{POWER_MODEL_COLUMN_NAME}: [bold]{algorithms}[/bold], "
@@ -610,63 +660,65 @@ def print_irradiance_table_2(
 
     solar_constant = dictionary.get(SOLAR_CONSTANT_COLUMN_NAME, None)
     perigee_offset = dictionary.get(PERIGEE_OFFSET_COLUMN_NAME, None)
-    eccentricity_correction_factor = dictionary.get(ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME, None)
+    eccentricity_correction_factor = dictionary.get(
+        ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME, None
+    )
 
     if solar_constant and perigee_offset and eccentricity_correction_factor:
-        caption += f'\n[underline]Constants[/underline] '
-        caption += f'{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, '
-        caption += f'{PERIGEE_OFFSET_COLUMN_NAME} : {perigee_offset}, '
-        caption += f'{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_correction_factor}, '
+        caption += "\n[underline]Constants[/underline] "
+        caption += f"{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, "
+        caption += f"{PERIGEE_OFFSET_COLUMN_NAME} : {perigee_offset}, "
+        caption += f"{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_correction_factor}, "
 
     from pvgisprototype.constants import SYMBOL_DESCRIPTIONS
+
     # add a caption for symbols found in the input dictionary
-    caption += '\n[underline]Legend[/underline] '
+    caption += "\n[underline]Legend[/underline] "
     for symbol, description in SYMBOL_DESCRIPTIONS.items():
         if any(symbol in key for key in dictionary.keys()):
             caption += f"[yellow]{symbol}[/yellow] is {description}, "
-    caption=caption.rstrip(', ')  # Remove trailing comma + space
+    caption = caption.rstrip(", ")  # Remove trailing comma + space
     table = Table(
-            title=title,
-            # caption=caption.rstrip(', '),  # Remove trailing comma + space
-            caption_justify="left",
-            expand=False,
-            padding=(0, 1),
-            box=SIMPLE_HEAD,
-            show_footer=True,
-            )
-    
+        title=title,
+        # caption=caption.rstrip(', '),  # Remove trailing comma + space
+        caption_justify="left",
+        expand=False,
+        padding=(0, 1),
+        box=SIMPLE_HEAD,
+        show_footer=True,
+    )
+
     if index:
         table.add_column("Index")
 
     # base columns
-    table.add_column('Time', footer=SYMBOL_SUMMATION)  # footer = 'Something'
-    
+    table.add_column("Time", footer=SYMBOL_SUMMATION)  # footer = 'Something'
+
     # remove the 'Title' entry! ---------------------------------------------
-    dictionary.pop('Title', NOT_AVAILABLE)
+    dictionary.pop("Title", NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
 
     keys_to_exclude = {
-            SURFACE_ORIENTATION_COLUMN_NAME,
-            SURFACE_TILT_COLUMN_NAME,
-            ANGLE_UNITS_COLUMN_NAME,
-            TIME_ALGORITHM_COLUMN_NAME,
-            POSITIONING_ALGORITHM_COLUMN_NAME,
-            SOLAR_CONSTANT_COLUMN_NAME,
-            PERIGEE_OFFSET_COLUMN_NAME,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
-            INCIDENCE_ALGORITHM_COLUMN_NAME,
-            INCIDENCE_DEFINITION,
-            RADIATION_MODEL_COLUMN_NAME,
-            TECHNOLOGY_NAME,
-            PEAK_POWER_COLUMN_NAME,
-            POWER_MODEL_COLUMN_NAME,
-            FINGERPRINT_COLUMN_NAME,
+        SURFACE_ORIENTATION_COLUMN_NAME,
+        SURFACE_TILT_COLUMN_NAME,
+        ANGLE_UNITS_COLUMN_NAME,
+        TIME_ALGORITHM_COLUMN_NAME,
+        POSITIONING_ALGORITHM_COLUMN_NAME,
+        SOLAR_CONSTANT_COLUMN_NAME,
+        PERIGEE_OFFSET_COLUMN_NAME,
+        ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
+        INCIDENCE_ALGORITHM_COLUMN_NAME,
+        INCIDENCE_DEFINITION,
+        RADIATION_MODEL_COLUMN_NAME,
+        TECHNOLOGY_NAME,
+        PEAK_POWER_COLUMN_NAME,
+        POWER_MODEL_COLUMN_NAME,
+        FINGERPRINT_COLUMN_NAME,
     }
 
     # add and process additional columns
     for key, value in dictionary.items():
         if key not in keys_to_exclude:
-
             # sum of array values
             if isinstance(value, np.ndarray) and value.dtype.kind in "if":
                 sum_of_key_value = str(np.nansum(value))
@@ -684,7 +736,9 @@ def print_irradiance_table_2(
                 table.add_column(key)
 
     # Zip series and timestamps
-    filtered_dictionary = {key: value for key, value in dictionary.items() if key not in keys_to_exclude}
+    filtered_dictionary = {
+        key: value for key, value in dictionary.items() if key not in keys_to_exclude
+    }
     zipped_series = zip(*filtered_dictionary.values())
     zipped_data = zip(timestamps, zipped_series)
 
@@ -697,24 +751,28 @@ def print_irradiance_table_2(
             row.append(str(index_counter))
             index_counter += 1
 
-        row.append(to_datetime(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
+        row.append(to_datetime(timestamp).strftime("%Y-%m-%d %H:%M:%S"))
 
-        for idx, (column_name, value) in enumerate(zip(filtered_dictionary.keys(), values)):
-
+        for idx, (column_name, value) in enumerate(
+            zip(filtered_dictionary.keys(), values)
+        ):
             # First row of the table is the header
             if idx == 0:  # assuming after 'Time' is the value of main interest
-                
                 # Make first row items bold
-                bold_value = Text(str(round_float_values(value, rounding_places)), style="bold")
+                bold_value = Text(
+                    str(round_float_values(value, rounding_places)), style="bold"
+                )
                 row.append(bold_value)
 
             else:
                 if not isinstance(value, str):
-
                     # If values of this column are negative / represent loss
                     if SYMBOL_LOSS in column_name:
                         # Make them bold red
-                        red_value = Text(str(round_float_values(value, rounding_places)), style="bold red")
+                        red_value = Text(
+                            str(round_float_values(value, rounding_places)),
+                            style="bold red",
+                        )
                         row.append(red_value)
 
                     else:
@@ -743,7 +801,7 @@ def add_table_row(
     reference_quantity=None,
     series=np.array([]),
     timestamps: DatetimeIndex = None,
-    frequency: str = 'YE',
+    frequency: str = "YE",
     source: str = None,
     quantity_style=None,
     value_style="cyan",
@@ -760,19 +818,19 @@ def add_table_row(
     Parameters
     ----------
     table :
-		The table object to which the row will be added.
+                The table object to which the row will be added.
     quantity :
-		The name of the quantity being added.
+                The name of the quantity being added.
     value :
-		The numerical value associated with the quantity.
+                The numerical value associated with the quantity.
     base_unit :
-		The base unit of measurement for the value.
+                The base unit of measurement for the value.
     percentage :
-		Optional; the percentage change or related metric.
+                Optional; the percentage change or related metric.
     reference_quantity :
-		Optional; the reference quantity for the percentage.
+                Optional; the reference quantity for the percentage.
     rounding_places :
-		Optional; the number of decimal places to round the value.
+                Optional; the number of decimal places to round the value.
 
     Notes
     -----
@@ -793,8 +851,16 @@ def add_table_row(
         signed_value = "-"  # this _is_ the variable added in a row !
     else:
         if isinstance(value, (float, np.float32, np.float64, int, np.int32, np.int64)):
-            styled_value = f"[{value_style}]{value:.{rounding_places}f}" if value_style else f"{value:.{rounding_places}f}"
-            signed_value = f"[{quantity_style}]+{styled_value}" if quantity in effects and value > 0 else styled_value
+            styled_value = (
+                f"[{value_style}]{value:.{rounding_places}f}"
+                if value_style
+                else f"{value:.{rounding_places}f}"
+            )
+            signed_value = (
+                f"[{quantity_style}]+{styled_value}"
+                if quantity in effects and value > 0
+                else styled_value
+            )
         else:
             raise TypeError(f"Unexpected type for value: {type(value)}")
 
@@ -802,28 +868,48 @@ def add_table_row(
     quantity = f"[{quantity_style}]{quantity}" if quantity_style else quantity
 
     # Mean value and unit
-    mean_value = f"[{mean_value_style}]{mean_value:.{rounding_places}f}" if mean_value_style else f"{mean_value:.{rounding_places}f}" 
+    mean_value = (
+        f"[{mean_value_style}]{mean_value:.{rounding_places}f}"
+        if mean_value_style
+        else f"{mean_value:.{rounding_places}f}"
+    )
     if standard_deviation:
-        standard_deviation = f"[{mean_value_style}]{standard_deviation:.{rounding_places}f}" if mean_value_style else f"{standard_deviation:.{rounding_places}f }" 
+        standard_deviation = (
+            f"[{mean_value_style}]{standard_deviation:.{rounding_places}f}"
+            if mean_value_style
+            else f"{standard_deviation:.{rounding_places}f }"
+        )
     else:
-        standard_deviation = ''
+        standard_deviation = ""
 
     # Style the unit
     unit = f"[{unit_style}]{unit}" if unit_style else unit
 
     # Get the reference quantity
-    reference_quantity = f"[{reference_quantity_style}]{reference_quantity}" if reference_quantity_style else reference_quantity
+    reference_quantity = (
+        f"[{reference_quantity_style}]{reference_quantity}"
+        if reference_quantity_style
+        else reference_quantity
+    )
 
     # Build the sparkline
-    sparkline = convert_series_to_sparkline(series, timestamps, frequency) if series.size > 0 else ''
+    sparkline = (
+        convert_series_to_sparkline(series, timestamps, frequency)
+        if series.size > 0
+        else ""
+    )
 
     # Prepare the basic row data structure
     row = [quantity, signed_value, unit]
-    
+
     # Add percentage and reference quantity if applicable
     if percentage is not None:
         # percentage = f"[red]{percentage:.{rounding_places}f}" if percentage < 0 else f"[{percentage_style}]{percentage:.{rounding_places}f}"
-        percentage = f"[red bold]{percentage:.{rounding_places}f}" if percentage < 0 else f"[green bold]+{percentage:.{rounding_places}f}"
+        percentage = (
+            f"[red bold]{percentage:.{rounding_places}f}"
+            if percentage < 0
+            else f"[green bold]+{percentage:.{rounding_places}f}"
+        )
         row.extend([f"{percentage}"])
         if reference_quantity:
             row.extend([reference_quantity])
@@ -841,7 +927,7 @@ def add_table_row(
         row.extend([""])
     if source:
         row.extend([source])
-    
+
     # table.add_row(
     #     quantity,
     #     value,
@@ -854,37 +940,36 @@ def add_table_row(
 
 
 def determine_frequency(timestamps):
-    """
-    """
+    """ """
     # First, get the "frequency" from the timestamps
     time_groupings = {
-        'YE': 'Yearly',
-        'S': 'Seasonal',
-        'ME': 'Monthly',
-        'W': 'Weekly',
-        'D': 'Daily',
-        '3h': '3-Hourly',
-        'h': 'Hourly',
-        'min': 'Minutely',
-        '8min': '8-Minutely',
+        "YE": "Yearly",
+        "S": "Seasonal",
+        "ME": "Monthly",
+        "W": "Weekly",
+        "D": "Daily",
+        "3h": "3-Hourly",
+        "h": "Hourly",
+        "min": "Minutely",
+        "8min": "8-Minutely",
     }
     if timestamps.year.unique().size > 1:
-        frequency = 'YE'
+        frequency = "YE"
     elif timestamps.month.unique().size > 1:
-        frequency = 'ME'
+        frequency = "ME"
     elif timestamps.to_period().week.unique().size > 1:
-        frequency = 'W'
+        frequency = "W"
     elif timestamps.day.unique().size > 1:
-        frequency = 'D'
+        frequency = "D"
     elif timestamps.hour.unique().size > 1:
         if timestamps.hour.unique().size < 17:  # Explain Me !
-            frequency = 'h'
+            frequency = "h"
         else:
-            frequency = '3h'
+            frequency = "3h"
     elif timestamps.minute.unique().size < 17:  # Explain Me !
-        frequency = 'min'
+        frequency = "min"
     else:
-        frequency = '8min'  # by 8 characters for a sparkline if timestamps > 64 min
+        frequency = "8min"  # by 8 characters for a sparkline if timestamps > 64 min
     frequency_label = time_groupings[frequency]
 
     return frequency, frequency_label
@@ -915,11 +1000,11 @@ def build_performance_table(
     table.add_column(
         "Quantity",
         justify="left",
-        style=quantity_style,# style="magenta",
+        style=quantity_style,  # style="magenta",
         no_wrap=True,
     )
     table.add_column(
-        "Total",#f"{SYMBOL_SUMMATION}",
+        "Total",  # f"{SYMBOL_SUMMATION}",
         justify="right",
         style=value_style,  # style="cyan",
     )
@@ -931,7 +1016,7 @@ def build_performance_table(
     table.add_column(
         "%",
         justify="right",
-        style=percentage_style,#style="dim",
+        style=percentage_style,  # style="dim",
     )
     table.add_column(
         "of",
@@ -940,7 +1025,7 @@ def build_performance_table(
     )
     table.add_column(f"{frequency_label} Sums", style="dim", justify="center")
     # table.add_column(f"{frequency_label} Mean", justify="right", style="white dim")#style=value_style)
-    table.add_column(f"Mean", justify="right", style="white dim")  # style=value_style)
+    table.add_column("Mean", justify="right", style="white dim")  # style=value_style)
     table.add_column(
         "Unit",  # for Mean values
         justify="left",
@@ -956,8 +1041,7 @@ def build_performance_table(
 
 
 def build_position_table() -> Table:
-    """
-    """
+    """ """
     position_table = Table(
         box=None,
         show_header=True,
@@ -965,124 +1049,126 @@ def build_position_table() -> Table:
         show_edge=False,
         pad_edge=False,
     )
-    position_table.add_column(f"{LATITUDE_NAME}", justify="center", style="bold", no_wrap=True)
-    position_table.add_column(f"{LONGITUDE_NAME}", justify="center", style="bold", no_wrap=True)
-    position_table.add_column(f"{ELEVATION_NAME}", justify="center", style="bold", no_wrap=True)
-    position_table.add_column(f"{SURFACE_ORIENTATION_NAME}", justify="center", style="bold", no_wrap=True)
-    position_table.add_column(f"{SURFACE_TILT_NAME}", justify="center", style="bold", no_wrap=True)
+    position_table.add_column(
+        f"{LATITUDE_NAME}", justify="center", style="bold", no_wrap=True
+    )
+    position_table.add_column(
+        f"{LONGITUDE_NAME}", justify="center", style="bold", no_wrap=True
+    )
+    position_table.add_column(
+        f"{ELEVATION_NAME}", justify="center", style="bold", no_wrap=True
+    )
+    position_table.add_column(
+        f"{SURFACE_ORIENTATION_NAME}", justify="center", style="bold", no_wrap=True
+    )
+    position_table.add_column(
+        f"{SURFACE_TILT_NAME}", justify="center", style="bold", no_wrap=True
+    )
 
     return position_table
 
 
 def build_position_panel(position_table) -> Panel:
-    """
-    """
+    """ """
     return Panel(
-            position_table,
-            # subtitle="Position",
-            # subtitle_align="right",
-            # box=None,
-            safe_box=True,
-            style='',
-            expand=False,
-            padding=(0, 3),
-            )
+        position_table,
+        # subtitle="Position",
+        # subtitle_align="right",
+        # box=None,
+        safe_box=True,
+        style="",
+        expand=False,
+        padding=(0, 3),
+    )
 
 
 def build_time_table():
-    """
-    """
+    """ """
     time_table = Table(
-            box=None,
-            show_header=True,
-            header_style=None,
-            show_edge=False,
-            pad_edge=False,
-            )
-    time_table.add_column('Start', justify="left", style="bold")
-    time_table.add_column('End', justify="left", style="dim bold")
+        box=None,
+        show_header=True,
+        header_style=None,
+        show_edge=False,
+        pad_edge=False,
+    )
+    time_table.add_column("Start", justify="left", style="bold")
+    time_table.add_column("End", justify="left", style="dim bold")
 
     return time_table
 
 
 def build_photovoltaic_module_table():
-    """
-    """
+    """ """
     photovoltaic_module_table = Table(
-            box=None,
-            show_header=True,
-            header_style=None,
-            show_edge=False,
-            pad_edge=False,
-            )
-    photovoltaic_module_table.add_column('Tech', justify="right",
-                                         style="bold")
-    photovoltaic_module_table.add_column('Peak-Power', justify="center",
-                                         style="bold")
-    photovoltaic_module_table.add_column('Mount Type', justify="left",
-                                         style="bold")
+        box=None,
+        show_header=True,
+        header_style=None,
+        show_edge=False,
+        pad_edge=False,
+    )
+    photovoltaic_module_table.add_column("Tech", justify="right", style="bold")
+    photovoltaic_module_table.add_column("Peak-Power", justify="center", style="bold")
+    photovoltaic_module_table.add_column("Mount Type", justify="left", style="bold")
 
     return photovoltaic_module_table
 
 
 def build_photovoltaic_module_panel(photovoltaic_module_table):
-    """
-    """
+    """ """
     photovoltaic_module_panel = Panel(
-            photovoltaic_module_table,
-            subtitle="PV Module",
-            subtitle_align="right",
-            safe_box=True,
-            expand=True,
-            padding=(0,2),
-            )
+        photovoltaic_module_table,
+        subtitle="PV Module",
+        subtitle_align="right",
+        safe_box=True,
+        expand=True,
+        padding=(0, 2),
+    )
 
     return photovoltaic_module_panel
 
 
 def build_pvgis_version_panel(
-        prefix_text = "PVGIS v6",
-        justify_text = "center",
-        style_text = "white dim",
-        border_style = "dim",
-        padding = (0, 2),
-        ) -> Panel:
-    """
-    """
+    prefix_text="PVGIS v6",
+    justify_text="center",
+    style_text="white dim",
+    border_style="dim",
+    padding=(0, 2),
+) -> Panel:
+    """ """
     from pvgisprototype._version import __version__
+
     pvgis_version = Text(
-            f"{prefix_text} ({__version__})",
-            justify=justify_text,
-            style=style_text,
-            )
+        f"{prefix_text} ({__version__})",
+        justify=justify_text,
+        style=style_text,
+    )
     return Panel(
-            pvgis_version,
-            # subtitle="[reverse]Fingerprint[/reverse]",
-            # subtitle_align="right",
-            border_style=border_style,
-            # style="dim",
-            expand=False,
-            padding=padding,
-        )
+        pvgis_version,
+        # subtitle="[reverse]Fingerprint[/reverse]",
+        # subtitle_align="right",
+        border_style=border_style,
+        # style="dim",
+        expand=False,
+        padding=padding,
+    )
 
 
 def build_fingerprint_panel(fingerprint):
-    """
-    """
+    """ """
     fingerprint = Text(
         f"{fingerprint}",
         justify="center",
         style="yellow bold",
     )
     return Panel(
-            fingerprint,
-            subtitle="[reverse]Fingerprint[/reverse]",
-            subtitle_align="right",
-            border_style="dim",
-            style="dim",
-            expand=False,
-            padding=(0,2),
-        )
+        fingerprint,
+        subtitle="[reverse]Fingerprint[/reverse]",
+        subtitle_align="right",
+        border_style="dim",
+        style="dim",
+        expand=False,
+        padding=(0, 2),
+    )
 
 
 # from rich.console import group
@@ -1108,23 +1194,23 @@ def build_version_and_fingerprint_columns(fingerprint) -> Columns:
 
 
 def print_change_percentages_panel(
-    longitude = None,
-    latitude = None,
-    elevation = None,
-    surface_orientation: bool =True,
-    surface_tilt:bool = True,
+    longitude=None,
+    latitude=None,
+    elevation=None,
+    surface_orientation: bool = True,
+    surface_tilt: bool = True,
     timestamps: DatetimeIndex | datetime = [datetime.now()],
     dictionary: dict = dict(),
-    title: str ='Analysis of Performance',
-    rounding_places: int = 1,#ROUNDING_PLACES_DEFAULT,
-    verbose = 1,
+    title: str = "Analysis of Performance",
+    rounding_places: int = 1,  # ROUNDING_PLACES_DEFAULT,
+    verbose=1,
     index: bool = False,
     fingerprint: bool = False,
     quantity_style="magenta",
-    value_style = "cyan",
-    unit_style ="cyan",
-    percentage_style = "dim",
-    reference_quantity_style = "white",
+    value_style="cyan",
+    unit_style="cyan",
+    percentage_style="dim",
+    reference_quantity_style="white",
 ):
     """Print a formatted table of photovoltaic performance metrics using the
     Rich library.
@@ -1138,7 +1224,7 @@ def print_change_percentages_panel(
       difference to standardised artificial laborary light spectrum
     - Effective irradiance = Inclined irradiance + Reflectivity effect + Spectral effect
     - Loss as a function of the PV module temperature and low irradiance effects
-    - Conversion of the effective irradiance to photovoltaic power 
+    - Conversion of the effective irradiance to photovoltaic power
     - Total net effect = Reflectivity, Spectral effect, Temperature & Low
       irradiance
 
@@ -1171,11 +1257,11 @@ def print_change_percentages_panel(
         reference_quantity_style=reference_quantity_style,
     )
     results = report_photovoltaic_performance(
-            dictionary=dictionary,
-            timestamps=timestamps,
-            frequency=frequency,
-            verbose=verbose,
-            )
+        dictionary=dictionary,
+        timestamps=timestamps,
+        frequency=frequency,
+        verbose=verbose,
+    )
 
     # Add rows based on the dictionary keys and corresponding values
     for label, (
@@ -1239,26 +1325,26 @@ def print_change_percentages_panel(
     )
     surface_tilt = round_float_values(surface_tilt, positioning_rounding_places)
     position_table.add_row(
-            f"{latitude}",
-            f"{longitude}",
-            f"{elevation}",
-            f"{surface_orientation}",
-            f"{surface_tilt}",
-            )
+        f"{latitude}",
+        f"{longitude}",
+        f"{elevation}",
+        f"{surface_orientation}",
+        f"{surface_tilt}",
+    )
     # position_table.add_row("Time :", f"{timestamp[0]}")
     # position_table.add_row("Time zone :", f"{timezone}")
-    
+
     longest_label_length = max(len(key) for key in dictionary.keys())
     surface_position_keys = {
-            SURFACE_ORIENTATION_NAME,
-            SURFACE_TILT_NAME,
-            ANGLE_UNIT_NAME,
-            # INCIDENCE_DEFINITION,
-            # UNIT_NAME,
-            }
+        SURFACE_ORIENTATION_NAME,
+        SURFACE_TILT_NAME,
+        ANGLE_UNIT_NAME,
+        # INCIDENCE_DEFINITION,
+        # UNIT_NAME,
+    }
     for key, value in dictionary.items():
         if key in surface_position_keys:
-            padded_key = f"{key} :".ljust(longest_label_length + 3, ' ')
+            padded_key = f"{key} :".ljust(longest_label_length + 3, " ")
             if key == INCIDENCE_DEFINITION:
                 value = f"[yellow]{value}[/yellow]"
             position_table.add_row(padded_key, str(value))
@@ -1267,28 +1353,30 @@ def print_change_percentages_panel(
 
     time_table = build_time_table()
     time_table.add_row(
-        str(timestamps.strftime('%Y-%m-%d %H:%M').values[0]),
-        str(timestamps.strftime('%Y-%m-%d %H:%M').values[-1]),
+        str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
+        str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
     )
     time_panel = Panel(
-            time_table,
-            # title="Time",
-            # subtitle="Time",
-            # subtitle_align="right",
-            safe_box=True,
-            expand=False,
-            padding=(0,2),
-            )
-    photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(':')
+        time_table,
+        # title="Time",
+        # subtitle="Time",
+        # subtitle_align="right",
+        safe_box=True,
+        expand=False,
+        padding=(0, 2),
+    )
+    photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(":")
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
     photovoltaic_module_table = build_photovoltaic_module_table()
     photovoltaic_module_table.add_row(
-            photovoltaic_module,
-            f"[green]{peak_power}[/green]",
-            mount_type,
-            )
+        photovoltaic_module,
+        f"[green]{peak_power}[/green]",
+        mount_type,
+    )
 
-    photovoltaic_module_panel = build_photovoltaic_module_panel(photovoltaic_module_table)
+    photovoltaic_module_panel = build_photovoltaic_module_panel(
+        photovoltaic_module_table
+    )
     # panels = [position_panel, time_panel, photovoltaic_module_panel]
 
     # columns = Columns(
@@ -1299,29 +1387,28 @@ def print_change_percentages_panel(
     #         )
 
     performance_panel = Panel(
-                performance_table,
-                title=title,
-                expand=False,
-                # style="on black",
-                )
+        performance_table,
+        title=title,
+        expand=False,
+        # style="on black",
+    )
     photovoltaic_module_columns = Columns(
-            [position_panel,
-            time_panel,
-            photovoltaic_module_panel],
-            # expand=True,
-            # equal=True,
-            padding=3,
-            )
+        [position_panel, time_panel, photovoltaic_module_panel],
+        # expand=True,
+        # equal=True,
+        padding=3,
+    )
 
     fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
     columns = build_version_and_fingerprint_columns(fingerprint)
 
     from rich.console import Group
+
     group = Group(
-            performance_panel,
-            photovoltaic_module_columns,
-            columns,
-            )
+        performance_panel,
+        photovoltaic_module_columns,
+        columns,
+    )
     # panel_group = Group(
     #         Panel(
     #             performance_table,
@@ -1354,13 +1441,10 @@ def print_finger_hash(dictionary: dict):
         )
         Console().print(fingerprint_panel)
 
-
-from click import Context
 def print_command_metadata(context: Context):
-    """
-    """
+    """ """
     command_parameters = {}
-    command_parameters['command'] = context.command_path
+    command_parameters["command"] = context.command_path
     command_parameters = command_parameters | context.params
     command_parameters_panel = Panel.fit(
         Pretty(command_parameters, no_wrap=True),
@@ -1373,8 +1457,10 @@ def print_command_metadata(context: Context):
 
     # write to file ?
     import json
+
     from pvgisprototype.validation.serialisation import CustomEncoder
-    with open('command_parameters.json', 'w') as json_file:
+
+    with open("command_parameters.json", "w") as json_file:
         json.dump(command_parameters, json_file, cls=CustomEncoder, indent=4)
 
 
@@ -1405,10 +1491,21 @@ def print_solar_position_series_in_columns(
         table_panel.add_row("Latitude", str(latitude))
 
         # For each parameter of interest, aggregate across models for this timestamp
-        parameters = ["Declination", "Hour Angle", "Zenith", "Altitude", "Azimuth", "Incidence"]
+        parameters = [
+            "Declination",
+            "Hour Angle",
+            "Zenith",
+            "Altitude",
+            "Azimuth",
+            "Incidence",
+        ]
         for param in parameters:
             # Assume `table` is a dictionary of models, each containing a list of values for each parameter
-            values = [round_float_values(model_result[param][i], rounding_places) for model_name, model_result in table.items() if param in model_result]
+            values = [
+                round_float_values(model_result[param][i], rounding_places)
+                for model_name, model_result in table.items()
+                if param in model_result
+            ]
             value_str = ", ".join(map(str, values))  # Combine values from all models
             table_panel.add_row(param, value_str)
 

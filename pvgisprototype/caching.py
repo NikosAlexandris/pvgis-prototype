@@ -1,14 +1,22 @@
+from functools import wraps
+
+import numpy
+from cachetools import cached
 from cachetools.keys import hashkey
 from pandas import DatetimeIndex, Index
-from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype import OpticalAirMass
-from pvgisprototype import RefractedSolarAltitude
-from pvgisprototype import SolarAltitude
-from pvgisprototype import SolarHourAngle
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
-import numpy
 
-def custom_hashkey(*args, **kwargs):
+from pvgisprototype import (
+    LinkeTurbidityFactor,
+    OpticalAirMass,
+    RefractedSolarAltitude,
+    SolarAltitude,
+    SolarHourAngle,
+    SurfaceOrientation,
+    SurfaceTilt,
+)
+
+
+def generate_custom_hashkey(*args, **kwargs):
     args = tuple(
         (
             # tuple(arg.tolist()) if isinstance(arg, numpy.ndarray)
@@ -60,3 +68,12 @@ def custom_hashkey(*args, **kwargs):
         for k, v in kwargs.items()
     }
     return hashkey(*args, **kwargs)
+
+
+def custom_cached(func):
+    @wraps(func)
+    @cached(cache={}, key=generate_custom_hashkey)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    return wrapper
