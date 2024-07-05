@@ -35,19 +35,21 @@ application, and the Web API as well, is :
 
 How does PVGIS 6 read external time series ?
 
-### 1 Pre-Process
+### Master-Plan
+
+#### Pre-Process
 
 ```python exec="true" html="true"
 --8<-- "docs/reference/time_series_data_preprocessing_diagram.py"
 ```
 
-### 2 Read
+#### Read
 
 ```python exec="true" html="true"
 --8<-- "docs/reference/time_series_data_reading_diagram.py"
 ```
 
-#### Read Backup-Plan
+### Alternative 1
 
 !!! warning
     
@@ -57,13 +59,23 @@ How does PVGIS 6 read external time series ?
 --8<-- "docs/reference/time_series_data_reading_alternative_diagram.py"
 ```
 
-## From A to Ω
+### Alternative 2
+
+!!! danger
+    
+    Storage-wise even more costly
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_reading_alternative_2_diagram.py"
+```
+
+## A to Ω
 
 ```python exec="true" html="true"
 --8<-- "docs/reference/time_series_data_from_alpha_to_omega_diagram.py"
 ```
 
-### From A to Ω again
+### A to Ω : Horizontally
 
 Same diagram "From A to Ω" with a horizontal layout
 
