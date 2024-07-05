@@ -1,35 +1,28 @@
+from datetime import datetime, timedelta
+from math import cos, radians, sin
+
+import numpy as np
 from devtools import debug
-from numpy import True_
 from pandas import DatetimeIndex
-import typer
 from rich import print
-from typing import Annotated
-from typing import Optional
-from datetime import datetime
-from datetime import timedelta
-import numpy
 
-from math import radians
-from math import degrees
-from pvgisprototype.constants import MINUTES
-from pvgisprototype import TrueSolarTime
-from math import sin
-from math import cos
-from zoneinfo import ZoneInfo
-
-from pvgisprototype import Longitude
+from pvgisprototype import Longitude, TrueSolarTime
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateSolarTimeMilne1921InputModel
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.api.utilities.timestamp import get_days_in_years
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    MINUTES,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import (
+    CalculateSolarTimeMilne1921InputModel,
+    validate_with_pydantic,
+)
 
 
 @validate_with_pydantic(CalculateSolarTimeMilne1921InputModel)
@@ -46,7 +39,7 @@ def calculate_apparent_solar_time_milne1921(
     - Local Time (LT)
 
     - Local Standard Time Meridian (LSTM)
-    
+
         - 1 hour in time equals to 15° degrees of earth's rotation
           (from: 360°/24 hours)
 
@@ -116,7 +109,6 @@ def calculate_apparent_solar_time_milne1921(
     #         logging.warning(f'Error setting tzinfo for timestamp = {timestamp}: {e}')
     # # Handle Me during input validation? -------------------------------------
 
-
     # Equation of Time, Milne 1921 -------------------------------------------
 
     # The difference of local time from UTC equals the time zone, in hours
@@ -125,9 +117,9 @@ def calculate_apparent_solar_time_milne1921(
 
     # `b` for the equation of time -------------------------------------------
     day_of_year = timestamp.timetuple().tm_yday
-    b = radians( 360 / 365 * (day_of_year - 81))  # from degrees to radians
+    b = radians(360 / 365 * (day_of_year - 81))  # from degrees to radians
 
-    # however, in : 
+    # however, in :
     # Solar Energy Engineering (Second Edition),
     # Chapter 2 - Environmental Characteristics,
     # Soteris A. Kalogirou, Academic Press, 2014,
@@ -149,13 +141,13 @@ def calculate_apparent_solar_time_milne1921(
     apparent_solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
 
     if verbose > 0:
-        print('Day of year : {day_of_year}')
-        print('Equation of time : {equation_of_time}')
-        print('Time correction factor : {time_correction_factor}')
+        print("Day of year : {day_of_year}")
+        print("Equation of time : {equation_of_time}")
+        print("Time correction factor : {time_correction_factor}")
 
     if verbose == 3:
         debug(locals())
-    
+
     return TrueSolarTime(
         value=apparent_solar_time,
         unit=MINUTES,
@@ -186,10 +178,12 @@ def calculate_apparent_solar_time_series_milne1921(
     # ------------------------------------------------- Further Optimisation ?
 
     days_of_year = timestamps.dayofyear
-    days_in_years = get_days_in_years(timestamps.year) 
+    days_in_years = get_days_in_years(timestamps.year)
     # In the original equation : days_in_years = 365
-    b = numpy.radians(360 / days_in_years * (days_of_year - 81))
-    equation_of_time = 9.87 * numpy.sin(2 * b) - 7.53 * numpy.cos(b) - 1.5 * numpy.sin(b)
+    b = np.radians(360 / days_in_years * (days_of_year - 81))
+    equation_of_time = (
+        9.87 * np.sin(2 * b) - 7.53 * np.cos(b) - 1.5 * np.sin(b)
+    )
 
     # In the original equation : time_correction_factor = 4 * (longitude - local_standard_time_meridian) + equation_of_time  in hours
     time_correction_factor_minutes = (
@@ -201,14 +195,14 @@ def calculate_apparent_solar_time_series_milne1921(
     true_solar_time_series = (
         timestamps - timestamps.normalize()
     ).total_seconds() + time_correction_factor_minutes * 60
-    true_solar_time_series_in_minutes = numpy.mod(
+    true_solar_time_series_in_minutes = np.mod(
         true_solar_time_series.astype(dtype) / 60, 1440
     )
 
     if not (
         (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
         & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
-    ).all(): 
+    ).all():
         out_of_range_values = true_solar_time_series_in_minutes[
             ~(
                 (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
@@ -223,13 +217,13 @@ def calculate_apparent_solar_time_series_milne1921(
         debug(locals())
 
     log_data_fingerprint(
-            data=true_solar_time_series_in_minutes,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=true_solar_time_series_in_minutes,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return TrueSolarTime(
         value=true_solar_time_series_in_minutes,
-        unit = MINUTES,
+        unit=MINUTES,
         timing_algorithm=SolarTimeModel.milne,
     )
