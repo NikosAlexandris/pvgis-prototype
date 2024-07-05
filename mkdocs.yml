@@ -126,9 +126,6 @@ extra:
 
 theme:
   logo: images/pvgis_image_squared.png
-  font:
-    text: false
-    code: false
   icon:
     tag:
       concepts: simple/blueprint
@@ -265,8 +262,6 @@ extra_javascript:
   - js/extra-loader.js
 
 plugins:
-  - privacy:
-      enabled: !ENV [CI, false]
   - search
   - badges
   - pagetree
