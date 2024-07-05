@@ -19,6 +19,8 @@ photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
 wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
 
 data_array_icon = "docs/logos/data_array.svg"
+# netcdf_icon = "docs/logos/netcdf-400x400.png"
+netcdf_icon = "docs/overrides/.icons/custom/series_chunked.svg"
 netcdf_continuous_in_time_icon = "docs/overrides/.icons/custom/series_continuous_in_time.svg"
 
 kerchunk_icon = "docs/logos/kerchunk.png"
@@ -50,44 +52,26 @@ try:
 
             # Data
 
-            NetCDF1_Rechunked = Custom("Continuous in time 1", netcdf_continuous_in_time_icon)
-            NetCDF2_Rechunked = Custom(".. 2", netcdf_continuous_in_time_icon)
-            NetCDFx_Rechunked = Custom(".. x", netcdf_continuous_in_time_icon)
-
-            # Tools
-
-            #In_Memory = Custom("First Call Read In Memory", '')
-            Xarray = Custom("", xarray_icon)
-
-
-            # Pre-Processed Data
-
-            with Cluster('*First Call Read In-Memory'):
-                Index = Custom("Index", binary_data_icon)
-                with Cluster("Optional Formats"):
-                    JSON = Custom("JSON (Slow!)", json_icon)
-                    Parquet = Custom("Parquet (Fast)", parquet_icon)
-
+            NetCDF1 = Custom("1", netcdf_icon)
+            NetCDF2 = Custom("2", netcdf_icon)
+            NetCDFx = Custom("..x", netcdf_icon)
 
             # Input Data to PVGIS
-            
-            Virtual_Zarr = Custom("", zarr_icon)
+            Zarr = Custom("Store", zarr_icon)
+
+            # Tools
+            Xarray = Custom("", xarray_icon)
 
             # Analysis of Photovoltaic Performance
-
             PVGIS_6 = Custom("PVGIS 6", pvgis6_icon)
-
 
             # Workflow =======================================================
 
-            Index - Edge(style="dashed") - Parquet
-            Index - Edge(style="dashed") - JSON
+            NetCDF1 - Edge(label='Rechunk continuous in time', style="dashed") >> Zarr
+            NetCDF2 - Edge(label='Rechunk .. in time', style="dashed") >> Zarr
+            NetCDFx - Edge(label='Rechunk .. in time', style="dashed") >> Zarr
 
-            [NetCDF1_Rechunked, NetCDF2_Rechunked, NetCDFx_Rechunked] \
-            - Edge(label="Read", color="firebrick", style="dashed") \
-            - Index \
-            - Edge(label="", color="firebrick", style="dashed") \
-            - Virtual_Zarr \
+            Zarr \
             - Edge(label="Read with Zarr engine", color="firebrick", style="dashed") \
             - Xarray \
             - Edge(label="", color="firebrick") \
