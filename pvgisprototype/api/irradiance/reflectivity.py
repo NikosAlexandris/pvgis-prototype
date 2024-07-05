@@ -1,18 +1,18 @@
-from devtools import debug
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from pvgisprototype import SolarIncidence
-from math import exp
-from math import pi
-from math import pow
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import ANGULAR_LOSS_COEFFICIENT
+from math import exp, pi, pow
+
 import numpy as np
+from devtools import debug
 from rich import print
+
+from pvgisprototype import SolarIncidence
+from pvgisprototype.constants import (
+    ANGULAR_LOSS_COEFFICIENT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 @log_function_call
@@ -63,8 +63,8 @@ def calculate_reflectivity_factor_for_direct_irradiance_series(
 
         - The negative exponential term of the fraction `solar_altitude /
           solar_declination` calculates the exponential decay or attenuation
-          factor based on the ratio of `solar_altitude` to the `solar_declination`. 
-    
+          factor based on the ratio of `solar_altitude` to the `solar_declination`.
+
     2. rescales the adjusted value to bring it within a suitable range,
     by multiplying it by the reciprocal of the exponential term with the
     reciprocal of the `solar_declination`:
@@ -116,23 +116,27 @@ def calculate_reflectivity_factor_for_direct_irradiance_series(
     of floating point numbers. As it may generate NaN elements, further
     processing in a time series context, would required attention for example
     when summing arrays with NaN elements.
-    
+
     To circumvent eventual "problems" and the need for special handling
     downstream in the code, we replace all NaN elements with 0 just before
     returning the final time series.
 
     """
     try:
-        numerator = 1 - np.exp( - np.cos(solar_incidence_series) / angular_loss_coefficient )
-        denominator =  1 / ( 1 - exp( -1 / angular_loss_coefficient))
+        numerator = 1 - np.exp(
+            -np.cos(solar_incidence_series) / angular_loss_coefficient
+        )
+        denominator = 1 / (1 - exp(-1 / angular_loss_coefficient))
         incidence_angle_modifier_series = numerator / denominator
-        incidence_angle_modifier_series = np.where(np.abs(solar_incidence_series) >= pi/2, 0, incidence_angle_modifier_series)  # Borrowed from pvlib !
+        incidence_angle_modifier_series = np.where(
+            np.abs(solar_incidence_series) >= pi / 2, 0, incidence_angle_modifier_series
+        )  # Borrowed from pvlib !
 
         if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             debug(locals())
 
         if verbose > 0:
-            print(f'Incidence angle modifier series: {incidence_angle_modifier_series}')
+            print(f"Incidence angle modifier series: {incidence_angle_modifier_series}")
 
         log_data_fingerprint(
             data=incidence_angle_modifier_series,
@@ -151,7 +155,7 @@ def calculate_reflectivity_factor_for_direct_irradiance_series(
 
 def calculate_reflectivity_factor_for_nondirect_irradiance(
     indirect_angular_loss_coefficient,
-    angular_loss_coefficient = ANGULAR_LOSS_COEFFICIENT,
+    angular_loss_coefficient=ANGULAR_LOSS_COEFFICIENT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Calculate the reflectivity factor as for small angles of solar
@@ -201,14 +205,14 @@ def calculate_reflectivity_factor_for_nondirect_irradiance(
     )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
-        
+
     return loss_factor
 
 
 def calculate_reflectivity_effect(
-        irradiance,
-        reflectivity,
-        ):
+    irradiance,
+    reflectivity,
+):
     """Calculate absolute reflectivity effect
 
     The total loss due to the reflectivity effect (which depends on the solar
@@ -238,7 +242,7 @@ def calculate_reflectivity_effect_percentage(
 ):
     """ """
     # --------------------------------------------------- Is this safe ? -
-    with np.errstate(divide='ignore', invalid='ignore'):
+    with np.errstate(divide="ignore", invalid="ignore"):
         percentage = np.where(
             irradiance != 0,
             100 * (1 - ((irradiance * reflectivity) / irradiance)),

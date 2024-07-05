@@ -19,7 +19,7 @@ photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
 wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
 
 data_array_icon = "docs/logos/data_array.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
+netcdf_continuous_in_time_icon = "docs/overrides/.icons/custom/series_continuous_in_time.svg"
 
 kerchunk_icon = "docs/logos/kerchunk.png"
 binary_data_icon = "docs/logos/pastebin.svg"
@@ -50,9 +50,9 @@ try:
 
             # Data
 
-            NetCDF1_Rechunked = Custom("1", netcdf_icon)
-            NetCDF2_Rechunked = Custom("2", netcdf_icon)
-            NetCDFx_Rechunked = Custom("..x", netcdf_icon)
+            NetCDF1_Rechunked = Custom("Continuous in time 1", netcdf_continuous_in_time_icon)
+            NetCDF2_Rechunked = Custom(".. 2", netcdf_continuous_in_time_icon)
+            NetCDFx_Rechunked = Custom(".. x", netcdf_continuous_in_time_icon)
 
             # Tools
 
