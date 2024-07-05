@@ -28,7 +28,7 @@ direct_horizontal_irradiance_icon = "docs/icons/noun_direct_horizontal_irradianc
 temperature_icon = "docs/icons/thermometer.svg"
 wind_speed_icon = "docs/icons/noun-windsock-4502486.svg"
 meteorological_variables_icon = "docs/icons/weather-partly-cloudy.svg"
-photovoltaic_power_icon = f"docs/icons/noun-solar-panel-6862742.svg"
+photovoltaic_power_icon = "docs/icons/noun-solar-panel-6862742.svg"
 
 
 try:
@@ -38,7 +38,7 @@ try:
             diagram.render = lambda: None
 
             User = Custom("User", user_icon)
-            Xarray = Custom("Input / Output", xarray_icon)
+            Xarray = Custom("Input", xarray_icon)
 
             with Cluster("Libraries"):
                 python = Python("Python") # != Python
@@ -116,10 +116,16 @@ try:
             << Edge(color="grey", style="dashed") \
             << [pvlib, Skyfield, Other]
 
-            with Cluster("SARAH 2/3 climate records - NetCDF files"):
-                Global_Horizontal_Irradiance = Custom("Global\nHorizontal\nIrradiance\n(GHI)", global_horizontal_irradiance_icon)
-                
-                Direct_Horizontal_Irradiance = Custom("Direct\nHorizontal\nIrradiance\n(DHI)", direct_horizontal_irradiance_icon)
+            with Cluster("Data"):
+
+                with Cluster("SARAH 2/3 climate records - NetCDF files"):
+                    Global_Horizontal_Irradiance = Custom("Global\nHorizontal\nIrradiance\n(GHI)", global_horizontal_irradiance_icon)
+                    
+                    Direct_Horizontal_Irradiance = Custom("Direct\nHorizontal\nIrradiance\n(DHI)", direct_horizontal_irradiance_icon)
+
+                with Cluster("Meteorological Time Series - NetCDF files"):
+                    Temperature = Custom("Temperature", temperature_icon)
+                    Wind_Speed = Custom("Wind Speed", wind_speed_icon)
 
             Solar_Irradiance \
             << Edge(color="magenta") \
@@ -127,9 +133,6 @@ try:
             << Edge(style="dashed", color="magenta") \
             << Global_Horizontal_Irradiance, Direct_Horizontal_Irradiance
 
-            with Cluster("Meteorological Time Series - NetCDF files"):
-                Temperature = Custom("Temperature", temperature_icon)
-                Wind_Speed = Custom("Wind Speed", wind_speed_icon)
 
             Meteorological_Variables \
             << Edge(color="magenta") \
@@ -138,7 +141,7 @@ try:
             << Temperature, Wind_Speed
 
             User \
-            - Edge(style="dashed", color="blue") \
+            - Edge(label="Input Query", style="dashed", color="blue") \
             >> WebAPI \
             >> Edge(style="dashed", color="blue") \
             >> API \
@@ -150,9 +153,9 @@ try:
             >> Meteorological_Variables \
             >> Edge(style="dashed", color="blue") \
             >> Photovoltaic_Performance \
-            >> Edge(style="dashed", color="firebrick") \
+            >> Edge(label="Output", style="dashed", color="firebrick") \
             >> WebAPI \
-            >> Edge(style="dashed", color="firebrick") \
+            >> Edge(label="Output JSON", style="dashed", color="firebrick") \
             >> User
 
             WebAPI - Pydantic

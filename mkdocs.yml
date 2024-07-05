@@ -26,7 +26,8 @@ nav:
     - tutorials/introduction.md
     - Solar Position:
       - tutorials/solar_position.md
-      - 󰆊 Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
+      - Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
+      - Comparing with USNO: notebooks/solar_position_pvgis_noaa_vs_usno.ipynb
     - Surface Position Optimization: notebooks/surface_position_optimization_examples.ipynb 
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
@@ -126,9 +127,6 @@ extra:
 
 theme:
   logo: images/pvgis_image_squared.png
-  font:
-    text: false
-    code: false
   icon:
     tag:
       concepts: simple/blueprint
@@ -249,6 +247,9 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - overrides/.icons
 
 extra_javascript:
   - javascripts/mathjax.js
@@ -262,8 +263,6 @@ extra_javascript:
   - js/extra-loader.js
 
 plugins:
-  - privacy:
-      enabled: !ENV [CI, false]
   - search
   - badges
   - pagetree
