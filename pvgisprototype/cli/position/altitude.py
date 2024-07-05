@@ -3,95 +3,140 @@ CLI module to calculate the solar altitude angle parameters over a
 location and a moment in time.
 """
 
-from typing import Annotated, List
-from typing import Optional
 from datetime import datetime
-from zoneinfo import ZoneInfo
 from pathlib import Path
+from typing import Annotated, Optional
+from zoneinfo import ZoneInfo
 
-from pvgisprototype.api.position.altitude import calculate_solar_altitude_series
-from pvgisprototype.cli.typer.location import typer_argument_longitude
-from pvgisprototype.cli.typer.location import typer_argument_latitude
-from pvgisprototype.cli.typer.timestamps import typer_argument_timestamps
-from pvgisprototype.cli.typer.timestamps import typer_option_random_timestamps
-from pvgisprototype.cli.typer.timestamps import typer_option_start_time
-from pvgisprototype.cli.typer.timestamps import typer_option_periods
-from pvgisprototype.cli.typer.timestamps import typer_option_frequency
-from pvgisprototype.cli.typer.timestamps import typer_option_end_time
-from pvgisprototype.cli.typer.timestamps import typer_option_timezone
-from pvgisprototype.cli.typer.position import typer_option_solar_position_model
-from pvgisprototype.cli.typer.refraction import typer_option_apply_atmospheric_refraction
-from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
-from pvgisprototype.cli.typer.earth_orbit import typer_option_perigee_offset
-from pvgisprototype.cli.typer.earth_orbit import typer_option_eccentricity_correction_factor
-from pvgisprototype.cli.typer.output import typer_option_angle_output_units
-from pvgisprototype.cli.typer.output import typer_option_rounding_places
-from pvgisprototype.cli.typer.verbosity import typer_option_verbose
-from pvgisprototype.cli.typer.output import typer_option_index
-
-from pvgisprototype.api.position.models import SolarPositionModel, SolarPositionParameter
-from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.api.position.models import select_models
-
-from pvgisprototype.constants import CSV_PATH_DEFAULT, QUIET_FLAG_DEFAULT, TERMINAL_WIDTH_FRACTION, UNIPLOT_FLAG_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT
-
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pandas import DatetimeIndex
-from pvgisprototype.api.utilities.timestamp import now_utc_datetimezone
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
+
 from pvgisprototype import SolarAltitude
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.cli.typer.data_processing import typer_option_dtype
-from pvgisprototype.cli.typer.data_processing import typer_option_array_backend
-from pvgisprototype.cli.typer.plot import typer_option_uniplot
-from pvgisprototype.cli.typer.plot import typer_option_uniplot_terminal_width
-from pvgisprototype.cli.typer.output import typer_option_csv
-from pvgisprototype.cli.typer.verbosity import typer_option_quiet
-from pvgisprototype.cli.typer.output import typer_option_panels_output
-from pvgisprototype.cli.typer.verbosity import typer_option_quiet
-from pvgisprototype.cli.typer.position import typer_option_solar_position_parameter
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
+from pvgisprototype.api.position.altitude import calculate_solar_altitude_series
+from pvgisprototype.api.position.models import (
+    SolarPositionModel,
+    SolarPositionParameter,
+    SolarTimeModel,
+    select_models,
+)
+from pvgisprototype.api.utilities.conversions import (
+    convert_float_to_degrees_if_requested,
+)
+from pvgisprototype.cli.typer.data_processing import (
+    typer_option_array_backend,
+    typer_option_dtype,
+)
+from pvgisprototype.cli.typer.earth_orbit import (
+    typer_option_eccentricity_correction_factor,
+    typer_option_perigee_offset,
+)
+from pvgisprototype.cli.typer.location import (
+    typer_argument_latitude,
+    typer_argument_longitude,
+)
 from pvgisprototype.cli.typer.log import typer_option_log
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.cli.typer.output import typer_option_fingerprint
-from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
-from pvgisprototype.cli.typer.output import typer_option_command_metadata
+from pvgisprototype.cli.typer.output import (
+    typer_option_angle_output_units,
+    typer_option_command_metadata,
+    typer_option_csv,
+    typer_option_fingerprint,
+    typer_option_index,
+    typer_option_panels_output,
+    typer_option_rounding_places,
+)
+from pvgisprototype.cli.typer.plot import (
+    typer_option_uniplot,
+    typer_option_uniplot_terminal_width,
+)
+from pvgisprototype.cli.typer.position import typer_option_solar_position_model
+from pvgisprototype.cli.typer.refraction import (
+    typer_option_apply_atmospheric_refraction,
+)
+from pvgisprototype.cli.typer.timestamps import (
+    typer_argument_timestamps,
+    typer_option_end_time,
+    typer_option_frequency,
+    typer_option_periods,
+    typer_option_random_timestamps,
+    typer_option_start_time,
+    typer_option_timezone,
+)
+from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
+from pvgisprototype.constants import (
+    ANGLE_OUTPUT_UNITS_DEFAULT,
+    ARRAY_BACKEND_DEFAULT,
+    ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    CSV_PATH_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    FINGERPRINT_FLAG_DEFAULT,
+    INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    LOG_LEVEL_DEFAULT,
+    PERIGEE_OFFSET,
+    QUIET_FLAG_DEFAULT,
+    RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    ROUNDING_PLACES_DEFAULT,
+    TERMINAL_WIDTH_FRACTION,
+    UNIPLOT_FLAG_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_function_call, logger
 
 
 @log_function_call
 def altitude(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,  # Used by a callback function
-    periods: Annotated[Optional[int], typer_option_periods] = None,  # Used by a callback function
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,  # Used by a callback function
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,  # Used by a callback function
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
+        now_utc_datetimezone()
+    ),
+    start_time: Annotated[
+        Optional[datetime], typer_option_start_time
+    ] = None,  # Used by a callback function
+    periods: Annotated[
+        Optional[int], typer_option_periods
+    ] = None,  # Used by a callback function
+    frequency: Annotated[
+        Optional[str], typer_option_frequency
+    ] = None,  # Used by a callback function
+    end_time: Annotated[
+        Optional[datetime], typer_option_end_time
+    ] = None,  # Used by a callback function
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    random_timestamps: Annotated[bool, typer_option_random_timestamps] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
-    model: Annotated[list[SolarPositionModel], typer_option_solar_position_model] = [SolarPositionModel.noaa],
-    apply_atmospheric_refraction: Annotated[Optional[bool], typer_option_apply_atmospheric_refraction] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    solar_time_model: Annotated[SolarTimeModel, typer_option_solar_time_model] = SolarTimeModel.milne,
+    random_timestamps: Annotated[
+        bool, typer_option_random_timestamps
+    ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
+    model: Annotated[list[SolarPositionModel], typer_option_solar_position_model] = [
+        SolarPositionModel.noaa
+    ],
+    apply_atmospheric_refraction: Annotated[
+        Optional[bool], typer_option_apply_atmospheric_refraction
+    ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    solar_time_model: Annotated[
+        SolarTimeModel, typer_option_solar_time_model
+    ] = SolarTimeModel.milne,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[float, typer_option_eccentricity_correction_factor] = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = ANGLE_OUTPUT_UNITS_DEFAULT,
-    rounding_places: Annotated[int, typer_option_rounding_places] = ROUNDING_PLACES_DEFAULT,
-    group_models: Annotated[Optional[bool], 'Visually cluster time series results per model'] = False,
+    eccentricity_correction_factor: Annotated[
+        float, typer_option_eccentricity_correction_factor
+    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: Annotated[
+        str, typer_option_angle_output_units
+    ] = ANGLE_OUTPUT_UNITS_DEFAULT,
+    rounding_places: Annotated[
+        int, typer_option_rounding_places
+    ] = ROUNDING_PLACES_DEFAULT,
+    group_models: Annotated[
+        Optional[bool], "Visually cluster time series results per model"
+    ] = False,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
-    resample_large_series: Annotated[bool, 'Resample large time series?'] = False,
-    terminal_width_fraction: Annotated[float, typer_option_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
+    resample_large_series: Annotated[bool, "Resample large time series?"] = False,
+    terminal_width_fraction: Annotated[
+        float, typer_option_uniplot_terminal_width
+    ] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
@@ -114,20 +159,23 @@ def altitude(
     user_requested_timestamps = None
     user_requested_timezone = None
     # -------------------------------------------- Smarter way to do this? ---
-    
+
     # Convert the input timestamp to UTC, for _all_ internal calculations
     utc_zoneinfo = ZoneInfo("UTC")
     if timestamps.tz != utc_zoneinfo:
-
         # Note the input timestamp and timezone
         user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
         timestamps = timestamps.tz_localize(utc_zoneinfo)
         timezone = utc_zoneinfo
-        logger.info(f'Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!')
+        logger.info(
+            f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
+        )
 
-    solar_position_models = select_models(SolarPositionModel, model)  # Using a callback fails!
+    solar_position_models = select_models(
+        SolarPositionModel, model
+    )  # Using a callback fails!
     solar_altitude_series = calculate_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
@@ -147,6 +195,7 @@ def altitude(
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
         from pvgisprototype.cli.print import print_solar_position_series_table
+
         print_solar_position_series_table(
             longitude=longitude,
             latitude=latitude,
@@ -154,12 +203,12 @@ def altitude(
             timezone=timezone,
             table=solar_altitude_series,
             position_parameters=[SolarPositionParameter.altitude],
-            title='Solar Altitude Series',
+            title="Solar Altitude Series",
             index=index,
             surface_orientation=None,
             surface_tilt=None,
             incidence=None,
-            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timestamps=user_requested_timestamps,
             user_requested_timezone=user_requested_timezone,
             rounding_places=rounding_places,
             group_models=group_models,
@@ -167,6 +216,7 @@ def altitude(
         )
     if csv:
         from pvgisprototype.cli.write import write_solar_position_series_csv
+
         write_solar_position_series_csv(
             longitude=longitude,
             latitude=latitude,
@@ -182,7 +232,7 @@ def altitude(
             # surface_orientation=None,
             # surface_tilt=None,
             # incidence=None,
-            user_requested_timestamps=user_requested_timestamps, 
+            user_requested_timestamps=user_requested_timestamps,
             user_requested_timezone=user_requested_timezone,
             # rounding_places=rounding_places,
             # group_models=group_models,
@@ -190,15 +240,16 @@ def altitude(
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_solar_position_series
+
         uniplot_solar_position_series(
             solar_position_series=solar_altitude_series,
             position_parameters=[SolarPositionParameter.altitude],
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle='Solar Altitude Series',
+            supertitle="Solar Altitude Series",
             title="Solar Altitude",
-            label='Altitude',
+            label="Altitude",
             legend_labels=None,
             terminal_width_fraction=terminal_width_fraction,
         )

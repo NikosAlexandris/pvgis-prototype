@@ -1,121 +1,68 @@
-from datetime import date
 from pathlib import Path
 from typing import Annotated, Any
 
 import numpy as np
-import orjson
 from fastapi import Request
-from fastapi.responses import Response
-from fastapi.responses import JSONResponse
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import JSONResponse, ORJSONResponse, Response
 from pandas import DatetimeIndex, to_datetime
 
-
-from pvgisprototype import LinkeTurbidityFactor, SpectralFactorSeries
-from pvgisprototype.api.irradiance.models import (
-    MethodForInexactMatches,
-    ModuleTemperatureAlgorithm,
-)
-from pvgisprototype.api.position.models import (
-    SOLAR_POSITION_ALGORITHM_DEFAULT,
-    SOLAR_TIME_ALGORITHM_DEFAULT,
-    SolarIncidenceModel,
-    SolarPositionModel,
-    SolarTimeModel,
-)
+from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.api.performance.report import summarise_photovoltaic_performance
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
-from pvgisprototype.api.power.broadband_multiple_surfaces import (
-    calculate_photovoltaic_power_output_series_from_multiple_surfaces,
-)
-from pvgisprototype.api.power.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.power.performance import summarise_photovoltaic_performance
-from pvgisprototype.api.quick_response_code import generate_quick_response_code
-from pvgisprototype.api.quick_response_code import QuickResponseCode
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.quick_response_code import (
+    QuickResponseCode,
+    generate_quick_response_code,
+)
+from pvgisprototype.api.utilities.conversions import (
+    convert_float_to_degrees_if_requested,
+)
 from pvgisprototype.constants import (
-    CSV_FLAG_DEFAULT,
     DEGREES,
+    FINGERPRINT_COLUMN_NAME,
+    FINGERPRINT_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     METADATA_FLAG_DEFAULT,
     NOT_AVAILABLE,
     PEAK_POWER_DEFAULT,
-    PHOTOVOLTAIC_PERFORMANCE_ANALYSIS_OUTPUT_FILENAME,
     PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_OUTPUT_FILENAME,
-    QUICK_RESPONSE_CODE_FLAG_DEFAULT,
-    RADIATION_CUTOFF_THRESHHOLD,
-    ALBEDO_DEFAULT,
-    ANALYSIS_FLAG_DEFAULT,
-    ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
-    FINGERPRINT_COLUMN_NAME,
-    FINGERPRINT_FLAG_DEFAULT,
-    IN_MEMORY_FLAG_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    MASK_AND_SCALE_FLAG_DEFAULT,
-    NEIGHBOR_LOOKUP_DEFAULT,
-    PERIGEE_OFFSET,
-    QUIET_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
-    SOLAR_CONSTANT,
-    STATISTICS_FLAG_DEFAULT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     SYSTEM_EFFICIENCY_DEFAULT,
-    TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
-    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.web_api.dependencies import (
-    fastapi_dependable_angle_output_units,
+    fastapi_dependable_fingerprint,
     fastapi_dependable_frequency,
-    fastapi_dependable_groupby,
     fastapi_dependable_latitude,
-    fastapi_dependable_linke_turbidity_factor_series,
     fastapi_dependable_longitude,
-    fastapi_dependable_refracted_solar_zenith,
-    fastapi_dependable_solar_position_models,
-    fastapi_dependable_spectral_factor_series,
     fastapi_dependable_surface_orientation,
-    fastapi_dependable_surface_orientation_list,
     fastapi_dependable_surface_tilt,
-    fastapi_dependable_surface_tilt_list,
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
-    # fastapi_dependable_csv,
     fastapi_dependable_verbose,
-    fastapi_dependable_fingerprint,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
-    fastapi_query_efficiency,
-    fastapi_query_temperature_model,
-    fastapi_query_radiation_cutoff_threshold,
-    fastapi_query_albedo,
     fastapi_query_analysis,
     fastapi_query_csv,
     fastapi_query_elevation,
     fastapi_query_end_time,
-    fastapi_query_fingerprint,
+    fastapi_query_index,
     fastapi_query_peak_power,
     fastapi_query_periods,
     fastapi_query_photovoltaic_module_model,
     fastapi_query_power_model,
     fastapi_query_quick_response_code,
-    fastapi_query_index,
     fastapi_query_quiet,
-    fastapi_query_solar_time_model,
     fastapi_query_start_time,
-    fastapi_query_statistics,
     fastapi_query_system_efficiency,
-    fastapi_query_tolerance,
-    fastapi_query_zero_negative_solar_incidence_angle,
 )
-from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Frequency, GroupBy, Timezone
+from pvgisprototype.web_api.schemas import AnalysisLevel, Frequency, Timezone
 
 
 def get_metadata(request: Request):
@@ -157,17 +104,33 @@ async def get_photovoltaic_performance_analysis(
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
-    surface_orientation: Annotated[float, fastapi_dependable_surface_orientation ] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Annotated[float, fastapi_dependable_surface_tilt ] = SURFACE_TILT_DEFAULT,
-    start_time: Annotated[str | None, fastapi_query_start_time] = '2013-01-01',  # Used by fastapi_query_start_time
-    periods: Annotated[str | None, fastapi_query_periods] = None,  # Used by fastapi_query_periods
+    surface_orientation: Annotated[
+        float, fastapi_dependable_surface_orientation
+    ] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: Annotated[
+        float, fastapi_dependable_surface_tilt
+    ] = SURFACE_TILT_DEFAULT,
+    start_time: Annotated[
+        str | None, fastapi_query_start_time
+    ] = "2013-01-01",  # Used by fastapi_query_start_time
+    periods: Annotated[
+        str | None, fastapi_query_periods
+    ] = None,  # Used by fastapi_query_periods
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = '2013-12-31', # Used by fastapi_query_end_time
+    end_time: Annotated[
+        str | None, fastapi_query_end_time
+    ] = "2013-12-31",  # Used by fastapi_query_end_time
     timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    photovoltaic_module: Annotated[ PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    system_efficiency: Annotated[float, fastapi_query_system_efficiency ] = SYSTEM_EFFICIENCY_DEFAULT,
-    power_model: Annotated[PhotovoltaicModulePerformanceModel, fastapi_query_power_model] = PhotovoltaicModulePerformanceModel.king,
+    photovoltaic_module: Annotated[
+        PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
+    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    system_efficiency: Annotated[
+        float, fastapi_query_system_efficiency
+    ] = SYSTEM_EFFICIENCY_DEFAULT,
+    power_model: Annotated[
+        PhotovoltaicModulePerformanceModel, fastapi_query_power_model
+    ] = PhotovoltaicModulePerformanceModel.king,
     peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     # statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     # groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
@@ -176,16 +139,56 @@ async def get_photovoltaic_performance_analysis(
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, fastapi_query_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, fastapi_query_quiet] = True,  # Keep me hardcoded !
-    fingerprint: Annotated[bool, fastapi_dependable_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    fingerprint: Annotated[
+        bool, fastapi_dependable_fingerprint
+    ] = FINGERPRINT_FLAG_DEFAULT,
     # metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     metadata: bool = METADATA_FLAG_DEFAULT,
-    quick_response_code: Annotated[QuickResponseCode, fastapi_query_quick_response_code] = QuickResponseCode.NoneValue,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
 ) -> Response:
     """Analyse the photovoltaic performance for a solar surface, various
     technologies, free-standing or building-integrated, at a specific location
     and a given period.
 
-    ### Algorithms & Models
+    <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
+    **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
+
+    # Features
+
+    - A symbol nomenclature for easy identification of quantities, units, and more -- see [Symbols](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/symbols/)
+    - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html)
+    - Valid time zone identifiers from [the IANA Time Zone Database](https://www.iana.org/time-zones)
+    - Surface position optimisation supported by [SciPy](https://docs.scipy.org/doc/scipy/reference/optimize.html) (**pending integration**)
+    - Get from simple to detailed output in form of **JSON**, **CSV** and **Excel** (the latter **pending implementation**)
+    - Share a **QR-Code** with a summary of the analysis
+    - **Fingerprint** your analysis
+    - Document your analysis including all **input metadata**
+
+    ## **Important Notes**
+
+    - The default time, if not given, regardless of the `frequency` is
+      `00:00:00`. It is then expected to get `0` incoming solar irradiance and
+      subsequently photovoltaic power/energy output.
+
+    - Of the four parameters `start_time`, `end_time`, `periods`, and
+      `frequency`, exactly three must be specified. If `frequency` is omitted,
+      the resulting timestamps (a Pandas `DatetimeIndex` object)
+      will have `periods` linearly spaced elements between `start_time` and
+      `end_time` (closed on both sides). Learn more about frequency strings at
+      [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
+
+    ## Need more control ?
+
+    In the `/performance/advanced` endpoint you may find :
+
+    - Optional algorithms for solar timing, positioning and the estimation of the solar incidence angle
+    - Disable atmospheric refraction for solar positioning
+    - Simpler power-rating model as well as module temperature model
+    - and more
+
+    # Algorithms & Models
 
     - Solar radiation model by Hofierka, 2002
     - Photovoltaic efficiency coefficients by ESTI, C2, JRC, European Commission
@@ -194,38 +197,14 @@ async def get_photovoltaic_performance_analysis(
     - Spectal mismatch effect by Huld, 2011
     - Overall system efficiency pre-set to 0.86, in other words 14% of loss for material degradation, aging, etc.
 
-    ### Input data
+    # Input data
 
     This function consumes internally :
-    
+
     - time series data limited to the period **2005** - **2023**.
     - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
     - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
-
-    ### **Important Notes**
-
-    - The default time, if not given, regardless of the `frequency` is
-      `00:00:00`. It is then expected to get `0` incoming solar irradiance and
-      subsequently photovoltaic power/energy output.
-
-    ### Features
-
-    - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html) 
-    - Surface position optimisation supported by [SciPy](https://docs.scipy.org/doc/scipy/reference/optimize.html) (**pending integration**)
-    - Get from simple to detailed output in form of **JSON**, **CSV** and **Excel** (the latter **pending implementation**)
-    - Share a **QR-Code** with a summary of the analysis
-    - **Fingerprint** your analysis
-    - Document your analysis including all **input metadata**
-
-    ### Need more control ?
-
-    In the `/performance/advanced` endpoint you may find :
-
-    - Optional algorithms for solar timing, positioning and the estimation of the solar incidence angle
-    - Disable atmospheric refraction for solar positioning
-    - Simpler power-rating model as well as module temperature model
-    - and more
 
     """
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
@@ -242,9 +221,7 @@ async def get_photovoltaic_performance_analysis(
         direct_horizontal_irradiance=Path(
             "sarah2_sid_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
-        spectral_factor_series=Path(
-            "spectral_effect_cSi_2013_over_esti_jrc.nc"
-            ),
+        spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
         temperature_series=Path(
             "era5_t2m_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
@@ -267,11 +244,10 @@ async def get_photovoltaic_performance_analysis(
     # ------------------------------------------------------------------------
 
     if csv:
-        from datetime import datetime
         from fastapi.responses import StreamingResponse
 
         # streaming_data = [(str(timestamp), photovoltaic_power) for timestamp, photovoltaic_power in zip(timestamps.tolist(), photovoltaic_power_output_series.value.tolist())]  # type: ignore
-        filename = 'filename.csv'
+        filename = "filename.csv"
         # filename = f"photovoltaic_power_output_{photovoltaic_power_output_series.components[FINGERPRINT_COLUMN_NAME]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
         # csv_content = ",".join(["Timestamp", "Photovoltaic Power"]) + "\n"
         # csv_content += (
@@ -286,40 +262,40 @@ async def get_photovoltaic_performance_analysis(
 
         dictionary = photovoltaic_power_output_series.components
         # remove 'Title' and 'Fingerprint' : we don't want repeated values ! ----
-        dictionary.pop('Title', NOT_AVAILABLE)
+        dictionary.pop("Title", NOT_AVAILABLE)
         fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
         # ------------------------------------------------------------- Important
 
-        header:list = []
+        header: list = []
         if index:
-            header.insert(0, 'Index')
+            header.insert(0, "Index")
         if longitude:
-            header.append('Longitude')
+            header.append("Longitude")
         if latitude:
-            header.append('Latitude')
+            header.append("Latitude")
 
-        header.append('Time')
+        header.append("Time")
         header.extend(dictionary.keys())
 
         # Convert single float or int values to arrays of the same length as timestamps
         for key, value in dictionary.items():
             if isinstance(value, (float, int)):
-                dictionary[key] = np.full(len(timestamps), value) # type: ignore
+                dictionary[key] = np.full(len(timestamps), value)  # type: ignore
             if isinstance(value, str):
-                dictionary[key] = np.full(len(timestamps), str(value)) # type: ignore
-        
+                dictionary[key] = np.full(len(timestamps), str(value))  # type: ignore
+
         # Zip series and timestamps
         zipped_series = zip(*dictionary.values())
-        zipped_data = zip(timestamps, zipped_series) # type: ignore
-        
+        zipped_data = zip(timestamps, zipped_series)  # type: ignore
+
         rows = []
         for idx, (timestamp, values) in enumerate(zipped_data):
             row = []
             if index:
                 row.append(idx)
             if longitude and latitude:
-                row.extend([longitude, latitude]) # type: ignore
-            row.append(timestamp.strftime('%Y-%m-%d %H:%M:%S'))
+                row.extend([longitude, latitude])  # type: ignore
+            row.append(timestamp.strftime("%Y-%m-%d %H:%M:%S"))
             row.extend(values)
             rows.append(row)
 
@@ -335,8 +311,8 @@ async def get_photovoltaic_performance_analysis(
 
     response = {}
     headers = {
-                "Content-Disposition": f'attachment; filename="{PHOTOVOLTAIC_POWER_OUTPUT_FILENAME}.json"'
-            }
+        "Content-Disposition": f'attachment; filename="{PHOTOVOLTAIC_POWER_OUTPUT_FILENAME}.json"'
+    }
 
     if fingerprint:
         response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[
@@ -352,7 +328,7 @@ async def get_photovoltaic_performance_analysis(
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
             }
-            
+
     if analysis.value != AnalysisLevel.NoneValue:
         photovoltaic_performance_report = summarise_photovoltaic_performance(
             longitude=longitude,
@@ -368,7 +344,7 @@ async def get_photovoltaic_performance_analysis(
         response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report
 
     if metadata:
-        response['Metadata'] = get_metadata(request=request)
+        response["Metadata"] = get_metadata(request=request)
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
@@ -383,17 +359,17 @@ async def get_photovoltaic_performance_analysis(
             output_type=quick_response_code,
         )
         if quick_response_code.value == QuickResponseCode.Base64:
-            response["QR"] = (f"data:image/png;base64,{quick_response}")
+            response["QR"] = f"data:image/png;base64,{quick_response}"
         elif quick_response_code.value == QuickResponseCode.Image:
             from io import BytesIO
+
             buffer = BytesIO()
-            image = quick_response.make_image() # type: ignore
+            image = quick_response.make_image()  # type: ignore
             image.save(buffer, format="PNG")
             image_bytes = buffer.getvalue()
             return Response(content=image_bytes, media_type="image/png")
         else:
             return JSONResponse(content={"message": "No QR code generated."})
-
 
     # return Response(
     #     orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"

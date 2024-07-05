@@ -1,22 +1,23 @@
-from pvgisprototype import (
-    TemperatureSeries,
-    WindSpeedSeries,
-    SpectralFactorSeries,
+import datetime
+import random
+from zoneinfo import ZoneInfo
+
+from pvgisprototype import (  # SurfaceOrientation,; SurfaceTilt,
+    Latitude,
     LinkeTurbidityFactor,
     Longitude,
-    Latitude,
-    # SurfaceOrientation,
-    # SurfaceTilt,
+    SpectralFactorSeries,
+    TemperatureSeries,
+    WindSpeedSeries,
 )
-
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.utilities.timestamp import generate_datetime_series
-import random
-import datetime
-from zoneinfo import ZoneInfo
 from pvgisprototype.api.surface.optimize_angles import optimize_angles
-from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMethod, SurfacePositionOptimizerMode
-
+from pvgisprototype.api.surface.parameter_models import (
+    SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMode,
+)
+from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
+import math
 
 def generate_random_date():
     date = datetime.datetime(
@@ -36,17 +37,17 @@ latitude = Latitude(value=45.812, unit="degrees")
 elevation = random.randrange(0, 200)
 
 # surface_orientation_value = random.uniform(0, SurfaceOrientation().max_radians)
-import math
+
 # surface_orientation = (SurfaceOrientation(value=math.pi, unit="radians"),)
 surface_orientation = math.pi
 # surface_tilt = (
 #     SurfaceTilt(value=random.uniform(0, SurfaceTilt().max_radians), unit="radians"),
 # )
-surface_tilt = math.pi/4
+surface_tilt = math.pi / 4
 # start_time, end_time = generate_random_date(), generate_random_date()
-start_time='2005-01-01'
-end_time='2020-12-31'
-timezone=ZoneInfo('UTC')
+start_time = "2005-01-01"
+end_time = "2020-12-31"
+timezone = ZoneInfo("UTC")
 if start_time > end_time:
     start_time, end_time = end_time, start_time
 # temperature_value = random.uniform(0, 35)

@@ -38,11 +38,11 @@ class Timezone(str, Enum):
 
 
 class AnalysisLevel(str, Enum):
-    Minimal = 'Minimal'
-    Simple = 'Simple'
-    Advanced = 'Advanced'
-    Extended = 'Extended'
-    NoneValue = 'None'
+    Minimal = "Minimal"
+    Simple = "Simple"
+    Advanced = "Advanced"
+    Extended = "Extended"
+    NoneValue = "None"
 
 
 class Frequency(str, Enum):

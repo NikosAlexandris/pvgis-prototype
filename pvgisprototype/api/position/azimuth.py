@@ -26,44 +26,49 @@ Input South  │     180     │  │     90     │  │     0      │
 
 """
 
-from pvgisprototype.algorithms.jenco.solar_azimuth import calculate_solar_azimuth_series_jenco
-from pvgisprototype.algorithms.pvlib.solar_azimuth import calculate_solar_azimuth_series_pvlib
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from devtools import debug
-from typing import Dict, Optional
-from typing import List
-from pandas import DatetimeIndex
+from typing import Dict, List, Optional
 from zoneinfo import ZoneInfo
-from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_series_noaa
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarAzimuthTimeSeriesInputModel
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from pvgisprototype import SolarAzimuth
-from pvgisprototype import RefractedSolarZenith
-from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import TIME_ALGORITHM_NAME
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME
-from pvgisprototype.constants import AZIMUTH_NAME, AZIMUTH_ORIGIN_NAME
-from pvgisprototype.constants import UNIT_NAME
-from pvgisprototype.constants import NOT_AVAILABLE
+
+from devtools import debug
+from pandas import DatetimeIndex
+
+from pvgisprototype import Latitude, Longitude, RefractedSolarZenith, SolarAzimuth
+from pvgisprototype.algorithms.jenco.solar_azimuth import (
+    calculate_solar_azimuth_series_jenco,
+)
+from pvgisprototype.algorithms.noaa.solar_azimuth import (
+    calculate_solar_azimuth_series_noaa,
+)
+from pvgisprototype.algorithms.pvlib.solar_azimuth import (
+    calculate_solar_azimuth_series_pvlib,
+)
+from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
+from pvgisprototype.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    AZIMUTH_NAME,
+    AZIMUTH_ORIGIN_NAME,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    NOT_AVAILABLE,
+    PERIGEE_OFFSET,
+    POSITION_ALGORITHM_NAME,
+    RADIANS,
+    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    TIME_ALGORITHM_NAME,
+    UNIT_NAME,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_function_call
+from pvgisprototype.validation.functions import (
+    ModelSolarAzimuthTimeSeriesInputModel,
+    validate_with_pydantic,
+)
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 @validate_with_pydantic(ModelSolarAzimuthTimeSeriesInputModel)
 def model_solar_azimuth_series(
     longitude: Longitude,
@@ -72,7 +77,9 @@ def model_solar_azimuth_series(
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: Optional[
+        RefractedSolarZenith
+    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -106,7 +113,6 @@ def model_solar_azimuth_series(
     solar_azimuth_series = None
 
     if solar_position_model.value == SolarPositionModel.noaa:
-
         solar_azimuth_series = calculate_solar_azimuth_series_noaa(
             longitude=longitude,
             latitude=latitude,
@@ -120,7 +126,6 @@ def model_solar_azimuth_series(
         )
 
     if solar_position_model.value == SolarPositionModel.jenco:
-
         solar_azimuth_series = calculate_solar_azimuth_series_jenco(
             longitude=longitude,
             latitude=latitude,
@@ -179,7 +184,7 @@ def model_solar_azimuth_series(
         #     timing_algorithm='pysolar',
         # )
 
-    if solar_position_model.value  == SolarPositionModel.hofierka:
+    if solar_position_model.value == SolarPositionModel.hofierka:
         pass
         # solar_azimuth = calculate_solar_azimuth_pvis(
         #     longitude=longitude,
@@ -189,8 +194,7 @@ def model_solar_azimuth_series(
         #     solar_time_model=solar_time_model,
         # )
 
-    if solar_position_model.value  == SolarPositionModel.pvlib:
-
+    if solar_position_model.value == SolarPositionModel.pvlib:
         solar_azimuth_series = calculate_solar_azimuth_series_pvlib(
             longitude=longitude,
             latitude=latitude,
@@ -220,7 +224,9 @@ def calculate_solar_azimuth_series(
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: Optional[RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: Optional[
+        RefractedSolarZenith
+    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
@@ -231,7 +237,9 @@ def calculate_solar_azimuth_series(
     """
     results = {}
     for solar_position_model in solar_position_models:
-        if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
+        if (
+            solar_position_model != SolarPositionModel.all
+        ):  # ignore 'all' in the enumeration
             solar_azimuth_series = model_solar_azimuth_series(
                 longitude=longitude,
                 latitude=latitude,
@@ -247,10 +255,26 @@ def calculate_solar_azimuth_series(
             )
             solar_azimuth_model_series = {
                 solar_position_model.name: {
-                    TIME_ALGORITHM_NAME: solar_azimuth_series.timing_algorithm if solar_azimuth_series else NOT_AVAILABLE,
-                    POSITION_ALGORITHM_NAME: solar_azimuth_series.position_algorithm if solar_azimuth_series else NOT_AVAILABLE,
-                    AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
-                    AZIMUTH_ORIGIN_NAME: solar_azimuth_series.origin if solar_azimuth_series else NOT_AVAILABLE,
+                    TIME_ALGORITHM_NAME: (
+                        solar_azimuth_series.timing_algorithm
+                        if solar_azimuth_series
+                        else NOT_AVAILABLE
+                    ),
+                    POSITION_ALGORITHM_NAME: (
+                        solar_azimuth_series.position_algorithm
+                        if solar_azimuth_series
+                        else NOT_AVAILABLE
+                    ),
+                    AZIMUTH_NAME: (
+                        getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE)
+                        if solar_azimuth_series
+                        else NOT_AVAILABLE
+                    ),
+                    AZIMUTH_ORIGIN_NAME: (
+                        solar_azimuth_series.origin
+                        if solar_azimuth_series
+                        else NOT_AVAILABLE
+                    ),
                     UNIT_NAME: angle_output_units,
                 }
             }

@@ -1,26 +1,25 @@
-from os import times
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from devtools import debug
-from typing import Any
-from typing import Optional
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
 from datetime import datetime
 from pathlib import Path
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT, VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.api.series.utilities import select_location_time_series
-from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.api.series.utilities import get_scale_and_offset
-from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.api.series.hardcodings import check_mark
-from pvgisprototype.api.series.hardcodings import x_mark
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
+from typing import Optional
+
+from devtools import debug
 from pandas import DatetimeIndex
+
+from pvgisprototype import Latitude, Longitude
+from pvgisprototype.api.series.hardcodings import exclamation_mark
+from pvgisprototype.api.series.models import MethodForInexactMatches
+from pvgisprototype.api.series.utilities import (
+    get_scale_and_offset,
+    select_location_time_series,
+)
+from pvgisprototype.caching import custom_cached
+from pvgisprototype.constants import (
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 def remap_to_2013(ts):
@@ -36,7 +35,7 @@ def remap_to_2013(ts):
     Adjusts the year of the given timestamp to 2013, handling specific edge cases:
     - Moves December timestamps to January 1, 2013.
     - Adjusts February 29 to February 28, 2013, for non-leap years.
-    
+
     Parameters
     ----------
     ts: datetime
@@ -65,7 +64,7 @@ def remap_to_2013(ts):
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 def select_time_series(
     time_series: Path,
     longitude: Longitude,
@@ -76,7 +75,7 @@ def select_time_series(
     remap_to_month_start: Optional[bool] = False,
     # convert_longitude_360: bool = False,
     neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = 0.1, # Customize default if needed
+    tolerance: Optional[float] = 0.1,  # Customize default if needed
     mask_and_scale: bool = False,
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,
@@ -91,13 +90,13 @@ def select_time_series(
     #     longitude = longitude % 360
     # warn_for_negative_longitude(longitude)
 
-    logger.info(f'Dataset : {time_series.name}')
-    logger.info(f'Path to : {time_series.parent.absolute()}')
+    logger.info(f"Dataset : {time_series.name}")
+    logger.info(f"Path to : {time_series.parent.absolute()}")
     scale_factor, add_offset = get_scale_and_offset(time_series)
-    logger.info(f'Scale factor : {scale_factor}, Offset : {add_offset}')
+    logger.info(f"Scale factor : {scale_factor}, Offset : {add_offset}")
 
-    if (longitude and latitude):
-        coordinates = f'Coordinates : {longitude}, {latitude}'
+    if longitude and latitude:
+        coordinates = f"Coordinates : {longitude}, {latitude}"
         logger.info(coordinates)
 
     location_time_series = select_location_time_series(
@@ -121,45 +120,61 @@ def select_time_series(
             start_time = location_time_series.time.values[0]
 
         else:  # Convert `start_time` & `end_time` to the correct string format
-            start_time = start_time.strftime('%Y-%m-%d %H:%M:%S')
-            end_time = end_time.strftime('%Y-%m-%d %H:%M:%S')
-    
+            start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
+            end_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
+
         try:
-            location_time_series = (
-                location_time_series.sel(time=slice(start_time, end_time))
+            location_time_series = location_time_series.sel(
+                time=slice(start_time, end_time)
             )
-        except Exception as e:
-            logger.exception(f"No data found for the given period {start_time} and {end_time}.")
+        except Exception:
+            logger.exception(
+                f"No data found for the given period {start_time} and {end_time}."
+            )
 
     if remap_to_month_start:
         remapped_timestamps = timestamps.map(lambda ts: remap_to_2013(ts))
-        from pandas import date_range
-        month_start_timestamps = date_range(start=remapped_timestamps.min().normalize(), end=remapped_timestamps.max(), freq='MS')
-        try:
-            location_time_series = location_time_series.sel(
-                time=month_start_timestamps, method=neighbor_lookup
+        if not remapped_timestamps.empty:
+            from pandas import date_range
+
+            month_start_timestamps = date_range(
+                start=remapped_timestamps.min().normalize(),
+                end=remapped_timestamps.max(),
+                freq="MS",
             )
-        except Exception as e:
-            logger.exception(f"No data found for the given 'month start' timestamps {month_start_timestamps}.")
+            try:
+                location_time_series = location_time_series.sel(
+                    time=month_start_timestamps, method=neighbor_lookup
+                )
+            except Exception:
+                logger.exception(
+                    f"No data found for the given 'month start' timestamps {month_start_timestamps}."
+                )
+        else:
+            error_message = "Remapped timestamps are empty, cannot proceed with date range creation."
+            logger.error(error_message)
+            raise ValueError(error_message)
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
             start_time = end_time = timestamps[0]
-        
+
         try:
-            location_time_series = (
-                location_time_series.sel(time=timestamps, method=neighbor_lookup)
+            location_time_series = location_time_series.sel(
+                time=timestamps, method=neighbor_lookup
             )
         except KeyError:
-            logger.exception(f"No data found for one or more of the given {timestamps}.")
+            logger.exception(
+                f"No data found for one or more of the given {timestamps}."
+            )
 
     if location_time_series.size == 1:
         single_value = float(location_time_series.values)
         warning = (
             f"{exclamation_mark} The selected timestamp "
             + f"{location_time_series.time.values}"
-            + f" matches the single value "
-            + f'{single_value}'
+            + " matches the single value "
+            + f"{single_value}"
         )
         logger.warning(warning)
 
@@ -170,9 +185,9 @@ def select_time_series(
         debug(locals())
 
     log_data_fingerprint(
-            data=location_time_series.values,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
-            )
+        data=location_time_series.values,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return location_time_series

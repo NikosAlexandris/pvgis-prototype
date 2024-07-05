@@ -1,37 +1,35 @@
+from math import cos, sin
+from zoneinfo import ZoneInfo
+
 import numpy
 from devtools import debug
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from math import sin
-from math import cos
-from math import isfinite
-from pvgisprototype import SolarAltitude
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
-from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
-from pvgisprototype.constants import NO_SOLAR_INCIDENCE, RADIANS
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
 from pandas import DatetimeIndex
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
+
+from pvgisprototype import Latitude, Longitude, SolarAltitude
+from pvgisprototype.algorithms.pvis.solar_declination import (
+    calculate_solar_declination_series_hofierka,
+)
+from pvgisprototype.algorithms.pvis.solar_hour_angle import (
+    calculate_solar_hour_angle_series_hofierka,
+)
+from pvgisprototype.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    RADIANS,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 # @validate_with_pydantic(CalculateSolarAltitudeTimeSeriesJencoInput)
 def calculate_solar_altitude_series_jenco(
-    longitude: Longitude,   # radians
-    latitude: Latitude,     # radians
+    longitude: Longitude,  # radians
+    latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     perigee_offset: float,
@@ -89,7 +87,6 @@ def calculate_solar_altitude_series_jenco(
         verbose=verbose,
         log=log,
     )
-    # solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
     solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
         longitude=longitude,
         timestamps=timestamps,
