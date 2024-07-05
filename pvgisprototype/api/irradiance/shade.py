@@ -1,18 +1,19 @@
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from typing import List
-from pvgisprototype import HorizonHeight
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
+
 import numpy as np
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import HORIZON_HEIGHT_UNIT
+
+from pvgisprototype import HorizonHeight
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    HORIZON_HEIGHT_UNIT,
+    LOG_LEVEL_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
 
 # @validate_with_pydantic()
@@ -50,12 +51,9 @@ def interpolate_horizon_height(
     position_after = 0 if position_after == len(horizon_heights) else position_after
 
     # Interpolate the horizon height (or weighted average)
-    horizon_height = (
-        (1 - (position_in_interval - position_before))
-        * horizon_heights[position_before] 
-        + (position_in_interval - position_before)
-        * horizon_heights[position_after]
-    )
+    horizon_height = (1 - (position_in_interval - position_before)) * horizon_heights[
+        position_before
+    ] + (position_in_interval - position_before) * horizon_heights[position_after]
 
     return HorizonHeight(horizon_height, HORIZON_HEIGHT_UNIT)
 
@@ -98,10 +96,8 @@ def interpolate_horizon_height_series(
     weights_after = positions_in_interval - positions_before
     weights_before = 1 - weights_after
     interpolated_horizon_heights = (
-        weights_before
-        * horizon_heights[positions_before]
-        + weights_after
-        * horizon_heights[positions_after]
+        weights_before * horizon_heights[positions_before]
+        + weights_after * horizon_heights[positions_after]
     )
 
     return HorizonHeight(interpolated_horizon_heights, HORIZON_HEIGHT_UNIT)
@@ -144,10 +140,12 @@ def is_surface_in_shade(
         return True
 
     if horizon_heights is not None:
-        horizon_height = interpolate_horizon_height(solar_azimuth, horizon_heights, horizon_interval)
+        horizon_height = interpolate_horizon_height(
+            solar_azimuth, horizon_heights, horizon_interval
+        )
         if horizon_height > solar_altitude:
             return True
-    
+
     return False
 
 
@@ -179,15 +177,15 @@ def is_surface_in_shade_series(
     """
     array_parameters = {
         "shape": solar_altitude_series.value.shape,  # Borrow shape from it
-        "dtype": 'bool',
+        "dtype": "bool",
         "init_method": False,
         "backend": array_backend,
     }
     surface_in_shade_series = create_array(**array_parameters)
     log_data_fingerprint(
-            data=surface_in_shade_series, ### FixMe!
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=surface_in_shade_series,  ### FixMe!
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return surface_in_shade_series

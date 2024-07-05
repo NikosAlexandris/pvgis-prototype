@@ -1,22 +1,25 @@
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+
 from devtools import debug
 from pandas import DatetimeIndex
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateLocalSolarTimeNOAAInput
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from pvgisprototype import RefractedSolarZenith
-from .event_time import calculate_event_time_time_series_noaa
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
+from pvgisprototype import Latitude, Longitude, RefractedSolarZenith
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateLocalSolarTimeNOAAInput,
+)
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.validation.functions import validate_with_pydantic
+
+from .event_time import calculate_event_time_time_series_noaa
+
+import numpy as np
 
 @validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
 def calculate_local_solar_time_noaa(
@@ -40,7 +43,7 @@ def calculate_local_solar_time_noaa(
     Notes
     -----
 
-    The local standard time (LST) 
+    The local standard time (LST)
 
 
     The general equation for AST is :
@@ -77,17 +80,17 @@ def calculate_local_solar_time_noaa(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
-        event='noon',
+        event="noon",
         refracted_solar_zenith=refracted_solar_zenith,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
     )
-    local_solar_time_delta = numpy.where(
-            timestamps < solar_noon_series,
-            timestamps - (solar_noon_series - timedelta(days=1)),
-            timestamps - solar_noon_series
-            )
+    local_solar_time_delta = np.where(
+        timestamps < solar_noon_series,
+        timestamps - (solar_noon_series - timedelta(days=1)),
+        timestamps - solar_noon_series,
+    )
     total_seconds = int(local_solar_time_delta.total_seconds())
-    local_solar_time_series= timestamps + timedelta(seconds=total_seconds)
+    local_solar_time_series = timestamps + timedelta(seconds=total_seconds)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
