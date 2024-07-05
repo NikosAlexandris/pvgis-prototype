@@ -1,11 +1,12 @@
+import collections.abc as cabc
 import enum
-import numpy
-import dask.array
 import importlib.util
 import types
-import collections.abc as cabc
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
 
+import dask.array
+import numpy
+
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
 
 CUPY_ENABLED = importlib.util.find_spec("cupy") is not None
 if CUPY_ENABLED:
@@ -58,7 +59,7 @@ class NDArrayBackend(enum.Enum):
     def module(self, linear_algebra: bool = False) -> types.ModuleType:
         """
         Return the Python module associated with an array backend.
-        
+
         Parameters
         ----------
         linear_algebra: bool
@@ -92,7 +93,9 @@ class ArrayDType(enum.Enum):
         try:
             return cls[dtype_str.upper()].value
         except KeyError:
-            raise ValueError(f"Invalid dtype. Supported types are: {list(cls.__members__.keys())}")
+            raise ValueError(
+                f"Invalid dtype. Supported types are: {list(cls.__members__.keys())}"
+            )
 
 
 def supported_array_types() -> cabc.Collection[type]:
@@ -105,9 +108,9 @@ def supported_array_types() -> cabc.Collection[type]:
 def create_array(
     shape,
     dtype: str = DATA_TYPE_DEFAULT,
-    init_method: bool | int | float | str ='zeros',
-    backend: str ='numpy',
-    use_gpu: bool =False,
+    init_method: bool | int | float | str = "zeros",
+    backend: str = "numpy",
+    use_gpu: bool = False,
 ):
     """
     Create an array with given shape, data type, initialization method, backend, and optional GPU usage.
@@ -133,7 +136,9 @@ def create_array(
     # Handle backend selection
     else:
         if backend not in NDArrayBackend.__members__:
-            raise ValueError(f"Invalid backend. Choose among {list(NDArrayBackend.__members__.keys())}.")
+            raise ValueError(
+                f"Invalid backend. Choose among {list(NDArrayBackend.__members__.keys())}."
+            )
         array_backend = NDArrayBackend[backend.upper()]
 
     array_module = array_backend.module()
@@ -143,13 +148,15 @@ def create_array(
         array = array_module.full(shape, init_method, dtype=dtype_obj)
     elif isinstance(init_method, bool):
         array = array_module.full(shape, init_method, dtype=bool)
-    elif init_method == 'zeros':
+    elif init_method == "zeros":
         array = array_module.zeros(shape, dtype=dtype_obj)
-    elif init_method == 'ones':
+    elif init_method == "ones":
         array = array_module.ones(shape, dtype=dtype_obj)
-    elif init_method == 'empty':
+    elif init_method == "empty":
         array = array_module.empty(shape, dtype=dtype_obj)
     else:
-        raise ValueError("Invalid initialization method. Choose 'zeros', 'ones', 'empty', or provide a specific value.")
+        raise ValueError(
+            "Invalid initialization method. Choose 'zeros', 'ones', 'empty', or provide a specific value."
+        )
 
     return array
