@@ -25,381 +25,63 @@ application, and the Web API as well, is :
 - Spectral factor series for 2013, equally used for every other year, produced
   by Thomas Huld and ... in collaboration with ...
 
-
 ## Input time series
 
 ```python exec="true" html="true"
-from base64 import b64encode
-from contextlib import suppress
-
-from diagrams import Diagram, Cluster, Edge
-from diagrams.custom import Custom
-
-
-icons_path = "docs/icons"
-
-pvgis6_icon = "docs/logos/pvgis6_70px.png"
-transmission_control_protocol_icon = f"{icons_path}/noun-transmission-control-protocol-6111114.svg"
-data_analysis_icon = f"{icons_path}/noun-data-analysis.svg"
-irradiance_icon = f"{icons_path}/wiggly_vertical_line.svg"
-global_horizontal_irradiance_icon = f"{icons_path}/noun_global_horizontal_irradiance.svg"
-direct_horizontal_irradiance_icon = f"{icons_path}/noun_direct_horizontal_irradiance.svg"
-spectral_effect_icon = f"{icons_path}/noun-sun-525998_modified.svg"
-temperature_icon = f"{icons_path}/thermometer.svg"
-photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
-wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
-cupy_icon = "docs/logos/CuPy_300x300.png"
-xarray_icon = "docs/logos/Xarray_RGB.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
-data_array_icon = "docs/logos/data_array.svg"
-numpy_icon = "docs/logos/numpy.svg"
-dask_icon = "docs/logos/dask.svg"
-pydantic_icon = "docs/logos/pydantic.png"
-zarr_icon = "docs/logos/zarr.png"  # zarr_logo_x.png
-kerchunk_icon = "docs/logos/kerchunk.png"
-binary_data_icon = "docs/logos/pastebin.svg"
-files_icon = f"{icons_path}/files.svg"
-pandas_icon = "docs/logos/pandas.svg"
-python = "docs/logos/python.svg"
-c_icon = "docs/logos/c.svg"
-cplusplus_icon = "docs/logos/cplusplus.svg"
-
-
-try:
-    with suppress(FileNotFoundError):
-        with Diagram("Analysis of Photovoltaic Performance", direction="TB", show=False) as diagram:
-            diagram.render = lambda: None
-
-
-            # "Raw" Data Acquisition & Production
-
-            Satellite_to_Data = Custom("Data Acquisition", transmission_control_protocol_icon)
-            ERA5_Data = Custom("ERA5 Reanalysis Data", data_array_icon)
-            Analysis = Custom("Analysis & Production", data_analysis_icon)
-
-
-            # Data
-
-            Data = Custom("Data / Observations", files_icon)
-            Files = Custom("Data", files_icon)
-            NetCDF = Custom("", netcdf_icon)
-
-
-            with Cluster("Time Series"):
-
-                with Cluster("SARAH 2/3 climate records"):
-                    Global_Horizontal_Irradiance = Custom("Global Horizontal Irradiance\n(GHI)", global_horizontal_irradiance_icon)
-                    Direct_Horizontal_Irradiance = Custom("Direct Horizontal Irradiance\n(DHI)", direct_horizontal_irradiance_icon)
-            
-                with Cluster("ERA5 Reanalysis Data"):
-                    Temperature = Custom("Temperature", temperature_icon)
-                    Wind_Speed = Custom("Wind Speed", wind_speed_icon)
-
-                Spectral_Effect = Custom("\nSpectral Factor", spectral_effect_icon)
-
-
-
-            # Workflow =======================================================
-
-            # Format of Time Series Data
-
-            Satellite_to_Data >> Global_Horizontal_Irradiance >> NetCDF
-            Satellite_to_Data >> Direct_Horizontal_Irradiance >> NetCDF
-
-            Satellite_to_Data \
-            - Edge(label="+", style="dashed") \
-            - Analysis \
-            >> ERA5_Data
-
-            ERA5_Data >> Temperature >> NetCDF
-            ERA5_Data >> Wind_Speed >> NetCDF
-            Analysis >> Spectral_Effect >> NetCDF
-
-            # Encode diagram as a PNG and print it in HTML Image format
-
-            png = b64encode(diagram.dot.pipe(format="png")).decode()
-
-    # Finally, print the "flow"
-
-    print(f'<img src="data:image/png;base64, {png}"/>')
-
-except Exception as e:
-    print(f"An error occurred: {e}")
-    import traceback
-    traceback.print_exc()  # This prints the full traceback
+--8<-- "docs/reference/time_series_data_input_diagram.py"
 ```
-
 
 ## Reading time series
 
 How does PVGIS 6 read external time series ?
 
-```python exec="true" html="true"
-from base64 import b64encode
-from contextlib import suppress
+### Master-Plan
 
-from diagrams import Diagram, Cluster, Edge
-from diagrams.custom import Custom
-
-
-icons_path = "docs/icons"
-
-pvgis6_icon = "docs/logos/pvgis6_70px.png"
-transmission_control_protocol_icon = f"{icons_path}/noun-transmission-control-protocol-6111114.svg"
-data_analysis_icon = f"{icons_path}/noun-data-analysis.svg"
-irradiance_icon = f"{icons_path}/wiggly_vertical_line.svg"
-global_horizontal_irradiance_icon = f"{icons_path}/noun_global_horizontal_irradiance.svg"
-direct_horizontal_irradiance_icon = f"{icons_path}/noun_direct_horizontal_irradiance.svg"
-spectral_effect_icon = f"{icons_path}/noun-sun-525998_modified.svg"
-temperature_icon = f"{icons_path}/thermometer.svg"
-photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
-wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
-
-data_array_icon = "docs/logos/data_array.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
-
-kerchunk_icon = "docs/logos/kerchunk.png"
-binary_data_icon = "docs/logos/pastebin.svg"
-json_icon = "docs/logos/json.svg"
-parquet_icon = "docs/logos/apacheparquet.svg"
-zarr_icon = "docs/logos/zarr.png"  # zarr_logo_x.png
-xarray_icon = "docs/logos/Xarray_RGB.svg"
-
-pydantic_icon = "docs/logos/pydantic.png"
-
-pandas_icon = "docs/logos/pandas.svg"
-numpy_icon = "docs/logos/numpy.svg"
-dask_icon = "docs/logos/dask.svg"
-cupy_icon = "docs/logos/CuPy_300x300.png"
-
-files_icon = f"{icons_path}/files.svg"
-
-python = "docs/logos/python.svg"
-c_icon = "docs/logos/c.svg"
-cplusplus_icon = "docs/logos/cplusplus.svg"
-
-
-try:
-    with suppress(FileNotFoundError):
-        with Diagram("Reading Time Series", direction="TB", show=False) as diagram:
-            diagram.render = lambda: None
-
-            # Data
-
-            NetCDF1 = Custom("1", netcdf_icon)
-            NetCDF2 = Custom("2", netcdf_icon)
-            NetCDFx = Custom("..x", netcdf_icon)
-
-            # Tools
-
-            Kerchunk = Custom("Kerchunk", kerchunk_icon)
-            #In_Memory = Custom("First Call Read In Memory", '')
-            Xarray = Custom("", xarray_icon)
-
-
-            # Pre-Processed Data
-
-            with Cluster('*First Call Read In-Memory'):
-                Index = Custom("Parquet Index", binary_data_icon)
-                with Cluster("Optional Formats"):
-                    JSON = Custom("JSON", json_icon)
-                    Parquet = Custom("Parquet", parquet_icon)
-
-
-            # Input Data to PVGIS
-            
-            Virtual_Zarr = Custom("", zarr_icon)
-
-            # Analysis of Photovoltaic Performance
-
-            PVGIS_6 = Custom("PVGIS 6", pvgis6_icon)
-
-
-            # Workflow =======================================================
-
-            Index - Edge(style="dashed") - Parquet
-            Index - Edge(style="dashed") - JSON
-
-            [NetCDF1, NetCDF2, NetCDFx] \
-            - Edge(label="Read time series", color="firebrick", style="dashed") \
-            - Kerchunk \
-            - Edge(
-                   label="Generate Index /\nVirtual Zarr",
-                   color="firebrick",
-                   style="dashed"
-                  ) \
-            - Index \
-            - Edge(label="", color="firebrick", style="dashed") \
-            - Virtual_Zarr \
-            - Edge(label="Read with Zarr engine", color="firebrick", style="dashed") \
-            - Xarray \
-            - Edge(label="", color="firebrick") \
-            >> PVGIS_6
-
-            # Encode diagram as a PNG and print it in HTML Image format
-
-            png = b64encode(diagram.dot.pipe(format="png")).decode()
-
-    # Finally, print the "flow"
-
-    print(f'<img src="data:image/png;base64, {png}"/>')
-
-except Exception as e:
-    print(f"An error occurred: {e}")
-    import traceback
-    traceback.print_exc()  # This prints the full traceback
-```
-
-## From A to Ω
+#### Pre-Process
 
 ```python exec="true" html="true"
-from base64 import b64encode
-from contextlib import suppress
-
-from diagrams import Diagram, Cluster, Edge
-from diagrams.custom import Custom
-
-
-icons_path = "docs/icons"
-
-pvgis6_icon = "docs/logos/pvgis6_70px.png"
-transmission_control_protocol_icon = f"{icons_path}/noun-transmission-control-protocol-6111114.svg"
-data_analysis_icon = f"{icons_path}/noun-data-analysis.svg"
-irradiance_icon = f"{icons_path}/wiggly_vertical_line.svg"
-global_horizontal_irradiance_icon = f"{icons_path}/noun_global_horizontal_irradiance.svg"
-direct_horizontal_irradiance_icon = f"{icons_path}/noun_direct_horizontal_irradiance.svg"
-spectral_effect_icon = f"{icons_path}/noun-sun-525998_modified.svg"
-temperature_icon = f"{icons_path}/thermometer.svg"
-photovoltaic_power_icon = f"{icons_path}/noun-solar-energy-853048.svg"
-wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani Pomal from <a href="https://thenounproject.com/browse/icons/term/windsock/" target="_blank" title="Windsock Icons">Noun Project</a> (CC BY 3.0) 
-cupy_icon = "docs/logos/CuPy_300x300.png"
-xarray_icon = "docs/logos/Xarray_RGB.svg"
-netcdf_icon = "docs/logos/netcdf-400x400.png"
-data_array_icon = "docs/logos/data_array.svg"
-numpy_icon = "docs/logos/numpy.svg"
-dask_icon = "docs/logos/dask.svg"
-pydantic_icon = "docs/logos/pydantic.png"
-zarr_icon = "docs/logos/zarr.png"  # zarr_logo_x.png
-kerchunk_icon = "docs/logos/kerchunk.png"
-binary_data_icon = "docs/logos/pastebin.svg"
-files_icon = f"{icons_path}/files.svg"
-pandas_icon = "docs/logos/pandas.svg"
-python = "docs/logos/python.svg"
-c_icon = "docs/logos/c.svg"
-cplusplus_icon = "docs/logos/cplusplus.svg"
-
-
-try:
-    with suppress(FileNotFoundError):
-        with Diagram("Analysis of Photovoltaic Performance", direction="TB", show=False) as diagram:
-            diagram.render = lambda: None
-
-
-            # "Raw" Data Acquisition & Production
-
-            Satellite_to_Data = Custom("Data Acquisition", transmission_control_protocol_icon)
-            ERA5_Data = Custom("ERA5 Reanalysis Data", data_array_icon)
-            Analysis = Custom("Analysis & Production", data_analysis_icon)
-
-
-            # Data
-
-            Data = Custom("Data / Observations", files_icon)
-            Files = Custom("Data", files_icon)
-            NetCDF = Custom("", netcdf_icon)
-
-
-            with Cluster("Time Series"):
-
-                with Cluster("SARAH 2/3 climate records"):
-                    Global_Horizontal_Irradiance = Custom("Global Horizontal Irradiance\n(GHI)", global_horizontal_irradiance_icon)
-                    Direct_Horizontal_Irradiance = Custom("Direct Horizontal Irradiance\n(DHI)", direct_horizontal_irradiance_icon)
-            
-                with Cluster("ERA5 Reanalysis Data"):
-                    Temperature = Custom("Temperature", temperature_icon)
-                    Wind_Speed = Custom("Wind Speed", wind_speed_icon)
-
-                Spectral_Effect = Custom("\nSpectral Factor", spectral_effect_icon)
-
-
-            # Tools
-
-            # Kerchunk
-
-            Kerchunk = Custom("Kerchunk", kerchunk_icon)
-            #In_Memory = Custom("First Call Read In Memory", '')
-
-
-            # Pre-Processed Data
-
-            with Cluster('*First Call Read In-Memory'):
-                Index = Custom("Index", binary_data_icon)
-
-
-            # Input Data to PVGIS
-            
-            with Cluster("Time Series for Photovoltaic Analysis"):
-
-                Virtual_Zarr = Custom("Virtual Zarr store", zarr_icon)
-
-
-            # Analysis of Photovoltaic Performance
-
-            with Cluster("Photovoltaic Performance Analysis"):
-                PVGIS_6 = Custom("PVGIS 6", pvgis6_icon)
-
-
-            Photovoltaic_Power = Custom("Photovoltaic Energy\nPVGIS 6", photovoltaic_power_icon)
-
-
-            # Workflow =======================================================
-
-            # Format of Time Series Data
-
-            Satellite_to_Data >> Global_Horizontal_Irradiance >> NetCDF
-            Satellite_to_Data >> Direct_Horizontal_Irradiance >> NetCDF
-
-            Satellite_to_Data \
-            - Edge(label="+", style="dashed") \
-            - Analysis \
-            >> ERA5_Data
-
-            ERA5_Data >> Temperature >> NetCDF
-            ERA5_Data >> Wind_Speed >> NetCDF
-            Analysis >> Spectral_Effect >> NetCDF
-
-
-            # PVGIS 6
-
-            NetCDF \
-            - Edge(label="Read NetCDF files", color="firebrick", style="dashed") \
-            - Kerchunk \
-            - Edge(
-                   label="Generate Index /\nVirtual Zarr",
-                   color="firebrick",
-                   style="dashed"
-                  ) \
-            - Index \
-            - Virtual_Zarr \
-            - Edge(label="Read from virtual Zarr store", color="firebrick", style="dashed") \
-            - PVGIS_6 \
-            >> Photovoltaic_Power
-
-
-            # Encode diagram as a PNG and print it in HTML Image format
-
-            png = b64encode(diagram.dot.pipe(format="png")).decode()
-
-    # Finally, print the "flow"
-
-    print(f'<img src="data:image/png;base64, {png}"/>')
-
-except Exception as e:
-    print(f"An error occurred: {e}")
-    import traceback
-    traceback.print_exc()  # This prints the full traceback
+--8<-- "docs/reference/time_series_data_preprocessing_diagram.py"
 ```
 
+#### Read
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_reading_diagram.py"
+```
+
+### Alternative 1
+
+!!! warning
+    
+    Storage-wise more costly
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_reading_alternative_diagram.py"
+```
+
+### Alternative 2
+
+!!! danger
+    
+    Storage-wise even more costly
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_reading_alternative_2_diagram.py"
+```
+
+## A to Ω
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_from_alpha_to_omega_diagram.py"
+```
+
+### A to Ω : Horizontally
+
+Same diagram "From A to Ω" with a horizontal layout
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_from_alpha_to_omega_alternative_diagram.py"
+```
 
 ### Icons
 

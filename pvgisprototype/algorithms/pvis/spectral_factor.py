@@ -1,6 +1,9 @@
 import numpy as np
 from numpy.typing import NDArray
-from pvgisprototype.algorithms.pvis.constants import STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE
+
+from pvgisprototype.algorithms.pvis.constants import (
+    STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE,
+)
 
 
 def integrate_spectrum_response(
@@ -21,7 +24,7 @@ def integrate_spectrum_response(
     nu_low = spectral_response_frequencies[0]
 
     number_of_response_values = len(spectral_response_frequencies)
-    number_of_kato_limits = len(kato_limits)
+    # number_of_kato_limits = len(kato_limits)
 
     while n < number_of_response_values - 1:
         if spectral_response_frequencies[n + 1] < kato_limits[m + 1]:
@@ -79,12 +82,14 @@ def calculate_minimum_spectral_mismatch(
       (2002). Influence of Spectral Effects on the Performance of Multijunction
       Amorphous Silicon Cells. to be published.
     """
+    minimum_spectral_mismatch = 0  # FixMe
+    minimum_junction = 1  # FixMe
     for junction in range(number_of_junctions):
         spectral_mismatch = integrate_spectrum_response(
-                spectral_response_frequencies=response_wavelengths,
-                spectral_response=spectral_response,
-                kato_limits=junction,
-                spectral_power_density=spectral_power_density,
+            spectral_response_frequencies=response_wavelengths,
+            spectral_response=spectral_response,
+            kato_limits=junction,
+            spectral_power_density=spectral_power_density,
         )
         if spectral_mismatch < minimum_spectral_mismatch:
             minimum_spectral_mismatch = spectral_mismatch
@@ -112,8 +117,9 @@ def calculate_spectral_factor(
         spectral_power_density=spectral_power_density,
     )
     spectral_factor = (
-        minimum_spectral_mismatch * STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE /
-        (global_total_power * standard_conditions_response)
+        minimum_spectral_mismatch
+        * STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE
+        / (global_total_power * standard_conditions_response)
     )
 
     return spectral_factor

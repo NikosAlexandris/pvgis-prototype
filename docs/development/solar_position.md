@@ -4,7 +4,7 @@ tags:
   - Development
   - Roadmap
   - Progress
-  - Solar Geometry
+  - Solar Position
 ---
 
 <style>
@@ -16,7 +16,7 @@ tags:
 }
 </style>
 
-The following solar geometry _components_
+The following solar position _components_
 are hard requirements
 in order to derive the single most important angle of _solar incidence_
 which is crucial for the estimation of the solar irradiance
@@ -24,11 +24,11 @@ incident on a solar surface.
 
 !!! tip
 
-    PVGIS CLI offers a primer on the solar geometry parameters.
+    PVGIS CLI offers a primer on the solar position parameters.
     Inform yourself using the `pvgis-prototype position intro` command.
-    See [pvgis-prototype position into](../how_to/solar_geometry_introduction.md)
+    See [pvgis-prototype position into](../how_to/solar_position_introduction.md)
 
-The implementations concern NOAA's solar geometry equations, listed _in dependency order_ : 
+The implementations concern NOAA's solar position equations, listed _in dependency order_ : 
 
 | Status                                      | Quantity              | Implementation         | Requires                                                      | Required by                                   | Support a Moment | Support Time series                         | Optimisation   |
 | -----------------------------------         | -------------------   | ---------------------- | ------------------------------------------------------------- | --------------------------------------------- | -----------      | -------------                               | -------------- |

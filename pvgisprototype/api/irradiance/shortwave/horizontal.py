@@ -3,84 +3,59 @@ API module to calculate the global (shortwave) irradiance over a
 location for a period in time.
 """
 
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from devtools import debug
-from typing import Optional
-import numpy as np
-from rich import print
-
 from datetime import datetime
+from typing import Optional
 from zoneinfo import ZoneInfo
-from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.models import SolarTimeModel
+
+import numpy as np
+from devtools import debug
+
+from pvgisprototype import Irradiance, LinkeTurbidityFactor
+from pvgisprototype.api.irradiance.diffuse.altitude import (
+    calculate_diffuse_solar_altitude_function_series,
+    diffuse_transmission_function_series,
+)
+from pvgisprototype.api.irradiance.direct.horizontal import (
+    calculate_direct_horizontal_irradiance_series,
+)
+from pvgisprototype.api.irradiance.extraterrestrial import (
+    calculate_extraterrestrial_normal_irradiance_series,
+)
+from pvgisprototype.api.irradiance.limits import (
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT,
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT,
+)
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
-from pvgisprototype.api.irradiance.direct.horizontal import calculate_direct_horizontal_irradiance_series
-from pvgisprototype.api.irradiance.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import diffuse_transmission_function_series
-from pvgisprototype.api.irradiance.diffuse.solar_altitude import calculate_diffuse_solar_altitude_function_series
-from pvgisprototype.api.irradiance.limits import LOWER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.api.irradiance.limits import UPPER_PHYSICALLY_POSSIBLE_LIMIT
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import TEMPERATURE_DEFAULT
-from pvgisprototype.constants import WIND_SPEED_DEFAULT
-from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import TIME_OFFSET_GLOBAL_DEFAULT
-from pvgisprototype.constants import HOUR_OFFSET_DEFAULT
-from pvgisprototype.constants import SOLAR_CONSTANT
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import TIME_OUTPUT_UNITS_DEFAULT
-from pvgisprototype.constants import ANGLE_OUTPUT_UNITS_DEFAULT
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import DEGREES
-from pvgisprototype.constants import TITLE_KEY_NAME
-from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE
-from pvgisprototype.constants import GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE
-from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import LINKE_TURBIDITY_COLUMN_NAME
-from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
-from pvgisprototype.constants import HOFIERKA_2002
-from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
-from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
-from pvgisprototype.constants import SHADE_COLUMN_NAME
-from pvgisprototype.constants import ABOVE_HORIZON_COLUMN_NAME
-from pvgisprototype.constants import LOW_ANGLE_COLUMN_NAME
-from pvgisprototype.constants import BELOW_HORIZON_COLUMN_NAME
-from pvgisprototype.constants import ALTITUDE_COLUMN_NAME
+from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype.constants import (
+    ALTITUDE_COLUMN_NAME,
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
+    FINGERPRINT_COLUMN_NAME,
+    FINGERPRINT_FLAG_DEFAULT,
+    GLOBAL_HORIZONTAL_IRRADIANCE,
+    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    HOFIERKA_2002,
+    IRRADIANCE_UNIT,
+    LINKE_TURBIDITY_COLUMN_NAME,
+    LOG_LEVEL_DEFAULT,
+    PERIGEE_OFFSET,
+    RADIANS,
+    RADIATION_MODEL_COLUMN_NAME,
+    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    SOLAR_CONSTANT,
+    TITLE_KEY_NAME,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype import Irradiance
-from pvgisprototype.constants import RANDOM_TIMESTAMPS_FLAG_DEFAULT
-from pvgisprototype.constants import IRRADIANCE_UNIT
-from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
-from pvgisprototype.constants import ANGULAR_LOSS_FACTOR_FLAG_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_TIME_SERIES_DEFAULT
 
 
 @log_function_call
@@ -92,7 +67,9 @@ def calculate_global_horizontal_irradiance_series(
     timezone: ZoneInfo | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Optional[bool] = True,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: Optional[
+        float
+    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_constant: float = SOLAR_CONSTANT,
@@ -114,7 +91,9 @@ def calculate_global_horizontal_irradiance_series(
     includes both the direct and the diffuse solar radiation.
     """
     if verbose > 0:
-        logger.info(':information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...')
+        logger.info(
+            ":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]..."
+        )
     direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_series(
         longitude=longitude,  # required by some of the solar time algorithms
         latitude=latitude,
@@ -183,33 +162,48 @@ def calculate_global_horizontal_irradiance_series(
     )
     if out_of_range_indices[0].size > 0:
         logger.warning(
-                f"{WARNING_OUT_OF_RANGE_VALUES} in `global_horizontal_irradiance_series` : {out_of_range_indices[0]}!"
+            f"{WARNING_OUT_OF_RANGE_VALUES} in `global_horizontal_irradiance_series` : {out_of_range_indices[0]}!"
         )
 
     # Building the output dictionary ========================================
 
     components_container = {
-        'main': lambda: {
+        "main": lambda: {
             TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE,
             GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        },# if verbose > 0 else {},
-
-        'extended': lambda: {
-            TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + ' & relevant components',
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-        } if verbose > 1 else {},
-
-        'more_extended': lambda: {
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units) if solar_altitude_series else None,
-            LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-        } if verbose > 2 else {},
-
-        'fingerprint': lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(global_horizontal_irradiance_series),
-        } if fingerprint else {},
+        },  # if verbose > 0 else {},
+        "extended": lambda: (
+            {
+                TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components",
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "more_extended": lambda: (
+            {
+                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
+                ALTITUDE_COLUMN_NAME: (
+                    getattr(solar_altitude_series, angle_output_units)
+                    if solar_altitude_series
+                    else None
+                ),
+                LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    global_horizontal_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
@@ -220,18 +214,18 @@ def calculate_global_horizontal_irradiance_series(
         debug(locals())
 
     log_data_fingerprint(
-            data=global_horizontal_irradiance_series,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=global_horizontal_irradiance_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return Irradiance(
-            value=global_horizontal_irradiance_series,
-            unit=IRRADIANCE_UNIT,
-            position_algorithm="",
-            timing_algorithm="",
-            elevation=elevation,
-            surface_orientation=None,
-            surface_tilt=None,
-            components=components,
-            )
+        value=global_horizontal_irradiance_series,
+        unit=IRRADIANCE_UNIT,
+        position_algorithm="",
+        timing_algorithm="",
+        elevation=elevation,
+        surface_orientation=None,
+        surface_tilt=None,
+        components=components,
+    )

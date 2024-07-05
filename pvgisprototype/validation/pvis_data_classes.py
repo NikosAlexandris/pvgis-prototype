@@ -1,43 +1,42 @@
-from typing import Tuple
-from pydantic import BaseModel
-from pydantic import ConfigDict
-from pydantic import field_validator
-from pydantic import confloat
-from typing import Union
-from typing import Optional
-from zoneinfo import ZoneInfo
-from datetime import datetime
-from datetime import time
-from pandas import Timestamp
-from pandas import DatetimeIndex
+from datetime import datetime, time
 from math import pi
+from typing import Optional, Tuple, Union
+from zoneinfo import ZoneInfo
+
 import numpy as np
 from numpy import ndarray
-from pvgisprototype import RefractedSolarAltitude
-from pvgisprototype import RefractedSolarZenith
-from pvgisprototype import SurfaceTilt
-from pvgisprototype import SurfaceOrientation
-from pvgisprototype import Latitude
-from pvgisprototype import Longitude
-from pvgisprototype import SolarDeclination
-from pvgisprototype import SolarHourAngle
-from pvgisprototype import Elevation
-from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import RADIANS, DEGREES
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.validation.arrays import ArrayDType
-from pvgisprototype.validation.arrays import NDArrayBackend
-from pvgisprototype.validation.arrays import CUPY_ENABLED
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
+from pandas import DatetimeIndex, Timestamp
+from pydantic import BaseModel, ConfigDict, confloat, field_validator
 
+from pvgisprototype import (
+    Elevation,
+    Latitude,
+    Longitude,
+    RefractedSolarAltitude,
+    RefractedSolarZenith,
+    SolarDeclination,
+    SolarHourAngle,
+    SurfaceOrientation,
+    SurfaceTilt,
+)
+from pvgisprototype.api.position.models import (
+    SolarIncidenceModel,
+    SolarPositionModel,
+    SolarTimeModel,
+)
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEGREES,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    PERIGEE_OFFSET,
+    RADIANS,
+    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    SURFACE_TILT_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+)
+from pvgisprototype.validation.arrays import CUPY_ENABLED, NDArrayBackend
 
 MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
 
@@ -58,13 +57,15 @@ class ArrayShapeModel(BaseModel):
 
 
 class ArrayInitialisationModel(BaseModel):
-    initialisation_method: str = 'zeros' 
+    initialisation_method: str = "zeros"
 
-    @field_validator('initialisation_method')
+    @field_validator("initialisation_method")
     def check_init_method(cls, v):
-        valid_methods = ['zeros', 'ones', 'empty']
+        valid_methods = ["zeros", "ones", "empty"]
         if v not in valid_methods:
-            raise ValueError(f"Invalid initialisation method. Choose among {valid_methods}.")
+            raise ValueError(
+                f"Invalid initialisation method. Choose among {valid_methods}."
+            )
         return v
 
 
@@ -85,12 +86,14 @@ class ArrayTypeModel(BaseModel):
 class ArrayBackendModel(BaseModel):
     array_backend: str = ARRAY_BACKEND_DEFAULT
 
-    @field_validator('array_backend')
+    @field_validator("array_backend")
     def check_backend(cls, v, values, **kwargs):
-        if values.get('use_gpu') and CUPY_ENABLED:
-            return 'CUPY'
+        if values.get("use_gpu") and CUPY_ENABLED:
+            return "CUPY"
         if v.upper() not in NDArrayBackend.__members__:
-            raise ValueError(f"Invalid backend. Choose among {list(NDArrayBackend.__members__.keys())}.")
+            raise ValueError(
+                f"Invalid backend. Choose among {list(NDArrayBackend.__members__.keys())}."
+            )
         return v.upper()
 
     class Config:
@@ -107,6 +110,7 @@ class ArrayModel(
 
 
 # Where?
+
 
 class LongitudeModel(BaseModel):
     longitude: Union[confloat(ge=-pi, le=pi), Longitude]
@@ -149,22 +153,25 @@ class LocationModel(
 ):
     timezone: Optional[ZoneInfo] = None
     name: Optional[str] = None
-    description: Optional[str] = None 
+    description: Optional[str] = None
 
 
 # When?
+
 
 class BaseTimestampModel(BaseModel):
     timestamp: Union[np.datetime64, Timestamp, DatetimeIndex]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    @field_validator('timestamp')
+    @field_validator("timestamp")
     def check_timestamp_type(cls, value):
         if isinstance(value, np.ndarray):
             if value.dtype.type != np.datetime64:
                 raise ValueError("NumPy array must be of dtype 'datetime64'")
         elif not isinstance(value, (np.datetime64, Timestamp, DatetimeIndex)):
-            raise TypeError("Timestamp must be a NumPy datetime64, a Pandas DatetimeIndex, or a Pandas Timestamp")
+            raise TypeError(
+                "Timestamp must be a NumPy datetime64, a Pandas DatetimeIndex, or a Pandas Timestamp"
+            )
         return value
 
 
@@ -172,14 +179,16 @@ class BaseTimestampSeriesModel(BaseModel):
     timestamps: DatetimeIndex | Timestamp
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    @field_validator('timestamps')
+    @field_validator("timestamps")
     def check_type(cls, value):
-        if isinstance(value, Timestamp) :
+        if isinstance(value, Timestamp):
             return DatetimeIndex([value])
         elif isinstance(value, DatetimeIndex):
             return value
         else:
-            raise TypeError("Timestamps must be a Pandas object of either type DatetimeIndex or Timestamp")
+            raise TypeError(
+                "Timestamps must be a Pandas object of either type DatetimeIndex or Timestamp"
+            )
 
 
 class BaseTimeModel(BaseTimestampModel):
@@ -240,6 +249,7 @@ class BaseTimeOutputUnitsModel(BaseModel):
 
 # Angular units
 
+
 class BaseAngleUnitsModel(BaseModel):
     angle_units: str = RADIANS
 
@@ -284,6 +294,7 @@ class BaseAngleOutputUnitsModel(BaseModel):
 
 # Solar geometry
 
+
 class SolarDeclinationModel(BaseModel):
     solar_declination: Union[confloat(ge=0, le=pi), SolarDeclination]
     model_config = ConfigDict(
@@ -311,6 +322,7 @@ class SolarPositionModelModel(BaseModel):
 
     The suffix ModelModels is intentional !
     """
+
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa
 
 
@@ -325,6 +337,7 @@ class SolarPositionModelModels(BaseModel):
 
     The suffix ModelModels is intentional !
     """
+
     solar_position_models: SolarPositionModel = SolarPositionModel.noaa
 
 
@@ -345,26 +358,30 @@ class SolarTimeModelModel(BaseModel):  # ModelModel is intentional !
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield
 
 
-'''
+"""
 FIXME: Decide if datetime.datetime or datetime.time, and also change the
 callback function convert_hours_to_datetime_time() in typer_argument_true_solar_time()
-'''
+"""
+
+
 class SolarTimeModel(BaseModel):
-    solar_time: Union[datetime, time]             # FIXME: Temporal solution for datetime.datetime AND datetime.time                                       
+    solar_time: Union[
+        datetime, time
+    ]  # FIXME: Temporal solution for datetime.datetime AND datetime.time
     model_config = ConfigDict(
-        description="""The solar time (ST) is a calculation of the passage of time based
-        on the position of the Sun in the sky. It is expected to be decimal hours in a
-        24 hour format and measured internally in seconds.""",
+        description="""The solar time (ST) is a calculation of the passage of time based on the position of the Sun in the sky. It is expected to be decimal hours in a 24 hour format and measured internally in seconds.""",
     )
 
 
 # Solar surface
 
+
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = SURFACE_TILT_DEFAULT
+    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = (
+        SURFACE_TILT_DEFAULT
+    )
     model_config = ConfigDict(
-        description="""Surface tilt (or slope) (β) is the angle between the inclined
-        surface (slope) and the horizontal plane.""",
+        description="""Surface tilt (or slope) (β) is the angle between the inclined surface (slope) and the horizontal plane.""",
     )
 
     @field_validator("surface_tilt")
@@ -417,9 +434,7 @@ class SolarHourAngleSeriesModel(BaseModel):
     )
 
     @field_validator("solar_hour_angle_series")
-    def validate_solar_hour_angle(
-        cls, input
-    ) -> Union[SolarHourAngle, ndarray]:
+    def validate_solar_hour_angle(cls, input) -> Union[SolarHourAngle, ndarray]:
         if isinstance(input, SolarHourAngle):
             return input
         # elif isinstance(input, ndarray) and all(                          # FIXME: What else could be?
@@ -435,7 +450,9 @@ class ApplyAtmosphericRefractionModel(BaseModel):
 
 
 class ZeroNegativeSolarIncidenceAngleModel(BaseModel):
-    zero_negative_solar_incidence_angle: Optional[bool] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
+    zero_negative_solar_incidence_angle: Optional[bool] = (
+        ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
+    )
 
 
 class RefractedSolarAltitudeModel(BaseModel):
@@ -465,7 +482,9 @@ class RefractedSolarAltitudeSeriesModel(BaseModel):
 
 
 class RefractedSolarZenithModel(BaseModel):
-    refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+    refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith] = (
+        REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+    )
 
     @field_validator("refracted_solar_zenith")
     def validate_refracted_solar_zenith(cls, input) -> RefractedSolarZenith:
@@ -504,6 +523,6 @@ class IrradianceInputModel(BaseModel):
         ge=0, le=8
     )  # help='A measure of atmospheric turbidity',
     optical_air_mass: float
-    extraterrestial_irradiance: confloat(
-        ge=1360
-    ) = 1360.8  # description="The average solar radiation at the top of the atmosphere ~1360.8 W/m^2 (Kopp, 2011)")
+    extraterrestial_irradiance: confloat(ge=1360) = (
+        1360.8  # description="The average solar radiation at the top of the atmosphere ~1360.8 W/m^2 (Kopp, 2011)")
+    )

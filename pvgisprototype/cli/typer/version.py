@@ -1,12 +1,14 @@
 """
-Version parameters 
+Version parameters
 """
 
 import typer
 
+
 def _version_callback(flag: bool) -> None:
     if flag:
         from pvgisprototype._version import __version__
+
         print(f"PVGIS prototype version: {__version__}")
         raise typer.Exit(code=0)
 

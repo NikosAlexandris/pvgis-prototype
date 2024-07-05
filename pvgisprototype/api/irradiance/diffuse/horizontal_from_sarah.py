@@ -1,34 +1,34 @@
-from pvgisprototype.log import logger
-from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from devtools import debug
-from pandas import DatetimeIndex
 from pathlib import Path
 from typing import Optional
-from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype import Irradiance
-from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNIT
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import TITLE_KEY_NAME
-from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
-from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
-from pvgisprototype.constants import HOFIERKA_2002
-from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
 
+from devtools import debug
+from pandas import DatetimeIndex
+
+from pvgisprototype import Irradiance
+from pvgisprototype.api.series.hardcodings import exclamation_mark
+from pvgisprototype.api.series.models import MethodForInexactMatches
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DIFFUSE_HORIZONTAL_IRRADIANCE,
+    DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    FINGERPRINT_COLUMN_NAME,
+    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    HOFIERKA_2002,
+    IRRADIANCE_UNIT,
+    LOG_LEVEL_DEFAULT,
+    MULTI_THREAD_FLAG_DEFAULT,
+    RADIATION_MODEL_COLUMN_NAME,
+    TITLE_KEY_NAME,
+    TOLERANCE_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.validation.hashing import generate_hash
 
 # def safe_select_time_series(*args, **kwargs):
 #     try:
@@ -97,6 +97,7 @@ def read_horizontal_irradiance_components_from_sarah(
     """
     if multi_thread:
         from concurrent.futures import ThreadPoolExecutor
+
         with ThreadPoolExecutor(max_workers=2) as executor:
             future_global_horizontal_irradiance_series = executor.submit(
                 select_time_series,
@@ -123,36 +124,48 @@ def read_horizontal_irradiance_components_from_sarah(
                 log=log,
             )
             global_horizontal_irradiance_series = (
-                future_global_horizontal_irradiance_series.result().to_numpy().astype(dtype=dtype)
+                future_global_horizontal_irradiance_series.result()
+                .to_numpy()
+                .astype(dtype=dtype)
             )
             direct_horizontal_irradiance_series = (
-                future_direct_horizontal_irradiance_series.result().to_numpy().astype(dtype=dtype)
+                future_direct_horizontal_irradiance_series.result()
+                .to_numpy()
+                .astype(dtype=dtype)
             )
     else:
-        global_horizontal_irradiance_series = select_time_series(
-            time_series=shortwave,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            mask_and_scale=mask_and_scale,
-            in_memory=in_memory,
-            verbose=verbose,
-            log=log,
-        ).to_numpy().astype(dtype=dtype)
-        direct_horizontal_irradiance_series = select_time_series(
-            time_series=direct,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            mask_and_scale=mask_and_scale,
-            in_memory=in_memory,
-            verbose=verbose,
-            log=log,
-        ).to_numpy().astype(dtype=dtype)
+        global_horizontal_irradiance_series = (
+            select_time_series(
+                time_series=shortwave,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                verbose=verbose,
+                log=log,
+            )
+            .to_numpy()
+            .astype(dtype=dtype)
+        )
+        direct_horizontal_irradiance_series = (
+            select_time_series(
+                time_series=direct,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                verbose=verbose,
+                log=log,
+            )
+            .to_numpy()
+            .astype(dtype=dtype)
+        )
 
     horizontal_irradiance_components = {
         GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
@@ -198,27 +211,36 @@ def calculate_diffuse_horizontal_component_from_sarah(
         single_value = float(diffuse_horizontal_irradiance_series)
         warning = (
             f"{exclamation_mark} The selected timestamp "
-            + f" matches the single value "
+            + " matches the single value "
             + f"{single_value}"
         )
         logger.warning(warning)
 
     components_container = {
-        'main': lambda: {
+        "main": lambda: {
             TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
         },
-        
-        'extended': lambda: {
-            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE + " & other horizontal components",
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,#.to_numpy(),
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,#.to_numpy(),
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        } if verbose > 1 else {},
-
-        'fingerprint': lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(diffuse_horizontal_irradiance_series),
-        } if fingerprint else {},
+        "extended": lambda: (
+            {
+                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
+                + " & other horizontal components",
+                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,  # .to_numpy(),
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,  # .to_numpy(),
+                RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    diffuse_horizontal_irradiance_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
@@ -235,12 +257,12 @@ def calculate_diffuse_horizontal_component_from_sarah(
     )
 
     return Irradiance(
-            value=diffuse_horizontal_irradiance_series,
-            unit=IRRADIANCE_UNIT,
-            position_algorithm="",
-            timing_algorithm="",
-            elevation=None,
-            surface_orientation=None,
-            surface_tilt=None,
-            components=components,
-            )
+        value=diffuse_horizontal_irradiance_series,
+        unit=IRRADIANCE_UNIT,
+        position_algorithm="",
+        timing_algorithm="",
+        elevation=None,
+        surface_orientation=None,
+        surface_tilt=None,
+        components=components,
+    )
