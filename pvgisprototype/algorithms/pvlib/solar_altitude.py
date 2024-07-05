@@ -1,30 +1,24 @@
-from devtools import debug
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from math import isfinite
 import numpy
-from pandas import DatetimeIndex
 import pvlib
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateSolarAltitudePVLIBInputModel
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from pvgisprototype import SolarAltitude
-from pvgisprototype.constants import DEGREES
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from cachetools import cached
-from pvgisprototype.caching import custom_hashkey
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from devtools import debug
+from pandas import DatetimeIndex
+
+from pvgisprototype import Latitude, Longitude, SolarAltitude
+from pvgisprototype.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DEGREES,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
-@cached(cache={}, key=custom_hashkey)
+@custom_cached
 # @validate_with_pydantic(CalculateSolarAltitudePVLIBInputModel)
 def calculate_solar_altitude_series_pvlib(
     longitude: Longitude,  # degrees

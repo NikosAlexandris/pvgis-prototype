@@ -1,25 +1,20 @@
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
+from pathlib import Path
+
+import netCDF4
+import typer
+import xarray as xr
 from devtools import debug
 from rich import print
-import warnings
-import typer
-import netCDF4
-import xarray as xr
 
-from pvgisprototype import Latitude
-from pvgisprototype import Longitude
-from typing import Annotated
-from typing import Tuple
-from enum import Enum
-from pathlib import Path
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype import Latitude, Longitude
+from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
 from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.api.series.hardcodings import check_mark
-from pvgisprototype.api.series.hardcodings import x_mark
 from pvgisprototype.cli.messages import ERROR_IN_SELECTING_DATA
+from pvgisprototype.constants import (
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_function_call, logger
 
 
 def load_or_open_dataarray(function, filename_or_object, mask_and_scale):
@@ -41,8 +36,7 @@ def open_data_array(
     in_memory: bool = False,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
-    """
-    """
+    """ """
     # try:
     #     if in_memory:
     #         dataarray = xr.load_dataarray(
@@ -83,16 +77,20 @@ def get_scale_and_offset(netcdf):
     """Get scale and offset values from a netCDF file"""
     dataset = netCDF4.Dataset(netcdf)
     netcdf_dimensions = set(dataset.dimensions)
-    netcdf_dimensions.update({'lon', 'longitude', 'lat', 'latitude'})  # all space dimensions?
+    netcdf_dimensions.update(
+        {"lon", "longitude", "lat", "latitude"}
+    )  # all space dimensions?
     netcdf_variables = set(dataset.variables)
-    variable = str(list(netcdf_variables.difference(netcdf_dimensions))[0])  # single variable name!
+    variable = str(
+        list(netcdf_variables.difference(netcdf_dimensions))[0]
+    )  # single variable name!
 
-    if 'scale_factor' in dataset[variable].ncattrs():
+    if "scale_factor" in dataset[variable].ncattrs():
         scale_factor = dataset[variable].scale_factor
     else:
         scale_factor = None
 
-    if 'add_offset' in dataset[variable].ncattrs():
+    if "add_offset" in dataset[variable].ncattrs():
         add_offset = dataset[variable].add_offset
     else:
         add_offset = None
@@ -107,7 +105,7 @@ def set_location_indexers(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Select single pair of coordinates from a data array
-    
+
     Will select center coordinates if none of (longitude, latitude) are
     provided.
     """
@@ -115,32 +113,34 @@ def set_location_indexers(
     # Ugly hack for when dimensions 'longitude', 'latitude' are not spelled out!
     # Use `coords` : a time series of a single pair of coordinates has only a `time` dimension!
     indexers = {}
-    dimensions = [dimension for dimension in data_array.coords if isinstance(dimension, str)]
-    if set(['lon', 'lat']) & set(dimensions):
-        x = 'lon'
-        y = 'lat'
-    elif set(['longitude', 'latitude']) & set(dimensions):
-        x = 'longitude'
-        y = 'latitude'
+    dimensions = [
+        dimension for dimension in data_array.coords if isinstance(dimension, str)
+    ]
+    if set(["lon", "lat"]) & set(dimensions):
+        x = "lon"
+        y = "lat"
+    elif set(["longitude", "latitude"]) & set(dimensions):
+        x = "longitude"
+        y = "latitude"
 
-    if (x and y):
-        logger.info(f'Dimensions  : {x}, {y}')
+    if x and y:
+        logger.info(f"Dimensions  : {x}, {y}")
 
     if not (longitude and latitude):
-        warning = f'{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates.'
+        warning = f"{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates."
         logger.warning(warning)
 
-        center_longitude = float(data_array[x][len(data_array[x])//2])
-        center_latitude = float(data_array[y][len(data_array[y])//2])
+        center_longitude = float(data_array[x][len(data_array[x]) // 2])
+        center_latitude = float(data_array[y][len(data_array[y]) // 2])
         indexers[x] = center_longitude
         indexers[y] = center_latitude
 
-        text_coordinates = f'{check_mark} Center coordinates (longitude, latitude) : {center_longitude}, {center_latitude}.'
+        text_coordinates = f"{check_mark} Center coordinates (longitude, latitude) : {center_longitude}, {center_latitude}."
 
     else:
         indexers[x] = longitude
         indexers[y] = latitude
-        text_coordinates = f'{check_mark} Coordinates : {longitude}, {latitude}.'
+        text_coordinates = f"{check_mark} Coordinates : {longitude}, {latitude}."
 
     logger.info(text_coordinates)
 
@@ -155,12 +155,12 @@ def select_coordinates(
     longitude: Longitude,
     latitude: Latitude,
     time: str = None,
-    method: str ='nearest',
+    method: str = "nearest",
     tolerance: float = 0.1,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """Select single pair of coordinates from a data array
-    
+
     Will select center coordinates if none of (longitude, latitude) are
     provided.
     """
@@ -174,17 +174,16 @@ def select_coordinates(
     try:
         if not time:
             data_array = data_array.sel(
-                    **indexers,
-                    method=method,
-                    )
+                **indexers,
+                method=method,
+            )
         else:
             # Review-Me ------------------------------------------------------
-            data_array = data_array.sel(
-                    time=time, method=method).sel(
-                        **indexers,
-                        method=method,
-                        tolerance=tolerance,
-                    )
+            data_array = data_array.sel(time=time, method=method).sel(
+                **indexers,
+                method=method,
+                tolerance=tolerance,
+            )
             # Review-Me ------------------------------------------------------
 
     except Exception as exception:

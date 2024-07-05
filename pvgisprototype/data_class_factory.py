@@ -1,30 +1,30 @@
-from pydantic import BaseModel
+from math import pi
+from typing import Optional, Tuple, Union
+
+import numpy as np
+from pandas import DatetimeIndex
+from pydantic import BaseModel, ConfigDict
 from pydantic_numpy import NpNDArray
 from pydantic_numpy.model import NumpyModel
-from pvgisprototype.constants import RADIANS, DEGREES
-from typing import Optional, Union, Tuple
-import numpy as np
-from math import pi
-from pandas import DatetimeIndex
-from pydantic import ConfigDict
 
+from pvgisprototype.constants import DEGREES, RADIANS
 
 type_mapping = {
-    'None': None,
-    'bool': bool,
-    'str': str,
-    'list': list,
-    'dict': dict,
-    'int': int,
-    'float': float,
-    'Optional[float]': Optional[float],
-    'ndarray': NpNDArray,
-    'Union[ndarray, float]': Union[NpNDArray, float],
-    'Tuple[Longitude, Latitude]': Tuple[float, float],
-    'DatetimeIndex': DatetimeIndex,
-    'Elevation': float,
-    'SurfaceOrientation': float,
-    'SurfaceTilt': float,
+    "None": None,
+    "bool": bool,
+    "str": str,
+    "list": list,
+    "dict": dict,
+    "int": int,
+    "float": float,
+    "Optional[float]": Optional[float],
+    "ndarray": NpNDArray,
+    "Union[ndarray, float]": Union[NpNDArray, float],
+    "Tuple[Longitude, Latitude]": Tuple[float, float],
+    "DatetimeIndex": DatetimeIndex,
+    "Elevation": float,
+    "SurfaceOrientation": float,
+    "SurfaceTilt": float,
 }
 
 
@@ -62,6 +62,7 @@ def _timestamp_to_minutes(timestamp):
 
 def _sun_to_plane(self):
     from pvgisprototype import SolarIncidence
+
     if isinstance(self, SolarIncidence):
         if self.definition == SolarIncidence().definition_complementary:
             return self
@@ -69,11 +70,12 @@ def _sun_to_plane(self):
             if self.unit == DEGREES:
                 return 90 - self.degrees
             if self.unit == RADIANS:
-                return pi/2 - self.radians
+                return pi / 2 - self.radians
 
 
 def complementary_incidence_angle_property(self):
     from pvgisprototype import SolarIncidence
+
     if isinstance(self, SolarIncidence):
         return _sun_to_plane(self)
 
@@ -151,8 +153,10 @@ def degrees_property(self):
             return self.value
         elif self.unit == RADIANS:
             from numbers import Number
+
             if isinstance(self.value, Number):
                 from math import degrees
+
                 return degrees(self.value)
             else:
                 return np.degrees(self.value)
@@ -169,8 +173,10 @@ def radians_property(self):
             return self.value
         elif self.unit == DEGREES:
             from numbers import Number
+
             if isinstance(self.value, Number):
                 from math import radians
+
                 return radians(self.value)
             else:
                 return np.radians(self.value)
@@ -184,7 +190,7 @@ def _custom_getattr(self, attribute_name):
     property_functions = {
         "radians": radians_property,
         "degrees": degrees_property,
-        "complementary" : complementary_incidence_angle_property,
+        "complementary": complementary_incidence_angle_property,
         "minutes": minutes_property,
         "timedelta": timedelta_property,
         "as_minutes": as_minutes_property,
@@ -232,7 +238,6 @@ class DataClassFactory:
             )
         return DataClassFactory._cache[model_name]
 
-
     @staticmethod
     def _hashable_array(array):
         try:
@@ -241,7 +246,6 @@ class DataClassFactory:
         except AttributeError:
             # If it's not an array or doesn't have the 'tobytes' method, hash normally
             return hash(array)
-
 
     @staticmethod
     def _generate_hash_function(fields, annotations):
@@ -260,7 +264,6 @@ class DataClassFactory:
 
         return hash_model
 
-
     @staticmethod
     def _is_np_ndarray_type(field_type):
         """Utility function to check if a field type is or involves NpNDArray."""
@@ -277,7 +280,6 @@ class DataClassFactory:
 
         return False
 
-
     @staticmethod
     def _generate_class(model_name, parameters):
         annotations = {}
@@ -286,22 +288,21 @@ class DataClassFactory:
         use_numpy_model = False
 
         for field_name, field_data in parameters[model_name].items():
-
             field_type = field_data["type"]
             if field_type in type_mapping:
                 annotations[field_name] = type_mapping[field_type]
                 fields.append(field_name)
                 if DataClassFactory._is_np_ndarray_type(type_mapping[field_type]):
                     use_numpy_model = True
-                    
+
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
 
         base_class = NumpyModel if use_numpy_model else BaseModel
         class_attributes = {
             "__getattr__": _custom_getattr,
-            #"__getstate__": _custom_getstate,
-            #"__setstate__": _custom_setstate,
+            # "__getstate__": _custom_getstate,
+            # "__setstate__": _custom_setstate,
             "__annotations__": annotations,
             "__module__": __package__,
             "__qualname__": model_name,

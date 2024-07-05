@@ -26,7 +26,9 @@ nav:
     - tutorials/introduction.md
     - Solar Position:
       - tutorials/solar_position.md
-      - 󰆊 Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
+      - Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
+      - Comparing with USNO: notebooks/solar_position_pvgis_noaa_vs_usno.ipynb
+    - Surface Position Optimization: notebooks/surface_position_optimization_examples.ipynb 
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
   - CLI:
@@ -98,15 +100,17 @@ nav:
   - Development:
     - development/index.md
     - development/gantt.md
-    - development/roadmap_and_progress.md
+    - Roadmap:
+      - development/roadmap_and_progress.md
+      - Components:
+        - development/solar_position.md
+        - development/solar_irradiance.md
+        - development/photovoltaic_performance.md
+        - development/topography.md
     - development/conventions.md
     - development/optimisation.md
     - development/contribution_guidelines.md
     - development/adding_new_features.md
-    - development/photovoltaic_performance.md
-    - development/solar_irradiance.md
-    - development/solar_geometry.md
-    - development/topography.md
     - development/pytest.md
     # - development/state_and_future_of_pvgis.md
     - 󰦕 Test Coverage: coverage.md
@@ -123,7 +127,6 @@ extra:
 
 theme:
   logo: images/pvgis_image_squared.png
-  font: false
   icon:
     tag:
       concepts: simple/blueprint
@@ -244,6 +247,9 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - overrides/.icons
 
 extra_javascript:
   - javascripts/mathjax.js
