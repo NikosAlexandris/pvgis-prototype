@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import List, Sequence
-from click import Context
+
 import numpy as np
 import pandas
+from click import Context
 from pandas import DatetimeIndex, to_datetime
 from rich.box import HORIZONTALS, ROUNDED, SIMPLE_HEAD
 from rich.columns import Columns
@@ -44,6 +45,7 @@ from pvgisprototype.constants import (
     LONGITUDE_NAME,
     NET_EFFECT,
     NOT_AVAILABLE,
+    ORIENTATION_NAME,
     PEAK_POWER_COLUMN_NAME,
     PERIGEE_OFFSET_COLUMN_NAME,
     POSITIONING_ALGORITHM_COLUMN_NAME,
@@ -56,15 +58,14 @@ from pvgisprototype.constants import (
     SPECTRAL_EFFECT_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
-    ORIENTATION_NAME,
     SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_NAME,
-    TILT_NAME,
     SYMBOL_LOSS,
     SYMBOL_SUMMATION,
     SYSTEM_LOSS,
     TECHNOLOGY_NAME,
     TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
+    TILT_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
     TITLE_KEY_NAME,
@@ -1074,8 +1075,8 @@ def build_position_panel(position_table) -> Panel:
     """ """
     return Panel(
         position_table,
-        # subtitle="Position",
-        # subtitle_align="right",
+        subtitle="Solar Surface",
+        subtitle_align="right",
         # box=None,
         safe_box=True,
         style="",
@@ -1094,6 +1095,7 @@ def build_time_table():
         pad_edge=False,
     )
     time_table.add_column("Start", justify="left", style="bold")
+    time_table.add_column("Every", justify="left", style="dim bold")
     time_table.add_column("End", justify="left", style="dim bold")
 
     return time_table
@@ -1356,6 +1358,7 @@ def print_change_percentages_panel(
     time_table = build_time_table()
     time_table.add_row(
         str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
+        str(timestamps.freqstr),
         str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
     )
     time_panel = Panel(
@@ -1442,6 +1445,7 @@ def print_finger_hash(dictionary: dict):
             style="dim",
         )
         Console().print(fingerprint_panel)
+
 
 def print_command_metadata(context: Context):
     """ """
