@@ -56,8 +56,10 @@ from pvgisprototype.constants import (
     SPECTRAL_EFFECT_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
+    ORIENTATION_NAME,
     SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_NAME,
+    TILT_NAME,
     SYMBOL_LOSS,
     SYMBOL_SUMMATION,
     SYSTEM_LOSS,
@@ -1059,10 +1061,10 @@ def build_position_table() -> Table:
         f"{ELEVATION_NAME}", justify="center", style="bold", no_wrap=True
     )
     position_table.add_column(
-        f"{SURFACE_ORIENTATION_NAME}", justify="center", style="bold", no_wrap=True
+        f"{ORIENTATION_NAME}", justify="center", style="bold", no_wrap=True
     )
     position_table.add_column(
-        f"{SURFACE_TILT_NAME}", justify="center", style="bold", no_wrap=True
+        f"{TILT_NAME}", justify="center", style="bold", no_wrap=True
     )
 
     return position_table
