@@ -26,8 +26,7 @@ nav:
     - tutorials/introduction.md
     - Solar Position:
       - tutorials/solar_position.md
-      - Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
-      - Comparing with USNO: notebooks/solar_position_pvgis_noaa_vs_usno.ipynb
+      - 󰆊 Comparing Algorithms: notebooks/solar_position_pvgis_noaa_vs_other_models.ipynb
     - Surface Position Optimization: notebooks/surface_position_optimization_examples.ipynb 
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
