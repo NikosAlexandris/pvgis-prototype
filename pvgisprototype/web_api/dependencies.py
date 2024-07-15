@@ -1,7 +1,7 @@
 import math
 from typing import Annotated, Dict, Optional, TypeVar
 from zoneinfo import ZoneInfo
-
+from pathlib import Path
 import numpy as np
 from fastapi import Depends, HTTPException
 from pandas import DatetimeIndex
@@ -490,6 +490,8 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
+                global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+                direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 timestamps=timestamps,
                 timezone=timezone,  # type: ignore
                 spectral_factor_series=spectral_factor_series,
@@ -513,6 +515,8 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
+                global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+                direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 timestamps=timestamps,
                 timezone=timezone,  # type: ignore
                 spectral_factor_series=spectral_factor_series,
@@ -536,6 +540,8 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
+                global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+                direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 timestamps=timestamps,
                 timezone=timezone,  # type: ignore
                 spectral_factor_series=spectral_factor_series,
