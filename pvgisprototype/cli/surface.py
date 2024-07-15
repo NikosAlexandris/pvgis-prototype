@@ -29,6 +29,7 @@ from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.optimize_angles import optimize_angles
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerMode,
 )
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
@@ -143,6 +144,7 @@ from pvgisprototype.constants import (
     MULTI_THREAD_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
     NOMENCLATURE_FLAG_DEFAULT,
+    PEAK_POWER_DEFAULT,
     PERIGEE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
     QUICK_RESPONSE_CODE_FLAG_DEFAULT,
@@ -163,6 +165,7 @@ from pvgisprototype.constants import (
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
+    WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     cPROFILE_FLAG_DEFAULT,
 )
@@ -314,7 +317,7 @@ def optmise_surface_position(
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    peak_power: Annotated[float, typer_option_photovoltaic_module_peak_power] = 1,
+    peak_power: Annotated[float, typer_option_photovoltaic_module_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
         Optional[float], typer_option_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
@@ -359,8 +362,8 @@ def optmise_surface_position(
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
-    workers: int = 1,
-    sampling_method_shgo="sobol",
+    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
+    sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
 ):
     """ """
     result = optimize_angles(
@@ -375,14 +378,16 @@ def optmise_surface_position(
         max_surface_tilt=max_surface_tilt,
         timestamps=timestamps,
         timezone=timezone,
+        global_horizontal_irradiance=global_horizontal_irradiance,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
         spectral_factor_series=spectral_factor_series,
-        photovoltaic_module=photovoltaic_module,
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
+        photovoltaic_module=photovoltaic_module,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        method=SurfacePositionOptimizerMethod.shgo,
+        method=method,
         mode=mode,
-        sampling_method_shgo="sobol",
+        sampling_method_shgo=sampling_method_shgo,
     )
 
     print(f"Optimised angles : {result}")
