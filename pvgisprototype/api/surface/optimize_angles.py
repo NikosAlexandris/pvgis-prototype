@@ -24,6 +24,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     WIND_SPEED_DEFAULT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
 )
 
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
@@ -36,6 +37,7 @@ from pvgisprototype.api.surface.helpers import (
 from pvgisprototype.api.surface.optimizer import optimizer
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerMode,
 )
 from pvgisprototype.constants import (
@@ -75,9 +77,11 @@ def optimize_angles(
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
-    workers: int = 1,
-    sampling_method_shgo="sobol",
+    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
+    sampling_method_shgo=SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
 ):
+    """
+    """
     location_parameters = create_dictionary_for_location_parameters(
         longitude=longitude,
         latitude=latitude,
@@ -88,7 +92,6 @@ def optimize_angles(
         surface_tilt=surface_tilt,
         mode=mode,
     )
-
     bounds = create_bounds_for_optimizer(
         min_surface_orientation=min_surface_orientation,
         max_surface_orientation=max_surface_orientation,
@@ -97,7 +100,6 @@ def optimize_angles(
         mode=mode,
         method=method,
     )
-
     result_optimizer = optimizer(
         location_parameters=location_parameters,
         func=calculate_mean_negative_power_output,
