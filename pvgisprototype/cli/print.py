@@ -39,6 +39,7 @@ from pvgisprototype.constants import (
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
     INCIDENCE_NAME,
+    IRRADIANCE_SOURCE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
     LATITUDE_NAME,
     LONGITUDE_COLUMN_NAME,
@@ -620,6 +621,7 @@ def print_irradiance_table_2(
     )
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
     algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
+    irradiance_data_source = dictionary.get(IRRADIANCE_SOURCE_COLUMN_NAME, None)
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
     timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, None)
     position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, None)
@@ -637,6 +639,9 @@ def print_irradiance_table_2(
 
     if algorithms:
         caption += f"{POWER_MODEL_COLUMN_NAME}: [bold]{algorithms}[/bold], "
+
+    if irradiance_data_source:
+        caption += f"\n{IRRADIANCE_SOURCE_COLUMN_NAME}: [bold]{irradiance_data_source}[/bold], "
 
     if radiation_model:
         caption += f"{RADIATION_MODEL_COLUMN_NAME}: [bold]{radiation_model}[/bold], "
@@ -712,6 +717,7 @@ def print_irradiance_table_2(
         ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
         INCIDENCE_ALGORITHM_COLUMN_NAME,
         INCIDENCE_DEFINITION,
+        IRRADIANCE_SOURCE_COLUMN_NAME,
         RADIATION_MODEL_COLUMN_NAME,
         TECHNOLOGY_NAME,
         PEAK_POWER_COLUMN_NAME,
