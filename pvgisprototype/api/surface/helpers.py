@@ -123,6 +123,17 @@ def calculate_mean_negative_power_output(
         # debug(locals())
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_orientation=surface_angle,
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            spectral_factor_series=spectral_factor_series,
+            temperature_series=temperature_series,
+            wind_speed_series=wind_speed_series,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            photovoltaic_module=photovoltaic_module,
             **location_parameters,
         )
 
@@ -130,6 +141,17 @@ def calculate_mean_negative_power_output(
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_orientation=surface_angle[0],
             surface_tilt=surface_angle[1],
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            spectral_factor_series=spectral_factor_series,
+            temperature_series=temperature_series,
+            wind_speed_series=wind_speed_series,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            photovoltaic_module=photovoltaic_module,
             **location_parameters,
         )
 
