@@ -45,7 +45,7 @@ ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     FORCE_COLOR=1 \
     PATH="/home/pvgis-user/.local/bin:${PATH}"
-    # ENV COLUMNS=160
+    ENV COLUMNS=200
 
 WORKDIR /home/pvgis-user/
 COPY --chown=pvgis-user:pvgis-user ./ /home/pvgis-user/
