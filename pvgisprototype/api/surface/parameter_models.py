@@ -10,6 +10,11 @@ class SurfacePositionOptimizerMethod(str, Enum):
     l_bfgs_b = "L-BFGS-B"  # Not working properly right now
     direct = "DIRECT"
 
+class SurfacePositionOptimizerMethodSHGOSamplingMethod(str, Enum):
+    halton = "halton"
+    sobol = "sobol"
+    simplicial = "simplicial"
+
 
 class SurfacePositionOptimizerMode(str, Enum):
     Orientation = "Orientation"
