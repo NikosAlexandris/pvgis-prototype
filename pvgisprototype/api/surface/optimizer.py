@@ -11,11 +11,12 @@ from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerMode,
 )
 from typing import Callable, Optional
 
-from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT, LINKE_TURBIDITY_TIME_SERIES_DEFAULT, MASK_AND_SCALE_FLAG_DEFAULT, NEIGHBOR_LOOKUP_DEFAULT, SPECTRAL_FACTOR_DEFAULT, TEMPERATURE_DEFAULT, TOLERANCE_DEFAULT, WIND_SPEED_DEFAULT
+from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT, LINKE_TURBIDITY_TIME_SERIES_DEFAULT, MASK_AND_SCALE_FLAG_DEFAULT, NEIGHBOR_LOOKUP_DEFAULT, SPECTRAL_FACTOR_DEFAULT, TEMPERATURE_DEFAULT, TOLERANCE_DEFAULT, WIND_SPEED_DEFAULT, WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION
 
 
 def optimizer(
@@ -38,8 +39,8 @@ def optimizer(
     bounds: optimize.Bounds = optimize.Bounds(
         lb=SurfaceTilt().min_radians, ub=SurfaceTilt().max_radians
     ),
-    workers: int = 1,
-    sampling_method_shgo: str = "sobol",
+    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
+    sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
 ):
     if method == SurfacePositionOptimizerMethod.shgo:
         result = optimize.shgo(
@@ -65,6 +66,8 @@ def optimizer(
             workers=workers,
             options={"disp": True},
         )
+        if not result['success']:
+            raise ValueError(f"Failed to optimize... : {str(result['message'])}")
 
     if method == SurfacePositionOptimizerMethod.brute:
         result = optimize.brute(
@@ -88,7 +91,11 @@ def optimizer(
             finish=None,
             workers=workers,
         )
+        if not result['success']:
+            raise ValueError(f"Failed to optimize... : {str(result['message'])}")
+
     else:
         # watch out for when the method passed is not shgo or brute. FIX THIS
         pass
+    
     return result

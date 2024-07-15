@@ -1,4 +1,6 @@
 import math
+from pathlib import Path
+from typing import Optional
 
 from scipy import optimize
 
@@ -10,6 +12,20 @@ from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMode,
 )
+from pvgisprototype import (
+    LinkeTurbidityFactor,
+    SpectralFactorSeries,
+    TemperatureSeries,
+    WindSpeedSeries,
+    SurfaceOrientation,
+    SurfaceTilt,
+)
+from pvgisprototype.api.irradiance.models import (
+    MethodForInexactMatches,
+    ModuleTemperatureAlgorithm,
+)
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT, LINKE_TURBIDITY_TIME_SERIES_DEFAULT, MASK_AND_SCALE_FLAG_DEFAULT, SPECTRAL_FACTOR_DEFAULT, TEMPERATURE_DEFAULT, TOLERANCE_DEFAULT, WIND_SPEED_DEFAULT
 
 
 def create_dictionary_for_location_parameters(
@@ -84,18 +100,18 @@ def create_bounds_for_optimizer(
 def calculate_mean_negative_power_output(
     surface_angle,
     location_parameters,
-    global_horizontal_irradiance,  # time series optional
-    direct_horizontal_irradiance,  # time series, optional
-    spectral_factor_series,
-    temperature_series,
-    wind_speed_series,
-    neighbor_lookup,
-    tolerance,
-    mask_and_scale,
-    in_memory,
-    linke_turbidity_factor_series,
-    photovoltaic_module,
-    mode
+    global_horizontal_irradiance: Optional[Path] = None,
+    direct_horizontal_irradiance: Optional[Path] = None,
+    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
+    temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
+    wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+    neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+    photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
 ):
     """
     """
