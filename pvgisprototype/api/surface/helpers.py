@@ -1,4 +1,6 @@
 import math
+from pathlib import Path
+from typing import Optional
 
 from scipy import optimize
 
@@ -10,6 +12,20 @@ from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMode,
 )
+from pvgisprototype import (
+    LinkeTurbidityFactor,
+    SpectralFactorSeries,
+    TemperatureSeries,
+    WindSpeedSeries,
+    SurfaceOrientation,
+    SurfaceTilt,
+)
+from pvgisprototype.api.irradiance.models import (
+    MethodForInexactMatches,
+    ModuleTemperatureAlgorithm,
+)
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT, LINKE_TURBIDITY_TIME_SERIES_DEFAULT, MASK_AND_SCALE_FLAG_DEFAULT, SPECTRAL_FACTOR_DEFAULT, TEMPERATURE_DEFAULT, TOLERANCE_DEFAULT, WIND_SPEED_DEFAULT
 
 
 def create_dictionary_for_location_parameters(
@@ -18,11 +34,6 @@ def create_dictionary_for_location_parameters(
     elevation,
     timestamps,
     timezone,
-    spectral_factor_series,
-    photovoltaic_module,
-    temperature_series,
-    wind_speed_series,
-    linke_turbidity_factor_series,
     surface_orientation,
     surface_tilt,
     mode,
@@ -33,11 +44,6 @@ def create_dictionary_for_location_parameters(
         "elevation": elevation,
         "timestamps": timestamps,
         "timezone": timezone,
-        "spectral_factor_series": spectral_factor_series,
-        "photovoltaic_module": photovoltaic_module,
-        "temperature_series": temperature_series,
-        "wind_speed_series": wind_speed_series,
-        "linke_turbidity_factor_series": linke_turbidity_factor_series,
     }
     if mode == SurfacePositionOptimizerMode.Tilt:
         dictionary_for_location_parameters["surface_orientation"] = surface_orientation
@@ -91,13 +97,40 @@ def create_bounds_for_optimizer(
         return bounds
 
 
-def calculate_mean_negative_power_output(surface_angle, location_parameters, mode):
-    """ """
+def calculate_mean_negative_power_output(
+    surface_angle,
+    location_parameters,
+    global_horizontal_irradiance: Optional[Path] = None,
+    direct_horizontal_irradiance: Optional[Path] = None,
+    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
+    temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
+    wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+    neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
+    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+    photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
+):
+    """
+    """
     # from devtools import debug
     # debug(locals())
     if mode == SurfacePositionOptimizerMode.Tilt:
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_tilt=surface_angle,
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            spectral_factor_series=spectral_factor_series,
+            temperature_series=temperature_series,
+            wind_speed_series=wind_speed_series,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            photovoltaic_module=photovoltaic_module,
             **location_parameters,
         )
 
@@ -106,6 +139,17 @@ def calculate_mean_negative_power_output(surface_angle, location_parameters, mod
         # debug(locals())
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_orientation=surface_angle,
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            spectral_factor_series=spectral_factor_series,
+            temperature_series=temperature_series,
+            wind_speed_series=wind_speed_series,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            photovoltaic_module=photovoltaic_module,
             **location_parameters,
         )
 
@@ -113,6 +157,17 @@ def calculate_mean_negative_power_output(surface_angle, location_parameters, mod
         power_output_series = calculate_photovoltaic_power_output_series(
             surface_orientation=surface_angle[0],
             surface_tilt=surface_angle[1],
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            spectral_factor_series=spectral_factor_series,
+            temperature_series=temperature_series,
+            wind_speed_series=wind_speed_series,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            photovoltaic_module=photovoltaic_module,
             **location_parameters,
         )
 
