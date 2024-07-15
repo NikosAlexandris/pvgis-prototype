@@ -252,6 +252,7 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
         from pvgisprototype.cli.print import print_finger_hash
 
         print_finger_hash(dictionary=diffuse_horizontal_irradiance_series.components)
+
     if metadata:
         import click
 
