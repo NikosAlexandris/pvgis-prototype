@@ -15,10 +15,13 @@ from pvgisprototype.constants import (
     DIFFUSE_HORIZONTAL_IRRADIANCE,
     DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    DIRECT_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME,
     FINGERPRINT_COLUMN_NAME,
     GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    GLOBAL_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     HOFIERKA_2002,
+    IRRADIANCE_SOURCE_COLUMN_NAME,
     IRRADIANCE_UNIT,
     LOG_LEVEL_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
@@ -170,6 +173,9 @@ def read_horizontal_irradiance_components_from_sarah(
     horizontal_irradiance_components = {
         GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
         DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+        IRRADIANCE_SOURCE_COLUMN_NAME: 'External time series',
+        GLOBAL_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME: f'{shortwave}',
+        DIRECT_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME: f'{direct}',
     }
 
     return horizontal_irradiance_components
@@ -217,17 +223,24 @@ def calculate_diffuse_horizontal_component_from_sarah(
         logger.warning(warning)
 
     components_container = {
-        "main": lambda: {
-            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-        },
-        "extended": lambda: (
+        "Diffuse irradiance": lambda: (
             {
-                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
-                + " & other horizontal components",
-                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,  # .to_numpy(),
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,  # .to_numpy(),
-                RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
+                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "Time series": lambda: {
+            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
+            + " & other horizontal components",
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,  # .to_numpy(),
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,  # .to_numpy(),
+            IRRADIANCE_SOURCE_COLUMN_NAME: "External time series",
+        },
+        "Sources": lambda: (
+            {
+                IRRADIANCE_SOURCE_COLUMN_NAME: "External time series",
             }
             if verbose > 1
             else {}

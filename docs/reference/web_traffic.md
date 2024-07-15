@@ -311,7 +311,7 @@ mlr head -n 4 access.log-20230604.gz \
   |sed 's/.*} //' \
   |sed 's/1=//' \
   |mlr --nidx --oxtab \
-    then put -f test/convert_nginx_to_csv.mlr \
+    then put -f convert_nginx_to_csv.mlr \
     then cut -f ip,status,size
 ```
 
