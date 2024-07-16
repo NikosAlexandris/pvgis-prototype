@@ -35,9 +35,11 @@ from pvgisprototype.constants import (
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
     POWER_NAME_WITH_SYMBOL,
+    RADIANS,
     REFLECTIVITY,
     REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_EFFECT_PERCENTAGE_COLUMN_NAME,
+    ROUNDING_PLACES_DEFAULT,
     SPECTRAL_EFFECT_COLUMN_NAME,
     SPECTRAL_EFFECT_NAME,
     SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME,
@@ -84,6 +86,9 @@ from pvgisprototype.constants import (
     UNIT_FOR_TOTAL_SPECTRAL_EFFECT_COLUMN_NAME,
     UNIT_FOR_TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME,
     VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.api.utilities.conversions import (
+    convert_float_to_degrees_if_requested,
 )
 
 
@@ -446,15 +451,16 @@ def summarise_photovoltaic_performance(
     dictionary: dict = None,
     timestamps: DatetimeIndex | None = None,
     frequency: str = Frequency.Hourly,
-    rounding_places=1,
+    analysis: AnalysisLevel = AnalysisLevel.Simple,
+    angle_output_units: str = RADIANS,
+    rounding_places: int = ROUNDING_PLACES_DEFAULT,
     dtype=DATA_TYPE_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    analysis: AnalysisLevel = AnalysisLevel.Simple,
 ):
     """
     Generate a simplified report for photovoltaic performance, focusing only on quantities and their values.
     """
-    positioning_rounding_places = 3
+    positioning_rounding_places = 3  # Review-Me !
     from pvgisprototype.api.utilities.conversions import round_float_values
 
     latitude = round_float_values(
@@ -494,16 +500,21 @@ def summarise_photovoltaic_performance(
         unit = photovoltaic_performance_analysis.get(unit_key, default)
         return {"value": value, "unit": unit}
 
+    # longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    # surface_orientation = convert_float_to_degrees_if_requested(surface_orientation, angle_output_units)
+    # surface_tilt = convert_float_to_degrees_if_requested(surface_tilt, angle_output_units)
+
     performance_analysis_container = {
         "Location & Position": lambda: {
-            LATITUDE_COLUMN_NAME: {"value": latitude, "unit": "degrees"},
-            LONGITUDE_COLUMN_NAME: {"value": longitude, "unit": "degrees"},
+            LATITUDE_COLUMN_NAME: {"value": latitude, "unit": angle_output_units},
+            LONGITUDE_COLUMN_NAME: {"value": longitude, "unit": angle_output_units},
             ELEVATION_COLUMN_NAME: {"value": elevation, "unit": "meters"},
             SURFACE_ORIENTATION_COLUMN_NAME: {
                 "value": surface_orientation,
-                "unit": "degrees",
+                "unit": angle_output_units,
             },
-            SURFACE_TILT_COLUMN_NAME: {"value": surface_tilt, "unit": "degrees"},
+            SURFACE_TILT_COLUMN_NAME: {"value": surface_tilt, "unit": angle_output_units},
             "Start time": str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
             "End time": str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
             "Frequency": frequency,

@@ -29,7 +29,7 @@ from pvgisprototype.api.position.models import (
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.surface.optimize_angles import optimize_angles
-from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
+from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMethodSHGOSamplingMethod, SurfacePositionOptimizerMode
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
 from pvgisprototype.constants import (
     DEGREES,
@@ -475,7 +475,10 @@ async def process_optimise_surface_position(
     optimise_surface_position: Annotated[
         SurfacePositionOptimizerMode, fastapi_query_optimise_surface_position
     ] = SurfacePositionOptimizerMode.NoneValue,
+    sampling_method_shgo=SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
 ) -> dict:
+    """
+    """
     if optimise_surface_position == SurfacePositionOptimizerMode.NoneValue:
         return {}
     else:
@@ -490,19 +493,17 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
-                global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 timestamps=timestamps,
                 timezone=timezone,  # type: ignore
-                spectral_factor_series=spectral_factor_series,
-                temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
-                wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-                linke_turbidity_factor_series=LinkeTurbidityFactor(
-                    value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-                ),
+                global_horizontal_irradiance = Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+                direct_horizontal_irradiance = Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+                spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
+                temperature_series = Path("era5_t2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
+                wind_speed_series = Path("era5_ws2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
+                linke_turbidity_factor_series = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
                 photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Orientation,
-                sampling_method_shgo="sobol",
+                sampling_method_shgo=sampling_method_shgo,
             )
         elif optimise_surface_position == SurfacePositionOptimizerMode.Tilt:
             optimise_surface_position = optimize_angles(
@@ -527,7 +528,7 @@ async def process_optimise_surface_position(
                 ),
                 photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Tilt,
-                sampling_method_shgo="sobol",
+                sampling_method_shgo=sampling_method_shgo,
             )
         else:
             optimise_surface_position = optimize_angles(
@@ -552,7 +553,7 @@ async def process_optimise_surface_position(
                 ),
                 photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Tilt_and_Orientation,
-                sampling_method_shgo="sobol",
+                sampling_method_shgo=sampling_method_shgo,
             )
 
         if (optimise_surface_position["surface_tilt"] is None) or (
