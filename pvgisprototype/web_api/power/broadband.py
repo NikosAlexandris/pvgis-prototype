@@ -456,6 +456,7 @@ async def get_photovoltaic_power_series_advanced(
             timestamps=timestamps,
             frequency=frequency,
             analysis=analysis,
+            angle_output_units=angle_output_units,
         )
         response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report
 
@@ -636,6 +637,7 @@ async def get_photovoltaic_power_series(
             timestamps=timestamps,
             frequency=frequency,
             analysis=analysis,
+            angle_output_units=angle_output_units,
         )
         response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report
 
@@ -922,19 +924,11 @@ async def get_photovoltaic_power_output_series_multi(
         surface_tilt=surface_tilt,
         timestamps=timestamps,
         timezone=timezone,
-        global_horizontal_irradiance=Path(
-            "sarah2_sis_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        direct_horizontal_irradiance=Path(
-            "sarah2_sid_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        spectral_factor_series=spectral_factor_series,
-        temperature_series=Path(
-            "era5_t2m_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        wind_speed_series=Path(
-            "era5_ws2m_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
+        global_horizontal_irradiance = Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+        direct_horizontal_irradiance = Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+        spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
+        temperature_series = Path("era5_t2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
+        wind_speed_series = Path("era5_ws2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
