@@ -59,4 +59,5 @@ FASTAPI_INPUT_PARAMETERS = [
     "metadata",
     "profile",
     "optimise_surface_position",
+    "sampling_method_shgo",
 ]
