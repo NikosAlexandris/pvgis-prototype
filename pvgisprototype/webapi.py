@@ -20,6 +20,7 @@ from pvgisprototype.web_api.power.broadband import (
     get_photovoltaic_power_series_advanced,
     get_photovoltaic_power_series_monthly_average,
 )
+from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -291,7 +292,9 @@ app.get("/calculate/power/broadband-multi", tags=["Power", "Multiple surfaces"])
     get_photovoltaic_power_output_series_multi
 )
 
-
+app.get("/calculate/surface/optimise-surface-position", tags=["Surface Optimisation"])(
+    get_optimised_surface_position
+)
 app.openapi = customise_openapi(app)
 
 
