@@ -86,6 +86,7 @@ from pvgisprototype.constants import (
     WIND_SPEED_TIME_SERIES_DESCRIPTION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
     cPROFILE_FLAG_DESCRIPTION,
+    SAMPLING_METHOD_DESCRIPTION,
 )
 
 fastapi_query_longitude = Query(
@@ -344,4 +345,8 @@ fastapi_query_profiling = Query(
 
 fastapi_query_optimise_surface_position = Query(
     description=OPTIMISE_SURFACE_POSITION_DESCRIPTION,
+)
+
+fastapi_query_sampling_method_shgo = Query(
+    description=SAMPLING_METHOD_DESCRIPTION,
 )
