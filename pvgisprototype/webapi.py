@@ -282,20 +282,18 @@ app.get(
     status_code=status.HTTP_201_CREATED,
 )(get_photovoltaic_performance_analysis)
 app.get("/calculate/power/broadband", tags=["Power"])(get_photovoltaic_power_series)
-app.get("/calculate/power/broadband_monthly_average", tags=["Power"])(
-    get_photovoltaic_power_series_monthly_average
-)
 app.get("/calculate/power/broadband-advanced", tags=["Power"])(
     get_photovoltaic_power_series_advanced
 )
-app.get("/calculate/power/broadband-multi", tags=["Power", "Multiple surfaces"])(
+app.get("/calculate/power/broadband-multi", tags=["Power"])(
     get_photovoltaic_power_output_series_multi
 )
 
-app.get("/calculate/surface/optimise-surface-position", tags=["Surface Optimisation"])(
+
+app.get("/surface/optimise-surface-position", tags=["Power"])(
     get_optimised_surface_position
 )
-app.openapi = customise_openapi(app)
+app.openapi = customise_openapi(app) # type: ignore
 
 
 if __name__ == "__main__":

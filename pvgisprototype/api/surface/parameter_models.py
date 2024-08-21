@@ -15,9 +15,13 @@ class SurfacePositionOptimizerMethodSHGOSamplingMethod(str, Enum):
     sobol = "sobol"
     simplicial = "simplicial"
 
-
 class SurfacePositionOptimizerMode(str, Enum):
     Orientation = "Orientation"
     Tilt = "Tilt"
     Tilt_and_Orientation = "Orientation & Tilt"
     NoneValue = "None"
+
+class SurfacePositionOptimizerModeNotNone(str, Enum):
+    Orientation = "Orientation"
+    Tilt = "Tilt"
+    Tilt_and_Orientation = "Orientation & Tilt"
