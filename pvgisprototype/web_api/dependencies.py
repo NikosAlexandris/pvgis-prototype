@@ -79,6 +79,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timestamps,
     fastapi_query_timezone,
     fastapi_query_verbose,
+    fastapi_query_sampling_method_shgo,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
@@ -475,7 +476,9 @@ async def process_optimise_surface_position(
     optimise_surface_position: Annotated[
         SurfacePositionOptimizerMode, fastapi_query_optimise_surface_position
     ] = SurfacePositionOptimizerMode.NoneValue,
-    sampling_method_shgo=SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    sampling_method_shgo: Annotated[
+        SurfacePositionOptimizerMethodSHGOSamplingMethod, fastapi_query_sampling_method_shgo
+    ] = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
 ) -> dict:
     """
     """
