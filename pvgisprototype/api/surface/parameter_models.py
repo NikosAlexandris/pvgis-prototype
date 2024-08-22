@@ -21,7 +21,7 @@ class SurfacePositionOptimizerMode(str, Enum):
     Tilt_and_Orientation = "Orientation & Tilt"
     NoneValue = "None"
 
-class SurfacePositionOptimizerModeNotNone(str, Enum):
+class SurfacePositionOptimizerModeWithoutNone(str, Enum):
     Orientation = "Orientation"
     Tilt = "Tilt"
     Tilt_and_Orientation = "Orientation & Tilt"

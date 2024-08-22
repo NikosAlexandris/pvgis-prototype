@@ -5,7 +5,7 @@ from pvgisprototype.web_api.dependencies import process_optimise_surface_positio
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_optimise_surface_position
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_csv
 from pvgisprototype.web_api.dependencies import fastapi_dependable_angle_output_units
-from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerModeNotNone
+from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerModeWithoutNone
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -15,7 +15,7 @@ from pvgisprototype.web_api.schemas import (
 
 async def get_optimised_surface_position(
     optimise_surface_position: Annotated[
-        SurfacePositionOptimizerModeNotNone, fastapi_query_optimise_surface_position
+        SurfacePositionOptimizerModeWithoutNone, fastapi_query_optimise_surface_position
     ],
     optimised_surface_position: Annotated[dict, Depends(process_optimise_surface_position)],
     angle_output_units: Annotated[
