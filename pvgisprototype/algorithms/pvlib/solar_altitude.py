@@ -1,5 +1,5 @@
 import numpy
-import pvlib
+from pvlib.solarposition import get_solarposition
 from devtools import debug
 from pandas import DatetimeIndex
 
@@ -31,7 +31,7 @@ def calculate_solar_altitude_series_pvlib(
     log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarAltitude:
     """Calculate the solar altitude (θ)"""
-    solar_position = pvlib.solarposition.get_solarposition(
+    solar_position = get_solarposition(
         timestamps, latitude.degrees, longitude.degrees
     )
     solar_altitude_series = solar_position["apparent_elevation"].values
