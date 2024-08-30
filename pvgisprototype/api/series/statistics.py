@@ -41,13 +41,13 @@ import numpy
 # from pvgisprototype.constants import WIND_SPEED_COLUMN_NAME
 # from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 # from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
-import pandas
-import xarray as xr
-from pandas import DatetimeIndex
+from xarray import DataArray
+from pandas import DatetimeIndex, Series
 from rich.box import SIMPLE_HEAD
 from rich.console import Console
 from rich.table import Table
-from scipy.stats import mode
+#from scipy.stats import mode
+from statistics import mode
 
 from pvgisprototype.api.utilities.conversions import round_float_values
 
@@ -104,9 +104,9 @@ def calculate_statistics(
     """Calculate the sum, mean, standard deviation of a series based on a
     specified frequency and its percentage relative to a reference series.
     """
-    pandas_series = pandas.Series(series, timestamps)
+    pandas_series = Series(series, timestamps)
     resampled = pandas_series.resample(frequency)
-    total = resampled.sum().sum().item()  # convert to Python float
+    total = resampled.sum().sum()
     # if isinstance(total, numpy.ndarray):
     #     total = total.astype(dtype)
     percentage = (total / reference_series * 100) if reference_series != 0 else 0
@@ -115,7 +115,7 @@ def calculate_statistics(
     if rounding_places is not None:
         total = round_float_values(total, rounding_places)
         percentage = round_float_values(percentage, rounding_places)
-    mean = resampled.mean().mean().item()  # convert to Python float
+    mean = resampled.mean().mean()
     std_dev = resampled.std().mean()  # Mean of standard deviations over the period
     return total, mean, std_dev, percentage
 
@@ -126,7 +126,7 @@ def calculate_mean_of_series_per_time_unit(
     frequency: str,
 ):
     """ """
-    pandas_series = pandas.Series(series, index=timestamps)
+    pandas_series = Series(series, index=timestamps)
     return pandas_series.resample(frequency).sum().mean().item()  # convert to float
 
 
@@ -139,10 +139,10 @@ def calculate_series_statistics(
     irradiance_xarray = None  # Ugly Hack :-/
     if isinstance(data_array, dict):
         # First, irradiance may exist only in a dictionary !
-        irradiance_xarray = data_array.get(GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME, None)
+        irradiance_array = data_array.get(GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME, None)
         if irradiance_xarray is not None:
-            irradiance_xarray = xr.DataArray(
-                irradiance_xarray,
+            irradiance_xarray = DataArray(
+                irradiance_array,
                 coords=[("time", timestamps)],
                 name="Effective irradiance series",
             )
@@ -154,7 +154,7 @@ def calculate_series_statistics(
         data_array = data_array[PHOTOVOLTAIC_POWER_COLUMN_NAME]
 
     # Regardless of whether the input data_array is an array or a dict :
-    data_xarray = xr.DataArray(
+    data_xarray = DataArray(
         data_array, coords=[("time", timestamps)], name="Effective irradiance series"
     )
     data_xarray.attrs["units"] = "W/m^2"
