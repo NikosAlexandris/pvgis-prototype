@@ -75,25 +75,27 @@ def open_data_array(
 
 def get_scale_and_offset(netcdf):
     """Get scale and offset values from a netCDF file"""
-    dataset = netCDF4.Dataset(netcdf)
-    netcdf_dimensions = set(dataset.dimensions)
-    netcdf_dimensions.update(
-        {"lon", "longitude", "lat", "latitude"}
-    )  # all space dimensions?
-    netcdf_variables = set(dataset.variables)
-    variable = str(
-        list(netcdf_variables.difference(netcdf_dimensions))[0]
-    )  # single variable name!
+    with netCDF4.Dataset(netcdf) as dataset:
+        netcdf_dimensions = set(dataset.dimensions)
+        netcdf_dimensions.update(
+            {"lon", "longitude", "lat", "latitude"}
+        )  # all space dimensions?
+        netcdf_variables = set(dataset.variables)
+        variable = str(
+            list(netcdf_variables.difference(netcdf_dimensions))[0]
+        )  # single variable name!
 
-    if "scale_factor" in dataset[variable].ncattrs():
-        scale_factor = dataset[variable].scale_factor
-    else:
-        scale_factor = None
+        attributes = dataset[variable].ncattrs()
+        
+        if "scale_factor" in attributes:
+            scale_factor = dataset[variable].scale_factor
+        else:
+            scale_factor = None
 
-    if "add_offset" in dataset[variable].ncattrs():
-        add_offset = dataset[variable].add_offset
-    else:
-        add_offset = None
+        if "add_offset" in attributes:
+            add_offset = dataset[variable].add_offset
+        else:
+            add_offset = None
 
     return (scale_factor, add_offset)
 
