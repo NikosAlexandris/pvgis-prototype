@@ -34,85 +34,52 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
 
 
-def atmospheric_refraction_for_high_solar_altitude(
-    solar_altitude: SolarAltitude,  # radians
-    verbose: int = 0,
-) -> AtmosphericRefraction:
+def atmospheric_refraction_adjustment(
+    solar_altitude: np.ndarray,  # radians
+    dtype: str = "float64"
+) -> np.ndarray:
     """
-    Calculate the atmospheric refraction adjustment for high solar_altitudes.
-
-    Parameters:
-    tangent_solar_altitude (float): The tangent of the solar altitude angle
-
-    Returns:
-    AtmosphericRefraction: The correction factor
+    Vectorized calculation of atmospheric refraction adjustment for different solar altitudes.
+    Applies different formulas based on the solar altitude angle.
     """
-    tangent_solar_altitude = tan(solar_altitude)  # in radians
-    adjustment_in_degrees = (
+    tangent_solar_altitude = np.tan(solar_altitude)
+    
+    # Conditions
+    mask_high = solar_altitude > np.radians(5, dtype=dtype)
+    mask_near = (solar_altitude > np.radians(-0.575, dtype=dtype)) & ~mask_high
+    mask_below = solar_altitude <= np.radians(-0.575, dtype=dtype)
+
+    # High solar altitude adjustment
+    adjustment_high = (
         58.1 / tangent_solar_altitude
         - 0.07 / (tangent_solar_altitude**3)
         + 0.000086 / (tangent_solar_altitude**5)
     ) / 3600  # 1 degree / 3600 seconds
 
-    if verbose == 3:
-        debug(locals())
-
-    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
-
-
-def atmospheric_refraction_for_near_horizon(
-    solar_altitude: SolarAltitude,  # radians
-    verbose: int = 0,
-) -> AtmosphericRefraction:
-    """
-    Calculate the atmospheric refraction adjusment for near horizon.
-
-    Parameters:
-    solar_altitude (float): The solar solar_altitude angle
-
-    Returns:
-    float: The adjustment factor
-    """
-    solar_altitude = degrees(solar_altitude)
-    adjustment_in_degrees = (
+    # Near horizon adjustment
+    solar_altitude_deg = np.degrees(solar_altitude)
+    adjustment_near = (
         1735
-        + solar_altitude
+        + solar_altitude_deg
         * (
             -518.2
-            + solar_altitude
-            * (103.4 + solar_altitude * (-12.79 + solar_altitude * 0.711))
+            + solar_altitude_deg
+            * (103.4 + solar_altitude_deg * (-12.79 + solar_altitude_deg * 0.711))
         )
     ) / 3600  # 1 degree / 3600 seconds
 
-    if verbose == 3:
-        debug(locals())
+    # Below horizon adjustment
+    adjustment_below = (-20.774 / tangent_solar_altitude) / 3600  # 1 degree / 3600 seconds
 
-    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
+    # Initialize adjustment array
+    adjustment = np.zeros_like(solar_altitude, dtype=dtype)
 
+    # Apply adjustments based on conditions
+    adjustment[mask_high] = np.radians(adjustment_high[mask_high])
+    adjustment[mask_near] = np.radians(adjustment_near[mask_near])
+    adjustment[mask_below] = np.radians(adjustment_below[mask_below])
 
-def atmospheric_refraction_for_below_horizon(
-    solar_altitude: SolarAltitude,  # radians
-    verbose: int = 0,
-) -> AtmosphericRefraction:
-    """
-    Calculate the atmospheric refraction adjustment for below horizon.
-
-    Parameters:
-    tangent_solar_altitude (float): The tangent of the solar altitude angle
-
-    Returns:
-    float: The correction factor
-    """
-    tangent_solar_altitude = tan(solar_altitude)  # in radians
-    adjustment_in_degrees = (
-        -20.774 / tangent_solar_altitude
-    ) / 3600  # 1 degree / 3600 seconds
-
-    if verbose == 3:
-        debug(locals())
-
-    return AtmosphericRefraction(value=radians(adjustment_in_degrees), unit=RADIANS)
-
+    return adjustment
 
 @validate_with_pydantic(AdjustSolarZenithForAtmosphericRefractionTimeSeriesNOAAInput)
 def adjust_solar_zenith_for_atmospheric_refraction_time_series(
@@ -127,36 +94,11 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     solar_altitude_series_array = (
         np.radians(90, dtype=dtype) - solar_zenith_series.radians
     )  # in radians
-    mask_high = solar_altitude_series_array > np.radians(5, dtype=dtype)
-    mask_near = (
-        solar_altitude_series_array > np.radians(-0.575, dtype=dtype)
-    ) & ~mask_high
-    mask_below = solar_altitude_series_array <= np.radians(-0.575, dtype=dtype)
 
-    # Adjust
-    function_high = np.vectorize(
-        lambda x: atmospheric_refraction_for_high_solar_altitude(x).value
-    )
-    function_near = np.vectorize(
-        lambda x: atmospheric_refraction_for_near_horizon(x).value
-    )
-    function_below = np.vectorize(
-        lambda x: atmospheric_refraction_for_below_horizon(x).value
-    )
+    # Adjust using vectorized operations
+    adjustment = atmospheric_refraction_adjustment(solar_altitude_series_array, dtype=dtype)
 
-    adjusted_solar_zenith_series_array = np.copy(solar_zenith_series.radians)
-    if mask_high.any():
-        adjusted_solar_zenith_series_array[mask_high] -= function_high(
-            solar_altitude_series_array[mask_high]
-        )
-    if mask_near.any():
-        adjusted_solar_zenith_series_array[mask_near] -= function_near(
-            solar_altitude_series_array[mask_near]
-        )
-    if mask_below.any():
-        adjusted_solar_zenith_series_array[mask_below] -= function_below(
-            solar_altitude_series_array[mask_below]
-        )
+    adjusted_solar_zenith_series_array = solar_zenith_series.radians - adjustment
 
     # Validate
     if not np.all(np.isfinite(adjusted_solar_zenith_series_array)) or not np.all(
