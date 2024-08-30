@@ -70,35 +70,6 @@ def get_metadata(request: Request):
     # return JSONResponse()
 
 
-def convert_numpy_arrays_to_lists(data: Any) -> Any:
-    """Convert all NumPy arrays and other NumPy types in the input to native Python types.
-
-    Parameters
-    ----------
-    data : Any
-        The input data possibly containing NumPy arrays and other NumPy types.
-
-    Returns
-    -------
-    Any
-        A new data structure with all NumPy arrays converted to lists and other NumPy types converted to native types.
-    """
-    if isinstance(data, dict):
-        return {k: convert_numpy_arrays_to_lists(v) for k, v in data.items()}
-    elif isinstance(data, list):
-        return [convert_numpy_arrays_to_lists(v) for v in data]
-    elif isinstance(data, tuple):
-        return tuple(convert_numpy_arrays_to_lists(v) for v in data)
-    elif isinstance(data, np.datetime64):
-        return to_datetime(str(data)).isoformat()
-    elif isinstance(data, np.ndarray):
-        return data.tolist()
-    elif isinstance(data, (np.float64, np.float32)):
-        return float(data)
-    else:
-        return data
-
-
 async def get_photovoltaic_performance_analysis(
     request: Request,
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
@@ -221,7 +192,7 @@ async def get_photovoltaic_performance_analysis(
         direct_horizontal_irradiance=Path(
             "sarah2_sid_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
-        spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
+        #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
         temperature_series=Path(
             "era5_t2m_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
@@ -321,9 +292,7 @@ async def get_photovoltaic_performance_analysis(
 
     if not quiet:
         if verbose > 0:
-            response = convert_numpy_arrays_to_lists(
-                photovoltaic_power_output_series.components
-            )
+            response = photovoltaic_power_output_series.components
         else:
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
