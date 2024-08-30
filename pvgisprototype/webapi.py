@@ -18,7 +18,6 @@ from pvgisprototype.web_api.power.broadband import (
     get_photovoltaic_power_output_series_multi,
     get_photovoltaic_power_series,
     get_photovoltaic_power_series_advanced,
-    get_photovoltaic_power_series_monthly_average,
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
 
@@ -175,6 +174,7 @@ app = FastAPI(
         "displayRequestDuration": True,  # Display request duration
         "showExtensions": True,  # Show vendor extensions
     },
+    default_response_class=ORJSONResponse,
 )
 
 
