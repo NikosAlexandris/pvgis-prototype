@@ -46,8 +46,7 @@ from pandas import DatetimeIndex, Series
 from rich.box import SIMPLE_HEAD
 from rich.console import Console
 from rich.table import Table
-#from scipy.stats import mode
-from statistics import mode
+from scipy.stats import mode
 
 from pvgisprototype.api.utilities.conversions import round_float_values
 
@@ -139,10 +138,10 @@ def calculate_series_statistics(
     irradiance_xarray = None  # Ugly Hack :-/
     if isinstance(data_array, dict):
         # First, irradiance may exist only in a dictionary !
-        irradiance_array = data_array.get(GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME, None)
+        irradiance_xarray = data_array.get(GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME, None)
         if irradiance_xarray is not None:
             irradiance_xarray = DataArray(
-                irradiance_array,
+                irradiance_xarray,
                 coords=[("time", timestamps)],
                 name="Effective irradiance series",
             )
