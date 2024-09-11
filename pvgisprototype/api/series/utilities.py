@@ -87,8 +87,126 @@ def open_data_array(
         )
 
 
+def open_data_set(
+    input_data: Path,
+    mask_and_scale: bool = False,
+    in_memory: bool = False,
+    verbose: int = 0,
+):
+    """Open or load a dataset based on the input flags."""
+    if in_memory:
+        if verbose > 0:
+            logger.info(f"Loading dataset '{input_data}' in memory...")
+        return load_or_open_dataset(
+            function=xr.load_dataset,
+            filename_or_object=input_data,
             mask_and_scale=mask_and_scale,
         )
+    else:
+        if verbose > 0:
+            logger.info(f"Opening dataset '{input_data}'...")
+        return load_or_open_dataset(
+            function=xr.open_dataset,
+            filename_or_object=input_data,
+            mask_and_scale=mask_and_scale,
+        )
+
+
+def load_or_open_dataarray_from_dataset(
+    dataset: Path,
+    variable: Optional[str] = None,
+    longitude: Optional[float] = None,
+    latitude: Optional[float] = None,
+    time: Optional[str] = None,
+    column_numbers: Optional[str] = None,
+    mask_and_scale: bool = False,
+    in_memory: bool = False,
+    method: str = "nearest",
+    tolerance: float = 0.1,
+    verbose: int = 0,
+):
+    """
+    Load or open a variable from a dataset and select coordinates.
+
+    Parameters
+    ----------
+    dataset: Path to the NetCDF dataset file.
+    variable: The variable name to extract from the dataset.
+    longitude: Longitude value to select.
+    latitude: Latitude value to select.
+    time: Time value to select.
+    mask_and_scale: Boolean to mask and scale data.
+    in_memory: Boolean to load dataset into memory.
+    method: Method for selecting nearest coordinates ('nearest').
+    tolerance: Tolerance level for selecting the nearest coordinate.
+    verbose: Verbosity level for logging.
+    """
+    
+    # Open the dataset
+    ds = open_data_set(
+        input_data=dataset,
+        mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
+        verbose=verbose,
+    )
+    
+    # If a variable is specified, check and extract it, otherwise raise error
+    if variable:
+        if variable in ds.variables:
+            data_array = ds[variable]
+        else:
+            logger.error(f"{x_mark} Variable '{variable}' not found in the dataset!")
+            raise typer.Exit(code=33)
+    else:
+        logger.error(f"{x_mark} No variable specified!")
+        raise typer.Exit(code=33)
+
+    # Select coordinates for longitude, latitude, and time if provided
+    indexers = {}
+    
+    if "longitude" in ds.coords and longitude:
+        indexers["longitude"] = longitude
+    elif "lon" in ds.coords and longitude:
+        indexers["lon"] = longitude
+
+    if "latitude" in ds.coords and latitude:
+        indexers["latitude"] = latitude
+    elif "lat" in ds.coords and latitude:
+        indexers["lat"] = latitude
+
+    if time:
+        indexers["time"] = time
+
+    # Apply selection using nearest method and tolerance if required
+    try:
+        data_array = data_array.sel(
+            **indexers,
+            method=method,
+            tolerance=tolerance
+        )
+    except Exception as e:
+        logger.error(f"Error in selecting data with given coordinates: {str(e)}")
+        raise typer.Exit(code=33)
+
+    if column_numbers:
+        try:
+            if '-' in column_numbers:  # Handle range like '1-10'
+                start, end = map(int, column_numbers.split('-'))
+                data_array = data_array.isel(center_wavelength=slice(start - 1, end))  # Adjust to 0-based indexing
+            elif ',' in column_numbers:  # Handle list like '1,5,7'
+                indices = list(map(int, column_numbers.split(',')))
+                data_array = data_array.isel(center_wavelength=[i - 1 for i in indices])  # Adjust to 0-based indexing
+            else:  # Handle single value like '1'
+                index = int(column_numbers) - 1  # Adjust to 0-based indexing
+                data_array = data_array.isel(center_wavelength=index)
+        except Exception as e:
+            logger.error(f"Error in processing column_numbers: {str(e)}")
+            raise typer.Exit(code=33)
+
+    if verbose > 0:
+        logger.info(f"Data successfully loaded for variable '{variable}'.")
+    
+    return data_array
 
 
 def read_data_array_or_set(
