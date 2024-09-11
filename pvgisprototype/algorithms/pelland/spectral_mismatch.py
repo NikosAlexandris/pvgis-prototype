@@ -40,9 +40,6 @@ def calculate_spectral_mismatch_pelland(
     Some Python source code shared via personal communication.
 
     """
-    # print(f'Irradiance input : {irradiance}')
-    # print(f'Responsivity input : {responsivity}')
-
     # Verify the reference spectrum is valid (no zero or near-zero values) ?
     if (reference_spectrum <= 0).any().any():
         raise ValueError(
@@ -52,22 +49,46 @@ def calculate_spectral_mismatch_pelland(
     #     print(f'Reference spectrum input : {reference_spectrum}')
 
     # Align wavelengths (columns) between dataframes
-    wavelengths = irradiance.columns.intersection(responsivity.index).intersection(
-        reference_spectrum.columns
+    # if not isinstance(irradiance, DataFrame):
+    #     irradiance = irradiance.to_dataframe()
+    # wavelengths = irradiance.columns.intersection(responsivity.index).intersection(
+    #     reference_spectrum.columns
+    # )
+    import numpy
+    wavelengths = numpy.intersect1d(
+        irradiance.center_wavelength.values, 
+        responsivity.index.intersection(reference_spectrum.columns)
     )
 
+    # Required ?
+    irradiance = irradiance.where(irradiance > -999, numpy.nan)
+
     # useful reference spectrum (average over the reference spectrum)
+    # useful_reference = (
+    #     responsivity.loc[wavelengths]
+    #     .mul(reference_spectrum.loc["global", wavelengths])
+    #     .sum()
+    #     / reference_spectrum.loc["global", wavelengths].sum()
+    # )
     useful_reference = (
         responsivity.loc[wavelengths]
-        .mul(reference_spectrum.loc["global", wavelengths])
+        .mul(reference_spectrum.loc["global", wavelengths].values)
         .sum()
         / reference_spectrum.loc["global", wavelengths].sum()
     )
-
     # useful irradiance (time-varying)
-    useful_irradiance = responsivity.loc[wavelengths].mul(irradiance[wavelengths]).sum(
-        axis=1
-    ) / irradiance[wavelengths].sum(axis=1)
+    # useful_irradiance = responsivity.loc[wavelengths].mul(irradiance[wavelengths]).sum(
+    #     axis=1
+    # ) / irradiance[wavelengths].sum(axis=1)
+
+    # get irradiance over specific wavelengths once and reuse
+    irradiance_selected = irradiance.sel(center_wavelength=wavelengths)
+    useful_irradiance = (
+        responsivity.loc[wavelengths].values
+        * irradiance_selected
+    ).sum(dim="center_wavelength") / irradiance_selected.sum(
+        dim="center_wavelength"
+    )
 
     spectral_mismatch = useful_irradiance / useful_reference
 
