@@ -18,6 +18,7 @@ from pvgisprototype.constants import (
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
     NOT_AVAILABLE,
+    SPECTRAL_FACTOR_COLUMN_NAME,
     TERMINAL_WIDTH_FRACTION,
     UNIT_NAME,
     UNITLESS,
@@ -53,8 +54,8 @@ def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
 def uniplot_data_array_series(
     data_array,
     list_extra_data_arrays=None,
-    # longitude: float,
-    # latitude: float,
+    longitude: float = None,
+    latitude: float = None,
     orientation: List[float] | float = None,
     tilt: List[float] | float = None,
     # time_series_2: Path = None,
@@ -104,6 +105,7 @@ def uniplot_data_array_series(
         ]
 
     y_series = [data_array] + (list_extra_data_arrays if list_extra_data_arrays else [])
+    timestamps_series = [timestamps] * len(y_series)  # list same DatetimeIndex for each series
 
     if isinstance(data_array, float):
         logger.error(
@@ -112,6 +114,8 @@ def uniplot_data_array_series(
         )
         return
 
+    if longitude and latitude:
+        title += f' observed from (longitude, latitude) {longitude}, {latitude}'
     # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
     # label = getattr(photovoltaic_power_output_series, 'name', None)
     # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
@@ -131,13 +135,14 @@ def uniplot_data_array_series(
     print("[reverse]Uniplot[/reverse]")
     try:
         plot(
-            # xs=timestamps,
+            xs=timestamps_series,
             ys=y_series,
             legend_labels=legend_labels,
             lines=lines,
             title=title if title else supertitle,
             y_unit=" " + str(unit),
-            force_ascii=True,
+            # force_ascii=True,
+            # color=False,
         )
     except IOError as e:
         raise IOError(f"Could not _uniplot_ {data_array.value=}") from e
@@ -150,8 +155,8 @@ def uniplot_solar_position_series(
     # index: bool = False,
     surface_orientation=None,
     surface_tilt=None,
-    # longitude: float,
-    # latitude: float,
+    longitude: float = None,
+    latitude: float = None,
     # time_series_2: Path = None,
     resample_large_series: bool = False,
     lines: bool = True,
@@ -226,6 +231,8 @@ def uniplot_solar_position_series(
         uniplot_data_array_series(
             data_array=solar_position_metric_series,
             list_extra_data_arrays=individual_series,
+            longitude=longitude,
+            latitude=latitude,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
