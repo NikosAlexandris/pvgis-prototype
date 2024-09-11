@@ -801,6 +801,95 @@ def print_irradiance_table_2(
         Console().print(Panel(caption, expand=False))
 
 
+def print_irradiance_xarray(
+    location_time_series: DataArray,
+    longitude=None,
+    latitude=None,
+    elevation=None,
+    title: str = "Irradiance series",
+    rounding_places: int = 3,
+    verbose: int = 1,
+    index: bool = False,
+) -> None:
+    """
+    Print the irradiance time series in a formatted table with each center wavelength as a column.
+
+    Parameters
+    ----------
+    location_time_series : xr.DataArray
+        The time series data with dimensions (time, center_wavelength).
+    longitude : float, optional
+        The longitude of the location.
+    latitude : float, optional
+        The latitude of the location.
+    elevation : float, optional
+        The elevation of the location.
+    title : str, optional
+        The title of the table.
+    rounding_places : int, optional
+        The number of decimal places to round to.
+    verbose : int, optional
+        Verbosity level.
+    index : bool, optional
+        Whether to show an index column.
+    """
+
+    # Extract relevant data from the location_time_series
+    timestamps = location_time_series.time.values
+    center_wavelengths = location_time_series.center_wavelength.values
+    irradiance_values = location_time_series.values
+
+    # Prepare the table
+    table = Table(
+        title=title,
+        caption_justify="left",
+        expand=False,
+        padding=(0, 1),
+        box=SIMPLE_HEAD,
+        show_footer=True,
+    )
+
+    if index:
+        table.add_column("Index")
+
+    table.add_column("Time", footer="Total")  # Timestamp column
+
+    # Add columns for each center wavelength (irradiance wavelength)
+    for wavelength in center_wavelengths:
+        table.add_column(f"{wavelength:.0f} nm", justify="right")
+
+    # Populate the table with the irradiance data
+    for idx, timestamp in enumerate(timestamps):
+        row = []
+
+        if index:
+            row.append(str(idx + 1))
+
+        # Convert timestamp to string format
+        row.append(datetime.utcfromtimestamp(timestamp.tolist() / 1e9).strftime("%Y-%m-%d %H:%M:%S"))
+
+        # Add irradiance values for each center wavelength at this timestamp
+        for irradiance in irradiance_values[idx]:
+            row.append(f"{round(irradiance, rounding_places):.{rounding_places}f}")
+
+        table.add_row(*row)
+
+    # Prepare a caption with the location information
+    caption = str()
+    if longitude is not None and latitude is not None:
+        caption += f"Location  Longitude ϑ, Latitude ϕ = {longitude}, {latitude}"
+
+    if elevation is not None:
+        caption += f", Elevation: {elevation} m"
+
+    caption += "\nLegend: Center Wavelengths (nm)"
+
+    if verbose:
+        console = Console()
+        console.print(table)
+        console.print(Panel(caption, expand=False))
+
+
 def add_table_row(
     table,
     quantity,
@@ -1528,6 +1617,8 @@ def print_solar_position_series_in_columns(
         panels.append(panel)
 
     Console().print(Columns(panels))
+
+
 from typing import Dict
 
 def print_spectral_mismatch(
