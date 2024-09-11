@@ -13,12 +13,14 @@ from rich.pretty import Pretty
 from rich.table import Table
 from rich.text import Text
 from sparklines import sparklines
+from xarray import DataArray
 
 from pvgisprototype.api.performance.report import report_photovoltaic_performance
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_PARAMETER_COLUMN_NAMES,
     SolarPositionParameter,
 )
+from pvgisprototype.api.spectrum.constants import SPECTRAL_MISMATCH_NAME
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     ALTITUDE_NAME,
@@ -57,6 +59,7 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT_COLUMN_NAME,
     SPECTRAL_EFFECT_NAME,
+    SPECTRAL_FACTOR_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_COLUMN_NAME,
@@ -1525,3 +1528,94 @@ def print_solar_position_series_in_columns(
         panels.append(panel)
 
     Console().print(Columns(panels))
+from typing import Dict
+
+def print_spectral_mismatch(
+    timestamps,
+    spectral_mismatch: Dict,
+    spectral_mismatch_model: List,
+    photovoltaic_module_type: List,
+    rounding_places: int = 3,
+    include_statistics: bool = False,
+    title: str = "Spectral Factor",
+    verbose: int = 1,
+    index: bool = False,
+    show_footer: bool = True,
+) -> None:
+    """
+    Print the spectral mismatch results in a formatted table.
+
+    Parameters
+    ----------
+    - timestamps :
+        The time series timestamps.
+    - spectral_mismatch :
+        Dictionary containing spectral mismatch data for different models and module types.
+    - spectral_mismatch_model :
+        List of spectral mismatch models.
+    - photovoltaic_module_type :
+        List of photovoltaic module types.
+    - rounding_places :
+        Number of decimal places for rounding.
+    - include_statistics :
+        Whether to include mean, median, etc., in the output.
+    - verbose : int
+        Verbosity level.
+    - index : bool
+        Whether to show an index column.
+    """
+    # Initialize the table with title and formatting options
+    table = Table(
+        title=title,
+        caption_justify="left",
+        expand=False,
+        padding=(0, 1),
+        box=SIMPLE_HEAD,
+        show_footer=show_footer,
+    )
+    if index:
+        table.add_column("Index")
+
+    table.add_column("Time", footer="μ" if show_footer else None)
+        # Initialize dictionary to store the means for each module type
+    means = {}
+
+    # Calculate mean values for the footer
+    if show_footer:
+        for module_type in photovoltaic_module_type:
+            model = spectral_mismatch_model[0]  # Assuming only one model for simplicity
+            spectral_factor_series = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+            mean_value = np.nanmean(spectral_factor_series)
+            means[module_type.value] = f"{mean_value:.{rounding_places}f}"
+
+    # Add columns for each photovoltaic module type with optional footer
+    for module_type in photovoltaic_module_type:
+        footer_text = means.get(module_type.value, "") if show_footer else None
+        table.add_column(f"{module_type.value}", justify="right", footer=footer_text)
+
+    # Aggregate data for each timestamp
+    for _index, timestamp in enumerate(timestamps):
+        row = []
+
+        if index:
+            row.append(str(_index + 1))  # count from 1
+
+        row.append(str(timestamp))
+
+        for module_type in photovoltaic_module_type:
+            model = spectral_mismatch_model[0]  # Assuming only one model for simplicity
+            sm_value = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)[_index]
+            row.append(f"{round(sm_value, rounding_places):.{rounding_places}f}")
+        table.add_row(*row)
+
+    print()
+
+    # Print the table if verbose is enabled
+    if verbose:
+        console = Console()
+        console.print(table)
+
+        # Optionally, display additional information in a panel
+        if verbose > 1:
+            extra_info = "Spectral Mismatch calculated for different photovoltaic module types using specified models."
+            console.print(Panel(extra_info, expand=False))
