@@ -1,5 +1,13 @@
+from pvgisprototype.log import logger
+from pandas import to_numeric, DataFrame
+from devtools import debug
+
+# from pvgisprototype.api.spectrum.helpers import (
+
 from pathlib import Path
 from typing import Union
+from pandas import read_csv
+from pandas import Series
 
 import numpy as np
 import typer
@@ -7,15 +15,23 @@ from typer import Context
 
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
+# from pvgisprototype.api.spectrum.helpers import generate_banded_data
+from pvgisprototype.api.spectrum.models import SpectralMismatchModel
 from pvgisprototype.cli.rich_help_panel_names import (
-    rich_help_panel_atmospheric_properties,
+    rich_help_panel_spectrum,
 )
 from pvgisprototype.cli.typer.path import validate_path
 from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
+    RESPONSIVITY_SPECTRAL_DATA,
     SPECTRAL_FACTOR_DEFAULT,
+    SPECTRAL_RESPONSIVITY_CSV_COLUMN_NAME_DEFAULT,
     UNITLESS,
+    WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
 )
+
+
+spectral_factor_typer_help = "Spectral factor time series"
 
 
 def parse_spectral_factor_series(
@@ -39,7 +55,8 @@ def parse_spectral_factor_series(
         #   either 12 monthly values  or  a full time series ?
 
         if isinstance(spectral_factor_input, str):
-            spectral_factor_input = np.fromstring(spectral_factor_input, sep=",")
+            from numpy import fromstring
+            spectral_factor_input = fromstring(spectral_factor_input, sep=",")
         # --------------------------------------------------------------------
 
         return spectral_factor_input
@@ -58,7 +75,6 @@ def spectral_factor_series_argument_callback(
         return validate_path(spectral_factor_series)
 
     from pvgisprototype.log import logger
-
     timestamps = ctx.params.get("timestamps", None)
     start_time = ctx.params.get("start_time")
     end_time = ctx.params.get("end_time")
@@ -140,12 +156,9 @@ def spectral_factor_series_option_callback(
     return SpectralFactorSeries(value=spectral_factor_series, unit=UNITLESS)
 
 
-spectral_factor_typer_help = "Spectral factor time series"
-
-
 typer_argument_spectral_factor_series = typer.Option(
     help=spectral_factor_typer_help,
-    rich_help_panel=rich_help_panel_atmospheric_properties,
+    rich_help_panel=rich_help_panel_spectrum,
     # is_eager=True,
     parser=parse_spectral_factor_series,
     callback=spectral_factor_series_argument_callback,
@@ -153,7 +166,7 @@ typer_argument_spectral_factor_series = typer.Option(
 )
 typer_option_spectral_factor_series = typer.Option(
     help=spectral_factor_typer_help,
-    rich_help_panel=rich_help_panel_atmospheric_properties,
+    rich_help_panel=rich_help_panel_spectrum,
     # is_eager=True,
     parser=parse_spectral_factor_series,
     callback=spectral_factor_series_option_callback,
