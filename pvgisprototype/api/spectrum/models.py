@@ -3,7 +3,7 @@ from enum import Enum
 
 class PhotovoltaicModuleSpectralResponsivityModel(str, Enum):
     all = "all"
-    generic = "Generic"
+    cSi = "cSi"
     asi = "aSi"
     monosi = "monoSi"
     polysi = "polySi"

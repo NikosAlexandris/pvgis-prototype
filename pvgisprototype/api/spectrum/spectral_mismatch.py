@@ -33,8 +33,11 @@ from pvgisprototype.constants import (
     REFERENCE_SPECTRUM_COLUMN_NAME,
     RESPONSIVITY_COLUMN_NAME,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    TOLERANCE_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
 )
 from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.api.series.models import MethodForInexactMatches
 
 
 @log_function_call
@@ -46,14 +49,10 @@ def model_spectral_mismatch(
     timezone: ZoneInfo,
     responsivity: Series,
     irradiance: DataFrame,
-    # neighbor_lookup: Annotated[
-    #     MethodForInexactMatches, typer_option_nearest_neighbor_lookup
-    # ] = NEIGHBOR_LOOKUP_DEFAULT,
-    # tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
-    # mask_and_scale: Annotated[
-    #     bool, typer_option_mask_and_scale
-    # ] = MASK_AND_SCALE_FLAG_DEFAULT,
-    # in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    # neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
+    # tolerance: None | float = TOLERANCE_DEFAULT,
+    # mask_and_scale: bool = False,
+    # in_memory: bool = False,
     min_wavelength: float = MIN_WAVELENGTH,
     max_wavelength: float = MAX_WAVELENGTH,
     reference_spectrum: None | Series = None,  # AM15G_IEC60904_3_ED4,
@@ -98,26 +97,24 @@ def model_spectral_mismatch(
 
     return spectral_mismatch
 
+from pvgisprototype import Latitude, Longitude, Elevation
+
 
 def calculate_spectral_mismatch(
-    # longitude: Longitude,
-    # latitude: Latitude,
-    # elevation: Elevation,
+    longitude: Longitude,
+    latitude: Latitude,
+    elevation: Elevation,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
+    irradiance: DataFrame,
+    # neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
+    # tolerance: None | float = TOLERANCE_DEFAULT,
+    # mask_and_scale: bool = False,
+    # in_memory: bool = False,
     # responsivity: Series,
     responsivity: Dict[str, Series],  # Dictionary to hold responsivity for each type
-    photovoltaic_module_type: List[PhotovoltaicModuleSpectralResponsivityModel],
-    irradiance: DataFrame,
-    # neighbor_lookup: Annotated[
-    #     MethodForInexactMatches, typer_option_nearest_neighbor_lookup
-    # ] = NEIGHBOR_LOOKUP_DEFAULT,
-    # tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
-    # mask_and_scale: Annotated[
-    #     bool, typer_option_mask_and_scale
-    # ] = MASK_AND_SCALE_FLAG_DEFAULT,
-    # in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
-    reference_spectrum: Series,  # AM15G_IEC60904_3_ED4,
+    photovoltaic_module_type: List[PhotovoltaicModuleSpectralResponsivityModel] = [PhotovoltaicModuleSpectralResponsivityModel.cSi],
+    reference_spectrum: Series = None,  # AM15G_IEC60904_3_ED4,
     integrate_reference_spectrum: bool = False,
     spectral_mismatch_models: List[SpectralMismatchModel] = [SpectralMismatchModel.pvlib],
     min_wavelength: float = MIN_WAVELENGTH,
@@ -157,7 +154,7 @@ def calculate_spectral_mismatch(
                     timestamps=timestamps,
                     timezone=timezone,
                     spectral_mismatch_model=spectral_mismatch_model,
-                    responsivity=responsivity[module_type.value],
+                    responsivity=responsivity.loc[module_type.value],
                     # responsivity=responsivity,
                     irradiance=irradiance,
                     reference_spectrum=reference_spectrum,
@@ -212,6 +209,6 @@ def calculate_spectral_mismatch(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
     return SpectralFactorSeries(
-            value=spectral_mismatch_series,
+            # value=spectral_mismatch_series,
             components=results,
             )
