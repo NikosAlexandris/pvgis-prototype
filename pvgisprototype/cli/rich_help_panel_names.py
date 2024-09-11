@@ -32,6 +32,18 @@ rich_help_panel_solar_position = "Solar position"
 
 rich_help_panel_irradiance_series = "External solar irradiance time series"
 
+# Solar spectrum
+
+rich_help_panel_spectrum = "Solar irradiance spectrum"
+
+# Spectral responsivity
+
+rich_help_panel_spectral_responsivity = 'Spectral responsivity'
+
+# Spectral mismatch
+
+rich_help_panel_spectral_mismatch = 'Spectral mismatch'
+
 # Ancillary data
 
 rich_help_panel_meteorology = "Meteorology"
