@@ -74,8 +74,9 @@ def select_time_series(
     end_time: Optional[datetime] = None,
     remap_to_month_start: Optional[bool] = False,
     # convert_longitude_360: bool = False,
+    variable: str = None,
     neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = 0.1,  # Customize default if needed
+    tolerance: float = 0.1,  # Customize default if needed
     mask_and_scale: bool = False,
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,
@@ -103,6 +104,7 @@ def select_time_series(
         time_series=time_series,
         longitude=longitude,
         latitude=latitude,
+        variable=variable,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
