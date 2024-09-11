@@ -311,6 +311,8 @@ def overview(
             solar_position_series=solar_position_series,
             position_parameters=solar_position_parameters,
             timestamps=timestamps,
+            longitude=longitude,
+            latitude=latitude,
             surface_orientation=True,
             surface_tilt=True,
             resample_large_series=resample_large_series,

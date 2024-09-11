@@ -1,17 +1,17 @@
 import typer
-
-from pvgisprototype.cli.irradiance.diffuse.diffuse import app as diffuse_irradiance
-from pvgisprototype.cli.irradiance.direct.direct import app as direct_irradiance
-from pvgisprototype.cli.irradiance.extraterrestrial import (
-    get_extraterrestrial_normal_irradiance_series,
-)
 from pvgisprototype.cli.irradiance.introduction import solar_irradiance_introduction
-from pvgisprototype.cli.irradiance.limits import app as limits
+from pvgisprototype.cli.irradiance.shortwave.shortwave import app as global_irradiance
+from pvgisprototype.cli.irradiance.direct.direct import app as direct_irradiance
+from pvgisprototype.cli.irradiance.diffuse.diffuse import app as diffuse_irradiance
 from pvgisprototype.cli.irradiance.reflected import (
     get_ground_reflected_inclined_irradiance_series,
 )
+from pvgisprototype.cli.irradiance.extraterrestrial import (
+    get_extraterrestrial_normal_irradiance_series,
+)
 from pvgisprototype.cli.irradiance.reflectivity import app as reflectivity_factor
-from pvgisprototype.cli.irradiance.shortwave.shortwave import app as global_irradiance
+from pvgisprototype.cli.irradiance.limits import app as limits
+from pvgisprototype.cli.irradiance.kato_bands import print_kato_spectral_bands
 from pvgisprototype.cli.messages import NOT_COMPLETE_CLI
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_introduction,
@@ -100,3 +100,10 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_toolbox,
 )
+app.command(
+    name="kato-bands",
+    help=f"{SYMBOL_IRRADIANCE_LIMITS} Print limits and center wavelengths of KATO spectral bands",
+    short_help=f"{SYMBOL_IRRADIANCE_LIMITS} Kato spectral bands limits and center wavelengths",
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_toolbox,
+)(print_kato_spectral_bands)
