@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 import netCDF4
 import typer
@@ -12,6 +13,7 @@ from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.cli.messages import ERROR_IN_SELECTING_DATA
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
@@ -30,8 +32,20 @@ def load_or_open_dataarray(function, filename_or_object, mask_and_scale):
         raise typer.Exit(code=33)
 
 
+def load_or_open_dataset(function, filename_or_object, mask_and_scale):
+    try:
+        dataset = function(
+            filename_or_obj=filename_or_object,
+            mask_and_scale=mask_and_scale,
+        )
+        return dataset
+    except Exception as exc:
+        typer.echo(f"Could not load or open the dataset: {str(exc)}")
+        raise typer.Exit(code=33)
+
+
 def open_data_array(
-    netcdf: str,
+    input_data: str,
     mask_and_scale: bool = False,
     in_memory: bool = False,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -48,7 +62,7 @@ def open_data_array(
     #     typer.echo(f"Could not load the data in memory: {str(exc)}")
     #     try:
     #         dataarray = xr.open_dataarray(
-    #                 filename_or_object=netcdf,
+    #                 filename_or_object=input_data_file,
     #                 mask_and_scale=mask_and_scale,
     #                 )
     #         return dataarray
@@ -57,20 +71,75 @@ def open_data_array(
     #         raise typer.Exit(code=33)
     if in_memory:
         if verbose > 0:
-            print("Reading data in memory...")
+            logger.info(f"Loading data array '{input_data}' in memory...")
         return load_or_open_dataarray(
             function=xr.load_dataarray,
-            filename_or_object=netcdf,
+            filename_or_object=input_data,
             mask_and_scale=mask_and_scale,
         )
     else:
         if verbose > 0:
-            print("Open file")
+            logger.info(f"Opening data array '{input_data}'...")
         return load_or_open_dataarray(
             function=xr.open_dataarray,
-            filename_or_object=netcdf,
+            filename_or_object=input_data,
             mask_and_scale=mask_and_scale,
         )
+
+
+            mask_and_scale=mask_and_scale,
+        )
+
+
+def read_data_array_or_set(
+        input_data: Path,
+        mask_and_scale: bool = False,
+        in_memory: bool = False,
+        verbose: int = 0,
+):
+    """Open the data and determine if it's a DataArray or Dataset."""
+
+    # try reading an array
+    try:
+        if in_memory:
+            if verbose > 0:
+                logger.info(f"{exclamation_mark} Trying to load the {input_data} into memory as a DataArray...")
+            return load_or_open_dataarray(
+                function=xr.load_dataarray,
+                filename_or_object=input_data,
+                mask_and_scale=mask_and_scale,
+            )
+        else:
+            if verbose > 0:
+                logger.info(f"{exclamation_mark} Trying to open the '{input_data}' as a DataArray...")
+            return load_or_open_dataarray(
+                function=xr.open_dataarray,
+                filename_or_object=input_data,
+                mask_and_scale=mask_and_scale,
+            )
+
+    # or a set
+    except:
+        try:
+            if in_memory:
+                if verbose > 0:
+                    logger.info(f"{exclamation_mark} Trying to load {input_data} into memory as a Dataset...")
+                return load_or_open_dataset(
+                    function=xr.load_dataset,
+                    filename_or_object=input_data,
+                    mask_and_scale=mask_and_scale,
+                )
+            else:
+                if verbose > 0:
+                    logger.info(f"{exclamation_mark} Trying to open {input_data} as a Dataset...")
+                return load_or_open_dataset(
+                    function=xr.open_dataset,
+                    filename_or_object=input_data,
+                    mask_and_scale=mask_and_scale,
+                )
+        except Exception as e:
+            logger.error(f"Error loading or opening data: {str(e)}")
+            raise typer.Exit(code=33)
 
 
 def get_scale_and_offset(netcdf):
@@ -124,10 +193,10 @@ def set_location_indexers(
         y = "latitude"
 
     if x and y:
-        logger.info(f"Dimensions  : {x}, {y}")
+        logger.info(f"{check_mark} Location specific dimensions detected in '{data_array.name}' : {x}, {y}")
 
     if not (longitude and latitude):
-        warning = f"{exclamation_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates."
+        warning = f"{check_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates."
         logger.warning(warning)
 
         center_longitude = float(data_array[x][len(data_array[x]) // 2])
@@ -195,7 +264,8 @@ def select_coordinates(
 
 @log_function_call
 def select_location_time_series(
-    time_series: Path = None,
+    time_series: Path = None,  # Is None required ?
+    variable: str = None,
     longitude: Longitude = None,
     latitude: Latitude = None,
     neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
@@ -203,15 +273,35 @@ def select_location_time_series(
     mask_and_scale: bool = False,
     in_memory: bool = False,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = 0,
+    log: int = LOG_LEVEL_DEFAULT,
 ):
     """Select a location from a time series data format supported by
     xarray"""
-    data_array = open_data_array(
-        time_series,
-        mask_and_scale,
-        in_memory,
+    # data_array = open_data_array(
+    #     time_series,
+    #     mask_and_scale,
+    #     in_memory,
+    # )
+    data = read_data_array_or_set(
+            input_data=time_series,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            verbose=verbose,
     )
+    if isinstance(data, xr.Dataset):
+        if not variable:
+            raise ValueError("You must specify a variable when selecting from a Dataset.")
+        if variable not in data:
+            raise ValueError(f"Variable '{variable}' not found in the Dataset.")
+        data_array = data[variable]  # Extract the DataArray from the Dataset
+        logger.info(f"{exclamation_mark} Successfully extracted '{variable}' from '{data_array.name}'.")
+
+    elif isinstance(data, xr.DataArray):
+        data_array = data  # It's already a DataArray, use it directly
+    
+    else:
+        raise ValueError("Unsupported data type. Must be a DataArray or Dataset.")
+    
     indexers = set_location_indexers(
         data_array=data_array,
         longitude=longitude,
