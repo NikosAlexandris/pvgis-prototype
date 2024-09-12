@@ -1,22 +1,15 @@
-import zoneinfo
-from functools import lru_cache
+from time import time
+import logging
+from fastapi import Request
 
-import numpy as np
+logger = logging.getLogger('uvicorn.error')
+logger.setLevel(logging.DEBUG)
 
+async def response_time(request: Request, call_next):
+    """Middleware timing function to log request processing time."""
+    start_time = time()
+    response = await call_next(request)
+    process_time = time() - start_time
+    logger.debug(f"Request: {request.url.path} | Process time: {int(1000 * process_time)}ms")
 
-@lru_cache(maxsize=None)
-def get_timezones():
-    return sorted(zoneinfo.available_timezones())
-
-
-def replace_arrays_with_lists(data):
-    if isinstance(data, dict):
-        return {k: replace_arrays_with_lists(v) for k, v in data.items()}
-    elif isinstance(data, tuple):
-        return tuple(replace_arrays_with_lists(v) for v in data)
-    elif isinstance(data, list):
-        return [replace_arrays_with_lists(v) for v in data]
-    elif isinstance(data, np.ndarray):
-        return data.tolist()
-    else:
-        return data
+    return response
