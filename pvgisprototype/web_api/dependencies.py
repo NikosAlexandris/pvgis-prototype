@@ -80,6 +80,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timezone,
     fastapi_query_verbose,
     fastapi_query_sampling_method_shgo,
+    fastapi_query_convert_timestamps, 
+    fastapi_query_timezone_to_be_converted,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
@@ -120,10 +122,22 @@ async def process_surface_tilt(
     return convert_to_radians_fastapi(surface_tilt)
 
 
+async def generate_timezone_object(timezone:str)->ZoneInfo:
+    """This function creates a ZoneInfo object from string.
+    """
+    return ZoneInfo(timezone)
+
+
 async def process_timezone(
     timezone: Annotated[Timezone, fastapi_query_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> ZoneInfo:
-    return ZoneInfo(timezone.value)
+    return await generate_timezone_object(timezone.value) # type: ignore
+
+
+async def process_timezone_to_be_converted(
+    timezone_to_be_converted: Annotated[Timezone, fastapi_query_timezone_to_be_converted] = Timezone.UTC,  # type: ignore[attr-defined]
+) -> ZoneInfo:
+    return await generate_timezone_object(timezone_to_be_converted.value) # type: ignore
 
 
 TimeUnit = TypeVar("TimeUnit", GroupBy, Frequency)
@@ -200,7 +214,7 @@ async def process_series_timestamp(
                 end_time=end_time,
                 periods=periods,
                 frequency=frequency,  # type: ignore
-                timezone=None,
+                timezone=timezone,
             )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
@@ -570,6 +584,19 @@ async def process_optimise_surface_position(
         return optimise_surface_position  # type: ignore
 
 
+async def convert_timestamps_to_specified_timezone(
+        timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+        timezone_to_be_converted: Annotated[Timezone, fastapi_query_timezone_to_be_converted] = Timezone.UTC,  # type: ignore[attr-defined]
+        converted_timestamps: Annotated[None, fastapi_query_convert_timestamps] = None,
+)->DatetimeIndex:
+    if timestamps.tz != timezone_to_be_converted: # type: ignore[union-attr]
+        converted_timestamps = timestamps.tz_convert(timezone_to_be_converted) # type: ignore[union-attr]
+
+    converted_timestamps = converted_timestamps.tz_localize(None) # type: ignore[attr-defined]
+    
+    return converted_timestamps
+
+
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_surface_orientation = Depends(process_surface_orientation)
@@ -598,3 +625,5 @@ fastapi_dependable_fingerprint = Depends(process_fingerprint)
 fastapi_dependable_optimise_surface_position = Depends(
     process_optimise_surface_position
 )
+fastapi_dependable_convert_timestamps = Depends(convert_timestamps_to_specified_timezone)
+fastapi_dependable_convert_timezone = Depends(process_timezone_to_be_converted)

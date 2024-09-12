@@ -1,10 +1,12 @@
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated
 
-import numpy as np
 from fastapi import Request
-from fastapi.responses import JSONResponse, ORJSONResponse, Response
-from pandas import DatetimeIndex, to_datetime
+from fastapi.responses import (Response, 
+    ORJSONResponse, 
+    PlainTextResponse,
+    )
+from pandas import DatetimeIndex
 
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.performance.report import summarise_photovoltaic_performance
@@ -46,6 +48,8 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
     fastapi_dependable_verbose,
+    fastapi_dependable_convert_timestamps,
+    fastapi_dependable_convert_timezone,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -118,6 +122,8 @@ async def get_photovoltaic_performance_analysis(
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
+    timezone_to_be_converted: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    converted_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ) -> Response:
     """Analyse the photovoltaic performance for a solar surface, various
     technologies, free-standing or building-integrated, at a specific location
@@ -184,20 +190,20 @@ async def get_photovoltaic_performance_analysis(
         elevation=elevation,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
-        timestamps=timestamps,
-        timezone=timezone,
+        timestamps=converted_timestamps,
+        timezone=timezone_to_be_converted,
         global_horizontal_irradiance=Path(
-            "sarah2_sis_over_esti_jrc.nc"
+            "sarah3_sis_12_076.nc"
         ),  # FIXME This hardwritten path will be replaced
         direct_horizontal_irradiance=Path(
-            "sarah2_sid_over_esti_jrc.nc"
+            "sarah3_sid_12_076.nc"
         ),  # FIXME This hardwritten path will be replaced
         #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
         temperature_series=Path(
-            "era5_t2m_over_esti_jrc.nc"
+            "era5_t2m_12_076.nc"
         ),  # FIXME This hardwritten path will be replaced
         wind_speed_series=Path(
-            "era5_ws2m_over_esti_jrc.nc"
+            "era5_ws2m_12_076.nc"
         ),  # FIXME This hardwritten path will be replaced
         photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
@@ -215,78 +221,64 @@ async def get_photovoltaic_performance_analysis(
     # ------------------------------------------------------------------------
 
     if csv:
-        from fastapi.responses import StreamingResponse
+        from polars import (DataFrame, 
+                    Series,
+                    Datetime,
+                    Float32,
+                    Float64,
+                    Int8,
+                    Int64,
+                    col,
+                    )
+        
 
-        # streaming_data = [(str(timestamp), photovoltaic_power) for timestamp, photovoltaic_power in zip(timestamps.tolist(), photovoltaic_power_output_series.value.tolist())]  # type: ignore
-        filename = "filename.csv"
-        # filename = f"photovoltaic_power_output_{photovoltaic_power_output_series.components[FINGERPRINT_COLUMN_NAME]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
-        # csv_content = ",".join(["Timestamp", "Photovoltaic Power"]) + "\n"
-        # csv_content += (
-        #     "\n".join(
-        #         [
-        #             ",".join([timestamp, str(photovoltaic_power)])
-        #             for timestamp, photovoltaic_power in streaming_data
-        #         ]
-        #     )
-        #     + "\n"
-        # )
+        if csv.endswith(".csv"):
+            filename = csv
+        else:
+            filename = f"{csv}.csv"
 
         dictionary = photovoltaic_power_output_series.components
-        # remove 'Title' and 'Fingerprint' : we don't want repeated values ! ----
+        # Remove 'Title' and 'Fingerprint' to avoid repeated values
         dictionary.pop("Title", NOT_AVAILABLE)
         fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
-        # ------------------------------------------------------------- Important
 
-        header: list = []
-        if index:
-            header.insert(0, "Index")
-        if longitude:
-            header.append("Longitude")
-        if latitude:
-            header.append("Latitude")
+        dictionary["Longitude"] = longitude
+        dictionary["Latitude"] = latitude
 
-        header.append("Time")
-        header.extend(dictionary.keys())
+        dataframe = DataFrame(dictionary)
 
-        # Convert single float or int values to arrays of the same length as timestamps
-        for key, value in dictionary.items():
-            if isinstance(value, (float, int)):
-                dictionary[key] = np.full(len(timestamps), value)  # type: ignore
-            if isinstance(value, str):
-                dictionary[key] = np.full(len(timestamps), str(value))  # type: ignore
+        dataframe = dataframe.with_columns([
+            Series("Time", timestamps).cast(Datetime)
+        ])
 
-        # Zip series and timestamps
-        zipped_series = zip(*dictionary.values())
-        zipped_data = zip(timestamps, zipped_series)  # type: ignore
-
-        rows = []
-        for idx, (timestamp, values) in enumerate(zipped_data):
-            row = []
-            if index:
-                row.append(idx)
-            if longitude and latitude:
-                row.extend([longitude, latitude])  # type: ignore
-            row.append(timestamp.strftime("%Y-%m-%d %H:%M:%S"))
-            row.extend(values)
-            rows.append(row)
-
-        csv_content = ",".join(header) + "\n"
-        csv_content += "\n".join([",".join(map(str, row)) for row in rows])
-
-        response_csv = StreamingResponse(
-            iter([csv_content]),
-            media_type="text/csv",
+        dataframe = dataframe.with_columns([
+            col(column).cast(Float32) if dataframe.schema[column] == Float64
+            else col(column).cast(Int8) if dataframe.schema[column] == Int64
+            else col(column)
+            for column in dataframe.columns
+        ])
+        
+        # Reorder columns to have 'Time', 'Latitude', 'Longitude' first
+        columns_order = ['Time', 'Latitude', 'Longitude'] + [col for col in dataframe.columns if col not in ['Time', 'Latitude', 'Longitude']]
+        dataframe = dataframe.select(columns_order)
+        
+        # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
+        response = PlainTextResponse(
+            content=dataframe.write_csv(),
             headers={"Content-Disposition": f"attachment; filename={filename}"},
+            media_type="text/csv"
         )
-        return response_csv
 
-    response = {}
+        return response
+
+    response:dict = {} # type: ignore
+
     headers = {
         "Content-Disposition": f'attachment; filename="{PHOTOVOLTAIC_POWER_OUTPUT_FILENAME}.json"'
     }
 
     if fingerprint:
-        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[
+        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[ # type: ignore
             FINGERPRINT_COLUMN_NAME
         ]
 
@@ -295,8 +287,8 @@ async def get_photovoltaic_performance_analysis(
             response = photovoltaic_power_output_series.components
         else:
             response = {
-                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
-            }
+                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value, 
+            } # type: ignore
 
     if analysis.value != AnalysisLevel.NoneValue:
         photovoltaic_performance_report = summarise_photovoltaic_performance(
@@ -310,10 +302,10 @@ async def get_photovoltaic_performance_analysis(
             frequency=frequency,
             analysis=analysis,
         )
-        response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report
+        response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report # type: ignore
 
     if metadata:
-        response["Metadata"] = get_metadata(request=request)
+        response["Metadata"] = get_metadata(request=request) # type: ignore
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
@@ -328,7 +320,7 @@ async def get_photovoltaic_performance_analysis(
             output_type=quick_response_code,
         )
         if quick_response_code.value == QuickResponseCode.Base64:
-            response["QR"] = f"data:image/png;base64,{quick_response}"
+            response["QR"] = f"data:image/png;base64,{quick_response}" # type: ignore
         elif quick_response_code.value == QuickResponseCode.Image:
             from io import BytesIO
 
@@ -338,9 +330,6 @@ async def get_photovoltaic_performance_analysis(
             image_bytes = buffer.getvalue()
             return Response(content=image_bytes, media_type="image/png")
         else:
-            return JSONResponse(content={"message": "No QR code generated."})
+            return ORJSONResponse({"message": "No QR code generated."})
 
-    # return Response(
-    #     orjson.dumps(response, option=orjson.OPT_SERIALIZE_NUMPY), headers=headers, media_type="application/json"
-    # )
     return ORJSONResponse(response, headers=headers, media_type="application/json")
