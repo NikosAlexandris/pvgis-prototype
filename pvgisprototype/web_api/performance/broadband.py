@@ -193,17 +193,17 @@ async def get_photovoltaic_performance_analysis(
         timestamps=converted_timestamps,
         timezone=timezone_to_be_converted,
         global_horizontal_irradiance=Path(
-            "sarah3_sis_12_076.nc"
+            "sarah2_sis_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
         direct_horizontal_irradiance=Path(
-            "sarah3_sid_12_076.nc"
+            "sarah2_sid_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
         #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
         temperature_series=Path(
-            "era5_t2m_12_076.nc"
+            "era5_t2m_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
         wind_speed_series=Path(
-            "era5_ws2m_12_076.nc"
+            "era5_ws2m_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
         photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
