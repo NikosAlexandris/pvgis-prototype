@@ -350,3 +350,13 @@ fastapi_query_optimise_surface_position = Query(
 fastapi_query_sampling_method_shgo = Query(
     description=SAMPLING_METHOD_DESCRIPTION,
 )
+
+fastapi_query_convert_timestamps = Query(
+    description=TIMESTAMPS_DESCRIPTION,
+    include_in_schema=False,
+)
+
+fastapi_query_timezone_to_be_converted = Query(
+    description=TIMEZONE_DESCRIPTION,
+    include_in_schema=False,
+)
