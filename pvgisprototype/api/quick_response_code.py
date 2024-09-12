@@ -90,7 +90,6 @@ def generate_quick_response_code(
     inclined_irradiance_series = dictionary.get(
         GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, numpy.array([])
     )
-    print(inclined_irradiance_series)
     inclined_irradiance_mean = calculate_mean_of_series_per_time_unit(
         inclined_irradiance_series, timestamps=timestamps, frequency=frequency
     )
