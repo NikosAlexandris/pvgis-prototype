@@ -31,6 +31,7 @@ typer_argument_global_horizontal_irradiance = typer.Argument(
 typer_option_global_horizontal_irradiance = typer.Option(
     help=global_horizontal_irradiance_typer_help,
     rich_help_panel=rich_help_panel_irradiance_series,
+    is_eager=True,
     show_default=False,
 )
 typer_argument_direct_horizontal_irradiance = typer.Argument(
@@ -41,6 +42,7 @@ typer_argument_direct_horizontal_irradiance = typer.Argument(
 typer_option_direct_horizontal_irradiance = typer.Option(
     help=direct_horizontal_irradiance_typer_help,
     rich_help_panel=rich_help_panel_irradiance_series,
+    is_eager=True,
     show_default=False,
 )
 typer_argument_term_n = typer.Argument(
