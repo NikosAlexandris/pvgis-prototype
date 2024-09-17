@@ -9,6 +9,8 @@ import typer
 from devtools import debug
 from pvgisprototype.api.irradiance.kato_bands import KATO_BANDS
 
+CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX = '_cf_compliant'
+
 
 def comply_sarah_dataset_to_cf_conventions(
     dataset, filename: str, kato_bands: dict = KATO_BANDS
@@ -20,6 +22,7 @@ def comply_sarah_dataset_to_cf_conventions(
     # Rename variables for better clarity
     rename_dict = {
         "wv": "center_wavelength",
+        "wvl": "center_wavelength",
         "SIS.kato": "SIS_kato",
         "SIS.broad": "SIS_broadband",
         "SIC.kato": "SIC_kato",
@@ -27,7 +30,8 @@ def comply_sarah_dataset_to_cf_conventions(
         "lon": "longitude",
         "lat": "latitude",
     }
-    dataset = dataset.rename(rename_dict)
+    filtered_rename_dict = {key: value for key, value in rename_dict.items() if key in dataset}
+    dataset = dataset.rename(filtered_rename_dict)
 
     # get latitude and longitude from filename, add dimensions + coordinates
     match = re.search(r"_(\-?\d+\.\d+)_(\-?\d+\.\d+)\.nc", filename)
@@ -155,7 +159,7 @@ def build_cf_compliant_netcdf_file(
     input_file: Path,
     output_path: Path,
     output_filename_prefix: str = "",
-    output_filename_suffix: str = "cf_compliant",
+    output_filename_suffix: str = CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX,
 ) -> None:
     """ """
     if input_file.suffix == ".nc":
@@ -176,7 +180,7 @@ def comply_dataset_to_cf_conventions(
     input_path: Path,
     output_path: Path,
     output_filename_prefix: str = "",
-    output_filename_suffix: str = "cf_compliant",
+    output_filename_suffix: str = CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX,
 ):
     """
     Loop over NetCDF files, update their structure, and save them to the output directory.
