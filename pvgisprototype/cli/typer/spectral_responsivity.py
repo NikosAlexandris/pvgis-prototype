@@ -155,7 +155,7 @@ def callback_spectral_responsivity_pandas(
     photovoltaic_module_types = select_models(
         PhotovoltaicModuleSpectralResponsivityModel, photovoltaic_module_type
     )  # Using a callback fails!
-    photovoltaic_module_types = [module.value for module in photovoltaic_module_types]
+    # photovoltaic_module_types = [module.value for module in photovoltaic_module_types]
     logger.info(f"Requested photovoltaic module types : {photovoltaic_module_types}")
 
     if isinstance(spectral_responsivity_input, DataFrame):
