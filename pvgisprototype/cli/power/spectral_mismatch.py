@@ -261,6 +261,9 @@ def spectral_mismatch_pandas(
                 log=log,
             )
         )
+        print(
+                f"Irradiance input : {irradiance}"
+                )
 
     # Check for spectra range
     import numpy
@@ -273,15 +276,20 @@ def spectral_mismatch_pandas(
             irradiance[wavelength_column] > max_wavelength,
         )
     ):
-        logger.info(f"{check_mark} The input irradiance wavelengths are within the reference range [{min_wavelength}, {max_wavelength}].")
+        logger.info(
+                f"{check_mark} The input irradiance wavelengths are within the reference range [{min_wavelength}, {max_wavelength}]."
+                )
     else:
-        logger.warning(f"{x_mark} The input irradiance wavelengths exceed the reference range [{min_wavelength}, {max_wavelength}]. Filtering...")
+        logger.warning(
+                f"{x_mark} The input irradiance wavelengths exceed the reference range [{min_wavelength}, {max_wavelength}]. Filtering..."
+                )
         irradiance = irradiance.sel(
             center_wavelength=numpy.logical_and(
                 irradiance[wavelength_column] > min_wavelength,
                 irradiance[wavelength_column] < max_wavelength
             )
         )
+    print(f'Responsivity : {responsivity}')
     spectral_mismatch = calculate_spectral_mismatch(
         longitude=longitude,
         latitude=latitude,
@@ -294,6 +302,9 @@ def spectral_mismatch_pandas(
         reference_spectrum=reference_spectrum,
         integrate_reference_spectrum=integrate_reference_spectrum,
         spectral_mismatch_models=spectral_mismatch_model,
+        verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
     )
     # spectral_mismatch = spectral_mismatch.to_xarray()
     # spectral_mismatch = spectral_mismatch[spectral_mismatch_model][photovoltaic_module_type][SPECTRAL_MISMATCH_NAME]

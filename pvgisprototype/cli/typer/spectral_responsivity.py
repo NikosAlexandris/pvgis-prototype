@@ -67,14 +67,24 @@ def parse_spectral_responsivity(
         return spectral_responsivity_series
 
     elif isinstance(spectral_responsivity_input, str) and Path(spectral_responsivity_input).exists():
+        logger.info(f"Reading spectral responsivity data from '{spectral_responsivity_input}'")
         spectral_responsivity = read_csv(
                 filepath_or_buffer=spectral_responsivity_input,
                 index_col=0,
                 )
+        import pandas.api.types as ptypes
+        if ptypes.is_numeric_dtype(spectral_responsivity.index):
+            spectral_responsivity.index.name = 'Wavelength'
+            spectral_responsivity.reset_index().set_index('Wavelength')
+        else:
+            spectral_responsivity.index.name = 'Type'
+            spectral_responsivity.reset_index().set_index('Type')
+
+        logger.info(f'Spectral responsivity input data :\n{spectral_responsivity}')
         # Check if required columns are present
-        required_index = 'Wavelength [nm]'
-        if not required_index == spectral_responsivity.index.name:
-            raise ValueError(f"CSV file must contain the column: {required_index}")
+        # required_index = 'Wavelength [nm]'
+        # if not required_index == spectral_responsivity.index.name:
+        #     raise ValueError(f"CSV file must contain the column: {required_index}")
 
         return spectral_responsivity
 
@@ -145,29 +155,35 @@ def callback_spectral_responsivity_pandas(
     photovoltaic_module_types = select_models(
         PhotovoltaicModuleSpectralResponsivityModel, photovoltaic_module_type
     )  # Using a callback fails!
-    # print(f'Module type : {type(photovoltaic_module_types)}')
-    # print(f'Module type : {photovoltaic_module_types}')
+    photovoltaic_module_types = [module.value for module in photovoltaic_module_types]
+    logger.info(f"Requested photovoltaic module types : {photovoltaic_module_types}")
 
     if isinstance(spectral_responsivity_input, DataFrame):
-        # print(f'Spectral responsivity input type : {type(spectral_responsivity_input)}')
-        # print(f'Spectral responsivity input : {spectral_responsivity_input}')
-        # if photovoltaic_module_types and photovoltaic_module_types in spectral_responsivity_input.columns:
+        logger.info(f"Spectral responsivity input is of type : {type(spectral_responsivity_input)}")
         if photovoltaic_module_types and all(
             module in spectral_responsivity_input.columns
             for module in photovoltaic_module_types
         ):
+            logger.info(f"Retrieving spectral responsivity data (from .columns) for : {photovoltaic_module_types}")
+            spectral_responsivity_input = spectral_responsivity_input[photovoltaic_module_types].T  # Why Transpose ?
+
+        elif photovoltaic_module_types and all(
+            module in spectral_responsivity_input.index
+            for module in photovoltaic_module_types
+        ):
+            logger.info(f"Retrieving spectral responsivity data (from .index) for : {photovoltaic_module_types}")
             spectral_responsivity_input = spectral_responsivity_input[photovoltaic_module_types]
-            # print(f'Spectral responsivity for {photovoltaic_module_types} type : {type(spectral_responsivity_input)}')
-            # print(f'Spectral responsivity for {photovoltaic_module_types} : {spectral_responsivity_input}')
 
         elif not photovoltaic_module_types or photovoltaic_module_types == [PhotovoltaicModuleSpectralResponsivityModel.cSi]:
             spectral_responsivity_input = spectral_responsivity_input[PhotovoltaicModuleSpectralResponsivityModel.cSi]
 
         else:
+            logger.error(f"Module type '{photovoltaic_module_types}' not found in spectral responsivity data.")
             raise KeyError(f"Module type '{photovoltaic_module_types}' not found in spectral responsivity data.")
     
     elif isinstance(spectral_responsivity_input, Series):
         if photovoltaic_module_types and photovoltaic_module_types != [PhotovoltaicModuleSpectralResponsivityModel.cSi]:
+            logger.error(f"Module type '{photovoltaic_module_types}' not applicable. Input data is already a Series.")
             raise KeyError(f"Module type '{photovoltaic_module_types}' not applicable. Input data is already a Series.")
     
     else:
@@ -183,31 +199,44 @@ def callback_spectral_responsivity_pandas(
 
     # How to check if not banded ?
 
-    if ctx.params.get("integrate_responsivity"):
-
+    integrate_responsivity = ctx.params.get("integrate_responsivity")
+    if integrate_responsivity:
         logger.info(
-            ":information: [bold][magenta]Banding[/magenta] spectral responsivity input : {spectral_responsivity_input}[/bold]"
+                f"Parameter `integrate_responsivity` set to {integrate_responsivity}"
+                )
+        logger.info(
+            f":information: Banding spectral responsivity input",
+            alt=f":information: [bold][magenta]Banding[/magenta] spectral responsivity input[/bold]"
         )
         spectrally_resolved_responsivity = generate_banded_data(
             reference_bands=adjusted_bands,
             spectral_data=DataFrame(
                 spectral_responsivity_input
-            ).T,  # DataFrame Required !
+            ),  # ).T,  # DataFrame Required !  Why Transpose ?
             data_type=RESPONSIVITY_SPECTRAL_DATA,
         )
         logger.info(
-            ":information: [bold][magenta]Banded/magenta] spectral responsivity input : {spectrally_resolved_responsivity}[/bold]"
+            f":information: Banded spectral responsivity input :\n{spectrally_resolved_responsivity}",
+            alt=f":information: [bold][magenta]Banded[/magenta] spectral responsivity input[/bold]: {spectrally_resolved_responsivity}"
         )
-        # return spectrally_resolved_responsivity.T.iloc[:, 0]  # 1 column possible !
-        return spectrally_resolved_responsivity.T  # 1 column possible !
+        import pandas.api.types as ptypes
+        if ptypes.is_numeric_dtype(spectrally_resolved_responsivity.index):
+            spectrally_resolved_responsivity.index.name = 'Wavelength'
+            spectrally_resolved_responsivity.reset_index().set_index('Wavelength')
+        else:
+            spectrally_resolved_responsivity.index.name = 'Type'
+            spectrally_resolved_responsivity.reset_index().set_index('Type')
+
+        return spectrally_resolved_responsivity.T.to_xarray()  # Why Transpose ?
     else:
         logger.warning(
-            "[bold]You may want to [yellow]integrate[/yellow] the spectral responsivity input to match the spectral bands of the solar irradiance data ![/bold].  Chekout the `--integrate-reference-spectrum` option."
+            f"You may want to integrate the spectral responsivity input to match the spectral bands of the solar irradiance data !.  Chekout the `--integrate-responsivity` option.",
+            alt=f"[bold]You may want to [yellow]integrate[/yellow] the spectral responsivity input to match the spectral bands of the solar irradiance data ![/bold].  Chekout the `--integrate-responsivity` option."
         )
 
-    # Return however a Series !
-    # return spectrally_resolved_responsivity.T#[module_type]#.iloc[:,0]  # 1 column possible !
-    return DataFrame(spectral_responsivity_input).T  # 1 column possible !
+    logger.info(f"Callback function returns `spectral_responsivity_input` :\n{spectral_responsivity_input.T.to_xarray()}")
+    # return DataFrame(spectral_responsivity_input)
+    return spectral_responsivity_input.T.to_xarray()
 
 
 typer_argument_spectral_responsivity = typer.Argument(
@@ -232,6 +261,7 @@ typer_option_spectral_responsivity_pandas = typer.Option(
 )
 typer_option_integrate_spectral_responsivity = typer.Option(
     help="Integrate the spectral responsivity over Kato bands",
+    is_eager=True,
     rich_help_panel=rich_help_panel_spectral_responsivity,
     show_default=True,
 )
