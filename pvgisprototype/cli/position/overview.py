@@ -213,15 +213,26 @@ def overview(
     # -------------------------------------------- Smarter way to do this? ---
 
     utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tz != utc_zoneinfo:
-        # Note the input timestamp and timezone
+
+    if timestamps.tz is None:
         user_requested_timestamps = timestamps
         user_requested_timezone = timezone
 
         timestamps = timestamps.tz_localize(utc_zoneinfo)
         timezone = utc_zoneinfo
         logger.info(
-            f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
+            f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
+        )
+
+    elif timestamps.tz != utc_zoneinfo:
+        # Note the input timestamp and timezone
+        user_requested_timestamps = timestamps
+        user_requested_timezone = timezone
+
+        timestamps = timestamps.tz_convert(utc_zoneinfo)
+        timezone = utc_zoneinfo
+        logger.info(
+            f"Input timestamps & zone\n{user_requested_timestamps}\n&\n{user_requested_timezone}\nconverted for all internal calculations to :\n{timestamps}"
         )
 
     # Why does the callback function `_parse_model` not work?
@@ -311,6 +322,8 @@ def overview(
             solar_position_series=solar_position_series,
             position_parameters=solar_position_parameters,
             timestamps=timestamps,
+            longitude=longitude,
+            latitude=latitude,
             surface_orientation=True,
             surface_tilt=True,
             resample_large_series=resample_large_series,

@@ -13,12 +13,14 @@ from rich.pretty import Pretty
 from rich.table import Table
 from rich.text import Text
 from sparklines import sparklines
+from xarray import DataArray
 
 from pvgisprototype.api.performance.report import report_photovoltaic_performance
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_PARAMETER_COLUMN_NAMES,
     SolarPositionParameter,
 )
+from pvgisprototype.api.spectrum.constants import SPECTRAL_MISMATCH_NAME
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     ALTITUDE_NAME,
@@ -42,6 +44,7 @@ from pvgisprototype.constants import (
     IRRADIANCE_SOURCE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
     LATITUDE_NAME,
+    LOCAL_TIME_COLUMN_NAME,
     LONGITUDE_COLUMN_NAME,
     LONGITUDE_NAME,
     NET_EFFECT,
@@ -57,6 +60,7 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT_COLUMN_NAME,
     SPECTRAL_EFFECT_NAME,
+    SPECTRAL_FACTOR_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_COLUMN_NAME,
@@ -69,6 +73,7 @@ from pvgisprototype.constants import (
     TILT_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
+    TIME_COLUMN_NAME,
     TITLE_KEY_NAME,
     UNIT_NAME,
     UNITLESS,
@@ -163,15 +168,17 @@ def build_caption(
         f"[[dim]{rounded_table[first_model].get(UNIT_NAME, UNITLESS)}[/dim]]"
         f"\n[underline]Algorithms[/underline]  "  # ---------------------------
         f"Timing : [bold]{rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
-        f"Zone : {timezone}, "
+        )
         # f"Positioning: {rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)}, "
         # f"Incidence: {rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)}\n"
         # f"[underline]Definitions[/underline]  "
         # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
         # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
-    )
+    
     if user_requested_timezone != timezone and user_requested_timezone is not None:
-        caption += f"Local zone : {user_requested_timezone}, "
+        caption += f"Local Zone : {user_requested_timezone}, "
+    else:
+        caption += f"Zone : {timezone}, "
     return caption
 
 
@@ -327,8 +334,12 @@ def print_solar_position_series_table(
         columns = []
         if index:
             columns.append("Index")
+        if user_requested_timestamps is not None:
+            time_column_name = LOCAL_TIME_COLUMN_NAME
+        else:
+            time_column_name = TIME_COLUMN_NAME
         if timestamps is not None:
-            columns.append("Time")
+            columns.append(time_column_name)
 
         for parameter in position_parameters:
             if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
@@ -377,6 +388,11 @@ def print_solar_position_series_table(
                 # caption=model_caption,
                 box=SIMPLE_HEAD,
             )
+
+            # -------------------------------------------------- Ugly Hack ---
+            if user_requested_timestamps is not None:
+                timestamps = user_requested_timestamps
+            # --- Ugly Hack --------------------------------------------------
 
             for _index, timestamp in enumerate(timestamps):
                 row = []
@@ -796,6 +812,95 @@ def print_irradiance_table_2(
     if verbose:
         Console().print(table)
         Console().print(Panel(caption, expand=False))
+
+
+def print_irradiance_xarray(
+    location_time_series: DataArray,
+    longitude=None,
+    latitude=None,
+    elevation=None,
+    title: str = "Irradiance series",
+    rounding_places: int = 3,
+    verbose: int = 1,
+    index: bool = False,
+) -> None:
+    """
+    Print the irradiance time series in a formatted table with each center wavelength as a column.
+
+    Parameters
+    ----------
+    location_time_series : xr.DataArray
+        The time series data with dimensions (time, center_wavelength).
+    longitude : float, optional
+        The longitude of the location.
+    latitude : float, optional
+        The latitude of the location.
+    elevation : float, optional
+        The elevation of the location.
+    title : str, optional
+        The title of the table.
+    rounding_places : int, optional
+        The number of decimal places to round to.
+    verbose : int, optional
+        Verbosity level.
+    index : bool, optional
+        Whether to show an index column.
+    """
+
+    # Extract relevant data from the location_time_series
+    timestamps = location_time_series.time.values
+    center_wavelengths = location_time_series.center_wavelength.values
+    irradiance_values = location_time_series.values
+
+    # Prepare the table
+    table = Table(
+        title=title,
+        caption_justify="left",
+        expand=False,
+        padding=(0, 1),
+        box=SIMPLE_HEAD,
+        show_footer=True,
+    )
+
+    if index:
+        table.add_column("Index")
+
+    table.add_column("Time", footer="Total")  # Timestamp column
+
+    # Add columns for each center wavelength (irradiance wavelength)
+    for wavelength in center_wavelengths:
+        table.add_column(f"{wavelength:.0f} nm", justify="right")
+
+    # Populate the table with the irradiance data
+    for idx, timestamp in enumerate(timestamps):
+        row = []
+
+        if index:
+            row.append(str(idx + 1))
+
+        # Convert timestamp to string format
+        row.append(datetime.utcfromtimestamp(timestamp.tolist() / 1e9).strftime("%Y-%m-%d %H:%M:%S"))
+
+        # Add irradiance values for each center wavelength at this timestamp
+        for irradiance in irradiance_values[idx]:
+            row.append(f"{round(irradiance, rounding_places):.{rounding_places}f}")
+
+        table.add_row(*row)
+
+    # Prepare a caption with the location information
+    caption = str()
+    if longitude is not None and latitude is not None:
+        caption += f"Location  Longitude ϑ, Latitude ϕ = {longitude}, {latitude}"
+
+    if elevation is not None:
+        caption += f", Elevation: {elevation} m"
+
+    caption += "\nLegend: Center Wavelengths (nm)"
+
+    if verbose:
+        console = Console()
+        console.print(table)
+        console.print(Panel(caption, expand=False))
 
 
 def add_table_row(
@@ -1525,3 +1630,96 @@ def print_solar_position_series_in_columns(
         panels.append(panel)
 
     Console().print(Columns(panels))
+
+
+from typing import Dict
+
+def print_spectral_mismatch(
+    timestamps,
+    spectral_mismatch: Dict,
+    spectral_mismatch_model: List,
+    photovoltaic_module_type: List,
+    rounding_places: int = 3,
+    include_statistics: bool = False,
+    title: str = "Spectral Factor",
+    verbose: int = 1,
+    index: bool = False,
+    show_footer: bool = True,
+) -> None:
+    """
+    Print the spectral mismatch results in a formatted table.
+
+    Parameters
+    ----------
+    - timestamps :
+        The time series timestamps.
+    - spectral_mismatch :
+        Dictionary containing spectral mismatch data for different models and module types.
+    - spectral_mismatch_model :
+        List of spectral mismatch models.
+    - photovoltaic_module_type :
+        List of photovoltaic module types.
+    - rounding_places :
+        Number of decimal places for rounding.
+    - include_statistics :
+        Whether to include mean, median, etc., in the output.
+    - verbose : int
+        Verbosity level.
+    - index : bool
+        Whether to show an index column.
+    """
+    # Initialize the table with title and formatting options
+    table = Table(
+        title=title,
+        caption_justify="left",
+        expand=False,
+        padding=(0, 1),
+        box=SIMPLE_HEAD,
+        show_footer=show_footer,
+    )
+    if index:
+        table.add_column("Index")
+
+    table.add_column("Time", footer="μ" if show_footer else None)
+        # Initialize dictionary to store the means for each module type
+    means = {}
+
+    # Calculate mean values for the footer
+    if show_footer:
+        for module_type in photovoltaic_module_type:
+            model = spectral_mismatch_model[0]  # Assuming only one model for simplicity
+            spectral_factor_series = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+            mean_value = np.nanmean(spectral_factor_series)
+            means[module_type.value] = f"{mean_value:.{rounding_places}f}"
+
+    # Add columns for each photovoltaic module type with optional footer
+    for module_type in photovoltaic_module_type:
+        footer_text = means.get(module_type.value, "") if show_footer else None
+        table.add_column(f"{module_type.value}", justify="right", footer=footer_text)
+
+    # Aggregate data for each timestamp
+    for _index, timestamp in enumerate(timestamps):
+        row = []
+
+        if index:
+            row.append(str(_index + 1))  # count from 1
+
+        row.append(str(timestamp))
+
+        for module_type in photovoltaic_module_type:
+            model = spectral_mismatch_model[0]  # Assuming only one model for simplicity
+            sm_value = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)[_index]
+            row.append(f"{round(sm_value, rounding_places):.{rounding_places}f}")
+        table.add_row(*row)
+
+    print()
+
+    # Print the table if verbose is enabled
+    if verbose:
+        console = Console()
+        console.print(table)
+
+        # Optionally, display additional information in a panel
+        if verbose > 1:
+            extra_info = "Spectral Mismatch calculated for different photovoltaic module types using specified models."
+            console.print(Panel(extra_info, expand=False))
