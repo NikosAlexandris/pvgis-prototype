@@ -1,131 +1,190 @@
-import numpy as np
-from scipy.interpolate import PchipInterpolator
-from scipy.integrate import simps
+from pvgisprototype.api.irradiance.kato_bands import KATO_BANDS
+from pvgisprototype.log import logger
+from xarray import DataArray
+from numpy import nan_to_num, concatenate, array
+from pandas import DataFrame
 import matplotlib.pyplot as plt
-import xarray as xr
+from scipy.integrate import simpson
 
 
-def calculate_spectral_factor(
-    row, AM15G_wavelength, AM15G_irradiance, SR_wavelength, SR_responsivity, plot=False, verbose=False
-):
+def is_kato_banded(spectral_data: DataArray, wavelengths: str) -> bool:
     """
-    Calculate the spectral mismatch factor using AM1.5G spectrum and spectral responsivity data.
+    Check if the irradiance data is Kato-banded based on the center wavelengths.
 
     Parameters
     ----------
-    row : dict-like
-        A dictionary-like row of data containing the global radiation values for different intervals.
-    AM15G_wavelength : np.ndarray
-        Array of wavelengths for the AM1.5G spectrum.
-    AM15G_irradiance : np.ndarray
-        Array of irradiance values for the AM1.5G spectrum.
-    SR_wavelength : np.ndarray
-        Array of wavelengths for the spectral responsivity.
-    SR_responsivity : np.ndarray
-        Array of responsivity values corresponding to the wavelengths.
-    plot : bool, optional
-        If True, plot the results. Default is False.
-    verbose : bool, optional
-        If True, print detailed output. Default is False.
+    irradiance : xarray.DataArray
+        Irradiance data with a `center_wavelength` coordinate.
 
     Returns
     -------
-    ratio : float
-        The calculated spectral mismatch factor.
+    bool
+        True if the irradiance data appears to be Kato-banded, False otherwise.
     """
+    from numpy import allclose
 
-    # Wavelength intervals in micrometers converted to nanometers
-    wavelength_intervals_nm = [
-        [240, 272], [272, 283], [283, 307], [307, 328], [328, 363],
-        [363, 408], [408, 452], [452, 518], [518, 540], [540, 550],
-        [550, 567], [567, 605], [605, 625], [625, 667], [667, 684],
-        [684, 704], [704, 743], [743, 791], [791, 844], [844, 889],
-        [889, 975], [975, 1046], [1046, 1194], [1194, 1516], [1516, 1613],
-        [1613, 1965], [1965, 2153], [2153, 2275], [2275, 3001], [3001, 3635],
-        [3635, 3991], [3991, 4606]
-    ]
+    from devtools import debug
+    debug(locals())
+
+    kato_bands_center_wavelengths = list(KATO_BANDS['Center [nm]'].values())
+    if spectral_data.coords[wavelengths].size == len(
+        kato_bands_center_wavelengths
+    ) and allclose(
+        spectral_data.coords[wavelengths], kato_bands_center_wavelengths, atol=10
+    ):
+        return True
+
+    return False
+
+
+def integrate_reference_spectrum(reference_spectrum, kato_wavelengths):
+    """
+    Vectorized integration of reference spectrum over Kato bands.
     
-    interval_widths_nm = np.array([end - start for start, end in wavelength_intervals_nm])
+    Parameters
+    ----------
+    reference_spectrum : xarray.DataArray
+        The reference spectrum as a DataArray with wavelength and global irradiance values.
+    kato_wavelengths : np.ndarray
+        Array of Kato center wavelengths.
 
-    # Extract total irradiance data for the current row
-    total_irradiance_values = np.array([row[f'global_radiation_kato{i}[w/m2]'] for i in range(1, 33)])
+    Returns
+    -------
+    integrated_spectrum : np.ndarray
+        Reference spectrum integrated over Kato bands.
+    """
+    # Calculate band edges from center wavelengths
+    band_edges = (kato_wavelengths[:-1] + kato_wavelengths[1:]) / 2.0
+    band_edges = concatenate([[kato_wavelengths[0] - (band_edges[0] - kato_wavelengths[0])], band_edges])
+    band_edges = concatenate([band_edges, [kato_wavelengths[-1] + (kato_wavelengths[-1] - band_edges[-1])]])
 
-    # Calculate the average irradiance density (W/m^2/nm) for each interval
-    average_irradiance_density = total_irradiance_values / interval_widths_nm
+    # Extract wavelength and irradiance values
+    wavelengths = reference_spectrum.wavelength.values
+    irradiance_values = reference_spectrum.values
 
-    # Create the x-values for the staircase plot (start and end points of each interval)
-    wavelengths_x_nm = np.array([val for interval in wavelength_intervals_nm for val in interval] + [wavelength_intervals_nm[-1][1]])
+    # Vectorized integration over each band
+    integrated_spectrum = array([
+        simpson(
+            y=irradiance_values[(wavelengths >= lower_edge) & (wavelengths <= upper_edge)],
+            x=wavelengths[(wavelengths >= lower_edge) & (wavelengths <= upper_edge)]
+        ) if len(irradiance_values[(wavelengths >= lower_edge) & (wavelengths <= upper_edge)]) > 0 else 0
+        for lower_edge, upper_edge in zip(band_edges[:-1], band_edges[1:])
+    ])
 
-    # Create the y-values for the staircase plot (repeat each density value for the interval)
-    irradiance_y_density = np.repeat(average_irradiance_density, 2)
-    irradiance_y_density = np.append(irradiance_y_density, 0)  # Add a zero to complete the last step
+    return integrated_spectrum
 
-    # PCHIP interpolation of the SR data to AM1.5G wavelengths
-    sr_pchip_interpolator = PchipInterpolator(SR_wavelength, SR_responsivity, extrapolate=False)
-    sr_interpolated_am15g = sr_pchip_interpolator(AM15G_wavelength)
-    sr_interpolated_am15g = np.nan_to_num(sr_interpolated_am15g)
 
-    # Multiply the interpolated SR values with the corresponding irradiance values
-    product_am15g_sr = AM15G_irradiance * sr_interpolated_am15g
-
-    # Integrate the AM1.5G spectrum and the product using the Simpson's rule
-    integral_am15g = simps(AM15G_irradiance, AM15G_wavelength)
-    integral_am15g_sr = simps(product_am15g_sr, AM15G_wavelength)
-
-    # Interpolate the staircase irradiance data to AM1.5G wavelengths
-    staircase_interpolated_am15g = np.interp(
-        AM15G_wavelength, wavelengths_x_nm, irradiance_y_density, left=irradiance_y_density[0], right=0
+def calculate_spectral_mismatch_factor_mihaylow(
+    irradiance,
+    responsivity,
+    reference_spectrum,
+):
+    """ """
+    reference_spectrum = reference_spectrum.to_xarray()
+    logger.info(
+        f'`reference_spectrum` input :\n{reference_spectrum}'
+    )
+    logger.info(
+        f'`reference_spectrum` wavelengths :\n{reference_spectrum.wavelength}'
     )
 
-    # Calculate the product of the interpolated staircase irradiance and SR data
-    product_staircase_sr = staircase_interpolated_am15g * sr_interpolated_am15g
+    # Prepare Responsivity ---------------------------------------------------
 
-    # Integrate the interpolated staircase data and the product using the Simpson's rule
-    integral_staircase = simps(staircase_interpolated_am15g, AM15G_wavelength)
-    integral_staircase_sr = simps(product_staircase_sr, AM15G_wavelength)
+    logger.info(
+        f'`responsivity` input :\n{responsivity}',
+    )
 
-    # Calculate the ratio of the integrals scaled by the total irradiance
-    ratio = (integral_staircase_sr / integral_am15g_sr) * (integral_am15g / integral_staircase)
+    # Push me upstream ? -----------------------------------------------------
+    if 'Center [nm]' in responsivity.coords:
+        responsivity = responsivity.rename({'Center [nm]': 'wavelength'})
+    else:
+        responsivity = responsivity.rename({'Wavelength': 'wavelength'})
 
-    if verbose:
-        total_irradiance = np.sum(average_irradiance_density * interval_widths_nm)
-        print(f"Calculated total irradiance: {total_irradiance} W/m^2")
-        print(f'integral_staircase: {integral_staircase}')
-        print(f'integral AM15G: {integral_am15g}')
-        print(f'integral_staircase_sr: {integral_staircase_sr}')
-        print(f'integral_am15g_sr: {integral_am15g_sr}')
-        print(f"The ratio of (staircase irradiance x SR) over (AM1.5G x SR) is: {ratio}")
+    logger.info(
+        f'Wavelengths in `responsivity` input : {responsivity.wavelength}',
+    )
+    # ------------------------------------------------------------------------
 
-    if plot:
-        fig, ax1 = plt.subplots(figsize=(12, 6))
+    # Interpolate Responsivity to Reference Spectrum
+    if not is_kato_banded(
+            spectral_data=responsivity,
+            wavelengths='wavelength',
+            ):
 
-        # Plot AM1.5G spectrum on the primary y-axis
-        ax1.plot(AM15G_wavelength, AM15G_irradiance, label='AM1.5G Spectrum', color='red')
-        ax1.set_xlabel('Wavelength (nm)')
-        ax1.set_ylabel('Irradiance (W/m^2/nm)', color='red')
-        ax1.tick_params(axis='y', labelcolor='red')
+        logger.warning(
+                f'Responsivity is not Kato-banded !',
+                )
 
-        # Create a secondary y-axis for the responsivity and staircase data
-        ax2 = ax1.twinx()
-        ax2.plot(AM15G_wavelength, sr_interpolated_am15g, label='Interpolated SR (PCHIP)', color='green')
-        ax2.set_ylabel('Responsivity (A/W) / Staircase Irradiance Density (W/m^2/nm)', color='green')
-        ax2.tick_params(axis='y', labelcolor='green')
+        from scipy.interpolate import pchip_interpolate
+        responsivity = pchip_interpolate(
+            xi=responsivity.wavelength,
+            yi=responsivity,
+            x=reference_spectrum.wavelength,
+        )
+        responsivity = nan_to_num(responsivity)
 
-        # Plot the staircase spectral irradiance data as steps
-        ax1.step(wavelengths_x_nm, irradiance_y_density, label='Staircase Irradiance', color='blue', where='post', alpha=0.7)
+        logger.info(
+                f"Interpolated responsivity :\n{responsivity}",
+                alt=f"[yellow]Interpolated[/yellow] responsivity :\n{responsivity}",
+                )
+    # Reference Spectrum -----------------------------------------------------
 
-        # Adding title and grid
-        plt.title('AM1.5G Spectrum, Interpolated SR, and Staircase Irradiance (PCHIP)')
+    # Total Reference Spectrum
+    total_reference_spectrum = simpson(
+        y=reference_spectrum['global'], x=reference_spectrum.wavelength
+    )
 
-        # Show the grid
-        ax1.grid(True)
+    # Useful Reference Spectrum
+    effective_reference_spectrum = reference_spectrum * responsivity
+    useful_reference_spectrum = simpson(
+        y=effective_reference_spectrum['global'],
+        x=reference_spectrum.wavelength,
+    )
 
-        # Show the legend
-        ax1.legend(loc='upper left')
-        ax2.legend(loc='upper right')
-        plt.xlim(300, 1300)
+    # Observed Irradiance ----------------------------------------------------
 
-        # Display the plot
-        plt.show()
+    logger.info(
+            f'`irradiance` input :\n{irradiance}'
+            )
 
-    return ratio
+    # Interpolate Observed Irradiance to Reference Spectrum
+    if is_kato_banded(
+        spectral_data=irradiance, wavelengths='center_wavelength'
+    ):
+        irradiance = irradiance.interp(
+            center_wavelength=reference_spectrum.wavelength,  # target
+            method="linear",
+        )
+        print()
+        print(f"Irradiance : {irradiance}")
+        print()
+    logger.info(
+            f"Interpolated iradiance :\n{irradiance}",
+            alt=f"[yellow]Interpolated[/yellow] irradiance :\n{irradiance}",
+            )
+
+    # Total Observed Irradiance
+    total_observed_irradiance = simpson(
+        y=irradiance,
+        x=reference_spectrum.wavelength,
+    )
+
+    # Useful Observed Irradiance
+    effective_observed_irradiance = irradiance * responsivity
+    useful_observed_irradiance = simpson(
+        y=effective_observed_irradiance,
+        x=reference_spectrum.wavelength,
+    )
+
+    logger.info(f"Total reference spectrum: {total_reference_spectrum}")
+    logger.info(f"Useful reference spectrum: {useful_reference_spectrum}")
+    logger.info(f"Total observed irradiance: {total_observed_irradiance}")
+    logger.info(f"Useful observed irradiance: {useful_observed_irradiance}")
+
+    # Spectral Mismatch Factor
+
+    a = useful_observed_irradiance / useful_reference_spectrum
+    b = total_reference_spectrum / total_observed_irradiance
+    spectral_mismatch_factor = a * b
+
+    return spectral_mismatch_factor
