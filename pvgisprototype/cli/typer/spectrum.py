@@ -46,8 +46,13 @@ def callback_reference_spectrum(
     Adjust the Kato bands according to the wavelength range
     """
     if reference_spectrum is None:
+        logger.info(
+                f":information: No user-requested reference spectrum !",
+                alt=f":information: [red bold]No user-requested reference spectrum ![/red bold]"
+        )
         from pvlib.spectrum import get_reference_spectra
-        reference_spectrum = DataFrame(get_reference_spectra()['global']).T
+        # reference_spectrum = DataFrame(get_reference_spectra()['global']).T
+        reference_spectrum = get_reference_spectra()['global']
         # reference_spectrum.index = to_numeric(reference_spectrum.index, errors='coerce')
         # reference_spectrum = reference_spectrum.dropna().astype(float)
 
@@ -59,40 +64,49 @@ def callback_reference_spectrum(
             max_wavelength=max_wavelength,
         )
 
-        # 'resolve' the reference_spectrum
-        logger.info(
-                ":information: [bold][magenta]Banding/magenta] reference spectrum : {reference_spectrum}[/bold]"
-        )
-        spectrally_resolved_reference_spectrum = generate_banded_data(
-                reference_bands=adjusted_bands,
-                spectral_data=reference_spectrum,
-                data_type="spectrum",
-        )
-        logger.info(
-                ":information: [bold][magenta]Banded/magenta] reference spectrum : {spectrally_resolved_reference_spectrum}[/bold]"
-        )
+        # How to check if not banded ?
 
-    # --------------------------------------------------------- Review & FixMe
-    else:
-        if not ctx.params.get("integrate_reference_spectrum"):
-            return DataFrame(reference_spectrum).T
+        integrate_reference_spectrum = ctx.params.get("integrate_reference_spectrum")
+        if integrate_reference_spectrum:
+            # 'resolve' the reference_spectrum
+            logger.info(
+                    f":information: Banding reference spectrum : {reference_spectrum}",
+                    alt=f":information: [bold][magenta]Banding[/magenta] reference spectrum : {reference_spectrum}[/bold]"
+            )
+            spectrally_resolved_reference_spectrum = generate_banded_data(
+                    reference_bands=adjusted_bands,
+                    spectral_data=DataFrame(reference_spectrum).T,  # DataFrame required !
+                    data_type="spectrum",
+            )
+            logger.info(
+                   f":information: Callback function returns the banded reference spectrum :\n{spectrally_resolved_reference_spectrum}",
+                   alt=f":information: Callback function returns the [bold][magenta]banded[/magenta] reference spectrum : {spectrally_resolved_reference_spectrum}[/bold]",
+            )
+            return DataFrame(spectrally_resolved_reference_spectrum)
 
-        reference_spectrum_x = reference_spectrum.T.drop(index='global', errors='ignore')
-        reference_wavelengths = reference_spectrum_x.index.astype(float)
-
-        kato_band_limits = DataFrame(KATO_BANDS)['Lower limit [nm]'].astype(float)
-        kato_band_limits_set = set(kato_band_limits)
-
-        if set(reference_wavelengths).issubset(kato_band_limits_set):
-            logger.info("All wavelengths in the reference spectrum are within the Kato band limits.")
-            return reference_spectrum
+        # --------------------------------------------------------- Review & FixMe
         else:
-            message = "Some wavelengths in the reference spectrum are outside the Kato band limits!"
-            raise ValueError(message)
+            return DataFrame(reference_spectrum)
+
+        # reference_spectrum_x = reference_spectrum.T.drop(index='global', errors='ignore')
+        # reference_wavelengths = reference_spectrum_x.index.astype(float)
+
+        # kato_band_limits = DataFrame(KATO_BANDS)['Lower limit [nm]'].astype(float)
+        # kato_band_limits_set = set(kato_band_limits)
+
+        # if set(reference_wavelengths).issubset(kato_band_limits_set):
+        #     logger.info(
+        #             f"All wavelengths in the input reference spectrum are within the Kato band limits : {wavelengths}",
+        #             alt=f"[green]All wavelengths in the input reference spectrum are within the Kato band limits[/green] : {wavelengths}",
+        #             )
+        #     return reference_spectrum
+        # else:
+        #     message = "Some wavelengths in the reference spectrum are outside the Kato band limits!"
+        #     raise ValueError(message)
     # --------------------------------------------------------- Review & FixMe
 
     # print(f'Resolved reference spectrum ? : {spectrally_resolved_reference_spectrum}')
-    return spectrally_resolved_reference_spectrum
+    # return spectrally_resolved_reference_spectrum
 
 
 reference_solar_irradiance_spectrum_typer_help = "The reference spectrum to use for the mismatch calculation. The default is the ASTM G173-03 global tilted spectrum. [(W/m^2)/nm]"
