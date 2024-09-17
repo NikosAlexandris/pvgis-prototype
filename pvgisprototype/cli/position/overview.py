@@ -210,22 +210,20 @@ def overview(
     # Note the input timestamp and timezone
     user_requested_timestamps = timestamps
     user_requested_timezone = timezone  # Set to UTC by the callback functon !
+    timezone = utc_zoneinfo = ZoneInfo('UTC')
     logger.info(
             f"Input time zone : {timezone}",
             alt=f"Input time zone : [code]{timezone}[/code]"
             )
-    utc_zoneinfo = ZoneInfo("UTC")
 
     if timestamps.tz is None:
         timestamps = timestamps.tz_localize(utc_zoneinfo)
-        timezone = utc_zoneinfo
         logger.info(
             f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
         )
 
     elif timestamps.tz != utc_zoneinfo:
         timestamps = timestamps.tz_convert(utc_zoneinfo)
-        timezone = utc_zoneinfo
         logger.info(
             f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
             alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
