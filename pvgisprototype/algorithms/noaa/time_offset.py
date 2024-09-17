@@ -165,22 +165,29 @@ def calculate_time_offset_series_noaa(
 
     """
     # We need a timezone!
+    utc_zoneinfo = ZoneInfo("UTC")
     if timestamps.tzinfo is None:
-        timestamps = timestamps.tz_localize(timezone)
-    else:
-        timestamps = timestamps.tz_convert(timezone)
+        # timestamps = timestamps.tz_localize(timezone)
+        timestamps = timestamps.tz_localize(utc_zoneinfo)
+    # else:
+        # timestamps = timestamps.tz_convert(timezone)
+    elif timestamps.tz != utc_zoneinfo:
+        timestamps = timestamps.tz_convert(utc_zoneinfo)
 
-    # ------------------------------------------------- Further Optimisation ?
-    # Optimisation : calculate unique offsets
-    unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
-    unique_offsets = {
-        tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)
-    }
-    # Map offsets back to timestamps
-    timezone_offset_minutes_series = np.array(
-        [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
-    )
-    # ------------------------------------------------- Further Optimisation ?
+    # --------------------------------------------------------------- Review -
+    # # ------------------------------------------------- Further Optimisation ?
+    # # Optimisation : calculate unique offsets
+    # unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
+    # unique_offsets = {
+    #     tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)
+    # }
+    # # Map offsets back to timestamps
+    # timezone_offset_minutes_series = np.array(
+    #     [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
+    # )
+    # # ------------------------------------------------- Further Optimisation ?
+    # --------------------------------------------------------------- Review -
+
     equation_of_time_series = calculate_equation_of_time_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
@@ -189,7 +196,7 @@ def calculate_time_offset_series_noaa(
     )
     time_offset_series_in_minutes = (
         longitude.as_minutes
-        - timezone_offset_minutes_series
+        # - timezone_offset_minutes_series
         + equation_of_time_series.minutes
     )
 
