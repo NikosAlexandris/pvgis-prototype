@@ -8,6 +8,7 @@ from devtools import debug
 from pandas import DatetimeIndex
 from rich import print
 from typing_extensions import Annotated
+from xarray.core.dataarray import DataArray
 
 from pvgisprototype import Longitude
 from pvgisprototype.api.datetime.now import now_datetime
@@ -18,7 +19,7 @@ from pvgisprototype.api.series.plot import plot_series
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA, NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.print import print_irradiance_table_2
+from pvgisprototype.cli.print import print_irradiance_table_2, print_irradiance_xarray
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer.location import (
@@ -135,6 +136,7 @@ def select(
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    variable_2: Annotated[Optional[str], typer_option_data_variable] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -165,6 +167,8 @@ def select(
 
     if not variable:
         dataset = xr.open_dataset(time_series)
+        # ----------------------------------------------------- Review Me ----    
+        #
         if len(dataset.data_vars) >= 2:
             variables = list(dataset.data_vars.keys())
             print(f"The dataset contains more than one variable : {variables}")
@@ -173,6 +177,8 @@ def select(
             )
         else:
             variable = list(dataset.data_vars)
+        #
+        # ----------------------------------------------------- Review Me ----    
     location_time_series = select_time_series(
         time_series=time_series,
         longitude=longitude,
@@ -181,6 +187,7 @@ def select(
         start_time=start_time,
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
+        variable=variable,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -197,6 +204,7 @@ def select(
         start_time=start_time,
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
+        variable=variable_2,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -247,15 +255,27 @@ def select(
         if location_time_series is not None and timestamps is None:
             timestamps = location_time_series.time.to_numpy()
 
-        print_irradiance_table_2(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=results,
-            title=title,
-            rounding_places=rounding_places,
-            verbose=verbose,
-        )
+        if isinstance(location_time_series, DataArray):
+            print_irradiance_xarray(
+                location_time_series=location_time_series,
+                longitude=longitude,
+                latitude=latitude,
+                # elevation=elevation,
+                title=title,
+                rounding_places=rounding_places,
+                verbose=verbose,
+                # index=index,
+            )
+        else:
+            print_irradiance_table_2(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                dictionary=results,
+                title=title,
+                rounding_places=rounding_places,
+                verbose=verbose,
+            )
 
     # statistics after echoing series which might be Long!
 
@@ -357,13 +377,14 @@ def plot(
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    variable: Annotated[Optional[str], typer_option_data_variable] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = None,
     tolerance: Annotated[
         Optional[float], typer_option_tolerance
     ] = 0.1,  # Customize default if needed
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     output_filename: Annotated[Path, typer_option_output_filename] = None,
     variable_name_as_suffix: Annotated[
@@ -383,10 +404,11 @@ def plot(
         timestamps=timestamps,
         start_time=start_time,
         end_time=end_time,
+        variable=variable,
         # convert_longitude_360=convert_longitude_360,
-        mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
         # in_memory=in_memory,
         verbose=verbose,
     )
@@ -420,14 +442,15 @@ def uniplot(
     timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    variable: Annotated[Optional[str], typer_option_data_variable] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = None,
     tolerance: Annotated[
         Optional[float], typer_option_tolerance
     ] = 0.1,  # Customize default if needed
+    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     lines: Annotated[bool, typer_option_uniplot_lines] = True,
     title: Annotated[str, typer_option_uniplot_title] = None,
@@ -454,10 +477,11 @@ def uniplot(
         timestamps=timestamps,
         start_time=start_time,
         end_time=end_time,
+        variable=variable,
         # convert_longitude_360=convert_longitude_360,
-        mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
         # in_memory=in_memory,
         verbose=verbose,
     )
@@ -470,10 +494,11 @@ def uniplot(
         timestamps=timestamps,
         start_time=start_time,
         end_time=end_time,
+        variable=variable,
         # convert_longitude_360=convert_longitude_360,
-        mask_and_scale=mask_and_scale,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
         # in_memory=in_memory,
         verbose=verbose,
     )

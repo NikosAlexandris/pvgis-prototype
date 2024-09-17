@@ -26,7 +26,7 @@ def select_models(enum_type: Type[Enum], models: List[Enum]) -> Sequence[Enum]:
     if enum_type.all in models:
         return [model for model in enum_type if model != enum_type.all]
 
-    return models
+    return list(models)
 
 
 def validate_model(enum_type: Type[Enum], model: List[Enum]) -> Enum:
