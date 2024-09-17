@@ -77,6 +77,8 @@ def calculate_spectral_mismatch_pelland(
     logger.info(
             f'Wavelengths in `reference_spectrum` input : {reference_spectrum.columns}'
             )
+
+    # Common wavelength range
     common_wavelengths = numpy.intersect1d(
         irradiance.center_wavelength.values,
         numpy.intersect1d(responsivity.center_wavelength, reference_spectrum.columns),
