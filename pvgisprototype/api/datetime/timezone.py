@@ -4,15 +4,19 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import typer
 from pandas import Timestamp
+from pvgisprototype.log import logger
 
 
 def convert_to_timezone(timezone: str) -> ZoneInfo:
     """Convert string to ZoneInfo object."""
-    # print(f'[yellow]i[/yellow] Executing convert_to_timezone()')
-
+    logger.info(
+            f"Executing callback function convert_to_timezone()"
+            )
     if timezone is None:
-        # print(f'  [yellow]>[/yellow] No timezone requested [red]?[/red]')  # Convert to warning!
-        # print(f'  [yellow]>[/yellow] Setting timezone to [red]UTC[/red]')
+        logger.warning(
+                f'No timezone requested since `timezone` = {timezone} ! ..Setting timezone to `UTC`',
+                alt=f'[red]No timezone requested[/red] since `timezone` = {timezone} ! ..[bold yellow]Setting timezone to[/bold yellow] [code]UTC[/code]'
+                )
         return ZoneInfo("UTC")
 
     else:
@@ -24,7 +28,7 @@ def convert_to_timezone(timezone: str) -> ZoneInfo:
                 return ZoneInfo(timezone)
 
         except (ZoneInfoNotFoundError, Exception):
-            print(
+            logger.error(
                 f"  [yellow]>[/yellow] Requested zone {timezone} not found. Setting it to [red]UTC[/red]."
             )
             return ZoneInfo("UTC")
