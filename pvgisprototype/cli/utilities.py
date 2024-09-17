@@ -11,7 +11,7 @@ from pvgisprototype.cli.typer.location import (
 )
 from pvgisprototype.cli.typer.photovoltaic import typer_argument_area
 from pvgisprototype.utilities.cf_conventions import comply_dataset_to_cf_conventions
-from pvgisprototype.utilities.concatenate_datasets import concatenate_datasets
+from pvgisprototype.utilities.merge_datasets import merge_datasets
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -24,14 +24,14 @@ app = typer.Typer(
 
 app.command(
     name="comply-dataset-to-cf-conventions",
-    help=f"Transform primitive SARAHx NetCDF data files to a spatiotemporal Dataset compliant to CF conventions [bold red]Prototype[/bold red]",
+    help=f"Transform primitive SARAHx NetCDF data files to a spatiotemporal Dataset compliant to CF conventions [bold yellow]Prototype[/bold yellow]",
     no_args_is_help=False,
 )(comply_dataset_to_cf_conventions)
 app.command(
-    name="concatenate-datasets",
-    help=f"Combine CF conventions compliant SARAHx NetCDF data files to a single spatiotemporal Dataset [bold red]Prototype[/bold red]",
+    name="merge-datasets",
+    help=f"Merge CF conventions compliant SARAHx NetCDF data files to a single spatiotemporal Dataset [bold yellow]Prototype[/bold yellow]",
     no_args_is_help=False,
-)(concatenate_datasets)
+)(merge_datasets)
 
 
 @app.command(
