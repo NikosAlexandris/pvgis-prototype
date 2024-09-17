@@ -13,6 +13,7 @@ from pvgisprototype.cli.typer.photovoltaic import typer_argument_area
 from pvgisprototype.utilities.cf_conventions import comply_dataset_to_cf_conventions
 from pvgisprototype.utilities.merge_datasets import merge_datasets
 
+
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=True,

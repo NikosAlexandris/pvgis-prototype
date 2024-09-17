@@ -1,0 +1,5 @@
+MIN_WAVELENGTH = 307.0  # nm
+MAX_WAVELENGTH = 1613.0  # nm
+
+SPECTRAL_MISMATCH_NAME = 'Spectral Mismatch'
+SPECTRAL_MISMATCH_MODEL_NAME = 'Spectral Mismatch Model'
