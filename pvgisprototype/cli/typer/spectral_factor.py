@@ -167,7 +167,7 @@ typer_argument_spectral_factor_series = typer.Option(
 typer_option_spectral_factor_series = typer.Option(
     help=spectral_factor_typer_help,
     rich_help_panel=rich_help_panel_spectrum,
-    # is_eager=True,
+    is_eager=True,
     parser=parse_spectral_factor_series,
     callback=spectral_factor_series_option_callback,
 )
