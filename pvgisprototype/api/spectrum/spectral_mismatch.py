@@ -1,4 +1,6 @@
 from pvgisprototype.algorithms.pelland.spectral_mismatch import calculate_spectral_mismatch_pelland
+from pvgisprototype.algorithms.mihaylov.spectral_mismatch import calculate_spectral_mismatch_factor_mihaylow
+from pvgisprototype import Latitude, Longitude, Elevation
 from pvgisprototype.log import log_function_call, log_data_fingerprint
 from devtools import debug
 from typing import Dict, List
@@ -93,11 +95,13 @@ def model_spectral_mismatch(
 
     if spectral_mismatch_model.value == SpectralMismatchModel.mihaylov:
 
-        pass
+        spectral_mismatch = calculate_spectral_mismatch_factor_mihaylow(
+            irradiance=irradiance,
+            responsivity=responsivity,
+            reference_spectrum=reference_spectrum,
+        )
 
     return spectral_mismatch
-
-from pvgisprototype import Latitude, Longitude, Elevation
 
 
 def calculate_spectral_mismatch(
@@ -148,13 +152,25 @@ def calculate_spectral_mismatch(
             model_results = {}  # To store results for the current mismatch model
 
             for module_type in photovoltaic_module_types:
+
+                # # Ugly Hack --------------------------------------------------
+                # module_name = module_type.value
+                # if module_name in responsivity:
+                #     selected_responsivity = responsivity.sel(index=module_name)
+                # elif module_name in responsivity.coords['index'].values:
+                #     selected_responsivity = responsivity[module_name]
+                # else:
+                #     raise KeyError(f"{module_name} not found in responsivity data.")
+                # # Ugly Hack --------------------------------------------------
+
+                selected_responsivity = responsivity[module_type.value]
                 spectral_mismatch_series = model_spectral_mismatch(
                     # longitude=longitude,
                     # latitude=latitude,
                     timestamps=timestamps,
                     timezone=timezone,
                     spectral_mismatch_model=spectral_mismatch_model,
-                    responsivity=responsivity.loc[module_type.value],
+                    responsivity=selected_responsivity,
                     # responsivity=responsivity,
                     irradiance=irradiance,
                     reference_spectrum=reference_spectrum,
