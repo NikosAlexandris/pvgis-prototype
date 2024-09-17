@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import netCDF4
+import numpy
 import typer
 import xarray as xr
 from devtools import debug
@@ -224,7 +225,13 @@ def select_location_time_series(
             method=neighbor_lookup,
             tolerance=tolerance,
         )
+        logger.info(
+                f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
+                )
+        if location_time_series.isnull().all():
+            logger.warning("Selection returns an empty array or all NaNs.")
         location_time_series.load()  # load into memory for fast processing
+    
 
     except Exception as exception:
         logger.error(f"{ERROR_IN_SELECTING_DATA} : {exception}")
