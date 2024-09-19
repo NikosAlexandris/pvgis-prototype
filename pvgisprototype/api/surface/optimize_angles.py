@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Optional
-import math
+from math import radians
 from zoneinfo import ZoneInfo
 from pandas import DatetimeIndex
 from pvgisprototype.api.series.models import MethodForInexactMatches
@@ -53,10 +53,10 @@ def optimize_angles(
     latitude: Latitude,
     elevation: float,  # change it to Elevation
     surface_orientation: SurfaceOrientation = SurfaceOrientation(
-        value=math.radians(180), unit="radians"
+        value=radians(180), unit="radians"
     ),  # SurfaceOrientation().default_radians
     surface_tilt: SurfaceTilt = SurfaceTilt(
-        value=math.radians(45), unit="radians"
+        value=radians(45), unit="radians"
     ),  # SurfaceTilt().default_radians
     min_surface_orientation: float = SurfaceOrientation().min_radians,
     max_surface_orientation: float = SurfaceOrientation().max_radians,
