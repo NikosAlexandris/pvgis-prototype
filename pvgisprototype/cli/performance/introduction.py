@@ -1,13 +1,13 @@
 from pvgisprototype.cli.documentation import A_PRIMER_ON_PHOTOVOLTAIC_PERFORMANCE
 
 
-def photovoltaic_power_introduction():
+def photovoltaic_performance_introduction():
     """A short introduction on photovoltaic performance"""
     introduction = """
-    [underline]Photovoltaic power is ... [/underline]
+    [underline]The performance of a photovoltaic (PV) system[/underline] is ...
     """
     note = """
-    PVGIS can estimate the photovoltaic power output for a series of technologies using either [magenta]broadband[/magenta] or [magenta]spectrally resolved[/magenta] irradiance data.
+    PVGIS can estimate the performance of a series of photovoltaic technologies using either [magenta]broadband[/magenta] or [magenta]spectrally resolved[/magenta] irradiance data.
     """
     from rich.panel import Panel
 
