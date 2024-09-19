@@ -733,6 +733,19 @@ async def get_photovoltaic_power_output_series_multi(
         surface_tilt=surface_tilt,
         timestamps=converted_timestamps,
         timezone=timezone_to_be_converted,
+        global_horizontal_irradiance=Path(
+            "sarah2_sis_over_esti_jrc.nc"
+        ),  # FIXME This hardwritten path will be replaced
+        direct_horizontal_irradiance=Path(
+            "sarah2_sid_over_esti_jrc.nc"
+        ),  # FIXME This hardwritten path will be replaced
+        temperature_series=Path(
+            "era5_t2m_over_esti_jrc.nc"
+        ),  # FIXME This hardwritten path will be replaced
+        wind_speed_series=Path(
+            "era5_ws2m_over_esti_jrc.nc"
+        ),  # FIXME This hardwritten path will be replaced
+        #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
