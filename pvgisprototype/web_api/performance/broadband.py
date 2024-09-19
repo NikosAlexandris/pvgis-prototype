@@ -2,7 +2,8 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import Request
-from fastapi.responses import (Response, 
+from fastapi.responses import (
+    Response, 
     ORJSONResponse, 
     PlainTextResponse,
     )
@@ -221,51 +222,18 @@ async def get_photovoltaic_performance_analysis(
     # ------------------------------------------------------------------------
 
     if csv:
-        from polars import (DataFrame, 
-                    Series,
-                    Datetime,
-                    Float32,
-                    Float64,
-                    Int8,
-                    Int64,
-                    col,
-                    )
-        
+        from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
 
-        if csv.endswith(".csv"):
-            filename = csv
-        else:
-            filename = f"{csv}.csv"
-
-        dictionary = photovoltaic_power_output_series.components
-        # Remove 'Title' and 'Fingerprint' to avoid repeated values
-        dictionary.pop("Title", NOT_AVAILABLE)
-        fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
-
-        dictionary["Longitude"] = longitude
-        dictionary["Latitude"] = latitude
-
-        dataframe = DataFrame(dictionary)
-
-        dataframe = dataframe.with_columns([
-            Series("Time", timestamps).cast(Datetime)
-        ])
-
-        dataframe = dataframe.with_columns([
-            col(column).cast(Float32) if dataframe.schema[column] == Float64
-            else col(column).cast(Int8) if dataframe.schema[column] == Int64
-            else col(column)
-            for column in dataframe.columns
-        ])
-        
-        # Reorder columns to have 'Time', 'Latitude', 'Longitude' first
-        columns_order = ['Time', 'Latitude', 'Longitude'] + [col for col in dataframe.columns if col not in ['Time', 'Latitude', 'Longitude']]
-        dataframe = dataframe.select(columns_order)
+        in_memory_csv = generate_photovoltaic_output_csv(dictionary=photovoltaic_power_output_series.components,
+                                                latitude=latitude, 
+                                                longitude=longitude,
+                                                timestamps=timestamps,
+                                                timezone=timezone) # type: ignore
         
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
-            content=dataframe.write_csv(),
-            headers={"Content-Disposition": f"attachment; filename={filename}"},
+            content=in_memory_csv,
+            headers={"Content-Disposition": f"attachment; filename={csv}"},
             media_type="text/csv"
         )
 
