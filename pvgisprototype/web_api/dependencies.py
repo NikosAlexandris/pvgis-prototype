@@ -461,6 +461,17 @@ async def process_fingerprint(
 
     return fingerprint
 
+async def convert_timestamps_to_specified_timezone(
+        timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+        timezone_to_be_converted: Annotated[Timezone, fastapi_query_timezone_to_be_converted] = Timezone.UTC,  # type: ignore[attr-defined]
+        converted_timestamps: Annotated[None, fastapi_query_convert_timestamps] = None,
+)->DatetimeIndex:
+    if timestamps.tz != timezone_to_be_converted: # type: ignore[union-attr]
+        converted_timestamps = timestamps.tz_convert(timezone_to_be_converted) # type: ignore[union-attr]
+
+    converted_timestamps = converted_timestamps.tz_localize(None) # type: ignore[attr-defined]
+    
+    return converted_timestamps
 
 async def process_optimise_surface_position(
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
@@ -478,6 +489,8 @@ async def process_optimise_surface_position(
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
+    timezone_to_be_converted: Annotated[Timezone, Depends(process_timezone_to_be_converted)] = Timezone.UTC,  # type: ignore[attr-defined]
+    converted_timestamps: Annotated[None, Depends(convert_timestamps_to_specified_timezone)] = None,
     spectral_factor_series: Annotated[
         SpectralFactorSeries, Depends(create_spectral_factor_series)
     ] = None,
@@ -510,8 +523,8 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
-                timestamps=timestamps,
-                timezone=timezone,  # type: ignore
+                timestamps=converted_timestamps,
+                timezone=timezone_to_be_converted,  # type: ignore
                 global_horizontal_irradiance = Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 direct_horizontal_irradiance = Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
@@ -538,8 +551,8 @@ async def process_optimise_surface_position(
                 timestamps=timestamps,
                 timezone=timezone,  # type: ignore
                 spectral_factor_series=spectral_factor_series,
-                temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
-                wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                timestamps=converted_timestamps,
+                timezone=timezone_to_be_converted,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
                     value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
                 ),
@@ -563,8 +576,8 @@ async def process_optimise_surface_position(
                 timestamps=timestamps,
                 timezone=timezone,  # type: ignore
                 spectral_factor_series=spectral_factor_series,
-                temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
-                wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                timestamps=converted_timestamps,
+                timezone=timezone_to_be_converted,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
                     value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
                 ),
@@ -573,9 +586,9 @@ async def process_optimise_surface_position(
                 sampling_method_shgo=sampling_method_shgo,
             )
 
-        if (optimise_surface_position["surface_tilt"] is None) or (
-            optimise_surface_position["surface_orientation"] is None
-        ):  # type: ignore
+        if (optimise_surface_position["surface_tilt"] is None) or ( # type: ignore
+            optimise_surface_position["surface_orientation"] is None # type: ignore
+        ):
             raise HTTPException(
                 status_code=400,
                 detail="Using combination of input could not find optimal surface position",
