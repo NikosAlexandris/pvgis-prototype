@@ -166,27 +166,25 @@ def calculate_time_offset_series_noaa(
     """
     # We need a timezone!
     utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tzinfo is None:
-        # timestamps = timestamps.tz_localize(timezone)
+    timezone_offset_minutes_series = 0  # in UTC the offest is 0
+
+    if timestamps.tzinfo is None:  # set to UTC
         timestamps = timestamps.tz_localize(utc_zoneinfo)
-    # else:
-        # timestamps = timestamps.tz_convert(timezone)
-    elif timestamps.tz != utc_zoneinfo:
+
+    elif timestamps.tz != utc_zoneinfo:  # convert to UTC
         timestamps = timestamps.tz_convert(utc_zoneinfo)
 
-    # --------------------------------------------------------------- Review -
-    # # ------------------------------------------------- Further Optimisation ?
-    # # Optimisation : calculate unique offsets
-    # unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
-    # unique_offsets = {
-    #     tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)
-    # }
-    # # Map offsets back to timestamps
-    # timezone_offset_minutes_series = np.array(
-    #     [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
-    # )
-    # # ------------------------------------------------- Further Optimisation ?
-    # --------------------------------------------------------------- Review -
+        # # ------------------------------------------- Further Optimisation ?
+        # Optimisation : calculate unique offsets
+        unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
+        unique_offsets = {
+            tz: tz.utcoffset().total_seconds() / 60 for tz in set(unique_timezones)
+        }
+        # Map offsets back to timestamps
+        timezone_offset_minutes_series = np.array(
+            [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
+        )
+        # # ------------------------------------------- Further Optimisation ?
 
     equation_of_time_series = calculate_equation_of_time_series_noaa(
         timestamps=timestamps,
@@ -205,16 +203,16 @@ def calculate_time_offset_series_noaa(
         & (time_offset_series_in_minutes <= TimeOffset().max_minutes)
     ):
         index_of_out_of_range_values = np.where(
-            (time_offset_series_in_minutes < TimeOffset().min_radians)
-            | (time_offset_series_in_minutes > TimeOffset().max_radians)
+            (time_offset_series_in_minutes < TimeOffset().min_minutes)
+            | (time_offset_series_in_minutes > TimeOffset().max_minutes)
         )
         out_of_range_values = time_offset_series_in_minutes[
             index_of_out_of_range_values
         ]
         raise ValueError(
             f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{TimeOffset().min_radians}, {TimeOffset().max_radians}] radians"
-            f" in [code]solar_declination_series[/code] : {out_of_range_values}"
+            f"[{TimeOffset().min_minutes}, {TimeOffset().max_minutes}] minutes"
+            f" in [code]time_offset_series_in_minutes[/code] : {out_of_range_values}"
         )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
