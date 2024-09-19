@@ -194,7 +194,7 @@ def calculate_time_offset_series_noaa(
     )
     time_offset_series_in_minutes = (
         longitude.as_minutes
-        - timezone_offset_minutes_series
+        # - timezone_offset_minutes_series
         + equation_of_time_series.minutes
     )
 
