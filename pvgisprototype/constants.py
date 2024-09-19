@@ -1276,6 +1276,7 @@ TOTAL_LOSS_COLUMN_NAME = f"{TOTAL_NAME} {LOSS_NAME}"
 # Analysis
 
 ANALYSIS_FLAG_DEFAULT = False
+ANALYSIS_FLAG_TRUE = True
 ANALYSIS_DESCRIPTION = f"{SYMBOL_CALCULATOR} Analysis of performance. Will force detailed calculations internally (`verbose>=9` and `quiet=True`) and report along with basic Information for location, surface position, photovoltaic cell technology, peak power and mount type, the requested level of details, i.e. `Minimal` reports : {PHOTOVOLTAIC_ENERGY_COLUMN_NAME}, `Simple` reports in addition {TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME} and {TOTAL_EFFECT_COLUMN_NAME}, `Advanced` reports in addition in-between figures for the gain/loss due to various effects and `Extended` will report in addition almost all intermediate quantities."
 
 
