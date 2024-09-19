@@ -16,6 +16,7 @@ from pvgisprototype.cli.citation import print_citation_text
 from pvgisprototype.cli.irradiance import irradiance
 from pvgisprototype.cli.position import position
 from pvgisprototype.cli.power import power
+from pvgisprototype.cli.performance import performance
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_performance,
     rich_help_panel_position,
@@ -75,6 +76,12 @@ app_completion.command(
     help="Install completion for the specified shell.",
 )(install)
 
+app.add_typer(
+    performance.app,
+    name="performance",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_performance,
+)
 app.add_typer(
     power.app,
     name="power",
