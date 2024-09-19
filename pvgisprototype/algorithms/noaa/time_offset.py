@@ -169,25 +169,18 @@ def calculate_time_offset_series_noaa(
         timestamps = timestamps.tz_localize(timezone) # THIS IS SO SLOW
     else:
         timestamps = timestamps.tz_convert(timezone)
-
     # ------------------------------------------------- Further Optimisation ?
     # Optimisation : calculate unique offsets
-    #unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
-    #unique_offsets = {
-    #    tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)
-    #}
+    unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
+    unique_offsets = {
+        tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)
+    }
     # Map offsets back to timestamps
-    #timezone_offset_minutes_series = np.array(
-    #    [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
-    #)
+    timezone_offset_minutes_series = np.array(
+        [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
+    )
     # ------------------------------------------------- Further Optimisation ?
-    # -------------------------------------------------
-    # Since DatetimeIndex cannot contain different timezones
-    utc_offset = (timestamps - timestamps.tz_convert('UTC')).total_seconds() / 60
 
-    # Convert to a numpy array
-    timezone_offset_minutes_series = utc_offset.to_numpy()
-    # -------------------------------------------------
     equation_of_time_series = calculate_equation_of_time_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
