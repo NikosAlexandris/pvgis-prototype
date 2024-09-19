@@ -1,10 +1,13 @@
 import csv
 from pathlib import Path
+from typing import Dict
+from pandas import DatetimeIndex
 
 import numpy as np
 
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
+    SPECTRAL_FACTOR_COLUMN_NAME,
     ALTITUDE_COLUMN_NAME,
     ALTITUDE_NAME,
     AZIMUTH_COLUMN_NAME,
@@ -284,3 +287,69 @@ def write_solar_position_series_csv(
         writer = csv.writer(file)
         writer.writerow(header)
         writer.writerows(rows)
+
+
+
+def write_spectral_mismatch_csv(
+    longitude,
+    latitude,
+    timestamps: DatetimeIndex,
+    spectral_mismatch_dictionary: Dict,
+    filename: Path = Path("spectral_mismatch.csv"),
+    index: bool = False,
+):
+    """
+    Write the spectral mismatch data to a CSV file.
+
+    Parameters
+    ----------
+    - longitude: Longitude of the location.
+    - latitude: Latitude of the location.
+    - timestamps: DatetimeIndex of the time series.
+    - spectral_mismatch_dictionary: Dictionary containing spectral mismatch data.
+    - filename: Path for the output CSV file.
+    - index: Whether to include the index in the CSV.
+
+    """
+    header = []
+    if index:
+        header.append("Index")
+    if longitude:
+        header.append("Longitude")
+    if latitude:
+        header.append("Latitude")
+    
+    header.append("Time")
+
+    # Prepare the data for each spectral mismatch model and module type
+    data_rows = []
+    for mismatch_model, result in spectral_mismatch_dictionary.items():
+        for module_type, data in result.items():
+            mismatch_series = data.get(SPECTRAL_FACTOR_COLUMN_NAME)
+
+            # If mismatch_series is a scalar, expand it to match the length of timestamps
+            if isinstance(mismatch_series, (float, int)):
+                mismatch_series = np.full(len(timestamps), mismatch_series)
+
+            # Add the header for this particular module type and mismatch model
+            header.append(f"{module_type.value} ({mismatch_model.name})")
+
+            # Prepare the rows
+            for idx, timestamp in enumerate(timestamps):
+                if len(data_rows) <= idx:
+                    data_row = []
+                    if index:
+                        data_row.append(idx)
+                    if longitude and latitude:
+                        data_row.extend([longitude, latitude])
+                    data_row.append(timestamp.strftime("%Y-%m-%d %H:%M:%S"))
+                    data_rows.append(data_row)
+
+                # Append mismatch data for this timestamp and module type
+                data_rows[idx].append(mismatch_series[idx])
+
+    # Write to CSV
+    with filename.open("w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(header)  # Write header
+        writer.writerows(data_rows)  # Write rows of data
