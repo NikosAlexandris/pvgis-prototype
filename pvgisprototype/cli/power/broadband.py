@@ -456,6 +456,8 @@ def photovoltaic_power_output_series(
         uniplot_data_array_series(
             data_array=photovoltaic_power_output_series.value,
             list_extra_data_arrays=None,
+            longitude=longitude,
+            latitude=latitude,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
@@ -777,3 +779,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         from pvgisprototype.cli.print import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
+    if fingerprint and not analysis:
+        from pvgisprototype.cli.print import print_finger_hash
+
+        print_finger_hash(dictionary=photovoltaic_power_output_series.components)

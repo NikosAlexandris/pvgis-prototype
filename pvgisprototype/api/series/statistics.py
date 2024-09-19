@@ -30,7 +30,7 @@ Total loss (%): 	     -20.48
 """
 
 import csv
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 import numpy
 
@@ -62,6 +62,7 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
+    SPECTRAL_FACTOR_COLUMN_NAME,
 )
 
 
@@ -406,3 +407,147 @@ def export_statistics_to_csv(data_array, filename):
         writer.writerow(["Statistic", "Value"])
         for statistic, value in statistics.items():
             writer.writerow([statistic, value])
+
+def calculate_spectral_mismatch_statistics(
+    spectral_mismatch: Dict,
+    spectral_mismatch_model: List,
+    photovoltaic_module_type: List,
+    timestamps: DatetimeIndex,
+    rounding_places: int = 3,
+    groupby: str = None,
+) -> dict:
+    """
+    Calculate statistics for the spectral mismatch data.
+
+    Parameters
+    ----------
+    spectral_mismatch : Dict
+        Dictionary containing spectral mismatch data.
+    spectral_mismatch_model : List
+        List of spectral mismatch models.
+    photovoltaic_module_type : List
+        List of photovoltaic module types.
+    timestamps : DatetimeIndex
+        Timestamps for the data series.
+    rounding_places : int
+        Decimal places for rounding.
+    groupby : str
+        Time grouping for statistics, e.g., 'Y', 'M', 'D', etc.
+
+    Returns
+    -------
+    statistics : dict
+        Dictionary with calculated statistics.
+    """
+    statistics = {}
+    
+    for module_type in photovoltaic_module_type:
+        model = spectral_mismatch_model[0]  # Assuming only one model for simplicity
+        mismatch_data = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+        
+        if mismatch_data is not None:
+            mismatch_xarray = xr.DataArray(
+                mismatch_data,
+                coords=[("time", timestamps)],
+                name=f"{module_type.value} Spectral Mismatch"
+            )
+            basic_stats = {
+                "Start": mismatch_xarray.time.values[0],
+                "End": mismatch_xarray.time.values[-1],
+                "Count": mismatch_xarray.count().values,
+                "Min": mismatch_xarray.min().values,
+                "Mean": round_float_values(mismatch_xarray.mean().values, rounding_places),
+                "Max": mismatch_xarray.max().values,
+                "Sum": mismatch_xarray.sum().values,
+            }
+            extended_stats = {
+                "Median": round_float_values(mismatch_xarray.median().values, rounding_places),
+                "Variance": round_float_values(mismatch_xarray.var().values, rounding_places),
+                "Standard deviation": round_float_values(mismatch_xarray.std().values, rounding_places),
+            }
+            time_stats = {
+                "Time of Min": mismatch_xarray.idxmin("time").values,
+                "Time of Max": mismatch_xarray.idxmax("time").values,
+            }
+            statistics[module_type.value] = {
+                "basic": basic_stats,
+                "extended": extended_stats,
+                "timestamps": time_stats,
+            }
+            time_groupings = {
+                "Y": "Yearly means",
+                "M": "Monthly means",
+                "D": "Daily means",
+            }
+            if groupby in time_groupings:
+                freq, label = groupby, time_groupings[groupby]
+                statistics[module_type.value][label] = mismatch_xarray.resample(time=freq).mean().values
+                statistics[module_type.value]["Sum of Group Means"] = statistics[module_type.value][label].sum()
+
+    return statistics
+
+
+def print_spectral_mismatch_statistics(
+    spectral_mismatch: Dict,
+    spectral_mismatch_model: List,
+    photovoltaic_module_type: List,
+    timestamps: DatetimeIndex,
+    groupby: str = None,
+    title: str = "Spectral Mismatch Statistics",
+    rounding_places: int = 3,
+    verbose: int = 1,
+    show_footer: bool = True,
+) -> None:
+    """
+    Print the spectral mismatch statistics in a formatted table.
+
+    Parameters
+    ----------
+    - spectral_mismatch : Dict
+        Spectral mismatch data for different models and module types.
+    - spectral_mismatch_model : List
+        List of spectral mismatch models.
+    - photovoltaic_module_type : List
+        List of photovoltaic module types.
+    - timestamps : DatetimeIndex
+        Timestamps for the data.
+    - groupby : str
+        Time grouping for statistics, e.g., 'Y', 'M', 'D', etc.
+    - rounding_places : int
+        Decimal places for rounding.
+    - title : str
+        Title of the table.
+    - verbose : int
+        Verbosity level for output.
+    - show_footer : bool
+        Whether to show footer with summary statistics.
+    """
+    table = Table(title=title, show_footer=show_footer, header_style="bold magenta")
+    
+    # Add columns to the table
+    table.add_column("Statistic", justify="right", style="cyan")
+    for module_type in photovoltaic_module_type:
+        table.add_column(f"{module_type.value}", justify="right")
+
+    # Calculate the statistics
+    statistics = calculate_spectral_mismatch_statistics(
+        spectral_mismatch, spectral_mismatch_model, photovoltaic_module_type, timestamps, rounding_places, groupby
+    )
+
+    # Add basic stats rows to the table
+    for stat_type in ["basic", "extended"]:
+        for stat_name in statistics[photovoltaic_module_type[0].value][stat_type]:
+            row = [stat_name]
+            for module_type in photovoltaic_module_type:
+                value = statistics[module_type.value][stat_type][stat_name]
+                row.append(f"{round_float_values(value, rounding_places)}")
+            table.add_row(*row)
+
+    # Optionally add footer if show_footer is True
+    if show_footer:
+        table.add_row("", "")
+        table.add_row("Summary", "Footer with additional info")
+
+    if verbose:
+        console = Console()
+        console.print(table)
