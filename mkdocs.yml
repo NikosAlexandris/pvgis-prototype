@@ -108,7 +108,7 @@ nav:
         - development/topography.md
     - development/conventions.md
     - development/optimisation.md
-    - web_api/profiling.md
+    - development/profiling.md
     - development/contribution_guidelines.md
     - development/adding_new_features.md
     - development/pytest.md
