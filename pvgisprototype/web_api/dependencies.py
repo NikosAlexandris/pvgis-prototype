@@ -597,19 +597,6 @@ async def process_optimise_surface_position(
         return optimise_surface_position  # type: ignore
 
 
-async def convert_timestamps_to_specified_timezone(
-        timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
-        timezone_to_be_converted: Annotated[Timezone, fastapi_query_timezone_to_be_converted] = Timezone.UTC,  # type: ignore[attr-defined]
-        converted_timestamps: Annotated[None, fastapi_query_convert_timestamps] = None,
-)->DatetimeIndex:
-    if timestamps.tz != timezone_to_be_converted: # type: ignore[union-attr]
-        converted_timestamps = timestamps.tz_convert(timezone_to_be_converted) # type: ignore[union-attr]
-
-    converted_timestamps = converted_timestamps.tz_localize(None) # type: ignore[attr-defined]
-    
-    return converted_timestamps
-
-
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_surface_orientation = Depends(process_surface_orientation)
