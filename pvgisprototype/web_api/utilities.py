@@ -1,15 +1,45 @@
-from time import time
-import logging
-from fastapi import Request
+from pandas import DatetimeIndex
+from zoneinfo import ZoneInfo
+from polars import (DataFrame, 
+                    Series,
+                    Datetime,
+                    Float32,
+                    Float64,
+                    Int8,
+                    Int64,
+                    col,
+                    )
+from pvgisprototype.constants import (
+    NOT_AVAILABLE,
+    FINGERPRINT_COLUMN_NAME,
 
-logger = logging.getLogger('uvicorn.error')
-logger.setLevel(logging.DEBUG)
+)
 
-async def response_time(request: Request, call_next):
-    """Middleware timing function to log request processing time."""
-    start_time = time()
-    response = await call_next(request)
-    process_time = time() - start_time
-    logger.debug(f"Request: {request.url.path} | Process time: {int(1000 * process_time)}ms")
+def generate_photovoltaic_output_csv(dictionary:dict, latitude:float, longitude:float, timestamps:DatetimeIndex, timezone:ZoneInfo)->DataFrame:
+    """Create in memory CSV file with the photovoltaic power output
+    """
 
-    return response
+    # Remove 'Title' and 'Fingerprint' to avoid repeated values
+    dictionary.pop("Title", NOT_AVAILABLE)
+    dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
+
+    dictionary["Longitude"] = longitude
+    dictionary["Latitude"] = latitude
+    
+    dataframe = DataFrame(dictionary)
+
+    dataframe = dataframe.with_columns([
+        Series("Time", timestamps).cast(Datetime(time_zone=timezone.key)) # type: ignore
+    ])
+    dataframe = dataframe.with_columns([
+        col(column).cast(Float32) if dataframe.schema[column] == Float64
+        else col(column).cast(Int8) if dataframe.schema[column] == Int64
+        else col(column)
+        for column in dataframe.columns
+    ])
+    
+    # Reorder columns to have 'Time', 'Latitude', 'Longitude' first
+    columns_order = ['Time', 'Latitude', 'Longitude'] + [col for col in dataframe.columns if col not in ['Time', 'Latitude', 'Longitude']]
+    dataframe = dataframe.select(columns_order)
+
+    return dataframe.write_csv() # type: ignore
