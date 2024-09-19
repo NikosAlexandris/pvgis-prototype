@@ -52,8 +52,8 @@ async def get_optimised_surface_position(
 
     response["Surface Optimised Position"] = {
         
-        'surface_orientation': convert_float_to_degrees_if_requested(optimised_surface_position["surface_orientation"].value, angle_output_units),
-        'surface_tilt': convert_float_to_degrees_if_requested(optimised_surface_position["surface_tilt"].value, angle_output_units),
+        'Optimised surface orientation': convert_float_to_degrees_if_requested(optimised_surface_position["surface_orientation"].value, angle_output_units),
+        'Optimised surface tilt': convert_float_to_degrees_if_requested(optimised_surface_position["surface_tilt"].value, angle_output_units),
         }
 
     return ORJSONResponse(response, headers=headers, media_type="application/json")
