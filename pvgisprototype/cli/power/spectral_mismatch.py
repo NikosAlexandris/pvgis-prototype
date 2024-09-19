@@ -1,0 +1,457 @@
+"""
+Calculate spectral mismatch using pvlib's calc_spectral_mismatch_field function.
+"""
+
+from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
+from pvgisprototype.api.plot import uniplot_spectral_mismatch_series
+from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
+import typer
+from pvgisprototype.api.spectrum.models import PhotovoltaicModuleSpectralResponsivityModel, SpectralMismatchModel
+from pvgisprototype.api.spectrum.spectral_mismatch import calculate_spectral_mismatch
+from pvgisprototype.cli.typer.log import typer_option_log
+from datetime import datetime
+from pandas import DatetimeIndex
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
+from pathlib import Path
+from typing import Annotated, Optional, List
+from pvgisprototype.cli.typer.plot import (
+    typer_option_uniplot,
+    typer_option_uniplot_terminal_width,
+)
+from pvgisprototype.api.irradiance.models import (
+    MethodForInexactMatches,
+)
+from pvgisprototype.cli.typer.time_series import (
+    typer_option_in_memory,
+    typer_option_mask_and_scale,
+    typer_option_nearest_neighbor_lookup,
+    typer_option_tolerance,
+)
+from pvgisprototype.constants import (
+    WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
+    SPECTRAL_RESPONSIVITY_CSV_COLUMN_NAME_DEFAULT,
+    UNIPLOT_FLAG_DEFAULT,
+    STATISTICS_FLAG_DEFAULT,
+    ANALYSIS_FLAG_DEFAULT,
+    CSV_PATH_DEFAULT,
+    FINGERPRINT_FLAG_DEFAULT,
+    SPECTRAL_FACTOR_COLUMN_NAME,
+    QUIET_FLAG_DEFAULT,
+    INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+    METADATA_FLAG_DEFAULT,
+    ROUNDING_PLACES_DEFAULT,
+    LOG_LEVEL_DEFAULT,
+    TERMINAL_WIDTH_FRACTION,
+    RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
+    TOLERANCE_DEFAULT,
+    IN_MEMORY_FLAG_DEFAULT,
+    MASK_AND_SCALE_FLAG_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    ARRAY_BACKEND_DEFAULT,
+    MULTI_THREAD_FLAG_DEFAULT,
+)
+from pvgisprototype.cli.typer.irradiance import (
+    typer_option_minimum_spectral_irradiance_wavelength,
+    typer_option_maximum_spectral_irradiance_wavelength,
+    typer_argument_global_horizontal_irradiance_pandas,
+)
+from pvgisprototype.cli.typer.data_processing import (
+    typer_option_array_backend,
+    typer_option_dtype,
+    typer_option_multi_thread,
+)
+from pvgisprototype.cli.typer.spectral_responsivity import (
+    # typer_argument_spectral_responsivity,
+    typer_option_photovoltaic_module_type,
+    typer_option_spectral_responsivity_pandas,
+    typer_option_integrate_spectral_responsivity,
+    typer_option_responsivity_column_name,
+    typer_option_wavelength_column_name,
+)
+from pvgisprototype.cli.typer.spectral_mismatch import typer_option_spectral_mismatch_model
+from pvgisprototype.cli.typer.spectrum import typer_option_reference_spectrum, typer_option_integrate_reference_spectrum
+from pvgisprototype.api.spectrum.constants import SPECTRAL_MISMATCH_NAME
+from pvgisprototype.algorithms.pvis.am15g_iec60904_3_ed4 import AM15G_IEC60904_3_ED4
+from pvgisprototype import SpectralResponsivity, SolarIrradianceSpectrum
+from pvgisprototype.cli.typer.output import (
+    typer_option_csv,
+)
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
+from pvgisprototype.algorithms.pvis.spectral_responsivity import (
+    SPECTRAL_RESPONSIVITY_DEFAULT,
+)
+from pvgisprototype.cli.typer.output import (
+    typer_option_command_metadata,
+    typer_option_csv,
+    typer_option_fingerprint,
+    typer_option_index,
+    typer_option_rounding_places,
+)
+from pvgisprototype.cli.typer.statistics import (
+    typer_option_analysis,
+    typer_option_groupby,
+    typer_option_nomenclature,
+    typer_option_statistics,
+)
+from pandas import Series
+from pvgisprototype.cli.typer.timestamps import (
+    typer_argument_timestamps,
+    typer_option_end_time,
+    typer_option_frequency,
+    typer_option_periods,
+    typer_option_random_timestamps,
+    typer_option_start_time,
+    typer_option_timezone,
+)
+from pvgisprototype.cli.typer.location import (
+    typer_argument_elevation,
+    typer_argument_latitude_in_degrees,
+    typer_argument_longitude_in_degrees,
+)
+from pvgisprototype.log import log_function_call, logger
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.cli.typer.time_series import (
+    typer_option_data_variable,
+    )
+
+
+@log_function_call
+def spectral_mismatch_pandas(
+    irradiance: Annotated[
+        Path,
+        typer_argument_global_horizontal_irradiance_pandas,
+    ],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    elevation: Annotated[float, typer_argument_elevation],
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
+    start_time: Annotated[
+        Optional[datetime], typer_option_start_time
+    ] = None,  # Used by a callback function
+    periods: Annotated[
+        Optional[int], typer_option_periods
+    ] = None,  # Used by a callback function
+    frequency: Annotated[
+        Optional[str], typer_option_frequency
+    ] = None,  # Used by a callback function
+    end_time: Annotated[
+        Optional[datetime], typer_option_end_time
+    ] = None,  # Used by a callback function
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    random_timestamps: Annotated[
+        bool, typer_option_random_timestamps
+    ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
+    responsivity: Annotated[
+        Series,
+        # Path | SpectralResponsivity,
+        typer_option_spectral_responsivity_pandas,
+    ] = SPECTRAL_RESPONSIVITY_DEFAULT,  # Accept also list of float values ?
+    integrate_responsivity: Annotated[
+        bool,
+        typer_option_integrate_spectral_responsivity,
+    ] = False,
+    responsivity_column: Annotated[
+        str,
+        typer_option_responsivity_column_name,
+    ] = SPECTRAL_RESPONSIVITY_CSV_COLUMN_NAME_DEFAULT,
+    wavelength_column: Annotated[
+        str,
+        typer_option_wavelength_column_name,
+    ] = WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
+    photovoltaic_module_type: Annotated[
+        List[PhotovoltaicModuleSpectralResponsivityModel],
+        typer_option_photovoltaic_module_type
+    ] = [PhotovoltaicModuleSpectralResponsivityModel.cSi],
+    variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    neighbor_lookup: Annotated[
+        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
+    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, typer_option_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    min_wavelength: Annotated[
+        float, typer_option_minimum_spectral_irradiance_wavelength
+    ] = MIN_WAVELENGTH,
+    max_wavelength: Annotated[
+        float, typer_option_maximum_spectral_irradiance_wavelength
+    ] = MAX_WAVELENGTH,
+    reference_spectrum: Annotated[
+        None | Series,
+        typer_option_reference_spectrum,
+    ] = None,# AM15G_IEC60904_3_ED4,
+    integrate_reference_spectrum: Annotated[
+        bool,
+        typer_option_integrate_reference_spectrum,
+    ] = False,
+    spectral_mismatch_model: Annotated[
+        List[SpectralMismatchModel], typer_option_spectral_mismatch_model
+    ] = [SpectralMismatchModel.pvlib],
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    multi_thread: Annotated[
+        bool, typer_option_multi_thread
+    ] = MULTI_THREAD_FLAG_DEFAULT,
+    rounding_places: Annotated[
+        int, typer_option_rounding_places
+    ] = ROUNDING_PLACES_DEFAULT,
+    analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
+    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
+    uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    terminal_width_fraction: Annotated[
+        float, typer_option_uniplot_terminal_width
+    ] = TERMINAL_WIDTH_FRACTION,
+    resample_large_series: Annotated[bool, "Resample large time series?"] = False,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    show_footer: Annotated[bool, typer.Option(help='Show output table footer')] = True,
+    quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
+):
+    """
+    """
+    # from devtools import debug
+    # debug(locals())
+
+    # Ugly Hacks ! -----------------------------------------------------------
+    # timestamps = irradiance.index
+    from pvgisprototype.api.position.models import select_models
+    photovoltaic_module_type = select_models(
+        PhotovoltaicModuleSpectralResponsivityModel, photovoltaic_module_type
+    )  # Using a callback fails!
+    # ------------------------------------------------------------------------
+    def is_netcdf(file_path: Path) -> bool:
+        return file_path.suffix in {'.nc', '.netcdf'}
+
+    if is_netcdf(irradiance):
+        # irradiance = (
+        #     select_time_series(
+        #         time_series=irradiance,
+        #         longitude=longitude,
+        #         latitude=latitude,
+        #         timestamps=timestamps,
+        #         neighbor_lookup=neighbor_lookup,
+        #         tolerance=tolerance,
+        #         mask_and_scale=mask_and_scale,
+        #         in_memory=in_memory,
+        #         verbose=verbose,
+        #         log=log,
+        #     )
+        #     .to_numpy()
+        #     .astype(dtype=dtype)
+        # )
+        irradiance = (
+            select_time_series(
+                time_series=irradiance,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                variable=variable,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                verbose=verbose,
+                log=log,
+            )
+        )
+        print(
+                f"Irradiance input : {irradiance}"
+                )
+
+    # Check for spectra range
+    import numpy
+    # if numpy.any(numpy.logical_or(
+    #     irradiance.columns < min_wavelength, irradiance.columns > max_wavelength
+    # )):
+    if numpy.any(
+        numpy.logical_or(
+            irradiance[wavelength_column] < min_wavelength,
+            irradiance[wavelength_column] > max_wavelength,
+        )
+    ):
+        logger.info(
+                f"{check_mark} The input irradiance wavelengths are within the reference range [{min_wavelength}, {max_wavelength}]."
+                )
+    else:
+        logger.warning(
+                f"{x_mark} The input irradiance wavelengths exceed the reference range [{min_wavelength}, {max_wavelength}]. Filtering..."
+                )
+        irradiance = irradiance.sel(
+            center_wavelength=numpy.logical_and(
+                irradiance[wavelength_column] > min_wavelength,
+                irradiance[wavelength_column] < max_wavelength
+            )
+        )
+    print(f'Responsivity : {responsivity}')
+    spectral_mismatch = calculate_spectral_mismatch(
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        timestamps=timestamps,
+        timezone=timezone,
+        irradiance=irradiance,
+        responsivity=responsivity,
+        photovoltaic_module_type=photovoltaic_module_type,
+        reference_spectrum=reference_spectrum,
+        integrate_reference_spectrum=integrate_reference_spectrum,
+        spectral_mismatch_models=spectral_mismatch_model,
+        verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
+    )
+    # spectral_mismatch = spectral_mismatch.to_xarray()
+    # spectral_mismatch = spectral_mismatch[spectral_mismatch_model][photovoltaic_module_type][SPECTRAL_MISMATCH_NAME]
+    # spectral_mismatch = spectral_mismatch[spectral_mismatch_model][SPECTRAL_MISMATCH_NAME]
+    # print(f'Output 1 "Mismatch" : {spectral_mismatch}')
+    # print()
+
+    # print(f'Output 2 "Mismatch Model" : {spectral_mismatch_model} ')
+    # print()
+
+    # print(f'Output 3 "Mismatch Model + Content" : {spectral_mismatch[spectral_mismatch_model]}')
+    # print()
+
+    # print(f'Output 4 \n : {spectral_mismatch[spectral_mismatch_model][SPECTRAL_MISMATCH_NAME]}')
+    # print()
+
+    # longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    if not quiet:
+        if verbose > 0:
+            # print(f'Spectral Mismatch : {spectral_mismatch}')
+            from pvgisprototype.cli.print import print_spectral_mismatch
+
+            print_spectral_mismatch(
+                timestamps=timestamps,
+                spectral_mismatch=spectral_mismatch.components,
+                spectral_mismatch_model=spectral_mismatch_model,
+                photovoltaic_module_type=photovoltaic_module_type,
+                # include_statistics=statistics,
+                title="Spectral Factor",
+                verbose=verbose,
+                index=index,
+                show_footer=show_footer,
+            )
+        else:
+            mismatch_dict = {}
+            for model in spectral_mismatch_model:
+                for module_type in photovoltaic_module_type:
+                    mismatch_data = spectral_mismatch.components.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+                    if isinstance(mismatch_data, memoryview):
+                        import numpy
+                        mismatch_data = numpy.array(mismatch_data).values.flatten(),
+                # # ------------------------- Better handling of rounding vs dtype ?
+                #     from pvgisprototype.api.utilities.conversions import round_float_values
+                #     mismatch_data = round_float_values(
+                #                 mismatch_data,
+                #             rounding_places,
+                #         ).astype(str)
+                # # ------------------------- Better handling of rounding vs dtype ?
+                    mismatch_dict[module_type.name] = mismatch_data
+
+                header = ", ".join(mismatch_dict.keys())
+                print(header)
+
+                # mismatch_values = ", ".join(mismatch_data.astype(str))
+                # print(f'{module_type.name}, {mismatch_values}')
+
+                # maximum length of mismatch data to properly format rows
+                max_length = max([len(v) for v in mismatch_dict.values()])
+
+                # Print each row of mismatch values, transposing the values
+                for i in range(max_length):
+                    row = []
+                    for module_type in mismatch_dict:
+                        if i < len(mismatch_dict[module_type]):
+                            row.append(f"{mismatch_dict[module_type][i]:.6f}")
+                        else:
+                            row.append("")  # Handle cases where lengths are uneven
+                    print(", ".join(row))
+
+
+    if csv:
+        from pvgisprototype.cli.write import write_spectral_mismatch_csv
+
+        write_spectral_mismatch_csv(
+            longitude=None,
+            latitude=None,
+            timestamps=timestamps,
+            spectral_mismatch_dictionary=spectral_mismatch.components,
+            filename=csv,
+            # index=index,
+        )
+    if statistics:
+        from pvgisprototype.api.series.statistics import print_spectral_mismatch_statistics
+
+        print_spectral_mismatch_statistics(
+            spectral_mismatch=spectral_mismatch.components,
+            spectral_mismatch_model=spectral_mismatch_model,
+            photovoltaic_module_type=photovoltaic_module_type,
+            timestamps=timestamps,
+            # groupby=groupby,
+            title="Spectral Factor Statistics",
+            rounding_places=rounding_places,
+            verbose=verbose,
+            show_footer=show_footer,
+        )
+    # if analysis:
+    #     from pvgisprototype.cli.print import print_change_percentages_panel
+
+    #     print_change_percentages_panel(
+    #         longitude=longitude,
+    #         latitude=latitude,
+    #         elevation=elevation,
+    #         timestamps=timestamps,
+    #         dictionary=photovoltaic_power_output_series.components,
+    #         # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
+    #         rounding_places=1,  # minimalism
+    #         index=index,
+    #         surface_orientation=True,
+    #         surface_tilt=True,
+    #         fingerprint=fingerprint,
+    #         verbose=verbose,
+    #     )
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_data_array_series
+
+        # print(f'Spectral Mismatch Output to plot ! : {spectral_mismatch}')
+
+        uniplot_spectral_mismatch_series(
+            spectral_mismatch_dictionary=spectral_mismatch.components,
+            spectral_mismatch_model=spectral_mismatch_model,
+            photovoltaic_module_type=photovoltaic_module_type,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
+            # lines=True,
+            supertitle="Spectral Mismatch",
+            title="Spectral Mismatch",
+            # label=photovoltaic_module_types,
+            # extra_legend_labels=None,
+            # unit='',
+            terminal_width_fraction=terminal_width_fraction,
+        )
+    if metadata:
+        import click
+
+        from pvgisprototype.cli.print import print_command_metadata
+
+        print_command_metadata(context=click.get_current_context())
+    if fingerprint and not analysis:
+        from pvgisprototype.cli.print import print_finger_hash
+
+        print_finger_hash(dictionary=spectral_mismatch)
+
+    # Step 5: Output results
+    # if output:
+    #     spectral_mismatch.to_csv(output)
+    #     if verbose:
+    #         print(f"Spectral mismatch factors saved to {output}")
+    # else:
+    #     print(spectral_mismatch)

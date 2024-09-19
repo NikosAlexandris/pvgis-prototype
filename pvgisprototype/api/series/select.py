@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from devtools import debug
+import numpy
 from pandas import DatetimeIndex
 
 from pvgisprototype import Latitude, Longitude
@@ -74,8 +75,10 @@ def select_time_series(
     end_time: Optional[datetime] = None,
     remap_to_month_start: Optional[bool] = False,
     # convert_longitude_360: bool = False,
+    variable: str = None,
     neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = 0.1,  # Customize default if needed
+    tolerance: float = 0.1,  # Customize default if needed
+    time_tolerance: str = '15m',  # Important for merged Datasets
     mask_and_scale: bool = False,
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,
@@ -103,12 +106,17 @@ def select_time_series(
         time_series=time_series,
         longitude=longitude,
         latitude=latitude,
+        variable=variable,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         verbose=verbose,
         # log=log,
     )
+    logger.info(
+            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
+            )
+    logger.info(f'Selected time series : {location_time_series}')
     # ------------------------------------------------------------------------
     if (start_time or end_time) and not remap_to_month_start:
         timestamps = None  # we don't need a timestamp anymore!
@@ -130,6 +138,10 @@ def select_time_series(
         except Exception:
             logger.exception(
                 f"No data found for the given period {start_time} and {end_time}."
+            )
+
+    logger.info(
+            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
             )
 
     if remap_to_month_start:
@@ -155,17 +167,28 @@ def select_time_series(
             logger.error(error_message)
             raise ValueError(error_message)
 
+    logger.info(
+            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
+            )
+
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
             start_time = end_time = timestamps[0]
 
         try:
             location_time_series = location_time_series.sel(
-                time=timestamps, method=neighbor_lookup
+                time=timestamps, method=neighbor_lookup,
+                # tolerance=time_tolerance,
             )
+            logger.info(f'Selected time series : {location_time_series}')
+            logger.info(f'Selected time series mean : {numpy.nanmean(location_time_series)}')
         except KeyError:
             logger.exception(
                 f"No data found for one or more of the given {timestamps}."
+            )
+
+    logger.info(
+            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
             )
 
     if location_time_series.size == 1:
