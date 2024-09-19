@@ -1,5 +1,7 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from typing import List, Sequence
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import numpy as np
 import pandas
@@ -165,7 +167,7 @@ def build_caption(
         f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
         f"Orientation : [bold blue]{rounded_table[first_model].get(SURFACE_ORIENTATION_NAME, None)}[/bold blue], "
         f"Tilt : [bold blue]{rounded_table[first_model].get(SURFACE_TILT_NAME, None)}[/bold blue] "
-        f"[[dim]{rounded_table[first_model].get(UNIT_NAME, UNITLESS)}[/dim]]"
+        f"[dim]{rounded_table[first_model].get(UNIT_NAME, UNITLESS)}[/dim]"
         f"\n[underline]Algorithms[/underline]  "  # ---------------------------
         f"Timing : [bold]{rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
         )
@@ -174,11 +176,12 @@ def build_caption(
         # f"[underline]Definitions[/underline]  "
         # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
         # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
-    
-    if user_requested_timezone != timezone and user_requested_timezone is not None:
-        caption += f"Local Zone : {user_requested_timezone}, "
+
+    if user_requested_timezone != ZoneInfo('UTC'):
+        caption += f"Local Zone : [bold]{user_requested_timezone}[/bold], "
     else:
-        caption += f"Zone : {timezone}, "
+        caption += f"Zone : [bold]{timezone}[/bold], "
+
     return caption
 
 
@@ -339,6 +342,10 @@ def print_solar_position_series_table(
         else:
             time_column_name = TIME_COLUMN_NAME
         if timestamps is not None:
+            if user_requested_timezone != ZoneInfo('UTC'):
+                time_column_name = LOCAL_TIME_COLUMN_NAME
+            else:
+                time_column_name = TIME_COLUMN_NAME
             columns.append(time_column_name)
 
         for parameter in position_parameters:

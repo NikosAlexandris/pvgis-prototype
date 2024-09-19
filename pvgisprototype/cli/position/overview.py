@@ -207,32 +207,26 @@ def overview(
     #     print('Yay')
     #     return
 
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamps = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-
-    utc_zoneinfo = ZoneInfo("UTC")
+    # Note the input timestamp and timezone
+    user_requested_timestamps = timestamps
+    user_requested_timezone = timezone  # Set to UTC by the callback functon !
+    timezone = utc_zoneinfo = ZoneInfo('UTC')
+    logger.info(
+            f"Input time zone : {timezone}",
+            alt=f"Input time zone : [code]{timezone}[/code]"
+            )
 
     if timestamps.tz is None:
-        user_requested_timestamps = timestamps
-        user_requested_timezone = timezone
-
         timestamps = timestamps.tz_localize(utc_zoneinfo)
-        timezone = utc_zoneinfo
         logger.info(
             f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
         )
 
     elif timestamps.tz != utc_zoneinfo:
-        # Note the input timestamp and timezone
-        user_requested_timestamps = timestamps
-        user_requested_timezone = timezone
-
         timestamps = timestamps.tz_convert(utc_zoneinfo)
-        timezone = utc_zoneinfo
         logger.info(
-            f"Input timestamps & zone\n{user_requested_timestamps}\n&\n{user_requested_timezone}\nconverted for all internal calculations to :\n{timestamps}"
+            f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
+            alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
         )
 
     # Why does the callback function `_parse_model` not work?
