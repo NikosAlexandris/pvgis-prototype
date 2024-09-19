@@ -100,10 +100,25 @@ def callback_generate_datetime_series(
                     )
             timestamps = timestamps.sel(time=slice(start_time, end_time))
 
-        if frequency:
-            timestamps = timestamps.resample(time=frequency).nearest()
+        if start_time and periods and not end_time:
+            if frequency:
+                timestamps = timestamps.resample(time=frequency).nearest()
+            timestamps = timestamps.isel(time=slice(0, periods))
 
-        # if periods:
+        elif end_time and periods and not start_time:
+            if frequency:
+                timestamps = timestamps.resample(time=frequency).nearest()
+            timestamps = timestamps.isel(time=slice(-periods, None))
+
+        elif start_time and end_time and periods:
+            logger.error(
+                    f"Best if you provide a `start_time` or an `end_time` along with `periods`, not both!",
+                    alt=f"Best if you provide a `start_time` or an `end_time` along with `periods`, not both!"
+                    )
+            raise ValueError("Best if you provide a `start_time` or an `end_time` along with `periods`, not both! Else, I cannot decide which periods to return, from the start or the the end.. ;-?")
+
+        elif frequency and not periods and (start_time or end_time):
+            timestamps = timestamps.resample(time=frequency).nearest()
 
         return DatetimeIndex(timestamps)
 
