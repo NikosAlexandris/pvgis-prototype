@@ -108,6 +108,7 @@ from pvgisprototype.cli.typer.spectral_factor import (
     typer_argument_spectral_factor_series,
 )
 from pvgisprototype.cli.typer.statistics import (
+    typer_option_analysis,
     typer_option_groupby,
     typer_option_nomenclature,
     typer_option_statistics,
@@ -135,7 +136,7 @@ from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_
 from pvgisprototype.cli.typer.wind_speed import typer_argument_wind_speed_series
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
-    ANALYSIS_FLAG_DEFAULT,
+    ANALYSIS_FLAG_TRUE,
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -288,6 +289,7 @@ def photovoltaic_power_output_series(
     rounding_places: Annotated[
         int, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
+    analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_TRUE,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     nomenclature: Annotated[
@@ -450,14 +452,29 @@ def photovoltaic_power_output_series(
             title="Photovoltaic power output",
             rounding_places=rounding_places,
         )
+    if analysis:
+        from pvgisprototype.cli.print import print_change_percentages_panel
+
+        print_change_percentages_panel(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            timestamps=timestamps,
+            dictionary=photovoltaic_power_output_series.components,
+            # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
+            rounding_places=1,  # minimalism
+            index=index,
+            surface_orientation=True,
+            surface_tilt=True,
+            fingerprint=fingerprint,
+            verbose=verbose,
+        )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
 
         uniplot_data_array_series(
             data_array=photovoltaic_power_output_series.value,
             list_extra_data_arrays=None,
-            longitude=longitude,
-            latitude=latitude,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
@@ -474,7 +491,7 @@ def photovoltaic_power_output_series(
         from pvgisprototype.cli.print import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
-    if fingerprint:
+    if fingerprint and not analysis:
         from pvgisprototype.cli.print import print_finger_hash
 
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
@@ -578,6 +595,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     rounding_places: Annotated[
         int, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
+    analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_TRUE,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
@@ -734,7 +752,23 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             groupby=groupby,
             title="Photovoltaic power output",
         )
+    if analysis:
+        from pvgisprototype.cli.print import print_change_percentages_panel
 
+        print_change_percentages_panel(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            timestamps=timestamps,
+            dictionary=photovoltaic_power_output_series.components,
+            # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
+            rounding_places=1,  # minimalism
+            index=index,
+            surface_orientation=True,
+            surface_tilt=True,
+            fingerprint=fingerprint,
+            verbose=verbose,
+        )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
 
@@ -769,7 +803,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             unit=POWER_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
-    if fingerprint:
+    if fingerprint and not analysis:
         from pvgisprototype.cli.print import print_finger_hash
 
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
@@ -779,7 +813,4 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         from pvgisprototype.cli.print import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
-    if fingerprint and not analysis:
-        from pvgisprototype.cli.print import print_finger_hash
 
-        print_finger_hash(dictionary=photovoltaic_power_output_series.components)
