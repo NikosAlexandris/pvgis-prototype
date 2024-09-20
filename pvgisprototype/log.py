@@ -57,15 +57,16 @@ def initialize_logger(
 
         richuru.install(level=0, rich_traceback=False)
 
-    log_file = ctx.params.get("log_file")
     if log_level and not rich_handler:
-        print("Logging to sys.stderr")
         import sys
+        # print(f"Logging to sys.stderr : {sys.stderr}")
 
         # logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
         fmt = "{time} | {level: <8} | {name: ^15} | {function: ^15} | {line: >3} | {message}"
         logger.add(sys.stderr, format=fmt, level=minimum_log_level)
+        logger.info(f"Logging to sys.stderr : {sys.stderr}")
 
+    log_file = ctx.params.get("log_file")
     if log_file:
         if not rich_handler:
             print(f"Logging to file : {log_file}")

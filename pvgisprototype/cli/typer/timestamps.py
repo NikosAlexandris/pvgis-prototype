@@ -8,6 +8,7 @@ from datetime import datetime
 
 import typer
 from pandas import DatetimeIndex
+import xarray
 
 from pvgisprototype.api.datetime.datetimeindex import (
     generate_datetime_series,
@@ -41,9 +42,8 @@ def callback_generate_datetime_series(
     end_time = ctx.params.get("end_time")
     if start_time == end_time:
         logger.warning(
-            (
-                "[yellow bold]The start and end time are the same and will generate a single time stamp![/yellow bold]"
-            )
+                f"The start {start_time} and end time {end_time} are the same and will generate a single time stamp!",
+                alt=f"[yellow bold]The start {start_time} and end time {end_time} are the same and will generate a single time stamp![/yellow bold]"
         )
     periods = ctx.params.get("periods", None)
     frequency = (
@@ -51,6 +51,77 @@ def callback_generate_datetime_series(
         if not periods
         else None
     )
+
+    # Input space-time data files ?
+    global_horizontal_irradiance = ctx.params.get("global_horizontal_irradiance")
+    direct_horizontal_irradiance = ctx.params.get("direct_horizontal_irradiance")
+    spectral_factor_series = ctx.params.get("spectral_factor_series")
+    time_series = ctx.params.get("time_series")
+
+    # Extract timestamps from first available space-time data file
+    if any(
+        [
+            global_horizontal_irradiance,
+            direct_horizontal_irradiance,
+            spectral_factor_series,
+            time_series,
+        ]
+    ):
+        data_file = next(
+            filter(
+                None,
+                [
+                    global_horizontal_irradiance,
+                    direct_horizontal_irradiance,
+                    spectral_factor_series,
+                    time_series,
+                ],
+            )
+        )
+        # timestamps = DatetimeIndex(xarray.open_dataarray(data_file).time)
+        timestamps = xarray.open_dataarray(data_file).time
+        logger.info(
+                f"Timestamps retrieved from {data_file} :\n{timestamps}",
+                alt=f"Timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}"
+                )
+
+        if timestamps is None:
+            logger.error(
+                    "No timestamps found in the provided data file!",
+                    alt="[red]No timestamps found in the provided data file![/red]",
+                    )
+            raise ValueError("Unable to extract timestamps from the data file.")
+        
+        # Filter timestamps based on start_time and end_time
+        if start_time or end_time:
+            logger.info(
+                    f"Slice timestamps from {start_time} to {end_time}",
+                    alt=f"Slice timestamps from {start_time} to {end_time}"
+                    )
+            timestamps = timestamps.sel(time=slice(start_time, end_time))
+
+        if start_time and periods and not end_time:
+            if frequency:
+                timestamps = timestamps.resample(time=frequency).nearest()
+            timestamps = timestamps.isel(time=slice(0, periods))
+
+        elif end_time and periods and not start_time:
+            if frequency:
+                timestamps = timestamps.resample(time=frequency).nearest()
+            timestamps = timestamps.isel(time=slice(-periods, None))
+
+        elif start_time and end_time and periods:
+            logger.error(
+                    f"Best if you provide a `start_time` or an `end_time` along with `periods`, not both!",
+                    alt=f"Best if you provide a `start_time` or an `end_time` along with `periods`, not both!"
+                    )
+            raise ValueError("Best if you provide a `start_time` or an `end_time` along with `periods`, not both! Else, I cannot decide which periods to return, from the start or the the end.. ;-?")
+
+        elif frequency and not periods and (start_time or end_time):
+            timestamps = timestamps.resample(time=frequency).nearest()
+
+        return DatetimeIndex(timestamps)
+
     if start_time is not None and end_time is not None:
         timestamps = generate_datetime_series(
             start_time=start_time,
