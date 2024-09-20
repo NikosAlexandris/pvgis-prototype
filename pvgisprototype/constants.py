@@ -694,9 +694,22 @@ SYSTEM_LOSS_DESCRIPTION = f"{SYSTEM_LOSS} & Degradation with age"
 
 # Spectral effect
 
+RESPONSIVITY = 'Responsivity'
+RESPONSIVITY_COLUMN_NAME = RESPONSIVITY
+RESPONSIVITY_SPECTRAL_DATA = 'responsivity'
+
+REFERENCE_SPECTRUM = 'Reference Spectrum'
+REFERENCE_SPECTRUM_COLUMN_NAME = REFERENCE_SPECTRUM
+SPECTRUM_DATA = 'spectrum'
+
+WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT = 'Wavelength [nm]'
+SPECTRAL_RESPONSIVITY_CSV_COLUMN_NAME_DEFAULT = 'Spectral Responsivity [A/W]'
+
+SPECTRAL_MISMATCH_MODEL_COLUMN_NAME = 'Spectral mismatch model'
 SPECTRAL_FACTOR_DEFAULT = 1
 SPECTRAL_FACTOR_NAME = "Spectral factor"
 SPECTRAL_FACTOR_COLUMN_NAME = f"{SPECTRAL_FACTOR_NAME} *"
+
 SPECTRAL_EFFECT_NAME = "Spectral effect"
 SPECTRAL_EFFECT_COLUMN_NAME = f"{SPECTRAL_EFFECT_NAME} {SYMBOL_PLUS_MINUS}"
 SPECTRAL_EFFECT_DESCRIPTION = (
@@ -878,6 +891,9 @@ INCIDENCE_ALGORITHM_DESCRIPTION = "Algorithm for solar incidence calculation"
 INCIDENCE_DEFINITION = INCIDENCE_NAME + " angle"
 
 SOLAR_TIME_COLUMN_NAME = "" + SOLAR_TIME_NAME
+TIME_NAME = 'Time'
+TIME_COLUMN_NAME = f'{TIME_NAME}'
+LOCAL_TIME_COLUMN_NAME = f'Local {TIME_NAME}'
 
 SURFACE_ORIENTATION_COLUMN_NAME = SURFACE_ORIENTATION_NAME + f" {SYMBOL_ORIENTATION}"
 ANGLE_NAME = "Angle"
@@ -1277,6 +1293,7 @@ TOTAL_LOSS_COLUMN_NAME = f"{TOTAL_NAME} {LOSS_NAME}"
 # Analysis
 
 ANALYSIS_FLAG_DEFAULT = False
+ANALYSIS_FLAG_TRUE = True
 ANALYSIS_DESCRIPTION = f"{SYMBOL_CALCULATOR} Analysis of performance. Will force detailed calculations internally (`verbose>=9` and `quiet=True`) and report along with basic Information for location, surface position, photovoltaic cell technology, peak power and mount type, the requested level of details, i.e. `Minimal` reports : {PHOTOVOLTAIC_ENERGY_COLUMN_NAME}, `Simple` reports in addition {TOTAL_GLOBAL_IN_PLANE_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME} and {TOTAL_EFFECT_COLUMN_NAME}, `Advanced` reports in addition in-between figures for the gain/loss due to various effects and `Extended` will report in addition almost all intermediate quantities."
 
 
