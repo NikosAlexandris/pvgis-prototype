@@ -11,12 +11,14 @@ from pvgisprototype.api.position.models import (
     SolarPositionParameter,
 )
 from pvgisprototype.api.series.hardcodings import exclamation_mark
+from pvgisprototype.api.spectrum.constants import SPECTRAL_MISMATCH_NAME
 from pvgisprototype.constants import (
     AZIMUTH_ORIGIN_NAME,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
     NOT_AVAILABLE,
+    SPECTRAL_FACTOR_COLUMN_NAME,
     TERMINAL_WIDTH_FRACTION,
     UNIT_NAME,
     UNITLESS,
@@ -52,8 +54,8 @@ def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
 def uniplot_data_array_series(
     data_array,
     list_extra_data_arrays=None,
-    # longitude: float,
-    # latitude: float,
+    longitude: float = None,
+    latitude: float = None,
     orientation: List[float] | float = None,
     tilt: List[float] | float = None,
     # time_series_2: Path = None,
@@ -103,6 +105,7 @@ def uniplot_data_array_series(
         ]
 
     y_series = [data_array] + (list_extra_data_arrays if list_extra_data_arrays else [])
+    timestamps_series = [timestamps] * len(y_series)  # list same DatetimeIndex for each series
 
     if isinstance(data_array, float):
         logger.error(
@@ -111,6 +114,8 @@ def uniplot_data_array_series(
         )
         return
 
+    if longitude and latitude:
+        title += f' observed from (longitude, latitude) {longitude}, {latitude}'
     # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
     # label = getattr(photovoltaic_power_output_series, 'name', None)
     # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
@@ -130,13 +135,14 @@ def uniplot_data_array_series(
     print("[reverse]Uniplot[/reverse]")
     try:
         plot(
-            # xs=timestamps,
+            xs=timestamps_series,
             ys=y_series,
             legend_labels=legend_labels,
             lines=lines,
             title=title if title else supertitle,
             y_unit=" " + str(unit),
-            force_ascii=True,
+            # force_ascii=True,
+            # color=False,
         )
     except IOError as e:
         raise IOError(f"Could not _uniplot_ {data_array.value=}") from e
@@ -149,8 +155,8 @@ def uniplot_solar_position_series(
     # index: bool = False,
     surface_orientation=None,
     surface_tilt=None,
-    # longitude: float,
-    # latitude: float,
+    longitude: float = None,
+    latitude: float = None,
     # time_series_2: Path = None,
     resample_large_series: bool = False,
     lines: bool = True,
@@ -225,6 +231,8 @@ def uniplot_solar_position_series(
         uniplot_data_array_series(
             data_array=solar_position_metric_series,
             list_extra_data_arrays=individual_series,
+            longitude=longitude,
+            latitude=latitude,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
@@ -236,3 +244,72 @@ def uniplot_solar_position_series(
             terminal_width_fraction=terminal_width_fraction,
             verbose=verbose,
         )
+
+
+from typing import Dict
+
+def uniplot_spectral_mismatch_series(
+    spectral_mismatch_dictionary: Dict,
+    spectral_mismatch_model: List,
+    photovoltaic_module_type: List,
+    timestamps: DatetimeIndex,
+    resample_large_series: bool = False,
+    supertitle: str = "Spectral Mismatch Series",
+    title: str = "Spectral Mismatch",
+    terminal_width_fraction: float = 0.9,
+    verbose: int = 0,
+):
+    """
+    Plots the spectral mismatch results for different module types using the uniplot library.
+
+    Parameters:
+    - spectral_mismatch: Dictionary containing spectral mismatch data.
+    - spectral_mismatch_model: List of spectral mismatch models.
+    - photovoltaic_module_type: List of photovoltaic module types.
+    - timestamps: DatetimeIndex of the time series.
+    - resample_large_series: Whether to resample large series.
+    - supertitle: Supertitle for the plot.
+    - title: Title for the plot.
+    - terminal_width_fraction: Width of the terminal for plotting.
+    - verbose: Verbosity level.
+    """
+    data_arrays = []
+    labels = []
+
+    for mismatch_model, result in spectral_mismatch_dictionary.items():
+        for module_type in result:
+            spectral_mismatch_for_module = spectral_mismatch_dictionary[mismatch_model][
+                module_type
+            ]
+            mismatch_series = spectral_mismatch_for_module.get(
+                SPECTRAL_FACTOR_COLUMN_NAME
+            )
+
+            # if needed
+            if isinstance(mismatch_series, memoryview):
+                mismatch_data = numpy.array(mismatch_series)
+
+            data_array = xarray.DataArray(
+                mismatch_series, coords=[timestamps], dims=["time"]
+            )
+            data_arrays.append(data_array)
+
+            label = f"{module_type.value}"
+            if len([mismatch_model]) > 1:
+                label += f" {mismatch_model.name}"
+            labels.append(label)
+
+    uniplot_data_array_series(
+        data_array=data_arrays[0],
+        list_extra_data_arrays=data_arrays[1:],
+        timestamps=timestamps,
+        resample_large_series=resample_large_series,
+        lines=True,
+        supertitle=supertitle,
+        title=title,
+        label=labels[0],
+        extra_legend_labels=labels[1:],
+        unit="",
+        terminal_width_fraction=terminal_width_fraction,
+        verbose=verbose,
+    )
