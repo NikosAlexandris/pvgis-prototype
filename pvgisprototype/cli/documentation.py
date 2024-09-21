@@ -1,9 +1,13 @@
+from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT, SOLAR_TIME_ALGORITHM_DEFAULT, SolarIncidenceModel
+
+
 A_PRIMER_ON_SOLAR_GEOMETRY = """
     The amount of solar irradiance incident on a solar surface at a location
     and a moment in time, depends on the [blue]Solar Incidence[/blue] angle.
 
     To calculcate the critical [cyan]Solar Incidence[/cyan] angle, PVGIS requires :
-    - the relative [cyan]Latitude[/cyan] and [cyan]Longitude[/cyan] coordinates of the surface in question
+    - the relative [cyan]Latitude[/cyan] and [cyan]Longitude[/cyan] coordinates
+      of the surface in question
     - the [cyan]Surface Orientation[/cyan] and [cyan]Surface Tilt[/cyan] angles
     - the [cyan]Solar Declination[/cyan] and the [cyan]Solar Hour[/cyan] angles
     - a [cyan]Timestamp[/cyan] from which to derive the latter two
@@ -59,66 +63,100 @@ A_PRIMER_ON_SOLAR_IRRADIANCE = """
     in watts per square metre (W/m2) in SI units. (source: Wikipedia)
 """
 
-A_PRIMER_ON_PHOTOVOLTAIC_PERFORMANCE = """
+A_PRIMER_ON_PHOTOVOLTAIC_PERFORMANCE = f"""
 A key metric for evaluating the overall performance of a photovoltaic (PV)
 system is the cumulative [yellow]Energy[/yellow] produced over a time period
-(e.g., daily, monthly, or annual). In other words, energy production is an
-arbitrary aggregate of the instantaneous power estimations over a time series.
+(e.g., daily, monthly, or annually). In other words, energy production is an
+aggregate of the [italic]instantaneous[/italic] power estimations over a time series.
 
-In turn, the instantaneous (effective irradiance, and thereby) power values
-reflect the [italic]current[/italic] output of the photovoltaic (PV) system
-at each moment in time.
+Instantaneous power values reflect the [italic]current[/italic] output of the PV
+system at each moment in time, which in turn depends on the effective irradiance.
 
-How does PVGIS calculcate photovoltaic power output ?
-First, we calculcate the position of the sun in the sky relative to the
-positioning of a solar surface. Essentially this boils down to one
-trigonometric paramter : the solar incidence angle. This angle depends on the
-solar altitude and solar azimuth angles on any given moment in time combined
-with the location, the orientation and the tilt of the solar surface itself.
-Second, we ..
+[bold]How does PVGIS calculate photovoltaic power output ?[/bold]
 
-Analytically, we can break down the algorith as follows:
-Let us go through the calculation step-by-step.
+First, it calculates [italic]the position of the sun[/italic] relative to the
+solar surface over the user requested period of time. This boils down to one
+key trigonometric parameter : the [cyan]solar incidence[/cyan] angle. The
+incidence angle depends on the [cyan]solar altitude[/cyan] and
+[cyan]azimuth[/cyan] angles at any given time, combined with the
+[cyan]location[/cyan], [cyan]orientation[/cyan], and [cyan]tilt[/cyan] of the
+solar surface.
+
+Second and based on the incidence angle, it estimates the [cyan]direct[/cyan]
+and [cyan]diffuse[/cyan] [yellow]irradiance[/yellow] components.
 
 
-Hence, .. :
+### Step by Step
 
-1. Defina an arbitrary period of time
+Analytically the algorithm performs the following steps :
 
-2. Calculate the solar altitude angle series
+1. Define an arbitrary period of time
 
-> The default algoriths for solar timing, positioning and the definition of the
-incidence angle are :
+   The user selects a time period over which the energy production will be
+   evaluated.
 
-    - `solar_time_model` is set to Milne1921 (see in pvgisprototype.constants: SOLAR_TIME_ALGORITHM_DEFAULT).
-        - Calculate the apparent solar time based on the equation of time by Milne 1921
+2. Calculate the [cyan]solar altitude[/cyan] angle series
+   
+   - The solar altitude angle is the elevation of the sun above the horizon.
 
-    - `solar_position_model` is set to NOAA's equation for .. (see : SOLAR_POSITION_ALGORITHM_DEFAULT).
-    - `solar_incidence_model` is set to Iqbal (see : SolarIncidenceModel.iqbal).
+   - The default algorithm for solar time is
+     [code]solar_time_model[/code] is set to [code]{SOLAR_TIME_ALGORITHM_DEFAULT}[/code]
+     (see: [code]pvgisprototype.constants.SOLAR_TIME_ALGORITHM_DEFAULT[/code]).
+     This calculates the apparent solar time based on the Equation of Time (Milne, 1921).
 
-3. Calculate the solar azimuth angle series
+   - The default solar positioning algorithm is
+     [code]solar_position_model[/code] is set to [code]{SOLAR_POSITION_ALGORITHM_DEFAULT}[/code]
+     (see: [code]pvgisprototype.constants.SOLAR_POSITION_ALGORITHM_DEFAULT[/code]).
 
-> NOAA
+   - The default model to calculate the solar incidence angle is
+     [code]solar_incidence_model[/code] is set to [code]{SolarIncidenceModel.iqbal}[/code]
+     (see: [code]SolarIncidenceModel.iqbal[/code]).
 
-4. Derive masks of the position of the sun :
+3. Calculate the [cyan]solar azimuth[/cyan] angle series
+   
+   - The solar azimuth is the compass direction from which the sunlight is
+     coming, calculated using the NOAA solar position algorithm.
 
-  i. above the horizon and not in shade
-  ii. very low sun angles
-  iii. below the horizon
+4. Derive masks for solar position
+   
+   - Create masks for different solar positions
 
-5. Calculate the direct horizontal irradiance component for ..
+     i. Above the horizon and not in shade.
+     ii. Low sun angles (for example, near sunrise or sunset).
+     iii. Below the horizon (nighttime).
 
-6. Calculate the diffuse and reflected irradiance components for the sun above
-the horizon
+5. Calculate the direct horizontal irradiance component
+   
+   - Compute the direct irradiance component that reaches the PV surface from
+     the sun without scattering.
 
-7. Sum the individual irradiance components to derive the global inclined
-irradiance
+6. Calculate the diffuse and ground-reflected irradiance components
+   
+   - For times when the sun is above the horizon, calculate the diffuse
+     irradiance (scattered light) and reflected irradiance (from nearby
+     surfaces).
 
-8. Read time series of the ambient temperature, the wind speed and the spectral factor
+7. Sum the individual irradiance components
+   
+   - Combine the direct, diffuse, and reflected components to derive the global
+     inclined irradiance on the solar panel.
+
+8. Read time series of ambient conditions
+   
+   - Input data such as ambient temperature, wind speed, and spectral factors
+     are read from time series, which affect panel performance.
 
 9. Derive the conversion efficiency coefficients
+   
+   - Conversion efficiency is calculated based on the temperature, wind speed,
+     and other factors influencing the PV panel's ability to convert irradiance
+     into power.
 
-10. Estimate the photovoltaic power as the product of the global irradiance and
-the efficiency coefficients.
+10. Estimate the photovoltaic power output
+   
+   - Photovoltaic power is estimated as the product of the global inclined
+     irradiance and the conversion efficiency coefficients. This gives the
+     instantaneous power output, which is then integrated over time to
+     calculate the total energy produced.
 
 """
