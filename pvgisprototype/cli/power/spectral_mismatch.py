@@ -164,7 +164,8 @@ def spectral_mismatch_pandas(
         List[PhotovoltaicModuleSpectralResponsivityModel],
         typer_option_photovoltaic_module_type
     ] = [PhotovoltaicModuleSpectralResponsivityModel.cSi],
-    variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    spectrally_resolved_irradiance: Annotated[str, typer_option_data_variable] = '',
+    average_irradiance_density: Annotated[str, typer_option_data_variable] = '',
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -173,6 +174,10 @@ def spectral_mismatch_pandas(
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    limit_spectral_range: Annotated[
+            bool,
+            typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_mismatch_model = Pelland`")
+            ] = False,
     min_wavelength: Annotated[
         float, typer_option_minimum_spectral_irradiance_wavelength
     ] = MIN_WAVELENGTH,
@@ -246,13 +251,13 @@ def spectral_mismatch_pandas(
         #     .to_numpy()
         #     .astype(dtype=dtype)
         # )
-        irradiance = (
+        spectrally_resolved_irradiance = (
             select_time_series(
                 time_series=irradiance,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                variable=variable,
+                variable=spectrally_resolved_irradiance,
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
                 mask_and_scale=mask_and_scale,
@@ -261,42 +266,57 @@ def spectral_mismatch_pandas(
                 log=log,
             )
         )
-        print(
-                f"Irradiance input : {irradiance}"
+        print(f'Spectral Mismatch Model : {spectral_mismatch_model}')
+        if SpectralMismatchModel.mihaylov in spectral_mismatch_model:
+            logger.info(
+                    f'Average irradiance density :\n{average_irradiance_density}',
+                    alt=f'[bold]Average irradiance density[/bold] :\n{average_irradiance_density}'
+                    )
+            average_irradiance_density = (
+                select_time_series(
+                    time_series=irradiance,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    variable=average_irradiance_density,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=verbose,
+                    log=log,
                 )
-
-    # Check for spectra range
-    import numpy
-    # if numpy.any(numpy.logical_or(
-    #     irradiance.columns < min_wavelength, irradiance.columns > max_wavelength
-    # )):
-    if numpy.any(
-        numpy.logical_or(
-            irradiance[wavelength_column] < min_wavelength,
-            irradiance[wavelength_column] > max_wavelength,
-        )
-    ):
-        logger.info(
-                f"{check_mark} The input irradiance wavelengths are within the reference range [{min_wavelength}, {max_wavelength}]."
-                )
-    else:
-        logger.warning(
-                f"{x_mark} The input irradiance wavelengths exceed the reference range [{min_wavelength}, {max_wavelength}]. Filtering..."
-                )
-        irradiance = irradiance.sel(
-            center_wavelength=numpy.logical_and(
-                irradiance[wavelength_column] > min_wavelength,
-                irradiance[wavelength_column] < max_wavelength
             )
-        )
-    print(f'Responsivity : {responsivity}')
+
+    if limit_spectral_range:
+        import numpy
+        if numpy.any(
+            numpy.logical_or(
+                irradiance[wavelength_column] < min_wavelength,
+                irradiance[wavelength_column] > max_wavelength,
+            )
+        ):
+            logger.info(
+                    f"{check_mark} The input irradiance wavelengths are within the reference range [{min_wavelength}, {max_wavelength}]."
+                    )
+        else:
+            logger.warning(
+                    f"{x_mark} The input irradiance wavelengths exceed the reference range [{min_wavelength}, {max_wavelength}]. Filtering..."
+                    )
+            irradiance = irradiance.sel(
+                center_wavelength=numpy.logical_and(
+                    irradiance[wavelength_column] > min_wavelength,
+                    irradiance[wavelength_column] < max_wavelength
+                )
+            )
     spectral_mismatch = calculate_spectral_mismatch(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
         timestamps=timestamps,
         timezone=timezone,
-        irradiance=irradiance,
+        irradiance=spectrally_resolved_irradiance,
+        average_irradiance_density=average_irradiance_density,
         responsivity=responsivity,
         photovoltaic_module_type=photovoltaic_module_type,
         reference_spectrum=reference_spectrum,
