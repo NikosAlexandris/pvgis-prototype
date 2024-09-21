@@ -192,7 +192,7 @@ def select(
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         in_memory=in_memory,
-        variable_name_as_suffix=variable_name_as_suffix,
+        # variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
         log=log,
     )
@@ -209,7 +209,7 @@ def select(
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
         in_memory=in_memory,
-        variable_name_as_suffix=variable_name_as_suffix,
+        # variable_name_as_suffix=variable_name_as_suffix,
         verbose=verbose,
         log=log,
     )
@@ -373,18 +373,33 @@ def plot(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
+    timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(
+        now_datetime()
+    ),
+    start_time: Annotated[
+        Optional[datetime], typer_option_start_time
+    ] = None,  # Used by a callback function
+    periods: Annotated[
+        Optional[int], typer_option_periods
+    ] = None,  # Used by a callback function
+    frequency: Annotated[
+        Optional[str], typer_option_frequency
+    ] = None,  # Used by a callback function
+    end_time: Annotated[
+        Optional[datetime], typer_option_end_time
+    ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    default_dimension: Annotated[str, 'Default dimension'] = 'time',
+    ask_for_dimension: Annotated[bool, "Ask to plot a specific dimension"] = True,
+    # slice_options: Annotated[bool, "Slice data dimensions"] = False,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
-    ] = None,
-    tolerance: Annotated[
-        Optional[float], typer_option_tolerance
-    ] = 0.1,  # Customize default if needed
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
+    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, typer_option_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     output_filename: Annotated[Path, typer_option_output_filename] = None,
     variable_name_as_suffix: Annotated[
@@ -395,6 +410,7 @@ def plot(
     tufte_style: Annotated[bool, typer_option_tufte_style] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Plot selected time series"""
     data_array = select_time_series(
@@ -411,11 +427,15 @@ def plot(
         mask_and_scale=mask_and_scale,
         # in_memory=in_memory,
         verbose=verbose,
+        log=log,
     )
     try:
         plot_series(
             data_array=data_array,
             time=timestamps,
+            default_dimension=default_dimension,
+            ask_for_dimension=ask_for_dimension,
+            # slice_options=slice_options,
             figure_name=output_filename,
             # add_offset=add_offset,
             variable_name_as_suffix=variable_name_as_suffix,
