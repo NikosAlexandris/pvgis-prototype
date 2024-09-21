@@ -18,6 +18,7 @@ from pydantic import BaseModel
 from pvgisprototype.validation.pvis_data_classes import (
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
+    ArrayBackendModel,
     BaseAngleOutputUnitsModel,
     BaseCoordinatesModel,
     BaseTimeModel,
@@ -128,13 +129,13 @@ class ModelSolarTimeInputModel(
 
 
 class ModelSolarTimeTimeSeriesInputModel(
-    BaseCoordinatesModel,
+    LongitudeModel,
     BaseTimeSeriesModel,
-    EarthOrbitModel,
-    TimeOffsetModel,
-    HourOffsetModel,
     SolarTimeModelModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
     VerbosityModel,
+    LoggingModel,
 ):
     pass
 

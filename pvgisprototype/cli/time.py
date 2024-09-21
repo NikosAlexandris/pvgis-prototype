@@ -2,6 +2,12 @@
 Important sun and solar surface geometry parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
 """
 
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.log import logger
+from pandas import DatetimeIndex
+
+from pvgisprototype.api.datetime.now import now_utc_datetimezone
+from pathlib import Path
 from datetime import datetime
 from typing import Annotated, List, Optional
 from zoneinfo import ZoneInfo
@@ -28,15 +34,49 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_timezone,
 )
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
-from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.constants import (
+    ANGLE_OUTPUT_UNITS_DEFAULT,
+    ARRAY_BACKEND_DEFAULT,
+    CSV_PATH_DEFAULT,
+    DATA_TYPE_DEFAULT,
     ECCENTRICITY_CORRECTION_FACTOR,
+    FINGERPRINT_FLAG_DEFAULT,
+    INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
+    QUIET_FLAG_DEFAULT,
+    RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    ROUNDING_PLACES_DEFAULT,
     SOLAR_TIME_COLUMN_NAME,
     SOLAR_TIME_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
+    VERBOSE_LEVEL_DEFAULT,
 )
+from pvgisprototype.cli.typer.data_processing import (
+    typer_option_array_backend,
+    typer_option_dtype,
+)
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.cli.typer.output import (
+    typer_option_angle_output_units,
+    typer_option_command_metadata,
+    typer_option_csv,
+    typer_option_fingerprint,
+    typer_option_index,
+    typer_option_rounding_places,
+)
+from pvgisprototype.cli.typer.timestamps import (
+    typer_argument_timestamps,
+    typer_option_end_time,
+    typer_option_frequency,
+    typer_option_periods,
+    typer_option_random_timestamps,
+    typer_option_start_time,
+    typer_option_timezone,
+)
+
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -81,17 +121,42 @@ def offset():
 @app.command("solar", no_args_is_help=True, help="⦩ Calculate the apparent solar time")
 def solar_time(
     longitude: Annotated[float, typer_argument_longitude],
-    latitude: Annotated[float, typer_argument_latitude],
-    timestamp: Annotated[Optional[datetime], typer_argument_timestamp],
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
+        now_utc_datetimezone()
+    ),
+    start_time: Annotated[
+        Optional[datetime], typer_option_start_time
+    ] = None,  # Used by a callback function
+    periods: Annotated[
+        Optional[int], typer_option_periods
+    ] = None,  # Used by a callback function
+    frequency: Annotated[
+        Optional[str], typer_option_frequency
+    ] = None,  # Used by a callback function
+    end_time: Annotated[
+        Optional[datetime], typer_option_end_time
+    ] = None,  # Used by a callback function
     timezone: Annotated[Optional[str], typer_option_timezone] = None,
-    solar_time_model: Annotated[List[SolarTimeModel], typer_option_solar_time_model] = [
-        SolarTimeModel.skyfield
-    ],
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
-    verbose: Annotated[int, typer_option_verbose] = 0,
+    random_timestamps: Annotated[
+        bool, typer_option_random_timestamps
+    ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
+    solar_time_model: Annotated[
+        List[SolarTimeModel], typer_option_solar_time_model
+    ] = [SolarTimeModel.milne],
+    angle_output_units: Annotated[
+        str, typer_option_angle_output_units
+    ] = ANGLE_OUTPUT_UNITS_DEFAULT,
+    rounding_places: Annotated[
+        int, typer_option_rounding_places
+    ] = ROUNDING_PLACES_DEFAULT,
+    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
 ):
     """Calculate the solar time.
 
@@ -105,48 +170,59 @@ def solar_time(
     time offset from the equation of time, and the hour offset (likely a
     longitude-based correction).
     """
-    # Convert the input timestamp to UTC, for _all_ internal calculations
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamp.tz != utc_zoneinfo:
-        # Note the input timestamp and timezone
-        user_requested_timestamp = timestamp
-        user_requested_timezone = timezone
+    # Note the input timestamp and timezone
+    user_requested_timestamps = timestamps
+    user_requested_timezone = timezone  # Set to UTC by the callback functon !
+    timezone = utc_zoneinfo = ZoneInfo('UTC')
+    logger.info(
+            f"Input time zone : {timezone}",
+            alt=f"Input time zone : [code]{timezone}[/code]"
+            )
 
-        timestamp = timestamp.astimezone(utc_zoneinfo)
-        timezone = utc_zoneinfo
-        typer.echo(
-            f"The requested timestamp - zone {user_requested_timestamp} {user_requested_timezone} has been converted to {timestamp} for all internal calculations!"
+    if timestamps.tz is None:
+        timestamps = timestamps.tz_localize(utc_zoneinfo)
+        logger.info(
+            f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
         )
 
-    solar_time_model = select_models(
+    elif timestamps.tz != utc_zoneinfo:
+        timestamps = timestamps.tz_convert(utc_zoneinfo)
+        logger.info(
+            f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
+            alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
+        )
+
+    solar_time_models = select_models(
         SolarTimeModel, solar_time_model
     )  # Using a callback fails!
+
     solar_time_series = calculate_solar_time_series(
-        # longitude=longitude,
-        # latitude=latitude,
-        # timestamp=timestamp,
-        # timezone=timezone,
-        # solar_time_models=solar_time_model,  # keep the CLI simple
-        # perigee_offset=perigee_offset,
-        # eccentricity_correction_factor=eccentricity_correction_factor,
-        # verbose=verbose,
+        longitude=longitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_time_models=solar_time_models,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
     )
-    solar_time_table = Table(
-        TIME_ALGORITHM_COLUMN_NAME,
-        SOLAR_TIME_COLUMN_NAME,
-        box=box.SIMPLE_HEAD,  # UNIT_NAME,
-    )
-    for model_result in solar_time_series:
-        # typer.echo(f'Solar time: {solar_time} {units} ({timezone})')
-        model_name = model_result.get(TIME_ALGORITHM_NAME, "")
-        solar_time = model_result.get(SOLAR_TIME_NAME, "")
-        # units = model_result.get(UNIT_NAME, '')
-        solar_time_table.add_row(
-            model_name,
-            str(solar_time),
-            # str(units),
+    print(f'{solar_time_series}')
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+
+    if not quiet:
+        from pvgisprototype.cli.print import print_solar_time_series_table
+
+        print_solar_time_series_table(
+            longitude=longitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            solar_time_series=solar_time_series,
+            title="Solar Time Overview",
+            rounding_places=rounding_places,
+            index=index,
         )
-    console.print(solar_time_table)
+    if csv:
+        pass
 
 
 @app.command(
