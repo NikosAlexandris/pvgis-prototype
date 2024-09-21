@@ -3,8 +3,7 @@ The time offset based on NOAA's General Solar Position Calculations.
 """
 
 from zoneinfo import ZoneInfo
-
-import numpy as np
+import numpy
 from devtools import debug
 from pandas import DatetimeIndex
 
@@ -166,22 +165,20 @@ def calculate_time_offset_series_noaa(
     """
     # We need a timezone!
     utc_zoneinfo = ZoneInfo("UTC")
-    timezone_offset_minutes_series = 0  # in UTC the offest is 0
+    local_standard_time_meridian_minutes_series = 0  # in UTC the offest is 0
 
     if timestamps.tzinfo is None:  # set to UTC
         timestamps = timestamps.tz_localize(utc_zoneinfo)
 
-    elif timestamps.tz != utc_zoneinfo:  # convert to UTC
-        timestamps = timestamps.tz_convert(utc_zoneinfo)
+    if timestamps.tz != utc_zoneinfo:
 
         # # ------------------------------------------- Further Optimisation ?
-        # Optimisation : calculate unique offsets
         unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
         unique_offsets = {
             tz: tz.utcoffset().total_seconds() / 60 for tz in set(unique_timezones)
         }
         # Map offsets back to timestamps
-        timezone_offset_minutes_series = np.array(
+        local_standard_time_meridian_minutes_series = numpy.array(
             [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
         )
         # # ------------------------------------------- Further Optimisation ?
@@ -194,11 +191,11 @@ def calculate_time_offset_series_noaa(
     )
     time_offset_series_in_minutes = (
         longitude.as_minutes
-        # - timezone_offset_minutes_series
+        - local_standard_time_meridian_minutes_series
         + equation_of_time_series.minutes
     )
 
-    if not np.all(
+    if not numpy.all(
         (TimeOffset().min_minutes <= time_offset_series_in_minutes)
         & (time_offset_series_in_minutes <= TimeOffset().max_minutes)
     ):
