@@ -1,3 +1,4 @@
+from xarray import DataArray
 from pvgisprototype.algorithms.pelland.spectral_mismatch import calculate_spectral_mismatch_pelland
 from pvgisprototype.algorithms.mihaylov.spectral_mismatch import calculate_spectral_mismatch_factor_mihaylow
 from pvgisprototype import Latitude, Longitude, Elevation
@@ -50,7 +51,8 @@ def model_spectral_mismatch(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     responsivity: Series,
-    irradiance: DataFrame,
+    irradiance: DataFrame | DataArray,
+    average_irradiance_density: None | DataFrame | DataArray,
     # neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
     # tolerance: None | float = TOLERANCE_DEFAULT,
     # mask_and_scale: bool = False,
@@ -97,6 +99,7 @@ def model_spectral_mismatch(
 
         spectral_mismatch = calculate_spectral_mismatch_factor_mihaylow(
             irradiance=irradiance,
+            average_irradiance_density=average_irradiance_density,
             responsivity=responsivity,
             reference_spectrum=reference_spectrum,
         )
@@ -111,6 +114,7 @@ def calculate_spectral_mismatch(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     irradiance: DataFrame,
+    average_irradiance_density: DataFrame,
     # neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
     # tolerance: None | float = TOLERANCE_DEFAULT,
     # mask_and_scale: bool = False,
@@ -173,6 +177,7 @@ def calculate_spectral_mismatch(
                     responsivity=selected_responsivity,
                     # responsivity=responsivity,
                     irradiance=irradiance,
+                    average_irradiance_density=average_irradiance_density,
                     reference_spectrum=reference_spectrum,
                     # dtype=dtype,
                     # array_backend=array_backend,
