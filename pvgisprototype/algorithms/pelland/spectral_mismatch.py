@@ -3,32 +3,6 @@ from xarray import DataArray
 from pvgisprototype.log import log_function_call, logger
 
 
-# def calculate_spectral_mismatch(
-#     irradiance: DataFrame,
-#     responsivity: DataFrame,
-#     reference_spectrum: DataFrame,
-# ):
-#     """ """
-#     print(f"Irradiance : {irradiance}")
-#     print(f"Responsivity : {responsivity}")
-
-#     if irradiance.index.equals(
-#         responsivity.T.index
-#     ) and irradiance.index.equals(reference_spectrum.index):
-#         print(f"Irradiance : {irradiance}")
-#         print(f"Responsivity : {responsivity}")
-
-#         uf_reference = (
-#             responsivity.T * reference_spectrum.T
-#         ).sum() / reference_spectrum.T.sum()
-#         print(f"Useful reference spectrum fraction : {uf_reference}")
-
-#         uf_irradiance = (responsivity.T * irradiance.T).T.sum() / irradiance.sum()
-#         print(f"Useful spectrum fraction : {uf_irradiance}")
-
-#         return uf_irradiance / uf_reference
-
-
 @log_function_call
 def calculate_spectral_mismatch_pelland(
     irradiance: DataArray,
@@ -44,8 +18,6 @@ def calculate_spectral_mismatch_pelland(
 
     """
     # Verify the reference spectrum is valid (no zero or near-zero values) ?
-    print(f'Reference spectrum : {type(reference_spectrum)}')
-    print(f'Reference spectrum : {reference_spectrum}')
     # if (reference_spectrum <= 0).any():
     #     raise ValueError(
     #         "The reference spectrum contains zero or negative values, which are invalid."
@@ -63,14 +35,6 @@ def calculate_spectral_mismatch_pelland(
     logger.info(
             f'Wavelengths in `irradiance` input : {irradiance.center_wavelength.values}',
             )
-    
-    # Push me upstream !
-    if 'Center [nm]' in responsivity.coords:
-        responsivity = responsivity.rename({'Center [nm]': 'center_wavelength'})
-    else:
-        responsivity = responsivity.rename({'Wavelength': 'center_wavelength'})
-    # ------------------------------------------------------------------------
-
     logger.info(
             f'Wavelengths in `responsivity` input : {responsivity}',
             )
