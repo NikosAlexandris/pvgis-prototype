@@ -79,8 +79,8 @@ from pvgisprototype.cli.typer.output import (
     typer_option_csv,
 )
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
-from pvgisprototype.algorithms.pvis.spectral_responsivity import (
-    SPECTRAL_RESPONSIVITY_DEFAULT,
+from pvgisprototype.data.spectral_responsivity import (
+    SPECTRAL_RESPONSIVITY_DATA,
 )
 from pvgisprototype.cli.typer.output import (
     typer_option_command_metadata,
@@ -144,10 +144,9 @@ def spectral_mismatch_pandas(
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     responsivity: Annotated[
-        Series,
-        # Path | SpectralResponsivity,
+        Series | Path,  # | SpectralResponsivity,
         typer_option_spectral_responsivity_pandas,
-    ] = SPECTRAL_RESPONSIVITY_DEFAULT,  # Accept also list of float values ?
+    ] = SPECTRAL_RESPONSIVITY_DATA,  # Accept also list of float values ?
     integrate_responsivity: Annotated[
         bool,
         typer_option_integrate_spectral_responsivity,
@@ -266,8 +265,8 @@ def spectral_mismatch_pandas(
                 log=log,
             )
         )
-        print(f'Spectral Mismatch Model : {spectral_mismatch_model}')
-        if SpectralMismatchModel.mihaylov in spectral_mismatch_model:
+        if SpectralMismatchModel.mihaylov in spectral_mismatch_model or SpectralMismatchModel.pvlib in spectral_mismatch_model:
+            print(f'Spectral mismatch model : {spectral_mismatch_model}')
             logger.info(
                     f'Average irradiance density :\n{average_irradiance_density}',
                     alt=f'[bold]Average irradiance density[/bold] :\n{average_irradiance_density}'
@@ -297,16 +296,16 @@ def spectral_mismatch_pandas(
             )
         ):
             logger.info(
-                    f"{check_mark} The input irradiance wavelengths are within the reference range [{min_wavelength}, {max_wavelength}]."
-                    )
+                f"{check_mark} The input irradiance wavelengths are within the reference range [{min_wavelength}, {max_wavelength}]."
+            )
         else:
             logger.warning(
-                    f"{x_mark} The input irradiance wavelengths exceed the reference range [{min_wavelength}, {max_wavelength}]. Filtering..."
-                    )
+                f"{x_mark} The input irradiance wavelengths exceed the reference range [{min_wavelength}, {max_wavelength}]. Filtering..."
+            )
             irradiance = irradiance.sel(
                 center_wavelength=numpy.logical_and(
                     irradiance[wavelength_column] > min_wavelength,
-                    irradiance[wavelength_column] < max_wavelength
+                    irradiance[wavelength_column] < max_wavelength,
                 )
             )
     spectral_mismatch = calculate_spectral_mismatch(
@@ -326,21 +325,6 @@ def spectral_mismatch_pandas(
         log=log,
         fingerprint=fingerprint,
     )
-    # spectral_mismatch = spectral_mismatch.to_xarray()
-    # spectral_mismatch = spectral_mismatch[spectral_mismatch_model][photovoltaic_module_type][SPECTRAL_MISMATCH_NAME]
-    # spectral_mismatch = spectral_mismatch[spectral_mismatch_model][SPECTRAL_MISMATCH_NAME]
-    # print(f'Output 1 "Mismatch" : {spectral_mismatch}')
-    # print()
-
-    # print(f'Output 2 "Mismatch Model" : {spectral_mismatch_model} ')
-    # print()
-
-    # print(f'Output 3 "Mismatch Model + Content" : {spectral_mismatch[spectral_mismatch_model]}')
-    # print()
-
-    # print(f'Output 4 \n : {spectral_mismatch[spectral_mismatch_model][SPECTRAL_MISMATCH_NAME]}')
-    # print()
-
     # longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
@@ -405,7 +389,7 @@ def spectral_mismatch_pandas(
             timestamps=timestamps,
             spectral_mismatch_dictionary=spectral_mismatch.components,
             filename=csv,
-            # index=index,
+            index=index,
         )
     if statistics:
         from pvgisprototype.api.series.statistics import print_spectral_mismatch_statistics
@@ -441,8 +425,6 @@ def spectral_mismatch_pandas(
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
 
-        # print(f'Spectral Mismatch Output to plot ! : {spectral_mismatch}')
-
         uniplot_spectral_mismatch_series(
             spectral_mismatch_dictionary=spectral_mismatch.components,
             spectral_mismatch_model=spectral_mismatch_model,
@@ -450,8 +432,8 @@ def spectral_mismatch_pandas(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             # lines=True,
-            supertitle="Spectral Mismatch",
-            title="Spectral Mismatch",
+            supertitle="Spectral Mismatch Factor",
+            title="Spectral Factor",
             # label=photovoltaic_module_types,
             # extra_legend_labels=None,
             # unit='',
