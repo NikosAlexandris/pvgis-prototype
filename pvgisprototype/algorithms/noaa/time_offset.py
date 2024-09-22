@@ -198,19 +198,9 @@ def calculate_time_offset_series_noaa(
         (TimeOffset().min_minutes <= time_offset_series_in_minutes)
         & (time_offset_series_in_minutes <= TimeOffset().max_minutes)
     ):
-<<<<<<< HEAD
         index_of_out_of_range_values = np.where(
             (time_offset_series_in_minutes < TimeOffset().min_minutes)
             | (time_offset_series_in_minutes > TimeOffset().max_minutes)
-||||||| f3e97ede
-        index_of_out_of_range_values = np.where(
-            (time_offset_series_in_minutes < TimeOffset().min_radians)
-            | (time_offset_series_in_minutes > TimeOffset().max_radians)
-=======
-        index_of_out_of_range_values = numpy.where(
-            (time_offset_series_in_minutes < TimeOffset().min_radians)
-            | (time_offset_series_in_minutes > TimeOffset().max_radians)
->>>>>>> 217-gitlab-add-performance-command
         )
         out_of_range_values = time_offset_series_in_minutes[
             index_of_out_of_range_values
