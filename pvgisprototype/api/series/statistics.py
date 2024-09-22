@@ -42,7 +42,7 @@ import numpy
 # from pvgisprototype.constants import SURFACE_TILT_COLUMN_NAME
 # from pvgisprototype.constants import SURFACE_ORIENTATION_COLUMN_NAME
 import pandas
-import xarray as xr
+from xarray import DataArray
 from pandas import DatetimeIndex
 from rich.box import SIMPLE_HEAD
 from rich.console import Console
@@ -65,6 +65,14 @@ from pvgisprototype.constants import (
     SPECTRAL_FACTOR_COLUMN_NAME,
 )
 
+TIME_GROUPINGS = {
+    "Y": ("year", "Yearly means"),
+    "S": ("season", "Seasonal means"),
+    "M": ("month", "Monthly means"),
+    "W": ("1W", "Weekly means"),
+    "D": ("1D", "Daily means"),
+    "H": ("1H", "Hourly means"),
+}
 
 def calculate_sum_and_percentage(
     series,
@@ -131,36 +139,12 @@ def calculate_mean_of_series_per_time_unit(
     return pandas_series.resample(frequency).sum().mean().item()  # convert to float
 
 
-def calculate_series_statistics(
-    data_array: Union[numpy.ndarray, Dict[str, numpy.ndarray]],
-    timestamps: DatetimeIndex,
-    groupby: str | None = None,
-) -> dict:
-    """ """
-    irradiance_xarray = None  # Ugly Hack :-/
-    if isinstance(data_array, dict):
-        # First, irradiance may exist only in a dictionary !
-        irradiance_xarray = data_array.get(GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME, None)
-        if irradiance_xarray is not None:
-            irradiance_xarray = xr.DataArray(
-                irradiance_xarray,
-                coords=[("time", timestamps)],
-                name="Effective irradiance series",
-            )
-            irradiance_xarray.attrs["units"] = "W/m^2"
-            irradiance_xarray.attrs["long_name"] = "Effective Solar Irradiance"
-            irradiance_xarray.load()
-
-        # Then, the primary wanted data
-        data_array = data_array[PHOTOVOLTAIC_POWER_COLUMN_NAME]
-
-    # Regardless of whether the input data_array is an array or a dict :
-    data_xarray = xr.DataArray(
-        data_array, coords=[("time", timestamps)], name="Effective irradiance series"
-    )
-    data_xarray.attrs["units"] = "W/m^2"
-    data_xarray.attrs["long_name"] = "Photovoltaic power"
-    data_xarray.load()
+def generate_series_statistics(
+        data_xarray: DataArray,
+        groupby: str | None = None,
+        ) -> dict:
+    """
+    """
     statistics_container = {
         "basic": lambda: {
             "Start": data_xarray.time.values[0],
@@ -184,24 +168,32 @@ def calculate_series_statistics(
             "Time of Max": data_xarray.idxmax("time").values,
             "Index of Max": data_xarray.argmax().values,
         },  # if verbose > 2 else {},
-        "groupby_summary": lambda: {"Sum of Group Means": None} if groupby else {},
-        # 'Longitude of Max': data_xarray.argmax('lon').values,
-        # 'Latitude of Max': data_xarray.argmax('lat').values,
+        "coordinates": lambda: (
+            {
+                "Longitude of Max": data_xarray.argmax("lon").values,
+                "Latitude of Max": data_xarray.argmax("lat").values,
+            }
+            if "longitude" in data_xarray.dims and "latitude" in data_xarray.dims
+            else {}
+        ),
     }
     statistics = {}
-    for key, func in statistics_container.items():
+    for _, func in statistics_container.items():
         statistics.update(func())
 
-    time_groupings = {
-        "Y": ("year", "Yearly means"),
-        "S": ("season", "Seasonal means"),
-        "M": ("month", "Monthly means"),
-        "W": ("1W", "Weekly means"),
-        "D": ("1D", "Daily means"),
-        "H": ("1H", "Hourly means"),
-    }
-    if groupby in time_groupings:
-        freq, label = time_groupings[groupby]
+    return statistics
+
+
+def group_series_statistics(
+        data_xarray: DataArray | None,
+        irradiance_xarray: DataArray | None,
+        statistics: dict,
+        groupby: str | None = None,
+        ):
+    """
+    """
+    if groupby in TIME_GROUPINGS:
+        freq, label = TIME_GROUPINGS[groupby]
         if groupby in ["Y", "M", "S"]:
             statistics[label] = data_xarray.groupby(f"time.{freq}").mean().values
             if irradiance_xarray is not None:
@@ -222,6 +214,47 @@ def calculate_series_statistics(
         statistics["Sum of Group Means"] = (
             data_xarray.resample(time=groupby).mean().sum().values
         )
+
+    return statistics
+
+
+def calculate_series_statistics(
+    data_array: Union[numpy.ndarray, Dict[str, numpy.ndarray]],
+    timestamps: DatetimeIndex,
+    groupby: str | None = None,
+) -> dict:
+    """ """
+    irradiance_xarray = None  # Ugly Hack :-/
+    if isinstance(data_array, dict):
+        # First, irradiance may exist only in a dictionary !
+        irradiance_xarray = data_array.get(GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME, None)
+        if irradiance_xarray is not None:
+            irradiance_xarray = DataArray(
+                irradiance_xarray,
+                coords=[("time", timestamps)],
+                name="Effective irradiance series",
+            )
+            irradiance_xarray.attrs["units"] = "W/m^2"
+            irradiance_xarray.attrs["long_name"] = "Effective Solar Irradiance"
+            irradiance_xarray.load()
+
+        # Then, the primary wanted data
+        data_array = data_array[PHOTOVOLTAIC_POWER_COLUMN_NAME]
+
+    # Regardless of whether the input data_array is an array or a dict :
+    data_xarray = DataArray(
+        data_array, coords=[("time", timestamps)], name="Effective irradiance series"
+    )
+    data_xarray.attrs["units"] = "W/m^2"
+    data_xarray.attrs["long_name"] = "Photovoltaic power"
+    data_xarray.load()
+    statistics = generate_series_statistics(data_xarray=data_xarray, groupby=groupby)
+    statistics = group_series_statistics(
+        data_xarray=data_xarray,
+        irradiance_xarray=irradiance_xarray,
+        statistics=statistics,
+        groupby=groupby,
+    )
 
     return statistics
 
@@ -408,13 +441,14 @@ def export_statistics_to_csv(data_array, filename):
         for statistic, value in statistics.items():
             writer.writerow([statistic, value])
 
+
 def calculate_spectral_mismatch_statistics(
     spectral_mismatch: Dict,
     spectral_mismatch_model: List,
     photovoltaic_module_type: List,
     timestamps: DatetimeIndex,
     rounding_places: int = 3,
-    groupby: str = None,
+    groupby: str | None = None,
 ) -> dict:
     """
     Calculate statistics for the spectral mismatch data.
@@ -437,54 +471,46 @@ def calculate_spectral_mismatch_statistics(
     Returns
     -------
     statistics : dict
-        Dictionary with calculated statistics.
+        Dictionary with calculated statistics for each model and module type.
     """
     statistics = {}
-    
-    for module_type in photovoltaic_module_type:
-        model = spectral_mismatch_model[0]  # Assuming only one model for simplicity
-        mismatch_data = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+
+    for model in spectral_mismatch_model:
+        statistics[model.value] = {}
         
-        if mismatch_data is not None:
-            mismatch_xarray = xr.DataArray(
-                mismatch_data,
-                coords=[("time", timestamps)],
-                name=f"{module_type.value} Spectral Mismatch"
-            )
-            basic_stats = {
-                "Start": mismatch_xarray.time.values[0],
-                "End": mismatch_xarray.time.values[-1],
-                "Count": mismatch_xarray.count().values,
-                "Min": mismatch_xarray.min().values,
-                "Mean": round_float_values(mismatch_xarray.mean().values, rounding_places),
-                "Max": mismatch_xarray.max().values,
-                "Sum": mismatch_xarray.sum().values,
-            }
-            extended_stats = {
-                "Median": round_float_values(mismatch_xarray.median().values, rounding_places),
-                "Variance": round_float_values(mismatch_xarray.var().values, rounding_places),
-                "Standard deviation": round_float_values(mismatch_xarray.std().values, rounding_places),
-            }
-            time_stats = {
-                "Time of Min": mismatch_xarray.idxmin("time").values,
-                "Time of Max": mismatch_xarray.idxmax("time").values,
-            }
-            statistics[module_type.value] = {
-                "basic": basic_stats,
-                "extended": extended_stats,
-                "timestamps": time_stats,
-            }
-            time_groupings = {
-                "Y": "Yearly means",
-                "M": "Monthly means",
-                "D": "Daily means",
-            }
-            if groupby in time_groupings:
-                freq, label = groupby, time_groupings[groupby]
-                statistics[module_type.value][label] = mismatch_xarray.resample(time=freq).mean().values
-                statistics[module_type.value]["Sum of Group Means"] = statistics[module_type.value][label].sum()
+        for module_type in photovoltaic_module_type:
+            # Extract mismatch data for the model and module type
+            mismatch_data = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+            
+            if mismatch_data is not None:
+                # Create an Xarray DataArray for the mismatch data
+                mismatch_xarray = DataArray(
+                    mismatch_data,
+                    coords=[("time", timestamps)],
+                    name=f"{module_type.value} Spectral Mismatch"
+                )
+                mismatch_xarray.attrs["units"] = "W/m^2"
+                mismatch_xarray.attrs["long_name"] = f"{module_type.value} Spectral Factor"
+
+                # Generate basic and extended statistics
+                module_statistics = generate_series_statistics(
+                    data_xarray=mismatch_xarray,
+                    groupby=groupby,
+                )
+
+                # Add time-grouped statistics (e.g., yearly, monthly) if requested
+                module_statistics = group_series_statistics(
+                    data_xarray=mismatch_xarray,
+                    irradiance_xarray=None,
+                    statistics=module_statistics,
+                    groupby=groupby,
+                )
+
+                # Store the statistics for this combination of model and module type
+                statistics[model.value][module_type.value] = module_statistics
 
     return statistics
+
 
 
 def print_spectral_mismatch_statistics(
@@ -492,62 +518,120 @@ def print_spectral_mismatch_statistics(
     spectral_mismatch_model: List,
     photovoltaic_module_type: List,
     timestamps: DatetimeIndex,
-    groupby: str = None,
+    groupby: str | None = None,
     title: str = "Spectral Mismatch Statistics",
     rounding_places: int = 3,
     verbose: int = 1,
     show_footer: bool = True,
+    monthly_overview: bool = False,
 ) -> None:
     """
     Print the spectral mismatch statistics in a formatted table.
-
-    Parameters
-    ----------
-    - spectral_mismatch : Dict
-        Spectral mismatch data for different models and module types.
-    - spectral_mismatch_model : List
-        List of spectral mismatch models.
-    - photovoltaic_module_type : List
-        List of photovoltaic module types.
-    - timestamps : DatetimeIndex
-        Timestamps for the data.
-    - groupby : str
-        Time grouping for statistics, e.g., 'Y', 'M', 'D', etc.
-    - rounding_places : int
-        Decimal places for rounding.
-    - title : str
-        Title of the table.
-    - verbose : int
-        Verbosity level for output.
-    - show_footer : bool
-        Whether to show footer with summary statistics.
     """
-    table = Table(title=title, show_footer=show_footer, header_style="bold magenta")
-    
-    # Add columns to the table
-    table.add_column("Statistic", justify="right", style="cyan")
-    for module_type in photovoltaic_module_type:
-        table.add_column(f"{module_type.value}", justify="right")
 
-    # Calculate the statistics
-    statistics = calculate_spectral_mismatch_statistics(
-        spectral_mismatch, spectral_mismatch_model, photovoltaic_module_type, timestamps, rounding_places, groupby
-    )
+    rename_monthly_output_rows = {
+        "Sum of Group Means": "Yearly PV energy",
+        f"Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}": "Yearly in-plane irradiance",
+    }
 
-    # Add basic stats rows to the table
-    for stat_type in ["basic", "extended"]:
-        for stat_name in statistics[photovoltaic_module_type[0].value][stat_type]:
+    # Iterate through spectral mismatch models
+    for model in spectral_mismatch_model:
+        if model.value not in spectral_mismatch:
+            print(f"Spectral mismatch model {model.value} not found in statistics.")
+            continue
+
+        # Create a new table for this model
+        table = Table(
+            title=f"{title} ({model.value})",
+            caption="Spectral Factor Statistics",
+            show_header=True,
+            header_style="bold magenta",
+            row_styles=["none", "dim"],
+            box=SIMPLE_HEAD,
+            highlight=True,
+        )
+
+        # Add a column for each photovoltaic module type
+        table.add_column(
+            "Statistic", justify="right", style="bright_blue", no_wrap=True
+        )
+        for module_type in photovoltaic_module_type:
+            table.add_column(f"{module_type.value}",
+                             # justify="right",
+                             style="cyan")
+
+        # Calculate statistics for each module type
+        statistics = calculate_spectral_mismatch_statistics(
+            spectral_mismatch, spectral_mismatch_model, photovoltaic_module_type, timestamps, rounding_places, groupby
+        )
+
+        # Basic metadata (Start, End, Count)
+        basic_metadata = ["Start", "End", "Count"]
+        for stat_name in basic_metadata:
             row = [stat_name]
             for module_type in photovoltaic_module_type:
-                value = statistics[module_type.value][stat_type][stat_name]
-                row.append(f"{round_float_values(value, rounding_places)}")
+                try:
+                    value = statistics[model.value][module_type.value].get(stat_name, "N/A")
+                    rounded_value = f"{round_float_values(value, rounding_places)}"
+                except KeyError:
+                    rounded_value = "N/A"
+                row.append(rounded_value)
             table.add_row(*row)
 
-    # Optionally add footer if show_footer is True
-    if show_footer:
+        # Separate!
         table.add_row("", "")
-        table.add_row("Summary", "Footer with additional info")
 
-    if verbose:
-        console = Console()
-        console.print(table)
+        # Extended statistics (Min, Mean, Max, Sum, etc.)
+        extended_statistics = ["Min", "Mean", "Max", "Sum", "25th Percentile", "Median", "Mode", "Variance", "Standard deviation"]
+        for stat_name in extended_statistics:
+            row = [stat_name]
+            for module_type in photovoltaic_module_type:
+                try:
+                    value = statistics[model.value][module_type.value].get(stat_name, "N/A")
+                    rounded_value = f"{round_float_values(value, rounding_places)}"
+                except KeyError:
+                    rounded_value = "N/A"
+                row.append(rounded_value)
+            table.add_row(*row)
+
+        # Separate!
+        table.add_row("", "")
+
+        # Add index statistics (Time of Min, Index of Min, Time of Max, Index of Max)
+        index_metadata = ["Time of Min", "Index of Min", "Time of Max", "Index of Max"]
+        for stat_name in index_metadata:
+            row = [stat_name]
+            for module_type in photovoltaic_module_type:
+                try:
+                    value = statistics[model.value][module_type.value].get(stat_name, "N/A")
+                    rounded_value = f"{round_float_values(value, rounding_places)}"
+                except KeyError:
+                    rounded_value = "N/A"
+                row.append(rounded_value)
+            table.add_row(*row)
+
+        # Add a separating row after the statistics for clarity
+        table.add_row("", "")
+
+        # Groupings (Yearly, Monthly, Custom Frequency)
+        time_groupings = ["Yearly means", "Monthly means", "Weekly means", "Daily means", "Hourly means"]
+        custom_freq_label = f"{groupby} means" if groupby and groupby not in time_groupings else None
+        if custom_freq_label and custom_freq_label in statistics:
+            custom_freq_data = statistics[custom_freq_label]
+            period_count = 1
+            for val in custom_freq_data:
+                label = f"{groupby} Period {period_count}"
+                table.add_row(label, str(val))
+                period_count += 1
+            table.add_row("", "")
+
+        # Optionally add footer if show_footer is True
+        if show_footer:
+            table.add_row("", "")
+            table.add_row("Summary", "Footer with additional info")
+
+        # Print the table for this model
+        if verbose:
+            console = Console()
+            console.print(table)
+
