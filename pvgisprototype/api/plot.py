@@ -254,8 +254,8 @@ def uniplot_spectral_mismatch_series(
     photovoltaic_module_type: List,
     timestamps: DatetimeIndex,
     resample_large_series: bool = False,
-    supertitle: str = "Spectral Mismatch Series",
-    title: str = "Spectral Mismatch",
+    supertitle: str = "Spectral Mismatch Factor Series",
+    title: str = "Spectral Factor",
     terminal_width_fraction: float = 0.9,
     verbose: int = 0,
 ):
@@ -277,6 +277,7 @@ def uniplot_spectral_mismatch_series(
     labels = []
 
     for mismatch_model, result in spectral_mismatch_dictionary.items():
+        title += f" ({mismatch_model.value})"
         for module_type in result:
             spectral_mismatch_for_module = spectral_mismatch_dictionary[mismatch_model][
                 module_type
@@ -299,17 +300,17 @@ def uniplot_spectral_mismatch_series(
                 label += f" {mismatch_model.name}"
             labels.append(label)
 
-    uniplot_data_array_series(
-        data_array=data_arrays[0],
-        list_extra_data_arrays=data_arrays[1:],
-        timestamps=timestamps,
-        resample_large_series=resample_large_series,
-        lines=True,
-        supertitle=supertitle,
-        title=title,
-        label=labels[0],
-        extra_legend_labels=labels[1:],
-        unit="",
-        terminal_width_fraction=terminal_width_fraction,
-        verbose=verbose,
-    )
+        uniplot_data_array_series(
+            data_array=data_arrays[0],
+            list_extra_data_arrays=data_arrays[1:],
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
+            lines=True,
+            supertitle=supertitle,
+            title=title,
+            label=labels[0],
+            extra_legend_labels=labels[1:],
+            unit="",
+            terminal_width_fraction=terminal_width_fraction,
+            verbose=verbose,
+        )
