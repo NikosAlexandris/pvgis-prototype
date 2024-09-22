@@ -45,12 +45,6 @@ def calculate_spectral_mismatch_factor_mihaylow(
 
     # Responsivity -----------------------------------------------------------
 
-    # Push me upstream ? -----------------------------------------------------
-    if 'Center [nm]' in responsivity.coords:
-        responsivity = responsivity.rename({'Center [nm]': 'wavelength'})
-    else:
-        responsivity = responsivity.rename({'Wavelength': 'wavelength'})
-
     logger.info(
         f'Spectral Responsivity input :\n{responsivity}',
         alt=f'[green]Spectral Responsivity[/green] input :\n{responsivity}',
@@ -99,6 +93,7 @@ def calculate_spectral_mismatch_factor_mihaylow(
             )
 
     # Useful Reference Spectrum
+
     useful_reference_spectrum = simpson(
         y=current_density_of_reference_spectrum['global'],
         x=reference_spectrum.wavelength
@@ -116,16 +111,20 @@ def calculate_spectral_mismatch_factor_mihaylow(
     right_value = 0  # Scalar value for the right boundary
     
     ## Interpolate Observed Irradiance to Reference Spectrum
+    logger.info(
+            f"Irradiance data to interpolate :\n{average_irradiance_density}",
+            alt=f"[yellow]Irradiance[/yellow] data to [bold]interpolate[/bold] :\n{average_irradiance_density}",
+            )
 
     interpolated_observed_irradiance = apply_ufunc(
         interp,
-        reference_spectrum.wavelength,            # The target wavelength grid
-        average_irradiance_density.center_wavelength,            # The current wavelength grid (Kato bands)
-        average_irradiance_density,                  # The irradiance data to be interpolated (2D array: time × Kato bands)
-        vectorize=True,                   # Allow vectorization over time dimension
+        reference_spectrum.wavelength,            # target wavelength grid
+        average_irradiance_density.center_wavelength,  # current wavelength grid (Kato bands)
+        average_irradiance_density,  # irradiance data to be interpolated (2D array: time × Kato bands)
+        vectorize=True,  # Allow vectorization over time dimension
         input_core_dims=[['wavelength'], ['center_wavelength'], ['center_wavelength']],
         output_core_dims=[['wavelength']],
-        dask="allowed",                   # Parallelize with Dask if available
+        dask="allowed",  # Parallelize with Dask if available
         kwargs={"left": left_value, "right": right_value}
     ).fillna(0.0)
     # interpolated_observed_irradiance = interpolated_observed_irradiance.where(
@@ -157,6 +156,7 @@ def calculate_spectral_mismatch_factor_mihaylow(
     # total_observed_interpolated_observed_irradiance = total_observed_interpolated_observed_irradiance.where(isfinite(total_observed_interpolated_observed_irradiance), 0.0)
 
     # Does length of x match the second dimension of y ?
+
     if reference_spectrum.wavelength.shape[0] != interpolated_observed_irradiance.shape[1]:
         raise ValueError("Wavelength dimension does not match the interpolated irradiance data shape.")
 
@@ -166,6 +166,7 @@ def calculate_spectral_mismatch_factor_mihaylow(
             )
 
     # Current Density of Observed Irradiance
+
     current_density_of_observed_interpolated_observed_irradiance = interpolated_observed_irradiance * reference_responsivity
     logger.info(
             f"Current density of Observed Irradiance :\n{current_density_of_reference_spectrum}",
@@ -182,6 +183,7 @@ def calculate_spectral_mismatch_factor_mihaylow(
             )
 
     # Spectral Mismatch Factor
+
     a = useful_observed_irradiance / useful_reference_spectrum
     # epsilon = 1e-10  # Small constant to avoid division by zero
     # b = total_reference_energy / (total_observed_interpolated_observed_irradiance + epsilon)
