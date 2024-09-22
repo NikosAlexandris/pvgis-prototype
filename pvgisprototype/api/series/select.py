@@ -113,9 +113,6 @@ def select_time_series(
         verbose=verbose,
         # log=log,
     )
-    logger.info(
-            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
-            )
     logger.info(f'Selected time series : {location_time_series}')
     # ------------------------------------------------------------------------
     if (start_time or end_time) and not remap_to_month_start:
@@ -138,10 +135,6 @@ def select_time_series(
         except Exception:
             logger.exception(
                 f"No data found for the given period {start_time} and {end_time}."
-            )
-
-    logger.info(
-            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
             )
 
     if remap_to_month_start:
@@ -167,10 +160,6 @@ def select_time_series(
             logger.error(error_message)
             raise ValueError(error_message)
 
-    logger.info(
-            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
-            )
-
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
             start_time = end_time = timestamps[0]
@@ -185,10 +174,6 @@ def select_time_series(
         except KeyError:
             logger.exception(
                 f"No data found for one or more of the given {timestamps}."
-            )
-
-    logger.info(
-            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
             )
 
     if location_time_series.size == 1:
