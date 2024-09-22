@@ -120,7 +120,7 @@ def select_time_series(
         verbose=verbose,
         # log=log,
     )
-
+    logger.info(f'Selected time series : {location_time_series}')
     # ------------------------------------------------------------------------
     if (start_time or end_time) and not remap_to_month_start:
         timestamps = None  # we don't need a timestamp anymore!
@@ -141,11 +141,9 @@ def select_time_series(
             )
         except Exception:
             logger.exception(
-                f"No data found for the given period {start_time} and {end_time}.",
-                alt=f"[red]No data found for the given period {start_time} and {end_time}.[/red]"
+                f"No data found for the given period {start_time} and {end_time}."
             )
 
-    # ------------------------------------------------------------ Ugly Hack !
     if remap_to_month_start:
         logger.info(
                 f"Remapping all timestaps for {time_series.name} to the reference year 2013",
@@ -173,7 +171,6 @@ def select_time_series(
             error_message = "Remapped timestamps are empty, cannot proceed with date range creation."
             logger.error(error_message)
             raise ValueError(error_message)
-    # Ugly Hack --------------------------------------------------------------
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
@@ -190,8 +187,7 @@ def select_time_series(
                     )
         except KeyError:
             logger.exception(
-                f"No data found for one or more of the given {timestamps}.",
-                alt=f"[red]No data found for one or more of the given [blue]{timestamps}[/blue].[/red]"
+                f"No data found for one or more of the given {timestamps}."
             )
 
     if location_time_series.size == 1:
