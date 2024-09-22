@@ -166,7 +166,6 @@ def calculate_time_offset_series_noaa(
     # We need a timezone!
     utc_zoneinfo = ZoneInfo("UTC")
     local_standard_time_meridian_minutes_series = 0  # in UTC the offest is 0
-
     if timestamps.tzinfo is None:  # set to UTC
         timestamps = timestamps.tz_localize(utc_zoneinfo)
 
