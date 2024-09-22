@@ -9,7 +9,7 @@ spectral_mismatch_model_typer_help = "Spectral mismatch model"
 
 typer_option_spectral_mismatch_model = typer.Option(
     help=spectral_mismatch_model_typer_help,
-    # is_eager=True,
+    is_eager=True,
     show_default=True,
     show_choices=True,
     case_sensitive=False,
