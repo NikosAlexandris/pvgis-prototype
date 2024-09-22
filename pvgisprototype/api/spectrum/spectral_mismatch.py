@@ -1,3 +1,4 @@
+from xarray import DataArray
 from pvgisprototype.algorithms.pelland.spectral_mismatch import calculate_spectral_mismatch_pelland
 from pvgisprototype.algorithms.mihaylov.spectral_mismatch import calculate_spectral_mismatch_factor_mihaylow
 from pvgisprototype import Latitude, Longitude, Elevation
@@ -50,7 +51,8 @@ def model_spectral_mismatch(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     responsivity: Series,
-    irradiance: DataFrame,
+    irradiance: DataFrame | DataArray,
+    average_irradiance_density: None | DataFrame | DataArray,
     # neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
     # tolerance: None | float = TOLERANCE_DEFAULT,
     # mask_and_scale: bool = False,
@@ -79,11 +81,18 @@ def model_spectral_mismatch(
 
     if spectral_mismatch_model.value == SpectralMismatchModel.pvlib:
 
-        spectral_mismatch = calc_spectral_mismatch_field(
-            sr=responsivity.T,  # for one PV module technology
-            e_sun=irradiance,
-            e_ref=reference_spectrum,
-        ).to_numpy()  # Very Important !
+        pass
+        # average_irradiance_density_without_geographic_coordinates = (
+        #     average_irradiance_density.drop_vars(
+        #         ["longitude", "latitude"], errors="ignore"
+        #     )
+        # )
+
+        # spectral_mismatch = calc_spectral_mismatch_field(
+        #     sr=responsivity.to_dataframe().T,  #T,  # for one PV module technology
+        #     e_sun=average_irradiance_density_without_geographic_coordinates.to_dataframe().T,
+        #     e_ref=reference_spectrum,
+        # ).to_numpy()  # Very Important !
 
     if spectral_mismatch_model.value == SpectralMismatchModel.pelland:
 
@@ -97,6 +106,7 @@ def model_spectral_mismatch(
 
         spectral_mismatch = calculate_spectral_mismatch_factor_mihaylow(
             irradiance=irradiance,
+            average_irradiance_density=average_irradiance_density,
             responsivity=responsivity,
             reference_spectrum=reference_spectrum,
         )
@@ -111,6 +121,7 @@ def calculate_spectral_mismatch(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     irradiance: DataFrame,
+    average_irradiance_density: DataFrame,
     # neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
     # tolerance: None | float = TOLERANCE_DEFAULT,
     # mask_and_scale: bool = False,
@@ -143,26 +154,14 @@ def calculate_spectral_mismatch(
     photovoltaic_module_types = select_models(
         PhotovoltaicModuleSpectralResponsivityModel, photovoltaic_module_type
         )# Using a callback fails!
-    # print('Here I Am!')
     for spectral_mismatch_model in spectral_mismatch_models:
         if (
             spectral_mismatch_model != SpectralMismatchModel.all
         ):  # ignore 'all' in the enumeration
 
-            model_results = {}  # To store results for the current mismatch model
+            model_results = {}  # store model output
 
             for module_type in photovoltaic_module_types:
-
-                # # Ugly Hack --------------------------------------------------
-                # module_name = module_type.value
-                # if module_name in responsivity:
-                #     selected_responsivity = responsivity.sel(index=module_name)
-                # elif module_name in responsivity.coords['index'].values:
-                #     selected_responsivity = responsivity[module_name]
-                # else:
-                #     raise KeyError(f"{module_name} not found in responsivity data.")
-                # # Ugly Hack --------------------------------------------------
-
                 selected_responsivity = responsivity[module_type.value]
                 spectral_mismatch_series = model_spectral_mismatch(
                     # longitude=longitude,
@@ -173,6 +172,7 @@ def calculate_spectral_mismatch(
                     responsivity=selected_responsivity,
                     # responsivity=responsivity,
                     irradiance=irradiance,
+                    average_irradiance_density=average_irradiance_density,
                     reference_spectrum=reference_spectrum,
                     # dtype=dtype,
                     # array_backend=array_backend,
@@ -211,19 +211,17 @@ def calculate_spectral_mismatch(
                     components.update(component())
 
                 model_results[module_type] = components
-
-                # Add the results for the current mismatch model to the final results
                 results[spectral_mismatch_model] = model_results
                 # results = results | spectral_mismatch_model_overview
     
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    log_data_fingerprint(
-        data=spectral_mismatch_series,
-        log_level=log,
-        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    )
+    # log_data_fingerprint(
+    #     data=spectral_mismatch_series,
+    #     log_level=log,
+    #     hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    # )
     return SpectralFactorSeries(
             # value=spectral_mismatch_series,
             components=results,
