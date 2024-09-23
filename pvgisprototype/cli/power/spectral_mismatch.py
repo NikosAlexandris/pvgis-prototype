@@ -72,8 +72,6 @@ from pvgisprototype.cli.typer.spectral_responsivity import (
 )
 from pvgisprototype.cli.typer.spectral_mismatch import typer_option_spectral_mismatch_model
 from pvgisprototype.cli.typer.spectrum import typer_option_reference_spectrum, typer_option_integrate_reference_spectrum
-from pvgisprototype.api.spectrum.constants import SPECTRAL_MISMATCH_NAME
-from pvgisprototype.algorithms.pvis.am15g_iec60904_3_ed4 import AM15G_IEC60904_3_ED4
 from pvgisprototype import SpectralResponsivity, SolarIrradianceSpectrum
 from pvgisprototype.cli.typer.output import (
     typer_option_csv,
