@@ -527,7 +527,7 @@ async def process_optimise_surface_position(
                 timezone=timezone_to_be_converted,  # type: ignore
                 global_horizontal_irradiance = Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 direct_horizontal_irradiance = Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
+                #spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
                 temperature_series = Path("era5_t2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
                 wind_speed_series = Path("era5_ws2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
                 linke_turbidity_factor_series = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
@@ -548,9 +548,7 @@ async def process_optimise_surface_position(
                 max_surface_tilt=SurfaceTilt().max_radians,
                 global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                timestamps=timestamps,
-                timezone=timezone,  # type: ignore
-                spectral_factor_series=spectral_factor_series,
+                #spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
                 timestamps=converted_timestamps,
                 timezone=timezone_to_be_converted,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -573,9 +571,7 @@ async def process_optimise_surface_position(
                 max_surface_tilt=SurfaceTilt().max_radians,
                 global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
                 direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                timestamps=timestamps,
-                timezone=timezone,  # type: ignore
-                spectral_factor_series=spectral_factor_series,
+                #spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
                 timestamps=converted_timestamps,
                 timezone=timezone_to_be_converted,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
