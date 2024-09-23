@@ -93,14 +93,21 @@ def select_time_series(
     #     longitude = longitude % 360
     # warn_for_negative_longitude(longitude)
 
-    logger.info(f"Dataset : {time_series.name}")
-    logger.info(f"Path to : {time_series.parent.absolute()}")
+    logger.info(
+            f"Data file : {time_series.name}",
+            alt=f"Data file : [code]{time_series.name}[/code]"
+            )
+    logger.info(
+            f"Path to : {time_series.parent.absolute()}",
+            alt=f"Path to : [code]{time_series.parent.absolute()}[/code]"
+            )
     scale_factor, add_offset = get_scale_and_offset(time_series)
     logger.info(f"Scale factor : {scale_factor}, Offset : {add_offset}")
 
     if longitude and latitude:
-        coordinates = f"Coordinates : {longitude}, {latitude}"
-        logger.info(coordinates)
+        coordinates = f"Requested location coordinates : {longitude}, {latitude}"
+        coordinates_alternative = f"[bold]Requested[/bold] location coordinates : {longitude}, {latitude}"
+        logger.info(coordinates, alt=coordinates_alternative)
 
     location_time_series = select_location_time_series(
         time_series=time_series,
@@ -113,9 +120,6 @@ def select_time_series(
         verbose=verbose,
         # log=log,
     )
-    logger.info(
-            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
-            )
     logger.info(f'Selected time series : {location_time_series}')
     # ------------------------------------------------------------------------
     if (start_time or end_time) and not remap_to_month_start:
@@ -140,11 +144,11 @@ def select_time_series(
                 f"No data found for the given period {start_time} and {end_time}."
             )
 
-    logger.info(
-            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
-            )
-
     if remap_to_month_start:
+        logger.info(
+                f"Remapping all timestaps for {time_series.name} to the reference year 2013",
+                alt=f"[bold]Remapping[/bold] all timestaps for {time_series.name} to the reference year 2013"
+                )
         remapped_timestamps = timestamps.map(lambda ts: remap_to_2013(ts))
         if not remapped_timestamps.empty:
             from pandas import date_range
@@ -160,16 +164,13 @@ def select_time_series(
                 )
             except Exception:
                 logger.exception(
-                    f"No data found for the given 'month start' timestamps {month_start_timestamps}."
+                    f"No data found for the given 'month start' timestamps {month_start_timestamps}.",
+                    alt=f"[red]No data found for the given 'month start' timestamps {month_start_timestamps}[/red]."
                 )
         else:
             error_message = "Remapped timestamps are empty, cannot proceed with date range creation."
             logger.error(error_message)
             raise ValueError(error_message)
-
-    logger.info(
-            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
-            )
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
@@ -180,15 +181,13 @@ def select_time_series(
                 time=timestamps, method=neighbor_lookup,
                 # tolerance=time_tolerance,
             )
-            logger.info(f'Selected time series : {location_time_series}')
-            logger.info(f'Selected time series mean : {numpy.nanmean(location_time_series)}')
+            logger.info(
+                    f'Selected timestamps from [brown]location[/brown] time series : {location_time_series}',
+                    alt=f'[bold]Selected[/bold] [blue]timestamps[/blue] from [brown]location[/brown] time series : {location_time_series}'
+                    )
         except KeyError:
             logger.exception(
                 f"No data found for one or more of the given {timestamps}."
-            )
-
-    logger.info(
-            f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
             )
 
     if location_time_series.size == 1:
