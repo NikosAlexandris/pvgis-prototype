@@ -9,7 +9,6 @@ from pvgisprototype.cli.performance.spectral import spectral_photovoltaic_perfor
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_introduction,
     rich_help_panel_performance,
-    rich_help_panel_performance_toolbox,
 )
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import (
@@ -27,7 +26,7 @@ app = typer.Typer(
     add_help_option=True,
     rich_markup_mode="rich",
     # help=f":electric_plug: Estimate the photovoltaic power or aggregated energy production of a PV system over a time series based on solar irradiance and ambient temperature [bold green]Prototype[/bold green]",
-    help=":electric_plug: Estimate the performance of a photovoltaic system over a time series",
+    help=":electric_plug: Analyse the performance of a photovoltaic system over a time series",
 )
 app.command(
     name="introduction",

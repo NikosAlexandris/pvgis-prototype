@@ -23,14 +23,15 @@ def parse_reference_spectrum(reference_spectrum: str) -> Series:
         isinstance(reference_spectrum, str)
         and Path(  reference_spectrum).exists()
     ):
+        logger.info(
+                f":information: Reading user-defined reference spectrum {reference_spectrum}!",
+                alt=f":information: [bold]Reading user-defined [magenta]reference spectrum ![/magenta bold]"
+        )
         reference_spectrum = DataFrame(read_csv(Path(reference_spectrum), index_col=0))
         reference_spectrum = reference_spectrum.T
         reference_spectrum.index = to_numeric(reference_spectrum.index, errors='coerce')
         reference_spectrum = reference_spectrum.dropna(axis=0).astype(float)
         reference_spectrum = reference_spectrum.squeeze()
-
-    # print(f'Reference Spectrum {type(reference_spectrum)}')
-    # print(f'Reference Spectrum {reference_spectrum}')
 
     return reference_spectrum
 
@@ -46,9 +47,9 @@ def callback_reference_spectrum(
     Adjust the Kato bands according to the wavelength range
     """
     if reference_spectrum is None:
-        logger.info(
-                f":information: No user-requested reference spectrum !",
-                alt=f":information: [red bold]No user-requested reference spectrum ![/red bold]"
+        logger.warning(
+                f"No user-requested reference spectrum ! Using the AM 1.5G standard solar spectrum",
+                alt=f"[bold][red]No user-requested reference spectrum ![/red] Using the AM 1.5G standard solar spectrum[/bold]",
         )
         from pvlib.spectrum import get_reference_spectra
         # reference_spectrum = DataFrame(get_reference_spectra()['global']).T
@@ -63,6 +64,10 @@ def callback_reference_spectrum(
             min_wavelength=min_wavelength,
             max_wavelength=max_wavelength,
         )
+        reference_spectrum.attrs['long_name'] = 'Global Reference Spectrum'
+        reference_spectrum.attrs['units'] = 'W/m^2'
+        reference_spectrum.attrs['description'] = 'Standard AM1.5G solar spectrum used for photovoltaic performance analysis.'
+        reference_spectrum.attrs['source'] = 'PVGIS data processing team, based on standardized spectra.'
 
         # How to check if not banded ?
 
