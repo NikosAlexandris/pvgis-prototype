@@ -1,9 +1,8 @@
 from pathlib import Path
 
-import xarray
 from pvgisprototype.log import logger
 from typing import List
-from xarray import Dataset, open_dataset, concat, merge
+from xarray import Dataset, open_dataset, merge
 
 
 def load_datasets(file_paths: List[Path]) -> List[Dataset]:
@@ -14,7 +13,7 @@ def load_datasets(file_paths: List[Path]) -> List[Dataset]:
     return datasets
 
 
-def concatenate_datasets_by_spatial_dimensions(
+def merge_datasets_by_spatial_dimensions(
     datasets: List[Dataset],
     longitude_dimension: str = "longitude",
     latitude_dimension: str = "latitude",
@@ -22,22 +21,22 @@ def concatenate_datasets_by_spatial_dimensions(
 ):
     return merge(datasets)
 
-def save_concatenated_dataset(
-    concatenated_dataset: Dataset,
+def save_merged_dataset(
+    merged_dataset: Dataset,
     output_file: Path,
     output_filename_prefix: str = "",
     output_filename_suffix: str = "concatenated",
 ):
-    """Save concatenated dataset to a NetCDF file."""
+    """Save merged dataset to a NetCDF file."""
     output_file = (
         output_file.parent
         / f"{output_filename_prefix}{output_file.stem}_{output_filename_suffix}{output_file.suffix}"
     )
-    concatenated_dataset.to_netcdf(output_file)
+    merged_dataset.to_netcdf(output_file)
     logger.info(f"Dataset saved to {output_file}")
 
 
-def concatenate_datasets(
+def merge_datasets(
     file_paths: List[Path],
     output_file: Path,
     output_filename_prefix: str = "",
@@ -45,9 +44,9 @@ def concatenate_datasets(
 ):
     """Load, concatenate, and save datasets."""
     datasets = load_datasets(file_paths)
-    concatenated_dataset = concatenate_datasets_by_spatial_dimensions(datasets)
-    save_concatenated_dataset(
-        concatenated_dataset=concatenated_dataset,
+    merged_dataset = merge_datasets_by_spatial_dimensions(datasets)
+    save_merged_dataset(
+        merged_dataset=merged_dataset,
         output_file=output_file,
         output_filename_prefix=output_filename_prefix,
         output_filename_suffix=output_filename_suffix,
@@ -55,4 +54,4 @@ def concatenate_datasets(
 
 
 if __name__ == "__main__":
-    concatenate_datasets(input_files, output_file)
+    merge_datasets(input_files, output_file)
