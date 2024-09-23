@@ -33,6 +33,9 @@ def get_coordinates(data_array: xr.DataArray) -> tuple:
 def plot_series(
     data_array,
     time: DatetimeIndex,
+    default_dimension='time',
+    ask_for_dimension=True,
+    # slice_options=None,
     figure_name: str = "series_plot",
     file_extension: str = "png",
     add_offset: bool = False,
@@ -43,6 +46,8 @@ def plot_series(
     resample_large_series: bool = False,
     fingerprint: bool = False,
 ):
+
+
     """
     Plot series over a location
     """
@@ -60,146 +65,214 @@ def plot_series(
 
     # Plot data
     if resample_large_series:
+        logger.info(
+                f"Request for `--resample-large-series`",
+                alt=f"Request for `--resample-large-series`"
+                )
         data_array = data_array.resample(time="1D").mean()
-    data_array.plot(
-        ax=ax, alpha=0.5, color="black", linewidth=1, marker="o", markersize=3, zorder=1
-    )
+        logger.info(
+                f"Resampled data array : {data_array}",
+                alt=f"Resampled data array : {data_array}"
+                )
+    dimensions = list(data_array.dims)
+    num_dimensions = len(dimensions)
 
-    # Remove unwanted spines
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
+    if num_dimensions == 1:
+        data_array.plot(
+            ax=ax,
+            alpha=0.5,
+            color="black",
+            linewidth=1,
+            marker="o",
+            markersize=3,
+            zorder=1,
+        )
 
-    # Remove x-axis label
-    plt.xlabel("")
+        # Remove unwanted spines
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
 
-    # Set title with fallback for missing 'long_name'
-    supertitle = getattr(data_array, "long_name", None)
-    fig.suptitle(
-        supertitle,
-        fontsize="xx-large",
-        ha="right",
-        va="top",
-        x=0.9,
-        y=0.95,
-        # rotation=270,
-    )
-    coordinate_x = round(float(data_array[x]), 3)
-    coordinate_y = round(float(data_array[y]), 3)
-    title = f"({data_array[x].name}, {data_array[y].name}) "
-    title += f"{coordinate_x}, {coordinate_y}"
-    ax.set_title(
-        title,
-        fontsize="xx-large",
-        ha="left",
-        va="top",
-        x=0.7,
-        y=0.95,
-        # rotation=270,
-    )
-    # supertitle += f'\n{title}'
+        # Remove x-axis label
+        plt.xlabel("")
 
-    # Format tick labels
-    ax.tick_params(axis="both", which="major", labelsize=14, direction="in")
-    ax.ticklabel_format(
-        axis="y",
-        style="scientific",
-        # scilimits=(5, 5),
-        useOffset=None,
-        useLocale=None,
-        useMathText=None,
-    )
+        # Set title with fallback for missing 'long_name'
+        supertitle = getattr(data_array, "long_name", None)
+        fig.suptitle(
+            supertitle,
+            fontsize="xx-large",
+            ha="right",
+            va="top",
+            x=0.9,
+            y=0.95,
+            # rotation=270,
+        )
+        coordinate_x = round(float(data_array[x]), 3)
+        coordinate_y = round(float(data_array[y]), 3)
+        title = f"({data_array[x].name}, {data_array[y].name}) "
+        title += f"{coordinate_x}, {coordinate_y}"
+        ax.set_title(
+            title,
+            fontsize="xx-large",
+            ha="left",
+            va="top",
+            x=0.7,
+            y=0.95,
+            # rotation=270,
+        )
+        # supertitle += f'\n{title}'
 
-    if tufte_style:
-        # First, get minimum and maximum values
-        minimum_value = float(data_array.min())
-        minimum_value = np.fix(minimum_value)  # if close to 0
-        maximum_value = float(data_array.max())
+        # Format tick labels
+        ax.tick_params(axis="both", which="major", labelsize=14, direction="in")
+        ax.ticklabel_format(
+            axis="y",
+            style="scientific",
+            # scilimits=(5, 5),
+            useOffset=None,
+            useLocale=None,
+            useMathText=None,
+        )
 
-        # X limits
-        x_limits = ax.get_xlim()
-        ax.set_xlim(x_limits[0], x_limits[1])
+        if tufte_style:
+            # First, get minimum and maximum values
+            minimum_value = float(data_array.min())
+            minimum_value = np.fix(minimum_value)  # if close to 0
+            maximum_value = float(data_array.max())
 
-        # X spine
-        ax.spines["bottom"].set_linewidth(0.5)
-        # Convert datetime to numerical representation
-        minimum_timestamp = mdates.date2num(data_array.time.values[0])
-        maximum_timestamp = mdates.date2num(data_array.time.values[-1])
-        ax.spines["bottom"].set_bounds(minimum_timestamp, maximum_timestamp)
+            # X limits
+            x_limits = ax.get_xlim()
+            ax.set_xlim(x_limits[0], x_limits[1])
 
-        # Y spine
-        ax.spines["left"].set_linewidth(0.5)
-        ax.spines["left"].set_bounds(minimum_value, maximum_value)
+            # X spine
+            ax.spines["bottom"].set_linewidth(0.5)
+            # Convert datetime to numerical representation
+            minimum_timestamp = mdates.date2num(data_array.time.values[0])
+            maximum_timestamp = mdates.date2num(data_array.time.values[-1])
+            ax.spines["bottom"].set_bounds(minimum_timestamp, maximum_timestamp)
 
-        # Only show ticks on bottom and left frame
-        ax.get_xaxis().tick_bottom()
-        ax.get_yaxis().tick_left()
+            # Y spine
+            ax.spines["left"].set_linewidth(0.5)
+            ax.spines["left"].set_bounds(minimum_value, maximum_value)
 
-        # Calculate tick positions
-        # -----------------------------------------------------------
-        # # Set the y-ticks to align with the minimum and maximum values
-        # ax.set_yticks([minimum_value, maximum_value])
-        # # Add an extra tick for the maximum value
-        # ax.set_yticks(ax.get_yticks().tolist() + [maximum_value])
-        # -----------------------------------------------------------
-        num_ticks = 5  # Adjust the number of ticks as desired
-        tick_locations = np.linspace(minimum_value, maximum_value, num_ticks)
+            # Only show ticks on bottom and left frame
+            ax.get_xaxis().tick_bottom()
+            ax.get_yaxis().tick_left()
 
-        # Align y-ticks with tick positions
-        ax.set_yticks(tick_locations)
+            # Calculate tick positions
+            # -----------------------------------------------------------
+            # # Set the y-ticks to align with the minimum and maximum values
+            # ax.set_yticks([minimum_value, maximum_value])
+            # # Add an extra tick for the maximum value
+            # ax.set_yticks(ax.get_yticks().tolist() + [maximum_value])
+            # -----------------------------------------------------------
+            num_ticks = 5  # Adjust the number of ticks as desired
+            tick_locations = np.linspace(minimum_value, maximum_value, num_ticks)
 
-        # Set axis labels
-        # ax.set_xlabel(data_array['time'].name, fontsize=16)
-        # ax.set_ylabel(data_array[y].units, fontsize=18)
+            # Align y-ticks with tick positions
+            ax.set_yticks(tick_locations)
 
-        # Do not plot the 'normal' title
-        fig.suptitle('')
-        plt.title('')
+            # Set axis labels
+            # ax.set_xlabel(data_array['time'].name, fontsize=16)
+            # ax.set_ylabel(data_array[y].units, fontsize=18)
 
-        # Plot title on the side
-        if getattr(data_array, "long_name", None):
-            # supertitle = f'{data_array.long_name}'
-            # supertitle += f'\n{title}'
+            # Do not plot the 'normal' title
+            fig.suptitle('')
+            plt.title('')
 
-            # Adjust the positioning slightly to the right of the plot
-            right_margin_offset = 0.02  # Adjust as needed based on figure size
-            text_x_position = (
-                1 + right_margin_offset
-            )  # 1 corresponds to the far right of the plot
-            text_background_box = dict(
-                facecolor="white", alpha=0.5, edgecolor="none", boxstyle="round,pad=0.5"
-            )
-            # supertitle_right = ax.text(
-            #     text_x_position,  # maximum_timestamp,
-            #     1,  # maximum_value,
-            #     f"{data_array.long_name}",
-            #     fontsize="x-large",
-            #     bbox=text_background_box,
-            #     va="top",
-            #     ha="right",
-            #     transform=ax.transAxes,  # ensure positioning is relative to axes size
-            # )
-            # supertitle_right_bbox = supertitle_right.get_window_extent()
-            # supertitle_right_height = supertitle_right_bbox.height
-            # semi-transparent background box for legibility ?
-            ax.text(
-                text_x_position,  # maximum_timestamp,
-                1,  # supertitle_right_bbox.y0 - supertitle_right_height,
-                f"{title}",
-                fontsize="large",
-                bbox=text_background_box,
-                va="top",
-                ha="right",
-                transform=ax.transAxes,  # ensure positioning is relative to axes size
-            )
+            # Plot title on the side
+            if getattr(data_array, "long_name", None):
+                # supertitle = f'{data_array.long_name}'
+                # supertitle += f'\n{title}'
+
+                # Adjust the positioning slightly to the right of the plot
+                right_margin_offset = 0.02  # Adjust as needed based on figure size
+                text_x_position = (
+                    1 + right_margin_offset
+                )  # 1 corresponds to the far right of the plot
+                text_background_box = dict(
+                    facecolor="white", alpha=0.5, edgecolor="none", boxstyle="round,pad=0.5"
+                )
+                # supertitle_right = ax.text(
+                #     text_x_position,  # maximum_timestamp,
+                #     1,  # maximum_value,
+                #     f"{data_array.long_name}",
+                #     fontsize="x-large",
+                #     bbox=text_background_box,
+                #     va="top",
+                #     ha="right",
+                #     transform=ax.transAxes,  # ensure positioning is relative to axes size
+                # )
+                # supertitle_right_bbox = supertitle_right.get_window_extent()
+                # supertitle_right_height = supertitle_right_bbox.height
+                # semi-transparent background box for legibility ?
+                ax.text(
+                    text_x_position,  # maximum_timestamp,
+                    1,  # supertitle_right_bbox.y0 - supertitle_right_height,
+                    f"{title}",
+                    fontsize="large",
+                    bbox=text_background_box,
+                    va="top",
+                    ha="right",
+                    transform=ax.transAxes,  # ensure positioning is relative to axes size
+                )
+            else:
+                # plt.suptitle(f'{data_array.name}')
+                # Axis labels as a title annotation.
+                ax.text(
+                    data_array.time[-1],
+                    maximum_value,
+                    f"{data_array.name}",
+                    fontsize="x-large",
+                )
+
+    elif num_dimensions > 1:
+        # Set title with fallback for missing 'long_name'
+        supertitle = getattr(data_array, "long_name", None)
+        fig.suptitle(
+            supertitle,
+            fontsize="xx-large",
+            ha="right",
+            va="top",
+            x=0.9,
+            y=0.95,
+            # rotation=270,
+        )
+        default_dimension = 'time'
+        print(f"Detected complex structure with dimensions: {dimensions}.")
+        
+        # if ask_for_dimension:
+        #     print(f"Please specify a dimension to plot over (choose from: {dimensions}):")
+        #     plot_dimension = input("Dimension: ")
+        # else:
+        #     # Use default dimension if available
+        #     plot_dimension = default_dimension if default_dimension in dimensions else dimensions[0]
+
+        # ---
+        print(f"Do you want to specify a dimension other than '{default_dimension}' to plot over (choose from: {dimensions}):")
+        plot_dimension = input("Dimension: ")
+        # plot_dimension = default_dimension if default_dimension in dimensions else dimensions[0]
+
+        if plot_dimension not in dimensions:
+            raise ValueError(f"Invalid dimension: {plot_dimension}. Available dimensions: {dimensions}")
+
+        if plot_dimension == default_dimension:
+            data_to_plot = data_array.mean(dim=[dim for dim in dimensions if dim != plot_dimension])
+            print(f"Aggregating over other dimensions. From {data_to_plot} plotting {plot_dimension} vs data.")
+            data_to_plot.plot()
+
+        # elif slice_options and plot_dimension in slice_options:
+        #     slice_values = slice_options[plot_dimension]
+        #     fig, axes = plt.subplots(len(slice_values), 1, figsize=(10, 5 * len(slice_values)))
+
+        #     for i, slice_value in enumerate(slice_values):
+        #         data_slice = data_array.sel({plot_dimension: slice_value})
+        #         data_slice.plot(ax=axes[i], alpha=0.5, color="black", linewidth=1)
+        #         axes[i].set_title(f'{plot_dimension.capitalize()}: {slice_value}')
+            
         else:
-            # plt.suptitle(f'{data_array.name}')
-            # Axis labels as a title annotation.
-            ax.text(
-                data_array.time[-1],
-                maximum_value,
-                f"{data_array.name}",
-                fontsize="x-large",
-            )
+            print(f"Aggregating over other dimensions for {plot_dimension}.")
+            data_to_plot = data_array.mean(dim=[dim for dim in dimensions if dim != plot_dimension])
+            data_to_plot.plot(alpha=0.5, color="black", linewidth=1)
+
 
     # Identity
     plt.subplots_adjust(bottom=0.18)
