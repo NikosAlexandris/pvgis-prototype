@@ -7,10 +7,9 @@ from devtools import debug
 from typing import Dict, List
 from zoneinfo import ZoneInfo
 from pandas import DataFrame, DatetimeIndex, Series
-from pvlib.spectrum import calc_spectral_mismatch_field
+# from pvlib.spectrum import calc_spectral_mismatch_field
 
 from pvgisprototype import SpectralFactorSeries
-from pvgisprototype.algorithms.pvis.spectral_responsivity import SPECTRAL_RESPONSIVITY_DEFAULT
 from pvgisprototype.api.position.models import select_models
 from pvgisprototype.api.spectrum.models import PhotovoltaicModuleSpectralResponsivityModel, SpectralMismatchModel
 from pvgisprototype.api.spectrum.constants import (
