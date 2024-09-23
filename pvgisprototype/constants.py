@@ -1,5 +1,6 @@
 from math import pi
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
+
 """
 This file `constants.py` contains important hard-coded values for
 `pvgisprototype`'s components.
@@ -803,7 +804,7 @@ NOMENCLATURE_FLAG_DEFAULT = False
 
 CSV_FLAG_DEFAULT = False
 CSV_PATH_DEFAULT = None
-CSV_DESCRIPTION = "CSV output filename. Will override all other output options!"
+CSV_DESCRIPTION = "CSV output filename. Will override other output options !"
 
 UNIPLOT_FLAG_DEFAULT = False
 UNIPLOT_FLAG_DESCRIPTION = "Uniplot"

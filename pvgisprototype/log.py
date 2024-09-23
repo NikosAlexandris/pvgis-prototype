@@ -69,10 +69,10 @@ def initialize_logger(
     log_file = ctx.params.get("log_file")
     if log_file:
         if not rich_handler:
-            print(f"Logging to file : {log_file}")
+            logger.info(f"Logging to file : {log_file}")
 
         else:
-            print(
+            logger.info(
                 f"Logging to file : {log_file}",
                 alt=f"Logging to file : [reverse]{log_file}[/reverse] ?",
             )
