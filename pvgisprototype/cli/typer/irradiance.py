@@ -107,10 +107,11 @@ typer_argument_global_horizontal_irradiance = typer.Argument(
     rich_help_panel=rich_help_panel_irradiance_series,
     show_default=False,
 )
-typer_argument_global_horizontal_irradiance_pandas = typer.Argument(
+typer_argument_spectrally_resolved_irradiance = typer.Argument(
     help="",
     parser=parse_irradiance_data,
     rich_help_panel=rich_help_panel_spectrum,
+    is_eager=True,
 )
 typer_option_global_horizontal_irradiance = typer.Option(
     help=global_horizontal_irradiance_typer_help,
