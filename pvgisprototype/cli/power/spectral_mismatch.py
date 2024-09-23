@@ -55,7 +55,7 @@ from pvgisprototype.constants import (
 from pvgisprototype.cli.typer.irradiance import (
     typer_option_minimum_spectral_irradiance_wavelength,
     typer_option_maximum_spectral_irradiance_wavelength,
-    typer_argument_global_horizontal_irradiance_pandas,
+    typer_argument_spectrally_resolved_irradiance,
 )
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
@@ -119,7 +119,7 @@ from pvgisprototype.cli.typer.time_series import (
 def spectral_mismatch_pandas(
     irradiance: Annotated[
         Path,
-        typer_argument_global_horizontal_irradiance_pandas,
+        typer_argument_spectrally_resolved_irradiance,
     ],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
@@ -218,11 +218,7 @@ def spectral_mismatch_pandas(
 ):
     """
     """
-    # from devtools import debug
-    # debug(locals())
-
     # Ugly Hacks ! -----------------------------------------------------------
-    # timestamps = irradiance.index
     from pvgisprototype.api.position.models import select_models
     photovoltaic_module_type = select_models(
         PhotovoltaicModuleSpectralResponsivityModel, photovoltaic_module_type
@@ -264,7 +260,6 @@ def spectral_mismatch_pandas(
             )
         )
         if SpectralMismatchModel.mihaylov in spectral_mismatch_model or SpectralMismatchModel.pvlib in spectral_mismatch_model:
-            print(f'Spectral mismatch model : {spectral_mismatch_model}')
             logger.info(
                     f'Average irradiance density :\n{average_irradiance_density}',
                     alt=f'[bold]Average irradiance density[/bold] :\n{average_irradiance_density}'
@@ -327,7 +322,6 @@ def spectral_mismatch_pandas(
     # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
         if verbose > 0:
-            # print(f'Spectral Mismatch : {spectral_mismatch}')
             from pvgisprototype.cli.print import print_spectral_mismatch
 
             print_spectral_mismatch(
@@ -447,11 +441,3 @@ def spectral_mismatch_pandas(
         from pvgisprototype.cli.print import print_finger_hash
 
         print_finger_hash(dictionary=spectral_mismatch)
-
-    # Step 5: Output results
-    # if output:
-    #     spectral_mismatch.to_csv(output)
-    #     if verbose:
-    #         print(f"Spectral mismatch factors saved to {output}")
-    # else:
-    #     print(spectral_mismatch)
