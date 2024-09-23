@@ -1,3 +1,5 @@
+import zoneinfo
+from functools import lru_cache
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
 from polars import (DataFrame, 
@@ -43,3 +45,7 @@ def generate_photovoltaic_output_csv(dictionary:dict, latitude:float, longitude:
     dataframe = dataframe.select(columns_order)
 
     return dataframe.write_csv() # type: ignore
+
+@lru_cache(maxsize=None)
+def get_timezones():
+    return sorted(zoneinfo.available_timezones())
