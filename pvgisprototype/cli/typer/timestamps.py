@@ -19,6 +19,7 @@ from pvgisprototype.api.datetime.timezone import (
     ctx_attach_requested_timezone,
     ctx_convert_to_timezone,
 )
+from pvgisprototype.api.series.utilities import read_data_array_or_set
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.log import logger
@@ -57,6 +58,7 @@ def callback_generate_datetime_series(
     direct_horizontal_irradiance = ctx.params.get("direct_horizontal_irradiance")
     spectral_factor_series = ctx.params.get("spectral_factor_series")
     time_series = ctx.params.get("time_series")
+    irradiance = ctx.params.get("irradiance")
 
     # Extract timestamps from first available space-time data file
     if any(
@@ -65,6 +67,7 @@ def callback_generate_datetime_series(
             direct_horizontal_irradiance,
             spectral_factor_series,
             time_series,
+            irradiance,  # used in the spectral mismatch factor
         ]
     ):
         data_file = next(
@@ -75,11 +78,11 @@ def callback_generate_datetime_series(
                     direct_horizontal_irradiance,
                     spectral_factor_series,
                     time_series,
+                    irradiance,
                 ],
             )
         )
-        # timestamps = DatetimeIndex(xarray.open_dataarray(data_file).time)
-        timestamps = xarray.open_dataarray(data_file).time
+        timestamps = read_data_array_or_set(data_file).time
         logger.info(
                 f"Timestamps retrieved from {data_file} :\n{timestamps}",
                 alt=f"Timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}"
