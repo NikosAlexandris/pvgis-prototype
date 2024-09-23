@@ -99,7 +99,7 @@ def hour_angle(
         str, typer_option_angle_output_units
     ] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     group_models: Annotated[
         Optional[bool], "Visually cluster time series results per model"

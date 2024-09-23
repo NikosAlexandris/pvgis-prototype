@@ -222,7 +222,10 @@ def read_data_array_or_set(
     try:
         if in_memory:
             if verbose > 0:
-                logger.info(f"{exclamation_mark} Trying to load the {input_data} into memory as a DataArray...")
+                logger.info(
+                        f"{exclamation_mark} Trying to load {input_data} into memory as a DataArray...",
+                        alt=f"{exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a DataArray...",
+                        )
             return load_or_open_dataarray(
                 function=xr.load_dataarray,
                 filename_or_object=input_data,
@@ -230,7 +233,10 @@ def read_data_array_or_set(
             )
         else:
             if verbose > 0:
-                logger.info(f"{exclamation_mark} Trying to open the '{input_data}' as a DataArray...")
+                logger.info(
+                        f"{exclamation_mark} Trying to open {input_data} as a DataArray...",
+                        alt=f"{exclamation_mark} [bold]Trying[/bold] to open {input_data} as a DataArray...",
+                        )
             return load_or_open_dataarray(
                 function=xr.open_dataarray,
                 filename_or_object=input_data,
@@ -242,7 +248,10 @@ def read_data_array_or_set(
         try:
             if in_memory:
                 if verbose > 0:
-                    logger.info(f"{exclamation_mark} Trying to load {input_data} into memory as a Dataset...")
+                    logger.info(
+                            f"{exclamation_mark} Trying to load {input_data} into memory as a Dataset...",
+                            alt=f"{exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a Dataset...",
+                            )
                 return load_or_open_dataset(
                     function=xr.load_dataset,
                     filename_or_object=input_data,
@@ -250,14 +259,20 @@ def read_data_array_or_set(
                 )
             else:
                 if verbose > 0:
-                    logger.info(f"{exclamation_mark} Trying to open {input_data} as a Dataset...")
+                    logger.info(
+                            f"{exclamation_mark} Trying to open {input_data} as a Dataset...",
+                            alt=f"{exclamation_mark} [bold]Trying[/bold] to open {input_data} as a Dataset...",
+                            )
                 return load_or_open_dataset(
                     function=xr.open_dataset,
                     filename_or_object=input_data,
                     mask_and_scale=mask_and_scale,
                 )
         except Exception as e:
-            logger.error(f"Error loading or opening data: {str(e)}")
+            logger.error(
+                    f"Error loading or opening data: {str(e)}",
+                    alt=f"Error loading or opening data: {str(e)}"
+                    )
             raise typer.Exit(code=33)
 
 
@@ -435,9 +450,6 @@ def select_location_time_series(
             method=neighbor_lookup,
             tolerance=tolerance,
         )
-        logger.info(
-                f"Specific location time series : {location_time_series.sel(time=slice('2018-01-01 07:00', '2018-01-01 08:00')).values}"
-                )
         if location_time_series.isnull().all():
             logger.warning("Selection returns an empty array or all NaNs.")
         location_time_series.load()  # load into memory for fast processing
@@ -449,5 +461,10 @@ def select_location_time_series(
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
+
+    logger.info(
+            f'Selected location time series : {location_time_series}',
+            alt=f'[bold]Selected[/bold] [brown]location[/brown] time series : {location_time_series}'
+            )
 
     return location_time_series
