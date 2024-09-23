@@ -267,13 +267,13 @@ async def get_photovoltaic_power_series_advanced(
         direct_horizontal_irradiance=Path(
             "sarah2_sid_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
-        spectral_factor_series=spectral_factor_series,
         temperature_series=Path(
             "era5_t2m_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
         wind_speed_series=Path(
             "era5_ws2m_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
+        #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -469,6 +469,7 @@ async def get_photovoltaic_power_series(
         wind_speed_series=Path(
             "era5_ws2m_over_esti_jrc.nc"
         ),  # FIXME This hardwritten path will be replaced
+        #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         photovoltaic_module=photovoltaic_module,
