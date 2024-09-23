@@ -13,7 +13,11 @@ CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX = '_cf_compliant'
 
 
 def comply_sarah_dataset_to_cf_conventions(
-    dataset, filename: str, kato_bands: dict = KATO_BANDS
+    dataset,
+    filename: str,
+    longitude: float | None = None,
+    latitude: float | None = None,
+    kato_bands: dict = KATO_BANDS,
 ):
     """
     Update the dataset to match the reference structure with appropriate renaming,
@@ -30,17 +34,20 @@ def comply_sarah_dataset_to_cf_conventions(
         "lon": "longitude",
         "lat": "latitude",
     }
-    filtered_rename_dict = {key: value for key, value in rename_dict.items() if key in dataset}
+    filtered_rename_dict = {
+        key: value for key, value in rename_dict.items() if key in dataset
+    }
     dataset = dataset.rename(filtered_rename_dict)
 
-    # get latitude and longitude from filename, add dimensions + coordinates
-    match = re.search(r"_(\-?\d+\.\d+)_(\-?\d+\.\d+)\.nc", filename)
+    if not longitude and not latitude:
+        # get latitude and longitude from filename, add dimensions + coordinates
+        match = re.search(r"_(\-?\d+\.\d+)_(\-?\d+\.\d+)\.nc", filename)
+        if match:
+            latitude = float(match.group(1))
+            longitude = float(match.group(2))
 
-    if match:
-        latitude = float(match.group(1))
-        longitude = float(match.group(2))
-    else:
-        raise ValueError("Could not parse latitude and longitude from filename")
+        else:
+            raise ValueError("Could not parse latitude and longitude from filename")
 
     dataset = dataset.expand_dims({"latitude": [latitude], "longitude": [longitude]})
     dataset["latitude"].attrs["units"] = "degrees_north"
@@ -158,27 +165,41 @@ def comply_sarah_dataset_to_cf_conventions(
 def build_cf_compliant_netcdf_file(
     input_file: Path,
     output_path: Path,
+    longitude: float | None = None,
+    latitude: float | None = None,
     output_filename_prefix: str = "",
     output_filename_suffix: str = CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX,
 ) -> None:
     """ """
-    if input_file.suffix == ".nc":
+    if input_file.suffix in {'.nc', '.netcdf'}:
         output_file = (
             output_path
             / f"{output_filename_prefix}{input_file.stem}{output_filename_suffix}{input_file.suffix}"
         )
-        logger.info(f"Processing {input_file.name}...")
+        logger.info(
+                f"Processing {input_file.name}",
+                alt=f"[bold]Processing[/bold] {input_file.name}",
+                )
         dataset = open_dataset(input_file)
         updated_dataset = comply_sarah_dataset_to_cf_conventions(
-            dataset=dataset, filename=input_file.name, kato_bands=KATO_BANDS
+            dataset=dataset,
+            filename=input_file.name,
+            longitude=longitude,
+            latitude=latitude,
+            kato_bands=KATO_BANDS,
         )
         updated_dataset.to_netcdf(output_file)
-        logger.info(f"Saved updated dataset to {output_file}")
+        logger.info(
+                f"Updated dataset written to {output_file}",
+                alt=f"Updated dataset written to {output_file}"
+                )
 
 
 def comply_dataset_to_cf_conventions(
     input_path: Path,
     output_path: Path,
+    longitude: float = None,
+    latitude: float = None,
     output_filename_prefix: str = "",
     output_filename_suffix: str = CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX,
 ):
@@ -192,6 +213,8 @@ def comply_dataset_to_cf_conventions(
         build_cf_compliant_netcdf_file(
             input_file=filename,
             output_path=output_path,
+            longitude=longitude,
+            latitude=latitude,
             output_filename_prefix=output_filename_prefix,
             output_filename_suffix=output_filename_suffix,
         )
