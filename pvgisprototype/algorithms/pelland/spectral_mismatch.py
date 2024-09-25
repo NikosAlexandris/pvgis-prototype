@@ -1,5 +1,7 @@
+from pvgisprototype import SpectralFactorSeries
 from pandas import DataFrame
 from xarray import DataArray
+from pvgisprototype.constants import SPECTRAL_FACTOR_COLUMN_NAME, SPECTRAL_FACTOR_NAME, TITLE_KEY_NAME, UNITLESS
 from pvgisprototype.log import log_function_call, logger
 
 
@@ -51,7 +53,7 @@ def calculate_spectral_mismatch_pelland(
             f"Intersection of wavelengths across input data : {common_wavelengths}"
             )
 
-    # useful reference spectrum (average over the reference spectrum)
+    # in Pelland : useful reference spectrum > average over the reference spectrum
     responsivity_selected = responsivity.sel(center_wavelength=common_wavelengths)
     logger.info(
             f"Selected responsivity data : {responsivity_selected}"
@@ -62,12 +64,14 @@ def calculate_spectral_mismatch_pelland(
             f"Selected reference spectrum data : {reference_spectrum_selected}"
             )
 
-    useful_reference = (
+    # in Pelland 2022 : useful fraction of reference spectrum
+    reference_current_density = (
         responsivity_selected * reference_spectrum_selected
     ).sum() / reference_spectrum_selected.sum()
     logger.info(
-        f"Useful fraction of reference spectrum : {useful_reference}"
-    )
+            f"Reference Current Density : {reference_current_density}",
+            alt=f"[bold][yellow]Reference[/yellow] current density[/bold] : {reference_current_density}"
+            )
 
     # useful irradiance (time-varying)
     irradiance_selected = irradiance.sel(center_wavelength=common_wavelengths)
@@ -87,16 +91,59 @@ def calculate_spectral_mismatch_pelland(
             f"Sum of irradiance : {sum_of_irradiance}"
             )
 
-    useful_irradiance = (
+    observed_current_density = (
         responsivity_selected * irradiance_selected
     ).sum(dim="center_wavelength") / irradiance_selected.sum(dim='center_wavelength')
     logger.info(
-        f"Useful fraction of irradiance : {useful_irradiance}"
+        f"Current Density of Observed Irradiance : {observed_current_density}"
     )
 
-    spectral_mismatch = useful_irradiance / useful_reference
-
+    spectral_factor = observed_current_density / reference_current_density
     logger.info(
-            f"Spectral mismatch = {spectral_mismatch}"
+            f"Spectral factor = {spectral_factor}"
             )
-    return spectral_mismatch.to_numpy()
+
+    components_container = {
+        "Metadata": lambda: {
+        },
+        "Spectral factor": lambda: {
+            TITLE_KEY_NAME: SPECTRAL_FACTOR_NAME,
+            SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor.to_numpy(),
+        },  # if verbose > 0 else {},
+        "Inputs" : lambda: {
+            'Irradiance': irradiance,
+            'Responsivity': responsivity,
+            'Reference spectrum': reference_spectrum,
+            },
+        "Intermediate quantities" : lambda: {
+            'Common spectral wavelengths': common_wavelengths,
+            'Selected spectral responsivity': responsivity_selected,
+            'Selected observed irradiance': irradiance_selected,
+            'Selected reference spectrum': reference_spectrum_selected,
+            },
+        "Sum of quantities": lambda: {
+            'Sum of Irradiance': sum_of_irradiance,
+            'Sum of responsivity by irradiance': sum_of_responsivity_by_irradiance,
+            'Sum of Reference spectrum': reference_spectrum.sum(),
+            },
+        # "Energy" : lambda: {
+        #     'Reference energy': total_reference_energy,
+        #     'Observed energy': total_observed_energy,
+        #     },
+        "Current density": lambda: {
+            'Reference current': reference_current_density,
+            'Observed current': observed_current_density
+            },
+            # if verbose > 1
+            # else {},
+        }
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
+
+    return SpectralFactorSeries(
+            value=spectral_factor.to_numpy(),
+            unit=UNITLESS,
+            spectral_factor_algorithm='Pelland 2022',
+            components=components,
+            )
