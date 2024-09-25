@@ -402,7 +402,7 @@ def select_location_time_series(
     variable: str = None,
     longitude: Longitude = None,
     latitude: Latitude = None,
-    neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
+    neighbor_lookup: MethodForInexactMatches | None = MethodForInexactMatches.nearest,
     tolerance: float = 0.1,
     mask_and_scale: bool = False,
     in_memory: bool = False,
