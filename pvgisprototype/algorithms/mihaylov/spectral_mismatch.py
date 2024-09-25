@@ -136,6 +136,16 @@ def calculate_spectral_mismatch_factor_mihaylow(
     photovoltaic modules. Nonetheless, a user may define another reference
     spectrum.
 
+    Sourcing the reference spectrum from pvlib, we have :
+
+    > get_reference_spectra()['global'].sum()
+    > 1002.8769556984464
+
+    Mihaylov used in his exploratory work a spectrum found ... which totals to
+    :
+    > reference_spectrum_mihaylov.irradiance.sum()
+    > 999.9668511125789
+
     """
     # Preparatory steps --- Push Me Upstream ?
 
