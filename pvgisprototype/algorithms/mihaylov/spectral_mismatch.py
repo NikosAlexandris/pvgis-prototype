@@ -1,10 +1,115 @@
+from pvgisprototype.constants import (
+    SPECTRAL_FACTOR_COLUMN_NAME,
+    SPECTRAL_FACTOR_NAME,
+    TITLE_KEY_NAME,
+    UNITLESS,
+)
 from pvgisprototype.log import logger
-from pvgisprototype.api.irradiance.kato_bands import KATO_BANDS
+from pvgisprototype import SpectralFactorSeries
 from xarray import apply_ufunc
-from numpy import interp, isfinite, nan_to_num
+from numpy import array, interp, nan_to_num, concatenate, append
 from scipy.integrate import simpson
-from pvgisprototype.algorithms.mihaylov.interpolate import interpolate_spectral_data
+from pvgisprototype.api.irradiance.kato_bands import KATO_BANDS
+from scipy.interpolate import pchip_interpolate
 
+
+def interpolate_row(
+        reference_wavelengths,
+        irradiance_wavelengths,
+        irradiance,
+        # left_values,
+        right_value=0,
+):
+    """Interpolate the observed irradiance to "match" the reference spectrum!
+
+    Notes
+    -----
+    Describe and Explain Me !
+
+    """
+    return interp(
+        x=reference_wavelengths,    # Reference wavelength grid
+        xp=irradiance_wavelengths,  # Staircase wavelengths (observed wavelengths)
+        fp=irradiance,              # Staircase irradiance data
+        right=right_value           # Right boundary condition
+    )
+
+
+def generate_staircase_limits(
+    limit_pairs: dict = KATO_BANDS,
+    lower_limit_name: str = "Lower limit [nm]",
+    # center_band_wavelength_limit_name: str = "Center [nm]",
+    upper_limit_name: str = "Upper limit [nm]",
+):
+    """Generate staircase limits
+
+    In this specific case the default input is the Kato spectral band
+    wavelength limits. The function duplicates the lower and upper spectral
+    band limits.
+    """
+    lower_limits = array(list(limit_pairs[lower_limit_name].values()))
+    upper_limits = array(list(limit_pairs[upper_limit_name].values()))
+    staircase_wavelengths = array(
+        [value for pair in zip(lower_limits, upper_limits) for value in pair]
+    )
+    staircase_wavelengths = append(staircase_wavelengths, upper_limits[-1])
+
+    return staircase_wavelengths
+
+
+def generate_staircase_from_irradiance(input_wavelengths):
+    """
+    Generate staircase wavelengths based on the input irradiance data array.
+
+    The irradiance data has 1024 center wavelengths, and this function creates
+    a staircase set of wavelengths, assuming the input irradiance data's
+    wavelengths act as limits for creating the staircase.
+
+    Parameters:
+    - irradiance_data_array: The xarray.DataArray that contains the center wavelengths.
+
+    Returns:
+    - staircase_wavelengths: Array of staircase wavelengths.
+    """
+    # generate lower and upper limits by shifting the center wavelengths
+    # assume lower limit of first wavelength and upper limit of last
+    lower_limits = input_wavelengths[:-1]
+    upper_limits = input_wavelengths[1:]
+
+    # Create the staircase by alternating lower and upper limits
+    staircase_wavelengths = array(
+        [val for pair in zip(lower_limits, upper_limits) for val in pair]
+    )
+
+    # Append the last upper limit to complete the staircase
+    staircase_wavelengths = append(staircase_wavelengths, upper_limits[-1])
+
+    return staircase_wavelengths
+
+
+def generate_staircase_data_array(array_1d):
+    """
+    Generate staircase data from a 1D array of irradiance values.
+    This duplicates the values for each wavelength for a staircase effect.
+    """
+    return concatenate([[value, value] for value in array_1d] + [[0]])
+
+
+def generate_staircase_data_array_alternative(array_1d):
+    """
+    Generate staircase data from a 1D array of irradiance values.
+    This duplicates the values for each wavelength for a staircase effect.
+
+    Ensures that the final staircase array has one less element than the number
+    of limits for proper matching with coordinates.
+    """
+    # Generate the staircase by duplicating each value in the array
+    staircase_data = concatenate([[value, value] for value in array_1d[:-1]])
+    
+    # Append the last value without duplication to match with coordinates
+    staircase_data = append(staircase_data, array_1d[-1])
+
+    return staircase_data
 
 def calculate_spectral_mismatch_factor_mihaylow(
     irradiance,
