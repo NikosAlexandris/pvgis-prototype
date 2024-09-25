@@ -21,6 +21,7 @@ from pvgisprototype.constants import (
     TIME_ALGORITHM_NAME,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call
 from pvgisprototype.validation.functions import (
@@ -43,6 +44,7 @@ def model_solar_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Calculates the solar time using the requested _algorithm_.
 
@@ -66,6 +68,7 @@ def model_solar_time_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
 
     if solar_time_model.value == SolarTimeModel.ephem:
@@ -93,6 +96,7 @@ def model_solar_time_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
 
     if solar_time_model.value == SolarTimeModel.skyfield:
@@ -122,6 +126,7 @@ def calculate_solar_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = VERBOSE_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """Calculates the solar time using all models and returns the results in a table.
 
@@ -147,6 +152,7 @@ def calculate_solar_time_series(
                 array_backend=array_backend,
                 verbose=verbose,
                 log=log,
+                validate_output=validate_output,
             )
             solar_time_model_overview = {
                 solar_time_model.name: {
