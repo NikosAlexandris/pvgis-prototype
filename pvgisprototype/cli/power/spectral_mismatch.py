@@ -2,6 +2,7 @@
 Calculate spectral mismatch using pvlib's calc_spectral_mismatch_field function.
 """
 
+from xarray import DataArray
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
 from pvgisprototype.api.plot import uniplot_spectral_mismatch_series
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
@@ -264,21 +265,22 @@ def spectral_mismatch_pandas(
                     f'Average irradiance density :\n{average_irradiance_density}',
                     alt=f'[bold]Average irradiance density[/bold] :\n{average_irradiance_density}'
                     )
-            average_irradiance_density = (
-                select_time_series(
-                    time_series=irradiance,
-                    longitude=longitude,
-                    latitude=latitude,
-                    timestamps=timestamps,
-                    variable=average_irradiance_density,
-                    neighbor_lookup=neighbor_lookup,
-                    tolerance=tolerance,
-                    mask_and_scale=mask_and_scale,
-                    in_memory=in_memory,
-                    verbose=verbose,
-                    log=log,
+            if average_irradiance_density:
+                average_irradiance_density = (
+                    select_time_series(
+                        time_series=irradiance,
+                        longitude=longitude,
+                        latitude=latitude,
+                        timestamps=timestamps,
+                        variable=average_irradiance_density,
+                        neighbor_lookup=neighbor_lookup,
+                        tolerance=tolerance,
+                        mask_and_scale=mask_and_scale,
+                        in_memory=in_memory,
+                        verbose=verbose,
+                        log=log,
+                    )
                 )
-            )
 
     if limit_spectral_range:
         import numpy
