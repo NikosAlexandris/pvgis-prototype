@@ -111,6 +111,7 @@ def generate_staircase_data_array_alternative(array_1d):
 
     return staircase_data
 
+
 def calculate_spectral_mismatch_factor_mihaylow(
     irradiance,
     average_irradiance_density,
@@ -167,24 +168,24 @@ def calculate_spectral_mismatch_factor_mihaylow(
 
     ## Expand responsivity wavelengths to cover the reference spectrum !
 
-    reference_responsivity = responsivity.reindex(
+    reference_spectral_responsivity = responsivity.reindex(
         wavelength=reference_spectrum.wavelength, fill_value=0
     )
     logger.info(
-        f"Expanded spectral responsivity to match reference spectrum :\n{reference_responsivity}",
-        alt=f"[yellow]Expanded [/yellow] [green]spectral responsivity[/green] to match the reference spectrum :\n{reference_responsivity}"
+        f"Expanded spectral responsivity to match reference spectrum :\n{reference_spectral_responsivity}",
+        alt=f"[yellow]Expanded [/yellow] [green]spectral responsivity[/green] to match the reference spectrum :\n{reference_spectral_responsivity}"
     )
 
     ## Interpolate Spectral Responsivity to match the Reference Spectrum
 
-    reference_responsivity = interpolate_spectral_data(
-            data=reference_responsivity,
-            reference_wavelengths=reference_spectrum.wavelength,
-            data_name='Reference Responsivity',
+    reference_spectral_responsivity = pchip_interpolate(
+            xi=reference_spectral_responsivity.wavelength.values,
+            yi=reference_spectral_responsivity.values,
+            x=reference_spectrum.wavelength,
             )
     logger.info(
-            f"Interpolated spectral responsivity data :\n{reference_responsivity}",
-            alt=f"[yellow]Interpolated[/yellow] [green]spectral responsivity[/green] data :\n{reference_responsivity}",
+            f"Interpolated spectral responsivity data :\n{reference_spectral_responsivity}",
+            alt=f"[yellow]Interpolated[/yellow] [green]spectral responsivity[/green] data :\n{reference_spectral_responsivity}",
             )
 
     # Reference Spectrum -----------------------------------------------------
@@ -201,30 +202,27 @@ def calculate_spectral_mismatch_factor_mihaylow(
     )
 
     # Current Density of Reference Spectrum
-    current_density_of_reference_spectrum = reference_spectrum * reference_responsivity
+
+    current_density_per_nanometer_reference_spectrum = reference_spectrum * reference_spectral_responsivity
     logger.info(
-            f"Current density of Reference Spectrum :\n{current_density_of_reference_spectrum}",
-            alt=f"[bold]Current density of Reference Spectrum[/bold] :\n{current_density_of_reference_spectrum}"
+            f"Current density of Reference Spectrum :\n{current_density_per_nanometer_reference_spectrum}",
+            alt=f"[bold]Current density of Reference Spectrum[/bold] :\n{current_density_per_nanometer_reference_spectrum}"
             )
 
     # Useful Reference Spectrum
 
-    useful_reference_spectrum = simpson(
-        y=current_density_of_reference_spectrum['global'],
+    reference_current_density = simpson(
+        y=current_density_per_nanometer_reference_spectrum['global'],
         x=reference_spectrum.wavelength
         # x=common_wavelengths
     )
     logger.info(
-            f"Useful reference spectrum : {useful_reference_spectrum}",
-            alt=f"[bold][yellow]Useful[/yellow] reference spectrum[/bold] : {useful_reference_spectrum}"
+            f"Useful reference spectrum : {reference_current_density}",
+            alt=f"[bold][yellow]Useful[/yellow] reference spectrum[/bold] : {reference_current_density}"
             )
 
     # Observed Irradiance ----------------------------------------------------
 
-    ## Get scalar boundary conditions for the left and right
-    left_value = float(average_irradiance_density.isel(center_wavelength=0).mean())
-    right_value = 0  # Scalar value for the right boundary
-    
     ## Interpolate Observed Irradiance to Reference Spectrum
     logger.info(
             f"Irradiance data to interpolate :\n{average_irradiance_density}",
@@ -242,14 +240,7 @@ def calculate_spectral_mismatch_factor_mihaylow(
         dask="allowed",  # Parallelize with Dask if available
         kwargs={"left": left_value, "right": right_value}
     ).fillna(0.0)
-    # interpolated_observed_irradiance = interpolated_observed_irradiance.where(
-    #     isfinite(interpolated_observed_irradiance), 0.0
-    # )
-    logger.info(
-            f"Interpolated irradiance :\n{interpolated_observed_irradiance}",
-            alt=f"[bold][yellow]Interpolated[/yellow] irradiance[/bold] :\n{interpolated_observed_irradiance}",
-            )
-
+    
     # Total Observed Irradiance 
 
     # Should include all bands up to ~4K nm
@@ -262,13 +253,13 @@ def calculate_spectral_mismatch_factor_mihaylow(
     # non-integrated dimensions.
     # ------------------------------------------------------------------------
 
-    total_observed_interpolated_observed_irradiance = simpson(
+    total_observed_energy = simpson(
         y=interpolated_observed_irradiance,
         x=reference_spectrum.wavelength,
         axis=1,  # integrate over wavelength axis
     )
-    total_observed_interpolated_observed_irradiance = nan_to_num(total_observed_interpolated_observed_irradiance)
-    # total_observed_interpolated_observed_irradiance = total_observed_interpolated_observed_irradiance.where(isfinite(total_observed_interpolated_observed_irradiance), 0.0)
+    total_observed_energy = nan_to_num(total_observed_energy)
+    # total_observed_energy = total_observed_energy.where(isfinite(total_observed_energy), 0.0)
 
     # Does length of x match the second dimension of y ?
 
@@ -276,32 +267,36 @@ def calculate_spectral_mismatch_factor_mihaylow(
         raise ValueError("Wavelength dimension does not match the interpolated irradiance data shape.")
 
     logger.info(
-            f"Total Observed Reference Irradiance :\n{total_observed_interpolated_observed_irradiance}",
-            alt=f"[bold]Total Observed Reference Irradiance[/bold] :\n{total_observed_interpolated_observed_irradiance}"
+            f"Total Observed Reference Irradiance :\n{total_observed_energy}",
+            alt=f"[bold]Total Observed Reference Irradiance[/bold] :\n{total_observed_energy}"
             )
 
     # Current Density of Observed Irradiance
 
-    current_density_of_observed_interpolated_observed_irradiance = interpolated_observed_irradiance * reference_responsivity
+    current_density_per_nanometer_observed_interpolated_observed_irradiance = interpolated_observed_irradiance * reference_spectral_responsivity
     logger.info(
-            f"Current density of Observed Irradiance :\n{current_density_of_reference_spectrum}",
-            alt=f"[yellow][bold]Current density[/bold] of Observed Irradiance[/yellow] :\n{current_density_of_reference_spectrum}"
+            f"Current density of Observed Irradiance :\n{current_density_per_nanometer_observed_interpolated_observed_irradiance}",
+            alt=f"[yellow][bold]Current density[/bold] of Observed Irradiance[/yellow] :\n{current_density_per_nanometer_observed_interpolated_observed_irradiance}"
             )
-    useful_observed_irradiance = simpson(
-        y=current_density_of_observed_interpolated_observed_irradiance,
+    observed_current_density = simpson(
+        y=current_density_per_nanometer_observed_interpolated_observed_irradiance,
         x=reference_spectrum.wavelength,
         axis=1,
     )
     logger.info(
-            f"Useful observed irradiance: {useful_observed_irradiance}",
-            alt=f"[bold][yellow]Useful[/yellow] observed irradiance[/bold] :\n{useful_observed_irradiance}"
+            f"Useful observed irradiance: {observed_current_density}",
+            alt=f"[bold][yellow]Useful[/yellow] observed irradiance[/bold] :\n{observed_current_density}"
             )
 
-    # Spectral Mismatch Factor
+    # Spectral Factor
 
-    a = useful_observed_irradiance / useful_reference_spectrum
+    a = observed_current_density / reference_current_density
     # epsilon = 1e-10  # Small constant to avoid division by zero
-    # b = total_reference_energy / (total_observed_interpolated_observed_irradiance + epsilon)
-    b = total_reference_energy / total_observed_interpolated_observed_irradiance
+    # b = total_reference_energy / (total_observed_energy + epsilon)
+    b = total_reference_energy / total_observed_energy
 
-    return a * b
+    return SpectralFactorSeries(
+            value=a*b,
+            unit=UNITLESS,
+            spectral_factor_algorithm='Mihaylov 2024 (Unpublished)',
+            )
