@@ -75,8 +75,8 @@ def select_time_series(
     end_time: Optional[datetime] = None,
     remap_to_month_start: Optional[bool] = False,
     # convert_longitude_360: bool = False,
-    variable: str = None,
-    neighbor_lookup: MethodForInexactMatches = None,
+    variable: str | None = None,
+    neighbor_lookup: MethodForInexactMatches | None = None,
     tolerance: float = 0.1,  # Customize default if needed
     time_tolerance: str = '15m',  # Important for merged Datasets
     mask_and_scale: bool = False,
@@ -174,6 +174,10 @@ def select_time_series(
 
     if timestamps is not None and not start_time and not end_time:
         if len(timestamps) == 1:
+            logger.warning(
+                    f"Single timestamp selected!",
+                    alt=f"[bold][yellow]Single timestamp selected![/bold][yellow]"
+                    )
             start_time = end_time = timestamps[0]
 
         try:
@@ -181,6 +185,13 @@ def select_time_series(
                 time=timestamps, method=neighbor_lookup,
                 # tolerance=time_tolerance,
             )
+            if location_time_series.indexes['time'].duplicated().any():
+                logger.error(
+                        f"Duplicate timestamps detected in location_time_series.",
+                        alt= f"[red]Duplicate timestamps detected in location_time_series![/red]"
+                        )
+                if location_time_series.indexes['time'].duplicated().any():
+                    raise ValueError("Duplicate timestaps detected!")
             logger.info(
                     f'Selected timestamps from [brown]location[/brown] time series : {location_time_series}',
                     alt=f'[bold]Selected[/bold] [blue]timestamps[/blue] from [brown]location[/brown] time series : {location_time_series}'
