@@ -18,6 +18,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     RADIANS,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.arrays import create_array
@@ -33,6 +34,7 @@ def calculate_fractional_year_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT
 ) -> FractionalYear:
     """Calculate the fractional year for a time series.
 
@@ -99,22 +101,23 @@ def calculate_fractional_year_series_noaa(
     )
     # Is this "restriction" correct ?
     fractional_year_series[fractional_year_series < 0] = 0
-
-    if not np.all(
-        (FractionalYear().min_radians <= fractional_year_series)
-        & (fractional_year_series <= FractionalYear().max_radians)
-    ):
-        index_of_out_of_range_values = np.where(
-            (fractional_year_series < FractionalYear().min_radians)
-            | (fractional_year_series > FractionalYear().max_radians)
-        )
-        out_of_range_values = fractional_year_series[index_of_out_of_range_values]
-        # Report values in "human readable" degrees
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{FractionalYear().min_radians}, {FractionalYear().max_radians}] radians"
-            f" in [code]fractional_year_series[/code] : {out_of_range_values}"
-        )
+    
+    if validate_output:
+        if not np.all(
+            (FractionalYear().min_radians <= fractional_year_series)
+            & (fractional_year_series <= FractionalYear().max_radians)
+        ):
+            index_of_out_of_range_values = np.where(
+                (fractional_year_series < FractionalYear().min_radians)
+                | (fractional_year_series > FractionalYear().max_radians)
+            )
+            out_of_range_values = fractional_year_series[index_of_out_of_range_values]
+            # Report values in "human readable" degrees
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{FractionalYear().min_radians}, {FractionalYear().max_radians}] radians"
+                f" in [code]fractional_year_series[/code] : {out_of_range_values}"
+            )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

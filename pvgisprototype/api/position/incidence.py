@@ -62,6 +62,7 @@ from pvgisprototype.constants import (
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call
 from pvgisprototype.validation.functions import (
@@ -91,6 +92,7 @@ def model_solar_incidence_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarIncidence:
     """ """
     solar_incidence_series = None
@@ -159,6 +161,7 @@ def model_solar_incidence_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output
         )
 
     if solar_incidence_model.value == SolarIncidenceModel.hofierka:
@@ -226,6 +229,7 @@ def calculate_solar_incidence_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     pass
     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
@@ -251,6 +255,7 @@ def calculate_solar_incidence_series(
                 array_backend=array_backend,
                 verbose=verbose,
                 log=log,
+                validate_output=validate_output
             )
             solar_incidence_model_series = {
                 solar_incidence_model.name: {

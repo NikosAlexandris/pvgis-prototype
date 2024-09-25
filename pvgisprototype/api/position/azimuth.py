@@ -59,6 +59,7 @@ from pvgisprototype.constants import (
     TIME_ALGORITHM_NAME,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call
 from pvgisprototype.validation.functions import (
@@ -87,6 +88,7 @@ def model_solar_azimuth_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarAzimuth:
     """
     The solar azimuth angle measures horizontally around the horizon from north
@@ -123,6 +125,7 @@ def model_solar_azimuth_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
 
     if solar_position_model.value == SolarPositionModel.jenco:
@@ -231,6 +234,7 @@ def calculate_solar_azimuth_series(
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """
     Calculates the solar position using all models and returns the results in a table.
@@ -252,6 +256,7 @@ def calculate_solar_azimuth_series(
                 perigee_offset=perigee_offset,
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 verbose=verbose,
+                validate_output=validate_output,
             )
             solar_azimuth_model_series = {
                 solar_position_model.name: {
