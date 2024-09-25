@@ -25,8 +25,19 @@ from pvgisprototype.api.irradiance.models import (
     ModuleTemperatureAlgorithm,
 )
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT, LINKE_TURBIDITY_TIME_SERIES_DEFAULT, MASK_AND_SCALE_FLAG_DEFAULT, SPECTRAL_FACTOR_DEFAULT, TEMPERATURE_DEFAULT, TOLERANCE_DEFAULT, WIND_SPEED_DEFAULT
-
+from pvgisprototype.constants import (
+    IN_MEMORY_FLAG_DEFAULT, 
+    LINKE_TURBIDITY_TIME_SERIES_DEFAULT, 
+    MASK_AND_SCALE_FLAG_DEFAULT, 
+    SPECTRAL_FACTOR_DEFAULT, 
+    TEMPERATURE_DEFAULT, 
+    TOLERANCE_DEFAULT, 
+    WIND_SPEED_DEFAULT,
+    RADIANS,
+)
+from pvgisprototype.api.utilities.conversions import (
+    convert_float_to_degrees_if_requested,
+)
 
 def create_dictionary_for_location_parameters(
     longitude,
@@ -183,6 +194,7 @@ def create_dictionary_for_result_optimizer(
     surface_orientation,
     surface_tilt,
     location_parameters,
+    angle_output_units,
 ):
     result_dictionary = {
         "surface_orientation": None,
@@ -191,19 +203,25 @@ def create_dictionary_for_result_optimizer(
     }
 
     if mode == SurfacePositionOptimizerMode.Tilt:
-        if isinstance(
+        if not isinstance(
             surface_orientation, SurfaceOrientation
         ):  # FIXME THIS SHOULD ONLY BE A SurfaceOrientation OBJECT
-            result_dictionary["surface_orientation"] = surface_orientation
-        else:
-            result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=surface_orientation, unit="radians"
+            surface_orientation = SurfaceOrientation(
+                value=surface_orientation, 
+                unit=RADIANS,
             )
+
+        surface_orientation = SurfaceOrientation(
+            value=convert_float_to_degrees_if_requested(surface_orientation.value, angle_output_units),
+            unit=angle_output_units,
+        )
+        
+        result_dictionary["surface_orientation"] = surface_orientation
 
         if method == SurfacePositionOptimizerMethod.brute:
             result_dictionary["surface_tilt"] = SurfaceTilt(
-                value=result_optimizer,
-                unit="radians",
+                value=convert_float_to_degrees_if_requested(result_optimizer, angle_output_units),
+                unit=angle_output_units,
                 optimal=True,
                 optimizer=method,
             )
@@ -216,27 +234,33 @@ def create_dictionary_for_result_optimizer(
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_tilt"] = SurfaceTilt(
-                value=result_optimizer.x[0],
-                unit="radians",
+                value=convert_float_to_degrees_if_requested(result_optimizer.x[0], angle_output_units),
+                unit=angle_output_units,
                 optimal=True,
                 optimizer=method,
             )
             result_dictionary["mean_power_output"] = -result_optimizer.fun
 
     if mode == SurfacePositionOptimizerMode.Orientation:
-        if isinstance(
-            surface_orientation, SurfaceTilt
-        ):  # FIXME THIS SHOULD ONLY BE A SurfaceTilt OBJECT
-            result_dictionary["surface_tilt"] = surface_tilt
-        else:
-            result_dictionary["surface_tilt"] = SurfaceOrientation(
-                value=surface_tilt, unit="radians"
+        if not isinstance(
+                surface_tilt, SurfaceTilt
+            ):  # FIXME THIS SHOULD ONLY BE A SurfaceOrientation OBJECT
+                surface_tilt = SurfaceTilt(
+                    value=surface_tilt, 
+                    unit=RADIANS,
+                )
+
+        surface_tilt = SurfaceTilt(
+                value=convert_float_to_degrees_if_requested(surface_tilt.value, angle_output_units),
+                unit=angle_output_units,
             )
+            
+        result_dictionary["surface_tilt"] = surface_tilt
 
         if method == SurfacePositionOptimizerMethod.brute:
             result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=result_optimizer,
-                unit="radians",
+                value=convert_float_to_degrees_if_requested(result_optimizer, angle_output_units),
+                unit=angle_output_units,
                 optimal=True,
                 optimizer=method,
             )
@@ -249,8 +273,8 @@ def create_dictionary_for_result_optimizer(
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=result_optimizer.x[0],
-                unit="radians",
+                value=convert_float_to_degrees_if_requested(result_optimizer.x[0], angle_output_units),
+                unit=angle_output_units,
                 optimal=True,
                 optimizer=method,
             )
@@ -259,14 +283,14 @@ def create_dictionary_for_result_optimizer(
     if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
         if method == SurfacePositionOptimizerMethod.brute:
             result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=result_optimizer[0],
-                unit="radians",
+                value=convert_float_to_degrees_if_requested(result_optimizer[0], angle_output_units),
+                unit=angle_output_units,
                 optimal=True,
                 optimizer=method,
             )
             result_dictionary["surface_tilt"] = SurfaceTilt(
-                value=result_optimizer[1],
-                unit="radians",
+                value=convert_float_to_degrees_if_requested(result_optimizer[1], angle_output_units),
+                unit=angle_output_units,
                 optimal=True,
                 optimizer=method,
             )
@@ -279,14 +303,14 @@ def create_dictionary_for_result_optimizer(
             )
         elif result_optimizer.message == "Optimization terminated successfully.":
             result_dictionary["surface_orientation"] = SurfaceOrientation(
-                value=result_optimizer.x[0],
-                unit="radians",
+                value=convert_float_to_degrees_if_requested(result_optimizer.x[0], angle_output_units),
+                unit=angle_output_units,
                 optimal=True,
                 optimizer=method,
             )
             result_dictionary["surface_tilt"] = SurfaceTilt(
-                value=result_optimizer.x[1],
-                unit="radians",
+                value=convert_float_to_degrees_if_requested(result_optimizer.x[1], angle_output_units),
+                unit=angle_output_units,
                 optimal=True,
                 optimizer=method,
             )
