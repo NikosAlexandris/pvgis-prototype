@@ -282,6 +282,13 @@ def spectral_mismatch_pandas(
                     )
                 )
 
+            # # Ugly Hack! --------------------------------------------------- #
+            # if not isinstance(average_irradiance_density, DataArray) and isinstance(spectrally_resolved_irradiance, DataArray):
+            #     spectrally_resolved_irradiance = spectrally_resolved_irradiance.rename(
+            #         {wavelength_column: "wavelength"}
+            #     )
+            # # Ugly Hack! --------------------------------------------------- #
+
     if limit_spectral_range:
         import numpy
         if numpy.any(
