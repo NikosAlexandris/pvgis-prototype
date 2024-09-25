@@ -23,6 +23,7 @@ from pvgisprototype.validation.pvis_data_classes import (
     LongitudeModel,
     RefractedSolarZenithModel,
     VerbosityModel,
+    ValidateOutputModel,
 )
 
 # Units?
@@ -44,6 +45,7 @@ class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel
 ):
     pass
 
@@ -53,6 +55,7 @@ class CalculateEquationOfTimeTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -63,6 +66,7 @@ class CalculateTimeOffsetTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel
 ):
     pass
 
@@ -73,6 +77,7 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -83,6 +88,7 @@ class CalculateSolarHourAngleTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -92,6 +98,7 @@ class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -127,6 +134,7 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -149,6 +157,7 @@ class CalculateSolarAzimuthTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
