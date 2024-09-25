@@ -224,21 +224,63 @@ def calculate_spectral_mismatch_factor_mihaylow(
     # Observed Irradiance ----------------------------------------------------
 
     ## Interpolate Observed Irradiance to Reference Spectrum
-    logger.info(
-            f"Irradiance data to interpolate :\n{average_irradiance_density}",
-            alt=f"[yellow]Irradiance[/yellow] data to [bold]interpolate[/bold] :\n{average_irradiance_density}",
-            )
+    from xarray import DataArray
+    if isinstance(average_irradiance_density, DataArray):
+        irradiance_density_to_interpolate = average_irradiance_density
+        staircase_irradiance_density_wavelengths = generate_staircase_limits(
+            KATO_BANDS
+        )
+        staircase_average_irradiance_density = apply_ufunc(
+            generate_staircase_data_array,
+            irradiance_density_to_interpolate, # average_irradiance_density,
+            input_core_dims=[["center_wavelength"]],
+            output_core_dims=[["staircase_wavelength"]],
+            vectorize=True,  # Ensures function works ac
+            dask="allowed",
+        )
+    elif isinstance(irradiance, DataArray):
+        irradiance_density_to_interpolate = irradiance
+        staircase_irradiance_density_wavelengths = generate_staircase_from_irradiance(
+            input_wavelengths=irradiance.center_wavelength
+        )
+        staircase_average_irradiance_density = apply_ufunc(
+            generate_staircase_data_array_alternative,
+            irradiance_density_to_interpolate, # average_irradiance_density,
+            input_core_dims=[["center_wavelength"]],
+            output_core_dims=[["staircase_wavelength"]],
+            vectorize=True,  # Ensures function works ac
+            dask="allowed",
+        )
 
+    logger.info(
+            f"Irradiance data to interpolate :\n{irradiance_density_to_interpolate}",
+            alt=f"[yellow]Irradiance[/yellow] data to [bold]interpolate[/bold] :\n{irradiance_density_to_interpolate}",
+            )
+    from xarray import DataArray
+    staircase_irradiance_density_xarray = DataArray(
+        data=staircase_average_irradiance_density.values,
+        dims=['time', 'staircase_wavelength'],
+        coords={
+            # 'time': average_irradiance_density['time'],
+            'time': irradiance_density_to_interpolate['time'],
+            'staircase_wavelength': staircase_irradiance_density_wavelengths
+        },
+        # attrs=average_irradiance_density.attrs
+        attrs=irradiance_density_to_interpolate.attrs
+    )
+
+    # interpolate over each time step using apply_ufunc
     interpolated_observed_irradiance = apply_ufunc(
-        interp,
-        reference_spectrum.wavelength,            # target wavelength grid
-        average_irradiance_density.center_wavelength,  # current wavelength grid (Kato bands)
-        average_irradiance_density,  # irradiance data to be interpolated (2D array: time × Kato bands)
-        vectorize=True,  # Allow vectorization over time dimension
-        input_core_dims=[['wavelength'], ['center_wavelength'], ['center_wavelength']],
+        interpolate_row,
+        reference_spectrum.wavelength,                # x
+        staircase_irradiance_density_xarray.staircase_wavelength, # staircase observed x !
+        staircase_irradiance_density_xarray,  # staircase observed y
+        input_core_dims=[['wavelength'], ['staircase_wavelength'], ['staircase_wavelength']],
         output_core_dims=[['wavelength']],
-        dask="allowed",  # Parallelize with Dask if available
-        kwargs={"left": left_value, "right": right_value}
+        # kwargs={"left_values": left_values, "right_value": right_value},
+        kwargs={"right_value": 0},
+        vectorize=True,
+        dask="allowed"                                       # if available
     ).fillna(0.0)
     
     # Total Observed Irradiance 
