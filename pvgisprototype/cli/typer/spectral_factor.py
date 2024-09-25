@@ -1,13 +1,7 @@
 from pvgisprototype.log import logger
-from pandas import to_numeric, DataFrame
-from devtools import debug
-
-# from pvgisprototype.api.spectrum.helpers import (
 
 from pathlib import Path
 from typing import Union
-from pandas import read_csv
-from pandas import Series
 
 import numpy as np
 import typer
@@ -15,19 +9,14 @@ from typer import Context
 
 from pvgisprototype import SpectralFactorSeries
 from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
-# from pvgisprototype.api.spectrum.helpers import generate_banded_data
-from pvgisprototype.api.spectrum.models import SpectralMismatchModel
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_spectrum,
 )
 from pvgisprototype.cli.typer.path import validate_path
 from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
-    RESPONSIVITY_SPECTRAL_DATA,
     SPECTRAL_FACTOR_DEFAULT,
-    SPECTRAL_RESPONSIVITY_CSV_COLUMN_NAME_DEFAULT,
     UNITLESS,
-    WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
 )
 
 

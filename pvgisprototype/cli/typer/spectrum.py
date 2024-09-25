@@ -2,6 +2,7 @@
 Solar irradiance reference spectrum AM 1.5G
 """
 
+from pvgisprototype.cli.messages import NOT_COMPLETE_CLI
 from pvgisprototype.log import logger
 import typer
 from pandas import to_numeric, DataFrame, read_csv, Series
@@ -25,13 +26,17 @@ def parse_reference_spectrum(reference_spectrum: str) -> Series:
     ):
         logger.info(
                 f":information: Reading user-defined reference spectrum {reference_spectrum}!",
-                alt=f":information: [bold]Reading user-defined [magenta]reference spectrum ![/magenta bold]"
+                alt=f":information: [bold]Reading user-defined [magenta]reference spectrum ![/magenta][/bold]"
         )
         reference_spectrum = DataFrame(read_csv(Path(reference_spectrum), index_col=0))
         reference_spectrum = reference_spectrum.T
         reference_spectrum.index = to_numeric(reference_spectrum.index, errors='coerce')
         reference_spectrum = reference_spectrum.dropna(axis=0).astype(float)
         reference_spectrum = reference_spectrum.squeeze()
+        logger.info(
+                f":information: Parsed user-defined reference spectrum :\n{reference_spectrum}!",
+                alt=f":information: Parsed [bold]user-defined [magenta]reference spectrum[/magenta][/bold] :\n{reference_spectrum}"
+        )
 
     return reference_spectrum
 
@@ -114,8 +119,7 @@ def callback_reference_spectrum(
     # return spectrally_resolved_reference_spectrum
 
 
-reference_solar_irradiance_spectrum_typer_help = "The reference spectrum to use for the mismatch calculation. The default is the ASTM G173-03 global tilted spectrum. [(W/m^2)/nm]"
-
+reference_solar_irradiance_spectrum_typer_help = f"The reference spectrum to use for the mismatch calculation. User-defined input {NOT_COMPLETE_CLI} The default is the ASTM G173-03 global tilted spectrum. [(W/m^2)/nm]"
 
 typer_option_reference_spectrum = typer.Option(
     help=reference_solar_irradiance_spectrum_typer_help,
