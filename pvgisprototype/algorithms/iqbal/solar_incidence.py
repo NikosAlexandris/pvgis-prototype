@@ -43,6 +43,7 @@ from pvgisprototype.constants import (
     SURFACE_TILT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
@@ -63,6 +64,7 @@ def calculate_solar_incidence_series_iqbal(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarIncidence:
     """Calculate the solar incidence angle for a surface oriented in any
     direction.
@@ -193,6 +195,7 @@ def calculate_solar_incidence_series_iqbal(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     solar_azimuth_series_north_based = calculate_solar_azimuth_series_noaa(
         longitude=longitude,
@@ -204,6 +207,7 @@ def calculate_solar_incidence_series_iqbal(
         array_backend=array_backend,
         verbose=0,
         log=log,
+        validate_output=validate_output,
     )  # North = 0 according to NOAA's solar geometry equations
 
     # array_parameters = {

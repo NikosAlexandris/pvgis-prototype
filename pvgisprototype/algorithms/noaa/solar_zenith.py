@@ -29,6 +29,7 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     RADIANS,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -88,6 +89,7 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT
 ) -> SolarZenith:
     """Adjust solar zenith for atmospheric refraction for a time series of solar zenith angles"""
     # Mask
@@ -101,6 +103,7 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     adjusted_solar_zenith_series_array = solar_zenith_series.radians - adjustment
 
     # Validate
+    '''
     if not np.all(np.isfinite(adjusted_solar_zenith_series_array)) or not np.all(
         (SolarZenith().min_radians <= adjusted_solar_zenith_series_array)
         & (adjusted_solar_zenith_series_array <= SolarZenith().max_radians)
@@ -108,7 +111,7 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
         raise ValueError(
             f"The `adjusted_solar_zenith` should be a finite number ranging in [{SolarZenith().min_radians}, {SolarZenith().max_radians}] radians"
         )
-
+    '''
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -134,6 +137,7 @@ def calculate_solar_zenith_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarZenith:
     """Calculate the solar zenith angle for a location over a time series"""
     solar_declination_series = calculate_solar_declination_series_noaa(
@@ -141,6 +145,7 @@ def calculate_solar_zenith_series_noaa(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        validate_output=validate_output,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
         longitude=longitude,
@@ -150,6 +155,7 @@ def calculate_solar_zenith_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     cosine_solar_zenith = sin(latitude.radians) * np.sin(
         solar_declination_series.radians
@@ -168,14 +174,14 @@ def calculate_solar_zenith_series_noaa(
                 solar_zenith_series,
             )
         )
-
-    if not np.all(np.isfinite(solar_zenith_series.radians)) or not np.all(
-        (SolarZenith().min_radians <= solar_zenith_series.radians)
-        & (solar_zenith_series.radians <= SolarZenith().max_radians)
-    ):
-        raise ValueError(
-            f"Solar zenith values should be finite numbers and range in [{SolarZenith().min_radians}, {SolarZenith().max_radians}] radians"
-        )
+    if validate_output:
+        if not np.all(np.isfinite(solar_zenith_series.radians)) or not np.all(
+            (SolarZenith().min_radians <= solar_zenith_series.radians)
+            & (solar_zenith_series.radians <= SolarZenith().max_radians)
+        ):
+            raise ValueError(
+                f"Solar zenith values should be finite numbers and range in [{SolarZenith().min_radians}, {SolarZenith().max_radians}] radians"
+            )
 
     log_data_fingerprint(
         data=solar_zenith_series.value,

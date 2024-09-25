@@ -33,6 +33,7 @@ from pvgisprototype.constants import (
     RADIANS,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 
@@ -50,6 +51,7 @@ def model_solar_declination_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = VERBOSE_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarDeclination:
     """ """
     solar_declination_series = None
@@ -61,6 +63,7 @@ def model_solar_declination_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
         solar_declination_series = convert_series_to_degrees_if_requested(
             solar_declination_series,
@@ -115,6 +118,7 @@ def calculate_solar_declination_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """Calculate the solar declination angle
 
@@ -137,6 +141,7 @@ def calculate_solar_declination_series(
                 dtype=dtype,
                 verbose=verbose,
                 log=log,
+                validate_output=validate_output,
             )
             solar_declination_model_series = {  # A less confusing name maybe ?
                 solar_declination_model.name: {

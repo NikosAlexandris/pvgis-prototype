@@ -24,6 +24,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     MINUTES,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import (
@@ -170,6 +171,7 @@ def calculate_apparent_solar_time_series_milne1921(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Calculate the apparent solar time based on the equation of time by Milne 1921 for a series of timestamps"""
     # We need a timezone!
@@ -224,21 +226,22 @@ def calculate_apparent_solar_time_series_milne1921(
         true_solar_time_series.astype(dtype) / 60, 1440
     )
 
-    if not (
-        (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
-        & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
-    ).all():
-        out_of_range_values = true_solar_time_series_in_minutes[
-            ~(
-                (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
-                & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+    if validate_output:
+        if not (
+            (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
+            & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+        ).all():
+            out_of_range_values = true_solar_time_series_in_minutes[
+                ~(
+                    (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
+                    & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+                )
+            ]
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes"
+                f" in [code]true_solar_time_series_in_minutes[/code] : {out_of_range_values}"
             )
-        ]
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes"
-            f" in [code]true_solar_time_series_in_minutes[/code] : {out_of_range_values}"
-        )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
