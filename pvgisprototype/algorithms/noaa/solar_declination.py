@@ -19,6 +19,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     RADIANS,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -33,6 +34,7 @@ def calculate_solar_declination_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarDeclination:
     """Calculate the solar declination for a time series.
 
@@ -67,6 +69,7 @@ def calculate_solar_declination_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     solar_declination_series = (
         0.006918
@@ -77,20 +80,22 @@ def calculate_solar_declination_series_noaa(
         - 0.002697 * np.cos(3 * fractional_year_series.radians)
         + 0.00148 * np.sin(3 * fractional_year_series.radians)
     )
-    if not np.all(
-        (SolarDeclination().min_radians <= solar_declination_series)
-        & (solar_declination_series <= SolarDeclination().max_radians)
-    ):
-        index_of_out_of_range_values = np.where(
-            (solar_declination_series < SolarDeclination().min_radians)
-            | (solar_declination_series > SolarDeclination().max_radians)
-        )
-        out_of_range_values = solar_declination_series[index_of_out_of_range_values]
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{SolarDeclination().min_degrees}, {SolarDeclination().max_degrees}] degrees"
-            f" in [code]solar_declination_series[/code] : {np.degrees(out_of_range_values)}"
-        )
+
+    if validate_output:
+        if not np.all(
+            (SolarDeclination().min_radians <= solar_declination_series)
+            & (solar_declination_series <= SolarDeclination().max_radians)
+        ):
+            index_of_out_of_range_values = np.where(
+                (solar_declination_series < SolarDeclination().min_radians)
+                | (solar_declination_series > SolarDeclination().max_radians)
+            )
+            out_of_range_values = solar_declination_series[index_of_out_of_range_values]
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{SolarDeclination().min_degrees}, {SolarDeclination().max_degrees}] degrees"
+                f" in [code]solar_declination_series[/code] : {np.degrees(out_of_range_values)}"
+            )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

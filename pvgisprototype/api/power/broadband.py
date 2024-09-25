@@ -135,6 +135,7 @@ from pvgisprototype.constants import (
     WIND_SPEED_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     cPROFILE_FLAG_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 from pvgisprototype.validation.arrays import create_array
@@ -191,6 +192,7 @@ def calculate_photovoltaic_power_output_series(
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
     profile: bool = cPROFILE_FLAG_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ):
     """
     Estimate the photovoltaic power over a time series or an arbitrarily
@@ -281,6 +283,7 @@ def calculate_photovoltaic_power_output_series(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info(
@@ -301,6 +304,7 @@ def calculate_photovoltaic_power_output_series(
         array_backend=array_backend,
         verbose=0,
         log=log,
+        validate_output=validate_output,
     )
     # Masks based on the solar altitude series
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
@@ -315,6 +319,7 @@ def calculate_photovoltaic_power_output_series(
     in_shade = is_surface_in_shade_series(
         solar_altitude_series,
         solar_azimuth_series,
+        validate_output=validate_output,
     )
     mask_not_in_shade = ~in_shade
     # mask_above_horizon_not_in_shade = numpy.logical_and.reduce(mask_above_horizon, mask_not_in_shade)

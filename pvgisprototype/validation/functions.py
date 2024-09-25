@@ -47,6 +47,7 @@ from pvgisprototype.validation.pvis_data_classes import (
     TimeOffsetModel,
     VerbosityModel,
     ZeroNegativeSolarIncidenceAngleModel,
+    ValidateOutputModel,
 )
 
 
@@ -337,6 +338,7 @@ class ModelSolarAltitudeTimeSeriesInputModel(
     # ArrayBackendModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -362,6 +364,7 @@ class ModelSolarAzimuthTimeSeriesInputModel(
     # ArrayBackendModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
