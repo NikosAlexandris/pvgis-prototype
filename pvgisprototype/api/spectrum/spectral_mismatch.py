@@ -183,13 +183,13 @@ def calculate_spectral_mismatch(
                         RESPONSIVITY_COLUMN_NAME: responsivity[module_type.value],
                         IRRADIANCE_COLUMN_NAME: irradiance,
                         IRRADIANCE_SOURCE_COLUMN_NAME: 'UpdateMe',
-                        REFERENCE_SPECTRUM_COLUMN_NAME: reference_spectrum,
+                        REFERENCE_SPECTRUM_COLUMN_NAME: 'See constant AM15G_IEC60904_3_ED4',
                     }
                     if verbose > 2
                     else {},
-                    "Mismatch": lambda: {
+                    "Spectral factor": lambda: {
                         TITLE_KEY_NAME: SPECTRAL_FACTOR_NAME,
-                        SPECTRAL_FACTOR_COLUMN_NAME: spectral_mismatch_series,
+                        SPECTRAL_FACTOR_COLUMN_NAME: spectral_mismatch_series.value,
                         TECHNOLOGY_NAME: module_type.name,
                         SPECTRAL_MISMATCH_MODEL_COLUMN_NAME: (
                             spectral_mismatch_model
@@ -209,6 +209,7 @@ def calculate_spectral_mismatch(
                 for key, component in components_container.items():
                     components.update(component())
 
+                components = components | spectral_mismatch_series.components
                 model_results[module_type] = components
                 results[spectral_mismatch_model] = model_results
                 # results = results | spectral_mismatch_model_overview
