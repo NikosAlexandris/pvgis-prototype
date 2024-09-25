@@ -137,6 +137,7 @@ def calculate_spectral_mismatch_factor_mihaylow(
     photovoltaic modules. Nonetheless, a user may define another reference
     spectrum.
 
+
     Sourcing the reference spectrum from pvlib, we have :
 
     > get_reference_spectra()['global'].sum()
@@ -146,6 +147,8 @@ def calculate_spectral_mismatch_factor_mihaylow(
     :
     > reference_spectrum_mihaylov.irradiance.sum()
     > 999.9668511125789
+
+
 
     """
     # Preparatory steps --- Push Me Upstream ?
@@ -337,8 +340,45 @@ def calculate_spectral_mismatch_factor_mihaylow(
     # b = total_reference_energy / (total_observed_energy + epsilon)
     b = total_reference_energy / total_observed_energy
 
+    components_container = {
+        "Metadata": lambda: {
+        },
+        "Spectral factor": lambda: {
+            TITLE_KEY_NAME: SPECTRAL_FACTOR_NAME,
+            SPECTRAL_FACTOR_COLUMN_NAME: a * b,
+        },  # if verbose > 0 else {},
+        "Inputs" : lambda: {
+            'Irradiance': irradiance if irradiance.any() else None,
+            # 'Sum of Irradiance': irradiance.sum(axis=1),
+            'Average irradiance density': average_irradiance_density,
+            # 'Sum of Avergage irradiance density': average_irradiance_density.sum(axis=1),
+            'Responsivity': responsivity,
+            'Reference spectrum': reference_spectrum,
+            'Sum of Reference spectrum': reference_spectrum.sum(),
+            },
+        "Intermediate quantities" : lambda: {
+            'Reference spectral responsivity': reference_spectral_responsivity,
+            'Interpolated observed irradiance': interpolated_observed_irradiance,
+            # 'Sum of Interpolated observed irradiance': interpolated_observed_irradiance.sum(axis=1),
+            },
+        "Energy" : lambda: {
+            'Reference energy': total_reference_energy,
+            'Observed energy': total_observed_energy,
+            },
+        "Current density": lambda: {
+            'Reference current': reference_current_density,
+            'Observed current': observed_current_density
+            },
+            # if verbose > 1
+            # else {},
+        }
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
+
     return SpectralFactorSeries(
             value=a*b,
             unit=UNITLESS,
             spectral_factor_algorithm='Mihaylov 2024 (Unpublished)',
+            components=components,
             )
