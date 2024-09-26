@@ -727,7 +727,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         from pvgisprototype.api.series.statistics import print_series_statistics
 
         print_series_statistics(
-            data_array=photovoltaic_power_output_series.value,
+            data_array=photovoltaic_power_output_series.series,
             timestamps=timestamps,
             groupby=groupby,
             title="Photovoltaic power output",
