@@ -9,8 +9,11 @@ from pvgisprototype.web_api.config.options import Environment
 def get_environment():
     
     load_dotenv(path.join(path.dirname(path.abspath(__file__)), "../../../.env"))
-    return environ["PVGISPROTOTYPE_WEB_API_ENVIRONMENT"]
-
+    try:
+        return environ["PVGISPROTOTYPE_WEB_API_ENVIRONMENT"]
+    except KeyError:
+        return "PRODUCTION" #NOTE IS THIS OK? FORCING PRODUCTION CONFIGURATION IF NO ENVIROMENTAL VARIABLE PVGISPROTOTYPE_WEB_API_ENVIRONMENT IS PROVIDED
+    
 @lru_cache
 def get_settings():
     match get_environment():
