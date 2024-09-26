@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Optional
 
 from devtools import debug
-import numpy
 from pandas import DatetimeIndex
 
 from pvgisprototype import Latitude, Longitude
@@ -76,8 +75,12 @@ def select_time_series(
     remap_to_month_start: Optional[bool] = False,
     # convert_longitude_360: bool = False,
     variable: str | None = None,
+    coordinate: str | None = None,
+    minimum: float | None = None,
+    maximum: float | None = None,
+    drop: bool = True,
     neighbor_lookup: MethodForInexactMatches | None = None,
-    tolerance: float = 0.1,  # Customize default if needed
+    tolerance: float | None = 0.1,  # Customize default if needed
     time_tolerance: str = '15m',  # Important for merged Datasets
     mask_and_scale: bool = False,
     in_memory: bool = False,
@@ -111,6 +114,10 @@ def select_time_series(
 
     location_time_series = select_location_time_series(
         time_series=time_series,
+        coordinate=coordinate,
+        minimum=minimum,
+        maximum=maximum,
+        drop=drop,
         longitude=longitude,
         latitude=latitude,
         variable=variable,
