@@ -8,18 +8,17 @@ from datetime import datetime
 
 import typer
 from pandas import DatetimeIndex
-import xarray
 
 from pvgisprototype.api.datetime.datetimeindex import (
-    generate_datetime_series,
     parse_timestamp_series,
+    generate_datetime_series,
+    generate_timestamps,
 )
 from pvgisprototype.api.datetime.now import now_local_datetimezone
 from pvgisprototype.api.datetime.timezone import (
     ctx_attach_requested_timezone,
     ctx_convert_to_timezone,
 )
-from pvgisprototype.api.series.utilities import read_data_array_or_set
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.log import logger
@@ -60,7 +59,6 @@ def callback_generate_datetime_series(
     time_series = ctx.params.get("time_series")
     irradiance = ctx.params.get("irradiance")
 
-    # Extract timestamps from first available space-time data file
     if any(
         [
             global_horizontal_irradiance,
@@ -82,80 +80,17 @@ def callback_generate_datetime_series(
                 ],
             )
         )
-        timestamps = read_data_array_or_set(data_file).time
+    else:
+        from pathlib import Path
+        data_file = None
 
-        # Implement Me ? --------------------------------------------------- #
-        #                                                                    #
-
-        # if check_for_duplicate_timestamps:
-        #     if timestamps.indexes['time'].duplicated().any():
-        #         logger.error(
-        #                 f"Duplicate timestamps detected.",
-        #                 alt= f"[red]Duplicate timestamps detected![/red]"
-        #                 )
-
-        #                                                                    #
-        # ----------------------------------------------------- Implement Me #
-
-        logger.info(
-                f"Timestamps retrieved from {data_file} :\n{timestamps}",
-                alt=f"Timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}"
-                )
-
-        if timestamps is None:
-            logger.error(
-                    "No timestamps found in the provided data file!",
-                    alt="[red]No timestamps found in the provided data file![/red]",
-                    )
-            raise ValueError("Unable to extract timestamps from the data file.")
-        
-        # Filter timestamps based on start_time and end_time
-        if start_time or end_time:
-            logger.info(
-                    f"Slice timestamps from {start_time} to {end_time}",
-                    alt=f"Slice timestamps from {start_time} to {end_time}"
-                    )
-            timestamps = timestamps.sel(time=slice(start_time, end_time))
-            logger.info(
-                    f"Sliced timestamps :\n{timestamps}",
-                    alt=f"[bold]Sliced timestamps[/bold] :\n{timestamps}"
-                    )
-
-        if start_time and periods and not end_time:
-            if frequency:
-                timestamps = timestamps.resample(time=frequency).nearest()
-            timestamps = timestamps.isel(time=slice(0, periods))
-
-        elif end_time and periods and not start_time:
-            if frequency:
-                timestamps = timestamps.resample(time=frequency).nearest()
-            timestamps = timestamps.isel(time=slice(-periods, None))
-
-        elif start_time and end_time and periods:
-            logger.error(
-                    f"Best if you provide a `start_time` OR an `end_time` along with `periods`, not both!",
-                    alt=f"[bold]Best if you provide a[/bold] `start_time` [bold][italics yellow]or[/italics yellow] an[/bold] `end_time` [bold]along with[/bold] `periods`, [bold red]not both![/bold red]"
-                    )
-            raise ValueError("Best if you provide a `start_time` or an `end_time` along with `periods`, not both! Else, I cannot decide which periods to return, from the start or the the end.. ;-?")
-
-        elif frequency and not periods and (start_time or end_time):
-            # resampled_timestamps = DatetimeIndex(
-            #     timestamps.resample(time=frequency).nearest()
-            # )
-            # resampled_timestamps.intersection(timestamps)
-            # logger.info(
-            #     f"Resampled timestamps at frequency = {frequency} :\n{timestamps}",
-            #     alt=f"Resampled timestamps at frequency = {frequency} :\n{timestamps}",
-            # )
-            logger.warning(
-                    f"Resampling the timestamps retrieved from the data would eventually introduce new timestamps! Skipping...",
-                    alt=f"[bold red]Resampling the timestamps retrieved from the data would eventually introduce new timestamps! Skipping...[/bold red]"
-                    )
-
-        return DatetimeIndex(timestamps)
-
-    if start_time is not None and end_time is not None:
-        timestamps = generate_datetime_series(
+    if (
+        start_time is not None
+        or end_time is not None
+        or periods is not None
+    ):
+        timestamps = generate_timestamps(
+            data_file=data_file,
             start_time=start_time,
             end_time=end_time,
             periods=periods,
@@ -163,14 +98,7 @@ def callback_generate_datetime_series(
             timezone=ctx.params.get("timezone"),
             name=ctx.params.get("datetimeindex_name", None),
         )
-    # from pandas import to_datetime
-    # -----------------------------------------------------------------------
-    # If we do the following, we need to take care of external naive time series!
-    # timezone_aware_timestamps = [
-    #     attach_requested_timezone(timestamp, timezone) for timestamp in timestamps
-    # ]
-    # return to_datetime(timezone_aware_timestamps, format="mixed")
-    # -----------------------------------------------------------------------
+
     return timestamps
 
 
