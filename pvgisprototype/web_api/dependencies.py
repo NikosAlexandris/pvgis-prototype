@@ -193,7 +193,11 @@ async def process_series_timestamp(
             status_code=400, detail="Provide a valid start and end time or a timestamp"
         )
 
-    if start_time is not None and end_time is not None:
+    if (
+        start_time is not None
+        or end_time is not None
+        or periods is not None
+    ):
         try:
             timestamps = generate_datetime_series(
                 start_time=start_time,
