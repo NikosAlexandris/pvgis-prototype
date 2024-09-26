@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 from pathlib import Path
 from typing import Optional
 
@@ -10,6 +10,7 @@ from rich import print
 from typing_extensions import Annotated
 from xarray.core.dataarray import DataArray
 
+from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
 from pvgisprototype import Longitude
 from pvgisprototype.api.datetime.now import now_datetime
 from pvgisprototype.api.series.csv import to_csv
@@ -18,6 +19,7 @@ from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.plot import plot_series
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
 from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA, NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.print import print_irradiance_table_2, print_irradiance_xarray
 from pvgisprototype.cli.typer.group import OrderCommands
@@ -62,9 +64,15 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_periods,
     typer_option_start_time,
 )
+from pvgisprototype.cli.typer.irradiance import (
+    typer_option_minimum_spectral_irradiance_wavelength,
+    typer_option_maximum_spectral_irradiance_wavelength,
+)
+from pvgisprototype.cli.typer.spectral_responsivity import (
+    typer_option_wavelength_column_name,
+)
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.constants import (
-    CSV_PATH_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
@@ -81,8 +89,10 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
+    WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
 )
 from pvgisprototype.log import logger
+
 
 app = typer.Typer(
     cls=OrderCommands,
@@ -107,6 +117,45 @@ def warn_for_negative_longitude(
         warning += "If the input dataset's longitude values range in [0, 360], consider using `--convert-longitude-360`!"
         logger.warning(warning)
         # print(warning)
+
+
+@app.command(
+    "introduction",
+    # no_args_is_help=False,
+    help="  Introduction on the [cyan]series[/cyan] command",
+)
+def series_introduction():
+    """A short introduction on the series command"""
+    introduction = """
+    The [code]series[/code] command is a convenience wrapper around Xarray's
+    data processing capabilities.
+
+    Explain [bold cyan]timestamps[/bold cyan].
+
+    And more ...
+
+    """
+
+    note = """
+    Timestamps are retrieved from the input data series. If the series are not
+    timestamped, then stamps are generated based on the user requested
+    combination of a three out of the four relevant parameters : `start-time`,
+    `end-time`, `frequency` and `period`.
+
+    """
+    from rich.panel import Panel
+
+    note_in_a_panel = Panel(
+        "[italic]{}[/italic]".format(note),
+        title="[bold cyan]Note[/bold cyan]",
+        width=78,
+    )
+    from rich.console import Console
+
+    console = Console()
+    # introduction.wrap(console, 30)
+    console.print(introduction)
+    console.print(note_in_a_panel)
 
 
 @app.command(
@@ -137,6 +186,20 @@ def select(
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     variable: Annotated[Optional[str], typer_option_data_variable] = None,
     variable_2: Annotated[Optional[str], typer_option_data_variable] = None,
+    coordinate: Annotated[
+        str,
+        typer_option_wavelength_column_name,  # Update Me
+    ] = WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
+    filter_coordinate: Annotated[
+            bool,
+            typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_mismatch_model = Pelland`")
+            ] = False,
+    minimum: Annotated[
+        Optional[float], typer_option_minimum_spectral_irradiance_wavelength  # Update Me
+    ] = None,
+    maximum: Annotated[
+        Optional[float], typer_option_maximum_spectral_irradiance_wavelength  # Update Me
+    ] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -147,10 +210,9 @@ def select(
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
-    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     output_filename: Annotated[
         Path, typer_option_output_filename
-    ] = "series_in",  # Path(),
+    ] = None,
     variable_name_as_suffix: Annotated[
         bool, typer_option_variable_name_as_suffix
     ] = True,
@@ -188,6 +250,9 @@ def select(
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
         variable=variable,
+        coordinate=coordinate,
+        minimum=minimum,
+        maximum=maximum,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -205,6 +270,9 @@ def select(
         end_time=end_time,
         # convert_longitude_360=convert_longitude_360,
         variable=variable_2,
+        coordinate=coordinate,
+        minimum=minimum,
+        maximum=maximum,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -216,24 +284,219 @@ def select(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    # if output_filename:
-    #     output_filename = Path(output_filename)
-    #     extension = output_filename.suffix.lower()
+    results = {
+        location_time_series.name: location_time_series.to_numpy(),
+    }
+    if location_time_series_2 is not None:
+        more_results = {
+            location_time_series_2.name: (
+                location_time_series_2.to_numpy()
+                if location_time_series_2 is not None
+                else None
+            )
+        }
+        results = results | more_results
+        print(f"Results : {results}")
 
-    #     if extension.lower() == '.nc':
-    #         location_time_series.to_time_series(output_filename)
+    title = "Location time series"
 
-    #     elif extension.lower() == '.csv':
-    #         location_time_series.to_pandas().to_csv(output_filename)
+    if verbose:
+        # special case!
+        if location_time_series is not None and timestamps is None:
+            timestamps = location_time_series.time.to_numpy()
 
-    #     else:
-    #         raise ValueError(f'Unsupported file extension: {extension}')
+        if isinstance(location_time_series, DataArray):
+            print_irradiance_xarray(
+                location_time_series=location_time_series,
+                longitude=longitude,
+                latitude=latitude,
+                # elevation=elevation,
+                title=title,
+                rounding_places=rounding_places,
+                verbose=verbose,
+                # index=index,
+            )
+            if isinstance(location_time_series_2, DataArray):
+                print_irradiance_xarray(
+                    location_time_series=location_time_series_2,
+                    longitude=longitude,
+                    latitude=latitude,
+                    # elevation=elevation,
+                    title=title,
+                    rounding_places=rounding_places,
+                    verbose=verbose,
+                    # index=index,
+                )
+        else:
+            print_irradiance_table_2(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                dictionary=results,
+                title=title,
+                rounding_places=rounding_places,
+                verbose=verbose,
+            )
+            # if location_time_series_2 is not None:
+            #     print_irradiance_table_2(
+            #         longitude=longitude,
+            #         latitude=latitude,
+            #         timestamps=timestamps,
+            #         dictionary=results,
+            #         title=title,
+            #         rounding_places=rounding_places,
+            #         verbose=verbose,
+            #     )
 
-    # if isinstance(location_time_series, float):
-    #     print(float)
+    # statistics after echoing series which might be Long!
 
-    # if isinstance(location_time_series, xr.DataArray):
-    #     # print(f'Series : {location_time_series.values}')
+    if statistics:
+        print_series_statistics(
+            data_array=location_time_series,
+            timestamps=timestamps,
+            groupby=groupby,
+            title="Selected series",
+            rounding_places=rounding_places,
+        )
+    output_handlers = {
+        ".nc": lambda location_time_series, path: location_time_series.to_netcdf(path),
+        ".csv": lambda location_time_series, path: to_csv(
+            x=location_time_series, path=path
+        ),
+    }
+    if output_filename:
+        extension = output_filename.suffix.lower()
+        if extension in output_handlers:
+            output_handlers[extension](location_time_series, output_filename)
+        else:
+            raise ValueError(f"Unsupported file extension: {extension}")
+
+
+@app.command(
+    "select-sarah",
+    no_args_is_help=True,
+    help="  Select SARAH time series over a location",
+)
+def select_sarah(
+    time_series: Annotated[Path, typer_argument_time_series],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees],
+    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+    time_series_2: Annotated[Path, typer_option_time_series] = None,
+    timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(
+        now_datetime()
+    ),
+    start_time: Annotated[
+        Optional[datetime], typer_option_start_time
+    ] = None,  # Used by a callback function
+    periods: Annotated[
+        Optional[int], typer_option_periods
+    ] = None,  # Used by a callback function
+    frequency: Annotated[
+        Optional[str], typer_option_frequency
+    ] = None,  # Used by a callback function
+    end_time: Annotated[
+        Optional[datetime], typer_option_end_time
+    ] = None,  # Used by a callback function
+    convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
+    variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    variable_2: Annotated[Optional[str], typer_option_data_variable] = None,
+    wavelength_column: Annotated[
+        str,
+        typer_option_wavelength_column_name,
+    ] = WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
+    limit_spectral_range: Annotated[
+            bool,
+            typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_mismatch_model = Pelland`")
+            ] = True,
+    min_wavelength: Annotated[
+        float, typer_option_minimum_spectral_irradiance_wavelength
+    ] = MIN_WAVELENGTH,
+    max_wavelength: Annotated[
+        float, typer_option_maximum_spectral_irradiance_wavelength
+    ] = MAX_WAVELENGTH,
+    neighbor_lookup: Annotated[
+        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
+    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, typer_option_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
+    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    output_filename: Annotated[Path, typer_option_output_filename] = None,
+    variable_name_as_suffix: Annotated[
+        bool, typer_option_variable_name_as_suffix
+    ] = True,
+    rounding_places: Annotated[
+        Optional[int], typer_option_rounding_places
+    ] = ROUNDING_PLACES_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
+):
+    """Select location series"""
+    if convert_longitude_360:
+        longitude = longitude % 360
+    warn_for_negative_longitude(longitude)
+
+    if not variable:
+        dataset = xr.open_dataset(time_series)
+        # ----------------------------------------------------- Review Me ----    
+        #
+        if len(dataset.data_vars) >= 2:
+            variables = list(dataset.data_vars.keys())
+            print(f"The dataset contains more than one variable : {variables}")
+            variable = typer.prompt(
+                "Please specify the variable you are interested in from the above list"
+            )
+        else:
+            variable = list(dataset.data_vars)
+        #
+        # ----------------------------------------------------- Review Me ----    
+    location_time_series = select_time_series(
+        time_series=time_series,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        variable=variable,
+        coordinate=wavelength_column,
+        minimum=min_wavelength,
+        maximum=max_wavelength,
+        drop=limit_spectral_range,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
+        # variable_name_as_suffix=variable_name_as_suffix,
+        verbose=verbose,
+        log=log,
+    )
+    location_time_series_2 = select_time_series(
+        time_series=time_series_2,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        start_time=start_time,
+        end_time=end_time,
+        # convert_longitude_360=convert_longitude_360,
+        variable=variable_2,
+        coordinate=wavelength_column,
+        minimum=min_wavelength,
+        maximum=max_wavelength,
+        drop=limit_spectral_range,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
+        # variable_name_as_suffix=variable_name_as_suffix,
+        verbose=verbose,
+        log=log,
+    )
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     results = {
         location_time_series.name: location_time_series.to_numpy(),
@@ -288,15 +551,24 @@ def select(
             rounding_places=rounding_places,
         )
 
-    if csv:
+    # if csv:
         # export_statistics_to_csv(
         #     data_array=location_time_series,
         #     filename=csv,
         # )
-        to_csv(
-            x=location_time_series,
-            path=str(csv),
-        )
+
+    output_handlers = {
+        ".nc": lambda location_time_series, path: location_time_series.to_netcdf(path),
+        ".csv": lambda location_time_series, path: to_csv(
+            x=location_time_series, path=path
+        ),
+    }
+    if output_filename:
+        extension = output_filename.suffix.lower()
+        if extension in output_handlers:
+            output_handlers[extension](location_time_series, output_filename)
+        else:
+            raise ValueError(f"Unsupported file extension: {extension}")
 
 
 @app.command(
@@ -313,8 +585,7 @@ def select_fast(
         Optional[float], typer_option_tolerance
     ] = 0.1,  # Customize default if needed
     # in_memory: Annotated[bool, typer_option_in_memory] = False,
-    csv: Annotated[Path, typer_option_csv] = "series.csv",
-    tocsv: Annotated[Path, typer_option_csv] = "seriesto.csv",
+    output_filename: Annotated[Path, typer_option_output_filename] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Bare read & write"""
@@ -326,14 +597,19 @@ def select_fast(
             series_2 = xr.open_dataarray(time_series_2).sel(
                 lon=longitude, lat=latitude, method="nearest"
             )
-        if csv:
-            series.to_pandas().to_csv(csv)
-            if time_series_2:
-                series_2.to_pandas().to_csv(csv.name + "2")
-        elif tocsv:
-            to_csv(x=series, path=str(tocsv))
-            if time_series_2:
-                to_csv(x=series_2, path=str(tocsv) + "2")
+        # Is .nc needed in the context of this command ? ---------------------
+        output_handlers = {
+            # ".nc": lambda location_time_series, path: location_time_series.to_netcdf(path),
+            ".csv": lambda location_time_series, path: to_csv(
+                x=location_time_series, path=path
+            ),
+        }
+        if output_filename:
+            extension = output_filename.suffix.lower()
+            if extension in output_handlers:
+                output_handlers[extension](location_time_series, output_filename)
+            else:
+                raise ValueError(f"Unsupported file extension: {extension}")
         print("Done.-")
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -409,6 +685,7 @@ def plot(
     height: Annotated[int, "Height for the plot"] = 3,
     tufte_style: Annotated[bool, typer_option_tufte_style] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    data_source: Annotated[str, typer.Option(help="Data source text to print in the footer of the plot.")] = '',
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -443,6 +720,7 @@ def plot(
             width=width,
             height=height,
             resample_large_series=resample_large_series,
+            data_source=data_source,
             fingerprint=fingerprint,
         )
     except Exception as exception:
@@ -479,6 +757,8 @@ def uniplot(
         float, typer_option_uniplot_terminal_width
     ] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    data_source: Annotated[str, typer.Option(help="Data source text to print in the footer of the plot.")] = '',
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
 ):
     """Plot time series in the terminal"""
     import os
@@ -536,6 +816,19 @@ def uniplot(
         label_2 = (
             getattr(data_array_2, "name", None) if data_array_2 is not None else None
         )
+        if data_source:
+            data_source_text = f" · {data_source}"
+
+        if fingerprint:
+            from pvgisprototype.validation.hashing import generate_hash
+            data_source_text += f" · Fingerprint : {generate_hash(data_array)}"
+
+        if label_2:
+            label_2 += data_source_text
+
+        else:
+            label += data_source_text
+
         unit = getattr(data_array, "units", None)
         plot(
             # x=data_array,
@@ -545,7 +838,7 @@ def uniplot(
             lines=lines,
             title=title if title else supertitle,
             y_unit=" " + str(unit),
-            force_ascii=True,
+            # force_ascii=True,
         )
 
 
