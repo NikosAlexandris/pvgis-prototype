@@ -43,8 +43,8 @@ def callback_generate_datetime_series(
     end_time = ctx.params.get("end_time")
     if start_time == end_time:
         logger.warning(
-                f"The start {start_time} and end time {end_time} are the same and will generate a single time stamp!",
-                alt=f"[yellow bold]The start {start_time} and end time {end_time} are the same and will generate a single time stamp![/yellow bold]"
+            f"The start {start_time} and end time {end_time} are the same and will generate a single time stamp!",
+            alt=f"[yellow bold]The start {start_time} and end time {end_time} are the same and will generate a single time stamp![/yellow bold]",
         )
     periods = ctx.params.get("periods", None)
     frequency = (
@@ -83,6 +83,20 @@ def callback_generate_datetime_series(
             )
         )
         timestamps = read_data_array_or_set(data_file).time
+
+        # Implement Me ? --------------------------------------------------- #
+        #                                                                    #
+
+        # if check_for_duplicate_timestamps:
+        #     if timestamps.indexes['time'].duplicated().any():
+        #         logger.error(
+        #                 f"Duplicate timestamps detected.",
+        #                 alt= f"[red]Duplicate timestamps detected![/red]"
+        #                 )
+
+        #                                                                    #
+        # ----------------------------------------------------- Implement Me #
+
         logger.info(
                 f"Timestamps retrieved from {data_file} :\n{timestamps}",
                 alt=f"Timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}"
@@ -102,6 +116,10 @@ def callback_generate_datetime_series(
                     alt=f"Slice timestamps from {start_time} to {end_time}"
                     )
             timestamps = timestamps.sel(time=slice(start_time, end_time))
+            logger.info(
+                    f"Sliced timestamps :\n{timestamps}",
+                    alt=f"[bold]Sliced timestamps[/bold] :\n{timestamps}"
+                    )
 
         if start_time and periods and not end_time:
             if frequency:
@@ -115,13 +133,24 @@ def callback_generate_datetime_series(
 
         elif start_time and end_time and periods:
             logger.error(
-                    f"Best if you provide a `start_time` or an `end_time` along with `periods`, not both!",
-                    alt=f"Best if you provide a `start_time` or an `end_time` along with `periods`, not both!"
+                    f"Best if you provide a `start_time` OR an `end_time` along with `periods`, not both!",
+                    alt=f"[bold]Best if you provide a[/bold] `start_time` [bold][italics yellow]or[/italics yellow] an[/bold] `end_time` [bold]along with[/bold] `periods`, [bold red]not both![/bold red]"
                     )
             raise ValueError("Best if you provide a `start_time` or an `end_time` along with `periods`, not both! Else, I cannot decide which periods to return, from the start or the the end.. ;-?")
 
         elif frequency and not periods and (start_time or end_time):
-            timestamps = timestamps.resample(time=frequency).nearest()
+            # resampled_timestamps = DatetimeIndex(
+            #     timestamps.resample(time=frequency).nearest()
+            # )
+            # resampled_timestamps.intersection(timestamps)
+            # logger.info(
+            #     f"Resampled timestamps at frequency = {frequency} :\n{timestamps}",
+            #     alt=f"Resampled timestamps at frequency = {frequency} :\n{timestamps}",
+            # )
+            logger.warning(
+                    f"Resampling the timestamps retrieved from the data would eventually introduce new timestamps! Skipping...",
+                    alt=f"[bold red]Resampling the timestamps retrieved from the data would eventually introduce new timestamps! Skipping...[/bold red]"
+                    )
 
         return DatetimeIndex(timestamps)
 
