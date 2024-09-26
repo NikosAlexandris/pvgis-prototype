@@ -2,7 +2,6 @@
 Calculate spectral mismatch using pvlib's calc_spectral_mismatch_field function.
 """
 
-from xarray import DataArray
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
 from pvgisprototype.api.plot import uniplot_spectral_mismatch_series
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
