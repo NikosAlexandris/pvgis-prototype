@@ -7,6 +7,8 @@ import typer
 import xarray as xr
 from devtools import debug
 from rich import print
+from xarray.core.dataarray import DataArray
+from xarray.core.dataset import Dataset
 
 from pvgisprototype import Latitude, Longitude
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
@@ -303,6 +305,74 @@ def get_scale_and_offset(netcdf):
     return (scale_factor, add_offset)
 
 
+def filter_xarray(
+    data: Dataset | DataArray,
+    coordinate: str,
+    minimum: float | None,
+    maximum: float | None,
+    drop: bool = True,
+) -> Dataset | DataArray:
+    """
+    Filter a Dataset or DataArray based on a given coordinate with specified minimum and/or
+    maximum values. If the `minimum` or `maximum` is None, the function will ignore that bound.
+    
+    Parameters
+    ----------
+    data : Dataset | DataArray
+        The input xarray Dataset or DataArray to filter.
+    coordinate : str
+        The name of the coordinate within the Dataset or DataArray to apply the filter on.
+    minimum : float or None
+        The minimum value for the coordinate. If None, no lower bound is applied.
+    maximum : float or None
+        The maximum value for the coordinate. If None, no upper bound is applied.
+    drop : bool, optional
+        Whether to drop values that fall outside the range, by default True.
+    
+    Returns
+    -------
+    Dataset | DataArray
+        The filtered xarray Dataset or DataArray, where values outside the 
+        [minimum, maximum] range are dropped or masked.
+    
+    Raises
+    ------
+    ValueError
+        If the coordinate is not present in the input data.
+    
+    Notes
+    -----
+    - If both `minimum` and `maximum` are None, the input data is returned unfiltered.
+    - Emits a warning via logger if any values exceed the bounds.
+    """
+    if coordinate not in data.coords:
+        raise ValueError(f"Coordinate '{coordinate}' not found in the dataset.")
+
+    condition = True  # Start with an always-true condition
+
+    if minimum is not None:
+        condition &= data[coordinate] >= minimum
+
+    if maximum is not None:
+        condition &= data[coordinate] <= maximum
+
+    # values outside the requested range ?
+    if numpy.any(~condition):
+        warning_message = f"{x_mark} The input data exceed the reference range [{minimum}, {maximum}]."
+        warning_alternative = f"{x_mark} [bold]The input data [red]exceed[/red] the reference range[/bold] [{minimum}, {maximum}]."
+        typer.echo(warning_message)
+        logger.warning(
+            warning_message,
+            alt=warning_alternative
+        )
+    else:
+        success_message = f"{check_mark} The input data are within the reference range [{minimum}, {maximum}]."
+        typer.echo(success_message)
+        logger.info(success_message)
+
+    return data.where(condition, drop=drop)
+
+
 def set_location_indexers(
     data_array,
     longitude: Longitude = None,
@@ -401,7 +471,11 @@ def select_coordinates(
 @log_function_call
 def select_location_time_series(
     time_series: Path = None,  # Is None required ?
-    variable: str = None,
+    variable: str | None = None,
+    coordinate: str | None = None,
+    minimum: float | None = None,
+    maximum: float | None = None,
+    drop: bool = True,
     longitude: Longitude = None,
     latitude: Latitude = None,
     neighbor_lookup: MethodForInexactMatches | None = MethodForInexactMatches.nearest,
@@ -438,6 +512,15 @@ def select_location_time_series(
     else:
         raise ValueError("Unsupported data type. Must be a DataArray or Dataset.")
     
+    # Is this correctly placed here ?
+    if coordinate:
+        data_array = filter_xarray(
+            data=data_array,
+            coordinate=coordinate,
+            minimum=minimum,
+            maximum=maximum,
+            drop=drop,
+        )
     indexers = set_location_indexers(
         data_array=data_array,
         longitude=longitude,
